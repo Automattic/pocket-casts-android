@@ -8,7 +8,7 @@ Before anything else, please take a moment to read our [Code of Conduct](CODE-OF
 
 ## Reporting Bugs, Asking Questions, and Suggesting Features
 
-Have a suggestion or feedback? Please go to [Issues](https://github.com/shiftyjelly/pocketcasts-android/issues) and [open a new issue](https://github.com/shiftyjelly/pocketcasts-android/issues/new). Prefix the title with a category like _"Bug:"_, _"Question:"_, or _"Feature Request:"_. Screenshots help us resolve issues and answer questions faster, so thanks for including some if you can.
+Have a suggestion or feedback? Please go to [Issues](https://github.com/automattic/pocket-casts-android/issues) and [open a new issue](https://github.com/automattic/pocket-casts-android/issues/new). Prefix the title with a category like _"Bug:"_, _"Question:"_, or _"Feature Request:"_. Screenshots help us resolve issues and answer questions faster, so thanks for including some if you can.
 
 ## Translating
 
@@ -20,7 +20,7 @@ Interested in using the upcoming versions of Pocket Casts? Do you love giving fe
 
 ## Submitting Code Changes
 
-If you're just getting started and want to familiarize yourself with the app’s code, we suggest looking at [these issues](https://github.com/shiftyjelly/pocketcasts-android/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) with the **good first issue** label. But if you’d like to tackle something different, you're more than welcome to visit the [Issues](https://github.com/shiftyjelly/pocketcasts-android/issues) page and pick an item that interests you.
+If you're just getting started and want to familiarize yourself with the app’s code, we suggest looking at [these issues](https://github.com/automattic/pocket-casts-android/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) with the **good first issue** label. But if you’d like to tackle something different, you're more than welcome to visit the [Issues](https://github.com/automattic/pocket-casts-android/issues) page and pick an item that interests you.
 
 We always try to avoid duplicating efforts, so if you decide to work on an issue, leave a comment to state your intent. If you choose to focus on a new feature or the change you’re proposing is significant, we recommend waiting for a response before proceeding. The issue may no longer align with project goals.
 
