@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="settings_row_action_options">
+        <item>@string/settings_row_action_play</item>
+        <item>@string/settings_row_action_download</item>
+    </array>
+    <array name="settings_up_next_swipe_options">
+        <item>@string/settings_up_next_swipe_play_next</item>
+        <item>@string/settings_up_next_swipe_play_last</item>
+    </array>
+    <array name="settings_podcast_episode_grouping_titles">
+        <item>@string/settings_podcast_episode_grouping_title_none</item>
+        <item>@string/settings_podcast_episode_grouping_title_downloaded</item>
+        <item>@string/settings_podcast_episode_grouping_title_unplayed</item>
+        <item>@string/settings_podcast_episode_grouping_title_season</item>
+        <item>@string/settings_podcast_episode_grouping_title_starred</item>
+    </array>
+    <string name="settings_podcast_episode_grouping_value_none">0</string>
+    <string name="settings_podcast_episode_grouping_value_downloaded">1</string>
+    <string name="settings_podcast_episode_grouping_value_unplayed">2</string>
+    <string name="settings_podcast_episode_grouping_value_season">3</string>
+    <string name="settings_podcast_episode_grouping_value_starred">4</string>
+    <array name="settings_podcast_episode_grouping_values">
+        <item>@string/settings_podcast_episode_grouping_value_none</item>
+        <item>@string/settings_podcast_episode_grouping_value_downloaded</item>
+        <item>@string/settings_podcast_episode_grouping_value_unplayed</item>
+        <item>@string/settings_podcast_episode_grouping_value_season</item>
+        <item>@string/settings_podcast_episode_grouping_value_starred</item>
+    </array>
+    <array name="settings_show_archived_options">
+        <item>@string/settings_show_archived_action_hide</item>
+        <item>@string/settings_show_archived_action_show</item>
+    </array>
+</resources>

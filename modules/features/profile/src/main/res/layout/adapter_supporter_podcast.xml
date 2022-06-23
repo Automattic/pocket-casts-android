@@ -1,0 +1,67 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/podcastArtwork"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center_vertical"
+        android:scaleType="centerCrop"
+        android:transitionName="podcast_artwork"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:importantForAccessibility="no" />
+
+    <ProgressBar
+        android:id="@+id/loadingImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/podcastArtwork"
+        app:layout_constraintBottom_toBottomOf="@id/podcastArtwork"
+        app:layout_constraintStart_toStartOf="@id/podcastArtwork"
+        app:layout_constraintEnd_toEndOf="@id/podcastArtwork"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/lblPodcastTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:maxLines="2"
+        android:textAppearance="@style/H30"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/podcastArtwork"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/lblHeadline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/C70"
+        android:textStyle="bold"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toTopOf="@id/lblPodcastTitle"
+        app:layout_constraintStart_toStartOf="@id/lblPodcastTitle"
+        app:layout_constraintEnd_toEndOf="@id/lblPodcastTitle"/>
+
+    <TextView
+        android:id="@+id/lblSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/C70"
+        android:layout_marginTop="2dp"
+        app:layout_constraintTop_toBottomOf="@id/lblPodcastTitle"
+        app:layout_constraintStart_toStartOf="@id/lblPodcastTitle"
+        app:layout_constraintEnd_toEndOf="@id/lblPodcastTitle"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

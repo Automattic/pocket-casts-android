@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="seekbar_width_percentage" format="float" type="dimen">0.8</item>
+</resources>

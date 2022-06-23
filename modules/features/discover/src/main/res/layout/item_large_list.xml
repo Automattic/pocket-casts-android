@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginBottom="6dp"
+        android:clipToPadding="false"
+        android:elevation="3dp"
+        app:cardCornerRadius="7dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/defaultArtworkSmall" />
+
+        <ImageButton
+            android:id="@+id/btnSubscribe"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/background_large_item_subscribe" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/lblTitle"
+        style="?attr/textSubtitle1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/primary_text_01"
+        android:ellipsize="end"
+        android:maxLines="1" />
+
+    <TextView
+        android:id="@+id/lblSubtitle"
+        style="?attr/textSubtitle2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/primary_text_02"
+        android:ellipsize="end"
+        android:maxLines="1" />
+</LinearLayout>

@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="episode"
+            type="au.com.shiftyjelly.pocketcasts.models.entity.Episode" />
+
+        <variable
+            name="podcast"
+            type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast" />
+
+        <variable
+            name="tintColor"
+            type="int" />
+
+        <variable
+            name="toolbarTintColor"
+            type="int" />
+
+        <variable
+            name="podcastColor"
+            type="int" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="64dp"
+        android:clipToPadding="false">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/loadingGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="lblDate,lblDuration,lblAuthor,btnDownload, btnShare, btnFav, btnAddToUpNext, btnArchive, btnPlay, btnPlayed"
+                android:visibility="invisible"
+                tools:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/btnClose"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="@dimen/episode_card_edge_padding"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_chevron"
+                android:tint="@{toolbarTintColor}"
+                android:contentDescription="@string/close"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/btnShare"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="@dimen/episode_card_edge_padding"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_share"
+                android:tint="@{toolbarTintColor}"
+                android:contentDescription="@string/podcast_share_episode"
+                app:layout_constraintBottom_toBottomOf="@+id/btnClose"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnClose" />
+
+            <ImageButton
+                android:id="@+id/btnFav"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@{episode.starred ? @drawable/ic_star_filled : @drawable/ic_star}"
+                android:tint="@{toolbarTintColor}"
+                app:layout_constraintBottom_toBottomOf="@+id/btnClose"
+                app:layout_constraintRight_toLeftOf="@+id/btnShare"
+                app:layout_constraintTop_toTopOf="@+id/btnClose" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/episodeArt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="56dp"
+                android:layout_marginStart="@dimen/episode_card_edge_padding"
+                android:layout_marginEnd="@dimen/episode_card_edge_padding"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="16dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:importantForAccessibility="noHideDescendants">
+
+                <ImageView
+                    android:id="@+id/podcastArtwork"
+                    android:layout_width="192dp"
+                    android:layout_height="192dp" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/lblTitle"
+                style="?attr/textH2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="@dimen/episode_card_edge_padding"
+                android:layout_marginEnd="@dimen/episode_card_edge_padding"
+                android:gravity="center"
+                android:text="@{episode.title}"
+                android:textColor="?attr/primary_text_01"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/episodeArt"
+                tools:text="Vergecast 193: Encryption in the hype matrix" />
+
+            <TextView
+                android:id="@+id/lblAuthor"
+                style="?attr/textH4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:drawableRight="@drawable/ic_chevron_right"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:text="@{podcast.title}"
+                android:textColor="@{podcastColor}"
+                android:paddingStart="@dimen/episode_card_edge_padding"
+                android:paddingEnd="@dimen/episode_card_edge_padding"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblTitle"
+                tools:text="Invisibilia" />
+
+            <View
+                android:id="@+id/topDivider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintBottom_toBottomOf="@+id/btnPlay"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnPlay" />
+
+            <au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
+                android:id="@+id/btnPlay"
+                android:layout_width="@dimen/episode_card_dimen"
+                android:layout_height="@dimen/episode_card_dimen"
+                android:layout_marginTop="16dp"
+                app:icon_height="38dp"
+                app:icon_tint="?attr/primary_ui_01"
+                app:icon_width="38dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblAuthor" />
+
+            <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButton
+                android:id="@+id/btnDownload"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:paddingBottom="5dp"
+                app:layout_constraintEnd_toStartOf="@+id/btnAddToUpNext"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/topDivider"
+                app:layout_constraintBottom_toTopOf="@+id/buttonBarrier"
+                app:layout_constraintVertical_bias="0.01"
+                android:contentDescription="@string/download"
+                tools:background="@tools:sample/avatars"
+                tools:text="Download" />
+
+            <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
+                android:id="@+id/btnAddToUpNext"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:gravity="top"
+                tools:background="@tools:sample/avatars"
+                android:contentDescription="@string/add_to_up_next"
+                app:layout_constraintStart_toEndOf="@+id/btnDownload"
+                app:layout_constraintEnd_toStartOf="@+id/btnPadding"
+                app:layout_constraintTop_toTopOf="@+id/btnDownload"
+                app:layout_constraintBottom_toTopOf="@+id/buttonBarrier"
+                app:layout_constraintVertical_bias="0.01"
+                app:layout_constraintHorizontal_chainStyle="packed" />
+
+            <View
+                android:id="@+id/btnPadding"
+                android:layout_width="@dimen/episode_card_action_middle_padding"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@+id/btnPlay"
+                app:layout_constraintStart_toStartOf="@+id/btnPlay"
+                app:layout_constraintTop_toTopOf="@+id/btnDownload"
+                app:layout_constraintHorizontal_chainStyle="packed" />
+
+            <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
+                android:id="@+id/btnPlayed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                tools:background="@tools:sample/avatars"
+                app:layout_constraintEnd_toStartOf="@+id/btnArchive"
+                app:layout_constraintStart_toEndOf="@+id/btnPadding"
+                app:layout_constraintTop_toTopOf="@+id/btnDownload"
+                app:layout_constraintBottom_toTopOf="@+id/buttonBarrier"
+                app:layout_constraintVertical_bias="0.01"
+                app:layout_constraintHorizontal_chainStyle="packed" />
+
+            <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
+                android:id="@+id/btnArchive"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/btnPlayed"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnDownload"
+                app:layout_constraintBottom_toTopOf="@+id/buttonBarrier"
+                app:layout_constraintVertical_bias="0.01"
+                tools:background="@tools:sample/avatars" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/buttonBarrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="btnDownload,btnAddToUpNext,btnPlayed,btnArchive" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/errorLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                app:constraint_referenced_ids="errorBorder,imgError,lblError,lblErrorDetail,viewErrorPadding" />
+
+            <View
+                android:id="@+id/errorBorder"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/background_episode_card_error_layout"
+                app:layout_constraintTop_toTopOf="@+id/lblError"
+                app:layout_constraintBottom_toBottomOf="@+id/viewErrorPadding"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/imgError"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="31dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblError"
+                tools:src="@drawable/ic_failedwarning"
+                app:tint="?attr/primary_icon_03" />
+
+            <TextView
+                android:id="@+id/lblError"
+                style="?attr/textBody1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="64dp"
+                android:layout_marginEnd="64dp"
+                android:paddingTop="10dp"
+                android:textColor="?attr/primary_text_01"
+                app:layout_constraintTop_toTopOf="@+id/buttonBarrier"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="Error downloading" />
+
+            <TextView
+                android:id="@+id/lblErrorDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="64dp"
+                android:layout_marginEnd="64dp"
+                android:paddingBottom="5dp"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintTop_toBottomOf="@+id/lblError"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="Really long error description"
+                style="?attr/textBody2" />
+
+            <View
+                android:id="@+id/viewErrorPadding"
+                android:layout_width="match_parent"
+                android:layout_height="13dp"
+                app:layout_constraintTop_toBottomOf="@+id/lblErrorDetail"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <View
+                android:id="@+id/bottomDivider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_marginTop="20dp"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewErrorPadding" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:indeterminate="false"
+                android:max="100"
+                android:progress="@{episode.playedPercentage}"
+                android:progressDrawable="@drawable/progress_bar"
+                app:layout_constraintBottom_toBottomOf="@id/bottomDivider"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+
+            <TextView
+                android:id="@+id/lblDate"
+                style="?attr/textCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="@dimen/episode_card_edge_padding"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/bottomDivider"
+                app:mediumDate="@{episode.publishedDate}"
+                android:textColor="?attr/primary_text_02"
+                tools:text="3 December 2018" />
+
+            <TextView
+                android:id="@+id/lblDuration"
+                style="?attr/textCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/episode_card_edge_padding"
+                app:layout_constraintBottom_toBottomOf="@+id/lblDate"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblDate"
+                app:shortTime="@{episode.duration}"
+                android:textColor="?attr/primary_text_02"
+                tools:text="50 mins" />
+
+            <FrameLayout
+                android:id="@+id/webViewShowNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingStart="@dimen/episode_card_edge_padding"
+                android:paddingEnd="@dimen/episode_card_edge_padding"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblDate" />
+
+            <TextView
+                android:id="@+id/webViewErrorText"
+                style="?attr/textBody2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingStart="@dimen/episode_card_edge_padding"
+                android:paddingEnd="@dimen/episode_card_edge_padding"
+                android:visibility="gone"
+                android:textColor="?attr/primary_text_01"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblDate" />
+
+            <ProgressBar
+                android:id="@+id/webViewLoader"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblDate" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/center_vertical_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

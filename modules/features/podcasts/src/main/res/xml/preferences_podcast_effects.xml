@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:persistent="true">
+
+    <SwitchPreference
+        android:key="customForPodcast"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/settings_podcast_custom" />
+
+    <au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlaybackSpeedPreference
+        android:key="playbackSpeed"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/player_effects_speed"
+        app:widgetLayout="@layout/preference_playback_speed"
+        />
+
+    <SwitchPreference
+        android:key="trimSilence"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/player_effects_trim_silence" />
+
+    <ListPreference
+        android:key="trimMode"
+        android:defaultValue="@integer/preference_trim_mode_default"
+        android:persistent="false"
+        android:title="@string/player_effects_trim_level"
+        android:summary="%s"
+        android:entries="@array/preference_trim_mode_titles"
+        android:entryValues="@array/preference_trim_mode_titles" />
+
+    <SwitchPreference
+        android:key="boostVolume"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/player_effects_volume_boost" />
+
+</PreferenceScreen>

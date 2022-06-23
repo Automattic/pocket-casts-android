@@ -1,0 +1,22 @@
+apply from: "../../modules.gradle"
+
+dependencies {
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:images')
+    implementation project(':modules:services:ui')
+    implementation project(':modules:services:compose')
+    implementation project(':modules:services:views')
+    implementation project(':modules:services:servers')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:model')
+}
+
+android {
+    buildFeatures {
+        viewBinding true
+        dataBinding = true
+        compose true
+    }
+}

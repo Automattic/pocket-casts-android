@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="au.com.shiftyjelly.pocketcasts.repositories">
+
+    <application
+        android:usesCleartextTraffic="true">
+        <provider
+            android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtContentProvider"
+            android:authorities="${applicationId}.media.library.provider"
+            android:exported="true" />
+
+        <!-- The widget can't move from the core package or it gets deleted when the new APK is installed -->
+        <receiver android:name="au.com.shiftyjelly.pocketcasts.core.ui.widget.PodcastWidget"
+            android:label="Pocket Casts"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.core.ui.widget.PREVIOUS"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.core.ui.widget.NEXT"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.core.ui.widget.PLAY"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.core.ui.widget.PAUSE"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget"/>
+        </receiver>
+
+    </application>
+
+</manifest>

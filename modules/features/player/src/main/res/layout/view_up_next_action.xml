@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="title" type="String"/>
+        <variable name="icon" type="android.graphics.drawable.Drawable"/>
+        <variable name="show" type="boolean" />
+    </data>
+
+    <FrameLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="@{show}"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="32dp"
+            android:layout_gravity="center_vertical"
+            tools:src="@tools:sample/avatars"
+            android:src="@{icon}"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/label"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="22dp"
+            android:paddingBottom="22dp"
+            android:paddingStart="70dp"
+            android:paddingEnd="16dp"
+            tools:text="Mark as played"
+            android:text="@{title}" />
+
+    </FrameLayout>
+
+</layout>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="2dp"
+    android:paddingBottom="16dp"
+    android:paddingStart="32dp"
+    android:paddingEnd="32dp"
+    android:gravity="center_horizontal">
+    <View
+        android:layout_width="48dp"
+        android:layout_height="4dp"
+        android:background="@drawable/background_dragger_player"
+        android:layout_marginBottom="16dp"/>
+    <ImageView
+        android:id="@+id/imgIcon"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp" />
+    <TextView
+        android:id="@+id/lblTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        style="?attr/textH3"
+        android:textColor="?attr/primary_text_01"
+        tools:text="Are you sure?"
+        android:layout_marginBottom="8dp"/>
+    <TextView
+        android:id="@+id/lblSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="?attr/textBody1"
+        android:textColor="?attr/primary_text_02"
+        tools:text="Summary"
+        android:gravity="center" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSecondary"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:backgroundTint="?attr/primary_ui_01"
+        android:textColor="?attr/primary_interactive_01"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:textSize="18sp"
+        android:textAllCaps="false"
+        android:letterSpacing="0"
+        app:cornerRadius="12dp"
+        tools:text="Secondary" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:textColor="?attr/primary_interactive_02"
+        app:cornerRadius="12dp"
+        android:textSize="18sp"
+        android:letterSpacing="0"
+        android:textAllCaps="false"
+        tools:text="Confirm" />
+</LinearLayout>

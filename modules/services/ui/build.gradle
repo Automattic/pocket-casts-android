@@ -1,0 +1,12 @@
+apply from: "../../modules.gradle"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+
+dependencies {
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:images')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:model')
+}

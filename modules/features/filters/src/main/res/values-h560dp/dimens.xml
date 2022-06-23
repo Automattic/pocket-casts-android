@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="filters_margin_under_close">60dp</dimen>
+    <dimen name="filters_padding_top">90dp</dimen>
+</resources>

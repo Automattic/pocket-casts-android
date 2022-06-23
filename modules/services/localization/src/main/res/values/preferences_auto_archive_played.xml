@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="settings_auto_archive_played_values">
+        <item>@string/settings_auto_archive_played_never</item>
+        <item>@string/settings_auto_archive_played_after_playing</item>
+        <item>@string/settings_auto_archive_played_after_24_hours</item>
+        <item>@string/settings_auto_archive_played_after_2_days</item>
+        <item>@string/settings_auto_archive_played_after_1_week</item>
+    </array>
+    <array name="settings_auto_archive_inactive_values">
+        <item>@string/settings_auto_archive_inactive_never</item>
+        <item>@string/settings_auto_archive_inactive_24_hours</item>
+        <item>@string/settings_auto_archive_inactive_2_days</item>
+        <item>@string/settings_auto_archive_inactive_1_week</item>
+        <item>@string/settings_auto_archive_inactive_2_weeks</item>
+        <item>@string/settings_auto_archive_inactive_30_days</item>
+        <item>@string/settings_auto_archive_inactive_3_months</item>
+    </array>
+    <array name="settings_auto_archive_episode_limit_values">
+        <item>@string/settings_auto_archive_limit_none</item>
+        <item>@string/settings_auto_archive_limit_1</item>
+        <item>@string/settings_auto_archive_limit_2</item>
+        <item>@string/settings_auto_archive_limit_5</item>
+        <item>@string/settings_auto_archive_limit_10</item>
+    </array>
+
+</resources>

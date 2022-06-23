@@ -1,0 +1,1866 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <declare-styleable name="ThemeStyles">
+        <attr name="isDark" format="boolean" />
+        <attr name="isImageTintEnabled" format="boolean" />
+        <attr name="imageTintThemeCacheTag" format="string" />
+
+        <attr name="toolbarTheme" format="reference" />
+
+        <!-- Components -->
+        <attr name="navigationCheckedColor" format="color" />
+        <attr name="colorSearchBox" format="color" />
+        <attr name="colorCellArchive" format="color" />
+        <attr name="colorCellPlayNext" format="color" />
+        <attr name="colorCellPlayLast" format="color" />
+        <attr name="colorDarkHeader" format="color" />
+        <attr name="colorMessageBackground" format="color" />
+        <attr name="colorMessageStroke" format="color" />
+        <attr name="colorIconMessage" format="color" />
+        <attr name="colorGrabber" format="color" />
+
+        <!-- Text Styles -->
+        <attr name="textH1" format="reference" />
+        <attr name="textH2" format="reference" />
+        <attr name="textH3" format="reference" />
+        <attr name="textH4" format="reference" />
+        <attr name="textBody1" format="reference" />
+        <attr name="textBody2" format="reference" />
+        <attr name="textSubtitle1" format="reference" />
+        <attr name="textSubtitle2" format="reference" />
+        <attr name="textButton" format="reference" />
+        <attr name="textCaption" format="reference" />
+        <attr name="textLabel" format="reference" />
+        <attr name="textOverline" format="reference" />
+
+        <!-- Podcasts badge -->
+        <attr name="badgeDrawable" format="reference" />
+
+        <!-- artwork -->
+        <attr name="defaultArtworkSmall" format="reference" />
+        <attr name="defaultArtwork" format="reference" />
+
+        <!-- Themed images -->
+        <attr name="accountHeaderDrawable" format="reference" />
+        <attr name="plus_logo" format="reference" />
+        <attr name="logo_title_horizontal" format="reference" />
+        <attr name="logo_title_vertical" format="reference" />
+        <attr name="about_logo_wordpress" format="reference" />
+        <attr name="about_logo_jetpack" format="reference" />
+        <attr name="about_logo_dayone" format="reference" />
+        <attr name="about_logo_pocketcasts" format="reference" />
+        <attr name="about_logo_woo" format="reference" />
+        <attr name="about_logo_simplenote" format="reference" />
+        <attr name="about_logo_tumblr" format="reference" />
+        <attr name="about_logo_wordpress_color" format="color" />
+        <attr name="about_logo_jetpack_color" format="color" />
+        <attr name="about_logo_dayone_color" format="color" />
+        <attr name="about_logo_pocketcasts_color" format="color" />
+        <attr name="about_logo_woo_color" format="color" />
+        <attr name="about_logo_simplenote_color" format="color" />
+        <attr name="about_logo_tumblr_color" format="color" />
+
+        <!-- Theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <attr name="primary_ui_01" format="color" />
+        <attr name="primary_ui_01_active" format="color" />
+        <attr name="primary_ui_02" format="color" />
+        <attr name="primary_ui_02_selected" format="color" />
+        <attr name="primary_ui_02_active" format="color" />
+        <attr name="primary_ui_03" format="color" />
+        <attr name="primary_ui_04" format="color" />
+        <attr name="primary_ui_05" format="color" />
+        <attr name="primary_ui_05_selected" format="color" />
+        <attr name="primary_ui_06" format="color" />
+        <attr name="primary_icon_01" format="color" />
+        <attr name="primary_icon_01_active" format="color" />
+        <attr name="primary_icon_02" format="color" />
+        <attr name="primary_icon_02_selected" format="color" />
+        <attr name="primary_icon_02_active" format="color" />
+        <attr name="primary_icon_03" format="color" />
+        <attr name="primary_icon_03_active" format="color" />
+        <attr name="primary_text_01" format="color" />
+        <attr name="primary_text_02" format="color" />
+        <attr name="primary_text_02_selected" format="color" />
+        <attr name="primary_field_01" format="color" />
+        <attr name="primary_field_01_active" format="color" />
+        <attr name="primary_field_02" format="color" />
+        <attr name="primary_field_02_active" format="color" />
+        <attr name="primary_field_03" format="color" />
+        <attr name="primary_field_03_active" format="color" />
+        <attr name="primary_interactive_01" format="color" />
+        <attr name="primary_interactive_01_hover" format="color" />
+        <attr name="primary_interactive_01_active" format="color" />
+        <attr name="primary_interactive_01_disabled" format="color" />
+        <attr name="primary_interactive_02" format="color" />
+        <attr name="primary_interactive_02_hover" format="color" />
+        <attr name="primary_interactive_02_active" format="color" />
+        <attr name="primary_interactive_03" format="color" />
+        <attr name="secondary_ui_01" format="color" />
+        <attr name="secondary_ui_02" format="color" />
+        <attr name="secondary_icon_01" format="color" />
+        <attr name="secondary_icon_02" format="color" />
+        <attr name="secondary_text_01" format="color" />
+        <attr name="secondary_text_02" format="color" />
+        <attr name="secondary_field_01" format="color" />
+        <attr name="secondary_field_01_active" format="color" />
+        <attr name="secondary_interactive_01" format="color" />
+        <attr name="secondary_interactive_01_hover" format="color" />
+        <attr name="secondary_interactive_01_active" format="color" />
+        <attr name="podcast_interactive_02" format="color" />
+        <attr name="podcast_interactive_04" format="color" />
+        <attr name="support_01" format="color" />
+        <attr name="support_02" format="color" />
+        <attr name="support_03" format="color" />
+        <attr name="support_04" format="color" />
+        <attr name="support_05" format="color" />
+        <attr name="support_06" format="color" />
+        <attr name="support_07" format="color" />
+        <attr name="support_08" format="color" />
+        <attr name="support_09" format="color" />
+        <attr name="support_10" format="color" />
+        <attr name="player_contrast_01" format="color" />
+        <attr name="player_contrast_02" format="color" />
+        <attr name="player_contrast_03" format="color" />
+        <attr name="player_contrast_04" format="color" />
+        <attr name="player_contrast_05" format="color" />
+        <attr name="player_contrast_06" format="color" />
+        <attr name="contrast_01" format="color" />
+        <attr name="contrast_02" format="color" />
+        <attr name="contrast_03" format="color" />
+        <attr name="contrast_04" format="color" />
+        <attr name="filter_01" format="color" />
+        <attr name="filter_02" format="color" />
+        <attr name="filter_03" format="color" />
+        <attr name="filter_04" format="color" />
+        <attr name="filter_05" format="color" />
+        <attr name="filter_06" format="color" />
+        <attr name="filter_07" format="color" />
+        <attr name="filter_08" format="color" />
+        <attr name="filter_09" format="color" />
+        <attr name="filter_10" format="color" />
+        <attr name="filter_11" format="color" />
+        <attr name="filter_12" format="color" />
+        <attr name="veil" format="color" />
+        <attr name="gradient_01_a" format="color" />
+        <attr name="gradient_01_e" format="color" />
+        <attr name="gradient_02_a" format="color" />
+        <attr name="gradient_02_e" format="color" />
+        <attr name="gradient_03_a" format="color" />
+        <attr name="gradient_03_e" format="color" />
+        <attr name="gradient_04_a" format="color" />
+        <attr name="gradient_04_e" format="color" />
+        <attr name="gradient_05_a" format="color" />
+        <attr name="gradient_05_e" format="color" />
+        <attr name="image_filter_01" format="color" />
+        <attr name="image_filter_02" format="color" />
+        <attr name="image_filter_03" format="color" />
+        <attr name="image_filter_04" format="color" />
+        <attr name="category_01" format="color" />
+        <attr name="category_02" format="color" />
+        <attr name="category_03" format="color" />
+        <attr name="category_04" format="color" />
+        <attr name="category_05" format="color" />
+        <attr name="category_06" format="color" />
+        <attr name="category_07" format="color" />
+        <attr name="category_08" format="color" />
+        <attr name="category_09" format="color" />
+        <attr name="category_10" format="color" />
+        <attr name="category_11" format="color" />
+        <attr name="category_12" format="color" />
+        <attr name="category_13" format="color" />
+        <attr name="category_14" format="color" />
+        <attr name="category_15" format="color" />
+        <attr name="category_16" format="color" />
+        <attr name="category_17" format="color" />
+        <attr name="category_18" format="color" />
+        <attr name="category_19" format="color" />
+        <!-- Theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+    </declare-styleable>
+
+    <!-- Common theme colours -->
+    <color name="cellPlayNext">#03a9f4</color>
+    <color name="cellPlayLast">#30b4f0</color>
+
+    <!-- Light theme colours -->
+    <color name="textColorPrimaryLight">#1E1F1E</color>
+    <color name="textColorSecondaryLight">#8F97A4</color>
+    <color name="navigationCheckedColorLight">#03A9F4</color>
+    <color name="searchBoxLight">#f2f4f5</color>
+    <color name="cellArchiveLight">#8f97a4</color>
+    <color name="colorMessageBackgroundLight">#FBFBFB</color>
+    <color name="colorMessageStrokeLight">#DCE1E4</color>
+    <color name="colorIconMessageLight">#B8C3C9</color>
+
+    <!-- Dark status bar color in the light theme -->
+    <color name="colorStatusBarDarkInLight">#FF000000</color>
+
+    <style name="ThemeBaseLight" parent="Theme.MaterialComponents.Light.NoActionBar" tools:ignore="NewApi">
+        <item name="preferenceTheme">@style/AppPreferenceTheme</item>
+        <item name="isDark">false</item>
+        <item name="isImageTintEnabled">false</item>
+        <item name="imageTintThemeCacheTag">light</item>
+
+        <item name="toolbarTheme">@style/LightToolbarTheme</item>
+
+        <!-- Default colours -->
+        <item name="colorSearchBox">@color/searchBoxLight</item>
+        <item name="colorCellArchive">@color/cellArchiveLight</item>
+        <item name="colorCellPlayNext">@color/cellPlayNext</item>
+        <item name="colorCellPlayLast">@color/cellPlayLast</item>
+        <item name="colorMessageBackground">@color/colorMessageBackgroundLight</item>
+        <item name="colorMessageStroke">@color/colorMessageStrokeLight</item>
+        <item name="colorIconMessage">@color/colorIconMessageLight</item>
+        <item name="colorGrabber">@color/coolgrey_40</item>
+
+        <!-- Light theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#FFFFFF</item>
+        <item name="primary_ui_01_active">#F7F9FA</item>
+        <item name="primary_ui_02">#FFFFFF</item>
+        <item name="primary_ui_02_selected">#E6F6FE</item>
+        <item name="primary_ui_02_active">#F7F9FA</item>
+        <item name="primary_ui_03">#FAFAFA</item>
+        <item name="primary_ui_04">#F7F9FA</item>
+        <item name="primary_ui_05">#E0E6EA</item>
+        <item name="primary_ui_05_selected">#8F97A4</item>
+        <item name="primary_ui_06">#F7F9FA</item>
+        <item name="primary_icon_01">#03A9F4</item>
+        <item name="primary_icon_01_active">#8AE9FF</item>
+        <item name="primary_icon_02">#B8C3C9</item>
+        <item name="primary_icon_02_selected">#03A9F4</item>
+        <item name="primary_icon_02_active">#8F97A4</item>
+        <item name="primary_icon_03">#8F97A4</item>
+        <item name="primary_icon_03_active">#03A9F4</item>
+        <item name="primary_text_01">#292B2E</item>
+        <item name="primary_text_02">#8F97A4</item>
+        <item name="primary_text_02_selected">#03A9F4</item>
+        <item name="primary_field_01">#EFF3F5</item>
+        <item name="primary_field_01_active">#E0E6EA</item>
+        <item name="primary_field_02">#FBFBFC</item>
+        <item name="primary_field_02_active">#FFFFFF</item>
+        <item name="primary_field_03">#B8C3C9</item>
+        <item name="primary_field_03_active">#03A9F4</item>
+        <item name="primary_interactive_01">#03A9F4</item>
+        <item name="primary_interactive_01_hover">#50D0F1</item>
+        <item name="primary_interactive_01_active">#8AE9FF</item>
+        <item name="primary_interactive_01_disabled">#3f03A9F4</item>
+        <item name="primary_interactive_02">#FFFFFF</item>
+        <item name="primary_interactive_02_hover">#0c03A9F4</item>
+        <item name="primary_interactive_02_active">#1903A9F4</item>
+        <item name="primary_interactive_03">#D9D9D9</item>
+        <item name="secondary_ui_01">#FFFFFF</item>
+        <item name="secondary_ui_02">#E0E6EA</item>
+        <item name="secondary_icon_01">#03A9F4</item>
+        <item name="secondary_icon_02">#8F97A4</item>
+        <item name="secondary_text_01">#292B2E</item>
+        <item name="secondary_text_02">#8F97A4</item>
+        <item name="secondary_field_01">#EFF3F5</item>
+        <item name="secondary_field_01_active">#E0E6EA</item>
+        <item name="secondary_interactive_01">#03A9F4</item>
+        <item name="secondary_interactive_01_hover">#50D0F1</item>
+        <item name="secondary_interactive_01_active">#8AE9FF</item>
+        <item name="podcast_interactive_02">#FFFFFF</item>
+        <item name="podcast_interactive_04">#000000</item>
+        <item name="support_01">#03A9F4</item>
+        <item name="support_02">#78D549</item>
+        <item name="support_03">#03A9F4</item>
+        <item name="support_04">#187ADC</item>
+        <item name="support_05">#F43E37</item>
+        <item name="support_06">#4C5052</item>
+        <item name="support_07">#FFFFFF</item>
+        <item name="support_08">#FF9D3B</item>
+        <item name="support_09">#080808</item>
+        <item name="support_10">#FEB700</item>
+        <item name="player_contrast_01">#FFFFFF</item>
+        <item name="player_contrast_02">#7fFFFFFF</item>
+        <item name="player_contrast_03">#66FFFFFF</item>
+        <item name="player_contrast_04">#4cFFFFFF</item>
+        <item name="player_contrast_05">#33FFFFFF</item>
+        <item name="player_contrast_06">#19FFFFFF</item>
+        <item name="contrast_01">#FFFFFF</item>
+        <item name="contrast_02">#b2FFFFFF</item>
+        <item name="contrast_03">#7fFFFFFF</item>
+        <item name="contrast_04">#19FFFFFF</item>
+        <item name="filter_01">#F43E37</item>
+        <item name="filter_02">#FF9D3B</item>
+        <item name="filter_03">#FEC635</item>
+        <item name="filter_04">#78D549</item>
+        <item name="filter_05">#03A9F4</item>
+        <item name="filter_06">#5D31C4</item>
+        <item name="filter_07">#E93673</item>
+        <item name="filter_08">#B8C3C9</item>
+        <item name="filter_09">#A177D9</item>
+        <item name="filter_10">#3DAD88</item>
+        <item name="filter_11">#2555CF</item>
+        <item name="filter_12">#945712</item>
+        <item name="veil">#4c000000</item>
+        <item name="gradient_01_a">#FED745</item>
+        <item name="gradient_01_e">#FEB525</item>
+        <item name="gradient_02_a">#03A9F4</item>
+        <item name="gradient_02_e">#50D0F1</item>
+        <item name="gradient_03_a">#F43769</item>
+        <item name="gradient_03_e">#FB5246</item>
+        <item name="gradient_04_a">#78D549</item>
+        <item name="gradient_04_e">#9BE45E</item>
+        <item name="gradient_05_a">#E74B8A</item>
+        <item name="gradient_05_e">#6046E9</item>
+        <item name="image_filter_01">#00FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#00FFFFFF</item>
+        <item name="image_filter_04">#00FFFFFF</item>
+        <item name="category_01">#F43E37</item>
+        <item name="category_02">#03A9F4</item>
+        <item name="category_03">#FEC635</item>
+        <item name="category_04">#187ADC</item>
+        <item name="category_05">#3B862D</item>
+        <item name="category_06">#8F97A4</item>
+        <item name="category_07">#B25900</item>
+        <item name="category_08">#78D549</item>
+        <item name="category_09">#FB8ECE</item>
+        <item name="category_10">#A866DB</item>
+        <item name="category_11">#D61F59</item>
+        <item name="category_12">#686C74</item>
+        <item name="category_13">#FF9D3B</item>
+        <item name="category_14">#50D0F1</item>
+        <item name="category_15">#E93673</item>
+        <item name="category_16">#0059B2</item>
+        <item name="category_17">#CC98F0</item>
+        <item name="category_18">#D9201C</item>
+        <item name="category_19">#5D31C4</item>
+        <!-- Light theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+
+        <!-- Text Styles -->
+        <item name="textH1">@style/LightH1</item>
+        <item name="textH2">@style/LightH2</item>
+        <item name="textH3">@style/LightH3</item>
+        <item name="textH4">@style/LightH4</item>
+        <item name="textBody1">@style/LightBody1</item>
+        <item name="textBody2">@style/LightBody2</item>
+        <item name="textSubtitle1">@style/LightSubtitle1</item>
+        <item name="textSubtitle2">@style/LightSubtitle2</item>
+        <item name="textButton">@style/LightButton</item>
+        <item name="textCaption">@style/LightCaption</item>
+        <item name="textOverline">@style/LightOverline</item>
+        <!-- AppCompat colours needed -->
+        <item name="colorPrimary">?attr/primary_interactive_01</item>
+        <item name="colorPrimaryDark">?attr/secondary_ui_01</item>
+        <item name="android:textColorPrimary">@color/coolgrey_80</item>
+        <item name="android:textColorSecondary">@color/coolgrey_80</item>
+        <item name="android:windowBackground">?attr/primary_ui_04</item>
+        <item name="colorAccent">?attr/primary_interactive_01</item>
+        <item name="colorButtonNormal">?attr/primary_interactive_01</item>
+        <item name="colorControlNormal">?attr/primary_interactive_01</item>
+        <item name="navigationCheckedColor">@color/navigationCheckedColorLight</item>
+        <item name="android:actionMenuTextColor">?attr/secondary_text_01</item>
+        <!-- Compound buttons -->
+        <item name="android:checkboxStyle">@style/CheckboxStyle</item>
+        <item name="android:radioButtonStyle">@style/RadiobuttonStyle</item>
+
+        <!-- Fade between theme changes -->
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+        <!-- Bottom sheet -->
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogThemeLight</item>
+        <!-- Podcasts badge -->
+        <item name="badgeDrawable">@drawable/unplayed</item>
+        <!-- Default artwork -->
+        <item name="defaultArtworkSmall">@drawable/defaultartwork_small</item>
+        <item name="defaultArtwork">@drawable/defaultartwork</item>
+        <!-- Podcast header gradient color -->
+        <item name="colorDarkHeader">@color/darktheme_background</item>
+        <!-- Themed images -->
+        <item name="accountHeaderDrawable">@drawable/account_header_light</item>
+        <item name="plus_logo">@drawable/plus_logo_horizontal_light</item>
+        <item name="logo_title_horizontal">@drawable/ic_logo_title_hor_dark</item>
+        <item name="logo_title_vertical">@drawable/ic_logo_title_ver_light</item>
+        <item name="about_logo_wordpress">@drawable/about_logo_wordpress</item>
+        <item name="about_logo_jetpack">@drawable/about_logo_jetpack</item>
+        <item name="about_logo_dayone">@drawable/about_logo_dayone</item>
+        <item name="about_logo_pocketcasts">@drawable/about_logo_pocketcasts</item>
+        <item name="about_logo_woo">@drawable/about_logo_woo</item>
+        <item name="about_logo_simplenote">@drawable/about_logo_simplenote</item>
+        <item name="about_logo_tumblr">@drawable/about_logo_tumblr</item>
+        <item name="about_logo_wordpress_color">#280675C4</item>
+        <item name="about_logo_jetpack_color">#2800BE28</item>
+        <item name="about_logo_dayone_color">#2844C0FF</item>
+        <item name="about_logo_pocketcasts_color">#28F43E37</item>
+        <item name="about_logo_woo_color">#287D57A4</item>
+        <item name="about_logo_simplenote_color">#283361CC</item>
+        <item name="about_logo_tumblr_color">#28001935</item>
+    </style>
+
+    <style name="ThemeLight" parent="ThemeBaseLight" tools:ignore="NewApi">
+        <!-- For older APIs, leave the status bar as black, always since the APIs to tint the icons don't exist -->
+        <item name="android:navigationBarColor">@color/black</item>
+
+        <!-- Only 23 and above support having a light status bar using windowLightStatusBar. There are other hacks, but too hard so just black for 21,22 -->
+        <item name="android:statusBarColor">@color/black</item>
+    </style>
+
+    <style name="LightToolbarTheme" parent="ThemeOverlay.AppCompat.Light"></style>
+
+    <style name="DarkToolbarTheme" parent="ThemeOverlay.AppCompat"></style>
+
+    <!-- Dark theme colours -->
+    <color name="textColorPrimaryDark">#FFFFFF</color>
+    <color name="textColorSecondaryDark">#8f97a4</color>
+    <color name="navigationCheckedColorDark">#FFFFFF</color>
+    <color name="searchBoxDark">#131313</color>
+    <color name="cellArchiveDark">#131313</color>
+    <color name="colorMessageBackgroundDark">#3a3a3b</color>
+    <color name="colorMessageStrokeDark">#979797</color>
+    <color name="colorIconMessageDark">#626262</color>
+
+    <style name="ThemeBaseDark" parent="Theme.MaterialComponents.NoActionBar" tools:ignore="NewApi">
+        <item name="preferenceTheme">@style/AppPreferenceTheme</item>
+        <item name="toolbarTheme">@style/DarkToolbarTheme</item>
+        <item name="isDark">true</item>
+        <item name="isImageTintEnabled">false</item>
+        <item name="imageTintThemeCacheTag">dark</item>
+
+        <!-- Default colours -->
+        <item name="colorSearchBox">@color/searchBoxDark</item>
+        <item name="colorCellArchive">@color/cellArchiveDark</item>
+        <item name="colorCellPlayNext">@color/cellPlayNext</item>
+        <item name="colorCellPlayLast">@color/cellPlayLast</item>
+        <item name="colorMessageBackground">@color/colorMessageBackgroundDark</item>
+        <item name="colorMessageStroke">@color/colorMessageStrokeDark</item>
+        <item name="colorIconMessage">@color/colorIconMessageDark</item>
+        <item name="colorControlNormal">?attr/primary_interactive_01</item>
+        <item name="colorGrabber">?attr/primary_text_02</item>
+
+        <!-- Dark theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#292B2E</item>
+        <item name="primary_ui_01_active">#383A3D</item>
+        <item name="primary_ui_02">#1A1B1D</item>
+        <item name="primary_ui_02_selected">#1E333D</item>
+        <item name="primary_ui_02_active">#222427</item>
+        <item name="primary_ui_03">#202124</item>
+        <item name="primary_ui_04">#161718</item>
+        <item name="primary_ui_05">#393A3C</item>
+        <item name="primary_ui_05_selected">#8F97A4</item>
+        <item name="primary_ui_06">#303337</item>
+        <item name="primary_icon_01">#33B8F4</item>
+        <item name="primary_icon_01_active">#64C7F4</item>
+        <item name="primary_icon_02">#8F97A4</item>
+        <item name="primary_icon_02_selected">#33B8F4</item>
+        <item name="primary_icon_02_active">#EFF3F5</item>
+        <item name="primary_icon_03">#686C74</item>
+        <item name="primary_icon_03_active">#33B8F4</item>
+        <item name="primary_text_01">#FFFFFF</item>
+        <item name="primary_text_02">#9C9FA4</item>
+        <item name="primary_text_02_selected">#33B8F4</item>
+        <item name="primary_field_01">#19EFF3F5</item>
+        <item name="primary_field_01_active">#26FBFBFC</item>
+        <item name="primary_field_02">#1cFBFBFC</item>
+        <item name="primary_field_02_active">#26FBFBFC</item>
+        <item name="primary_field_03">#7fB8C3C9</item>
+        <item name="primary_field_03_active">#33B8F4</item>
+        <item name="primary_interactive_01">#40C3FF</item>
+        <item name="primary_interactive_01_hover">#50D0F1</item>
+        <item name="primary_interactive_01_active">#8AE9FF</item>
+        <item name="primary_interactive_01_disabled">#3f33B8F4</item>
+        <item name="primary_interactive_02">#17181A</item>
+        <item name="primary_interactive_02_hover">#0c33B8F4</item>
+        <item name="primary_interactive_02_active">#1933B8F4</item>
+        <item name="primary_interactive_03">#595959</item>
+        <item name="secondary_ui_01">#292B2E</item>
+        <item name="secondary_ui_02">#383A3C</item>
+        <item name="secondary_icon_01">#33B8F4</item>
+        <item name="secondary_icon_02">#686C74</item>
+        <item name="secondary_text_01">#FFFFFF</item>
+        <item name="secondary_text_02">#686C74</item>
+        <item name="secondary_field_01">#19FFFFFF</item>
+        <item name="secondary_field_01_active">#26FBFBFC</item>
+        <item name="secondary_interactive_01">#33B8F4</item>
+        <item name="secondary_interactive_01_hover">#64C7F4</item>
+        <item name="secondary_interactive_01_active">#8AE9FF</item>
+        <item name="podcast_interactive_02">#292B2E</item>
+        <item name="podcast_interactive_04">#000000</item>
+        <item name="support_01">#33B8F4</item>
+        <item name="support_02">#78D549</item>
+        <item name="support_03">#33B8F4</item>
+        <item name="support_04">#4490DC</item>
+        <item name="support_05">#F43E37</item>
+        <item name="support_06">#7C8A94</item>
+        <item name="support_07">#292B2E</item>
+        <item name="support_08">#EB9D4F</item>
+        <item name="support_09">#161718</item>
+        <item name="support_10">#F5CA5B</item>
+        <item name="player_contrast_01">#FFFFFF</item>
+        <item name="player_contrast_02">#7fFFFFFF</item>
+        <item name="player_contrast_03">#66FFFFFF</item>
+        <item name="player_contrast_04">#4cFFFFFF</item>
+        <item name="player_contrast_05">#33FFFFFF</item>
+        <item name="player_contrast_06">#19FFFFFF</item>
+        <item name="contrast_01">#FFFFFF</item>
+        <item name="contrast_02">#b2FFFFFF</item>
+        <item name="contrast_03">#7fFFFFFF</item>
+        <item name="contrast_04">#19FFFFFF</item>
+        <item name="filter_01">#DF514C</item>
+        <item name="filter_02">#EB9D4F</item>
+        <item name="filter_03">#EABD49</item>
+        <item name="filter_04">#7FBF5F</item>
+        <item name="filter_05">#1BA0DC</item>
+        <item name="filter_06">#9D79F2</item>
+        <item name="filter_07">#D24D7A</item>
+        <item name="filter_08">#BDC2C4</item>
+        <item name="filter_09">#FAA5C1</item>
+        <item name="filter_10">#03CEA4</item>
+        <item name="filter_11">#5584FA</item>
+        <item name="filter_12">#A3863B</item>
+        <item name="veil">#7f000000</item>
+        <item name="gradient_01_a">#D7B32E</item>
+        <item name="gradient_01_e">#C18000</item>
+        <item name="gradient_02_a">#3993AA</item>
+        <item name="gradient_02_e">#008CCB</item>
+        <item name="gradient_03_a">#C9522E</item>
+        <item name="gradient_03_e">#B82E3C</item>
+        <item name="gradient_04_a">#7FB74F</item>
+        <item name="gradient_04_e">#508D32</item>
+        <item name="gradient_05_a">#BC4E7B</item>
+        <item name="gradient_05_e">#6B59C7</item>
+        <item name="image_filter_01">#00FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#00FFFFFF</item>
+        <item name="image_filter_04">#00FFFFFF</item>
+        <item name="category_01">#F8574D</item>
+        <item name="category_02">#09B7DF</item>
+        <item name="category_03">#FEDD4A</item>
+        <item name="category_04">#22ABEA</item>
+        <item name="category_05">#53B63F</item>
+        <item name="category_06">#BCC0C8</item>
+        <item name="category_07">#D17D00</item>
+        <item name="category_08">#A8E666</item>
+        <item name="category_09">#FDBBE1</item>
+        <item name="category_10">#CB8FE9</item>
+        <item name="category_11">#E62B7D</item>
+        <item name="category_12">#9297A2</item>
+        <item name="category_13">#FFC453</item>
+        <item name="category_14">#70E3F7</item>
+        <item name="category_15">#E62B7D</item>
+        <item name="category_16">#007DD1</item>
+        <item name="category_17">#E0C1F6</item>
+        <item name="category_18">#E82D27</item>
+        <item name="category_19">#8245DC</item>
+        <!-- Dark theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+
+        <!-- Text Styles -->
+        <item name="textH1">@style/DarkH1</item>
+        <item name="textH2">@style/DarkH2</item>
+        <item name="textH3">@style/DarkH3</item>
+        <item name="textH4">@style/DarkH4</item>
+        <item name="textBody1">@style/DarkBody1</item>
+        <item name="textBody2">@style/DarkBody2</item>
+        <item name="textSubtitle1">@style/DarkSubtitle1</item>
+        <item name="textSubtitle2">@style/DarkSubtitle2</item>
+        <item name="textButton">@style/DarkButton</item>
+        <item name="textCaption">@style/DarkCaption</item>
+        <item name="textOverline">@style/DarkOverline</item>
+        <!-- AppCompat colours needed -->
+        <item name="colorPrimary">?attr/primary_interactive_01</item>
+        <item name="colorPrimaryDark">?attr/secondary_ui_01</item>
+        <item name="android:textColorPrimary">?attr/primary_text_01</item>
+        <item name="android:textColorSecondary">@color/coolgrey_30</item>
+        <item name="textColorAlertDialogListItem">?attr/primary_text_01</item>
+        <item name="android:windowBackground">?attr/primary_ui_04</item>
+        <item name="colorAccent">?attr/primary_interactive_01</item>
+        <item name="colorButtonNormal">?attr/primary_interactive_01</item>
+        <item name="colorBackgroundFloating">?attr/primary_ui_01</item>
+        <item name="navigationCheckedColor">@color/white</item>
+
+        <!-- Compound buttons -->
+        <item name="android:checkboxStyle">@style/CheckboxStyle</item>
+        <item name="android:radioButtonStyle">@style/RadiobuttonStyle</item>
+        <!-- Fade between theme changes -->
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
+        <!-- Bottom sheet -->
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogThemeDark</item>
+        <!-- Podcasts badge -->
+        <item name="badgeDrawable">@drawable/unplayed</item>
+        <!-- Default artwork -->
+        <item name="defaultArtworkSmall">@drawable/defaultartwork_small_dark</item>
+        <item name="defaultArtwork">@drawable/defaultartwork_dark</item>
+        <!-- Podcast header gradient color -->
+        <item name="colorDarkHeader">@color/darktheme_background</item>
+        <!-- Themed images -->
+        <item name="accountHeaderDrawable">@drawable/account_header_dark</item>
+        <item name="plus_logo">@drawable/plus_logo_horizontal_dark</item>
+        <item name="logo_title_horizontal">@drawable/ic_logo_title_hor_light</item>
+        <item name="logo_title_vertical">@drawable/ic_logo_title_ver_dark</item>
+        <item name="about_logo_wordpress">@drawable/about_logo_wordpress</item>
+        <item name="about_logo_jetpack">@drawable/about_logo_jetpack</item>
+        <item name="about_logo_dayone">@drawable/about_logo_dayone</item>
+        <item name="about_logo_pocketcasts">@drawable/about_logo_pocketcasts</item>
+        <item name="about_logo_woo">@drawable/about_logo_woo</item>
+        <item name="about_logo_simplenote">@drawable/about_logo_simplenote</item>
+        <item name="about_logo_tumblr">@drawable/about_logo_tumblr_dark</item>
+        <item name="about_logo_wordpress_color">#280675C4</item>
+        <item name="about_logo_jetpack_color">#2800BE28</item>
+        <item name="about_logo_dayone_color">#2844C0FF</item>
+        <item name="about_logo_pocketcasts_color">#28F43E37</item>
+        <item name="about_logo_woo_color">#287D57A4</item>
+        <item name="about_logo_simplenote_color">#283361CC</item>
+        <item name="about_logo_tumblr_color">#28FFFFFF</item>
+    </style>
+
+    <style name="ThemeDark" parent="ThemeBaseDark">
+        <!-- For older APIs, leave the status bar as black, always since the APIs to tint the icons don't exist -->
+        <item name="android:navigationBarColor">?attr/primary_ui_03</item>
+        <item name="android:statusBarColor">@color/black</item>
+    </style>
+
+    <style name="ExtraThemeDark" parent="ThemeDark" tools:ignore="NewApi">
+        <item name="colorDarkHeader">@color/extradarktheme_background</item>
+
+        <!-- Extra dark theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#222427</item>
+        <item name="primary_ui_01_active">#19E0E6EA</item>
+        <item name="primary_ui_02">#000000</item>
+        <item name="primary_ui_02_selected">#1F1F1F</item>
+        <item name="primary_ui_02_active">#161717</item>
+        <item name="primary_ui_03">#080808</item>
+        <item name="primary_ui_04">#000000</item>
+        <item name="primary_ui_05">#7f393A3C</item>
+        <item name="primary_ui_05_selected">#686C74</item>
+        <item name="primary_ui_06">#2D2F31</item>
+        <item name="primary_icon_01">#50D0F1</item>
+        <item name="primary_icon_01_active">#80DAF1</item>
+        <item name="primary_icon_02">#686C74</item>
+        <item name="primary_icon_02_selected">#50D0F1</item>
+        <item name="primary_icon_02_active">#EFF3F5</item>
+        <item name="primary_icon_03">#686C74</item>
+        <item name="primary_icon_03_active">#50D0F1</item>
+        <item name="primary_text_01">#B8C3C9</item>
+        <item name="primary_text_02">#686C74</item>
+        <item name="primary_text_02_selected">#50D0F1</item>
+        <item name="primary_field_01">#19FBFBFC</item>
+        <item name="primary_field_01_active">#26FBFBFC</item>
+        <item name="primary_field_02">#19FBFBFC</item>
+        <item name="primary_field_02_active">#26FBFBFC</item>
+        <item name="primary_field_03">#33B8C3C9</item>
+        <item name="primary_field_03_active">#33B8F4</item>
+        <item name="primary_interactive_01">#50D0F1</item>
+        <item name="primary_interactive_01_hover">#6EE1FF</item>
+        <item name="primary_interactive_01_active">#A1ECFF</item>
+        <item name="primary_interactive_01_disabled">#3f50D0F1</item>
+        <item name="primary_interactive_02">#09090A</item>
+        <item name="primary_interactive_02_hover">#1903A9F4</item>
+        <item name="primary_interactive_02_active">#1950D0F1</item>
+        <item name="primary_interactive_03">#595959</item>
+        <item name="secondary_ui_01">#000000</item>
+        <item name="secondary_ui_02">#1A1C1E</item>
+        <item name="secondary_icon_01">#50D0F1</item>
+        <item name="secondary_icon_02">#686C74</item>
+        <item name="secondary_text_01">#B8C3C9</item>
+        <item name="secondary_text_02">#686C74</item>
+        <item name="secondary_field_01">#19FBFBFC</item>
+        <item name="secondary_field_01_active">#26FBFBFC</item>
+        <item name="secondary_interactive_01">#50D0F1</item>
+        <item name="secondary_interactive_01_hover">#6EE1FF</item>
+        <item name="secondary_interactive_01_active">#A1ECFF</item>
+        <item name="podcast_interactive_02">#000000</item>
+        <item name="podcast_interactive_04">#000000</item>
+        <item name="support_01">#50D0F1</item>
+        <item name="support_02">#78D549</item>
+        <item name="support_03">#33B8F4</item>
+        <item name="support_04">#4490DC</item>
+        <item name="support_05">#F43E37</item>
+        <item name="support_06">#7C8A94</item>
+        <item name="support_07">#161718</item>
+        <item name="support_08">#FF9D3B</item>
+        <item name="support_09">#1A1C1E</item>
+        <item name="support_10">#F5CA5B</item>
+        <item name="player_contrast_01">#FFFFFF</item>
+        <item name="player_contrast_02">#66FFFFFF</item>
+        <item name="player_contrast_03">#51FFFFFF</item>
+        <item name="player_contrast_04">#3dFFFFFF</item>
+        <item name="player_contrast_05">#28FFFFFF</item>
+        <item name="player_contrast_06">#14FFFFFF</item>
+        <item name="contrast_01">#FFFFFF</item>
+        <item name="contrast_02">#b2FFFFFF</item>
+        <item name="contrast_03">#7fFFFFFF</item>
+        <item name="contrast_04">#19FFFFFF</item>
+        <item name="filter_01">#DF514C</item>
+        <item name="filter_02">#EB9D4F</item>
+        <item name="filter_03">#EABD49</item>
+        <item name="filter_04">#7FBF5F</item>
+        <item name="filter_05">#1BA0DC</item>
+        <item name="filter_06">#9D79F2</item>
+        <item name="filter_07">#D24D7A</item>
+        <item name="filter_08">#BDC2C4</item>
+        <item name="filter_09">#FAA5C1</item>
+        <item name="filter_10">#03CEA4</item>
+        <item name="filter_11">#5584FA</item>
+        <item name="filter_12">#A3863B</item>
+        <item name="veil">#7f000000</item>
+        <item name="gradient_01_a">#D7B32E</item>
+        <item name="gradient_01_e">#C18000</item>
+        <item name="gradient_02_a">#3993AA</item>
+        <item name="gradient_02_e">#008CCB</item>
+        <item name="gradient_03_a">#C9522E</item>
+        <item name="gradient_03_e">#B82E3C</item>
+        <item name="gradient_04_a">#7FB74F</item>
+        <item name="gradient_04_e">#508D32</item>
+        <item name="gradient_05_a">#BC4E7B</item>
+        <item name="gradient_05_e">#6B59C7</item>
+        <item name="image_filter_01">#00FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#00FFFFFF</item>
+        <item name="image_filter_04">#00FFFFFF</item>
+        <item name="category_01">#F8574D</item>
+        <item name="category_02">#09B7DF</item>
+        <item name="category_03">#FEDD4A</item>
+        <item name="category_04">#22ABEA</item>
+        <item name="category_05">#53B63F</item>
+        <item name="category_06">#BCC0C8</item>
+        <item name="category_07">#D17D00</item>
+        <item name="category_08">#A8E666</item>
+        <item name="category_09">#FDBBE1</item>
+        <item name="category_10">#CB8FE9</item>
+        <item name="category_11">#E62B7D</item>
+        <item name="category_12">#9297A2</item>
+        <item name="category_13">#FFC453</item>
+        <item name="category_14">#70E3F7</item>
+        <item name="category_15">#E62B7D</item>
+        <item name="category_16">#007DD1</item>
+        <item name="category_17">#E0C1F6</item>
+        <item name="category_18">#E82D27</item>
+        <item name="category_19">#8245DC</item>
+        <!-- Extra dark theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+    </style>
+
+    <style name="BaseClassicLight" parent="ThemeBaseLight">
+        <item name="toolbarTheme">@style/ClassicLight.Toolbar</item>
+
+        <!-- Classic light theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#FFFFFF</item>
+        <item name="primary_ui_01_active">#F7F9FA</item>
+        <item name="primary_ui_02">#FFFFFF</item>
+        <item name="primary_ui_02_selected">#FEECEB</item>
+        <item name="primary_ui_02_active">#F7F9FA</item>
+        <item name="primary_ui_03">#FAFAF9</item>
+        <item name="primary_ui_04">#F7F9FA</item>
+        <item name="primary_ui_05">#E0E6EA</item>
+        <item name="primary_ui_05_selected">#8F97A4</item>
+        <item name="primary_ui_06">#F7F9FA</item>
+        <item name="primary_icon_01">#F43E37</item>
+        <item name="primary_icon_01_active">#F49D9A</item>
+        <item name="primary_icon_02">#B8C3C9</item>
+        <item name="primary_icon_02_selected">#F43E37</item>
+        <item name="primary_icon_02_active">#8F97A4</item>
+        <item name="primary_icon_03">#8F97A4</item>
+        <item name="primary_icon_03_active">#03A9F4</item>
+        <item name="primary_text_01">#292B2E</item>
+        <item name="primary_text_02">#8F97A4</item>
+        <item name="primary_text_02_selected">#F43E37</item>
+        <item name="primary_field_01">#EFF3F5</item>
+        <item name="primary_field_01_active">#E0E6EA</item>
+        <item name="primary_field_02">#FBFBFC</item>
+        <item name="primary_field_02_active">#FFFFFF</item>
+        <item name="primary_field_03">#B8C3C9</item>
+        <item name="primary_field_03_active">#03A9F4</item>
+        <item name="primary_interactive_01">#F43E37</item>
+        <item name="primary_interactive_01_hover">#03A9F4</item>
+        <item name="primary_interactive_01_active">#F43E37</item>
+        <item name="primary_interactive_01_disabled">#3fF43E37</item>
+        <item name="primary_interactive_02">#FFFFFF</item>
+        <item name="primary_interactive_02_hover">#1903A9F4</item>
+        <item name="primary_interactive_02_active">#19F43E37</item>
+        <item name="primary_interactive_03">#D9D9D9</item>
+        <item name="secondary_ui_01">#F43E37</item>
+        <item name="secondary_ui_02">#F43E37</item>
+        <item name="secondary_icon_01">#FFFFFF</item>
+        <item name="secondary_icon_02">#FFFFFF</item>
+        <item name="secondary_text_01">#FFFFFF</item>
+        <item name="secondary_text_02">#FFFFFF</item>
+        <item name="secondary_field_01">#33FFFFFF</item>
+        <item name="secondary_field_01_active">#4cFFFFFF</item>
+        <item name="secondary_interactive_01">#FFFFFF</item>
+        <item name="secondary_interactive_01_hover">#50D0F1</item>
+        <item name="secondary_interactive_01_active">#F99F9B</item>
+        <item name="podcast_interactive_02">#FFFFFF</item>
+        <item name="podcast_interactive_04">#000000</item>
+        <item name="support_01">#03A9F4</item>
+        <item name="support_02">#78D549</item>
+        <item name="support_03">#03A9F4</item>
+        <item name="support_04">#187ADC</item>
+        <item name="support_05">#F43E37</item>
+        <item name="support_06">#686C74</item>
+        <item name="support_07">#FFFFFF</item>
+        <item name="support_08">#FF9D3B</item>
+        <item name="support_09">#080808</item>
+        <item name="support_10">#FEB700</item>
+        <item name="player_contrast_01">#FFFFFF</item>
+        <item name="player_contrast_02">#7fFFFFFF</item>
+        <item name="player_contrast_03">#66FFFFFF</item>
+        <item name="player_contrast_04">#4cFFFFFF</item>
+        <item name="player_contrast_05">#33FFFFFF</item>
+        <item name="player_contrast_06">#19FFFFFF</item>
+        <item name="contrast_01">#FFFFFF</item>
+        <item name="contrast_02">#b2FFFFFF</item>
+        <item name="contrast_03">#7fFFFFFF</item>
+        <item name="contrast_04">#19FFFFFF</item>
+        <item name="filter_01">#F43E37</item>
+        <item name="filter_02">#FF9D3B</item>
+        <item name="filter_03">#FEC635</item>
+        <item name="filter_04">#78D549</item>
+        <item name="filter_05">#03A9F4</item>
+        <item name="filter_06">#5D31C4</item>
+        <item name="filter_07">#E93673</item>
+        <item name="filter_08">#B8C3C9</item>
+        <item name="filter_09">#A177D9</item>
+        <item name="filter_10">#3DAD88</item>
+        <item name="filter_11">#2555CF</item>
+        <item name="filter_12">#945712</item>
+        <item name="veil">#4c000000</item>
+        <item name="gradient_01_a">#FED745</item>
+        <item name="gradient_01_e">#FEB525</item>
+        <item name="gradient_02_a">#03A9F4</item>
+        <item name="gradient_02_e">#50D0F1</item>
+        <item name="gradient_03_a">#F43769</item>
+        <item name="gradient_03_e">#FB5246</item>
+        <item name="gradient_04_a">#78D549</item>
+        <item name="gradient_04_e">#9BE45E</item>
+        <item name="gradient_05_a">#E74B8A</item>
+        <item name="gradient_05_e">#6046E9</item>
+        <item name="image_filter_01">#00FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#00FFFFFF</item>
+        <item name="image_filter_04">#00FFFFFF</item>
+        <item name="category_01">#F43E37</item>
+        <item name="category_02">#03A9F4</item>
+        <item name="category_03">#FEC635</item>
+        <item name="category_04">#187ADC</item>
+        <item name="category_05">#3B862D</item>
+        <item name="category_06">#8F97A4</item>
+        <item name="category_07">#B25900</item>
+        <item name="category_08">#78D549</item>
+        <item name="category_09">#FB8ECE</item>
+        <item name="category_10">#A866DB</item>
+        <item name="category_11">#D61F59</item>
+        <item name="category_12">#686C74</item>
+        <item name="category_13">#FF9D3B</item>
+        <item name="category_14">#50D0F1</item>
+        <item name="category_15">#E93673</item>
+        <item name="category_16">#0059B2</item>
+        <item name="category_17">#CC98F0</item>
+        <item name="category_18">#D9201C</item>
+        <item name="category_19">#5D31C4</item>
+        <!-- Classic light theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+
+        <item name="toolbarStyle">@style/ClassicLight.Toolbar</item>
+    </style>
+
+    <style name="ClassicLight" parent="BaseClassicLight" tools:ignore="NewApi">
+        <!-- For older APIs, leave the status bar as black, always since the APIs to tint the icons don't exist -->
+        <item name="android:navigationBarColor">@color/black</item>
+
+        <!-- Only 23 and above support having a light status bar using windowLightStatusBar. There are other hacks, but too hard so just black for 21,22 -->
+        <item name="android:statusBarColor">@color/black</item>
+    </style>
+
+    <style name="ClassicLight.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="titleTextAppearance">@style/ClassicLight.Toolbar.TitleText</item>
+    </style>
+
+    <style name="ClassicLight.Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:colorControlNormal">@color/white</item>
+        <item name="android:letterSpacing">.025</item>
+    </style>
+
+    <style name="BaseIndigo" parent="ThemeBaseLight">
+        <item name="toolbarTheme">@style/ClassicLight.Toolbar</item>
+        <item name="isImageTintEnabled">false</item>
+        <item name="imageTintThemeCacheTag">indigo</item>
+
+        <!-- Indigo theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#ECEDE6</item>
+        <item name="primary_ui_01_active">#F1F2EF</item>
+        <item name="primary_ui_02">#F4F5F2</item>
+        <item name="primary_ui_02_selected">#E2E4E5</item>
+        <item name="primary_ui_02_active">#F7F9FA</item>
+        <item name="primary_ui_03">#EFEFEF</item>
+        <item name="primary_ui_04">#ECEDE6</item>
+        <item name="primary_ui_05">#D8DCDC</item>
+        <item name="primary_ui_05_selected">#556675</item>
+        <item name="primary_ui_06">#E8E8DF</item>
+        <item name="primary_icon_01">#3D4E70</item>
+        <item name="primary_icon_01_active">#586784</item>
+        <item name="primary_icon_02">#9DA7B5</item>
+        <item name="primary_icon_02_selected">#3F4B6A</item>
+        <item name="primary_icon_02_active">#8F97A4</item>
+        <item name="primary_icon_03">#6D7B87</item>
+        <item name="primary_icon_03_active">#70ADD1</item>
+        <item name="primary_text_01">#323E5C</item>
+        <item name="primary_text_02">#7E8999</item>
+        <item name="primary_text_02_selected">#333D58</item>
+        <item name="primary_field_01">#E7E8E1</item>
+        <item name="primary_field_01_active">#EBEADA</item>
+        <item name="primary_field_02">#FBFBFC</item>
+        <item name="primary_field_02_active">#FFFFFF</item>
+        <item name="primary_field_03">#B8C3C9</item>
+        <item name="primary_field_03_active">#70ADD1</item>
+        <item name="primary_interactive_01">#639ED6</item>
+        <item name="primary_interactive_01_hover">#AECBE5</item>
+        <item name="primary_interactive_01_active">#94B4D1</item>
+        <item name="primary_interactive_01_disabled">#3f8395A7</item>
+        <item name="primary_interactive_02">#F8FAF2</item>
+        <item name="primary_interactive_02_hover">#1903A9F4</item>
+        <item name="primary_interactive_02_active">#3394A6B4</item>
+        <item name="primary_interactive_03">#D1D8DE</item>
+        <item name="secondary_ui_01">#32364F</item>
+        <item name="secondary_ui_02">#32364F</item>
+        <item name="secondary_icon_01">#F3F1E4</item>
+        <item name="secondary_icon_02">#DEDEDE</item>
+        <item name="secondary_text_01">#EAE8DC</item>
+        <item name="secondary_text_02">#DEDEDE</item>
+        <item name="secondary_field_01">#26EFF3F5</item>
+        <item name="secondary_field_01_active">#4cFFFFFF</item>
+        <item name="secondary_interactive_01">#FFFFFF</item>
+        <item name="secondary_interactive_01_hover">#C9CFDA</item>
+        <item name="secondary_interactive_01_active">#949FB5</item>
+        <item name="podcast_interactive_02">#FFFFFF</item>
+        <item name="podcast_interactive_04">#000000</item>
+        <item name="support_01">#4BA1D6</item>
+        <item name="support_02">#54C483</item>
+        <item name="support_03">#3D4363</item>
+        <item name="support_04">#25273E</item>
+        <item name="support_05">#D44A5A</item>
+        <item name="support_06">#90A5B8</item>
+        <item name="support_07">#FFFFFF</item>
+        <item name="support_08">#B26428</item>
+        <item name="support_09">#232637</item>
+        <item name="support_10">#F5C167</item>
+        <item name="player_contrast_01">#C1C2BC</item>
+        <item name="player_contrast_02">#7fDBDBCE</item>
+        <item name="player_contrast_03">#66CFCCBE</item>
+        <item name="player_contrast_04">#4cDADBD7</item>
+        <item name="player_contrast_05">#33B1B5AA</item>
+        <item name="player_contrast_06">#19C2C0B6</item>
+        <item name="contrast_01">#E2E3DC</item>
+        <item name="contrast_02">#b2DBDBCE</item>
+        <item name="contrast_03">#7fDBDBCE</item>
+        <item name="contrast_04">#19DBDBCE</item>
+        <item name="filter_01">#8E656B</item>
+        <item name="filter_02">#A08B7B</item>
+        <item name="filter_03">#A59C80</item>
+        <item name="filter_04">#7C987D</item>
+        <item name="filter_05">#54829D</item>
+        <item name="filter_06">#5F5885</item>
+        <item name="filter_07">#8B637A</item>
+        <item name="filter_08">#9299A2</item>
+        <item name="filter_09">#998A9E</item>
+        <item name="filter_10">#A4B391</item>
+        <item name="filter_11">#84A0B0</item>
+        <item name="filter_12">#8C8C80</item>
+        <item name="veil">#4c25273E</item>
+        <item name="gradient_01_a">#F2D672</item>
+        <item name="gradient_01_e">#F2B03D</item>
+        <item name="gradient_02_a">#5C8BCC</item>
+        <item name="gradient_02_e">#95B0E5</item>
+        <item name="gradient_03_a">#D96F8B</item>
+        <item name="gradient_03_e">#D94860</item>
+        <item name="gradient_04_a">#66CC91</item>
+        <item name="gradient_04_e">#90D977</item>
+        <item name="gradient_05_a">#CC70A4</item>
+        <item name="gradient_05_e">#7B73BF</item>
+        <item name="image_filter_01">#FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#FFFFFF</item>
+        <item name="image_filter_04">#FFFFFF</item>
+        <item name="category_01">#CE4A4E</item>
+        <item name="category_02">#2998D0</item>
+        <item name="category_03">#EEC465</item>
+        <item name="category_04">#2C6EBC</item>
+        <item name="category_05">#397B39</item>
+        <item name="category_06">#8091B3</item>
+        <item name="category_07">#96581C</item>
+        <item name="category_08">#77C868</item>
+        <item name="category_09">#EA90CE</item>
+        <item name="category_10">#9668CA</item>
+        <item name="category_11">#B02F64</item>
+        <item name="category_12">#5A6689</item>
+        <item name="category_13">#E79D62</item>
+        <item name="category_14">#61C3DE</item>
+        <item name="category_15">#B02F64</item>
+        <item name="category_16">#14509C</item>
+        <item name="category_17">#C197E5</item>
+        <item name="category_18">#B02E2F</item>
+        <item name="category_19">#5036AA</item>
+        <!-- Indigo theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+
+        <item name="toolbarStyle">@style/ClassicLight.Toolbar</item>
+    </style>
+
+    <style name="Indigo" parent="BaseIndigo" />
+
+    <style name="Electric" parent="ThemeDark">
+        <!-- Electricity theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#19232B</item>
+        <item name="primary_ui_01_active">#171C24</item>
+        <item name="primary_ui_02">#161A20</item>
+        <item name="primary_ui_02_selected">#1A2C34</item>
+        <item name="primary_ui_02_active">#1B212A</item>
+        <item name="primary_ui_03">#171C25</item>
+        <item name="primary_ui_04">#111419</item>
+        <item name="primary_ui_05">#1E3C4A</item>
+        <item name="primary_ui_05_selected">#3FD2E6</item>
+        <item name="primary_ui_06">#1B2933</item>
+        <item name="primary_icon_01">#3FD2E6</item>
+        <item name="primary_icon_01_active">#8AE9FF</item>
+        <item name="primary_icon_02">#16698C</item>
+        <item name="primary_icon_02_selected">#3FD2E6</item>
+        <item name="primary_icon_02_active">#3FD2E6</item>
+        <item name="primary_icon_03">#2A7683</item>
+        <item name="primary_icon_03_active">#8AE9FF</item>
+        <item name="primary_text_01">#FFFFFF</item>
+        <item name="primary_text_02">#21ADDB</item>
+        <item name="primary_text_02_selected">#3FD2E6</item>
+        <item name="primary_field_01">#163FD2E6</item>
+        <item name="primary_field_01_active">#233FD2E6</item>
+        <item name="primary_field_02">#163FD2E6</item>
+        <item name="primary_field_02_active">#233FD2E6</item>
+        <item name="primary_field_03">#2d3FD2E6</item>
+        <item name="primary_field_03_active">#3FD2E6</item>
+        <item name="primary_interactive_01">#3FD2E6</item>
+        <item name="primary_interactive_01_hover">#64DDF2</item>
+        <item name="primary_interactive_01_active">#3FD2E6</item>
+        <item name="primary_interactive_01_disabled">#3f3FD2E6</item>
+        <item name="primary_interactive_02">#13171C</item>
+        <item name="primary_interactive_02_hover">#1903A9F4</item>
+        <item name="primary_interactive_02_active">#199FE8F2</item>
+        <item name="primary_interactive_03">#284D5C</item>
+        <item name="secondary_ui_01">#212835</item>
+        <item name="secondary_ui_02">#2C384B</item>
+        <item name="secondary_icon_01">#3FD2E6</item>
+        <item name="secondary_icon_02">#16698C</item>
+        <item name="secondary_text_01">#3FD2E6</item>
+        <item name="secondary_text_02">#16698C</item>
+        <item name="secondary_field_01">#163FD2E6</item>
+        <item name="secondary_field_01_active">#233FD2E6</item>
+        <item name="secondary_interactive_01">#3FD2E6</item>
+        <item name="secondary_interactive_01_hover">#64DDF2</item>
+        <item name="secondary_interactive_01_active">#9FE8F2</item>
+        <item name="podcast_interactive_02">#212835</item>
+        <item name="podcast_interactive_04">#212835</item>
+        <item name="support_01">#3FD2E6</item>
+        <item name="support_02">#3FE664</item>
+        <item name="support_03">#0B3C50</item>
+        <item name="support_04">#093243</item>
+        <item name="support_05">#F84F44</item>
+        <item name="support_06">#093243</item>
+        <item name="support_07">#FFFFFF</item>
+        <item name="support_08">#F6A935</item>
+        <item name="support_09">#212835</item>
+        <item name="support_10">#FEEC4C</item>
+        <item name="player_contrast_01">#FFFFFF</item>
+        <item name="player_contrast_02">#b23FD2E6</item>
+        <item name="player_contrast_03">#8c3FD2E6</item>
+        <item name="player_contrast_04">#4c3FD2E6</item>
+        <item name="player_contrast_05">#333FD2E6</item>
+        <item name="player_contrast_06">#193FD2E6</item>
+        <item name="contrast_01">#FFFFFF</item>
+        <item name="contrast_02">#ccB2F6FF</item>
+        <item name="contrast_03">#99B2F6FF</item>
+        <item name="contrast_04">#33B2F6FF</item>
+        <item name="filter_01">#F84F44</item>
+        <item name="filter_02">#F6A935</item>
+        <item name="filter_03">#CFE63F</item>
+        <item name="filter_04">#3FE664</item>
+        <item name="filter_05">#3FD2E6</item>
+        <item name="filter_06">#B65BFD</item>
+        <item name="filter_07">#FF4BB7</item>
+        <item name="filter_08">#BFBFBF</item>
+        <item name="filter_09">#FF94F1</item>
+        <item name="filter_10">#58EDAC</item>
+        <item name="filter_11">#0A9AFA</item>
+        <item name="filter_12">#CCA083</item>
+        <item name="veil">#7f000000</item>
+        <item name="gradient_01_a">#D7B32E</item>
+        <item name="gradient_01_e">#C18000</item>
+        <item name="gradient_02_a">#54B29E</item>
+        <item name="gradient_02_e">#3FB7E6</item>
+        <item name="gradient_03_a">#DE4010</item>
+        <item name="gradient_03_e">#AB5068</item>
+        <item name="gradient_04_a">#38CC71</item>
+        <item name="gradient_04_e">#519948</item>
+        <item name="gradient_05_a">#CC3C92</item>
+        <item name="gradient_05_e">#8163B0</item>
+        <item name="image_filter_01">#00FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#00FFFFFF</item>
+        <item name="image_filter_04">#00FFFFFF</item>
+        <item name="category_01">#3FD2E6</item>
+        <item name="category_02">#3FD2E6</item>
+        <item name="category_03">#3FD2E6</item>
+        <item name="category_04">#3FD2E6</item>
+        <item name="category_05">#3FD2E6</item>
+        <item name="category_06">#3FD2E6</item>
+        <item name="category_07">#3FD2E6</item>
+        <item name="category_08">#3FD2E6</item>
+        <item name="category_09">#3FD2E6</item>
+        <item name="category_10">#3FD2E6</item>
+        <item name="category_11">#3FD2E6</item>
+        <item name="category_12">#3FD2E6</item>
+        <item name="category_13">#3FD2E6</item>
+        <item name="category_14">#3FD2E6</item>
+        <item name="category_15">#3FD2E6</item>
+        <item name="category_16">#3FD2E6</item>
+        <item name="category_17">#3FD2E6</item>
+        <item name="category_18">#3FD2E6</item>
+        <item name="category_19">#3FD2E6</item>
+        <!-- Electricity theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+
+        <item name="toolbarStyle">@style/Electric.Toolbar</item>
+        <item name="toolbarTheme">@style/Electric.Toolbar.Theme</item>
+    </style>
+
+    <style name="BaseRose" parent="ThemeLight">
+        <!-- Rose theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#fff0eb</item>
+        <item name="primary_ui_01_active">#fff9f7</item>
+        <item name="primary_ui_02">#FFEEED</item>
+        <item name="primary_ui_02_selected">#f7caca</item>
+        <item name="primary_ui_02_active">#fce2de</item>
+        <item name="primary_ui_03">#F7E2E2</item>
+        <item name="primary_ui_04">#FCE6E6</item>
+        <item name="primary_ui_05">#f5d1c4</item>
+        <item name="primary_ui_05_selected">#e53958</item>
+        <item name="primary_ui_06">#fff8f7</item>
+        <item name="primary_icon_01">#f05d54</item>
+        <item name="primary_icon_01_active">#ff6f66</item>
+        <item name="primary_icon_02">#F58C87</item>
+        <item name="primary_icon_02_selected">#f22469</item>
+        <item name="primary_icon_02_active">#f55c53</item>
+        <item name="primary_icon_03">#e54558</item>
+        <item name="primary_icon_03_active">#ff7373</item>
+        <item name="primary_text_01">#990038</item>
+        <item name="primary_text_02">#E52535</item>
+        <item name="primary_text_02_selected">#d90048</item>
+        <item name="primary_field_01">#fffdfc</item>
+        <item name="primary_field_01_active">#ffffff</item>
+        <item name="primary_field_02">#fffbfa</item>
+        <item name="primary_field_02_active">#ffffff</item>
+        <item name="primary_field_03">#f7caca</item>
+        <item name="primary_field_03_active">#ffaebd</item>
+        <item name="primary_interactive_01">#ff7978</item>
+        <item name="primary_interactive_01_hover">#ff9f9e</item>
+        <item name="primary_interactive_01_active">#ffc5c4</item>
+        <item name="primary_interactive_01_disabled">#3f997272</item>
+        <item name="primary_interactive_02">#fdfaf9</item>
+        <item name="primary_interactive_02_hover">#19f4032b</item>
+        <item name="primary_interactive_02_active">#ccffffff</item>
+        <item name="primary_interactive_03">#E0CED1</item>
+        <item name="secondary_ui_01">#FFC2C0</item>
+        <item name="secondary_ui_02">#FCB3B1</item>
+        <item name="secondary_icon_01">#d40019</item>
+        <item name="secondary_icon_02">#de3e59</item>
+        <item name="secondary_text_01">#990059</item>
+        <item name="secondary_text_02">#ab494d</item>
+        <item name="secondary_field_01">#7ffbf0ef</item>
+        <item name="secondary_field_01_active">#fbf0ef</item>
+        <item name="secondary_interactive_01">#cf1133</item>
+        <item name="secondary_interactive_01_hover">#c9cfda</item>
+        <item name="secondary_interactive_01_active">#e8415f</item>
+        <item name="podcast_interactive_02">#F8EDED</item>
+        <item name="podcast_interactive_04">#000000</item>
+        <item name="support_01">#D93F99</item>
+        <item name="support_02">#899c12</item>
+        <item name="support_03">#bf3950</item>
+        <item name="support_04">#991f3d</item>
+        <item name="support_05">#d44a5a</item>
+        <item name="support_06">#ad86a0</item>
+        <item name="support_07">#ffffff</item>
+        <item name="support_08">#b26428</item>
+        <item name="support_09">#FD4D90</item>
+        <item name="support_10">#FF4FE2</item>
+        <item name="player_contrast_01">#ffd9d9</item>
+        <item name="player_contrast_02">#99FFDCD6</item>
+        <item name="player_contrast_03">#7fffdcd6</item>
+        <item name="player_contrast_04">#66ffe0db</item>
+        <item name="player_contrast_05">#3fFFDCD6</item>
+        <item name="player_contrast_06">#19ffdcd6</item>
+        <item name="contrast_01">#ffffff</item>
+        <item name="contrast_02">#d8ffffff</item>
+        <item name="contrast_03">#b2ffffff</item>
+        <item name="contrast_04">#33ffffff</item>
+        <item name="filter_01">#d66e6c</item>
+        <item name="filter_02">#dfa280</item>
+        <item name="filter_03">#e0b985</item>
+        <item name="filter_04">#b1b676</item>
+        <item name="filter_05">#8196bc</item>
+        <item name="filter_06">#9b5c9e</item>
+        <item name="filter_07">#d26c80</item>
+        <item name="filter_08">#b8b8d8</item>
+        <item name="filter_09">#6883BA</item>
+        <item name="filter_10">#546A76</item>
+        <item name="filter_11">#998E87</item>
+        <item name="filter_12">#997F7F</item>
+        <item name="veil">#bff2ccc7</item>
+        <item name="gradient_01_a">#ffcb78</item>
+        <item name="gradient_01_e">#ffaf4d</item>
+        <item name="gradient_02_a">#f0546e</item>
+        <item name="gradient_02_e">#ff938c</item>
+        <item name="gradient_03_a">#c4459a</item>
+        <item name="gradient_03_e">#de435c</item>
+        <item name="gradient_04_a">#c1c917</item>
+        <item name="gradient_04_e">#bbde47</item>
+        <item name="gradient_05_a">#e5679a</item>
+        <item name="gradient_05_e">#af73bf</item>
+        <item name="image_filter_01">#FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#FFFFFF</item>
+        <item name="image_filter_04">#FFFFFF</item>
+        <item name="category_01">#CE4A4E</item>
+        <item name="category_02">#2998D0</item>
+        <item name="category_03">#EEC465</item>
+        <item name="category_04">#2C6EBC</item>
+        <item name="category_05">#397B39</item>
+        <item name="category_06">#8091B3</item>
+        <item name="category_07">#96581C</item>
+        <item name="category_08">#77C868</item>
+        <item name="category_09">#EA90CE</item>
+        <item name="category_10">#9668CA</item>
+        <item name="category_11">#B02F64</item>
+        <item name="category_12">#5A6689</item>
+        <item name="category_13">#E79D62</item>
+        <item name="category_14">#61C3DE</item>
+        <item name="category_15">#B02F64</item>
+        <item name="category_16">#14509C</item>
+        <item name="category_17">#C197E5</item>
+        <item name="category_18">#B02E2F</item>
+        <item name="category_19">#5036AA</item>
+        <!-- Rose theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+    </style>
+
+    <style name="Rose" parent="BaseRose">
+        <item name="toolbarStyle">@style/Rose.Toolbar</item>
+        <item name="toolbarTheme">@style/Rose.Toolbar.Theme</item>
+    </style>
+
+    <style name="Rose.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="titleTextAppearance">@style/Rose.Toolbar.TitleText</item>
+    </style>
+
+    <style name="Rose.Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">#AB494D</item>
+    </style>
+
+    <style name="Rose.Toolbar.Theme" parent="ThemeOverlay.AppCompat">
+        <item name="colorControlNormal">?attr/secondary_icon_01</item>
+    </style>
+
+    <style name="LightContrast" parent="ThemeLight">
+        <!-- Light contrast theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#ffffff</item>
+        <item name="primary_ui_01_active">#f7f9fa</item>
+        <item name="primary_ui_02">#ffffff</item>
+        <item name="primary_ui_02_selected">#e5e5e5</item>
+        <item name="primary_ui_02_active">#f2f2f2</item>
+        <item name="primary_ui_03">#ffffff</item>
+        <item name="primary_ui_04">#ffffff</item>
+        <item name="primary_ui_05">#e4e4e4</item>
+        <item name="primary_ui_05_selected">#000000</item>
+        <item name="primary_ui_06">#ffffff</item>
+        <item name="primary_icon_01">#000000</item>
+        <item name="primary_icon_01_active">#3f3f3f</item>
+        <item name="primary_icon_02">#808080</item>
+        <item name="primary_icon_02_selected">#0225C2</item>
+        <item name="primary_icon_02_active">#bf000000</item>
+        <item name="primary_icon_03">#656565</item>
+        <item name="primary_icon_03_active">#000000</item>
+        <item name="primary_text_01">#000000</item>
+        <item name="primary_text_02">#595959</item>
+        <item name="primary_text_02_selected">#023087</item>
+        <item name="primary_field_01">#f1f1f1</item>
+        <item name="primary_field_01_active">#e4e4e4</item>
+        <item name="primary_field_02">#fbfbfc</item>
+        <item name="primary_field_02_active">#ffffff</item>
+        <item name="primary_field_03">#7e7e7e</item>
+        <item name="primary_field_03_active">#000000</item>
+        <item name="primary_interactive_01">#000000</item>
+        <item name="primary_interactive_01_hover">#212121</item>
+        <item name="primary_interactive_01_active">#404040</item>
+        <item name="primary_interactive_01_disabled">#3fF43E37</item>
+        <item name="primary_interactive_02">#ffffff</item>
+        <item name="primary_interactive_02_hover">#cccccc</item>
+        <item name="primary_interactive_02_active">#19000000</item>
+        <item name="primary_interactive_03">#D9D9D9</item>
+        <item name="secondary_ui_01">#ffffff</item>
+        <item name="secondary_ui_02">#bfbfbf</item>
+        <item name="secondary_icon_01">#000000</item>
+        <item name="secondary_icon_02">#000000</item>
+        <item name="secondary_text_01">#000000</item>
+        <item name="secondary_text_02">#cc000000</item>
+        <item name="secondary_field_01">#f2f2f2</item>
+        <item name="secondary_field_01_active">#f8f8f8</item>
+        <item name="secondary_interactive_01">#000000</item>
+        <item name="secondary_interactive_01_hover">#212121</item>
+        <item name="secondary_interactive_01_active">#404040</item>
+        <item name="podcast_interactive_02">#ffffff</item>
+        <item name="podcast_interactive_04">#ffffff</item>
+        <item name="support_01">#03a9f4</item>
+        <item name="support_02">#78d549</item>
+        <item name="support_03">#343434</item>
+        <item name="support_04">#000000</item>
+        <item name="support_05">#f43e37</item>
+        <item name="support_06">#1a1a1a</item>
+        <item name="support_07">#ffffff</item>
+        <item name="support_08">#ff9d3b</item>
+        <item name="support_09">#000000</item>
+        <item name="support_10">#FEB700</item>
+        <item name="player_contrast_01">#ffffff</item>
+        <item name="player_contrast_02">#ccffffff</item>
+        <item name="player_contrast_03">#a5ffffff</item>
+        <item name="player_contrast_04">#7fffffff</item>
+        <item name="player_contrast_05">#33ffffff</item>
+        <item name="player_contrast_06">#19ffffff</item>
+        <item name="contrast_01">#ffffff</item>
+        <item name="contrast_02">#d8ffffff</item>
+        <item name="contrast_03">#b2ffffff</item>
+        <item name="contrast_04">#33ffffff</item>
+        <item name="filter_01">#F43E37</item>
+        <item name="filter_02">#E87400</item>
+        <item name="filter_03">#BF8C00</item>
+        <item name="filter_04">#39A800</item>
+        <item name="filter_05">#039DE3</item>
+        <item name="filter_06">#5D31C4</item>
+        <item name="filter_07">#E93673</item>
+        <item name="filter_08">#8C9499</item>
+        <item name="filter_09">#A177D9</item>
+        <item name="filter_10">#3DAD88</item>
+        <item name="filter_11">#2555CF</item>
+        <item name="filter_12">#945712</item>
+        <item name="veil">#4c000000</item>
+        <item name="gradient_01_a">#FED745</item>
+        <item name="gradient_01_e">#FEB525</item>
+        <item name="gradient_02_a">#03A9F4</item>
+        <item name="gradient_02_e">#50D0F1</item>
+        <item name="gradient_03_a">#F43769</item>
+        <item name="gradient_03_e">#FB5246</item>
+        <item name="gradient_04_a">#78D549</item>
+        <item name="gradient_04_e">#9BE45E</item>
+        <item name="gradient_05_a">#E74B8A</item>
+        <item name="gradient_05_e">#6046E9</item>
+        <item name="image_filter_01">#00FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#00FFFFFF</item>
+        <item name="image_filter_04">#00FFFFFF</item>
+        <item name="category_01">#F43E37</item>
+        <item name="category_02">#03A9F4</item>
+        <item name="category_03">#FEC635</item>
+        <item name="category_04">#187ADC</item>
+        <item name="category_05">#3B862D</item>
+        <item name="category_06">#8F97A4</item>
+        <item name="category_07">#B25900</item>
+        <item name="category_08">#78D549</item>
+        <item name="category_09">#FB8ECE</item>
+        <item name="category_10">#A866DB</item>
+        <item name="category_11">#D61F59</item>
+        <item name="category_12">#686C74</item>
+        <item name="category_13">#FF9D3B</item>
+        <item name="category_14">#50D0F1</item>
+        <item name="category_15">#E93673</item>
+        <item name="category_16">#0059B2</item>
+        <item name="category_17">#CC98F0</item>
+        <item name="category_18">#D9201C</item>
+        <item name="category_19">#5D31C4</item>
+        <!-- Light contrast theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+    </style>
+
+    <style name="DarkContrast" parent="ThemeDark">
+        <!-- Dark contrast theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#000000</item>
+        <item name="primary_ui_01_active">#1b1b1b</item>
+        <item name="primary_ui_02">#000000</item>
+        <item name="primary_ui_02_selected">#262626</item>
+        <item name="primary_ui_02_active">#1b1b1b</item>
+        <item name="primary_ui_03">#000000</item>
+        <item name="primary_ui_04">#000000</item>
+        <item name="primary_ui_05">#333333</item>
+        <item name="primary_ui_05_selected">#ffffff</item>
+        <item name="primary_ui_06">#000000</item>
+        <item name="primary_icon_01">#ffffff</item>
+        <item name="primary_icon_01_active">#bebebe</item>
+        <item name="primary_icon_02">#b2b2b2</item>
+        <item name="primary_icon_02_selected">#ffffff</item>
+        <item name="primary_icon_02_active">#bf000000</item>
+        <item name="primary_icon_03">#656565</item>
+        <item name="primary_icon_03_active">#ffffff</item>
+        <item name="primary_text_01">#ffffff</item>
+        <item name="primary_text_02">#d9d9d9</item>
+        <item name="primary_text_02_selected">#ffffff</item>
+        <item name="primary_field_01">#272727</item>
+        <item name="primary_field_01_active">#181818</item>
+        <item name="primary_field_02">#1a1a1a</item>
+        <item name="primary_field_02_active">#0c0c0c</item>
+        <item name="primary_field_03">#808080</item>
+        <item name="primary_field_03_active">#ffffff</item>
+        <item name="primary_interactive_01">#ffffff</item>
+        <item name="primary_interactive_01_hover">#212121</item>
+        <item name="primary_interactive_01_active">#404040</item>
+        <item name="primary_interactive_01_disabled">#3fFB5146</item>
+        <item name="primary_interactive_02">#000000</item>
+        <item name="primary_interactive_02_hover">#cccccc</item>
+        <item name="primary_interactive_02_active">#19000000</item>
+        <item name="primary_interactive_03">#595959</item>
+        <item name="secondary_ui_01">#000000</item>
+        <item name="secondary_ui_02">#333333</item>
+        <item name="secondary_icon_01">#ffffff</item>
+        <item name="secondary_icon_02">#cdcdcd</item>
+        <item name="secondary_text_01">#ffffff</item>
+        <item name="secondary_text_02">#d9d9d9</item>
+        <item name="secondary_field_01">#252525</item>
+        <item name="secondary_field_01_active">#1a1a1a</item>
+        <item name="secondary_interactive_01">#ffffff</item>
+        <item name="secondary_interactive_01_hover">#212121</item>
+        <item name="secondary_interactive_01_active">#c0c0c0</item>
+        <item name="podcast_interactive_02">#ffffff</item>
+        <item name="podcast_interactive_04">#000000</item>
+        <item name="support_01">#03a9f4</item>
+        <item name="support_02">#78d549</item>
+        <item name="support_03">#333333</item>
+        <item name="support_04">#262626</item>
+        <item name="support_05">#F43E37</item>
+        <item name="support_06">#262626</item>
+        <item name="support_07">#ffffff</item>
+        <item name="support_08">#ff9d3b</item>
+        <item name="support_09">#000000</item>
+        <item name="support_10">#F5CA5B</item>
+        <item name="player_contrast_01">#ffffff</item>
+        <item name="player_contrast_02">#ccffffff</item>
+        <item name="player_contrast_03">#a5ffffff</item>
+        <item name="player_contrast_04">#7fffffff</item>
+        <item name="player_contrast_05">#33ffffff</item>
+        <item name="player_contrast_06">#19ffffff</item>
+        <item name="contrast_01">#ffffff</item>
+        <item name="contrast_02">#ccffffff</item>
+        <item name="contrast_03">#99ffffff</item>
+        <item name="contrast_04">#33ffffff</item>
+        <item name="filter_01">#FF6557</item>
+        <item name="filter_02">#EB8118</item>
+        <item name="filter_03">#FFBF1A</item>
+        <item name="filter_04">#99FF66</item>
+        <item name="filter_05">#1AB8FF</item>
+        <item name="filter_06">#CC73FF</item>
+        <item name="filter_07">#FF6680</item>
+        <item name="filter_08">#B8C3C9</item>
+        <item name="filter_09">#9BA2FF</item>
+        <item name="filter_10">#32D9A9</item>
+        <item name="filter_11">#21E6ED</item>
+        <item name="filter_12">#AD753D</item>
+        <item name="veil">#99000000</item>
+        <item name="gradient_01_a">#D7B32E</item>
+        <item name="gradient_01_e">#C18000</item>
+        <item name="gradient_02_a">#3993AA</item>
+        <item name="gradient_02_e">#008CCB</item>
+        <item name="gradient_03_a">#C9522E</item>
+        <item name="gradient_03_e">#B82E3C</item>
+        <item name="gradient_04_a">#7FB74F</item>
+        <item name="gradient_04_e">#508D32</item>
+        <item name="gradient_05_a">#BC4E7B</item>
+        <item name="gradient_05_e">#6B59C7</item>
+        <item name="image_filter_01">#00FFFFFF</item>
+        <item name="image_filter_02">#00FFFFFF</item>
+        <item name="image_filter_03">#00FFFFFF</item>
+        <item name="image_filter_04">#00FFFFFF</item>
+        <item name="category_01">#F8574D</item>
+        <item name="category_02">#09B7DF</item>
+        <item name="category_03">#FEDD4A</item>
+        <item name="category_04">#22ABEA</item>
+        <item name="category_05">#53B63F</item>
+        <item name="category_06">#BCC0C8</item>
+        <item name="category_07">#D17D00</item>
+        <item name="category_08">#A8E666</item>
+        <item name="category_09">#FDBBE1</item>
+        <item name="category_10">#CB8FE9</item>
+        <item name="category_11">#E62B7D</item>
+        <item name="category_12">#9297A2</item>
+        <item name="category_13">#FFC453</item>
+        <item name="category_14">#70E3F7</item>
+        <item name="category_15">#E62B7D</item>
+        <item name="category_16">#007DD1</item>
+        <item name="category_17">#E0C1F6</item>
+        <item name="category_18">#E82D27</item>
+        <item name="category_19">#8245DC</item>
+        <!-- Dark contrast theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+    </style>
+
+    <style name="BaseRadioactive" parent="ThemeDark">
+        <item name="isImageTintEnabled">true</item>
+        <item name="imageTintThemeCacheTag">radioactive</item>
+
+        <!-- Radioactive theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - begin ************ -->
+        <item name="primary_ui_01">#162F1E</item>
+        <item name="primary_ui_01_active">#193D25</item>
+        <item name="primary_ui_02">#0d1b11</item>
+        <item name="primary_ui_02_selected">#173119</item>
+        <item name="primary_ui_02_active">#0d1b11</item>
+        <item name="primary_ui_03">#162f1e</item>
+        <item name="primary_ui_04">#111419</item>
+        <item name="primary_ui_05">#27591a</item>
+        <item name="primary_ui_05_selected">#70e84e</item>
+        <item name="primary_ui_06">#1a3e11</item>
+        <item name="primary_icon_01">#74f864</item>
+        <item name="primary_icon_01_active">#70e84e</item>
+        <item name="primary_icon_02">#59bc3d</item>
+        <item name="primary_icon_02_selected">#9FF2B1</item>
+        <item name="primary_icon_02_active">#70e84e</item>
+        <item name="primary_icon_03">#70e84e</item>
+        <item name="primary_icon_03_active">#70e84e</item>
+        <item name="primary_text_01">#74f864</item>
+        <item name="primary_text_02">#469431</item>
+        <item name="primary_text_02_selected">#9FF2B1</item>
+        <item name="primary_field_01">#1a3e11</item>
+        <item name="primary_field_01_active">#27591a</item>
+        <item name="primary_field_02">#1a3e11</item>
+        <item name="primary_field_02_active">#27591a</item>
+        <item name="primary_field_03">#257111</item>
+        <item name="primary_field_03_active">#70e84e</item>
+        <item name="primary_interactive_01">#88FF66</item>
+        <item name="primary_interactive_01_hover">#87ED7F</item>
+        <item name="primary_interactive_01_active">#9FF2B1</item>
+        <item name="primary_interactive_01_disabled">#59bc3d</item>
+        <item name="primary_interactive_02">#131711</item>
+        <item name="primary_interactive_02_hover">#1959BC3D</item>
+        <item name="primary_interactive_02_active">#339FF2B1</item>
+        <item name="primary_interactive_03">#1F5014</item>
+        <item name="secondary_ui_01">#162f1e</item>
+        <item name="secondary_ui_02">#162f1e</item>
+        <item name="secondary_icon_01">#70e84e</item>
+        <item name="secondary_icon_02">#70e84e</item>
+        <item name="secondary_text_01">#70e84e</item>
+        <item name="secondary_text_02">#70e84e</item>
+        <item name="secondary_field_01">#1a3e11</item>
+        <item name="secondary_field_01_active">#27591a</item>
+        <item name="secondary_interactive_01">#88FF66</item>
+        <item name="secondary_interactive_01_hover">#70e84e</item>
+        <item name="secondary_interactive_01_active">#59bc3d</item>
+        <item name="podcast_interactive_02">#0B0D0F</item>
+        <item name="podcast_interactive_04">#0B0D0F</item>
+        <item name="support_01">#74f864</item>
+        <item name="support_02">#70e84e</item>
+        <item name="support_03">#27591a</item>
+        <item name="support_04">#162f1e</item>
+        <item name="support_05">#489848</item>
+        <item name="support_06">#162f1e</item>
+        <item name="support_07">#70e84e</item>
+        <item name="support_08">#70e84e</item>
+        <item name="support_09">#111419</item>
+        <item name="support_10">#8DFF80</item>
+        <item name="player_contrast_01">#70e84e</item>
+        <item name="player_contrast_02">#cc70e84e</item>
+        <item name="player_contrast_03">#b270e84e</item>
+        <item name="player_contrast_04">#5156E52E</item>
+        <item name="player_contrast_05">#3d56E52E</item>
+        <item name="player_contrast_06">#2d56E52E</item>
+        <item name="contrast_01">#70E84E</item>
+        <item name="contrast_02">#cc70e84e</item>
+        <item name="contrast_03">#b270E84E</item>
+        <item name="contrast_04">#3f70E84E</item>
+        <item name="filter_01">#74f864</item>
+        <item name="filter_02">#74f864</item>
+        <item name="filter_03">#74f864</item>
+        <item name="filter_04">#74f864</item>
+        <item name="filter_05">#74f864</item>
+        <item name="filter_06">#74f864</item>
+        <item name="filter_07">#74f864</item>
+        <item name="filter_08">#74f864</item>
+        <item name="filter_09">#74f864</item>
+        <item name="filter_10">#74f864</item>
+        <item name="filter_11">#74f864</item>
+        <item name="filter_12">#74f864</item>
+        <item name="veil">#bf173d17</item>
+        <item name="gradient_01_a">#948a00</item>
+        <item name="gradient_01_e">#eeff00</item>
+        <item name="gradient_02_a">#3dbd4c</item>
+        <item name="gradient_02_e">#a4f864</item>
+        <item name="gradient_03_a">#538a11</item>
+        <item name="gradient_03_e">#f8e963</item>
+        <item name="gradient_04_a">#579986</item>
+        <item name="gradient_04_e">#0ecc77</item>
+        <item name="gradient_05_a">#53a26a</item>
+        <item name="gradient_05_e">#b0c073</item>
+        <item name="image_filter_01">#00FFFFFF</item>
+        <item name="image_filter_02">#26FFFFFF</item>
+        <item name="image_filter_03">#70E84E</item>
+        <item name="image_filter_04">#7f70E84E</item>
+        <item name="category_01">#74f864</item>
+        <item name="category_02">#74f864</item>
+        <item name="category_03">#74f864</item>
+        <item name="category_04">#74f864</item>
+        <item name="category_05">#74f864</item>
+        <item name="category_06">#74f864</item>
+        <item name="category_07">#74f864</item>
+        <item name="category_08">#74f864</item>
+        <item name="category_09">#74f864</item>
+        <item name="category_10">#74f864</item>
+        <item name="category_11">#74f864</item>
+        <item name="category_12">#74f864</item>
+        <item name="category_13">#74f864</item>
+        <item name="category_14">#74f864</item>
+        <item name="category_15">#74f864</item>
+        <item name="category_16">#74f864</item>
+        <item name="category_17">#74f864</item>
+        <item name="category_18">#74f864</item>
+        <item name="category_19">#74f864</item>
+        <!-- Radioactive theme tokens - WARNING AUTO GENERATED, DO NOT EDIT - end ************ -->
+
+        <item name="android:textColorSecondary">@color/radioactive_primary_text_2</item>
+        <item name="checkboxStyle">@style/RadioactiveControlStyle</item>
+        <item name="switchStyle">@style/RadioactiveControlStyle</item>
+    </style>
+
+    <style name="RadioactiveControlStyle" parent="Base.Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="colorControlNormal">?attr/primary_field_03</item>
+    </style>
+
+    <style name="Radioactive" parent="BaseRadioactive" />
+
+    <style name="Electric.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="titleTextAppearance">@style/Electric.Toolbar.TitleText</item>
+    </style>
+
+    <style name="Electric.Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">#3FD2E6</item>
+        <item name="android:letterSpacing">.025</item>
+    </style>
+
+    <style name="Electric.Toolbar.Theme" parent="ThemeOverlay.AppCompat">
+        <item name="colorControlNormal">?attr/secondary_icon_01</item>
+    </style>
+
+    <!-- Player toolbar theme -->
+    <style name="PlayerToolbarTheme" parent="ThemeDark">
+        <item name="mediaRouteButtonTint">#B3FFFFFF</item>
+    </style>
+    <!-- Bottom Sheet Light Theme -->
+    <style name="BottomSheetDialogBaseThemeLight" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyleLight</item>
+    </style>
+
+    <style name="BottomSheetDialogThemeLight" parent="BottomSheetDialogBaseThemeLight"></style>
+
+    <style name="BottomSheetStyleLight" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment_light</item>
+    </style>
+
+    <!-- Bottom Sheet Dark Theme -->
+    <style name="BottomSheetDialogBaseThemeDark" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyleDark</item>
+    </style>
+
+    <style name="BottomSheetDialogThemeDark" parent="BottomSheetDialogBaseThemeDark"></style>
+
+    <style name="BottomSheetStyleDark" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment_dark</item>
+    </style>
+
+    <style name="SwitchStyle">
+        <item name="colorControlActivated">?attr/colorAccent</item>
+    </style>
+
+    <style name="CheckboxStyle" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:buttonTint">?attr/primary_interactive_01</item>
+    </style>
+
+    <style name="RadiobuttonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:buttonTint">?attr/primary_interactive_01</item>
+    </style>
+
+    <style name="WindowAnimationTransition">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
+
+    <!-- Android Auto themes -->
+    <style name="CarTheme" parent="ThemeDark">
+        <item name="android:colorAccent">@color/pocketcastsreddark</item>
+        <item name="colorAccent">@color/pocketcastsreddark</item>
+        <item name="android:colorControlActivated">@color/pocketcastsreddark</item>
+        <item name="colorControlActivated">@color/pocketcastsreddark</item>
+    </style>
+
+    <!-- Text styles from Zeplin -->
+    <style name="LightH1">
+        <item name="android:textSize">31sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:lineSpacingExtra">11sp</item>
+        <item name="android:textColor">#1e1f1e</item>
+    </style>
+
+    <style name="DarkH1">
+        <item name="android:textSize">31sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:lineSpacingExtra">11sp</item>
+        <item name="android:textColor">@color/lighttheme_foreground</item>
+    </style>
+
+    <style name="LightH3">
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textColor">#1e1f1e</item>
+    </style>
+
+    <style name="LightH4">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textColor">#1e1f1e</item>
+    </style>
+
+    <style name="LightSubtitle1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">#de000000</item>
+    </style>
+
+    <style name="LightBody1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textColor">@color/darktheme_foreground</item>
+    </style>
+
+    <style name="DarkSubtitle1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/lighttheme_foreground</item>
+    </style>
+
+    <style name="DarkBody1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textColor">@color/lighttheme_foreground</item>
+    </style>
+
+    <style name="LightButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?attr/primary_interactive_01</item>
+    </style>
+
+    <style name="DarkButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/lighttheme_foreground</item>
+    </style>
+
+    <style name="LightBody2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textColor">#99000000</item>
+    </style>
+
+    <style name="LightCaption">
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">@color/lighttheme_icons_primary</item>
+    </style>
+
+    <style name="LightOverline">
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.07</item>
+        <item name="android:textColor">@color/lighttheme_icons_primary</item>
+    </style>
+
+    <style name="LightSubtitle2">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:textColor">@color/lighttheme_icons_primary</item>
+    </style>
+
+    <style name="DarkH4">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textColor">@color/lighttheme_foreground</item>
+    </style>
+
+    <style name="DarkH3">
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:textColor">@color/lighttheme_foreground</item>
+    </style>
+
+    <style name="LightH2">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textColor">#1e1f1e</item>
+    </style>
+
+    <style name="DarkH2">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textColor">@color/lighttheme_foreground</item>
+    </style>
+
+    <style name="DarkSubtitle2">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:textColor">#b3ffffff</item>
+    </style>
+
+    <style name="DarkBody2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textColor">#b3ffffff</item>
+    </style>
+
+    <style name="DarkCaption">
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">#b3ffffff</item>
+    </style>
+
+    <style name="DarkOverline">
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:letterSpacing">0.07</item>
+        <item name="android:textColor">#b3ffffff</item>
+    </style>
+
+</resources>

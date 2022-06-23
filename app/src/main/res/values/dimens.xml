@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="miniPlayerPeekHeight">124dp</dimen>
+    <dimen name="miniPlayerHeight">68dp</dimen>
+</resources>

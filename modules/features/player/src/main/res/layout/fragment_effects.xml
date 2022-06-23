@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="effects"
+            type="au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects" />
+        <variable
+            name="podcast"
+            type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast" />
+        <variable
+            name="playbackSpeedString"
+            type="String" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:theme="@style/PlayerTheme"
+        android:background="?attr/primary_ui_01">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/effectsConstraint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="16dp">
+
+                <View
+                    android:layout_width="48dp"
+                    android:layout_height="4dp"
+                    android:background="@drawable/background_dragger_player"
+                    android:layout_marginTop="4dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <TextView
+                    android:id="@+id/effectsTitle"
+                    style="@style/H30"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/podcast_playback_effects"
+                    android:textColor="?attr/player_contrast_01"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/iconSpeed"
+                    android:layout_width="29dp"
+                    android:layout_height="29dp"
+                    android:layout_marginTop="30dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_speed"
+                    app:tint="?attr/player_contrast_02"
+                    app:layout_constraintLeft_toLeftOf="@id/effectsTitle"
+                    app:layout_constraintTop_toBottomOf="@id/effectsTitle" />
+
+                <ImageButton
+                    android:id="@+id/btnSpeedUp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginRight="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_effects_plus"
+                    android:tint="?attr/player_contrast_02"
+                    android:contentDescription="@string/player_effects_speed_up"
+                    app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/iconSpeed" />
+
+                <TextView
+                    android:id="@+id/lblSpeed"
+                    style="@style/DarkSubtitle1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/background_speed_label"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="@{playbackSpeedString}"
+                    android:textColor="?attr/player_contrast_01"
+                    app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
+                    app:layout_constraintRight_toLeftOf="@id/btnSpeedUp"
+                    app:layout_constraintTop_toTopOf="@id/iconSpeed"
+                    tools:text="1.0x" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="?attr/player_contrast_05"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/iconSpeed"
+                    app:layout_constraintBottom_toTopOf="@id/iconTrim"/>
+
+                <ImageButton
+                    android:id="@+id/btnSpeedDown"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_minus"
+                    android:tint="?attr/player_contrast_02"
+                    android:contentDescription="@string/player_effects_speed_down"
+                    app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
+                    app:layout_constraintRight_toLeftOf="@id/lblSpeed"
+                    app:layout_constraintTop_toTopOf="@id/iconSpeed" />
+
+                <TextView
+                    android:id="@+id/speedLabel"
+                    style="@style/DarkSubtitle1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/player_effects_speed"
+                    android:textColor="?attr/player_contrast_01"
+                    app:layout_constraintBottom_toBottomOf="@id/iconSpeed"
+                    app:layout_constraintLeft_toRightOf="@id/iconSpeed"
+                    app:layout_constraintTop_toTopOf="@id/iconSpeed" />
+
+                <ImageView
+                    android:id="@+id/iconTrim"
+                    android:layout_width="29dp"
+                    android:layout_height="29dp"
+                    android:layout_marginTop="32dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_trim"
+                    app:tint="?attr/player_contrast_02"
+                    android:importantForAccessibility="no"
+                    app:layout_constraintLeft_toLeftOf="@id/iconSpeed"
+                    app:layout_constraintTop_toBottomOf="@+id/iconSpeed" />
+
+                <Switch
+                    android:id="@+id/switchTrim"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/player_effects_trim_silence"
+                    app:layout_constraintRight_toRightOf="@id/btnSpeedUp"
+                    app:layout_constraintTop_toTopOf="@id/iconTrim"
+                    app:theme="@style/SwitchStyle" />
+
+                <TextView
+                    android:id="@+id/trimSilenceLabel"
+                    style="@style/DarkSubtitle1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/player_effects_trim_silence"
+                    android:textColor="?attr/player_contrast_01"
+                    app:layout_constraintLeft_toLeftOf="@id/speedLabel"
+                    app:layout_constraintRight_toLeftOf="@id/switchTrim"
+                    app:layout_constraintTop_toTopOf="@id/iconTrim" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/trimToggleGroup"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:selectionRequired="true"
+                    android:layout_marginTop="4dp"
+                    app:layout_constraintLeft_toLeftOf="@id/trimSilenceLabel"
+                    app:layout_constraintRight_toRightOf="@id/switchTrim"
+                    app:layout_constraintTop_toBottomOf="@id/trimSilenceLabel">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/trimLow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:backgroundTint="@color/trim_mode_background"
+                        app:strokeColor="@color/trim_stroke_color"
+                        android:textAllCaps="false"
+                        android:text="@string/player_effects_trim_mild"
+                        style="?attr/materialButtonOutlinedStyle"
+                        />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/trimMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/player_contrast_01"
+                        app:backgroundTint="@color/trim_mode_background"
+                        app:strokeColor="@color/trim_stroke_color"
+                        android:textAllCaps="false"
+                        android:text="@string/player_effects_trim_medium"
+                        style="?attr/materialButtonOutlinedStyle"
+                        />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/trimHigh"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/player_contrast_01"
+                        app:backgroundTint="@color/trim_mode_background"
+                        app:strokeColor="@color/trim_stroke_color"
+                        android:textAllCaps="false"
+                        android:text="@string/player_effects_trim_mad_max"
+                        style="?attr/materialButtonOutlinedStyle"
+                        />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+                <TextView
+                    android:id="@+id/detailSilenceLabel"
+                    style="@style/DarkSubtitle2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="?attr/player_contrast_01"
+                    android:text="@string/player_trim_silence_detail"
+                    app:layout_constraintLeft_toLeftOf="@id/trimSilenceLabel"
+                    app:layout_constraintRight_toLeftOf="@id/switchTrim"
+                    app:layout_constraintTop_toBottomOf="@id/trimToggleGroup" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="?attr/player_contrast_05"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/detailSilenceLabel"
+                    app:layout_constraintBottom_toTopOf="@id/iconVolume"/>
+
+                <ImageView
+                    android:id="@+id/iconVolume"
+                    android:layout_width="29dp"
+                    android:layout_height="29dp"
+                    android:layout_marginTop="32dp"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_volumeboost"
+                    app:tint="?attr/player_contrast_02"
+                    android:importantForAccessibility="no"
+                    app:layout_constraintLeft_toLeftOf="@id/iconSpeed"
+                    app:layout_constraintTop_toBottomOf="@id/detailSilenceLabel" />
+
+                <Switch
+                    android:id="@+id/switchVolume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintRight_toRightOf="@id/btnSpeedUp"
+                    app:layout_constraintTop_toTopOf="@id/iconVolume"
+                    android:contentDescription="@string/player_effects_volume_boost"
+                    app:theme="@style/SwitchStyle" />
+
+                <TextView
+                    android:id="@+id/volumeLabel"
+                    style="@style/DarkSubtitle1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/player_effects_volume_boost"
+                    android:textColor="?attr/player_contrast_01"
+                    app:layout_constraintLeft_toLeftOf="@id/speedLabel"
+                    app:layout_constraintRight_toLeftOf="@id/switchTrim"
+                    app:layout_constraintTop_toTopOf="@id/iconVolume" />
+
+                <TextView
+                    android:id="@+id/detailVolumeLabel"
+                    style="@style/DarkSubtitle2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/player_effects_voices_sound_louder"
+                    android:textColor="?attr/player_contrast_01"
+                    app:layout_constraintLeft_toLeftOf="@id/trimSilenceLabel"
+                    app:layout_constraintTop_toBottomOf="@id/volumeLabel" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="60dp"
+                    android:background="#181818"
+                    android:elevation="2dp"
+                    app:cardCornerRadius="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/detailVolumeLabel"
+                    android:visibility="@{podcast.overrideGlobalEffects}">
+
+                    <ImageView
+                        android:id="@+id/podcastEffectsImage"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="20dp"
+                        android:importantForAccessibility="no"
+                        android:layout_gravity="center_vertical" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="60dp"
+                        android:text="@string/player_effects_custom_effects_applied" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClear"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/player_effects_clear"
+                        android:textColor="?attr/player_contrast_01" />
+
+                </androidx.cardview.widget.CardView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
+</layout>

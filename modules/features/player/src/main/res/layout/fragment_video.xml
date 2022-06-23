@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="viewModel" type="au.com.shiftyjelly.pocketcasts.player.viewmodel.VideoViewModel" />
+        <variable name="skipBackwardInSecs" type="String" />
+        <variable name="skipForwardInSecs" type="String" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000">
+
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/videoView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:use_controller="false"
+            app:repeat_toggle_modes="none"/>
+
+        <View
+            android:id="@+id/touchView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/controlsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:background="@color/videoButtonBackground"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/videoButtonBackground"
+                app:navigationIcon="@drawable/ic_cancel"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/btnPip"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_picture_in_picture"
+                android:scaleType="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/skipBack"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="centerInside"
+                android:background="?android:attr/selectableItemBackground"
+                app:circle="@{true}"
+                app:layout_constraintBottom_toBottomOf="@+id/playButton"
+                app:layout_constraintEnd_toStartOf="@+id/playButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/playButton"
+                app:lottie_rawRes="@raw/skip_button" />
+
+            <TextView
+                android:id="@+id/skipBackText"
+                android:layout_width="45dp"
+                android:layout_height="53dp"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:fontFamily="sans-serif-medium"
+                android:paddingTop="8dp"
+                android:textColor="#FFFFFF"
+                android:importantForAccessibility="no"
+                android:textSize="15sp"
+                android:text="@{skipBackwardInSecs}"
+                app:layout_constraintStart_toStartOf="@+id/skipBack"
+                app:layout_constraintEnd_toEndOf="@+id/skipBack"
+                app:layout_constraintTop_toTopOf="@+id/skipBack"
+                app:layout_constraintBottom_toBottomOf="@+id/skipBack"/>
+
+            <au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
+                android:id="@+id/playButton"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                app:icon_width="60dp"
+                app:icon_height="60dp"
+                app:icon_tint="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/skipForward"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleX="-1"
+                android:scaleType="centerInside"
+                android:background="?android:attr/selectableItemBackground"
+                app:circle="@{true}"
+                app:layout_constraintBottom_toBottomOf="@+id/playButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/playButton"
+                app:layout_constraintTop_toTopOf="@+id/playButton"
+                app:lottie_rawRes="@raw/skip_button" />
+
+            <TextView
+                android:id="@+id/jumpForwardText"
+                android:layout_width="45dp"
+                android:layout_height="53dp"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:fontFamily="sans-serif-medium"
+                android:paddingTop="8dp"
+                android:textColor="#FFFFFF"
+                android:importantForAccessibility="no"
+                android:textSize="15sp"
+                android:text="@{skipForwardInSecs}"
+                app:layout_constraintStart_toStartOf="@+id/skipForward"
+                app:layout_constraintEnd_toEndOf="@+id/skipForward"
+                app:layout_constraintTop_toTopOf="@+id/skipForward"
+                app:layout_constraintBottom_toBottomOf="@+id/skipForward"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:clickable="false"
+                android:background="@color/videoButtonBackground"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                app:playbackState="@{viewModel.playbackState}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </FrameLayout>
+
+</layout>

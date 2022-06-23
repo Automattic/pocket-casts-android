@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="car_create_account_btn_top_margin">56dp</dimen>
+    <dimen name="car_sign_in_btn_top_margin">32dp</dimen>
+    <dimen name="car_create_heading_top_margin">16dp</dimen>
+</resources>

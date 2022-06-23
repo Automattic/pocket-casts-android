@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="episodeNotificationsScreen"
+    android:persistent="true" >
+
+    <PreferenceCategory android:title="@string/settings_notifications_new_episodes"  android:key="new_episodes_category">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="episodeNotificationsOn"
+            android:persistent="false"
+            android:minHeight="72dp"
+            android:title="@string/settings_notification_notify_me" />
+
+        <PreferenceScreen
+            android:key="notificationPodcasts"
+            android:title="@string/settings_notification_choose_podcasts"
+            android:summary="@string/settings_podcasts_selected_zero"
+            android:persistent="false" />
+
+        <PreferenceScreen
+            android:key="notificationActions"
+            android:persistent="false"
+            android:summary=""
+            android:title="@string/settings_notification_actions" />
+
+        <Preference
+            android:key="notificationRingtone"
+            android:persistent="false"
+            android:summary="@string/settings_notification_sound_summary"
+            android:title="@string/settings_notification_sound" />
+
+        <ListPreference
+            android:key="notificationVibrate"
+            android:persistent="true"
+            android:summary=""
+            android:title="@string/settings_notification_vibrate" />
+
+        <Preference
+            android:key="openSystemSettings"
+            android:summary="@string/settings_notification_advanced_summary"
+            android:title="@string/settings_notification_advanced" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings" >
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="overrideAudioInterruption"
+            android:persistent="true"
+            android:summary="@string/settings_notification_play_over_summary"
+            android:title="@string/settings_notification_play_over" />
+        <SwitchPreference
+            android:key="hideNotificationOnPause"
+            android:persistent="true"
+            android:title="@string/settings_notification_hide_on_pause" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

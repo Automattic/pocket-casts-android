@@ -1,0 +1,6 @@
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <files-path name="localfiles" path="email/"/>
+    <files-path name="internalpodcasts" path="PocketCasts/podcasts" />
+    <external-files-path name="externalpodcasts" path="PocketCasts/podcasts" />
+    <cache-path name="podcasts_cache" path="." />
+</paths>

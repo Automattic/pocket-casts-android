@@ -1,0 +1,95 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
+apply from: "../base.gradle"
+apply plugin: 'com.google.android.gms.oss-licenses-plugin'
+
+android {
+    defaultConfig {
+        applicationId project.applicationId
+        multiDexEnabled true
+    }
+
+    sourceSets {
+        androidTest.assets.srcDirs += files("$rootDir/modules/services/model/schemas".toString())
+    }
+
+    buildFeatures {
+        viewBinding true
+        dataBinding = true
+        compose true
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    if (canSignRelease) {
+        signingConfigs {
+            release {
+                storeFile = file(pocketcastsKeyStoreFile)
+                storePassword = pocketcastsKeyStorePassword
+                keyAlias = pocketcastsKeyStoreAlias
+                keyPassword = pocketcastsKeyStoreAliasPassword
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            firebaseCrashlytics {
+                mappingFileUploadEnabled false
+            }
+
+            def gitLongVersion = "git -C ${rootDir} describe --tags --long --dirty".execute().text.trim()
+            def (gitTag, versionBuild, gitHash, gitDirty) = gitLongVersion.tokenize('-')
+
+            manifestPlaceholders = [
+                    gitHash: gitHash + (gitDirty ? ("-" + gitDirty) : "")
+            ]
+        }
+
+        debugProd {
+            initWith debug
+        }
+
+        release {
+            manifestPlaceholders = [
+                    gitHash: ""
+            ]
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            if (canSignRelease) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:ui')
+    implementation project(':modules:services:compose')
+    implementation project(':modules:services:views')
+    implementation project(':modules:services:model')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:servers')
+    implementation project(':modules:features:discover')
+    implementation project(':modules:features:profile')
+    implementation project(':modules:features:settings')
+    implementation project(':modules:features:podcasts')
+    implementation project(':modules:features:player')
+    implementation project(':modules:features:search')
+    implementation project(':modules:features:filters')
+    implementation project(':modules:features:navigation')
+    implementation project(':modules:features:account')
+}
+
+task appStart(type: Exec, dependsOn: 'installDebug') {
+    commandLine 'adb', 'shell', 'am', 'start', '-n', 'au.com.shiftyjelly.pocketcasts.debug/au.com.shiftyjelly.pocketcasts.ui.MainActivity'
+}

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="transparent">#00000000</color>
+
+    <color name="pocketcastsreddark">#C62828</color>
+
+    <!-- Export from Zeplin -->
+    <color name="pocketcastsred">#f44336</color>
+    <color name="darktheme_background">#242425</color>
+    <color name="buttonblue">#03a9f4</color>
+    <color name="darktheme_icons_primary">#686c74</color>
+    <color name="darktheme_icons_secondary">#4f4f4f</color>
+    <color name="lighttheme_foreground">#ffffff</color>
+    <color name="lighttheme_background">#ffffff</color>
+    <color name="lighttheme_icons_primary">#8f97a4</color>
+    <color name="lighttheme_icons_secondary">#b8c3c9</color>
+    <color name="darktheme_foreground">#000000</color>
+
+    <!-- Custom -->
+    <color name="green_disabled_alpha">#B378D549</color>
+    <color name="extradarktheme_background">#000000</color>
+    <color name="podcast_header_background">#1E1F1E</color>
+
+    <!-- Material components -->
+    <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#884f4f4f</color>
+
+    <!-- Color palette -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="red_10">#FEE5E2</color>
+    <color name="red_20">#FDCBC5</color>
+    <color name="red_30">#FC978C</color>
+    <color name="red_40">#FB5146</color>
+    <color name="red_50">#F43E37</color>
+    <color name="red_60">#D9201C</color>
+    <color name="red_70">#AA0A08</color>
+    <color name="red_80">#550504</color>
+    <color name="red_90">#2A0202</color>
+    <color name="blue_10">#E1FBFF</color>
+    <color name="blue_20">#C4F4FF</color>
+    <color name="blue_30">#8AE9FF</color>
+    <color name="blue_40">#50D0F1</color>
+    <color name="blue_50">#03A9F4</color>
+    <color name="blue_60">#187ADC</color>
+    <color name="blue_70">#0059B2</color>
+    <color name="blue_80">#002D59</color>
+    <color name="blue_90">#00162C</color>
+    <color name="green_10">#F1FBE5</color>
+    <color name="green_20">#E3F7CA</color>
+    <color name="green_30">#C8EF9A</color>
+    <color name="green_40">#9BE45E</color>
+    <color name="green_50">#78D549</color>
+    <color name="green_60">#58BE37</color>
+    <color name="green_70">#3B862D</color>
+    <color name="green_80">#1E4316</color>
+    <color name="green_90">#0F210B</color>
+    <color name="yellow_10">#FEFCE1</color>
+    <color name="yellow_20">#FEFAC3</color>
+    <color name="yellow_30">#FDF58D</color>
+    <color name="yellow_40">#FADB47</color>
+    <color name="yellow_50">#FEC635</color>
+    <color name="yellow_60">#EC9209</color>
+    <color name="yellow_70">#B25900</color>
+    <color name="yellow_80">#592D00</color>
+    <color name="yellow_90">#2C1600</color>
+    <color name="orange_10">#FFF7E1</color>
+    <color name="orange_20">#FFEFC4</color>
+    <color name="orange_30">#FFE08A</color>
+    <color name="orange_40">#FEC143</color>
+    <color name="orange_50">#FF9D3B</color>
+    <color name="orange_60">#E16914</color>
+    <color name="orange_70">#B03C03</color>
+    <color name="orange_80">#581E01</color>
+    <color name="orange_90">#2C0F00</color>
+    <color name="purple_10">#F1E4FB</color>
+    <color name="purple_20">#E4C9F8</color>
+    <color name="purple_30">#CC98F0</color>
+    <color name="purple_40">#A866DB</color>
+    <color name="purple_50">#7642D1</color>
+    <color name="purple_60">#5D31C4</color>
+    <color name="purple_70">#3612A1</color>
+    <color name="purple_80">#1B0950</color>
+    <color name="purple_90">#0D0428</color>
+    <color name="pink_10">#FEE2F2</color>
+    <color name="pink_20">#FDC6E6</color>
+    <color name="pink_30">#FB8ECE</color>
+    <color name="pink_40">#F250A8</color>
+    <color name="pink_50">#E93673</color>
+    <color name="pink_60">#D61F59</color>
+    <color name="pink_70">#AD060E</color>
+    <color name="pink_80">#560307</color>
+    <color name="pink_90">#2B0103</color>
+    <color name="coolgrey_10">#FBFBFC</color>
+    <color name="coolgrey_20">#F7F9FA</color>
+    <color name="coolgrey_30">#EFF3F5</color>
+    <color name="coolgrey_40">#E0E6EA</color>
+    <color name="coolgrey_50">#B8C3C9</color>
+    <color name="coolgrey_60">#8F97A4</color>
+    <color name="coolgrey_70">#686C74</color>
+    <color name="coolgrey_80">#292B2E</color>
+    <color name="coolgrey_90">#161718</color>
+    <color name="warmgrey_10">#FBFBFC</color>
+    <color name="warmgrey_20">#FAFAFA</color>
+    <color name="warmgrey_30">#F5F5F5</color>
+    <color name="warmgrey_40">#EAEAEA</color>
+    <color name="warmgrey_50">#C9C9C9</color>
+    <color name="warmgrey_60">#A4A4A4</color>
+    <color name="warmgrey_70">#747474</color>
+    <color name="warmgrey_80">#2E2E2E</color>
+    <color name="warmgrey_90">#181818</color>
+    <color name="darkgrey_10">#686C74</color>
+    <color name="darkgrey_20">#4C5052</color>
+    <color name="darkgrey_30">#383A3D</color>
+    <color name="darkgrey_40">#2D2F31</color>
+    <color name="darkgrey_50">#222427</color>
+    <color name="darkgrey_60">#1A1C1E</color>
+    <color name="darkgrey_70">#101010</color>
+    <color name="darkgrey_80">#080808</color>
+    <color name="darkgrey_90">#030303</color>
+
+    <color name="radioactive_primary_text_2">#469431</color>
+</resources>

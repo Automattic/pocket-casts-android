@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardImage"
+        android:layout_width="108dp"
+        android:layout_height="108dp"
+        android:layout_margin="16dp"
+        android:elevation="2dp"
+        app:cardCornerRadius="4dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imgPodcast"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/defaultArtworkSmall" />
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/lblSponsored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textAppearance="@style/C50"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toEndOf="@id/cardImage"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Sponsored" />
+
+    <TextView
+        android:id="@+id/lblTitle"
+        style="@style/H20"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:textColor="?attr/primary_text_01"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@+id/btnSubscribe"
+        app:layout_constraintStart_toEndOf="@id/cardImage"
+        app:layout_constraintTop_toBottomOf="@id/lblSponsored"
+        tools:text="Title" />
+
+    <ImageView
+        android:id="@+id/btnSubscribe"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical|end"
+        android:background="?android:attr/actionBarItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="centerInside"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:contentDescription="@string/subscribe"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?attr/primary_icon_02" />
+
+    <TextView
+        android:id="@+id/lblBody"
+        style="@style/P40"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="top"
+        android:lineSpacingExtra="3sp"
+        android:textColor="?attr/primary_text_02"
+        android:textSize="@dimen/discover_single_podcast_body_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/lblTitle"
+        app:layout_constraintTop_toBottomOf="@id/lblTitle"
+        tools:text="Title" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrierImageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="cardImage,lblBody" />
+
+    <View
+        style="@style/row_divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barrierImageText" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/mark_as_played"
+        android:title="@string/mark_as_played" />
+    <item
+        android:id="@+id/close_player"
+        android:title="@string/player_end_playback_clear_up_next" />
+</menu>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:background="?attr/primary_ui_02"
+    android:foreground="?attr/selectableItemBackground">
+    <TextView
+        android:id="@+id/lblText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        style="@style/H40"
+        android:textColor="?attr/primary_text_01"
+        tools:text="10 podcasts chosen" />
+</LinearLayout>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="row_title_color">#1E1F1E</color>
+    <color name="row_subtitle_color">#8F97A4</color>
+    <color name="row_divider">?attr/primary_ui_05</color>
+</resources>

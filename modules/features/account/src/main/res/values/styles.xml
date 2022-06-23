@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="error_text">
+        <item name="android:textColor">#D32F2F</item>
+    </style>
+
+    <style name="PCTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/text_input_stroke_color</item>
+        <item name="passwordToggleTint">?attr/primary_icon_03</item>
+        <item name="hintTextColor">?attr/primary_interactive_01</item>
+        <item name="android:textColorHint">?attr/primary_text_02</item>
+    </style>
+</resources>

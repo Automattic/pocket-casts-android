@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="carousel_height">269dp</dimen>
+    <dimen name="body_text_size">14sp</dimen>
+    <dimen name="network_header_height">262dp</dimen>
+    <dimen name="network_header_image_size">188dp</dimen>
+    <dimen name="network_header_margin">12dp</dimen>
+</resources>

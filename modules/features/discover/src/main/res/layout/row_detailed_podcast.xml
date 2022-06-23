@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.widget.LinearLayout">
+    <androidx.cardview.widget.CardView
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:elevation="2dp"
+        app:cardCornerRadius="4dp"
+        android:layout_marginEnd="8dp">
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            tools:background="#ccc" />
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/lblTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textAppearance="?attr/textBody2"
+            tools:text="Title" />
+        <TextView
+            android:id="@+id/lblSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Author"
+            style="@style/row_podcast_subtitle" />
+        <TextView
+            android:id="@+id/lblBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textBody1"
+            android:lineSpacingExtra="2sp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            tools:text="Authoadfasdfajsdhfkjashdgjhasdgijlhasdjfghajsdhfgjasdhfjasdhgajshdgjkahsdfgjhasfdgjhasfdghasdfhgskadfhgsadfgiusdhfgkjsdfgknasifdghagosr" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSubscribe"
+        style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+        android:paddingRight="16dp"
+        android:gravity="top|center_horizontal"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="top"
+        app:iconTint="@color/row_subtitle_color"/>
+</merge>

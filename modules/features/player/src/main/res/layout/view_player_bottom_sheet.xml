@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+    </data>
+
+    <merge
+        android:id="@+id/bottomSheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <au.com.shiftyjelly.pocketcasts.player.view.MiniPlayer
+            android:id="@+id/miniPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="68dp" />
+
+        <View
+            android:id="@+id/popupAnchor"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:background="@color/transparent"/>
+
+        <FrameLayout
+            android:id="@+id/player"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:translationY="@dimen/player_fragment_start_y">
+
+            <fragment
+                android:id="@+id/playerFragment"
+                android:name="au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
+
+    </merge>
+</layout>

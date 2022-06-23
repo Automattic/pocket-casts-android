@@ -1,0 +1,24 @@
+apply from: "../../modules.gradle"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+
+android {
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:utils')
+
+    api androidLibs.room
+    implementation androidLibs.roomRx
+    implementation androidLibs.roomKtx
+
+    kapt androidLibs.roomCompile
+}

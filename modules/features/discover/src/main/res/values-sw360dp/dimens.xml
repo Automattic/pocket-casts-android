@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="discover_single_podcast_body_text_size">15sp</dimen>
+</resources>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/mainScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/primary_ui_04"
+        android:layout_marginTop="?android:actionBarSize">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainConstraintView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/primary_ui_01">
+
+            <View
+                android:id="@+id/dividerView"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/userView" />
+
+            <ImageView
+                android:id="@+id/imgSignOut"
+                android:layout_width="@dimen/auto_profile_icon_size"
+                android:layout_height="@dimen/auto_profile_icon_size"
+                android:layout_marginStart="16dp"
+                app:tint="?attr/support_05"
+                app:layout_constraintBottom_toBottomOf="@id/btnSignOut"
+                app:layout_constraintStart_toStartOf="@id/btnSignOut"
+                app:layout_constraintTop_toTopOf="@id/btnSignOut"
+                app:srcCompat="@drawable/ic_signout" />
+
+            <TextView
+                android:id="@+id/lblSignOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_sign_out"
+                android:textAppearance="@style/TextAppearance.Car.Body1"
+                android:textColor="?attr/support_05"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnSignOut"
+                app:layout_constraintStart_toEndOf="@id/imgSignOut"
+                app:layout_constraintTop_toTopOf="@+id/btnSignOut" />
+
+            <View
+                android:id="@+id/btnSignOut"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/automotive_profile_row_height"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:contentDescription="@string/profile_sign_out"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView" />
+
+            <View
+                android:id="@+id/page_bottom_padding"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:background="?attr/primary_ui_04"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnSignOut" />
+
+            <au.com.shiftyjelly.pocketcasts.profile.ExpandedUserView
+                android:id="@+id/userView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</FrameLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="seekbar_width_percentage" format="float" type="dimen">1.0</item>
+    <dimen name="player_fragment_start_y">69dp</dimen>
+    <dimen name="player_tab_text_size">14sp</dimen>
+    <dimen name="player_tab_padding">6dp</dimen>
+</resources>

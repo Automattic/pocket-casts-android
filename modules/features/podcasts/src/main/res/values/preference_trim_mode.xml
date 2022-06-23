@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preference_trim_mode_titles">
+        <item>@string/player_effects_trim_mild</item>
+        <item>@string/player_effects_trim_medium</item>
+        <item>@string/player_effects_trim_mad_max</item>
+    </array>
+
+    <integer name="preference_trim_mode_default">1</integer>
+    <integer-array name="preference_trim_mode_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </integer-array>
+</resources>

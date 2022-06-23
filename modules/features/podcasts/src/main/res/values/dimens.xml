@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="episode_card_dimen">60dp</dimen>
+    <dimen name="episode_card_download_button_left">16dp</dimen>
+    <dimen name="episode_card_played_button_left">16dp</dimen>
+    <dimen name="episode_card_edge_padding">8dp</dimen>
+    <dimen name="episode_card_action_middle_padding">20dp</dimen>
+    <dimen name="episode_card_image_size">96dp</dimen>
+    <dimen name="podcast_header_height">113dp</dimen>
+</resources>

@@ -1,0 +1,5 @@
+apply from: "../../modules.gradle"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+
+// utils should have no other module dependencies

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:persistent="true">
+
+    <Preference
+        app:isPreferenceVisible="false"
+        android:key="feedIssueDetected"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/podcast_feed_issue_detected"
+        android:summary="@string/podcast_feed_issue_detected_summary" />
+
+    <SwitchPreference
+        android:key="notifications"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/podcast_notifications" />
+
+    <SwitchPreference
+        android:key="autoDownload"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/podcast_settings_auto_download"
+        android:summary="@string/podcast_settings_auto_download_summary" />
+
+    <SwitchPreference
+        android:key="addToUpNext"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/podcast_settings_add_to_up_next"
+        android:summary="@string/podcast_settings_add_to_up_next_summary"/>
+
+    <ListPreference
+        android:key="addToUpNextOrder"
+        app:isPreferenceVisible="false"
+        android:persistent="false"
+        android:title="@string/podcast_settings_position"
+        android:summary="@string/podcast_settings_position_summary" />
+
+    <Preference
+        android:key="addToUpNextGlobal"
+        app:isPreferenceVisible="false"
+        android:persistent="false"
+        android:title="@string/podcast_settings_up_next_global"
+        android:summary="@string/podcast_settings_up_next_global_summary" />
+
+    <Preference
+        android:key="autoArchivePodcast"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/podcast_settings_auto_archive" />
+
+    <Preference
+        android:key="playbackEffects"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/podcast_settings_playback_effects"
+        android:summary="@string/podcast_settings_playback_effects_summary" />
+
+    <EditTextPreference
+        android:persistent="false"
+        android:defaultValue="0"
+        android:inputType="number"
+        android:key="skipFirst"
+        android:title="@string/podcast_settings_skip_first"
+        android:summary="@string/podcast_settings_skip_first_summary"
+        android:selectAllOnFocus="true" />
+
+    <EditTextPreference
+        android:persistent="false"
+        android:defaultValue="0"
+        android:inputType="number"
+        android:key="skipLast"
+        android:title="@string/podcast_settings_skip_last"
+        android:summary="@string/podcast_settings_skip_last_summary"
+        android:selectAllOnFocus="true" />
+
+    <Preference
+        android:key="filters"
+        android:persistent="false"
+        android:title="@string/filters"
+        android:defaultValue="false" />
+
+    <au.com.shiftyjelly.pocketcasts.views.component.ButtonPreference
+        android:key="unsubscribe"
+        android:layout="@layout/preference_unsub_button" />
+</PreferenceScreen>

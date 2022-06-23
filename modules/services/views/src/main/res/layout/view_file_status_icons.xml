@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:parentTag="LinearLayout">
+
+    <ImageView
+        android:id="@+id/imgUpNext"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="4dp"
+        app:srcCompat="@drawable/ic_upnext"
+        app:tint="?attr/support_01"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/imgIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="4dp"
+        app:srcCompat="@drawable/ic_downloaded"
+        app:tint="?attr/support_02" />
+
+    <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
+        android:id="@+id/imgCloud"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center"
+        app:gradient="gradient_1"
+        android:layout_marginEnd="4dp" />
+
+    <au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
+        android:id="@+id/progressCircle"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="4dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="center"
+        android:layout_marginEnd="4dp" />
+
+    <TextView
+        android:id="@+id/lblStatus"
+        style="?attr/textCaption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:lines="1"
+        tools:text="16 mins" />
+
+</merge>

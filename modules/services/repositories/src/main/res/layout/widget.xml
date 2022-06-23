@@ -1,0 +1,149 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_frame"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="@drawable/widget_background"
+    android:layoutDirection="ltr"
+    android:clickable="true"
+    android:focusable="true">
+
+    <FrameLayout
+        android:id="@+id/widget_empty_player"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/widget_nothingloaded"
+            android:layout_gravity="center"
+            android:alpha="0.4" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/widget_podcast_playing"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/widget_artwork"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:adjustViewBounds="true"
+            android:layout_gravity="start"
+            android:padding="8dp"
+            android:scaleType="fitXY"
+            android:focusable="true"
+            android:clickable="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="64dp"
+            android:orientation="horizontal"
+            android:weightSum="3" >
+
+            <FrameLayout
+                android:id="@+id/widget_skip_back"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:focusable="true"
+                android:clickable="true" >
+
+                <TextView
+                    android:id="@+id/widget_skip_back_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_gravity="center"
+                    android:paddingLeft="2dp"
+                    android:paddingTop="4dp"
+                    android:textColor="#FFF"
+                    android:textSize="12sp" />
+
+                <ImageView
+                    android:src="@drawable/widget_skipbackwards"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <FrameLayout
+                    android:id="@+id/widget_play_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/play_episode"
+                    android:background="?android:attr/selectableItemBackground">
+
+                    <ImageView
+                        android:src="@drawable/widget_play"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/widget_pause_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/pause_episode"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:src="@drawable/widget_pause"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/widget_skip_forward"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true" >
+
+                <TextView
+                    android:id="@+id/widget_skip_forward_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingRight="2dp"
+                    android:layout_gravity="center"
+                    android:paddingTop="4dp"
+                    android:textColor="#FFF"
+                    android:textSize="12sp" />
+
+                <ImageView
+                    android:src="@drawable/widget_skipforwards"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

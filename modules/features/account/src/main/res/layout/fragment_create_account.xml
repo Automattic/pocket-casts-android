@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/primary_ui_01" >
+
+    <ScrollView
+        android:id="@+id/mainScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnNext"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/freeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_editor_absoluteX="16dp">
+
+                <View
+                    android:id="@+id/padding0Panel"
+                    android:layout_width="0dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constrainedHeight="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/lblUnlockedText" />
+
+                <au.com.shiftyjelly.pocketcasts.views.component.SelectablePanel
+                    android:id="@+id/outlinePanel"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/panel_border"
+                    app:layout_constraintBottom_toBottomOf="@id/padding0Panel"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="1.0" />
+
+                <RadioButton
+                    android:id="@+id/btnFree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="22dp"
+                    android:buttonTint="?attr/primary_interactive_01"
+                    android:checked="false"
+                    android:clickable="false"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/lblRegular"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/profile_regular"
+                    android:textAppearance="@style/H30"
+                    android:textColor="?attr/primary_text_01"
+                    app:layout_constraintStart_toEndOf="@+id/btnFree"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/lblUnlockedText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="@string/profile_almost_everything"
+                    android:textAppearance="@style/H50"
+                    android:textColor="?attr/primary_text_02"
+                    app:layout_constraintStart_toStartOf="@+id/lblRegular"
+                    app:layout_constraintTop_toBottomOf="@+id/lblRegular" />
+
+                <TextView
+                    android:id="@+id/lblFreeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="40dp"
+                    android:text="@string/profile_free"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/H30"
+                    android:textColor="?attr/primary_text_01"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/plusLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/freeLayout">
+
+                <View
+                    android:id="@+id/padding1Panel"
+                    android:layout_width="0dp"
+                    android:layout_height="31dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constrainedHeight="false"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/lblFindMore" />
+
+                <au.com.shiftyjelly.pocketcasts.views.component.SelectablePanel
+                    android:id="@+id/plusPanel"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/panel_border"
+                    app:layout_constraintBottom_toBottomOf="@id/padding1Panel"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="1.0" />
+
+                <RadioButton
+                    android:id="@+id/btnPlus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="22dp"
+                    android:checked="false"
+                    android:clickable="false"
+                    app:layout_constraintBottom_toBottomOf="@id/lblEverything"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/lblPlus" />
+
+                <TextView
+                    android:id="@+id/lblPlus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/pocket_casts_plus"
+                    android:textAppearance="@style/H30"
+                    android:textColor="?attr/primary_text_01"
+                    app:layout_constraintStart_toEndOf="@+id/btnPlus"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/lblEverything"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="@string/profile_everything_unlocked"
+                    android:textAppearance="@style/H60"
+                    android:textColor="?attr/primary_text_02"
+                    app:layout_constraintStart_toStartOf="@+id/lblPlus"
+                    app:layout_constraintTop_toBottomOf="@+id/lblPlus" />
+
+                <TextView
+                    android:id="@+id/txtSubCharge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="40dp"
+                    android:textAppearance="@style/H30"
+                    android:textColor="?attr/primary_text_01"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="$1" />
+
+                <TextView
+                    android:id="@+id/lblSubFrequency"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="@string/profile_per_month"
+                    android:textAppearance="@style/H60"
+                    android:textColor="?attr/primary_text_02"
+                    app:layout_constraintEnd_toEndOf="@+id/txtSubCharge"
+                    app:layout_constraintTop_toBottomOf="@+id/lblPlus" />
+
+                <ImageView
+                    android:id="@+id/imgFeature0"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/lblFeature0"
+                    app:layout_constraintStart_toStartOf="@id/lblEverything"
+                    app:layout_constraintTop_toTopOf="@id/lblFeature0"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_plus" />
+
+                <TextView
+                    android:id="@+id/lblFeature0"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="28dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/profile_web_player"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="@style/H40"
+                    android:textColor="?attr/primary_text_02"
+                    app:layout_constraintEnd_toEndOf="@+id/plusPanel"
+                    app:layout_constraintStart_toEndOf="@id/imgFeature0"
+                    app:layout_constraintTop_toBottomOf="@id/lblEverything" />
+
+                <ImageView
+                    android:id="@+id/imgFeature1"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/lblFeature1"
+                    app:layout_constraintStart_toStartOf="@+id/lblEverything"
+                    app:layout_constraintTop_toTopOf="@+id/lblFeature1"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_plus" />
+
+                <TextView
+                    android:id="@+id/lblFeature1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/profile_extra_themes"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="@style/H40"
+                    android:textColor="?attr/primary_text_02"
+                    app:layout_constraintEnd_toEndOf="@+id/plusPanel"
+                    app:layout_constraintStart_toEndOf="@id/imgFeature1"
+                    app:layout_constraintTop_toBottomOf="@+id/lblFeature0" />
+
+                <ImageView
+                    android:id="@+id/imgFeature2"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/lblFeature2"
+                    app:layout_constraintStart_toStartOf="@+id/lblEverything"
+                    app:layout_constraintTop_toTopOf="@+id/lblFeature2"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_plus"  />
+
+                <TextView
+                    android:id="@+id/lblFeature2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/profile_extra_app_icons"
+                    android:textAlignment="viewStart"
+                    android:textAppearance="@style/H40"
+                    android:textColor="?attr/primary_text_02"
+                    app:layout_constraintEnd_toEndOf="@+id/plusPanel"
+                    app:layout_constraintStart_toEndOf="@id/imgFeature2"
+                    app:layout_constraintTop_toBottomOf="@+id/lblFeature1" />
+
+                <ImageView
+                    android:id="@+id/imgFeature3"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/lblFeature3"
+                    app:layout_constraintStart_toStartOf="@+id/lblEverything"
+                    app:layout_constraintTop_toTopOf="@+id/lblFeature3"
+                    android:importantForAccessibility="no"
+                    app:srcCompat="@drawable/ic_plus"
+                    tools:layout_editor_absoluteX="72dp"
+                    tools:layout_editor_absoluteY="122dp" />
+
+                <TextView
+                    android:id="@+id/lblFeature3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:textAppearance="@style/H40"
+                    android:textAlignment="viewStart"
+                    android:textColor="?attr/primary_text_02"
+                    app:layout_constraintEnd_toEndOf="@+id/plusPanel"
+                    app:layout_constraintStart_toEndOf="@id/imgFeature3"
+                    app:layout_constraintTop_toBottomOf="@+id/lblFeature2" />
+
+                <View
+                    android:id="@+id/dividerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/divider_height"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="32dp"
+                    android:background="?attr/primary_ui_05"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/lblFeature3" />
+
+                <ImageView
+                    android:id="@+id/imgLogo"
+                    android:layout_width="232dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginStart="64dp"
+                    android:layout_marginEnd="64dp"
+                    android:contentDescription="@string/pocket_casts_plus"
+                    android:scaleType="fitXY"
+                    android:src="?attr/plus_logo"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/dividerView" />
+
+                <TextView
+                    android:id="@+id/lblFindMore"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="64dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="64dp"
+                    android:gravity="center"
+                    android:text="@string/profile_find_out_more"
+                    android:textAppearance="@style/H50"
+                    android:textColor="?attr/primary_interactive_01"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/imgLogo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNext"
+        style="@style/MaterialButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.02"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/profile_next"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

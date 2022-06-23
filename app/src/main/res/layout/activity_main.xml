@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/root">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/mainFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/design_bottom_navigation_height"
+            android:clipToPadding="false" />
+
+        <!-- Hack: the only way to get the Snackbar in front of the bottom navigation view -->
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/snackbarFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="56dp"/>
+
+        <au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
+            android:id="@+id/playerBottomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000"
+            android:elevation="8dp"
+            android:visibility="gone"
+            app:behavior_peekHeight="@dimen/miniPlayerPeekHeight"
+            app:layout_behavior="au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheetBehavior" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:elevation="8dp"
+            android:background="?attr/primary_ui_03"
+            app:itemTextColor="@color/navigation_color"
+            app:itemIconTint="@color/navigation_color"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/navigation" />
+
+        <FrameLayout
+            android:id="@+id/fragmentOverBottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:translationZ="100dp"/>
+
+        <FrameLayout
+            android:id="@+id/frameBottomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="8dp"
+            app:behavior_peekHeight="0dp"
+            app:layout_behavior="au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior"
+            android:clickable="true"
+            android:translationZ="200dp"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <au.com.shiftyjelly.pocketcasts.views.component.RadioactiveLineView
+        android:id="@+id/radioactiveLineView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+</FrameLayout>

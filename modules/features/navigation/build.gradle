@@ -1,0 +1,5 @@
+apply from: "../../modules.gradle"
+
+dependencies {
+    implementation "com.github.akarnokd:rxjava2-extensions:0.20.10"
+}

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<au.com.shiftyjelly.pocketcasts.player.helper.NestedCoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/tabHolder"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="8dp"
+            tools:ignore="RtlSymmetry">
+
+            <ImageView
+                android:id="@+id/btnClosePlayer"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:contentDescription="@string/player_close"
+                app:srcCompat="@drawable/ic_chevron_white"
+                app:tint="?attr/player_contrast_01" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                style="@style/Widget.MaterialComponents.TabLayout"
+                app:tabIndicatorFullWidth="false"
+                app:tabTextAppearance="@style/PlayerTabTextAppearance"
+                app:tabGravity="fill"
+                app:tabMode="scrollable"
+                app:tabIndicatorColor="?attr/player_contrast_01"
+                app:tabTextColor="?attr/player_contrast_02"
+                app:tabSelectedTextColor="?attr/player_contrast_01"
+                app:tabBackground="@color/transparent"
+                app:tabPaddingStart="@dimen/player_tab_padding"
+                app:tabPaddingEnd="@dimen/player_tab_padding"
+                app:tabMinWidth="0dp" />
+            <FrameLayout
+                android:layout_width="68dp"
+                android:layout_height="match_parent">
+                <ImageView
+                    android:id="@+id/upNextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/mini_player_upnext_badge"
+                    app:tint="?attr/player_contrast_01" />
+                <TextView
+                    android:id="@+id/countText"
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="30.5dp"
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeMaxTextSize="16sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:letterSpacing="-0.05"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:layout_gravity="end|center_vertical"
+                    android:textColor="#000" />
+            </FrameLayout>
+
+        </LinearLayout>
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/upNextFrameBottomSheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="8dp"
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        android:clickable="true"
+        android:translationZ="200dp"
+        android:visibility="gone" />
+
+    <au.com.shiftyjelly.pocketcasts.views.tour.TourView
+        android:id="@+id/tourView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</au.com.shiftyjelly.pocketcasts.player.helper.NestedCoordinatorLayout>

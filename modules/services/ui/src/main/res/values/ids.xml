@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="stepview" type="id" />
+    <item name="tour_background" type="id" />
+    <item name="leftRightItem1" type="id" />
+    <item name="leftRightItem2" type="id" />
+    <item name="menu_markasunplayed" type="id" />
+    <item name="menu_unstar" type="id" />
+    <item name="menu_undownload" type="id" />
+    <item name="menu_unarchive" type="id" />
+</resources>

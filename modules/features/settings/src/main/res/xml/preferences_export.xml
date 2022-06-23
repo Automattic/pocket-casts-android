@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:persistent="true" >
+
+    <PreferenceCategory android:title="@string/settings_import_title" >
+        <Preference
+            android:key="importPodcasts"
+            android:summary="@string/settings_import_file_summary"
+            android:title="@string/settings_import_file" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_export_subscriptions" >
+        <Preference
+            android:key="exportSendEmail"
+            android:summary="@string/settings_export_send_email_summary"
+            android:title="@string/settings_export_send_email" />
+        <Preference
+            android:key="exportSaveFile"
+            android:summary="@string/settings_export_save_file_summary"
+            android:title="@string/settings_export_save_file" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

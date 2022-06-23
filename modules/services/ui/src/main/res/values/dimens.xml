@@ -1,0 +1,7 @@
+<resources>
+    <integer name="podcast_list_column_num">1</integer>
+
+    <dimen name="bottom_sheet_corner_radius">8dp</dimen>
+    <dimen name="bottom_sheet_top_padding">10dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+</resources>

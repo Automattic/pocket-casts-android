@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+    <View
+        android:layout_width="48dp"
+        android:layout_height="4dp"
+        android:background="@drawable/background_dragger_player"
+        android:layout_marginTop="4dp"
+        android:layout_gravity="center"/>
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="156dp"
+        android:layout_height="148dp"
+        app:srcCompat="@drawable/plus_logo_vertical_white"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:text="@string/profile_promo_upgraded"
+        style="@style/H20" />
+    <TextView
+        android:id="@+id/lblDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        tools:text="Three months of pocketcasts free!"
+        android:lineSpacingMultiplier="1.2"
+        android:gravity="center"
+        android:textColor="?attr/primary_text_02"
+        style="@style/P30" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDone"
+        style="@style/MaterialButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="40dp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.02"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/done"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        app:cornerRadius="12dp" />
+</LinearLayout>

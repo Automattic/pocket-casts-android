@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+            android:key="selectAllPodcasts"
+            android:persistent="false"
+            android:defaultValue="false"
+            android:title="" />
+
+    <PreferenceCategory android:key="podcastsList"
+                        android:title="@string/podcasts">
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

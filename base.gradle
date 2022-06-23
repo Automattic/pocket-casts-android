@@ -1,0 +1,255 @@
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'dagger.hilt.android.plugin'
+
+def SERVER_MAIN_URL_PROD = "\"https://refresh.pocketcasts.com\""
+def SERVER_API_URL_PROD = "\"https://api.pocketcasts.com\""
+def SERVER_CACHE_URL_PROD = "\"https://cache.pocketcasts.com\""
+def SERVER_STATIC_URL_PROD = "\"https://static.pocketcasts.com\""
+def SERVER_SHARING_URL_PROD = "\"https://sharing.pocketcasts.com\""
+def SERVER_LIST_URL_PROD = "\"https://lists.pocketcasts.com\""
+def SERVER_LIST_HOST_PROD = "\"lists.pocketcasts.com\""
+def SERVER_SHORT_URL_PROD = "\"https://pca.st\""
+def WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
+
+ext {
+    canSignRelease = project.hasProperty('pocketcastsKeyStoreFile')
+}
+
+android {
+    compileSdkVersion project.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion project.minSdkVersion
+        targetSdkVersion project.targetSdkVersion
+        versionCode project.versionCode
+        versionName project.versionName
+        buildConfigField 'int', 'VERSION_CODE', "${project.versionCode}"
+        buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
+
+        buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.properties["pocketcastsSettingsEncryptSecret"] ?: ""}\""
+        buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.properties["pocketcastsSharingServerSecret"] ?: ""}\""
+
+        testInstrumentationRunner project.testInstrumentationRunner
+        testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+        // disable Kotlin warnings for Coroutines, working with the annotation @OptIn(DelicateCoroutinesApi::class)
+        freeCompilerArgs += [
+            "-Xopt-in=kotlin.RequiresOptIn"
+        ]
+        kotlinOptions.allWarningsAsErrors = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion project.versionCompose
+    }
+
+    testOptions {
+        animationsDisabled = true
+    }
+
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/licenses/ASM'
+        // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
+        exclude '**/attach_hotspot_windows.dll'
+    }
+
+    buildTypes {
+        debug {
+            pseudoLocalesEnabled true
+            testCoverageEnabled false
+            ext.alwaysUpdateBuildId = false
+
+            buildConfigField "String", "SERVER_MAIN_URL", "\"https://refresh.pocketcasts.net\""
+            buildConfigField "String", "SERVER_API_URL", "\"https://api.pocketcasts.net\""
+            buildConfigField "String", "SERVER_CACHE_URL", "\"https://podcast-api.pocketcasts.net\""
+            buildConfigField "String", "SERVER_STATIC_URL", "\"https://static.pocketcasts.net\""
+            buildConfigField "String", "SERVER_SHARING_URL", "\"https://sharing.pocketcasts.net\""
+            buildConfigField "String", "SERVER_SHORT_URL", "\"https://pcast.pocketcasts.net\""
+            buildConfigField "String", "WEB_BASE_HOST", "\"pocketcasts.net\""
+            buildConfigField "String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.net\""
+            buildConfigField "String", "SERVER_LIST_HOST", "\"lists.pocketcasts.net\""
+        }
+
+        debugProd {
+            debuggable true
+
+            testCoverageEnabled false
+            ext.alwaysUpdateBuildId = false
+
+            buildConfigField "String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD
+            buildConfigField "String", "SERVER_API_URL", SERVER_API_URL_PROD
+            buildConfigField "String", "SERVER_CACHE_URL", SERVER_CACHE_URL_PROD
+            buildConfigField "String", "SERVER_STATIC_URL", SERVER_STATIC_URL_PROD
+            buildConfigField "String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD
+            buildConfigField "String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD
+            buildConfigField "String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD
+            buildConfigField "String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD
+            buildConfigField "String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD
+        }
+
+        release {
+            minifyEnabled true
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$rootProject.rootDir.absolutePath/app/proguard-rules.pro"
+
+            buildConfigField "String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD
+            buildConfigField "String", "SERVER_API_URL", SERVER_API_URL_PROD
+            buildConfigField "String", "SERVER_CACHE_URL", SERVER_CACHE_URL_PROD
+            buildConfigField "String", "SERVER_STATIC_URL", SERVER_STATIC_URL_PROD
+            buildConfigField "String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD
+            buildConfigField "String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD
+            buildConfigField "String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD
+            buildConfigField "String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD
+            buildConfigField "String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD
+        }
+    }
+
+    lintOptions {
+        disable 'AppCompatResource', 'ContentDescription', 'DiffUtilEquals'
+        xmlReport true
+    }
+}
+
+dependencies {
+    // Uncomment if you want to run with leak canary
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+
+    implementation androidLibs.appCompat
+    implementation androidLibs.ktx
+    implementation androidLibs.ktxFragment
+    implementation androidLibs.ktxPreference
+    implementation androidLibs.mediarouter
+    implementation androidLibs.palette
+    implementation androidLibs.recyclerview
+    implementation androidLibs.design
+    implementation androidLibs.cardview
+    implementation androidLibs.preference
+    implementation androidLibs.browser
+    implementation androidLibs.constraintLayout
+    implementation androidLibs.cast
+    implementation platform(androidLibs.firebaseBom)
+    implementation androidLibs.firebaseCrashlytics
+    implementation androidLibs.firebaseAnalytics
+    implementation androidLibs.firebaseConfig
+    implementation androidLibs.liveDataReactiveStreams
+    implementation androidLibs.lifecycleViewModel
+    implementation androidLibs.lifecycleScope
+    implementation androidLibs.lifecycleLiveData
+    implementation androidLibs.lifecycleProcess
+    implementation androidLibs.paging
+    implementation androidLibs.pagingRx
+    implementation androidLibs.workManager
+    implementation androidLibs.workManagerRx
+    implementation androidLibs.navigationFragment
+    implementation androidLibs.navigationUi
+    implementation androidLibs.billing
+    implementation androidLibs.openSource
+    implementation androidLibs.viewPager
+    implementation androidLibs.swipeToRefresh
+    implementation androidLibs.browserHelper
+    implementation androidLibs.guava
+    implementation androidLibs.flexbox
+    implementation androidLibs.composeActivity
+    implementation androidLibs.composeUi
+    implementation androidLibs.composeUiToolingPreview
+    implementation androidLibs.composeMaterial
+    implementation androidLibs.composeAnimation
+    implementation androidLibs.composeViewModel
+    implementation androidLibs.composeLiveData
+    implementation androidLibs.composeNavigation
+    implementation androidLibs.composeRx
+
+    implementation libs.kotlinCoroutines
+    implementation libs.kotlinCoroutinesAndroid
+    implementation libs.kotlinCoroutinesRx
+    implementation libs.deviceNames
+    implementation libs.exoplayerCore
+    implementation libs.exoplayerUi
+    implementation libs.exoplayerMediaSession
+    implementation libs.exoplayerCast
+    implementation libs.glide
+    implementation libs.glideOkHttp
+    implementation libs.coil
+    implementation libs.coilCompose
+    implementation libs.okHttp
+    implementation libs.okHttpLogging
+    implementation libs.rxJava
+    implementation libs.rxAndroid
+    implementation libs.rxKoltin
+    implementation libs.rxRelay
+    implementation libs.retrofit
+    implementation libs.retrofitMoshi
+    implementation libs.retrofitRxJava
+    implementation libs.moshi
+    implementation libs.moshiAdapters
+    implementation libs.kotlin
+    implementation libs.timber
+    implementation libs.materialDialog
+    implementation libs.lottie
+    implementation libs.materialProgressBar
+    implementation libs.hiltAndroid
+    implementation libs.hiltWorkManager
+    implementation libs.accompanistFlowLayout
+
+    kapt libs.moshiKotlinCompile
+    kapt libs.glideCompile
+    kapt libs.hiltCompiler
+    kapt libs.hiltDaggerCompiler
+
+    debugImplementation androidLibs.composeUiTooling
+    debugProdImplementation androidLibs.composeUiTooling
+    debugImplementation androidLibs.composeUiTestManifest
+    debugProdImplementation androidLibs.composeUiTestManifest
+
+    testImplementation libs.junit
+    testImplementation libs.jsonAssert
+    testImplementation libs.mockWebServer
+    testImplementation libs.testMokitoKotlin
+    androidTestImplementation libs.jsonAssert
+    androidTestImplementation androidLibs.androidTestCore
+    androidTestImplementation androidLibs.roomTest
+    androidTestImplementation androidLibs.annotations
+    androidTestImplementation androidLibs.testRunner
+    androidTestImplementation androidLibs.testRules
+    androidTestImplementation androidLibs.testEspressoCore
+    androidTestImplementation androidLibs.testEspressoContrib
+    androidTestImplementation androidLibs.testExpressoIntents
+    androidTestImplementation androidLibs.testExpressoAccessibility
+    androidTestImplementation androidLibs.testExpressoWeb
+    androidTestImplementation androidLibs.testExpressoIdlingConcurrent
+    androidTestImplementation androidLibs.testExpressoIdlingResouce
+    androidTestImplementation androidLibs.testUiautomator
+    androidTestImplementation androidLibs.workManagerTest
+    androidTestImplementation androidLibs.composeUiTestJunit
+    androidTestImplementation libs.testMockitoAndroid
+    androidTestImplementation libs.testMokitoKotlin
+    androidTestImplementation libs.mockWebServer
+    androidTestImplementation(libs.barista) {
+        exclude group: 'org.jetbrains.kotlin'
+    }
+
+    coreLibraryDesugaring androidLibs.desugarJdk
+}

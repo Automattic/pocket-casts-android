@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_archive"
+        android:icon="@drawable/ic_archive"
+        android:title="@string/archive"
+        app:showAsAction="always"/>
+    <item android:id="@+id/menu_removefromupnext"
+        android:icon="@drawable/ic_upnext_remove"
+        android:title="@string/remove_from_up_next"
+        app:showAsAction="always" />
+    <item android:id="@+id/menu_download"
+        android:icon="@drawable/ic_download"
+        android:title="@string/download"
+        app:showAsAction="always" />
+    <item android:id="@+id/menu_mark_played"
+        android:icon="@drawable/ic_markasplayed"
+        android:title="@string/mark_as_played"
+        app:showAsAction="always" />
+    <item android:id="@+id/menu_movetotop"
+        android:title="@string/player_up_next_move_to_top"
+        android:icon="@drawable/ic_upnext_movetotop"
+        app:showAsAction="never" />
+    <item android:id="@+id/menu_movetobottom"
+        android:title="@string/player_up_next_move_to_bottom"
+        android:icon="@drawable/ic_upnext_movetobottom"
+        app:showAsAction="never" />
+    <item android:id="@+id/menu_select_all"
+        android:title="@string/select_all"
+        app:showAsAction="never" />
+    <item android:id="@+id/menu_unselect_all"
+        android:title="@string/select_none"
+        app:showAsAction="never" />
+</menu>

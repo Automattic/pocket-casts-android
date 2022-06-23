@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/secondary_ui_01"
+            android:minHeight="?android:attr/actionBarSize" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/primary_ui_04"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/themeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/primary_ui_04"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/lblTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_theme"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/themeLayout" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/themeRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:clipToPadding="false"
+                android:paddingStart="72dp"
+                android:paddingEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblTheme" />
+
+            <TextView
+                android:id="@+id/lblSystemTheme"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/settings_use_android_light_dark_mode"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                app:layout_constraintEnd_toStartOf="@+id/swtShowArtwork"
+                app:layout_constraintStart_toStartOf="@+id/lblPodcastArtwork"
+                app:layout_constraintTop_toBottomOf="@+id/themeRecyclerView" />
+
+            <Switch
+                android:id="@+id/swtSystemTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblSystemTheme"
+                app:layout_constraintBottom_toBottomOf="@+id/lblSystemTheme"/>
+
+            <View
+                android:id="@+id/dividerView0"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblSystemTheme" />
+
+            <TextView
+                android:id="@+id/lblAppIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/settings_app_icon"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView0" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/appIconRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:clipToPadding="false"
+                android:paddingStart="72dp"
+                android:paddingEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblAppIcon" />
+
+            <View
+                android:id="@+id/dividerView1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/appIconRecyclerView" />
+
+            <TextView
+                android:id="@+id/lblPodcastArtwork"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="72dp"
+                android:layout_marginTop="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/settings_podcast_artwork"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView1" />
+
+            <View
+                android:id="@+id/btnShowArtwork"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblShowArtwork"
+                app:layout_constraintBottom_toBottomOf="@+id/lblShowArtworkDetails"/>
+
+            <TextView
+                android:id="@+id/lblShowArtwork"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:paddingTop="8dp"
+                android:text="@string/settings_show_artwork"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@+id/swtShowArtwork"
+                app:layout_constraintStart_toStartOf="@+id/lblPodcastArtwork"
+                app:layout_constraintTop_toBottomOf="@+id/lblPodcastArtwork" />
+
+            <Switch
+                android:id="@+id/swtShowArtwork"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="24dp"
+                android:contentDescription="@string/settings_show_artwork"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblShowArtwork" />
+
+            <TextView
+                android:id="@+id/lblShowArtworkDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/settings_show_artwork_details"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintEnd_toStartOf="@+id/swtShowArtwork"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/lblShowArtwork"
+                app:layout_constraintTop_toBottomOf="@+id/lblShowArtwork" />
+
+            <View
+                android:id="@+id/btnUseEmbeddedArtwork"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblUseEmbeddedArtwork"
+                app:layout_constraintBottom_toBottomOf="@+id/lblUseEmbeddedArtworkDetails"/>
+
+            <TextView
+                android:id="@+id/lblUseEmbeddedArtwork"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/settings_use_embedded_podcast_artwork"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@+id/swtUseEmbeddedArtwork"
+                app:layout_constraintStart_toStartOf="@+id/lblPodcastArtwork"
+                app:layout_constraintTop_toBottomOf="@+id/lblShowArtworkDetails" />
+
+            <Switch
+                android:id="@+id/swtUseEmbeddedArtwork"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="24dp"
+                android:contentDescription="@string/settings_use_embedded_podcast_artwork"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblUseEmbeddedArtwork" />
+
+            <TextView
+                android:id="@+id/lblUseEmbeddedArtworkDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/settings_embedded_artwork_details"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintEnd_toStartOf="@+id/swtUseEmbeddedArtwork"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/lblUseEmbeddedArtwork"
+                app:layout_constraintTop_toBottomOf="@+id/lblUseEmbeddedArtwork" />
+
+            <TextView
+                android:id="@+id/lblRefreshAllPodcastArtwork"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_refresh_all_podcast_artwork"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:paddingStart="72dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblUseEmbeddedArtworkDetails" />
+
+            <View
+                android:id="@+id/dividerView"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_marginTop="16dp"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblRefreshAllPodcastArtwork" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/upgradeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="imgLogo,btnCloseUpgrade,footerPadding,lblGetMore,lblFindMore" />
+
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="232dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/pocket_casts_plus"
+                android:scaleType="fitXY"
+                android:src="?attr/plus_logo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView" />
+
+            <ImageView
+                android:id="@+id/btnCloseUpgrade"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@string/settings_close_upgrade_offer"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_close"
+                app:tint="?attr/primary_text_02"
+                android:background="?attr/actionBarItemBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView" />
+
+            <TextView
+                android:id="@+id/lblGetMore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="64dp"
+                android:layout_marginEnd="64dp"
+                android:gravity="center_horizontal"
+                android:text="@string/settings_get_plus_and_more"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_02"
+                android:lineSpacingMultiplier="1.1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imgLogo" />
+
+            <TextView
+                android:id="@+id/lblFindMore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="64dp"
+                android:layout_marginStart="64dp"
+                android:layout_marginEnd="64dp"
+                android:gravity="center"
+                android:text="@string/settings_learn_more"
+                android:textAppearance="@style/H50"
+                android:textColor="?attr/primary_interactive_01"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblGetMore" />
+
+            <Space
+                android:id="@+id/footerPadding"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblFindMore" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

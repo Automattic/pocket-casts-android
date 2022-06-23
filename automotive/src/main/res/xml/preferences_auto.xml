@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/player_up_next">
+        <SwitchPreference
+            android:key="autoUpNextEmpty"
+            android:title="@string/settings_auto_play"
+            app:defaultValue="true"
+            android:summary="@string/settings_auto_play_summary" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_title_playback">
+        <SwitchPreference
+            android:key="autoSubscribeToPlayed"
+            android:title="@string/settings_subscribe_to_played"
+            android:defaultValue="true"
+            android:summary="@string/settings_subscribe_to_played_summary" />
+    </PreferenceCategory>
+    <EditTextPreference
+        android:id="@+id/edit_text_skip_forward"
+        android:name="Skip Forward"
+        android:defaultValue="30"
+        android:inputType="number"
+        android:key="skipForward"
+        android:selectAllOnFocus="true"
+        android:summary="@string/settings_skip_forward_time_summary"
+        android:title="@string/settings_skip_forward_time" />
+    <EditTextPreference
+        android:name="Skip Back"
+        android:defaultValue="10"
+        android:inputType="number"
+        android:key="skipBack"
+        android:selectAllOnFocus="true"
+        android:summary="@string/settings_skip_back_time_summary"
+        android:title="@string/settings_skip_back_time" />
+    <Preference
+        android:key="refresh_now"
+        android:title="@string/profile_refresh_now"
+        android:summary=""
+        android:persistent="false" />
+</PreferenceScreen>

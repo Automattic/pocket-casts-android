@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/primary_ui_01"
+        android:theme="@style/PlayerTheme">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp">
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/sleepSetup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="@{!safeUnbox(viewModel.isSleepRunning)}"
+                app:constraint_referenced_ids="sleepTitle,labelMins5,buttonMins5,separator1,labelMins15,buttonMins15,separator2,labelMins30,buttonMins30,separator3,labelMins60,buttonMins60,separator4,labelEndOfEpisode,buttonEndOfEpisode,separator5,labelCustom,buttonCustom,customMinusButton,customPlusButton"
+                tools:ignore="MissingConstraints" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/sleepRunning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="@{safeUnbox(viewModel.isSleepRunning)}"
+                app:constraint_referenced_ids="sleepAnimation"
+                tools:ignore="MissingConstraints" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/sleepRunningTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="@{safeUnbox(viewModel.isSleepRunning) &amp;&amp; !safeUnbox(viewModel.isSleepAtEndOfEpisode)}"
+                app:constraint_referenced_ids="sleepTime,buttonAddTime,buttonEndOfEpisode2,buttonCancelTime"
+                tools:ignore="MissingConstraints" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/sleepRunningEndOfEpisode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="@{safeUnbox(viewModel.isSleepRunning) &amp;&amp; safeUnbox(viewModel.isSleepAtEndOfEpisode)}"
+                app:constraint_referenced_ids="sleepingEndOfEpisode,buttonCancelEndOfEpisode"
+                tools:ignore="MissingConstraints" />
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/background_dragger_player"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/sleepTitle"
+                style="@style/H30"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/player_sleep_timer_title"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/labelMins5"
+                style="@style/DarkSubtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical"
+                android:importantForAccessibility="no"
+                android:text="@string/player_sleep_5_minutes"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sleepTitle" />
+
+            <View
+                android:id="@+id/buttonMins5"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:contentDescription="@string/player_sleep_5_minutes"
+                android:focusable="true"
+                app:layout_constraintBottom_toBottomOf="@+id/labelMins5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/labelMins5" />
+
+            <View
+                android:id="@+id/separator1"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/player_contrast_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/labelMins5" />
+
+            <TextView
+                android:id="@+id/labelMins15"
+                style="@style/DarkSubtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:layout_marginStart="32dp"
+                android:gravity="center_vertical"
+                android:importantForAccessibility="no"
+                android:text="@string/player_sleep_15_minutes"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/separator1" />
+
+            <View
+                android:id="@+id/buttonMins15"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:contentDescription="@string/player_sleep_15_minutes"
+                android:focusable="true"
+                app:layout_constraintBottom_toBottomOf="@+id/labelMins15"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/labelMins15" />
+
+            <View
+                android:id="@+id/separator2"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/player_contrast_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/labelMins15" />
+
+            <TextView
+                android:id="@+id/labelMins30"
+                style="@style/DarkSubtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:layout_marginStart="32dp"
+                android:gravity="center_vertical"
+                android:importantForAccessibility="no"
+                android:text="@string/player_sleep_30_minutes"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/separator2" />
+
+            <View
+                android:id="@+id/buttonMins30"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:contentDescription="@string/player_sleep_30_minutes"
+                android:focusable="true"
+                app:layout_constraintBottom_toBottomOf="@+id/labelMins30"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/labelMins30" />
+
+            <View
+                android:id="@+id/separator3"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/player_contrast_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/labelMins30" />
+
+            <TextView
+                android:id="@+id/labelMins60"
+                style="@style/DarkSubtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:layout_marginStart="32dp"
+                android:gravity="center_vertical"
+                android:importantForAccessibility="no"
+                android:text="@string/player_sleep_60_minutes"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/separator3" />
+
+            <View
+                android:id="@+id/buttonMins60"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:contentDescription="@string/player_sleep_60_minutes"
+                android:focusable="true"
+                app:layout_constraintBottom_toBottomOf="@+id/labelMins60"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/labelMins60" />
+
+            <View
+                android:id="@+id/separator4"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/player_contrast_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/labelMins60" />
+
+            <TextView
+                android:id="@+id/labelEndOfEpisode"
+                style="@style/DarkSubtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:layout_marginStart="32dp"
+                android:gravity="center_vertical"
+                android:importantForAccessibility="no"
+                android:text="@string/player_sleep_end_of_episode"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/separator4" />
+
+            <View
+                android:id="@+id/buttonEndOfEpisode"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:contentDescription="@string/player_sleep_end_of_episode"
+                android:focusable="true"
+                app:layout_constraintBottom_toBottomOf="@+id/labelEndOfEpisode"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/labelEndOfEpisode" />
+
+            <View
+                android:id="@+id/separator5"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/player_contrast_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/labelEndOfEpisode" />
+
+            <TextView
+                android:id="@+id/labelCustom"
+                style="@style/DarkSubtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:layout_marginStart="32dp"
+                android:gravity="center_vertical"
+                android:text="@{viewModel.sleepCustomTimeText}"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/separator5" />
+
+            <View
+                android:id="@+id/buttonCustom"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintBottom_toBottomOf="@+id/labelCustom"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/labelCustom" />
+
+            <ImageView
+                android:id="@+id/customMinusButton"
+                android:layout_width="44dp"
+                android:layout_height="0dp"
+                android:contentDescription="@string/player_sleep_custom_minus"
+                android:scaleType="center"
+                android:src="@drawable/ic_minus"
+                app:tint="?attr/player_contrast_01"
+                app:layout_constraintBottom_toBottomOf="@+id/labelCustom"
+                app:layout_constraintEnd_toStartOf="@+id/customPlusButton"
+                app:layout_constraintTop_toTopOf="@+id/labelCustom" />
+
+            <ImageView
+                android:id="@+id/customPlusButton"
+                android:layout_width="44dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="24dp"
+                android:contentDescription="@string/player_sleep_custom_plus"
+                android:scaleType="center"
+                android:src="@drawable/ic_effects_plus"
+                app:tint="?attr/player_contrast_01"
+                app:layout_constraintBottom_toBottomOf="@+id/labelCustom"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/labelCustom" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/sleepAnimation"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="32dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/sleep_button" />
+
+            <TextView
+                android:id="@+id/sleepTime"
+                style="@style/DarkH1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="monospace"
+                android:text="@{viewModel.sleepTimeLeftText}"
+                android:textSize="60sp"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sleepAnimation" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonAddTime"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="32dp"
+                android:minWidth="172dp"
+                android:text="@string/player_sleep_add_5_minutes"
+                android:textColor="?attr/player_contrast_01"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sleepTime"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonEndOfEpisode2"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="32dp"
+                android:minWidth="172dp"
+                android:text="@string/player_sleep_end_of_episode"
+                android:textColor="?attr/player_contrast_01"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/buttonAddTime"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonCancelTime"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="32dp"
+                android:minWidth="172dp"
+                android:text="@string/player_sleep_cancel_timer"
+                android:textColor="?attr/player_contrast_01"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/buttonEndOfEpisode2"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
+
+            <TextView
+                android:id="@+id/sleepingEndOfEpisode"
+                style="@style/DarkSubtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/player_sleep_when_episode_ends"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sleepAnimation" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonCancelEndOfEpisode"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="32dp"
+                android:minWidth="172dp"
+                android:text="@string/player_sleep_cancel_timer"
+                android:textColor="?attr/player_contrast_01"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sleepingEndOfEpisode"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</layout>

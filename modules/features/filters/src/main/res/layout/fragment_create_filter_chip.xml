@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rootScrollView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fillViewport="true"
+    android:background="?attr/primary_ui_01">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:clipToPadding="false">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/filters_create_filter"
+            style="@style/H10"
+            android:textColor="?attr/primary_text_01" />
+        <TextView
+            android:id="@+id/lblFilterBy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/filters_create_filter_by"
+            android:layout_marginTop="40dp"
+            style="@style/C60"
+            android:textColor="?attr/primary_text_02" />
+        <View
+            android:id="@+id/filterByDivider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/primary_ui_05"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"/>
+
+        <HorizontalScrollView
+            android:id="@+id/chipScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/primary_ui_01"
+            android:layout_marginEnd="-16dp"
+            android:layout_marginStart="-16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clipToPadding="false">
+            <LinearLayout
+                android:id="@+id/chipLinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                tools:ignore="UselessLeaf">
+                <!-- Empty at start, dynamically added to -->
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/lblAddMore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/filters_create_add_more"
+            android:layout_marginTop="24dp"
+            style="@style/H60"
+            android:visibility="gone"
+            android:textColor="?attr/primary_text_02" />
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/chipBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:flexWrap="wrap">
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPodcasts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipEpisodes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDownload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAudioVideo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipStarred"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dp" />
+        </com.google.android.flexbox.FlexboxLayout>
+
+        <TextView
+            android:id="@+id/lblSelectFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/filters_create_select_criteria"
+            android:layout_marginTop="24dp"
+            style="@style/H60"
+            android:textColor="?attr/primary_text_02" />
+
+        <TextView
+            android:id="@+id/lblPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/filters_preview"
+            android:layout_marginTop="24dp"
+            style="@style/C60"
+            android:visibility="gone"
+            android:textColor="?attr/primary_text_02" />
+        <View
+            android:id="@+id/previewDivider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/primary_ui_05"
+            android:layout_marginTop="10dp"
+            android:visibility="gone" />
+
+        <include layout="@layout/filter_empty_layout"
+            android:id="@+id/emptyLayout"
+            android:visibility="gone"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

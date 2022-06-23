@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ThemeLight" parent="ThemeBaseLight">
+        <item name="android:navigationBarColor">?attr/primary_ui_03</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:statusBarColor">?attr/secondary_ui_01</item>
+    </style>
+
+    <style name="ThemeDark" parent="ThemeBaseDark">
+        <item name="android:navigationBarColor">?attr/primary_ui_03</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:statusBarColor">?attr/secondary_ui_01</item>
+    </style>
+
+    <style name="ClassicLight" parent="BaseClassicLight">
+        <item name="android:navigationBarColor">?attr/primary_ui_03</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:statusBarColor">?attr/secondary_ui_01</item>
+    </style>
+
+    <style name="Indigo" parent="BaseIndigo">
+        <item name="android:navigationBarColor">?attr/primary_ui_03</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:statusBarColor">?attr/secondary_ui_01</item>
+    </style>
+
+    <style name="Radioactive" parent="BaseRadioactive">
+        <item name="android:navigationBarColor">?attr/primary_ui_03</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:statusBarColor">?attr/secondary_ui_01</item>
+    </style>
+
+    <style name="BottomSheetDialogThemeLight" parent="BottomSheetDialogBaseThemeLight">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:navigationBarColor">?attr/primary_ui_01</item>
+    </style>
+
+    <style name="BottomSheetDialogThemeDark" parent="BottomSheetDialogBaseThemeDark">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:navigationBarColor">?attr/primary_ui_01</item>
+    </style>
+
+</resources>

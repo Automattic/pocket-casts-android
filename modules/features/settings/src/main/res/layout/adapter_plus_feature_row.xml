@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+    <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
+        android:id="@+id/imgIcon"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:gradient="gradient_1" />
+    <TextView
+        android:id="@+id/lblTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/H40"
+        android:textColor="?attr/primary_text_01"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintStart_toEndOf="@id/imgIcon"
+        app:layout_constraintBottom_toTopOf="@id/lblBody"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <TextView
+        android:id="@+id/lblBody"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/P40"
+        android:textColor="?attr/primary_text_02"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toStartOf="@id/lblTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lblTitle"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

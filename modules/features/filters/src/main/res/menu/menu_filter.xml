@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/media_route_menu_item"
+        android:title="@string/play_on"
+        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_sortby"
+        android:title="@string/filters_options_sort_by"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_playall"
+        app:showAsAction="never"
+        android:title="@string/filters_options_play_all" />
+    <item
+        android:id="@+id/menu_downloadall"
+        app:showAsAction="never"
+        android:title="@string/filters_options_download_all" />
+    <item
+        android:id="@+id/menu_options"
+        android:title="@string/filters_options_settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_delete"
+        android:title="@string/filters_options_delete"
+        app:showAsAction="never" />
+</menu>

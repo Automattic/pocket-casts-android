@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/episode_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/primary_ui_02"
+        android:paddingTop="8dp">
+
+        <au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeSearchView
+            android:id="@+id/episodeSearchView"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnEpisodeOptions"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnEpisodeOptions"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/ic_more_vert_black_24dp"
+            android:contentDescription="@string/podcast_episodes_options"
+            android:background="?android:attr/actionBarItemBackground"
+            app:tint="?attr/primary_icon_02"
+            app:layout_constraintStart_toEndOf="@+id/episodeSearchView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/primary_ui_05"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/episodeSearchView" />
+
+        <TextView
+            android:id="@+id/episodesSummary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif"
+            android:textStyle="normal"
+            android:textAppearance="?attr/textCaption"
+            android:textColor="?attr/primary_text_02"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            tools:textColor="@color/black"
+            tools:text="213 episodes • 24 archived"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnArchived"
+            app:layout_constraintTop_toTopOf="@+id/btnArchived"
+            app:layout_constraintBottom_toBottomOf="@+id/btnArchived"
+            app:layout_constraintHorizontal_chainStyle="spread_inside" />
+
+        <Button
+            android:id="@+id/btnArchived"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textAllCaps="false"
+            android:text="@string/podcast_episodes_show_archived"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="6dp"
+            android:gravity="center_vertical|end"
+            tools:textColor="@color/black"
+            tools:text="Show archived"
+            android:paddingBottom="2dp"
+            android:paddingTop="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/episodesSummary"
+            app:layout_constraintTop_toTopOf="@+id/divider"
+            app:layout_constraintBottom_toTopOf="@+id/summaryBarrier"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/summaryBarrier"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="episodesSummary,btnArchived" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/primary_ui_05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/summaryBarrier" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

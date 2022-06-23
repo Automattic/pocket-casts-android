@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/incoming_podcast_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        />
+
+    <TextView
+        android:id="@+id/incoming_subscribe_to_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/podcasts_share_subscribe_to_all"
+        android:textSize="14sp"
+        android:textColor="#78D549"
+        android:layout_gravity="right"
+        android:padding="16dp"
+        android:fontFamily="sans-serif-medium"
+        android:background="?android:attr/selectableItemBackground"
+        />
+
+</FrameLayout>

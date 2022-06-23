@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
+        <variable name="expanded" type="boolean" />
+        <variable name="tintColor" type="int"/>
+        <variable name="headerColor" type="int"/>
+        <variable name="isPlusUser" type="boolean"/>
+    </data>
+
+    <LinearLayout android:id="@+id/podcast_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/top"
+            layout="@layout/view_podcast_header_top"
+            app:podcast="@{podcast}"
+            app:tintColor="@{tintColor}"
+            app:headerColor="@{headerColor}"
+            app:expanded="@{expanded}"
+            app:isPlusUser="@{isPlusUser}"/>
+
+        <include
+            android:id="@+id/bottom"
+            layout="@layout/view_podcast_header_bottom"
+            app:podcast="@{podcast}"
+            app:tintColor="@{tintColor}"
+            app:expanded="@{expanded}" />
+
+    </LinearLayout>
+</layout>

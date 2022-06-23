@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutNoEpisodes"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="32dp"
+    android:paddingStart="64dp"
+    android:paddingEnd="64dp"
+    android:paddingBottom="32dp"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:orientation="vertical">
+
+    <TextView
+        style="?attr/textH2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/podcast_no_episodes_found"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/lblBody"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:maxWidth="250dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="?attr/primary_text_01"
+        android:layout_marginBottom="16dp"
+        tools:text="All 200 episodes of this podcast are archived" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnShowArchived"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:text="@string/podcast_episodes_show_archived" />
+
+</LinearLayout>

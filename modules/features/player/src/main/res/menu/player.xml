@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/enter_full_screen"
+        android:title="@string/player_full_screen"
+        android:icon="@drawable/ic_fullscreen"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/pip"
+        android:title="@string/player_pip"
+        android:icon="@drawable/ic_picture_in_picture"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/media_route_menu_item"
+        android:title="@string/play_on"
+        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/player_actions"
+        android:icon="@drawable/ic_more"
+        android:title="@string/player_actions"
+        app:showAsAction="always" />
+
+</menu>

@@ -1,0 +1,83 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-parcelize'
+}
+apply from: "../base.gradle"
+
+android {
+    defaultConfig {
+        minSdkVersion 28
+    }
+
+    if (canSignRelease) {
+        signingConfigs {
+            release {
+                storeFile = file(pocketcastsKeyStoreFile)
+                storePassword = pocketcastsKeyStorePassword
+                keyAlias = pocketcastsKeyStoreAlias
+                keyPassword = pocketcastsKeyStoreAliasPassword
+            }
+        }
+    }
+
+    buildTypes {
+        debugProd {
+            initWith debug
+
+            debuggable true
+        }
+
+        release {
+            manifestPlaceholders = [
+                    gitHash: ""
+            ]
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            if (canSignRelease) {
+                signingConfig signingConfigs.release
+            }
+
+        }
+    }
+
+    flavorDimensions "automotive"
+    productFlavors {
+        automotive {
+            dimension "automotive"
+            buildConfigField "String", "SYNC_USERNAME", "null"
+            buildConfigField "String", "SYNC_PASSWORD", "null"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    // Commented out the Automotive library as it clashes with the Material library and we don't use it. Duplicate value for resource attr/navigationIconTint.
+    //implementation 'androidx.car:car:1.0.0-alpha7'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation project(':modules:services:localization')
+
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:model')
+    implementation project(':modules:services:ui')
+    implementation project(':modules:services:views')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:servers')
+    implementation project(':modules:features:profile')
+    implementation project(':modules:features:podcasts')
+    implementation project(':modules:features:settings')
+    implementation project(':modules:features:discover')
+    implementation project(':modules:features:account')
+}
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'

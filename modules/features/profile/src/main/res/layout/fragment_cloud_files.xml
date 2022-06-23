@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/primary_ui_02">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/secondary_ui_01"
+            android:minHeight="?android:attr/actionBarSize" />
+
+        <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+            android:id="@+id/multiSelectToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/actionBarSize"
+            android:visibility="gone"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="?android:actionBarSize">
+        <LinearLayout
+            android:id="@+id/layoutUsage"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                app:src="@drawable/ic_cloud"
+                app:gradient="gradient_1" />
+            <TextView
+                android:id="@+id/lblFilecount"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                style="@style/H60"
+                android:textColor="?attr/primary_text_02"
+                tools:text="106 files"/>
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="match_parent" />
+            <TextView
+                android:id="@+id/lblUsage"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical|end"
+                style="@style/H60"
+                android:textColor="?attr/primary_text_02"
+                tools:text="1.8 GB / 2.0 GB"/>
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="match_parent" />
+            <TextView
+                android:id="@+id/lblPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                style="@style/H60"
+                tools:text="90% Full"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/layoutUsageLocked"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+            <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
+                android:layout_width="18dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                app:src="@drawable/ic_lock"
+                app:gradient="gradient_1" />
+            <TextView
+                android:id="@+id/lblFileUploadLocked"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                style="@style/H60"
+                android:textColor="?attr/primary_text_02"
+                android:text="@string/profile_cloud_no_files_uploaded"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/primary_ui_05" />
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:background="?attr/primary_ui_02"
+                android:paddingBottom="64dp" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/emptyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_marginTop="32dp"
+            app:src="@drawable/ic_no_files"
+            app:gradient="gradient_2" />
+
+        <TextView
+            android:id="@+id/lblEmptyTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:textAppearance="@style/H20"
+            android:textColor="?attr/primary_text_01" />
+
+        <TextView
+            android:id="@+id/lblEmptySummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:textAppearance="@style/H40"
+            android:textColor="?attr/primary_text_02" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/frameChildFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/primary_ui_01"
+        android:layout_marginTop="?android:actionBarSize"
+        android:visibility="gone"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/profile_cloud_add_file"
+        app:backgroundTint="?attr/primary_interactive_01"
+        app:tint="?attr/primary_interactive_02"
+        android:src="@drawable/ic_add_black_24dp" />
+</FrameLayout>

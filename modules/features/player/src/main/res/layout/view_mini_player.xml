@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable name="playbackState" type="au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState" />
+        <variable name="episode" type="au.com.shiftyjelly.pocketcasts.models.entity.Playable" />
+        <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast" />
+        <variable name="tintColor" type="int"/>
+        <variable name="upNextCount" type="int"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:focusable="true"
+        android:clickable="true">
+
+        <View
+            android:id="@+id/miniPlayerTint"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/primary_ui_01" />
+
+        <ImageView
+            android:id="@+id/artwork"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/round_corners_2dp"
+            app:clipToOutline="@{true}"
+            app:layout_constraintBottom_toTopOf="@+id/progressBar"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/skipForward"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_marginStart="8dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:scaleType="centerInside"
+            android:clickable="false"
+            android:contentDescription="@string/skip_forward"
+            app:tint="@{tintColor}"
+            app:layout_constraintBottom_toTopOf="@+id/progressBar"
+            app:layout_constraintStart_toEndOf="@+id/miniPlayButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/mini_player_skip_forward" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/miniPlayButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/mini_player_play_background"
+            android:scaleType="centerInside"
+            android:clickable="false"
+            app:backgroundTint="@{tintColor}"
+            app:lottie_rawRes="@raw/mini_player_play_button"
+            app:layout_constraintBottom_toTopOf="@+id/progressBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/skipBack"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:scaleType="centerInside"
+            android:clickable="false"
+            android:contentDescription="@string/skip_back"
+            app:tint="@{tintColor}"
+            app:layout_constraintBottom_toTopOf="@+id/progressBar"
+            app:layout_constraintEnd_toStartOf="@+id/miniPlayButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/mini_player_skip_back" />
+
+        <ImageButton
+            android:id="@+id/upNextButton"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:scaleType="centerInside"
+            android:clickable="false"
+            android:contentDescription="@string/player_up_next"
+            app:tint="@{tintColor}"
+            app:layout_constraintBottom_toTopOf="@+id/progressBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/countText"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_marginEnd="30.5dp"
+            android:textStyle="bold"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMaxTextSize="16sp"
+            app:autoSizeStepGranularity="1sp"
+            android:letterSpacing="-0.05"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="@{`` + upNextCount}"
+            android:textColor="?attr/primary_ui_01"
+            android:visibility="@{upNextCount > 0}"
+            app:layout_constraintBottom_toTopOf="@+id/progressBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_gravity="center"
+            android:progressDrawable="@drawable/mini_player_progress_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

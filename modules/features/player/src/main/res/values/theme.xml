@@ -1,0 +1,10 @@
+<resources>
+
+    <style name="PlayerTheme" parent="Theme.AppCompat.NoActionBar">
+    </style>
+
+    <style name="PlayerTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">@dimen/player_tab_text_size</item>
+    </style>
+</resources>

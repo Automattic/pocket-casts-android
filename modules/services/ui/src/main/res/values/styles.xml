@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppPreferenceTheme"
+        parent="@style/PreferenceThemeOverlay.v14.Material">
+        <item name="preferenceFragmentCompatStyle">
+            @style/PocketCasts.PreferenceThemeOverlay
+        </item>
+    </style>
+
+    <style name="PocketCasts.PreferenceThemeOverlay" parent="@style/PreferenceFragment.Material">
+        <item name="android:layout">@layout/settings_pocketcasts_settings_fragment</item>
+    </style>
+
+    <style name="row_podcast_title">
+        <item name="android:textSize">16sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">?attr/support_05</item>
+    </style>
+
+    <style name="row_podcast_subtitle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">?attr/support_05</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="WearMediaTheme">
+        <item name="colorPrimaryDark">#DE000000</item>
+    </style>
+
+    <style name="MaterialButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/button_background_color</item>
+        <item name="android:textColor">?attr/primary_interactive_02</item>
+    </style>
+
+    <style name="H10" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textSize">31sp</item>
+        <item name="android:textColor">?attr/primary_text_01</item>
+    </style>
+
+    <style name="H20" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">?attr/primary_text_01</item>
+    </style>
+
+    <style name="H30" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?attr/primary_text_01</item>
+    </style>
+
+    <style name="H40" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">?attr/primary_text_01</item>
+    </style>
+
+    <style name="H50" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/primary_text_01</item>
+    </style>
+
+    <style name="H60" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/primary_text_01</item>
+    </style>
+
+    <style name="H70" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="C40" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">?attr/primary_text_02</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
+    <style name="C50" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">?attr/primary_text_02</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
+    <style name="C60" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?attr/primary_text_02</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
+    <style name="C70" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">?attr/primary_text_02</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
+    <style name="P30" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?attr/secondary_text_01</item>
+    </style>
+
+    <style name="P40" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/secondary_text_01</item>
+    </style>
+
+    <style name="P50" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?attr/secondary_text_01</item>
+    </style>
+
+    <style name="P60" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">?attr/secondary_text_01</item>
+    </style>
+
+    <style name="PCOutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:paddingStart">40dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingEnd">40dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primary_interactive_01</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="PCButton" parent="Widget.MaterialComponents.Button">
+        <item name="background">?attr/primary_interactive_01</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:paddingStart">40dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingEnd">40dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primary_interactive_02</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:drawableTint">?attr/primary_interactive_02</item>
+    </style>
+
+    <style name="ShapeAppearancePill">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>

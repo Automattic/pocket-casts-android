@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:background="?attr/primary_ui_03"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/secondary_ui_01"
+            android:minHeight="?android:attr/actionBarSize" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:id="@+id/mainScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?android:actionBarSize"
+        android:background="?attr/primary_ui_03"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainConstraintView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="beforeDescendants"
+            android:focusableInTouchMode="true"
+            android:paddingBottom="16dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/nameLayout"
+                style="@style/PCTextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:hint="@string/profile_files_add_filename"
+                android:textColorHint="?attr/primary_text_01"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txtFilename"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
+                    android:inputType="textNoSuggestions"
+                    android:textColor="?attr/primary_text_01"
+                    tools:text="filename.mp3" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/lblFilename"
+                style="@style/P50"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="start"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/nameLayout"
+                app:layout_constraintEnd_toStartOf="@id/lblFilesize"
+                app:layout_constraintHorizontal_bias="0.0"
+                tools:text="Filename.mp3" />
+
+            <TextView
+                android:id="@+id/lblFilesize"
+                style="@style/P50"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/nameLayout"
+                tools:text="123.45 MB" />
+
+            <View
+                android:id="@+id/containerImage"
+                android:layout_width="match_parent"
+                android:layout_height="330dp"
+                android:background="?attr/primary_ui_03"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblFilename" />
+
+            <ImageView
+                android:id="@+id/imgFile"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="30dp"
+                android:contentDescription="@string/profile_file"
+                android:src="@drawable/ic_uploadedfile"
+                app:layout_constraintEnd_toEndOf="@id/containerImage"
+                app:layout_constraintStart_toStartOf="@id/containerImage"
+                app:layout_constraintTop_toTopOf="@id/containerImage" />
+
+            <ImageView
+                android:id="@+id/imgFileArtwork"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="30dp"
+                android:contentDescription="@string/profile_file"
+                android:src="@drawable/defaultartwork"
+                app:layout_constraintEnd_toEndOf="@id/containerImage"
+                app:layout_constraintStart_toStartOf="@id/containerImage"
+                app:layout_constraintTop_toTopOf="@id/containerImage" />
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/imgFile"
+                app:layout_constraintEnd_toEndOf="@+id/imgFile"
+                app:layout_constraintStart_toStartOf="@+id/imgFile"
+                app:layout_constraintTop_toTopOf="@+id/imgFile" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnImage"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/profile_files_add_custom_image"
+                android:textAllCaps="false"
+                android:textColor="?attr/primary_interactive_01"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imgFile" />
+
+            <ImageView
+                android:id="@+id/imgLock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:contentDescription="@string/profile_file_locked"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/btnImage"
+                app:layout_constraintStart_toEndOf="@id/btnImage"
+                app:layout_constraintTop_toTopOf="@id/btnImage"
+                app:srcCompat="@drawable/ic_locked_small" />
+
+            <View
+                android:id="@+id/btnLock"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintTop_toTopOf="@+id/imgLock"
+                app:layout_constraintBottom_toBottomOf="@+id/imgLock"
+                app:layout_constraintEnd_toEndOf="@+id/imgLock"
+                app:layout_constraintStart_toStartOf="@+id/imgLock"
+                >
+            </View>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerColor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="40dp"
+                android:clipToPadding="false"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                app:layout_constraintTop_toBottomOf="@id/btnImage"
+                tools:layout_height="40dp" />
+
+            <include
+                android:id="@+id/upgradeLayout"
+                layout="@layout/layout_plus_callout"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/recyclerColor" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#aa000000"
+        android:visibility="gone">
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
+</FrameLayout>

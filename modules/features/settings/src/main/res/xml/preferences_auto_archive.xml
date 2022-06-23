@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory>
+        <ListPreference
+            android:key="autoArchivePlayedEpisodes"
+            android:title="@string/settings_archive_played"
+            android:summary="%s"
+            android:defaultValue="@string/settings_auto_archive_played_after_playing"
+            android:entries="@array/settings_auto_archive_played_values"
+            android:entryValues="@array/settings_auto_archive_played_values"
+            android:dialogTitle="@string/settings_archive_played_dialog"/>
+        <ListPreference
+            android:key="autoArchiveInactiveEpisodes"
+            android:title="@string/settings_auto_archive_inactive"
+            android:summary="%s"
+            android:defaultValue="@string/settings_auto_archive_inactive_never"
+            android:entries="@array/settings_auto_archive_inactive_values"
+            android:entryValues="@array/settings_auto_archive_inactive_values"
+            android:dialogTitle="@string/settings_auto_archive_inactive_dialog"/>
+        <Preference
+            android:summary="@string/settings_auto_archive_time_limits" />
+    </PreferenceCategory>
+    <PreferenceCategory>
+        <SwitchPreference
+            android:key="autoArchiveIncludeStarred"
+            android:title="@string/settings_auto_archive_starred"
+            android:summary="@string/settings_auto_archive_starred_summary"/>
+    </PreferenceCategory>
+</PreferenceScreen>

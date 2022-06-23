@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools" package="au.com.shiftyjelly.pocketcasts">
+
+    <supports-screens
+            android:largeScreens="true"
+            android:normalScreens="true"
+            android:smallScreens="true"
+            android:xlargeScreens="true"/>
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
+    <uses-feature android:name="android.hardware.telephony" android:required="false"/>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="com.android.vending.CHECK_LICENSE"/>
+    <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <application
+            android:name=".PocketcastsApplication"
+            android:hardwareAccelerated="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:largeHeap="true"
+            android:allowBackup="true"
+            android:fullBackupContent="@xml/backup_scheme"
+            android:usesCleartextTraffic="true"
+            android:supportsRtl="false"
+            tools:replace="android:supportsRtl"
+            android:theme="@style/ThemeDark"
+            tools:ignore="UnusedAttribute">
+
+        <meta-data android:name="com.google.android.gms.car.application"
+                   android:resource="@xml/automotive_app_desc"/>
+
+        <meta-data android:name="com.google.android.wearable.media.theme"
+                   android:resource="@style/WearMediaTheme"/>
+
+        <!-- Main activity. Uses standard launch mode as if you go into a episode list and then exit the app, then open using recents the back button was broken. Also when on the updates tab if you click a notification and then you have to back twice. -->
+        <activity
+                android:name=".ui.MainActivity"
+                android:configChanges="screenSize|smallestScreenSize|screenLayout"
+                android:launchMode="singleTop"
+                android:colorMode="default"
+                android:exported="true"
+                android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <!-- allows opml import from gmail attachments -->
+                <data android:mimeType="application/octet-stream" android:pathPattern=".*\\.opml" android:host="*"
+                      android:scheme="file"/>
+                <!-- commented this out as it was opening 'install (1).apk' -->
+                <!--<data-->
+                <!--android:mimeType="application/octet-stream"-->
+                <!--android:pathPattern=".*\\.opml"-->
+                <!--android:scheme="content" />-->
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <!-- allows opml import from gmail attachments and the files app -->
+                <data
+                        android:host="*"
+                        android:mimeType="text/xml"
+                        android:scheme="content"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                        android:host="*"
+                        android:scheme="pktc"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:host="*"
+                    android:mimeType="application/*"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="content" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="*"
+                    android:mimeType="application/xml"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="https" />
+                <data
+                    android:host="*"
+                    android:mimeType="application/xml"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="http" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/*"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="https" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/*"
+                    android:pathPattern=".*\\.opml"
+                    android:scheme="http" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                        android:host="*"
+                        android:mimeType="text/*"
+                        android:pathPattern=".*\\.opml"
+                        android:scheme="file"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                        android:host="*"
+                        android:mimeType="*/*"
+                        android:pathPattern=".*\\.opml"
+                        android:scheme="file"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="itpc"/>
+                <data android:scheme="pcast"/>
+                <data android:scheme="feed"/>
+                <data android:scheme="rss"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                        android:host="itunes.apple.com"
+                        android:scheme="https"
+                        android:pathPattern="/.*/podcast/.*"/>
+                <data
+                        android:host="itunes.apple.com"
+                        android:scheme="http"
+                        android:pathPattern="/.*/podcast/.*"/>
+                <data
+                        android:host="podcasts.apple.com"
+                        android:scheme="https"
+                        android:pathPattern="/.*/podcast/.*"/>
+                <data
+                        android:host="podcasts.apple.com"
+                        android:scheme="http"
+                        android:pathPattern="/.*/podcast/.*"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:pathPattern=".*\\.xml"/>
+                <data android:pathPattern=".*\\.rss"/>
+                <data android:host="*"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+                <data android:scheme="file"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:mimeType="text/xml"/>
+                <data android:mimeType="application/rss+xml"/>
+                <data android:mimeType="application/atom+xml"/>
+                <data android:host="*"/>
+                <data android:scheme="file"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <intent-filter android:label="Pocket Casts">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:pathPattern=".*\\..*/.*"/>
+                <data android:host="subscribeonandroid.com"/>
+                <data android:host="www.subscribeonandroid.com"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+            </intent-filter>
+
+            <!-- https://lists.pocketcasts.com/.well-known/assetlinks.json is needed for this to work -->
+            <intent-filter android:autoVerify="true" tools:ignore="UnusedAttribute">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http" android:host="lists.pocketcasts.com"/>
+                <data android:scheme="https" android:host="lists.pocketcasts.com"/>
+            </intent-filter>
+
+            <meta-data
+                    android:name="android.app.shortcuts"
+                    android:resource="@xml/shortcuts"/>
+        </activity>
+        
+        <activity-alias
+            android:name=".ui.MainActivity_0"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_1"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_1">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_2"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_2">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_3"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_3">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_4"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_4">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_5"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_5">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_6"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_6">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_7"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_7">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_8"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_radioactive">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_9"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_indigo">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_10"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_cat">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_11"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_redvelvet">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_12"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_rose">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity android:name=".profile.sonos.SonosAppLinkActivity" android:label="@string/profile_sonos"/>
+
+        <activity android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/Theme.AppCompat.DayNight"/>
+        <activity android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/Theme.AppCompat.DayNight"/>
+
+        <!-- services which are user triggered, eg: run in the foreground -->
+        <service android:name="au.com.shiftyjelly.pocketcasts.ui.tasks.RefreshArtworkTask"/>
+
+        <!-- services which are periodic or trigerred by the app automatically triggered, eg: can run in the background -->
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsJob"
+                 android:permission="android.permission.BIND_JOB_SERVICE"
+                 android:exported="true"/>
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsJob"
+                 android:permission="android.permission.BIND_JOB_SERVICE"
+                 android:exported="true"/>
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob"
+                 android:permission="android.permission.BIND_JOB_SERVICE"
+                 android:exported="true"/>
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncJob"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
+
+        <receiver android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerReceiver" />
+
+        <receiver android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.PLAY"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.PAUSE"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.STOP"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.NEXT"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.SKIP_FORWARD"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.SKIP_BACKWARD"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.REFRESH_PODCASTS"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_DELETED"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_PLAY_EPISODE"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_DOWNLOAD_EPISODE"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_ADD_TO_UP_NEXT"/>
+                <action android:name="au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_STREAM_EPISODE"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+                android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService"
+                android:exported="true"
+                android:label="@string/app_name"
+                android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService"/>
+            </intent-filter>
+        </service>
+
+        <!-- A receiver that will receive media buttons and send as
+            intents to your MediaBrowserServiceCompat implementation.
+            Required on pre-Lollipop. More information at
+            http://developer.android.com/reference/android/support/v4/media/session/MediaButtonReceiver.html -->
+        <receiver android:name="androidx.media.session.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver
+                android:name="au.com.shiftyjelly.pocketcasts.views.component.CustomTabsBroadcastReceiver"
+                android:enabled="true">
+        </receiver>
+
+        <!-- Google play services -->
+        <meta-data
+                android:name="com.google.android.gms.version"
+                android:value="@integer/google_play_services_version"/>
+
+        <!-- Chromecast -->
+        <meta-data
+            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="au.com.shiftyjelly.pocketcasts.CastOptionsProvider" />
+
+        <!-- Android Auto theme -->
+        <meta-data
+                android:name="com.google.android.gms.car.application.theme"
+                android:resource="@style/CarTheme"/>
+
+        <!-- Dev version number -->
+        <meta-data
+                android:name="au.com.shiftyjelly.pocketcasts.gitHash"
+                android:value="${gitHash}"/>
+
+        <!-- File sharing / Opml export -->
+        <provider
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.fileprovider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths"/>
+        </provider>
+
+        <!-- Work Manager -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!-- If you are using androidx.startup to initialize other components -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+        <!-- Disable Advertising ID collection -->
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false"/>
+
+        <!-- Samsung Carmode -->
+        <meta-data android:name="com.sec.android.automotive.drivelink.notification.SmallIcon" android:resource="@drawable/notification"/>
+
+    </application>
+
+</manifest>

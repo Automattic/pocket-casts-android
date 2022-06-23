@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginStart="20dp"
+        android:background="?attr/actionBarItemBackground"
+        android:contentDescription="@string/cancel"
+        android:scaleType="fitCenter"
+        android:tint="?attr/primary_icon_01"
+        android:padding="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_cancel" />
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="225dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/btnClose"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="?attr/logo_title_horizontal" />
+</androidx.constraintlayout.widget.ConstraintLayout>

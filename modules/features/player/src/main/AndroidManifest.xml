@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="au.com.shiftyjelly.pocketcasts.player">
+
+    <application>
+        <activity
+            android:name=".view.video.VideoActivity"
+            android:launchMode="singleTask"
+            android:supportsPictureInPicture="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            tools:ignore="UnusedAttribute" />
+    </application>
+
+
+</manifest>

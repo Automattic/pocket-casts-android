@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:persistent="true">
+
+    <SwitchPreference
+        android:key="customForPodcast"
+        android:defaultValue="false"
+        android:persistent="false"
+        android:title="@string/podcast_settings_auto_archive_custom"
+        android:summary="@string/podcast_settings_auto_archive_custom_summary"/>
+
+    <PreferenceCategory
+        android:key="customCategory">
+        <ListPreference
+            android:key="autoArchivePodcastPlayedEpisodes"
+            android:title="@string/settings_archive_played"
+            android:summary="%s"
+            android:defaultValue="@string/settings_auto_archive_played_after_playing"
+            android:entries="@array/settings_auto_archive_played_values"
+            android:entryValues="@array/settings_auto_archive_played_values"
+            android:dialogTitle="@string/podcast_settings_played_episodes"
+            android:persistent="false"/>
+        <ListPreference
+            android:key="autoArchivePodcastInactiveEpisodes"
+            android:title="@string/settings_auto_archive_inactive"
+            android:summary="%s"
+            android:defaultValue="@string/settings_auto_archive_inactive_never"
+            android:entries="@array/settings_auto_archive_inactive_values"
+            android:entryValues="@array/settings_auto_archive_inactive_values"
+            android:dialogTitle="@string/settings_inactive_episodes"
+            android:persistent="false"/>
+        <Preference
+            android:summary="@string/settings_auto_archive_time_limits" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="categoryEpisodeLimit">
+        <ListPreference
+            android:key="autoArchiveEpisodeLimit"
+            android:title="@string/settings_auto_archive_episode_limit"
+            android:summary="%s"
+            android:defaultValue="@string/settings_auto_archive_limit_none"
+            android:entries="@array/settings_auto_archive_episode_limit_values"
+            android:entryValues="@array/settings_auto_archive_episode_limit_values"
+            android:dialogTitle="@string/settings_auto_archive_episode_limit"
+            android:persistent="false"/>
+        <Preference
+            android:summary="@string/settings_auto_archive_episode_limit_summary" />
+    </PreferenceCategory>
+</PreferenceScreen>

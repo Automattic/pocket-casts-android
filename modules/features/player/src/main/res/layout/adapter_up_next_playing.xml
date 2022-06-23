@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="playingState" type="au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/itemContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:paddingTop="16dp">
+
+        <au.com.shiftyjelly.pocketcasts.player.view.ChapterProgressBar
+            android:id="@+id/chapterProgress"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:progress="@{playingState.progressPercent}"
+            app:show="@{playingState.progressPercent > 0}"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="72dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="16dp"
+            android:scaleType="centerInside"
+            android:paddingEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            style="?attr/textOverline"
+            android:textColor="?attr/player_contrast_02"
+            tools:text="TODAY"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/image"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/UpNextRowTitle"
+            android:textAppearance="@style/DarkSubtitle1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{playingState.episode.title}"
+            android:paddingBottom="2dp"
+            android:gravity="center_vertical"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintBottom_toTopOf="@+id/info"
+            app:layout_constraintEnd_toStartOf="@+id/playingAnimation"
+            app:layout_constraintStart_toEndOf="@+id/image"
+            app:layout_constraintTop_toBottomOf="@+id/date"
+            tools:text="Episode description" />
+
+        <ImageView
+            android:id="@+id/downloaded"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_downloaded"
+            app:tint="?attr/support_02"
+            android:visibility="@{playingState.episode.isDownloaded()}"
+            app:layout_constraintBottom_toBottomOf="@+id/info"
+            app:layout_constraintEnd_toStartOf="@+id/info"
+            app:layout_constraintStart_toEndOf="@+id/image"
+            app:layout_constraintTop_toTopOf="@+id/info"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView
+            android:id="@+id/info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/reorder"
+            app:layout_constraintStart_toEndOf="@+id/downloaded"
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            app:timeLeft="@{playingState.episode}"
+            tools:text="Episode description"
+            style="@style/UpNextRowSummary"
+            android:textAppearance="@style/DarkBody2" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/playingAnimation"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintEnd_toStartOf="@id/reorder"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="4dp"
+            android:visibility="gone"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/nowplaying" />
+
+        <ImageView
+            android:id="@+id/reorder"
+            android:layout_width="44dp"
+            android:layout_height="0dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:cropToPadding="false"
+            android:paddingStart="0dp"
+            android:paddingEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_chapter_skipforward" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

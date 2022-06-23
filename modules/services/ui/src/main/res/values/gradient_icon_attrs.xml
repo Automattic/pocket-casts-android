@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GradientIcon">
+        <attr name="src" format="reference" />
+        <attr name="src_overlay" format="reference" />
+        <attr name="gradient" format="enum">
+            <enum name="gradient_1" value="0" />
+            <enum name="gradient_2" value="1" />
+            <enum name="gradient_3" value="3" />
+            <enum name="gradient_4" value="4" />
+            <enum name="gradient_5" value="5" />
+        </attr>
+    </declare-styleable>
+</resources>

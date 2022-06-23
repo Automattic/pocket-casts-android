@@ -1,0 +1,5 @@
+[*.{kt,kts}]
+max_line_length=off
+# Android specific rules
+ij_kotlin_import_nested_classes = false
+ij_kotlin_imports_layout = *,^

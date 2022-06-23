@@ -1,0 +1,561 @@
+package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
+
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ValueAnimator
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.view.isVisible
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.ChangeBounds
+import androidx.transition.TransitionManager
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.R
+import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
+import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.views.extensions.hide
+import au.com.shiftyjelly.pocketcasts.views.extensions.show
+import au.com.shiftyjelly.pocketcasts.views.extensions.toggleVisibility
+import au.com.shiftyjelly.pocketcasts.views.helper.AnimatorUtil
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import io.reactivex.disposables.CompositeDisposable
+import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
+
+private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<Any>() {
+    override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+        return when {
+            oldItem is Podcast && newItem is Podcast -> true
+            oldItem is PodcastAdapter.EpisodeHeader && newItem is PodcastAdapter.EpisodeHeader -> true
+            oldItem is Episode && newItem is Episode -> oldItem.uuid == newItem.uuid
+            oldItem is PodcastAdapter.DividerRow && newItem is PodcastAdapter.DividerRow -> oldItem.groupIndex == newItem.groupIndex
+            else -> oldItem == newItem
+        }
+    }
+
+    @SuppressLint("DiffUtilEquals")
+    override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+        if (oldItem is Podcast && newItem is Podcast) {
+            return true
+        } else if (oldItem is PodcastAdapter.EpisodeHeader && newItem is PodcastAdapter.EpisodeHeader) {
+            // don't compare search term because we don't what the row to recreate while typing
+            return oldItem.searchTerm.isNotEmpty() || newItem.searchTerm.isNotEmpty() ||
+                (
+                    oldItem.archivedCount == newItem.archivedCount &&
+                        oldItem.episodeCount == newItem.episodeCount &&
+                        oldItem.showingArchived == newItem.showingArchived &&
+                        oldItem.episodeLimit == newItem.episodeLimit
+                    )
+        }
+        return oldItem == newItem
+    }
+}
+
+class PodcastAdapter(
+    val downloadManager: DownloadManager,
+    val playbackManager: PlaybackManager,
+    val upNextQueue: UpNextQueue,
+    val settings: Settings,
+    val theme: Theme,
+    var fromListUuid: String?,
+    private val onSubscribeClicked: () -> Unit,
+    private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
+    private val onEpisodesOptionsClicked: () -> Unit,
+    private val onRowLongPress: (episode: Episode) -> Unit,
+    private val onFoldersClicked: () -> Unit,
+    private val onNotificationsClicked: () -> Unit,
+    private val onSettingsClicked: () -> Unit,
+    private val playButtonListener: PlayButton.OnClickListener,
+    private val onRowClicked: (Episode) -> Unit,
+    private val onSearchQueryChanged: (String) -> Unit,
+    private val onSearchFocus: () -> Unit,
+    private val onShowArchivedClicked: () -> Unit,
+    private val multiSelectHelper: MultiSelectHelper,
+    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit
+) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
+
+    data class EpisodeLimitRow(val episodeLimit: Int)
+    class DividerRow(val grouping: PodcastGrouping, val groupIndex: Int)
+    data class NoEpisodeMessage(val bodyText: String, val showButton: Boolean)
+    data class EpisodeHeader(val showingArchived: Boolean, val episodeCount: Int, val archivedCount: Int, val searchTerm: String, val episodeLimit: Int?)
+
+    companion object {
+        val VIEW_TYPE_EPISODE_HEADER = R.layout.adapter_episode_header
+        val VIEW_TYPE_PODCAST_HEADER = R.layout.adapter_podcast_header
+        val VIEW_TYPE_EPISODE_LIMIT_ROW = R.layout.adapter_episode_limit
+        val VIEW_TYPE_NO_EPISODE = R.layout.adapter_no_episodes
+        val VIEW_TYPE_DIVIDER = R.layout.adapter_divider_row
+    }
+
+    private val disposables = CompositeDisposable()
+    private var podcast: Podcast = Podcast()
+
+    private var headerExpanded: Boolean = false
+    private var tintColor: Int = 0x000000
+    private var signedInAsPlus: Boolean = false
+    var castConnected: Boolean = false
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    init {
+        setHasStableIds(true)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return when (viewType) {
+            VIEW_TYPE_PODCAST_HEADER -> PodcastViewHolder(AdapterPodcastHeaderBinding.inflate(inflater, parent, false), this)
+            VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
+            VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
+            VIEW_TYPE_NO_EPISODE -> NoEpisodesViewHolder(inflater.inflate(R.layout.adapter_no_episodes, parent, false))
+            VIEW_TYPE_DIVIDER -> DividerViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
+            else -> EpisodeViewHolder(AdapterEpisodeBinding.inflate(inflater, parent, false), EpisodeViewHolder.ViewMode.NoArtwork, downloadManager.progressUpdateRelay, playbackManager.playbackStateRelay, upNextQueue.changesObservable)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, fromListUuid)
+            is PodcastViewHolder -> bindPodcastViewHolder(holder)
+            is EpisodeHeaderViewHolder -> bindingEpisodeHeaderViewHolder(holder, position)
+            is EpisodeLimitViewHolder -> bindEpisodeLimitRow(holder, position)
+            is NoEpisodesViewHolder -> bindNoEpisodesMessage(holder, position)
+            is DividerViewHolder -> bindDividerRow(holder, position)
+        }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        disposables.clear()
+    }
+
+    private fun bindPodcastViewHolder(holder: PodcastViewHolder) {
+        holder.binding.podcast = podcast
+        holder.binding.expanded = headerExpanded
+        holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
+        holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
+        holder.binding.isPlusUser = signedInAsPlus
+
+        val context = holder.itemView.context
+        val imageLoader = PodcastImageLoaderThemed(context)
+        val imageView = holder.binding.top.artwork
+        // stopping the artwork flickering when Glide reloads the image
+        if (imageView.drawable == null || holder.lastImagePodcastUuid == null || holder.lastImagePodcastUuid != podcast.uuid) {
+            holder.lastImagePodcastUuid = podcast.uuid
+            imageLoader.loadLargeImage(podcast, imageView)
+        }
+
+        imageView.setOnLongClickListener {
+            onArtworkLongClicked {
+                imageLoader.loadLargeImage(podcast, imageView)
+            }
+            true
+        }
+
+        holder.binding.podcastHeader.contentDescription = podcast.title
+
+        holder.binding.executePendingBindings()
+    }
+
+    private fun bindingEpisodeHeaderViewHolder(holder: EpisodeHeaderViewHolder, position: Int) {
+        val episodeHeader = getItem(position) as? EpisodeHeader ?: return
+        holder.binding.episodesSummary.let {
+            val quantityString = if (episodeHeader.episodeCount == 1) {
+                it.context.resources.getString(LR.string.podcast_episode_summary_singular, episodeHeader.archivedCount)
+            } else {
+                it.context.resources.getString(LR.string.podcast_episode_summary_plural, episodeHeader.episodeCount, episodeHeader.archivedCount)
+            }
+            val text = if (episodeHeader.episodeLimit != null) {
+                val limited = "Limited to ${episodeHeader.episodeLimit}"
+                val spannable = SpannableString("$quantityString • $limited")
+                val color = ContextCompat.getColor(holder.itemView.context, UR.color.orange_50)
+                spannable.setSpan(ForegroundColorSpan(color), spannable.length - limited.length, spannable.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                spannable
+            } else {
+                SpannableString(quantityString)
+            }
+            it.text = text
+        }
+        holder.binding.episodeSearchView.apply {
+            onSearch = { query ->
+                onSearchQueryChanged(query)
+            }
+            text = episodeHeader.searchTerm
+        }
+        holder.binding.btnArchived.setText(if (episodeHeader.showingArchived) LR.string.podcast_hide_archived else LR.string.podcast_show_archived)
+        holder.binding.btnArchived.setOnClickListener { onShowArchivedClicked() }
+    }
+
+    private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, position: Int, fromListUuid: String?) {
+        val episode = getItem(position) as? Episode ?: return
+        holder.setup(episode, fromListUuid, ThemeColor.podcastIcon02(theme.activeTheme, tintColor), playButtonListener, settings.streamingMode() || castConnected, settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables)
+        holder.episodeRow.setOnClickListener {
+            if (multiSelectHelper.isMultiSelecting) {
+                holder.binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
+            } else {
+                onRowClicked(episode)
+            }
+        }
+        holder.episodeRow.setOnLongClickListener {
+            onRowLongPress(episode)
+            true
+        }
+    }
+
+    private fun bindEpisodeLimitRow(holder: EpisodeLimitViewHolder, position: Int) {
+        val episodeLimitRow = getItem(position) as? EpisodeLimitRow ?: return
+        val limit = episodeLimitRow.episodeLimit
+        holder.lblTitle.text = holder.itemView.resources.getString(LR.string.podcast_episodes_limited, limit)
+    }
+
+    private fun bindNoEpisodesMessage(holder: NoEpisodesViewHolder, position: Int) {
+        val noEpisodeMessage = getItem(position) as? NoEpisodeMessage ?: return
+        holder.lblBody.text = noEpisodeMessage.bodyText
+        holder.btnShowArchived.setOnClickListener { onShowArchivedClicked() }
+        holder.btnShowArchived.isVisible = noEpisodeMessage.showButton
+    }
+
+    private fun bindDividerRow(holder: DividerViewHolder, position: Int) {
+        val dividerRow = getItem(position) as? DividerRow ?: return
+        val title = dividerRow.grouping.groupTitles(dividerRow.groupIndex, holder.lblTitle.context)
+        if (title.isNotEmpty()) {
+            holder.lblTitle.visibility = View.VISIBLE
+            holder.lblTitle.text = title
+        } else {
+            holder.lblTitle.visibility = View.GONE
+        }
+    }
+
+    fun setPodcast(podcast: Podcast) {
+        // expand the podcast description and details if the user hasn't subscribed
+        if (this.podcast.uuid != podcast.uuid) {
+            headerExpanded = !podcast.isSubscribed
+        }
+        this.podcast = podcast
+        notifyDataSetChanged()
+    }
+
+    fun setTint(tintColor: Int) {
+        this.tintColor = tintColor
+    }
+
+    fun setSignedInAsPlus(signedInAsPlus: Boolean) {
+        this.signedInAsPlus = signedInAsPlus
+        notifyItemChanged(0)
+    }
+
+    fun setEpisodes(episodes: List<Episode>, showingArchived: Boolean, episodeCount: Int, archivedCount: Int, searchTerm: String, episodeLimit: Int?, episodeLimitIndex: Int?, grouping: PodcastGrouping, episodesSortType: EpisodesSortType, context: Context) {
+        val groupingFunction = grouping.sortFunction
+        val episodesPlusLimit: MutableList<Any> = episodes.toMutableList()
+        if (episodeLimit != null && episodeLimitIndex != null && groupingFunction == null) {
+            if (searchTerm.isEmpty() && (podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_ASC || podcast.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC)) {
+                episodesPlusLimit.add(episodeLimitIndex, EpisodeLimitRow(episodeLimit))
+            }
+        }
+        if (groupingFunction != null) {
+            val reversedSort = if (grouping is PodcastGrouping.Season) {
+                episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC
+            } else {
+                false
+            }
+
+            val grouped = grouping.formGroups(episodes, reversedSort, context.resources)
+            episodesPlusLimit.clear()
+
+            grouped.forEachIndexed { index, list ->
+                if (list.isNotEmpty()) {
+                    episodesPlusLimit.add(DividerRow(grouping, index))
+                    episodesPlusLimit.addAll(list)
+                }
+            }
+        }
+        val content = mutableListOf(Podcast(), EpisodeHeader(showingArchived, episodeCount, archivedCount, searchTerm, if (podcast.overrideGlobalArchive) podcast.autoArchiveEpisodeLimit else null))
+        content.addAll(episodesPlusLimit)
+
+        if (episodes.isEmpty()) {
+            if (searchTerm.isEmpty()) {
+                if (archivedCount == 0) {
+                    content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes), false))
+                } else {
+                    content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes_all_archived, archivedCount), true))
+                }
+            } else {
+                content.add(NoEpisodeMessage(context.getString(LR.string.podcast_no_episodes_matching), false))
+            }
+        }
+
+        submitList(content)
+    }
+
+    fun setError() {
+        submitList(emptyList())
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        val item = getItem(position)
+        return when (item) {
+            is Podcast -> R.layout.adapter_podcast_header
+            is EpisodeHeader -> R.layout.adapter_episode_header
+            is EpisodeLimitRow -> R.layout.adapter_episode_limit
+            is NoEpisodeMessage -> R.layout.adapter_no_episodes
+            is DividerRow -> R.layout.adapter_divider_row
+            else -> R.layout.adapter_episode
+        }
+    }
+
+    override fun getItemId(position: Int): Long {
+        val item = getItem(position)
+        return when (item) {
+            is Podcast -> Long.MAX_VALUE
+            is EpisodeHeader -> Long.MAX_VALUE - 1
+            is EpisodeLimitRow -> Long.MAX_VALUE - 2
+            is NoEpisodeMessage -> Long.MAX_VALUE - 3
+            is DividerRow -> item.groupIndex.toLong()
+            is Episode -> item.adapterId
+            else -> throw IllegalStateException("Unknown item type")
+        }
+    }
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        super.onViewRecycled(holder)
+        if (holder is EpisodeViewHolder) {
+            holder.clearObservers()
+        }
+    }
+
+    private fun onHeaderClicked(binding: AdapterPodcastHeaderBinding) {
+        val transition = ChangeBounds().apply {
+            duration = 200
+            interpolator = FastOutSlowInInterpolator()
+        }
+
+        val constraintLayout = binding.top.root as ConstraintLayout
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(constraintLayout)
+        constraintSet.constrainPercentWidth(R.id.artworkContainer, if (!binding.bottom.root.isVisible) 0.40f else 0.38f)
+
+        TransitionManager.beginDelayedTransition(binding.root as ViewGroup, transition)
+        constraintSet.applyTo(constraintLayout)
+
+        val expanded = binding.bottom.root.toggleVisibility()
+        binding.top.chevron.isEnabled = expanded
+        headerExpanded = expanded
+    }
+
+    private fun onWebsiteLinkClicked(context: Context) {
+        podcast.podcastUrl?.let { url ->
+            if (url.isNotBlank()) {
+                try {
+                    startActivity(context, webUrlToIntent(url), null)
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to open podcast web page.")
+                }
+            }
+        }
+    }
+
+    private fun webUrlToIntent(url: String): Intent {
+        var uri = Uri.parse(url)
+        // fix for podcast web pages that don't start with http://
+        if (uri.scheme.isNullOrBlank() && !url.contains("://")) {
+            uri = Uri.parse("http://$url")
+        }
+        return Intent(Intent.ACTION_VIEW, uri)
+    }
+
+    internal class EpisodeHeaderViewHolder(val binding: AdapterEpisodeHeaderBinding, val onEpisodesOptionsClicked: () -> Unit, val onSearchFocus: () -> Unit) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.btnEpisodeOptions.setOnClickListener {
+                onEpisodesOptionsClicked()
+            }
+            binding.episodeSearchView.onFocus = {
+                onSearchFocus()
+            }
+        }
+    }
+
+    internal class EpisodeLimitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
+    }
+
+    internal class NoEpisodesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val lblBody = itemView.findViewById<TextView>(R.id.lblBody)
+        val btnShowArchived = itemView.findViewById<View>(R.id.btnShowArchived)
+    }
+
+    internal class DividerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val lblTitle = itemView.findViewById<TextView>(R.id.lblTitle)
+    }
+
+    internal class PodcastViewHolder(val binding: AdapterPodcastHeaderBinding, val adapter: PodcastAdapter) : RecyclerView.ViewHolder(binding.root) {
+
+        var lastImagePodcastUuid: String? = null
+
+        init {
+            binding.top.header.setOnClickListener {
+                adapter.onHeaderClicked(binding)
+            }
+            binding.top.artwork.setOnClickListener {
+                adapter.onHeaderClicked(binding)
+            }
+            binding.top.subscribeButton.setOnClickListener {
+                animateToSubscribed()
+            }
+            binding.top.subscribedButton.setOnClickListener {
+                unsubscribe()
+            }
+            binding.top.folders.setOnClickListener {
+                adapter.onFoldersClicked()
+            }
+            binding.top.notifications.setOnClickListener {
+                adapter.onNotificationsClicked()
+            }
+            binding.top.settings.setOnClickListener {
+                adapter.onSettingsClicked()
+            }
+            binding.bottom.linkText.setOnClickListener {
+                adapter.onWebsiteLinkClicked(it.context)
+            }
+        }
+
+        private fun unsubscribe() {
+            adapter.onUnsubscribeClicked {
+                unsubscribeConfirmed()
+            }
+        }
+
+        private fun unsubscribeConfirmed() {
+            val subscribeButton = binding.top.subscribeButton
+            val subscribedButton = binding.top.subscribedButton
+            val greenButton = binding.top.animationSubscribedButton
+            val subscribeText = binding.top.animationSubscribeText
+            val notificationsButton = binding.top.notifications
+            val settingsButton = binding.top.settings
+
+            subscribeButton.show()
+            subscribedButton.hide()
+            greenButton.hide()
+            subscribeText.hide()
+            notificationsButton.hide()
+            settingsButton.hide()
+        }
+
+        private fun animateToSubscribed() {
+            val subscribeButton = binding.top.subscribeButton
+            val subscribedButton = binding.top.subscribedButton
+            val greenButton = binding.top.animationSubscribedButton
+            val subscribeText = binding.top.animationSubscribeText
+            val notificationsButton = binding.top.notifications
+            val settingsButton = binding.top.settings
+            val displayMetrics = greenButton.context.resources.displayMetrics
+            val accelerateDecelerateInterpolator = AccelerateDecelerateInterpolator()
+
+            greenButton.alpha = 0f
+            greenButton.show()
+
+            subscribeText.alpha = 0f
+            subscribeText.show()
+
+            subscribedButton.alpha = 0f
+            subscribedButton.show()
+
+            notificationsButton.alpha = 0f
+            notificationsButton.show()
+
+            settingsButton.alpha = 0f
+            settingsButton.show()
+
+            val fadeInGreenButton = AnimatorUtil.fadeIn(greenButton, 300)
+            fadeInGreenButton.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    subscribeButton.hide()
+                }
+            })
+
+            val fadeInSubscribeText = AnimatorUtil.fadeIn(subscribeText, 300)
+
+            val fadeInButton = AnimatorSet()
+            fadeInButton.playTogether(fadeInGreenButton, fadeInSubscribeText)
+
+            val greenButtonWidth = subscribeButton.measuredWidth
+            val changeWidthGreenButton = ValueAnimator.ofInt(greenButtonWidth, 32.dpToPx(displayMetrics))
+            changeWidthGreenButton.addUpdateListener { valueAnimator ->
+                val animatedValue = valueAnimator.animatedValue as Int
+                val layoutParams = greenButton.layoutParams
+                layoutParams.width = animatedValue
+                greenButton.layoutParams = layoutParams
+            }
+            changeWidthGreenButton.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    greenButton.layoutParams.width = greenButtonWidth
+                    greenButton.hide()
+                }
+            })
+            changeWidthGreenButton.duration = 300
+            changeWidthGreenButton.startDelay = 600
+
+            val fadeOutSubscribeText = AnimatorUtil.fadeOut(subscribeText, 100)
+            fadeOutSubscribeText.startDelay = 600
+
+            val fadeInSubscribedButton = AnimatorUtil.fadeIn(subscribedButton, 200)
+            fadeInSubscribedButton.startDelay = 700
+
+            val fadeInNotificationsButton = AnimatorUtil.fadeIn(notificationsButton, 200)
+            fadeInNotificationsButton.startDelay = 700
+
+            val fadeInSettingsButton = AnimatorUtil.fadeIn(settingsButton, 200)
+            fadeInSettingsButton.startDelay = 700
+
+            val translationXNotificationsButton = AnimatorUtil.translationX(notificationsButton, 100.dpToPx(displayMetrics), 0, accelerateDecelerateInterpolator, 900)
+            val translationXSettingsButton = AnimatorUtil.translationX(settingsButton, 100.dpToPx(displayMetrics), 0, accelerateDecelerateInterpolator, 900)
+
+            val widthAndTickSet = AnimatorSet()
+            widthAndTickSet.playTogether(fadeOutSubscribeText, changeWidthGreenButton, fadeInSubscribedButton, fadeInNotificationsButton, fadeInSettingsButton, translationXSettingsButton, translationXNotificationsButton)
+
+            val set = AnimatorSet()
+            set.playSequentially(fadeInButton, widthAndTickSet)
+            set.addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (binding.expanded) {
+                        adapter.onHeaderClicked(binding)
+                    }
+                    adapter.onSubscribeClicked()
+                }
+            })
+            set.start()
+        }
+    }
+}

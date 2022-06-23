@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/secondary_ui_01"
+            android:minHeight="?android:attr/actionBarSize" />
+
+        <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+            android:id="@+id/multiSelectToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/actionBarSize"
+            android:visibility="gone" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:id="@+id/mainScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/primary_ui_03"
+        android:layout_marginTop="?android:actionBarSize">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mainConstraintView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/primary_ui_02">
+
+            <View
+                android:id="@+id/dividerView"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                android:layout_marginTop="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/userUpgradeView" />
+
+            <ImageView
+                android:id="@+id/imgMail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:tint="?attr/primary_interactive_01"
+                app:layout_constraintBottom_toBottomOf="@id/btnChangeEmail"
+                app:layout_constraintStart_toStartOf="@id/btnChangeEmail"
+                app:layout_constraintTop_toTopOf="@id/btnChangeEmail"
+                app:srcCompat="@drawable/ic_mail" />
+
+            <TextView
+                android:id="@+id/lblChangeEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_change_email_address"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnChangeEmail"
+                app:layout_constraintStart_toEndOf="@+id/imgMail"
+                app:layout_constraintTop_toTopOf="@id/btnChangeEmail" />
+
+            <View
+                android:id="@+id/btnChangeEmail"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/profile_change_email_address"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView" />
+
+            <View
+                android:id="@+id/dividerView2"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnChangeEmail" />
+
+            <ImageView
+                android:id="@+id/imgPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:tint="?attr/primary_interactive_01"
+                app:layout_constraintBottom_toBottomOf="@id/btnChangePwd"
+                app:layout_constraintStart_toStartOf="@id/btnChangePwd"
+                app:layout_constraintTop_toTopOf="@id/btnChangePwd"
+                app:srcCompat="@drawable/ic_password" />
+
+            <TextView
+                android:id="@+id/lblChangePassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_change_password"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnChangePwd"
+                app:layout_constraintStart_toEndOf="@id/imgPassword"
+                app:layout_constraintTop_toTopOf="@+id/btnChangePwd" />
+
+            <View
+                android:id="@+id/btnChangePwd"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:contentDescription="@string/profile_change_password"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnChangeEmail" />
+
+            <View
+                android:id="@+id/dividerView3"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnChangePwd" />
+
+            <ImageView
+                android:id="@+id/imgSub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:tint="?attr/primary_interactive_01"
+                app:layout_constraintBottom_toBottomOf="@+id/btnCancelSub"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnCancelSub"
+                app:srcCompat="@drawable/ic_subscription_cancel" />
+
+            <TextView
+                android:id="@+id/lblCancelSub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/profile_cancel_subscription"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnCancelSub"
+                app:layout_constraintStart_toEndOf="@+id/imgSub"
+                app:layout_constraintTop_toTopOf="@+id/btnCancelSub" />
+
+            <View
+                android:id="@+id/btnCancelSub"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:contentDescription="@string/profile_cancel_subscription"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnChangePwd" />
+
+            <View
+                android:id="@+id/dividerView4"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnCancelSub" />
+
+            <ImageView
+                android:id="@+id/imgNewsletter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                app:tint="?attr/primary_interactive_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintStart_toStartOf="@id/btnNewsletter"
+                app:layout_constraintTop_toBottomOf="@id/btnCancelSub"
+                app:srcCompat="@drawable/ic_newsletter" />
+
+            <TextView
+                android:id="@+id/lblNewsletter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/profile_pocket_casts_newsletter"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintStart_toEndOf="@id/imgNewsletter"
+                app:layout_constraintTop_toBottomOf="@id/btnCancelSub" />
+
+            <TextView
+                android:id="@+id/txtNewsletterDetail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:lineSpacingMultiplier="1.1"
+                android:paddingBottom="24dp"
+                android:text="@string/profile_newsletter_detail"
+                android:textAppearance="@style/P50"
+                android:textColor="?attr/primary_text_02"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toStartOf="@id/swtNewsletter"
+                app:layout_constraintStart_toStartOf="@id/lblNewsletter"
+                app:layout_constraintTop_toBottomOf="@+id/lblNewsletter" />
+
+            <Switch
+                android:id="@+id/swtNewsletter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:textColor="?attr/primary_interactive_01"
+                android:contentDescription="@string/profile_pocket_casts_newsletter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/lblNewsletter" />
+
+            <View
+                android:id="@+id/btnNewsletter"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/txtNewsletterDetail"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnCancelSub" />
+
+            <View
+                android:id="@+id/dividerView5"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnNewsletter" />
+
+            <View
+                android:id="@+id/viewBg1"
+                android:layout_width="0dp"
+                android:layout_height="23dp"
+                android:background="?attr/primary_ui_04"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView5" />
+
+            <View
+                android:id="@+id/dividerView10"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewBg1" />
+
+            <ImageView
+                android:id="@+id/imgPrivacyPolicy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:tint="?attr/primary_interactive_01"
+                app:layout_constraintBottom_toBottomOf="@id/btnPrivacyPolicy"
+                app:layout_constraintStart_toStartOf="@id/btnPrivacyPolicy"
+                app:layout_constraintTop_toTopOf="@id/btnPrivacyPolicy"
+                app:srcCompat="@drawable/ic_privacy_policy" />
+
+            <TextView
+                android:id="@+id/lblPrivacyPolicy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_privacy_policy"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnPrivacyPolicy"
+                app:layout_constraintStart_toEndOf="@id/imgPrivacyPolicy"
+                app:layout_constraintTop_toTopOf="@+id/btnPrivacyPolicy" />
+
+            <View
+                android:id="@+id/btnPrivacyPolicy"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:contentDescription="@string/profile_privacy_policy"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView10" />
+
+            <View
+                android:id="@+id/dividerView6"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnPrivacyPolicy" />
+
+
+            <ImageView
+                android:id="@+id/imgTermsOfUse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:tint="?attr/primary_interactive_01"
+                app:layout_constraintBottom_toBottomOf="@id/btnTermsOfUse"
+                app:layout_constraintStart_toStartOf="@id/btnTermsOfUse"
+                app:layout_constraintTop_toTopOf="@id/btnTermsOfUse"
+                app:srcCompat="@drawable/ic_terms_conditions" />
+
+            <TextView
+                android:id="@+id/lblTermsOfUse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_terms_of_use"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_interactive_01"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnTermsOfUse"
+                app:layout_constraintStart_toEndOf="@id/imgTermsOfUse"
+                app:layout_constraintTop_toTopOf="@+id/btnTermsOfUse" />
+
+            <View
+                android:id="@+id/btnTermsOfUse"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:contentDescription="@string/profile_terms_of_use"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView6" />
+
+            <View
+                android:id="@+id/dividerView7"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnTermsOfUse" />
+
+            <View
+                android:id="@+id/viewBg2"
+                android:layout_width="0dp"
+                android:layout_height="23dp"
+                android:background="?attr/primary_ui_04"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView7" />
+
+            <View
+                android:id="@+id/dividerView11"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewBg2" />
+
+            <ImageView
+                android:id="@+id/imgSignOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:tint="?attr/support_05"
+                app:layout_constraintBottom_toBottomOf="@id/btnSignOut"
+                app:layout_constraintStart_toStartOf="@id/btnSignOut"
+                app:layout_constraintTop_toTopOf="@id/btnSignOut"
+                app:srcCompat="@drawable/ic_signout" />
+
+            <TextView
+                android:id="@+id/lblSignOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_sign_out"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/support_05"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnSignOut"
+                app:layout_constraintStart_toEndOf="@id/imgSignOut"
+                app:layout_constraintTop_toTopOf="@+id/btnSignOut" />
+
+            <View
+                android:id="@+id/btnSignOut"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:contentDescription="@string/profile_sign_out"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView11" />
+
+            <View
+                android:id="@+id/dividerView12"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnSignOut" />
+
+            <View
+                android:id="@+id/viewBg3"
+                android:layout_width="0dp"
+                android:layout_height="23dp"
+                android:background="?attr/primary_ui_04"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView12" />
+
+            <View
+                android:id="@+id/dividerView13"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewBg3" />
+
+            <ImageView
+                android:id="@+id/imgDeleteAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:tint="?attr/support_05"
+                app:layout_constraintBottom_toBottomOf="@id/btnDeleteAccount"
+                app:layout_constraintStart_toStartOf="@id/btnDeleteAccount"
+                app:layout_constraintTop_toTopOf="@id/btnDeleteAccount"
+                app:srcCompat="@drawable/ic_delete" />
+
+            <TextView
+                android:id="@+id/lblDeleteAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_delete_account"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/support_05"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnDeleteAccount"
+                app:layout_constraintStart_toEndOf="@id/imgDeleteAccount"
+                app:layout_constraintTop_toTopOf="@+id/btnDeleteAccount" />
+
+            <View
+                android:id="@+id/btnDeleteAccount"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:contentDescription="@string/profile_delete_account"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView13" />
+
+            <View
+                android:id="@+id/dividerView14"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnDeleteAccount" />
+
+            <View
+                android:id="@+id/page_bottom_padding"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:background="?attr/primary_ui_04"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView14" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/cancelViewGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:constraint_referenced_ids="btnCancelSub,imgSub,lblCancelSub" />
+
+            <au.com.shiftyjelly.pocketcasts.profile.ExpandedUserView
+                android:id="@+id/userView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <au.com.shiftyjelly.pocketcasts.profile.UserUpgradeView
+                android:id="@+id/userUpgradeView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/userView" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</FrameLayout>

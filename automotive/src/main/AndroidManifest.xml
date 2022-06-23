@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="au.com.shiftyjelly.pocketcasts"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="true" />
+    <uses-feature
+        android:name="android.software.car.templates_host"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <application
+        android:name=".AutomotiveApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Automotive.ThemeDark"
+        android:appCategory="audio"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".AutomotiveSettingsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES"/>
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".AutoPlaybackService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <!-- services which are user triggered, eg: run in the foreground -->
+        <service android:name="au.com.shiftyjelly.pocketcasts.ui.tasks.RefreshArtworkTask"/>
+
+        <!-- services which are periodic or trigerred by the app automatically triggered, eg: can run in the background -->
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsJob"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsJob"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncJob"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
+
+        <!-- Work Manager -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!-- If you are using androidx.startup to initialize other components -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+        <!-- Disable crashlytics and manually start it -->
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="pocketcasts_automotive"
+            android:value="true" />
+    </application>
+
+</manifest>

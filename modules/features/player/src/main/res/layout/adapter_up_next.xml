@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="episode" type="au.com.shiftyjelly.pocketcasts.models.entity.Playable" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:id="@+id/rightToLeftSwipeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/support_06"
+            android:importantForAccessibility="noHideDescendants">
+
+            <ImageView
+                android:id="@+id/archiveIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="23dp"
+                android:src="@drawable/ic_archive"
+                app:tint="@android:color/white" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/leftToRightSwipeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="noHideDescendants">
+
+            <FrameLayout
+                android:id="@id/leftRightItem2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/support_03">
+
+                <ImageView
+                    android:id="@+id/leftRightIcon2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|right"
+                    android:padding="23dp"
+                    android:src="@drawable/ic_upnext_playlast"
+                    app:tint="@android:color/white" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@id/leftRightItem1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/support_04"
+                android:importantForAccessibility="noHideDescendants">
+
+                <ImageView
+                    android:id="@+id/leftRightIcon1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|right"
+                    android:padding="23dp"
+                    android:src="@drawable/ic_upnext_playnext"
+                    app:tint="@android:color/white" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/itemContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/primary_ui_02"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <CheckBox
+                android:id="@+id/checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="72dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="16dp"
+                android:paddingEnd="16dp"
+                android:scaleType="centerInside"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/checkbox"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/date"
+                style="?attr/textOverline"
+                android:textColor="?attr/player_contrast_02"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:paddingBottom="2dp"
+                android:textAllCaps="true"
+                app:layout_constraintLeft_toRightOf="@+id/image"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="TODAY" />
+
+            <TextView
+                android:id="@+id/title"
+                style="@style/UpNextRowTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingBottom="2dp"
+                android:text="@{episode.title}"
+                android:textAppearance="@style/DarkSubtitle1"
+                android:textColor="?attr/player_contrast_01"
+                app:layout_constraintBottom_toTopOf="@+id/info"
+                app:layout_constraintEnd_toStartOf="@+id/reorder"
+                app:layout_constraintStart_toEndOf="@+id/image"
+                app:layout_constraintTop_toBottomOf="@+id/date"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="Episode description" />
+
+            <ImageView
+                android:id="@+id/downloaded"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_downloaded"
+                app:tint="?attr/support_02"
+                android:visibility="@{episode.isDownloaded()}"
+                app:layout_constraintBottom_toBottomOf="@+id/info"
+                app:layout_constraintEnd_toStartOf="@+id/info"
+                app:layout_constraintStart_toEndOf="@+id/image"
+                app:layout_constraintTop_toTopOf="@+id/info" />
+
+            <TextView
+                android:id="@+id/info"
+                style="@style/UpNextRowSummary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="2dp"
+                android:textAppearance="@style/DarkBody2"
+                android:textColor="?attr/player_contrast_02"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/reorder"
+                app:layout_constraintStart_toEndOf="@+id/downloaded"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:timeLeft="@{episode}"
+                tools:text="Episode description" />
+
+            <ImageButton
+                android:id="@+id/reorder"
+                android:layout_width="44dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/actionBarItemBackground"
+                android:cropToPadding="false"
+                android:paddingStart="0dp"
+                android:paddingEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_reorder"
+                app:tint="?attr/player_contrast_02"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</layout>

@@ -1,0 +1,22 @@
+<vector android:height="24dp" android:viewportHeight="160"
+    android:viewportWidth="160" android:width="24dp"
+    xmlns:aapt="http://schemas.android.com/aapt" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillType="evenOdd" android:pathData="M55.5,54.75C55.5,44.118 64.118,35.5 74.75,35.5C85.382,35.5 94,44.118 94,54.75C94,65.382 85.382,74 74.75,74C64.118,74 55.5,65.382 55.5,54.75ZM74.75,23.5C57.491,23.5 43.5,37.491 43.5,54.75C43.5,64.093 47.6,72.478 54.099,78.205C36.11,85.989 23.5,103.756 23.5,124.5C23.5,127.814 26.186,130.5 29.5,130.5C32.814,130.5 35.5,127.814 35.5,124.5C35.5,103.3 52.897,86 74.5,86C85.823,86 96,90.755 103.124,98.35C105.391,100.767 109.188,100.889 111.605,98.622C114.022,96.355 114.143,92.558 111.876,90.141C107.221,85.178 101.568,81.144 95.235,78.35C101.83,72.62 106,64.172 106,54.75C106,37.491 92.009,23.5 74.75,23.5Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:endX="116.561" android:endY="113.106"
+                android:startX="28.039" android:startY="32.5422" android:type="linear">
+                <item android:color="#FF03A9F4" android:offset="0"/>
+                <item android:color="#FF50D0F1" android:offset="1"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:fillType="evenOdd" android:pathData="M143.946,84.48C146.442,86.659 146.699,90.45 144.52,92.946L107.853,134.946L103.626,139.788L99.086,135.238L80.753,116.863C78.412,114.517 78.416,110.718 80.762,108.378C83.108,106.037 86.907,106.041 89.247,108.387L103.041,122.212L135.48,85.054C137.659,82.558 141.45,82.301 143.946,84.48Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:endX="143.976" android:endY="134.26"
+                android:startX="87.8318" android:startY="83.676" android:type="linear">
+                <item android:color="#FF78D549" android:offset="0"/>
+                <item android:color="#FF9BE45E" android:offset="1"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

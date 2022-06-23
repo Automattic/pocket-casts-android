@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusableInTouchMode="true">
+
+            <ImageView
+                android:id="@+id/imgBannerBackground"
+                android:layout_width="0dp"
+                android:layout_height="138dp"
+                android:background="@color/black"
+                android:foreground="@drawable/background_profile_header"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <au.com.shiftyjelly.pocketcasts.profile.UserView
+                android:id="@+id/userView"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.50" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="end"
+                app:constraint_referenced_ids="userView" />
+
+            <TextView
+                android:id="@+id/lblPodcastCount"
+                style="@style/label_profile_stats"
+                android:layout_marginStart="16dp"
+                android:text="0"
+                android:textColor="?attr/contrast_01"
+                app:layout_constraintBottom_toTopOf="@+id/lblPodcastCountLabel"
+                app:layout_constraintEnd_toStartOf="@+id/lblDaysListened"
+                app:layout_constraintStart_toEndOf="@+id/barrier"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="999" />
+
+            <TextView
+                android:id="@+id/lblDaysListened"
+                style="@style/label_profile_stats"
+                android:text="0"
+                android:textColor="?attr/contrast_01"
+                app:layout_constraintEnd_toStartOf="@+id/lblDaysSaved"
+                app:layout_constraintStart_toEndOf="@+id/lblPodcastCount"
+                app:layout_constraintTop_toTopOf="@id/lblPodcastCount"
+                tools:text="99" />
+
+            <TextView
+                android:id="@+id/lblDaysSaved"
+                style="@style/label_profile_stats"
+                android:layout_marginEnd="48dp"
+                android:text="0"
+                android:textColor="?attr/contrast_01"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/lblDaysListened"
+                app:layout_constraintTop_toTopOf="@id/lblPodcastCount"
+                tools:text="99" />
+
+            <TextView
+                android:id="@+id/lblPodcastCountLabel"
+                style="@style/label_profile_stat_label"
+                android:layout_marginTop="4dp"
+                android:text="@string/profile_stat_podcasts"
+                android:textColor="?attr/contrast_02"
+                app:layout_constraintBottom_toBottomOf="@id/imgBannerBackground"
+                app:layout_constraintEnd_toEndOf="@+id/lblPodcastCount"
+                app:layout_constraintStart_toStartOf="@+id/lblPodcastCount"
+                app:layout_constraintTop_toBottomOf="@+id/lblPodcastCount" />
+
+            <TextView
+                android:id="@+id/lblDaysListenedLabel"
+                style="@style/label_profile_stat_label"
+                android:layout_marginTop="4dp"
+                android:text="@string/profile_stat_days_listened"
+                android:textColor="?attr/contrast_02"
+                app:layout_constraintEnd_toEndOf="@+id/lblDaysListened"
+                app:layout_constraintStart_toStartOf="@+id/lblDaysListened"
+                app:layout_constraintTop_toBottomOf="@+id/lblDaysListened" />
+
+            <TextView
+                android:id="@+id/lblDaysSavedLabel"
+                style="@style/label_profile_stat_label"
+                android:layout_marginTop="4dp"
+                android:text="@string/profile_stats_days_saved"
+                android:textColor="?attr/contrast_02"
+                app:layout_constraintEnd_toEndOf="@+id/lblDaysSaved"
+                app:layout_constraintStart_toStartOf="@+id/lblDaysSaved"
+                app:layout_constraintTop_toBottomOf="@+id/lblDaysSaved" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="?attr/primary_ui_02"
+                android:clipToPadding="false"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imgBannerBackground" />
+
+            <TextView
+                android:id="@+id/lblRefreshStatus"
+                style="?attr/textSubtitle2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:drawablePadding="8dp"
+                android:gravity="center"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/recyclerView"
+                tools:text="Last refresh 3 mins ago" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRefresh"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:letterSpacing="0"
+                android:text="@string/profile_refresh_now"
+                android:textAllCaps="false"
+                android:textColor="?attr/primary_text_02"
+                app:icon="@drawable/ic_retry_small_spinnable"
+                app:iconTint="?attr/primary_text_02"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblRefreshStatus"
+                app:strokeColor="?attr/primary_ui_05" />
+
+            <include
+                android:id="@+id/upgradeLayout"
+                layout="@layout/layout_plus_callout"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnRefresh"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <ImageButton
+        android:id="@+id/btnSettings"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="right"
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="10dp"
+        android:background="?android:attr/actionBarItemBackground"
+        android:contentDescription="@string/settings"
+        android:src="@drawable/ic_profile_settings"
+        android:theme="@style/ThemeDark"
+        android:tint="?attr/contrast_01" />
+
+</FrameLayout>

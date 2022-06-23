@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/account_nav_graph"
+    app:startDestination="@+id/accountFragment">
+
+    <fragment
+        android:id="@+id/createAccountFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.CreateAccountFragment"
+        android:label="@string/profile_select_account_type">
+        <action
+            android:id="@+id/action_createAccountFragment_to_createEmailFragment"
+            app:destination="@id/createEmailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_createAccountFragment_to_createFrequencyFragment"
+            app:destination="@id/createFrequencyFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.AccountFragment"
+        android:label="@string/profile_set_up_account">
+        <action
+            android:id="@+id/action_accountFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_createAccountFragment"
+            app:destination="@id/createAccountFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_upgradedAccountFragment"
+            app:destination="@id/upgradedAccountFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_accountFragment_to_createEmailFragment"
+            app:destination="@id/createEmailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.SignInFragment"
+        android:label="@string/sign_in">
+        <action
+            android:id="@+id/action_signInFragment_to_resetPasswordFragment"
+            app:destination="@id/resetPasswordFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/createEmailFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.CreateEmailFragment"
+        android:label="@string/create_account">
+        <action
+            android:id="@+id/action_createEmailFragment_to_createDoneFragment"
+            app:destination="@id/createDoneFragment" />
+        <action
+            android:id="@+id/action_createEmailFragment_to_createPayNowFragment"
+            app:destination="@id/createPayNowFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createDoneFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.CreateDoneFragment" />
+    <fragment
+        android:id="@+id/createFrequencyFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.CreateFrequencyFragment"
+        android:label="@string/plus_select_payment_frequency">
+        <action
+            android:id="@+id/action_createFrequencyFragment_to_createTOSFragment"
+            app:destination="@id/createTOSFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/createTOSFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.CreateTOSFragment"
+        android:label="@string/profile_create_terms_of_use" >
+        <action
+            android:id="@+id/action_createTOSFragment_to_createEmailFragment"
+            app:destination="@id/createEmailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_createTOSFragment_to_accountFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popUpTo="@id/accountFragment" />
+        <action
+            android:id="@+id/action_createTOSFragment_to_createPayNowFragment"
+            app:destination="@id/createPayNowFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/createPayNowFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.CreatePayNowFragment"
+        android:label="@string/profile_create_completed">
+        <action
+            android:id="@+id/action_createPayNowFragment_to_createDoneFragment"
+            app:destination="@id/createDoneFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/upgradedAccountFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.profile.UpgradedAccountFragment"
+        android:label="Account Upgraded" />
+    <fragment
+        android:id="@+id/resetPasswordFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.ResetPasswordFragment"
+        android:label="Reset Password" />
+    <fragment
+        android:id="@+id/promoCodeFragment"
+        android:name="au.com.shiftyjelly.pocketcasts.account.PromoCodeFragment"
+        android:label="PromoCodeFragment" >
+        <action
+            android:id="@+id/action_promoCodeFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_promoCodeFragment_to_createEmailFragment"
+            app:destination="@id/createEmailFragment" />
+        <argument
+            android:name="promocode"
+            app:argType="string" />
+    </fragment>
+</navigation>

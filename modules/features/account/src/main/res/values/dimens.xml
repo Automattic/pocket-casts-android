@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="automotive_profile_row_height">80dp</dimen>
+    <dimen name="auto_profile_icon_size">36dp</dimen>
+    <dimen name="car_create_account_btn_top_margin">96dp</dimen>
+    <dimen name="car_sign_in_btn_top_margin">56dp</dimen>
+    <dimen name="car_create_heading_top_margin">44dp</dimen>
+</resources>

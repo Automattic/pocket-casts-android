@@ -1,0 +1,280 @@
+package au.com.shiftyjelly.pocketcasts.profile
+
+import android.app.AlertDialog
+import android.content.Intent
+import android.content.res.ColorStateList
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.widget.TextViewCompat
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.account.AccountActivity
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
+import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentProfileBinding
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.settings.SettingsAdapter
+import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
+import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
+import au.com.shiftyjelly.pocketcasts.settings.util.SettingsHelper
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
+import java.util.Date
+import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
+
+@AndroidEntryPoint
+class ProfileFragment : BaseFragment() {
+
+    override var statusBarColor: StatusBarColor = StatusBarColor.Dark
+
+    @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var userManager: UserManager
+
+    private val viewModel: ProfileViewModel by viewModels()
+    private var binding: FragmentProfileBinding? = null
+    private val sections = listOf(
+        SettingsAdapter.Item(LR.string.profile_navigation_stats, R.drawable.ic_stats, StatsFragment::class.java),
+        SettingsAdapter.Item(LR.string.profile_navigation_downloads, R.drawable.ic_profile_download, ProfileEpisodeListFragment::class.java),
+        SettingsAdapter.Item(LR.string.profile_navigation_files, R.drawable.ic_file, CloudFilesFragment::class.java),
+        SettingsAdapter.Item(LR.string.profile_navigation_starred, R.drawable.ic_starred, ProfileEpisodeListFragment::class.java),
+        SettingsAdapter.Item(LR.string.profile_navigation_listening_history, R.drawable.ic_listen_history, ProfileEpisodeListFragment::class.java)
+    )
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding?.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.clearFailedRefresh()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val binding = binding ?: return
+
+        binding.btnSettings.setOnClickListener {
+            (activity as FragmentHostListener).addFragment(SettingsFragment())
+        }
+
+        val linearLayoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        val recyclerView = binding.recyclerView
+        recyclerView.layoutManager = linearLayoutManager
+        val divider = DividerItemDecoration(context, linearLayoutManager.orientation)
+        ContextCompat.getDrawable(recyclerView.context, UR.drawable.divider)?.let {
+            divider.setDrawable(it)
+        }
+        recyclerView.addItemDecoration(divider)
+        recyclerView.adapter = SettingsAdapter(sections) { section ->
+            section.fragment?.let { fragmentClass ->
+                if (fragmentClass == ProfileEpisodeListFragment::class.java) {
+                    val fragment = when (section.title) {
+                        LR.string.profile_navigation_downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
+                        LR.string.profile_navigation_starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
+                        LR.string.profile_navigation_listening_history -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
+                        else -> throw IllegalStateException("Unknown row")
+                    }
+                    (activity as? FragmentHostListener)?.addFragment(fragment)
+                } else {
+                    (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                }
+            }
+
+            section.action?.invoke()
+        }
+
+        SettingsHelper.loadHeaderImageInto(binding.imgBannerBackground)
+        binding.imgBannerBackground.setOnLongClickListener {
+            theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity)
+            true
+        }
+
+        viewModel.podcastCount.observe(viewLifecycleOwner) {
+            binding.lblPodcastCount.text = it.toString()
+            // check if the stats have changed, causes the stats to change on first sign in
+            viewModel.updateState()
+        }
+
+        viewModel.daysListenedCount.observe(viewLifecycleOwner) {
+            val timeAndUnit = convertSecsToTimeAndUnit(it)
+            binding.lblDaysListened.text = timeAndUnit.value
+            binding.lblDaysListenedLabel.setText(timeAndUnit.listenedStringId)
+        }
+
+        viewModel.daysSavedCount.observe(viewLifecycleOwner) {
+            val timeAndUnit = convertSecsToTimeAndUnit(it)
+            binding.lblDaysSaved.text = timeAndUnit.value
+            binding.lblDaysSavedLabel.setText(timeAndUnit.savedStringId)
+        }
+
+        viewModel.signInState.observe(viewLifecycleOwner) { state ->
+            binding.userView.signedInState = state
+
+            binding.upgradeLayout.root.isInvisible = settings.getUpgradeClosedProfile() || state.isSignedInAsPlus
+            if (binding.upgradeLayout.root.isInvisible) {
+                // We need this to get the correct padding below refresh
+                binding.upgradeLayout.root.updateLayoutParams<ConstraintLayout.LayoutParams> { height = 16.dpToPx(view.context) }
+            }
+        }
+
+        binding.userView.setOnClickListener {
+            if (viewModel.isSignedIn) {
+                val fragment = AccountDetailsFragment.newInstance()
+                (activity as FragmentHostListener).addFragment(fragment)
+            } else {
+                val intent = Intent(activity, AccountActivity::class.java)
+                activity?.startActivity(intent)
+            }
+        }
+
+        binding.btnRefresh.setOnClickListener {
+            updateRefreshUI(RefreshState.Refreshing)
+            podcastManager.refreshPodcasts("profile")
+        }
+
+        val upgradeLayout = binding.upgradeLayout
+        upgradeLayout.btnClose.setOnClickListener {
+            settings.setUpgradeClosedProfile(true)
+            upgradeLayout.root.isVisible = false
+        }
+
+        upgradeLayout.lblGetMore.text = getString(LR.string.profile_help_support)
+        upgradeLayout.root.setOnClickListener {
+            PlusUpgradeFragment.newInstance(featureBlocked = false).show(childFragmentManager, "upgradebottomsheet")
+        }
+
+        viewModel.refreshObservable.observe(viewLifecycleOwner) { state ->
+            updateRefreshUI(state)
+        }
+    }
+
+    private fun updateRefreshUI(state: RefreshState?) {
+        val binding = binding ?: return
+        val lblRefreshStatus = binding.lblRefreshStatus
+        when (state) {
+            is RefreshState.Never -> {
+                lblRefreshStatus.text = getString(LR.string.profile_refreshed_never)
+                lblRefreshStatus.setCompoundDrawables(null, null, null, null)
+                lblRefreshStatus.setOnClickListener(null)
+            }
+            is RefreshState.Success -> {
+                updateLastRefreshText(lblRefreshStatus, state.date)
+                lblRefreshStatus.setCompoundDrawables(null, null, null, null)
+                lblRefreshStatus.setOnClickListener(null)
+            }
+            is RefreshState.Refreshing -> {
+                lblRefreshStatus.text = getString(LR.string.profile_refreshing)
+                lblRefreshStatus.setCompoundDrawables(null, null, null, null)
+                lblRefreshStatus.setOnClickListener(null)
+            }
+            is RefreshState.Failed -> {
+                lblRefreshStatus.text = getString(LR.string.profile_refresh_failed)
+                context?.let { context ->
+                    val errorDrawable = context.getThemeTintedDrawable(IR.drawable.ic_alert_small, UR.attr.primary_icon_02)
+                    lblRefreshStatus.setCompoundDrawablesWithIntrinsicBounds(errorDrawable, null, null, null)
+                    lblRefreshStatus.compoundDrawablePadding = 8.dpToPx(context)
+                    TextViewCompat.setCompoundDrawableTintList(
+                        lblRefreshStatus,
+                        ColorStateList.valueOf(
+                            context.getThemeColor(
+                                UR.attr.secondary_icon_01
+                            )
+                        )
+                    )
+                    lblRefreshStatus.setOnClickListener {
+                        AlertDialog.Builder(context)
+                            .setTitle(LR.string.profile_refresh_error)
+                            .setMessage(state.error)
+                            .setPositiveButton(LR.string.ok, null)
+                            .show()
+                    }
+                }
+            }
+            else -> {
+                lblRefreshStatus.setText(LR.string.profile_refresh_status_unknown)
+                lblRefreshStatus.setCompoundDrawables(null, null, null, null)
+                lblRefreshStatus.setOnClickListener(null)
+            }
+        }
+    }
+
+    private fun updateLastRefreshText(lblRefreshStatus: TextView, lastRefresh: Date) {
+        val time = Date().time - lastRefresh.time
+        val timeAmount = resources.getStringPluralSecondsMinutesHoursDaysOrYears(time)
+        lblRefreshStatus.text = getString(LR.string.profile_last_refresh, timeAmount)
+    }
+
+    override fun onBackPressed(): Boolean {
+        viewModel.updateState()
+        return super.onBackPressed()
+    }
+
+    private fun convertSecsToTimeAndUnit(seconds: Long): TimeAndUnit {
+        val days = seconds / 86400
+        val hours = seconds / 3600
+        val mins = seconds / 60
+        val secs = seconds
+
+        if (days > 0) {
+            return TimeAndUnit(
+                value = days.toString(),
+                savedStringId = if (days == 1L) LR.string.profile_stats_day_saved else LR.string.profile_stats_days_saved,
+                listenedStringId = if (days == 1L) LR.string.profile_stats_day_listened else LR.string.profile_stats_days_listened
+            )
+        }
+        if (hours > 0) {
+            return TimeAndUnit(
+                value = hours.toString(),
+                savedStringId = if (hours == 1L) LR.string.profile_stats_hour_saved else LR.string.profile_stats_hours_saved,
+                listenedStringId = if (hours == 1L) LR.string.profile_stats_hour_listened else LR.string.profile_stats_hours_listened
+            )
+        }
+        if (mins > 0 && days < 1) {
+            return TimeAndUnit(
+                value = mins.toString(),
+                savedStringId = if (mins == 1L) LR.string.profile_stats_minute_saved else LR.string.profile_stats_minutes_saved,
+                listenedStringId = if (mins == 1L) LR.string.profile_stats_minute_listened else LR.string.profile_stats_minutes_listened
+            )
+        }
+        return TimeAndUnit(
+            value = secs.toString(),
+            savedStringId = if (secs == 1L) LR.string.profile_stats_second_saved else LR.string.profile_stats_seconds_saved,
+            listenedStringId = if (secs == 1L) LR.string.profile_stats_second_listened else LR.string.profile_stats_seconds_listened
+        )
+    }
+
+    data class TimeAndUnit(val value: String, @StringRes val savedStringId: Int, @StringRes val listenedStringId: Int)
+}

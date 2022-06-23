@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/paymentItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp">
+
+        <Space
+            android:id="@+id/spaceBottom"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <au.com.shiftyjelly.pocketcasts.views.component.SelectablePanel
+            android:id="@+id/outlinePanel"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/panel_border"
+            app:layout_constraintBottom_toBottomOf="@id/spaceBottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/spaceTop" />
+
+        <Space
+            android:id="@+id/spaceTop"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <RadioButton
+            android:id="@+id/btnFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:checked="false"
+            android:clickable="false"
+            app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
+            app:layout_constraintStart_toStartOf="@+id/outlinePanel"
+            app:layout_constraintTop_toTopOf="@+id/outlinePanel" />
+
+        <TextView
+            android:id="@+id/txtTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textAppearance="@style/H30"
+            android:textColor="?attr/primary_text_01"
+            app:layout_constraintBottom_toTopOf="@+id/spaceBottom"
+            app:layout_constraintStart_toEndOf="@+id/btnFrequency"
+            app:layout_constraintTop_toBottomOf="@+id/spaceTop"
+            tools:text="Title" />
+
+        <TextView
+            android:id="@+id/txtDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="end"
+            android:textAppearance="@style/H60"
+            android:textColor="?attr/primary_interactive_01"
+            app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
+            app:layout_constraintEnd_toStartOf="@+id/txtAmount"
+            app:layout_constraintStart_toEndOf="@+id/txtTitle"
+            app:layout_constraintTop_toTopOf="@+id/outlinePanel"
+            tools:text="DESCRIPTION" />
+
+        <TextView
+            android:id="@+id/txtAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:textAppearance="@style/H30"
+            android:textColor="?attr/primary_text_01"
+            app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
+            app:layout_constraintEnd_toEndOf="@+id/outlinePanel"
+            app:layout_constraintTop_toTopOf="@+id/outlinePanel"
+            tools:text="$100" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

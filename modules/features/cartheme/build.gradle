@@ -1,0 +1,12 @@
+apply from: "../../modules.gradle"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation androidLibs.appCompat
+    implementation androidLibs.ktx
+    testImplementation libs.junit
+    androidTestImplementation androidLibs.junitExt
+    androidTestImplementation androidLibs.testEspressoCore
+}

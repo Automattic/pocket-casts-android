@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/primary_ui_01"
+    android:orientation="vertical"
+    tools:context=".account.AccountFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/primary_ui_01">
+
+            <TextView
+                android:id="@+id/lblSignIn"
+                style="?attr/primary_text_01"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="@dimen/car_create_heading_top_margin"
+                android:layout_marginEnd="24dp"
+                android:gravity="center_horizontal"
+                android:text="@string/profile_sign_in_or_create_account"
+                android:textAppearance="@style/TextAppearance.Car.Display1"
+                android:textColor="?attr/primary_text_01"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imgCreateAccount" />
+
+            <TextView
+                android:id="@+id/lblSaveYourPodcasts"
+                style="?attr/primary_text_01"
+                android:layout_width="670dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="24dp"
+                android:gravity="center_horizontal"
+                android:text="@string/profile_save_your_podcasts"
+                android:textAppearance="@style/TextAppearance.Car.Body1"
+                android:textColor="?attr/primary_text_02"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblSignIn" />
+
+            <au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
+                android:id="@+id/imgCreateAccount"
+                android:layout_width="360dp"
+                android:layout_height="360dp"
+                android:scaleType="fitCenter"
+                app:gradient="gradient_2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:src="@drawable/ic_create_new_account" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCreate"
+                style="@style/MaterialButtonStyle"
+                android:layout_width="592dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="@dimen/car_create_account_btn_top_margin"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.02"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:text="@string/create_account"
+                android:textAllCaps="false"
+                android:textSize="@dimen/car_body2_size"
+                app:cornerRadius="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblSaveYourPodcasts" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSignIn"
+                style="@style/PCOutlinedButton"
+                android:layout_width="592dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="@dimen/car_sign_in_btn_top_margin"
+                android:layout_marginEnd="16dp"
+                android:text="@string/sign_in"
+                android:textSize="@dimen/car_body2_size"
+                app:cornerRadius="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnCreate"
+                app:strokeColor="?attr/primary_interactive_01"
+                app:strokeWidth="2dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+</LinearLayout>

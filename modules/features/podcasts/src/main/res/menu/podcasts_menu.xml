@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/folders_locked"
+        android:icon="@drawable/folder_lock_light"
+        app:showAsAction="always"
+        android:visible="false"
+        android:title="@string/create_folder" />
+
+    <item
+        android:id="@+id/create_folder"
+        android:icon="@drawable/folder_create"
+        app:showAsAction="always"
+        android:visible="false"
+        android:title="@string/create_folder" />
+
+    <item
+        android:id="@+id/media_route_menu_item"
+        android:title="@string/play_on"
+        app:actionProviderClass="androidx.mediarouter.app.MediaRouteActionProvider"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/search_podcasts"
+        android:icon="@drawable/ic_search_black_24dp"
+        app:showAsAction="always"
+        android:title="@string/podcasts_menu_search_podcasts" />
+
+    <item
+        android:id="@+id/more_options"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        app:showAsAction="always"
+        android:title="@string/podcasts_menu_more_options" />
+
+</menu>

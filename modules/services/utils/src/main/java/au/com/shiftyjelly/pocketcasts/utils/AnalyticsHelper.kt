@@ -1,0 +1,193 @@
+package au.com.shiftyjelly.pocketcasts.utils
+
+import android.os.Bundle
+import androidx.core.os.bundleOf
+import com.google.firebase.analytics.FirebaseAnalytics
+import timber.log.Timber
+
+object AnalyticsHelper {
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+    fun setup(analytics: FirebaseAnalytics) {
+        firebaseAnalytics = analytics
+    }
+
+    fun openedFeaturedPodcast() {
+        logEvent("featured_podcast_clicked")
+    }
+
+    fun subscribedToFeaturedPodcast() {
+        logEvent("featured_podcast_subscribed")
+    }
+
+    fun podcastEpisodePlayedFromList(listId: String, podcastUuid: String) {
+        val params = Bundle()
+        params.putString("list_id", listId)
+        params.putString("podcast_uuid", podcastUuid)
+
+        logEvent("discover_list_episode_play", params)
+    }
+
+    fun podcastEpisodeTappedFromList(listId: String, podcastUuid: String, episodeUuid: String) {
+        val params = Bundle().apply {
+            putString("list_id", listId)
+            putString("podcast_uuid", podcastUuid)
+            putString("episode_uuid", episodeUuid)
+        }
+        logEvent("discover_list_podcast_episode_tap", params)
+    }
+
+    fun podcastSubscribedFromList(listId: String, podcastUuid: String) {
+        val params = Bundle()
+        params.putString("list_id", listId)
+        params.putString("podcast_uuid", podcastUuid)
+
+        logEvent("discover_list_podcast_subscribe", params)
+    }
+
+    fun podcastTappedFromList(listId: String, podcastUuid: String) {
+        val params = Bundle()
+        params.putString("list_id", listId)
+        params.putString("podcast_uuid", podcastUuid)
+
+        logEvent("discover_list_podcast_tap", params)
+    }
+
+    fun listShowAllTapped(listId: String) {
+        val params = Bundle()
+        params.putString("list_id", listId)
+
+        logEvent("discover_list_show_all", params)
+    }
+
+    fun listImpression(listId: String) {
+        val params = Bundle()
+        params.putString("list_id", listId)
+
+        logEvent("discover_list_impression", params)
+    }
+
+    fun listShared(listId: String) {
+        val params = Bundle()
+        params.putString("list_id", listId)
+
+        logEvent("discover_list_shared", params)
+    }
+
+    fun navigatedToPodcasts() {
+        logEvent("podcast_tab_open")
+    }
+
+    fun navigatedToFilters() {
+        logEvent("filter_tab_open")
+    }
+
+    fun navigatedToDiscover() {
+        logEvent("discover_open")
+    }
+
+    fun navigatedToProfile() {
+        logEvent("profile_tab_open")
+    }
+
+    fun userGuideOpened() {
+        logEvent("user_guide_opened")
+    }
+
+    fun userGuideEmailSupport() {
+        logEvent("user_guide_email")
+    }
+
+    fun userGuideEmailFeedback() {
+        logEvent("user_guide_feedback")
+    }
+
+    fun statusReportSent() {
+        logEvent("status_report")
+    }
+
+    fun longPressedEpisodeButton() {
+        logEvent("long_pressed_episode_btn")
+    }
+
+    fun enteredMultiSelect() {
+        logEvent("entered_multi_select")
+    }
+
+    fun playedEpisode() {
+        logEvent("played_episode")
+    }
+
+    fun subscribedToPodcast() {
+        logEvent("subscribed_to_podcast")
+    }
+
+    fun tourStarted(tourName: String) {
+        logEvent("${tourName}_tour_started")
+    }
+
+    fun tourCompleted(tourName: String) {
+        logEvent("${tourName}_tour_completed")
+    }
+
+    fun tourCancelled(tourName: String, atStep: Int) {
+        logEvent("${tourName}_tour_cancelled_$atStep")
+    }
+
+    fun openedCategory(categoryId: Int, region: String) {
+        logEvent(
+            "category_open",
+            bundle = bundleOf(
+                "id" to categoryId,
+                "region" to region
+            )
+        )
+
+        logEvent("category_page_open_$categoryId")
+    }
+
+    fun nowPlayingOpen() {
+        logEvent("now_playing_open")
+    }
+
+    fun openedPlayerNotes() {
+        logEvent("now_playing_notes_open")
+    }
+
+    fun openedPlayerChapters() {
+        logEvent("now_playing_chapters_open")
+    }
+
+    fun openedUpNext() {
+        logEvent("up_next_open")
+    }
+
+    fun openedPodcast(podcastUuid: String) {
+        logEvent("podcast_open", bundleOf("podcastUuid" to podcastUuid))
+    }
+
+    fun openedEpisode(podcastUuid: String, episodeUuid: String) {
+        logEvent("episode_open", bundleOf("podcastUuid" to podcastUuid, "episodeUuid" to episodeUuid))
+    }
+
+    fun openedFilter() {
+        logEvent("filter_opened")
+    }
+
+    fun accountDeleted() {
+        logEvent("account_deleted")
+    }
+
+    fun podcastFeedRefreshed() {
+        logEvent("podcast_feed_refreshed")
+    }
+
+    fun foregroundServiceStartNotAllowedException() {
+        logEvent("foreground_service_exception")
+    }
+
+    private fun logEvent(name: String, bundle: Bundle? = Bundle()) {
+        firebaseAnalytics.logEvent(name, bundle)
+
+        Timber.d("Logged $name $bundle")
+    }
+}

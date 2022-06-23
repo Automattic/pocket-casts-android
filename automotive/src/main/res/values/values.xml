@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- HACK: This is the copied car theme so we can base it off of our own themes -->
+    <style name="Automotive.ThemeDark" parent="ThemeBaseDark">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:alertDialogTheme">@style/Theme.Car.Dark.Dialog.Alert</item>
+        <item name="android:colorAccent">@color/car_accent</item>
+        <item name="android:colorForeground">@color/car_grey_300</item>
+        <item name="android:borderlessButtonStyle">@style/Widget.Car.Button.Borderless.Colored
+        </item>
+        <item name="android:buttonStyle">@style/Widget.Car.Button</item>
+        <item name="checkboxStyle">@style/Widget.Car.CheckBox.Light</item>
+        <item name="android:checkboxStyle">@style/Widget.Car.CheckBox.Light</item>
+        <item name="android:colorButtonNormal">@color/car_accent</item>
+        <item name="android:colorControlHighlight">@color/car_card_ripple_background_light</item>
+        <item name="android:colorControlNormal">@color/car_grey_300</item>
+        <item name="android:colorPrimary">@android:color/black</item>
+        <item name="android:colorPrimaryDark">@android:color/black</item>
+        <item name="android:editTextColor">@color/car_primary_text_light</item>
+        <item name="android:editTextStyle">@style/Widget.Car.EditText</item>
+        <item name="textInputStyle">@style/Widget.Design.TextInputLayout</item>
+        <item name="android:listChoiceIndicatorMultiple">@drawable/car_checkbox</item>
+        <item name="android:listChoiceIndicatorSingle">@drawable/car_radio_button</item>
+        <item name="android:listPreferredItemHeightSmall">@dimen/car_double_line_list_item_height
+        </item>
+        <item name="android:listPreferredItemPaddingStart">@dimen/car_keyline_1</item>
+        <item name="android:listPreferredItemPaddingEnd">@dimen/car_keyline_1</item>
+        <item name="android:progressBarStyleHorizontal">@style/Widget.Car.ProgressBar.Horizontal
+        </item>
+        <item name="android:progressBackgroundTint">@color/car_seekbar_track_background_dark</item>
+        <item name="android:progressTint">?attr/android:colorControlActivated</item>
+        <item name="android:secondaryProgressTint">@color/car_seekbar_track_secondary_progress
+        </item>
+        <item name="android:selectableItemBackground">@drawable/car_card_ripple_background_light
+        </item>
+        <item name="android:selectableItemBackgroundBorderless">
+            @drawable/car_button_ripple_background_light
+        </item>
+        <item name="android:seekBarStyle">@style/Widget.Car.SeekBar.Light</item>
+        <item name="android:textColorPrimary">@color/car_primary_text_light</item>
+        <item name="android:textColorHighlight">@color/car_grey_700</item>
+        <item name="android:textColorHint">@color/car_secondary_text_light</item>
+        <item name="actionBarItemBackground">@drawable/car_card_ripple_background_light</item>
+        <item name="actionBarSize">@dimen/car_app_bar_height</item>
+        <item name="actionButtonStyle">@style/Widget.Car.ActionButton.Light</item>
+        <item name="actionMenuTextAppearance">@style/TextAppearance.Car.ActionBar.Menu</item>
+        <item name="actionMenuTextColor">?android:attr/colorButtonNormal</item>
+        <item name="alertDialogTheme">@style/Theme.Car.Dark.Dialog.Alert</item>
+        <item name="alphaJumpPickerBackground">@color/car_card_dark</item>
+        <item name="borderlessButtonStyle">@style/Widget.Car.Button.Borderless.Colored</item>
+        <item name="carDialogTheme">@style/Theme.Car.Dark.Dialog</item>
+        <item name="carToolbarStyle">@style/Widget.Car.CarToolbar</item>
+        <item name="colorAccent">@color/car_accent</item>
+        <item name="colorControlHighlight">@color/car_card_ripple_background_light</item>
+        <item name="colorPrimary">@android:color/black</item>
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="colorSwitchThumbNormal">@color/car_grey_300</item>
+        <item name="editTextStyle">@style/Widget.Car.EditText</item>
+        <item name="listItemActionDividerColor">@color/car_list_divider_light</item>
+        <item name="listItemFocusOutlineColor">@color/car_accent_light</item>
+        <item name="listItemBackground">@drawable/car_list_item_background</item>
+        <item name="listItemBackgroundColor">@color/car_card_dark</item>
+        <item name="listItemForeground">@drawable/car_card_ripple_background_light</item>
+        <item name="listItemBodyTextAppearance">@style/TextAppearance.Car.ListItem.BodyText.Light</item>
+        <item name="listItemPrimaryIconTint">@null</item>
+        <item name="listItemSupplementalIconTint">@null</item>
+        <item name="listItemSubheaderTextAppearance">@style/TextAppearance.Car.Subheader</item>
+        <item name="listItemTitleTextAppearance">@style/TextAppearance.Car.Body1.Light</item>
+        <item name="seekBarStyle">@style/Widget.Car.SeekBar.Light</item>
+        <item name="selectableItemBackground">@drawable/car_card_ripple_background_light</item>
+        <item name="selectableItemBackgroundBorderless">
+            @drawable/car_button_ripple_background_light
+        </item>
+        <item name="switchStyle">@style/Widget.Car.Switch</item>
+        <item name="toolbarNavigationButtonStyle">
+            @style/Widget.Car.Toolbar.Button.Navigation.Light
+        </item>
+        <item name="toolbarStyle">@style/Widget.Car.Toolbar.Light</item>
+        <item name="preferenceTheme">@style/PCPreferenceThemeOverlayCar</item>
+    </style>
+    <style name="PCPreferenceThemeOverlayCar">
+        <item name="preferenceScreenStyle">@style/CarPreference.PreferenceScreen</item>
+        <item name="preferenceCategoryStyle">@style/CarPreference.Category</item>
+        <item name="preferenceStyle">@style/CarPreference</item>
+        <item name="preferenceInformationStyle">@style/CarPreference.Information</item>
+        <item name="checkBoxPreferenceStyle">@style/CarPreference.CheckBoxPreference</item>
+        <item name="switchPreferenceCompatStyle">@style/CarPreference.SwitchPreferenceCompat</item>
+        <item name="switchPreferenceStyle">@style/CarPreference.PCSwitchPreference</item>
+        <item name="seekBarPreferenceStyle">@style/CarPreference.SeekBarPreference</item>
+        <item name="dialogPreferenceStyle">@style/CarPreference.DialogPreference</item>
+        <item name="editTextPreferenceStyle">
+            @style/CarPreference.DialogPreference.EditTextPreference
+        </item>
+        <item name="dropdownPreferenceStyle">@style/CarPreference.DropDown</item>
+        <item name="preferenceFragmentListStyle">@style/CarPreferenceFragmentList</item>
+    </style>
+    <style name="CarPreference.PCSwitchPreference">
+        <item name="android:layout">@layout/layout_preference_car</item>
+        <item name="android:widgetLayout">@layout/layout_car_switch</item>
+    </style>
+    <style name="CarPreference.PCSwitchPreferenceCompat">
+        <item name="android:layout">@layout/layout_preference_car</item>
+        <item name="android:widgetLayout">@layout/preference_car_switch_compat_widget</item>
+    </style>
+</resources>

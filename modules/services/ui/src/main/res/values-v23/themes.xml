@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ThemeLight" parent="ThemeBaseLight">
+        <item name="android:statusBarColor">@color/white</item>
+    </style>
+
+    <style name="ThemeDark" parent="ThemeBaseDark">
+        <item name="android:statusBarColor">@color/black</item>
+    </style>
+
+    <style name="ClassicLight" parent="BaseClassicLight">
+        <item name="android:statusBarColor">@color/black</item>
+    </style>
+</resources>

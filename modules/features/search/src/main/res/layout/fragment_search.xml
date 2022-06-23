@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="au.com.shiftyjelly.pocketcasts.search.SearchViewModel" />
+        <variable
+            name="floating"
+            type="boolean" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".SearchFragment">
+
+        <FrameLayout
+            android:id="@+id/floatingLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="@{floating ? @dimen/search_box_floating_top : 0}"
+            android:background="?attr/secondary_ui_01">
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                android:hint="@string/search_podcasts"
+                android:textColorHint="?attr/secondary_text_02"
+                android:paddingStart="40dp"
+                android:paddingEnd="8dp"
+                app:searchIcon="@null"
+                android:theme="@style/Widget.AppCompat.SearchView.PCAccent"
+                android:textColor="?attr/secondary_text_01" />
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginStart="6dp"
+                android:src="@drawable/ic_arrow_back_24dp"
+                android:tint="?attr/secondary_icon_01"
+                android:background="?android:attr/actionBarItemBackground" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/resultPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/primary_ui_01"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:clipToPadding="false"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:id="@+id/noResults"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:importantForAccessibility="no"
+                    android:paddingTop="32dp"
+                    android:paddingBottom="16dp"
+                    app:tint="?attr/primary_icon_01"
+                    app:srcCompat="@drawable/search" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp"
+                    android:gravity="center"
+                    style="?attr/textH2"
+                    android:text="@string/search_no_podcasts_found" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:gravity="center"
+                    style="?attr/textBody2"
+                    android:textColor="?attr/primary_text_02"
+                    android:text="@string/search_no_podcasts_found_summary" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/searchFailed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:importantForAccessibility="no"
+                    android:paddingTop="32dp"
+                    android:paddingBottom="16dp"
+                    app:tint="?attr/primary_icon_01"
+                    app:srcCompat="@drawable/search_failed" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp"
+                    android:gravity="center"
+                    style="?attr/textH2"
+                    android:text="@string/error_search_failed" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:gravity="center"
+                    style="?attr/textBody2"
+                    android:textColor="?attr/primary_text_02"
+                    android:text="@string/error_check_your_internet_connection" />
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="16dp"
+                android:indeterminate="true"
+                android:indeterminateTint="?attr/secondary_icon_01"
+                style="?android:attr/progressBarStyleSmall"
+                android:visibility="@{viewModel.loading}"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

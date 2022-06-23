@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/primary_ui_01"
+    android:clickable="true"
+    android:focusable="true">
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="60dp"
+        android:clipToPadding="false">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:paddingTop="@dimen/filters_padding_top">
+            <TextView
+                android:id="@+id/lblTitle"
+                style="?attr/textH1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textColor="?attr/primary_text_01"
+                tools:text="Episodes" />
+
+            <TextView
+                android:id="@+id/lblSwitchTitle"
+                style="@style/P30"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblTitle"
+                android:textColor="?attr/primary_text_01"
+                android:text="@string/filters_filter_by_duration" />
+
+            <Switch
+                android:id="@+id/switchDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/lblSwitchTitle"
+                app:layout_constraintBottom_toBottomOf="@+id/lblSwitchTitle"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintTop_toBottomOf="@+id/lblSwitchTitle"
+                android:layout_marginTop="25dp" />
+
+            <TextView
+                android:id="@+id/lblLongerThan"
+                style="@style/P30"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="30dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/stepperLongerThan"
+                app:layout_constraintTop_toBottomOf="@id/divider"
+                android:textColor="?attr/primary_text_01"
+                android:text="@string/filters_duration_longer_than" />
+
+            <au.com.shiftyjelly.pocketcasts.views.component.NumericStepper
+                android:id="@+id/stepperLongerThan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/lblLongerThan"
+                app:layout_constraintBottom_toBottomOf="@id/lblLongerThan"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/lblShorterThan"
+                style="@style/P30"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/stepperShorterThan"
+                app:layout_constraintTop_toBottomOf="@+id/lblLongerThan"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textColor="?attr/primary_text_01"
+                android:text="@string/filters_duration_shorter_than" />
+
+            <au.com.shiftyjelly.pocketcasts.views.component.NumericStepper
+                android:id="@+id/stepperShorterThan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@id/lblShorterThan"
+                app:layout_constraintBottom_toBottomOf="@id/lblShorterThan"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/close"
+        android:src="@drawable/ic_cancel"
+        android:tint="?attr/primary_icon_01" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="16dp"
+        android:layout_gravity="bottom"
+        android:padding="16dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:background="?attr/primary_ui_01">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="@string/filters_update_filter"
+            style="@style/PCButton"/>
+    </FrameLayout>
+</FrameLayout>

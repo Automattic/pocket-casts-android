@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical">
+    <ImageButton
+        android:id="@+id/btnSpeedDown"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:tint="?attr/primary_icon_01"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_minus"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+    <TextView
+        android:id="@+id/lblSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_speed_label"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        style="?attr/textSubtitle1"
+        android:text="1.0"/>
+    <ImageButton
+        android:id="@+id/btnSpeedUp"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:tint="?attr/primary_icon_01"
+        android:src="@drawable/ic_effects_plus"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+</LinearLayout>

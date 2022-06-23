@@ -1,0 +1,73 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext {
+        kotlin_version = '1.6.10'
+        hilt_version = '2.38.1'
+    }
+    repositories {
+        google()
+        mavenLocal()
+    }
+
+    // Gradle Plugins
+    dependencies {
+        // Android - https://developer.android.com/studio/releases/gradle-plugin
+        classpath 'com.android.tools.build:gradle:7.2.1'
+
+        // Google Services - https://developers.google.com/android/guides/google-services-plugin
+        classpath "com.google.gms:google-services:4.3.10"
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.0'
+        // Kotlin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // Open source licenses plugin
+        classpath 'com.google.android.gms:oss-licenses-plugin:0.10.5'
+        // Hilt dependency injection
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
+    }
+
+    // Force proguard to the new version to fix "proguard.ParseException: Use of generics not allowed for java type at '<1>_<2>_<3>JsonAdapter' in line 31 of file '/Users/philip/.gradle/caches/transforms-2/files-2.1/d5ca2d039e1d32e9ba6bfd6a67df5151/META-INF/proguard/moshi.pro'"
+    configurations.all {
+        resolutionStrategy {
+            force 'net.sf.proguard:proguard-gradle:6.1.1'
+        }
+    }
+}
+
+plugins {
+    id 'com.github.ben-manes.versions' version '0.42.0'
+    id 'com.diffplug.spotless' version '6.2.2'
+}
+
+apply plugin: 'base'
+apply from: rootProject.file('dependencies.gradle')
+apply from: 'scripts/git-hooks/install.gradle'
+
+apply plugin: 'com.diffplug.spotless'
+spotless {
+    kotlin {
+        target '**/*.kt'
+        targetExclude("$buildDir/**/*.kt")
+        targetExclude('bin/**/*.kt')
+        ktlint('0.45.1')
+    }
+}
+
+dependencyUpdates.resolutionStrategy {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}

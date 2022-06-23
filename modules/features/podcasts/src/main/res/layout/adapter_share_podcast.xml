@@ -1,0 +1,58 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        android:background="?attr/secondary_ui_01" />
+
+    <au.com.shiftyjelly.pocketcasts.views.component.SquareImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#000000"
+        android:elevation="1dp"
+        android:layout_margin="4dp"/>
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="11sp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:maxLines="4"
+        android:padding="4dp"
+        android:background="#ececec"
+        android:layout_margin="4dp"
+        android:elevation="1dp"
+        android:ellipsize="end" />
+
+    <au.com.shiftyjelly.pocketcasts.views.component.SquareButton
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="2dp"
+        android:background="?android:attr/selectableItemBackground" />
+
+    <ImageButton
+        android:id="@+id/checkbox"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/share_podcasts_checkbox"
+        android:elevation="2dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="right"
+        android:importantForAccessibility="no"
+        />
+
+</FrameLayout>

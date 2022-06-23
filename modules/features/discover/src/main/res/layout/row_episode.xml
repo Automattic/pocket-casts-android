@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:elevation="2dp"
+        app:cardCornerRadius="4dp"
+        android:layout_marginRight="16dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            tools:background="#ccc" />
+
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/podcastTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textAppearance="@style/H60"
+            android:ellipsize="end"
+            android:textColor="?attr/primary_text_02" />
+
+        <TextView
+            android:id="@+id/episodeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/H40"
+            android:lineSpacingMultiplier="1.1"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:maxLines="2"
+            android:gravity="center_vertical"
+            android:ellipsize="end"
+            android:textColor="?attr/primary_text_01" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+
+            <au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
+                android:id="@+id/playButton"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                app:icon_height="12dp"
+                app:icon_width="12dp"
+                app:icon_tint="?attr/primary_ui_01"
+                android:layout_marginEnd="10dp" />
+
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/H60"
+                android:textColor="?attr/primary_text_02" />
+
+            <TextView
+                android:id="@+id/durationPublishedSeparator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/H60"
+                android:textColor="?attr/primary_text_02"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:text=" • " />
+
+            <TextView
+                android:id="@+id/published"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/H60"
+                android:textColor="?attr/primary_text_02" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</merge>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <View
+        android:id="@+id/gradientBack"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:background="@drawable/background_gradient01"
+        app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:id="@+id/tileOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@id/gradientBack"
+        app:layout_constraintEnd_toEndOf="@id/gradientBack"
+        app:layout_constraintTop_toTopOf="@id/gradientBack"
+        app:layout_constraintBottom_toBottomOf="@id/gradientBack" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/gradientBack"
+        app:layout_constraintEnd_toEndOf="@id/gradientBack"
+        app:layout_constraintTop_toTopOf="@id/gradientBack"
+        app:layout_constraintBottom_toBottomOf="@id/gradientBack"
+        android:importantForAccessibility="no"
+        app:srcCompat="@drawable/ic_plus_subtract"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

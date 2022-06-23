@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:persistent="true">
+
+    <PreferenceCategory android:title="@string/player_up_next">
+
+        <SwitchPreference
+            android:key="autoDownloadUpNext"
+            android:title="@string/settings_auto_download_up_next"
+            android:defaultValue="false"
+            android:persistent="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/podcasts" android:key="podcasts_category">
+
+        <SwitchPreference
+            android:key="autoDownloadNewEpisodes"
+            android:title="@string/settings_auto_download_new_episodes"
+            android:persistent="false" />
+
+        <Preference
+            android:key="autoDownloadPodcastsPreference"
+            android:title="@string/settings_choose_podcasts"
+            android:summary="@string/settings_podcasts_selected_zero"
+            android:persistent="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/filters">
+
+        <Preference
+            android:key="autoDownloadPlaylists"
+            android:title="@string/settings_auto_download_filters_episodes"
+            android:summary="@string/filters_chosen_none"
+            android:persistent="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="autoDownloadOnlyDownloadOnWifi"
+            android:title="@string/settings_auto_download_unmetered"
+            android:summary="@string/settings_auto_download_unmetered_summary"
+            android:persistent="true"
+
+             />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="autoDownloadOnlyDownloadWhenCharging"
+            android:title="@string/settings_auto_download_charging"
+            android:persistent="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/downloads">
+        <Preference
+            android:key="cancelAll"
+            android:persistent="false"
+            android:title="@string/settings_auto_download_stop_all" />
+        <Preference
+            android:key="clearDownloadErrors"
+            android:persistent="false"
+            android:title="@string/settings_auto_download_clear_errors" />
+    </PreferenceCategory>
+</PreferenceScreen>

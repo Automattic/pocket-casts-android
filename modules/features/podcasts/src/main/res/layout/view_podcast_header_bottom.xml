@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
+        <variable name="expanded" type="boolean" />
+        <variable name="tintColor" type="int" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:paddingBottom="8dp"
+        android:clipToPadding="false"
+        android:background="?attr/primary_ui_02"
+        app:show="@{expanded}">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="6dp"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.1"
+            app:readMore="@{3}"
+            android:text="@{podcast.title}"
+            android:textAppearance="?attr/textH2"
+            android:textColor="?attr/primary_text_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@tools:sample/lorem/random" />
+
+        <TextView
+            android:id="@+id/category"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:includeFontPadding="false"
+            android:text="@{podcast.getFirstCategory(context.resources)}"
+            android:textAppearance="?attr/textSubtitle2"
+            android:textColor="?attr/primary_text_02"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            tools:text="@tools:sample/lorem" />
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="18dp"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.3"
+            android:textAppearance="?attr/textBody1"
+            android:text="@{podcast.podcastDescription}"
+            android:textColor="?attr/primary_text_01"
+            app:readMore="@{3}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/category"
+            tools:text="@tools:sample/lorem/random" />
+
+        <TextView
+            android:id="@+id/author_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.2"
+            android:maxLines="2"
+            android:textAppearance="?attr/textBody1"
+            android:textColor="?attr/primary_text_01"
+            android:text="@{podcast.author}"
+            app:showIfPresent="@{podcast.author}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/author_image"
+            app:layout_constraintTop_toTopOf="@+id/panel"
+            tools:text="@tools:sample/lorem" />
+
+        <ImageView
+            android:id="@+id/author_image"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:tint="?attr/primary_icon_02"
+            android:visibility="gone"
+            app:showIfPresent="@{podcast.author}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/author_text"
+            app:layout_constraintTop_toTopOf="@+id/author_text"
+            app:srcCompat="@drawable/ic_author" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/author_barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="author_text,author_image" />
+
+        <ImageView
+            android:id="@+id/link_image"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="12dp"
+            app:tint="?attr/primary_icon_02"
+            app:showIfPresent="@{podcast.shortUrl}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/author_barrier"
+            app:srcCompat="@drawable/ic_link" />
+
+        <TextView
+            android:id="@+id/link_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.2"
+            android:maxLines="1"
+            android:padding="8dp"
+            android:textAppearance="?attr/textBody1"
+            android:text="@{podcast.getShortUrl()}"
+            android:background="?android:attr/selectableItemBackground"
+            app:textColor="@{tintColor}"
+            app:showIfPresent="@{podcast.shortUrl}"
+            app:layout_constraintBottom_toBottomOf="@+id/link_image"
+            app:layout_constraintStart_toEndOf="@+id/link_image"
+            app:layout_constraintTop_toTopOf="@+id/link_image"
+            tools:text="@tools:sample/lorem" />
+
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="schedule_image,schedule_text"
+            android:visibility="@{podcast.displayableFrequency(context.resources) != null}"
+            android:id="@+id/frequency_group"
+            tools:ignore="MissingConstraints" />
+
+        <ImageView
+            android:id="@+id/schedule_image"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="12dp"
+            app:tint="?attr/primary_icon_02"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/link_image"
+            app:srcCompat="@drawable/ic_schedule" />
+
+        <TextView
+            android:id="@+id/schedule_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.2"
+            android:maxLines="3"
+            android:textAppearance="?attr/textBody1"
+            android:text="@{podcast.displayableFrequency(context.resources)}"
+            android:textColor="?attr/primary_text_01"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/schedule_image"
+            app:layout_constraintBottom_toBottomOf="@+id/schedule_image"
+            app:layout_constraintTop_toTopOf="@+id/schedule_image"
+            tools:text="@tools:sample/lorem" />
+
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="next_image,next_text"
+            android:visibility="@{podcast.displayableNextEpisodeDate(context.resources) != null}"
+            android:id="@+id/next_group"
+            tools:ignore="MissingConstraints" />
+
+        <ImageView
+            android:id="@+id/next_image"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            app:tint="?attr/primary_icon_02"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/schedule_image"
+            app:srcCompat="@drawable/ic_nextepisode" />
+
+        <TextView
+            android:id="@+id/next_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:lineSpacingMultiplier="1.2"
+            android:textAppearance="?attr/textBody1"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="@{podcast.displayableNextEpisodeDate(context.resources)}"
+            android:textColor="?attr/primary_text_01"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/next_image"
+            app:layout_constraintBottom_toBottomOf="@+id/next_image"
+            app:layout_constraintTop_toTopOf="@+id/next_image"
+            tools:text="@tools:sample/lorem" />
+
+        <View
+            android:id="@+id/panel_padding"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/next_image"/>
+
+        <View
+            android:id="@+id/panel"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/panel_only_border"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/description"
+            app:layout_constraintBottom_toBottomOf="@+id/panel_padding" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/primary_ui_05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/next_image"
+            android:layout_marginTop="36dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast"/>
+        <variable name="tintColor" type="int"/>
+        <variable name="headerColor" type="int"/>
+        <variable name="expanded" type="boolean" />
+        <variable name="isPlusUser" type="boolean" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/primary_ui_02"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp">
+
+        <View
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/podcast_header_height"
+            android:background="@{headerColor}"
+            android:contentDescription="@string/podcasts_show_podcast_details"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/chevron"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/expand_details"
+            android:enabled="@{expanded}"
+            android:rotation="180"
+            android:scaleType="center"
+            android:stateListAnimator="@animator/rotate_chevron"
+            app:tint="?attr/contrast_02"
+            android:layout_marginBottom="22dp"
+            app:layout_constraintBottom_toBottomOf="@+id/header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_chevron" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/artworkContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="20dp"
+            android:clipToPadding="false"
+            android:elevation="8dp"
+            android:importantForAccessibility="noHideDescendants"
+            android:scaleType="centerCrop"
+            app:cardCornerRadius="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent="0.38">
+
+            <ImageView
+                android:id="@+id/artwork"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                tools:src="@tools:sample/avatars" />
+
+        </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/folders"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/podcast_change_folder"
+            android:tooltipText="@string/folders"
+            android:focusable="true"
+            android:scaleType="center"
+            android:src="@{podcast.folderUuid == null ? @drawable/ic_folder : @drawable/ic_folder_check}"
+            app:tint="?attr/primary_icon_02"
+            app:layout_constraintEnd_toStartOf="@+id/notifications"
+            app:layout_constraintTop_toBottomOf="@+id/header"
+            app:show="@{podcast.isSubscribed &amp;&amp; isPlusUser}" />
+
+        <ImageView
+            android:id="@+id/notifications"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:clickable="true"
+            android:contentDescription="@{podcast.isShowNotifications() ? @string/podcast_notifications_on : @string/podcast_notifications_off}"
+            android:tooltipText="@{podcast.isShowNotifications() ? @string/podcast_notifications_on : @string/podcast_notifications_off}"
+            android:focusable="true"
+            android:scaleType="center"
+            android:src="@{podcast.isShowNotifications() ? @drawable/ic_notifications_on : @drawable/ic_notifications_off}"
+            app:tint="?attr/primary_icon_02"
+            app:layout_constraintEnd_toStartOf="@+id/settings"
+            app:layout_constraintTop_toBottomOf="@+id/header"
+            app:show="@{podcast.isSubscribed}" />
+
+        <ImageView
+            android:id="@+id/settings"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="68dp"
+            android:background="?android:attr/actionBarItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/settings"
+            android:tooltipText="@string/settings"
+            android:focusable="true"
+            android:scaleType="center"
+            app:tint="?attr/primary_icon_02"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header"
+            app:show="@{podcast.isSubscribed}"
+            app:srcCompat="@drawable/ic_settings_small"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/subscribeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_rounded"
+            android:contentDescription="@string/subscribe"
+            android:fontFamily="sans-serif-medium"
+            android:foreground="@drawable/button_rounded_ripple"
+            android:gravity="center_vertical"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:text="@string/subscribe"
+            android:textColor="?attr/primary_icon_02"
+            android:textSize="15sp"
+            app:cornerRadius="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header"
+            app:show="@{!podcast.isSubscribed}" />
+
+        <TextView
+            android:id="@+id/animationSubscribedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_rounded_green"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:text="@string/subscribe"
+            android:textColor="?attr/support_02"
+            android:textSize="15sp"
+            android:visibility="gone"
+            app:cornerRadius="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header" />
+
+        <TextView
+            android:id="@+id/animationSubscribeText"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
+            android:text="@string/podcast_subscribed"
+            android:textColor="?attr/primary_interactive_02"
+            android:textSize="15sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header" />
+
+        <ImageView
+            android:id="@+id/subscribedButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="0dp"
+            android:background="?attr/support_02"
+            android:contentDescription="@string/unsubscribe"
+            android:tooltipText="@string/unsubscribe"
+            android:scaleType="center"
+            app:tint="?attr/primary_interactive_02"
+            app:circle="@{true}"
+            app:cornerRadius="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header"
+            app:show="@{podcast.isSubscribed}"
+            app:srcCompat="@drawable/ic_tick_small" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
