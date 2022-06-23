@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a bug with the Pocket Casts Android app
+labels: ["bug", "triage"]
+body:
+
+    - type: markdown
+      attributes:
+          value: |
+              _Thanks for taking the time to file this bug report!_
+
+    - type: textarea
+      attributes:
+          label: Description
+          description: Please write a brief description of the bug, including what you expect to happen and what is currently happening.
+          placeholder: |
+              Feature '...' is not working properly. I expect '...' to happen, but '...' happens instead
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Step-by-step reproduction instructions
+          placeholder: |
+              1. Go to '...'
+              2. Click on '...'
+              3. Scroll down to '...'
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Screenshots or screen recording
+          description: |
+              If possible, please upload a screenshot or screen recording which demonstrates the bug.
+      validations:
+          required: false
+
+    - type: dropdown
+      attributes:
+          label: Did you search for existing bug reports?
+          description: Please confirm that you searched for existing bug reports in https://github.com/Automattic/pocket-casts-android/issues before opening this issue.
+          options:
+              - 'Yes'
+              - 'No'
+      validations:
+          required: true
+
+    - type: textarea
+      attributes:
+          label: Device, Operating system, and Pocket Casts app version
+          placeholder: |
+              Google Pixel 6 wAndroid 12, Pocket Casts 7.19.0
+      validations:
+          required: false
+
