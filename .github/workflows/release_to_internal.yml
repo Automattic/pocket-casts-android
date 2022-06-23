@@ -4,7 +4,7 @@ name: Release to Internal
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   deployment:
