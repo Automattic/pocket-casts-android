@@ -51,7 +51,7 @@ jobs:
       - name: Assemble Release
         run: ./gradlew :app:bundleRelease --no-daemon
         env:
-          VERSION_CODE_START: 8123
+          VERSION_CODE_START: 8135
       - name: Sign Release
         uses: r0adkll/sign-android-release@v1
         id: sign_app
@@ -74,7 +74,7 @@ jobs:
       - name: Assemble Automotive Release
         run: ./gradlew assembleAutomotiveRelease bundleAutomotiveRelease --no-daemon
         env:
-          VERSION_CODE_START: 58123
+          VERSION_CODE_START: 58135
       - name: Sign Automotive Bundle Release
         uses: r0adkll/sign-android-release@v1
         id: sign_automotive_bundle
