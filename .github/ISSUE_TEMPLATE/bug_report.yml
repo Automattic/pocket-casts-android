@@ -35,13 +35,15 @@ body:
       validations:
           required: false
 
-    - type: checkboxes
+    - type: dropdown
       attributes:
-        label: Did you search for existing bug reports?
-        description: Please confirm that you searched for existing bug reports in https://github.com/Automattic/pocket-casts-android/issues before opening this issue.
-        options:
-          - label: I have searched for existing bug reports.
-            required: true
+          label: Did you search for existing bug reports?
+          description: Please confirm that you searched for existing bug reports in https://github.com/Automattic/pocket-casts-android/issues before opening this issue.
+          options:
+              - 'Yes'
+              - 'No'
+      validations:
+          required: true
 
     - type: textarea
       attributes:
