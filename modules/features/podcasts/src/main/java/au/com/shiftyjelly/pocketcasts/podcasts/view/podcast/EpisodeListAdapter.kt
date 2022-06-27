@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -44,6 +45,7 @@ class EpisodeListAdapter(
     val playButtonListener: PlayButton.OnClickListener,
     val imageLoader: PodcastImageLoader,
     val multiSelectHelper: MultiSelectHelper,
+    val fragmentManager: FragmentManager,
     val fromListUuid: String? = null
 ) : ListAdapter<Playable, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
@@ -88,7 +90,7 @@ class EpisodeListAdapter(
             }
         }
         holder.episodeRow.setOnLongClickListener {
-            multiSelectHelper.defaultLongPress(episode)
+            multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = fragmentManager)
             notifyDataSetChanged()
             true
         }
@@ -106,7 +108,7 @@ class EpisodeListAdapter(
             }
         }
         holder.episodeRow.setOnLongClickListener {
-            multiSelectHelper.defaultLongPress(userEpisode)
+            multiSelectHelper.defaultLongPress(episode = userEpisode, fragmentManager = fragmentManager)
             notifyDataSetChanged()
             true
         }

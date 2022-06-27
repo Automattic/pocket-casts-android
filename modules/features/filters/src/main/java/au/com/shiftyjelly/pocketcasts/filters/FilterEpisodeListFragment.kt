@@ -109,7 +109,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
 
-        adapter = EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, this::onRowClick, playButtonListener, imageLoader, multiSelectHelper)
+        adapter = EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, this::onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -437,7 +437,6 @@ class FilterEpisodeListFragment : BaseFragment() {
                 }
             }
         }
-        multiSelectHelper.fragmentManager = childFragmentManager
         multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
     }
 

@@ -86,10 +86,9 @@ class MultiSelectHelper @Inject constructor(
     var coordinatorLayout: View? = null
     var context: Context? = null
 
-    lateinit var fragmentManager: FragmentManager
     lateinit var listener: Listener
 
-    fun defaultLongPress(episode: Playable) {
+    fun defaultLongPress(episode: Playable, fragmentManager: FragmentManager) {
         if (!isMultiSelecting) {
             isMultiSelecting = !isMultiSelecting
             select(episode)
@@ -103,10 +102,10 @@ class MultiSelectHelper @Inject constructor(
         }
     }
 
-    fun onMenuItemSelected(itemId: Int, resources: Resources): Boolean {
+    fun onMenuItemSelected(itemId: Int, resources: Resources, fragmentManager: FragmentManager): Boolean {
         return when (itemId) {
             R.id.menu_archive -> {
-                archive(resources = resources)
+                archive(resources = resources, fragmentManager = fragmentManager)
                 true
             }
             UR.id.menu_unarchive -> {
@@ -114,11 +113,11 @@ class MultiSelectHelper @Inject constructor(
                 true
             }
             R.id.menu_delete -> {
-                delete(resources)
+                delete(resources, fragmentManager)
                 true
             }
             R.id.menu_download -> {
-                download(resources)
+                download(resources, fragmentManager)
                 true
             }
             UR.id.menu_undownload -> {
@@ -126,7 +125,7 @@ class MultiSelectHelper @Inject constructor(
                 true
             }
             R.id.menu_mark_played -> {
-                markAsPlayed(resources = resources)
+                markAsPlayed(resources = resources, fragmentManager = fragmentManager)
                 true
             }
             UR.id.menu_markasunplayed -> {
@@ -229,7 +228,7 @@ class MultiSelectHelper @Inject constructor(
         }
     }
 
-    fun markAsPlayed(shownWarning: Boolean = false, resources: Resources) {
+    fun markAsPlayed(shownWarning: Boolean = false, resources: Resources, fragmentManager: FragmentManager) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -238,7 +237,7 @@ class MultiSelectHelper @Inject constructor(
         launch {
             val list = selectedList.toList()
             if (!shownWarning && list.size > WARNING_LIMIT) {
-                playedWarning(list.size, resources = resources)
+                playedWarning(list.size, resources = resources, fragmentManager = fragmentManager)
                 return@launch
             }
 
@@ -269,7 +268,7 @@ class MultiSelectHelper @Inject constructor(
         }
     }
 
-    fun archive(shownWarning: Boolean = false, resources: Resources) {
+    fun archive(shownWarning: Boolean = false, resources: Resources, fragmentManager: FragmentManager) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -278,7 +277,7 @@ class MultiSelectHelper @Inject constructor(
         launch {
             val list = selectedList.filterIsInstance<Episode>().toList()
             if (!shownWarning && list.size > WARNING_LIMIT) {
-                archiveWarning(list.size, resources = resources)
+                archiveWarning(list.size, resources = resources, fragmentManager = fragmentManager)
                 return@launch
             }
 
@@ -343,18 +342,18 @@ class MultiSelectHelper @Inject constructor(
         }
     }
 
-    fun playedWarning(count: Int, resources: Resources) {
+    fun playedWarning(count: Int, resources: Resources, fragmentManager: FragmentManager) {
         val buttonString = resources.getStringPlural(count = count, singular = LR.string.mark_as_played_singular, plural = LR.string.mark_as_played_plural)
 
         ConfirmationDialog()
             .setTitle(resources.getString(LR.string.mark_as_played_title))
             .setIconId(IR.drawable.ic_markasplayed)
             .setButtonType(ConfirmationDialog.ButtonType.Danger(buttonString))
-            .setOnConfirm { markAsPlayed(shownWarning = true, resources = resources) }
+            .setOnConfirm { markAsPlayed(shownWarning = true, resources = resources, fragmentManager = fragmentManager) }
             .show(fragmentManager, "confirm_played_all_")
     }
 
-    fun archiveWarning(count: Int, resources: Resources) {
+    fun archiveWarning(count: Int, resources: Resources, fragmentManager: FragmentManager) {
         val buttonString = resources.getStringPlural(count = count, singular = LR.string.archive_episodes_singular, plural = LR.string.archive_episodes_plural)
 
         ConfirmationDialog()
@@ -362,11 +361,11 @@ class MultiSelectHelper @Inject constructor(
             .setSummary(resources.getString(LR.string.archive_summary))
             .setIconId(IR.drawable.ic_archive)
             .setButtonType(ConfirmationDialog.ButtonType.Danger(buttonString))
-            .setOnConfirm { archive(shownWarning = true, resources = resources) }
+            .setOnConfirm { archive(shownWarning = true, resources = resources, fragmentManager = fragmentManager) }
             .show(fragmentManager, "confirm_archive_all_")
     }
 
-    fun download(resources: Resources) {
+    fun download(resources: Resources, fragmentManager: FragmentManager) {
         if (selectedList.isEmpty()) {
             closeMultiSelect()
             return
@@ -451,7 +450,7 @@ class MultiSelectHelper @Inject constructor(
         }
     }
 
-    fun delete(resources: Resources) {
+    fun delete(resources: Resources, fragmentManager: FragmentManager) {
         val episodes = selectedList.filterIsInstance<UserEpisode>()
         if (episodes.isEmpty()) return
 

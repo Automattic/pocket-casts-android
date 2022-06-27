@@ -156,7 +156,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     private val onRowLongPress: (episode: Episode) -> Unit = { episode ->
-        multiSelectHelper.defaultLongPress(episode)
+        multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = childFragmentManager)
         adapter?.notifyDataSetChanged()
     }
 
@@ -493,7 +493,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             adapter?.notifyDataSetChanged()
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        multiSelectHelper.fragmentManager = childFragmentManager
         multiSelectHelper.listener = object : MultiSelectHelper.Listener {
             override fun multiSelectSelectNone() {
                 val episodeState = viewModel.episodes.value

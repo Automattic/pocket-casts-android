@@ -77,7 +77,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
                 showOverflowBottomSheet()
                 true
             } else {
-                multiSelectHelper.onMenuItemSelected(it.itemId, resources)
+                multiSelectHelper.onMenuItemSelected(itemId = it.itemId, resources = resources, fragmentManager = fragmentManager)
             }
         }
 

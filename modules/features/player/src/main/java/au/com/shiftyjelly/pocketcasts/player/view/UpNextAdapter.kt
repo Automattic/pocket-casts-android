@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -29,7 +30,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class UpNextAdapter(context: Context, val imageLoader: PodcastImageLoader, val episodeManager: EpisodeManager, val listener: UpNextListener, val multiSelectHelper: MultiSelectHelper) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
+class UpNextAdapter(context: Context, val imageLoader: PodcastImageLoader, val episodeManager: EpisodeManager, val listener: UpNextListener, val multiSelectHelper: MultiSelectHelper, val fragmentManager: FragmentManager) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
 
     var isPlaying: Boolean = false
@@ -86,7 +87,7 @@ class UpNextAdapter(context: Context, val imageLoader: PodcastImageLoader, val e
         }
         holder.binding.itemContainer.setOnLongClickListener {
             if (multiSelectHelper.isMultiSelecting) {
-                multiSelectHelper.defaultLongPress(item)
+                multiSelectHelper.defaultLongPress(episode = item, fragmentManager = fragmentManager)
             } else {
                 val podcastUuid = (item as? Episode)?.podcastUuid
                 listener.onEpisodeActionsLongPress(episodeUuid = item.uuid, podcastUuid = podcastUuid)
