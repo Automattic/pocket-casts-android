@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.SettingsAdapter
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
+import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
 import au.com.shiftyjelly.pocketcasts.settings.util.SettingsHelper
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -173,7 +174,7 @@ class ProfileFragment : BaseFragment() {
 
         upgradeLayout.lblGetMore.text = getString(LR.string.profile_help_support)
         upgradeLayout.root.setOnClickListener {
-            PlusUpgradeFragment.newInstance(featureBlocked = false).show(childFragmentManager, "upgradebottomsheet")
+            PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Profile).show(childFragmentManager, "upgradebottomsheet")
         }
 
         viewModel.refreshObservable.observe(viewLifecycleOwner) { state ->

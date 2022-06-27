@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
+import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
@@ -170,7 +171,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
             // show the upgrade to Plus dialog
-            PlusUpgradeFragment.newInstance(featureBlocked = true).show(parentFragmentManager, "plus_upgrade_bottom_sheet")
+            PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Folders).show(parentFragmentManager, "plus_upgrade_bottom_sheet")
             true
         }
 

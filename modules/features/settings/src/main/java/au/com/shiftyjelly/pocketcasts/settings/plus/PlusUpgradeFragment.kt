@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.UpgradeAccountViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,13 +22,31 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class PlusUpgradeFragment : BaseDialogFragment() {
-    companion object {
-        private const val EXTRA_FEATURE_BLOCKED = "extra_feature_blocked"
 
-        fun newInstance(featureBlocked: Boolean): PlusUpgradeFragment {
+    sealed class UpgradePage(val promotionId: String, val promotionName: String, val featureBlocked: Boolean) {
+        object Profile : UpgradePage(promotionId = "PROFILE", promotionName = "Upgrade to Plus from profile", featureBlocked = false)
+        object Files : UpgradePage(promotionId = "FILES", promotionName = "Upgrade to Plus for files", featureBlocked = true)
+        object Folders : UpgradePage(promotionId = "FOLDERS", promotionName = "Upgrade to Plus for folders", featureBlocked = true)
+        object Themes : UpgradePage(promotionId = "THEMES", promotionName = "Upgrade to Plus for themes", featureBlocked = true)
+        object Icons : UpgradePage(promotionId = "ICONS", promotionName = "Upgrade to Plus for icons", featureBlocked = true)
+        object Unknown : UpgradePage(promotionId = "UNKNOWN", promotionName = "Unknown", featureBlocked = false)
+
+        companion object {
+            fun fromString(value: String): UpgradePage {
+                return when (value) {
+                    Folders.promotionId -> Folders
+                    else -> Unknown
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val EXTRA_START_PAGE = "extra_start_page"
+
+        fun newInstance(upgradePage: UpgradePage): PlusUpgradeFragment {
             return PlusUpgradeFragment().apply {
-                // if the upgrade dialog is shown after clicking a Plus feature the title will be "This feature requires Pocket Casts Plus" otherwise "Help support Pocket Casts"
-                arguments = bundleOf(EXTRA_FEATURE_BLOCKED to featureBlocked)
+                arguments = bundleOf(EXTRA_START_PAGE to upgradePage.promotionId)
             }
         }
     }
@@ -36,8 +55,8 @@ class PlusUpgradeFragment : BaseDialogFragment() {
 
     private val viewModel: UpgradeAccountViewModel by viewModels()
 
-    private val featureBlocked: Boolean
-        get() = arguments?.getBoolean(EXTRA_FEATURE_BLOCKED) ?: true
+    private val upgradePage: UpgradePage
+        get() = UpgradePage.fromString(arguments?.getString(EXTRA_START_PAGE) ?: "")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
@@ -48,12 +67,18 @@ class PlusUpgradeFragment : BaseDialogFragment() {
                         onUpgradeClick = { upgrade() },
                         onLearnMoreClick = { openLearnMore() },
                         storageLimitGb = settings.getCustomStorageLimitGb(),
-                        featureBlocked = featureBlocked,
+                        featureBlocked = upgradePage.featureBlocked,
                         viewModel = viewModel
                     )
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        AnalyticsHelper.plusUpgradeViewed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
     }
 
     private fun openLearnMore() {
@@ -70,6 +95,8 @@ class PlusUpgradeFragment : BaseDialogFragment() {
             intent.data = Uri.parse(Settings.INTENT_LINK_UPGRADE)
             startActivity(intent)
         }
+
+        AnalyticsHelper.plusUpgradeConfirmed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
         dialog?.dismiss()
     }
 }

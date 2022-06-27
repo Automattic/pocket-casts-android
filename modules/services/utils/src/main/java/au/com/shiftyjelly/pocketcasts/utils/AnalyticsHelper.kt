@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.utils
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.FirebaseAnalytics.Event
+import com.google.firebase.analytics.FirebaseAnalytics.Param
 import timber.log.Timber
 
 object AnalyticsHelper {
@@ -189,5 +191,50 @@ object AnalyticsHelper {
         firebaseAnalytics.logEvent(name, bundle)
 
         Timber.d("Logged $name $bundle")
+    }
+
+    fun plusUpgradeViewed(promotionId: String, promotionName: String) {
+        logEvent(
+            Event.VIEW_PROMOTION,
+            bundleOf(
+                Param.PROMOTION_ID to promotionId,
+                Param.PROMOTION_NAME to promotionName
+            )
+        )
+    }
+
+    fun plusUpgradeConfirmed(promotionId: String, promotionName: String) {
+        logEvent(
+            Event.SELECT_PROMOTION,
+            bundleOf(
+                Param.PROMOTION_ID to promotionId,
+                Param.PROMOTION_NAME to promotionName
+            )
+        )
+    }
+
+    fun plusPlanChosen(sku: String, title: String, price: Double, currency: String) {
+        val plan = bundleOf(
+            Param.ITEM_ID to sku,
+            Param.ITEM_NAME to title,
+            Param.PRICE to price,
+            Param.QUANTITY to 1
+        )
+        logEvent(
+            Event.ADD_TO_CART,
+            bundleOf(
+                Param.CURRENCY to currency,
+                Param.VALUE to price,
+                Param.ITEMS to arrayOf(plan)
+            )
+        )
+    }
+
+    fun plusPurchased() {
+        logEvent(Event.PURCHASE)
+    }
+
+    fun folderCreated() {
+        logEvent("folder_created")
     }
 }

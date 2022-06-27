@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
+import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -268,7 +269,7 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
     }
 
     private fun showUpgradeSheet() {
-        val bottomSheet = PlusUpgradeFragment.newInstance(featureBlocked = true)
+        val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Files)
         bottomSheet.show(supportFragmentManager, "upgrade_bottom_sheet")
     }
 
