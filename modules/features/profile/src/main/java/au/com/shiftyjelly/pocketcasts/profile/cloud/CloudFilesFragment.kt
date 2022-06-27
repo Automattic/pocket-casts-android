@@ -61,7 +61,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private val viewModel: CloudFilesViewModel by viewModels()
     private var binding: FragmentCloudFilesBinding? = null
 
-    val adapter by lazy { EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, onRowClick, playButtonListener, imageLoader, multiSelectHelper) }
+    val adapter by lazy { EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager) }
 
     private val onRowClick = { episode: Playable ->
         CloudFileBottomSheetFragment.newInstance(episode.uuid).show(parentFragmentManager, "cloud_bottom_sheet")
@@ -227,7 +227,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        multiSelectHelper.fragmentManager = childFragmentManager
         binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
     }
 

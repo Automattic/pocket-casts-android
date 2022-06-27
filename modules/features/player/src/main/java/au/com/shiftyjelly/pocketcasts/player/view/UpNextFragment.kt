@@ -103,7 +103,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val imageLoader = PodcastImageLoaderThemed(context)
-        adapter = UpNextAdapter(context, imageLoader, episodeManager, this, multiSelectHelper)
+        adapter = UpNextAdapter(context, imageLoader, episodeManager, this, multiSelectHelper, childFragmentManager)
         adapter.theme = overrideTheme
 
         if (!isEmbedded) {
@@ -205,7 +205,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             }
         }
 
-        multiSelectHelper.fragmentManager = childFragmentManager
         multiSelectHelper.context = view.context
         multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = VR.menu.menu_multiselect_upnext, fragmentManager = parentFragmentManager)
 
