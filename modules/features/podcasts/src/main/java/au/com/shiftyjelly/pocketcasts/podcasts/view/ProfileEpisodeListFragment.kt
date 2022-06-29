@@ -227,7 +227,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             navigationIcon = BackArrow,
             activity = activity,
             theme = theme,
-            menu = R.menu.menu_profile_list
+            menu = if (mode.showMenu) R.menu.menu_profile_list else null
         )
         toolbar.setOnMenuItemClickListener(this)
     }
