@@ -187,12 +187,6 @@ object AnalyticsHelper {
         logEvent("foreground_service_exception")
     }
 
-    private fun logEvent(name: String, bundle: Bundle? = Bundle()) {
-        firebaseAnalytics.logEvent(name, bundle)
-
-        Timber.d("Logged $name $bundle")
-    }
-
     fun plusUpgradeViewed(promotionId: String, promotionName: String) {
         logEvent(
             Event.VIEW_PROMOTION,
@@ -236,5 +230,11 @@ object AnalyticsHelper {
 
     fun folderCreated() {
         logEvent("folder_created")
+    }
+
+    private fun logEvent(name: String, bundle: Bundle? = Bundle()) {
+        firebaseAnalytics.logEvent(name, bundle)
+
+        Timber.d("Logged $name $bundle")
     }
 }

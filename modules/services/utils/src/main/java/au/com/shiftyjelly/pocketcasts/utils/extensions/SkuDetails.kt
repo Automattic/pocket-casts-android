@@ -8,5 +8,5 @@ fun SkuDetails.shortTitle(): String {
 
 val SkuDetails.priceDouble: Double
     get() {
-        return if (priceAmountMicros == 0L) 0.0 else priceAmountMicros * 1_000_000.0
+        return priceAmountMicros * 1_000_000.0
     }
