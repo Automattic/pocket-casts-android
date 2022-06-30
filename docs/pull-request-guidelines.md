@@ -8,11 +8,10 @@ The `main` branch represents the latest version. This is what you want to fork a
 
 Branch names should use the following pattern.
 
-`add/` = add a new feature  
-`try/` = experimental feature, "tentatively add”  
-`update/` = update an existing feature  
-`remove/` = remove an existing feature  
 `fix/` = fix an existing issue  
+`update/` = update an existing feature  
+`add/` = add a new feature  
+`remove/` = remove an existing feature  
 
 Some examples are `add/sleep-timer` and `fix/notifications-crash`.
 
