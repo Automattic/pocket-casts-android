@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentSettingsAppearanceBinding
 import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
+import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceState
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceViewModel
 import au.com.shiftyjelly.pocketcasts.ui.worker.RefreshArtworkWorker
@@ -76,7 +77,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                                 binding.swtSystemTheme.isChecked = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
                             }
                         } else {
-                            val bottomSheet = PlusUpgradeFragment.newInstance(featureBlocked = true)
+                            val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Themes)
                             viewModel.updateChangeThemeType(Pair(beforeThemeType, afterThemeType))
                             bottomSheet.show(parentFragmentManager, "upgrade_bottom_sheet")
                         }
@@ -94,7 +95,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                                 .setPositiveButton(LR.string.settings_app_icon_ok, null)
                                 .show()
                         } else {
-                            val bottomSheet = PlusUpgradeFragment.newInstance(featureBlocked = true)
+                            val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Icons)
                             viewModel.updateChangeAppIconType(Pair(beforeAppIconType, afterAppIconType))
                             bottomSheet.show(parentFragmentManager, "upgrade_bottom_sheet")
                         }

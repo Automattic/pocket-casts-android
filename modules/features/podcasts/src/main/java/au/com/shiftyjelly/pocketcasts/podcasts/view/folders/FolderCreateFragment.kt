@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -61,6 +62,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                                 onSaveClick = {
                                     viewModel.saveFolder(resources = resources) { folder ->
                                         sharedViewModel.folderUuid = folder.uuid
+                                        AnalyticsHelper.folderCreated()
                                         dismiss()
                                     }
                                 },
