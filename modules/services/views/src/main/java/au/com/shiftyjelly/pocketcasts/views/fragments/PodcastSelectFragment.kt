@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -92,12 +93,12 @@ class PodcastSelectFragment : BaseFragment() {
         }
         podcastManager.findSubscribedRx()
             .zipWith(Single.fromCallable { listener.podcastSelectFragmentGetCurrentSelection() })
-            .map {
-                val podcasts = it.first
-                val selected = it.second
-                return@map podcasts.map {
-                    SelectablePodcast(it, selected.contains(it.uuid))
-                }
+            .map { pair ->
+                val podcasts = pair.first
+                val selected = pair.second
+                return@map podcasts
+                    .sortedBy { PodcastsSortType.cleanStringForSort(it.title) }
+                    .map { SelectablePodcast(it, selected.contains(it.uuid)) }
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
