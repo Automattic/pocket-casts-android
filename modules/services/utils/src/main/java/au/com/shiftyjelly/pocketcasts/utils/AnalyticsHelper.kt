@@ -207,6 +207,24 @@ object AnalyticsHelper {
         )
     }
 
+    fun plusUpgradeClosed(promotionId: String, promotionName: String) {
+        logEvent(
+            "close_promotion",
+            bundleOf(
+                Param.PROMOTION_ID to promotionId,
+                Param.PROMOTION_NAME to promotionName
+            )
+        )
+    }
+
+    fun createAccountClicked() {
+        logEvent("select_create_account")
+    }
+
+    fun signInAccountClicked() {
+        logEvent("select_sign_in_account")
+    }
+
     fun plusPlanChosen(sku: String, title: String, price: Double, currency: String) {
         val plan = bundleOf(
             Param.ITEM_ID to sku,
@@ -235,6 +253,6 @@ object AnalyticsHelper {
     private fun logEvent(name: String, bundle: Bundle? = Bundle()) {
         firebaseAnalytics.logEvent(name, bundle)
 
-        Timber.d("Logged $name $bundle")
+        Timber.d("Analytic event $name $bundle")
     }
 }
