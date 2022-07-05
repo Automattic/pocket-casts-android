@@ -68,6 +68,8 @@ class NotesViewModel
     }
 
     private fun loadShowNotes(episodeUuid: String): Completable {
+        updateShowNotes("")
+
         return Completable.fromAction {
             serverShowNotesManager.loadShowNotes(
                 episodeUuid,
