@@ -42,7 +42,7 @@ class NotesViewModel
         setConvertTimesToLinks(true)
     }
 
-    val showNotes = MutableLiveData<String>().apply { postValue("") }
+    val showNotes = MutableLiveData<Pair<String, Boolean>>().apply { postValue(Pair("", false)) }
     val episode = MutableLiveData<Episode>()
 
     fun loadEpisode(playable: Playable, color: Int) {
@@ -68,31 +68,33 @@ class NotesViewModel
     }
 
     private fun loadShowNotes(episodeUuid: String): Completable {
-        updateShowNotes("")
+        // Clear previous show notes while loading new notes
+        updateShowNotes("", inProgress = true)
 
         return Completable.fromAction {
             serverShowNotesManager.loadShowNotes(
                 episodeUuid,
                 object : CachedServerCallback<String> {
                     override fun cachedDataFound(data: String) {
-                        updateShowNotes(data)
+                        updateShowNotes(data, inProgress = false)
                     }
 
                     override fun networkDataFound(data: String) {
-                        updateShowNotes(data)
+                        updateShowNotes(data, inProgress = false)
                     }
 
                     override fun notFound() {
-                        updateShowNotes("")
+                        updateShowNotes("", inProgress = false)
                     }
                 }
             )
         }
     }
 
-    private fun updateShowNotes(notes: String?) {
-        notes ?: return
-        showNotes.postValue(showNotesFormatter.format(notes))
+    private fun updateShowNotes(notes: String, inProgress: Boolean) {
+        showNotesFormatter.format(notes)?.let { formatted ->
+            showNotes.postValue(Pair(formatted, inProgress))
+        }
     }
 
     override fun onCleared() {
