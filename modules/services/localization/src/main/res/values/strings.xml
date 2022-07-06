@@ -79,7 +79,7 @@
     <string name="retry">Retry</string>
     <string name="queue_for_later">Queue for later</string>
     <string name="youre_not_on_wifi">You\'re not on WiFi</string>
-    <string name="youre_on_metered_wifi">"You\'re on metered WiFi"</string>
+    <string name="youre_on_metered_wifi">You\'re on metered WiFi</string>
     <string name="delete_download">Delete download</string>
     <string name="chromecast">Chromecast</string>
     <string name="rearrange_actions">Rearrange Actions</string>
