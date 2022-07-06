@@ -47,6 +47,7 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
         playerViewModel.listDataLive.observe(viewLifecycleOwner) {
             adapter.submitList(it.chapters)
             view.setBackgroundColor(it.podcastHeader.backgroundColor)
+            if (it.showPlayer) showPlayer()
         }
     }
 
@@ -56,8 +57,8 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
         }
     }
 
-    override fun onChapterClick(chapter: Chapter) {
-        playerViewModel.skipToChapter(chapter)
+     override fun onChapterClick(chapter: Chapter) {
+        playerViewModel.onChapterClick(chapter)
     }
 
     override fun onChapterUrlClick(chapter: Chapter) {
@@ -70,5 +71,10 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
                 UiUtil.displayAlertError(requireContext(), getString(LR.string.player_open_url_failed, it), null)
             }
         }
+    }
+
+    private fun showPlayer() {
+        (parentFragment as? PlayerContainerFragment)?.openPlayer()
+        playerViewModel.onPlayerShown()
     }
 }

@@ -140,7 +140,8 @@ class PlayerViewModel @Inject constructor(
         var chapters: List<Chapter>,
         var upNextExpanded: Boolean,
         var upNextEpisodes: List<Playable>,
-        var upNextSummary: UpNextSummary
+        var upNextSummary: UpNextSummary,
+        var showPlayer: Boolean,
     )
 
     var upNextExpanded = settings.getBooleanForKey(Settings.PREFERENCE_UPNEXT_EXPANDED, true)
@@ -155,6 +156,7 @@ class PlayerViewModel @Inject constructor(
 
     private val upNextExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(upNextExpanded) }
     private val chaptersExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(chaptersExpanded) }
+    private val showPlayerObservable = BehaviorRelay.create<Boolean>().apply { accept(false) }
 
     val listDataRx = Observables.combineLatest(
         upNextStateObservable,
@@ -164,6 +166,7 @@ class PlayerViewModel @Inject constructor(
         upNextExpandedObservable,
         chaptersExpandedObservable,
         settings.playbackEffectsObservable,
+        showPlayerObservable,
         this::mergeListData
     )
         .distinctUntilChanged()
@@ -274,7 +277,7 @@ class PlayerViewModel @Inject constructor(
         updateSleepTimer()
     }
 
-    fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects): ListData {
+    fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects, showPlayer: Boolean): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -350,7 +353,8 @@ class PlayerViewModel @Inject constructor(
             chapters = chapters,
             upNextExpanded = upNextExpanded,
             upNextEpisodes = upNextEpisodes,
-            upNextSummary = upNextFooter
+            upNextSummary = upNextFooter,
+            showPlayer = showPlayer
         )
     }
 
@@ -575,7 +579,17 @@ class PlayerViewModel @Inject constructor(
         playbackManager.playPause()
     }
 
-    fun skipToChapter(chapter: Chapter) {
-        playbackManager.skipToChapter(chapter)
+    fun onChapterClick(chapter: Chapter) {
+        launch {
+            if (playbackManager.isSameChapter(chapter)) {
+                showPlayerObservable.accept(true)
+            } else {
+                playbackManager.skipToChapter(chapter)
+            }
+        }
+    }
+
+    fun onPlayerShown() {
+        showPlayerObservable.accept(false)
     }
 }
