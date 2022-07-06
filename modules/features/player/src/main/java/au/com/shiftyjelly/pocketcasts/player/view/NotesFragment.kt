@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormatt
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,7 +84,7 @@ class NotesFragment : BaseFragment() {
                 // else it won't show any notes until the app is restarted
                 setupShowNotes()
             }
-            binding?.progressBar?.visibility = if (inProgress) View.VISIBLE else View.GONE
+            binding?.progressBar?.showIf(inProgress)
             loadShowNotes(notes)
         }
 
