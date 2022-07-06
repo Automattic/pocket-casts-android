@@ -15,11 +15,12 @@
         android:layout_height="match_parent"
         android:theme="@style/PlayerTheme"
         android:background="#000000"
-        android:scrollbars="vertical">
+        android:scrollbars="vertical"
+        android:fillViewport="true" >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:paddingTop="0dp">
 
@@ -90,14 +91,28 @@
                     android:textColor="?attr/player_contrast_02" />
             </LinearLayout>
 
-            <View
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="?attr/player_contrast_05"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/player_contrast_05" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    android:visibility="gone" />
+
+            </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/showNotes"
