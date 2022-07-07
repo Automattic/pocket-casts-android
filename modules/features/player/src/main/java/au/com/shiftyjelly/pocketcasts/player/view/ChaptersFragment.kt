@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentChaptersBinding
@@ -48,6 +49,9 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
             adapter.submitList(it.chapters)
             view.setBackgroundColor(it.podcastHeader.backgroundColor)
         }
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            playerViewModel.showPlayerFlow.collect { showPlayer() }
+        }
     }
 
     fun scrollToChapter(chapter: Chapter) {
@@ -57,7 +61,7 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
     }
 
     override fun onChapterClick(chapter: Chapter) {
-        playerViewModel.skipToChapter(chapter)
+        playerViewModel.onChapterClick(chapter)
     }
 
     override fun onChapterUrlClick(chapter: Chapter) {
@@ -70,5 +74,9 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
                 UiUtil.displayAlertError(requireContext(), getString(LR.string.player_open_url_failed, it), null)
             }
         }
+    }
+
+    private fun showPlayer() {
+        (parentFragment as? PlayerContainerFragment)?.openPlayer()
     }
 }

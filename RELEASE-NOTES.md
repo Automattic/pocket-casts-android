@@ -46,6 +46,8 @@
         ([#3450](https://github.com/shiftyjelly/pocketcasts-android/pull/3450)).
     *   Fix displaying previous show notes briefly when switching episodes.
         ([#35](https://github.com/Automattic/pocket-casts-android/pull/35)).
+    *   Fix same chapter click behaviour 
+        ([#59](https://github.com/Automattic/pocket-casts-android/pull/59)).
 
 ### 7.19.2 (2022-02-11)
 
