@@ -66,7 +66,7 @@ project.ext {
             cast: "com.google.android.gms:play-services-cast-framework:21.0.1",
             desugarJdk: "com.android.tools:desugar_jdk_libs:1.1.5",
             // Firebase BoM (Bill of Materials enables you to manage all your Firebase library versions by specifying only one version)
-            firebaseBom: "com.google.firebase:firebase-bom:30.1.0",
+            firebaseBom: "com.google.firebase:firebase-bom:30.2.0",
             firebaseCrashlytics: "com.google.firebase:firebase-crashlytics-ktx",
             firebaseAnalytics: "com.google.firebase:firebase-analytics-ktx",
             firebaseConfig: "com.google.firebase:firebase-config-ktx",

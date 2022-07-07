@@ -18,10 +18,12 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.NotesViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.cleanup
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
+import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.IntentUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,15 +71,21 @@ class NotesFragment : BaseFragment() {
         binding = FragmentNotesBinding.inflate(inflater, container, false)
         binding?.lifecycleOwner = viewLifecycleOwner
 
+        binding?.progressBar?.apply {
+            setIndicatorColor(ThemeColor.playerContrast03(theme.activeTheme))
+            trackColor = ThemeColor.playerContrast05(theme.activeTheme)
+        }
+
         setupShowNotes()
 
-        viewModel.showNotes.observe(viewLifecycleOwner) {
+        viewModel.showNotes.observe(viewLifecycleOwner) { (notes, inProgress) ->
             if (webView == null) {
                 // If the webview has crashed we need to reinitialise it or
                 // else it won't show any notes until the app is restarted
                 setupShowNotes()
             }
-            loadShowNotes(it)
+            binding?.progressBar?.showIf(inProgress)
+            loadShowNotes(notes)
         }
 
         binding?.viewModel = viewModel
