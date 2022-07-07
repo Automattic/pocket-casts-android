@@ -138,11 +138,14 @@ class PlayerViewModel @Inject constructor(
         var podcastHeader: PlayerHeader,
         var chaptersExpanded: Boolean,
         var chapters: List<Chapter>,
+        var currentChapter: Chapter?,
         var upNextExpanded: Boolean,
         var upNextEpisodes: List<Playable>,
         var upNextSummary: UpNextSummary,
         var showPlayer: Boolean,
-    )
+    ) {
+        fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
+    }
 
     var upNextExpanded = settings.getBooleanForKey(Settings.PREFERENCE_UPNEXT_EXPANDED, true)
     var chaptersExpanded = settings.getBooleanForKey(Settings.PREFERENCE_CHAPTERS_EXPANDED, true)
@@ -331,6 +334,7 @@ class PlayerViewModel @Inject constructor(
         }
         // copy the chapter so the diff can see the differences
         val chapters = playbackState.chapters.getListWithState(playbackState.positionMs).map { it.copy() }
+        val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs)
 
         var episodeCount = 0
         var totalTime = 0.0
@@ -351,6 +355,7 @@ class PlayerViewModel @Inject constructor(
             podcastHeader = podcastHeader,
             chaptersExpanded = chaptersExpanded,
             chapters = chapters,
+            currentChapter = currentChapter,
             upNextExpanded = upNextExpanded,
             upNextEpisodes = upNextEpisodes,
             upNextSummary = upNextFooter,
@@ -581,7 +586,8 @@ class PlayerViewModel @Inject constructor(
 
     fun onChapterClick(chapter: Chapter) {
         launch {
-            if (playbackManager.isSameChapter(chapter)) {
+            val listData = listDataLive.value
+            if (listData?.isSameChapter(chapter) == true) {
                 showPlayerObservable.accept(true)
             } else {
                 playbackManager.skipToChapter(chapter)

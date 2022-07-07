@@ -186,12 +186,6 @@ open class PlaybackManager @Inject constructor(
         return upNextQueue.currentEpisode
     }
 
-    private suspend fun getCurrentChapter() = getCurrentEpisode()?.let { episode ->
-        playbackStateRelay.blockingFirst().chapters.getChapter(getCurrentTimeMs(episode))
-    }
-
-    suspend fun isSameChapter(chapter: Chapter) = getCurrentChapter()?.index == chapter.index
-
     private suspend fun autoLoadEpisode(autoPlay: Boolean): Playable? {
         val nextEpisode = getCurrentEpisode()
         if (nextEpisode != null) {
