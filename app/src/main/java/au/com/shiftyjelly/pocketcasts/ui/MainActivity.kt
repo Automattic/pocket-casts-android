@@ -355,7 +355,9 @@ class MainActivity :
             }
         }
 
-        if (binding.playerBottomSheet.isPlayerOpen) {
+        if (binding.playerBottomSheet.isPlayerOpen
+            && childrenWithBackStack.isNotEmpty()
+            && (childrenWithBackStack.last() as Fragment) is PlayerContainerFragment) {
             binding.playerBottomSheet.closePlayer()
             return
         }
