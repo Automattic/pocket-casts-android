@@ -161,6 +161,12 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
     }
 
+    fun openPlayer() {
+        val index = adapter.indexOfPlayer
+        if (index == -1) return
+        binding?.viewPager?.currentItem = index
+    }
+
     fun openChaptersAt(chapter: Chapter) {
         val index = adapter.indexOfChapters
         if (index == -1) {
@@ -201,6 +207,9 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     }
 
     private var sections = listOf<Section>(Section.Player)
+
+    val indexOfPlayer: Int
+        get() = sections.indexOf(Section.Player)
 
     val indexOfChapters: Int
         get() = sections.indexOf(Section.Chapters)

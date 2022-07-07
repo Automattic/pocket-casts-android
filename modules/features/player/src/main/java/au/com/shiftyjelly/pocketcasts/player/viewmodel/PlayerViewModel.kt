@@ -57,6 +57,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -138,10 +140,16 @@ class PlayerViewModel @Inject constructor(
         var podcastHeader: PlayerHeader,
         var chaptersExpanded: Boolean,
         var chapters: List<Chapter>,
+        var currentChapter: Chapter?,
         var upNextExpanded: Boolean,
         var upNextEpisodes: List<Playable>,
-        var upNextSummary: UpNextSummary
-    )
+        var upNextSummary: UpNextSummary,
+    ) {
+        fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
+    }
+
+    private val _showPlayerFlow = MutableSharedFlow<Unit>()
+    val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
 
     var upNextExpanded = settings.getBooleanForKey(Settings.PREFERENCE_UPNEXT_EXPANDED, true)
     var chaptersExpanded = settings.getBooleanForKey(Settings.PREFERENCE_CHAPTERS_EXPANDED, true)
@@ -328,6 +336,7 @@ class PlayerViewModel @Inject constructor(
         }
         // copy the chapter so the diff can see the differences
         val chapters = playbackState.chapters.getListWithState(playbackState.positionMs).map { it.copy() }
+        val currentChapter = playbackState.chapters.getChapter(playbackState.positionMs)
 
         var episodeCount = 0
         var totalTime = 0.0
@@ -348,6 +357,7 @@ class PlayerViewModel @Inject constructor(
             podcastHeader = podcastHeader,
             chaptersExpanded = chaptersExpanded,
             chapters = chapters,
+            currentChapter = currentChapter,
             upNextExpanded = upNextExpanded,
             upNextEpisodes = upNextEpisodes,
             upNextSummary = upNextFooter
@@ -575,7 +585,14 @@ class PlayerViewModel @Inject constructor(
         playbackManager.playPause()
     }
 
-    fun skipToChapter(chapter: Chapter) {
-        playbackManager.skipToChapter(chapter)
+    fun onChapterClick(chapter: Chapter) {
+        launch {
+            val listData = listDataLive.value
+            if (listData?.isSameChapter(chapter) == true) {
+                _showPlayerFlow.emit(Unit)
+            } else {
+                playbackManager.skipToChapter(chapter)
+            }
+        }
     }
 }
