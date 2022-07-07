@@ -57,6 +57,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -142,10 +144,12 @@ class PlayerViewModel @Inject constructor(
         var upNextExpanded: Boolean,
         var upNextEpisodes: List<Playable>,
         var upNextSummary: UpNextSummary,
-        var showPlayer: Boolean,
     ) {
         fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
     }
+
+    private val _showPlayerFlow = MutableSharedFlow<Unit>()
+    val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
 
     var upNextExpanded = settings.getBooleanForKey(Settings.PREFERENCE_UPNEXT_EXPANDED, true)
     var chaptersExpanded = settings.getBooleanForKey(Settings.PREFERENCE_CHAPTERS_EXPANDED, true)
@@ -159,7 +163,6 @@ class PlayerViewModel @Inject constructor(
 
     private val upNextExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(upNextExpanded) }
     private val chaptersExpandedObservable = BehaviorRelay.create<Boolean>().apply { accept(chaptersExpanded) }
-    private val showPlayerObservable = BehaviorRelay.create<Boolean>().apply { accept(false) }
 
     val listDataRx = Observables.combineLatest(
         upNextStateObservable,
@@ -169,7 +172,6 @@ class PlayerViewModel @Inject constructor(
         upNextExpandedObservable,
         chaptersExpandedObservable,
         settings.playbackEffectsObservable,
-        showPlayerObservable,
         this::mergeListData
     )
         .distinctUntilChanged()
@@ -280,7 +282,7 @@ class PlayerViewModel @Inject constructor(
         updateSleepTimer()
     }
 
-    fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects, showPlayer: Boolean): ListData {
+    fun mergeListData(upNextState: UpNextQueue.State, playbackState: PlaybackState, skipBackwardInSecs: Int, skipForwardInSecs: Int, upNextExpanded: Boolean, chaptersExpanded: Boolean, globalPlaybackEffects: PlaybackEffects): ListData {
         val podcast: Podcast? = (upNextState as? UpNextQueue.State.Loaded)?.podcast
         val episode = (upNextState as? UpNextQueue.State.Loaded)?.episode
 
@@ -358,8 +360,7 @@ class PlayerViewModel @Inject constructor(
             currentChapter = currentChapter,
             upNextExpanded = upNextExpanded,
             upNextEpisodes = upNextEpisodes,
-            upNextSummary = upNextFooter,
-            showPlayer = showPlayer
+            upNextSummary = upNextFooter
         )
     }
 
@@ -588,14 +589,10 @@ class PlayerViewModel @Inject constructor(
         launch {
             val listData = listDataLive.value
             if (listData?.isSameChapter(chapter) == true) {
-                showPlayerObservable.accept(true)
+                _showPlayerFlow.emit(Unit)
             } else {
                 playbackManager.skipToChapter(chapter)
             }
         }
-    }
-
-    fun onPlayerShown() {
-        showPlayerObservable.accept(false)
     }
 }
