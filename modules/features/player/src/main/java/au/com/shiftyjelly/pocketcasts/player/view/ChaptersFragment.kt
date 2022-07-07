@@ -60,7 +60,7 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
         }
     }
 
-     override fun onChapterClick(chapter: Chapter) {
+    override fun onChapterClick(chapter: Chapter) {
         playerViewModel.onChapterClick(chapter)
     }
 
