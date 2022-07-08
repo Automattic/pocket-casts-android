@@ -48,6 +48,8 @@
         ([#35](https://github.com/Automattic/pocket-casts-android/pull/35)).
     *   Fix same chapter click behaviour 
         ([#59](https://github.com/Automattic/pocket-casts-android/pull/59)).
+    *   Prevent video player controls from getting stuck on the screen
+        ([#77](https://github.com/Automattic/pocket-casts-android/pull/77)).
 
 ### 7.19.2 (2022-02-11)
 
