@@ -74,6 +74,7 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnClose?.setOnClickListener {
+            AnalyticsHelper.closeAccountMissingClicked()
             activity?.finish()
         }
 

@@ -217,6 +217,10 @@ object AnalyticsHelper {
         )
     }
 
+    fun closeAccountMissingClicked() {
+        logEvent("close_account_missing")
+    }
+
     fun createAccountClicked() {
         logEvent("select_create_account")
     }
