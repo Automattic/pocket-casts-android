@@ -339,9 +339,12 @@ class MainActivity :
             return
         }
 
-        if (navigator.isShowingModal() && navigator.currentFragment() !is HasBackstack) {
-            navigator.pop()
-            return
+        if (navigator.isShowingModal()) {
+            val modalFragmentChildrenCount = navigator.currentFragment()?.childFragmentManager?.fragments?.size
+            if (navigator.currentFragment() !is HasBackstack || modalFragmentChildrenCount == 0) {
+                navigator.pop()
+                return
+            }
         }
 
         // Check for embedded up next fragment being shown in player container
