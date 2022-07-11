@@ -385,7 +385,7 @@ class MainActivity :
             }
         }
 
-        if (!navigator.pop()) {
+        if (navigator.isAtRootOfStack() || !navigator.pop()) {
             super.onBackPressed()
         }
     }
