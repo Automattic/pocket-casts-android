@@ -340,8 +340,14 @@ class MainActivity :
         }
 
         if (navigator.isShowingModal()) {
-            val modalFragmentChildrenCount = navigator.currentFragment()?.childFragmentManager?.fragments?.size
-            if (navigator.currentFragment() !is HasBackstack || modalFragmentChildrenCount == 0) {
+            val currentFragment = navigator.currentFragment()
+            if (currentFragment is HasBackstack) {
+                val handled = currentFragment.onBackPressed()
+                if (!handled) {
+                    navigator.pop()
+                }
+                return
+            } else {
                 navigator.pop()
                 return
             }
