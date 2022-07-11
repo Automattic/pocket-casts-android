@@ -41,7 +41,10 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
         binding.viewModel = viewModel
 
         // video under the status and navigation bar
-        setupSystemUiWithListener()
+        setupSystemUi()
+
+        // listen for taps causing the system ui to come back
+        listenForSystemUiChanges()
 
         val context = binding.videoView.context
 
@@ -111,13 +114,10 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
         binding = null
     }
 
-    private fun setupSystemUiWithListener() {
-        val window = activity?.window ?: return
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        getInsetsController()?.hide(WindowInsetsCompat.Type.navigationBars())
+    private fun listenForSystemUiChanges() {
+        val view = binding?.root ?: return
 
-        // listen for taps causing the system ui to come back
-        ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
             if (insets.isVisible(WindowInsetsCompat.Type.statusBars())) {
                 viewModel.showControls()
             } else {
@@ -125,6 +125,12 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
             }
             insets
         }
+    }
+
+    private fun setupSystemUi() {
+        val window = activity?.window ?: return
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        getInsetsController()?.hide(WindowInsetsCompat.Type.navigationBars())
     }
 
     private fun hideSystemUi() {
