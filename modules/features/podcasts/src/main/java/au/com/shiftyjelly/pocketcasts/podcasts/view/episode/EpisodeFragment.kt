@@ -24,6 +24,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -225,6 +226,11 @@ class EpisodeFragment : BaseDialogFragment() {
 
                         // Archive
                         binding.btnArchive.isOn = state.episode.isArchived
+
+                        // Time Left
+                        val timeLeft = TimeHelper.getTimeLeft(state.episode.playedUpToMs, state.episode.durationMs.toLong(), state.episode.isInProgress, binding.lblTimeLeft.context)
+                        binding.lblTimeLeft.text = timeLeft.text
+                        binding.lblTimeLeft.contentDescription = timeLeft.description
 
                         // Download State
                         val downloadSize = Util.formattedBytes(bytes = state.episode.sizeInBytes, context = binding.btnDownload.context).replace(

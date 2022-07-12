@@ -48,6 +48,8 @@
         ([#35](https://github.com/Automattic/pocket-casts-android/pull/35)).
     *   Fix same chapter click behaviour 
         ([#59](https://github.com/Automattic/pocket-casts-android/pull/59)).
+    *   Replace duration with time left on episode screen from listening history  
+        ([#83](https://github.com/Automattic/pocket-casts-android/pull/83)).
     *   Fix back navigation for full screen player 'Rearrange Actions' page
         ([#76](https://github.com/Automattic/pocket-casts-android/pull/76)).
 
