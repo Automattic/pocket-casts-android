@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.plus
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -83,6 +84,11 @@ class PlusUpgradeFragment : BaseDialogFragment() {
 
     private fun openLearnMore() {
         WebViewActivity.show(context, getString(LR.string.learn_more), Settings.INFO_LEARN_MORE_URL)
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
     }
 
     private fun acceptUpgrade() {
