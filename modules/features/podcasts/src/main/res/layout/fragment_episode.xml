@@ -43,7 +43,7 @@
                 android:id="@+id/loadingGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="lblDate,lblDuration,lblAuthor,btnDownload, btnShare, btnFav, btnAddToUpNext, btnArchive, btnPlay, btnPlayed"
+                app:constraint_referenced_ids="lblDate,lblTimeLeft,lblAuthor,btnDownload, btnShare, btnFav, btnAddToUpNext, btnArchive, btnPlay, btnPlayed"
                 android:visibility="invisible"
                 tools:visibility="visible" />
 
@@ -339,7 +339,7 @@
                 tools:text="3 December 2018" />
 
             <TextView
-                android:id="@+id/lblDuration"
+                android:id="@+id/lblTimeLeft"
                 style="?attr/textCaption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -347,9 +347,8 @@
                 app:layout_constraintBottom_toBottomOf="@+id/lblDate"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/lblDate"
-                app:shortTime="@{episode.duration}"
                 android:textColor="?attr/primary_text_02"
-                tools:text="50 mins" />
+                tools:text="1h 50m left" />
 
             <FrameLayout
                 android:id="@+id/webViewShowNotes"
