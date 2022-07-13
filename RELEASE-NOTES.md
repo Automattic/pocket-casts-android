@@ -50,6 +50,8 @@
         ([#59](https://github.com/Automattic/pocket-casts-android/pull/59)).
     *   Replace duration with time left on episode screen from listening history  
         ([#83](https://github.com/Automattic/pocket-casts-android/pull/83)).
+    *   Fix back navigation for full screen player 'Rearrange Actions' page
+        ([#76](https://github.com/Automattic/pocket-casts-android/pull/76)).
 
 ### 7.19.2 (2022-02-11)
 

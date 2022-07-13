@@ -339,9 +339,18 @@ class MainActivity :
             return
         }
 
-        if (navigator.isShowingModal() && navigator.currentFragment() !is HasBackstack) {
-            navigator.pop()
-            return
+        if (navigator.isShowingModal()) {
+            val currentFragment = navigator.currentFragment()
+            if (currentFragment is HasBackstack) {
+                val handled = currentFragment.onBackPressed()
+                if (!handled) {
+                    navigator.pop()
+                }
+                return
+            } else {
+                navigator.pop()
+                return
+            }
         }
 
         // Check for embedded up next fragment being shown in player container
@@ -376,7 +385,7 @@ class MainActivity :
             }
         }
 
-        if (!navigator.pop()) {
+        if (navigator.isAtRootOfStack() || !navigator.pop()) {
             super.onBackPressed()
         }
     }
