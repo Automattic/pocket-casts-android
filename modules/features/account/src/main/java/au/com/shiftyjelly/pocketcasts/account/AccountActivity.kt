@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.AccountActivityBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -97,6 +98,9 @@ class AccountActivity : AppCompatActivity() {
         if (currentFragment?.id == R.id.createPayNowFragment || currentFragment?.id == R.id.createDoneFragment) {
             finish()
             return
+        }
+        if (currentFragment?.id == R.id.accountFragment) {
+            AnalyticsHelper.closeAccountMissingClicked()
         }
 
         UiUtil.hideKeyboard(binding.root)

@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.plus
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -63,8 +64,8 @@ class PlusUpgradeFragment : BaseDialogFragment() {
             setContent {
                 AppTheme(theme.activeTheme) {
                     PlusUpgradePage(
-                        onCloseClick = { dismiss() },
-                        onUpgradeClick = { upgrade() },
+                        onCloseClick = { closeUpgrade() },
+                        onUpgradeClick = { acceptUpgrade() },
                         onLearnMoreClick = { openLearnMore() },
                         storageLimitGb = settings.getCustomStorageLimitGb(),
                         featureBlocked = upgradePage.featureBlocked,
@@ -85,7 +86,12 @@ class PlusUpgradeFragment : BaseDialogFragment() {
         WebViewActivity.show(context, getString(LR.string.learn_more), Settings.INFO_LEARN_MORE_URL)
     }
 
-    private fun upgrade() {
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
+    }
+
+    private fun acceptUpgrade() {
         // Check we are in the right module, if not we will have to deeplink in to the upgrade process
         val fragmentHost = activity as? FragmentHostListener
         if (fragmentHost != null) {
@@ -97,6 +103,11 @@ class PlusUpgradeFragment : BaseDialogFragment() {
         }
 
         AnalyticsHelper.plusUpgradeConfirmed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
-        dialog?.dismiss()
+        dismiss()
+    }
+
+    private fun closeUpgrade() {
+        AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
+        dismiss()
     }
 }
