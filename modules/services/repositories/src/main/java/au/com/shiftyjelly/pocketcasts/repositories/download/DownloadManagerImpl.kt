@@ -81,7 +81,7 @@ class DownloadManagerImpl @Inject constructor(
     override val progressUpdates: MutableMap<String, DownloadProgressUpdate> = mutableMapOf()
     override val progressUpdateRelay: Subject<DownloadProgressUpdate> = ReplaySubject.createWithSize(20)
 
-    private var workManagerListener: LiveData<Pair<List<WorkInfo>, Map<String?, Playable>>>? = null
+    private var workManagerListener: LiveData<Pair<List<WorkInfo>, Map<String?, String>>>? = null
 
     override fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, playlistManager: PlaylistManager, playbackManager: PlaybackManager) {
         this.episodeManager = episodeManager
@@ -108,7 +108,9 @@ class DownloadManagerImpl @Inject constructor(
             .distinctUntilChanged { t1, t2 -> // We only really need to make sure we have all the downloading episodes available, we don't care when their metadata changes
                 t1.map { it.uuid }.toSet() == t2.map { it.uuid }.toSet()
             }
-            .map { it.associateBy { it.downloadTaskId } } // Convert to map for easy lookup
+            .map { list ->
+                list.associateBy({ it.downloadTaskId }, { it.uuid }) // Convert to map for easy lookup
+            }
 
         launch(downloadsCoroutineContext) {
             cleanUpStaleDownloads(workManager)
@@ -117,18 +119,19 @@ class DownloadManagerImpl @Inject constructor(
         val episodeLiveData = LiveDataReactiveStreams.fromPublisher(episodeFlowable)
         workManagerListener = workManager.getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG).combineLatest(episodeLiveData)
 
-        workManagerListener?.observeForever { (tasks, episodes) ->
+        workManagerListener?.observeForever { (tasks, episodeUuids) ->
             tasks.forEach { workInfo ->
                 val taskId = workInfo.id.toString()
-                val episode = episodes[taskId]
-                val episodeUUID = episode?.uuid
+                val episodeUUID = episodeUuids[taskId]
                 if (episodeUUID != null) {
                     val info = DownloadingInfo(episodeUUID, workInfo.id)
                     when (workInfo.state) {
                         WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
                             launch(downloadsCoroutineContext) {
                                 pendingQueue[episodeUUID] = DownloadingInfo(episodeUUID, workInfo.id)
-                                getRequirementsAndSetStatusAsync(episode)
+                                episodeManager.findPlayableByUuid(episodeUUID)?.let { episode ->
+                                    getRequirementsAndSetStatusAsync(episode)
+                                }
                                 synchronized(downloadingQueue) {
                                     if (downloadingQueue.contains(info)) {
                                         downloadingQueue.remove(info)
@@ -159,7 +162,8 @@ class DownloadManagerImpl @Inject constructor(
 
                                 episodeManager.findPlayableByUuid(episodeUUID)?.let {
                                     episodeManager.updateDownloadTaskId(it, null)
-                                    if (!episode.isDownloaded && it.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
+                                    val episode = episodeManager.findPlayableByUuid(episodeUUID)
+                                    if (episode?.isDownloaded == false && it.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
                                         episodeManager.updateEpisodeStatus(it, EpisodeStatusEnum.NOT_DOWNLOADED)
                                     }
                                 }
@@ -177,7 +181,7 @@ class DownloadManagerImpl @Inject constructor(
                         }
                         WorkInfo.State.SUCCEEDED -> {
                             launch(downloadsCoroutineContext) {
-                                Timber.d("Worker succeeded: ${episode.title}")
+                                Timber.d("Worker succeeded: $episodeUUID")
                                 synchronized(downloadingQueue) {
                                     downloadingQueue.remove(info)
                                 }
