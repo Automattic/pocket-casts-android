@@ -129,6 +129,7 @@ project.ext {
             kotlinCoroutines: "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versionKotlinCoroutines",
             kotlinCoroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versionKotlinCoroutines",
             kotlinCoroutinesRx: "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$versionKotlinCoroutines",
+            kotlinCoroutinesTest: "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versionKotlinCoroutines",
             // Retrofit
             retrofit: "com.squareup.retrofit2:retrofit:$versionRetrofit",
             retrofitMoshi: "com.squareup.retrofit2:converter-moshi:$versionRetrofit",
