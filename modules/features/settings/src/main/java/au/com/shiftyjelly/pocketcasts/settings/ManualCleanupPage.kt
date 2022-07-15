@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,6 +55,7 @@ fun ManualCleanupPage(
         }
         ManageDownloadsView(
             state = state,
+            onStarredSwitchClicked = { viewModel.onStarredSwitchClicked(it) },
             onDeleteButtonClicked = { viewModel.onDeleteButtonClicked() },
         )
         LaunchedEffect(Unit) {
@@ -66,6 +70,7 @@ fun ManualCleanupPage(
 @Composable
 private fun ManageDownloadsView(
     state: ManualCleanupViewModel.State,
+    onStarredSwitchClicked: (Boolean) -> Unit,
     onDeleteButtonClicked: () -> Unit,
 ) {
     val deleteButtonContentColor =
@@ -75,7 +80,7 @@ private fun ManageDownloadsView(
         DiskSpaceSizeView(stringResource(LR.string.in_progress), "")
         DiskSpaceSizeView(stringResource(LR.string.played), "")
         TotalDownloadSizeRow(state.totalDownloadSize)
-        IncludeStarredRow()
+        IncludeStarredRow(onStarredSwitchClicked)
         RowButton(
             text = stringResource(id = state.deleteButton.title),
             enabled = state.deleteButton.isEnabled,
@@ -113,8 +118,10 @@ private fun TotalDownloadSizeRow(
 
 @Composable
 private fun IncludeStarredRow(
-    modifier: Modifier = Modifier
+    onStarredSwitchClicked: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    var checkedState: Boolean by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -124,7 +131,13 @@ private fun IncludeStarredRow(
             text = stringResource(LR.string.settings_manage_downloads_include_starred),
             modifier = modifier.weight(1f)
         )
-        Switch(checked = false, onCheckedChange = {})
+        Switch(
+            checked = checkedState,
+            onCheckedChange = {
+                onStarredSwitchClicked(it)
+                checkedState = it
+            },
+        )
     }
 }
 
@@ -136,6 +149,7 @@ private fun ManualCleanupPagePreview(
     AppTheme(themeType) {
         ManageDownloadsView(
             state = ManualCleanupViewModel.State(),
+            onStarredSwitchClicked = {},
             onDeleteButtonClicked = {},
         )
     }

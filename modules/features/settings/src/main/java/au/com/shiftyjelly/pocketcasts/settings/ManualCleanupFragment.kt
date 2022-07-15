@@ -79,9 +79,6 @@ class ManualCleanupFragment : BaseFragment() {
         unplayed.setup(LR.string.unplayed, "")
         inProgress.setup(LR.string.in_progress, "")
         played.setup(LR.string.played, "")
-        switchStarred.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.onStarredSwitchClicked(isChecked)
-        }
     }
 
     private fun FragmentManualcleanupBinding.setupObservers() {
