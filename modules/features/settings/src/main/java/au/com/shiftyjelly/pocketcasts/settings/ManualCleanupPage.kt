@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Switch
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,6 +40,7 @@ fun ManualCleanupPage(
     onBackClick: () -> Unit,
 ) {
     val state: ManualCleanupViewModel.State by viewModel.state.collectAsState()
+    val context = LocalContext.current
     Column {
         if (showToolbar) {
             ThemedTopAppBar(
@@ -50,6 +53,12 @@ fun ManualCleanupPage(
             state = state,
             onDeleteButtonClicked = { viewModel.onDeleteButtonClicked() },
         )
+        LaunchedEffect(Unit) {
+            viewModel.snackbarMessage
+                .collect { message ->
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 }
 

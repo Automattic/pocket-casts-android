@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
@@ -98,10 +96,6 @@ class ManualCleanupFragment : BaseFragment() {
                 )
             }
         }
-
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.snackbarMessage.collect { showSnackbar(it) }
-        }
     }
 
     private fun ManualCleanupViewModel.State.DiskSpaceView.update(
@@ -114,9 +108,5 @@ class ManualCleanupFragment : BaseFragment() {
         viewModel.updateDeleteList(view.isChecked, episodes)
         view.onCheckedChanged =
             { isChecked -> viewModel.onDiskSpaceCheckedChanged(isChecked, episodes) }
-    }
-
-    private fun FragmentManualcleanupBinding.showSnackbar(@StringRes stringResId: Int) {
-        Toast.makeText(btnDelete.context, stringResId, Toast.LENGTH_SHORT).show()
     }
 }
