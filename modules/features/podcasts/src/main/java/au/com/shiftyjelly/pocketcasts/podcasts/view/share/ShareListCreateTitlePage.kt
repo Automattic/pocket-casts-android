@@ -36,6 +36,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+/**
+ * The second page when sharing a list of podcasts. Enter the list title and description.
+ */
 @Composable
 fun ShareListCreateTitlePage(
     onBackClick: () -> Unit,

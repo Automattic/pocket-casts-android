@@ -18,6 +18,9 @@ import au.com.shiftyjelly.pocketcasts.compose.podcast.PodcastSelectGrid
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+/**
+ * The first page when sharing a list of podcasts. Select the podcasts to share.
+ */
 @Composable
 fun ShareListCreatePodcastsPage(
     onCloseClick: () -> Unit,

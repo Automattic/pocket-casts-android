@@ -33,6 +33,9 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+/**
+ * The page shown when generating a sharing a list of podcasts fails.
+ */
 @Composable
 fun ShareListCreateFailedPage(
     onCloseClick: () -> Unit,

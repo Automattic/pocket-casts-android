@@ -38,6 +38,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+/**
+ * Loading page while the sharing a list of podcasts is building.
+ */
 @Composable
 fun ShareListCreateBuildingPage(
     onCloseClick: () -> Unit,
