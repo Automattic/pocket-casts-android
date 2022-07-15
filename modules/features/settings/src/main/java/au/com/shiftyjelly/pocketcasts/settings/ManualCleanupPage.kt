@@ -96,7 +96,7 @@ private fun ManageDownloadsView(
         TotalDownloadSizeRow(state.totalDownloadSize)
         IncludeStarredRow(onStarredSwitchClicked)
         RowButton(
-            text = stringResource(id = state.deleteButton.title),
+            text = state.deleteButton.title,
             enabled = state.deleteButton.isEnabled,
             colors = ButtonDefaults.buttonColors(
                 contentColor = deleteButtonContentColor,
@@ -162,7 +162,11 @@ private fun ManualCleanupPagePreview(
 ) {
     AppTheme(themeType) {
         ManageDownloadsView(
-            state = ManualCleanupViewModel.State(),
+            state = ManualCleanupViewModel.State(
+                deleteButton = ManualCleanupViewModel.State.DeleteButton(
+                    title = stringResource(id = LR.string.settings_select_episodes_to_delete)
+                )
+            ),
             onDiskSpaceCheckedChanged = { _, _ -> },
             onStarredSwitchClicked = {},
             onDeleteButtonClicked = {},

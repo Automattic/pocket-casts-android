@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
+import android.content.Context
 import androidx.annotation.AttrRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.combineLatest
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,13 +29,14 @@ class ManualCleanupViewModel
 @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
     data class State(
         val unplayedDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.unplayed),
         val inProgressDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.in_progress),
         val playedDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.played),
         val totalDownloadSize: Long = 0L,
-        val deleteButton: DeleteButton = DeleteButton(),
+        val deleteButton: DeleteButton,
     ) {
         data class DiskSpaceView(
             @StringRes val title: Int,
@@ -42,14 +45,21 @@ class ManualCleanupViewModel
             val episodesBytesSize = episodes.sumOf { it.sizeInBytes }
             val episodesSize = episodes.size
         }
+
         data class DeleteButton(
-            @StringRes val title: Int = LR.string.settings_select_episodes_to_delete,
+            val title: String,
             @AttrRes val contentColor: Int = UR.attr.primary_interactive_01,
             val isEnabled: Boolean = false,
         )
     }
 
-    private val _state = MutableStateFlow(State())
+    private val _state = MutableStateFlow(
+        State(
+            deleteButton = State.DeleteButton(
+                title = context.getString(LR.string.settings_select_episodes_to_delete)
+            )
+        )
+    )
     val state: StateFlow<State>
         get() = _state
 
@@ -59,13 +69,16 @@ class ManualCleanupViewModel
     private val deleteButton: State.DeleteButton
         get() = if (episodesToDelete.isEmpty()) {
             _state.value.deleteButton.copy(
-                title = LR.string.settings_select_episodes_to_delete,
+                title = context.getString(LR.string.settings_select_episodes_to_delete),
                 contentColor = UR.attr.primary_interactive_01_disabled,
                 isEnabled = false,
             )
         } else {
             _state.value.deleteButton.copy(
-                title = LR.string.settings_select_episodes_to_delete,
+                title = context.getString(
+                    LR.string.settings_delete_episodes,
+                    episodesToDelete.size
+                ),
                 contentColor = UR.attr.primary_interactive_01,
                 isEnabled = true,
             )
