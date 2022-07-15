@@ -15,7 +15,6 @@ import io.reactivex.Flowable
 import junit.framework.TestCase.assertFalse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
@@ -61,16 +60,14 @@ class ManualCleanupViewModelTest {
 
     @Test
     fun `given episodes selected, when delete button clicked, then episodes are deleted`() {
-        runBlocking {
-            whenever(episodeManager.observeDownloadedEpisodes())
-                .thenReturn(Flowable.generate { listOf(episode) })
-            viewModel.onDiskSpaceCheckedChanged(isChecked = true, episodes = episodes)
+        whenever(episodeManager.observeDownloadedEpisodes())
+            .thenReturn(Flowable.generate { listOf(episode) })
+        viewModel.onDiskSpaceCheckedChanged(isChecked = true, episodes = episodes)
 
-            viewModel.onDeleteButtonClicked()
+        viewModel.onDeleteButtonClicked()
 
-            verifyBlocking(episodeManager, times(1)) {
-                deleteEpisodeFiles(episodes, playbackManager)
-            }
+        verifyBlocking(episodeManager, times(1)) {
+            deleteEpisodeFiles(episodes, playbackManager)
         }
     }
 
