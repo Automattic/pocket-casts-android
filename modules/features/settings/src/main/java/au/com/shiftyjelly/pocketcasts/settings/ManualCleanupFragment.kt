@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentManualcleanupBinding
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -83,7 +81,6 @@ class ManualCleanupFragment : BaseFragment() {
         unplayed.setup(LR.string.unplayed, "")
         inProgress.setup(LR.string.in_progress, "")
         played.setup(LR.string.played, "")
-        btnDelete.setOnClickListener { viewModel.onDeleteButtonClicked() }
         switchStarred.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onStarredSwitchClicked(isChecked)
         }
@@ -95,7 +92,6 @@ class ManualCleanupFragment : BaseFragment() {
                 it.unplayedDiskSpaceView.update(unplayed)
                 it.inProgressDiskSpaceView.update(inProgress)
                 it.playedDiskSpaceView.update(played)
-                updateButton(it.deleteButton)
                 lblTotal.text = Util.formattedBytes(
                     bytes = it.totalDownloadSize,
                     context = lblTotal.context
@@ -118,15 +114,6 @@ class ManualCleanupFragment : BaseFragment() {
         viewModel.updateDeleteList(view.isChecked, episodes)
         view.onCheckedChanged =
             { isChecked -> viewModel.onDiskSpaceCheckedChanged(isChecked, episodes) }
-    }
-
-    private fun FragmentManualcleanupBinding.updateButton(deleteButton: ManualCleanupViewModel.State.DeleteButton) {
-        with(btnDelete) {
-            setText(deleteButton.title)
-            isEnabled = deleteButton.isEnabled
-            backgroundTintList =
-                ColorStateList.valueOf(context.getThemeColor(deleteButton.contentColor))
-        }
     }
 
     private fun FragmentManualcleanupBinding.showSnackbar(@StringRes stringResId: Int) {

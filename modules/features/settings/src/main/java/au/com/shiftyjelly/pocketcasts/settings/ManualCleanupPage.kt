@@ -4,12 +4,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -23,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.settings.components.DiskSpaceSizeView
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -41,14 +46,20 @@ fun ManualCleanupPage(
                 onNavigationClick = { onBackClick() },
             )
         }
-        ManageDownloadsView(state)
+        ManageDownloadsView(
+            state = state,
+            onDeleteButtonClicked = { viewModel.onDeleteButtonClicked() },
+        )
     }
 }
 
 @Composable
 private fun ManageDownloadsView(
     state: ManualCleanupViewModel.State,
+    onDeleteButtonClicked: () -> Unit,
 ) {
+    val deleteButtonContentColor =
+        Color(LocalContext.current.getThemeColor(state.deleteButton.contentColor))
     Column {
         DiskSpaceSizeView(stringResource(LR.string.unplayed), "")
         DiskSpaceSizeView(stringResource(LR.string.in_progress), "")
@@ -56,8 +67,13 @@ private fun ManageDownloadsView(
         TotalDownloadSizeRow("100mb")
         IncludeStarredRow()
         RowButton(
-            text = stringResource(LR.string.settings_select_episodes_to_delete),
-            onClick = {}
+            text = stringResource(id = state.deleteButton.title),
+            enabled = state.deleteButton.isEnabled,
+            colors = ButtonDefaults.buttonColors(
+                contentColor = deleteButtonContentColor,
+                disabledContentColor = deleteButtonContentColor.copy(alpha = ContentAlpha.disabled),
+            ),
+            onClick = { onDeleteButtonClicked() },
         )
     }
 }
@@ -105,6 +121,7 @@ private fun ManualCleanupPagePreview(
     AppTheme(themeType) {
         ManageDownloadsView(
             state = ManualCleanupViewModel.State(),
+            onDeleteButtonClicked = {},
         )
     }
 }
