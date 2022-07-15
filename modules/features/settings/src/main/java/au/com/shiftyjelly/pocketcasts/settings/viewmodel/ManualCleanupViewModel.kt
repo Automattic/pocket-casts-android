@@ -131,7 +131,7 @@ class ManualCleanupViewModel
         }
     }
 
-    fun updateDeleteList(isChecked: Boolean, episodes: List<Episode>) {
+    private fun updateDeleteList(isChecked: Boolean, episodes: List<Episode>) {
         if (isChecked) {
             episodesToDelete.addAll(episodes)
         } else {
