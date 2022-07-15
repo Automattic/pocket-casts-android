@@ -169,7 +169,7 @@ class FolderEditViewModel
     }
 
     fun changeFolderName(name: String) {
-        folderName.value = name
+        folderName.value = name.take(100)
     }
 
     fun changeColor(index: Int) {

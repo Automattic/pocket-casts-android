@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
+import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -73,10 +74,12 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnClose?.setOnClickListener {
+            AnalyticsHelper.closeAccountMissingClicked()
             activity?.finish()
         }
 
         binding.btnCreate.setOnClickListener {
+            AnalyticsHelper.createAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 if (Util.isCarUiMode(view.context) || accountViewModel.supporterInstance) { // We can't sign up to plus on cars so skip that step
                     view.findNavController().navigate(R.id.action_accountFragment_to_createEmailFragment)
@@ -87,6 +90,7 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnSignIn.setOnClickListener {
+            AnalyticsHelper.signInAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 view.findNavController().navigate(R.id.action_accountFragment_to_signInFragment)
             }
