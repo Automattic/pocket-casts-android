@@ -13,6 +13,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -39,21 +40,27 @@ class ManualCleanupViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         whenever(context.getString(anyInt())).thenReturn("")
         whenever(context.getString(anyInt(), anyOrNull())).thenReturn("")
-        whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.generate { emptyList<Episode>() })
+        whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.generate { listOf(episodes) })
         viewModel = ManualCleanupViewModel(episodeManager, playbackManager, context)
     }
 
     @Test
-    fun `given episodes not present, when ui is built, then delete button is disabled`() {
-        whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.generate { emptyList<Episode>() })
+    fun `given episodes present, when disk space size checked, then delete button is enabled`() {
+        viewModel.onDiskSpaceCheckedChanged(isChecked = true, episodes = episodes)
+
+        assertTrue(viewModel.state.value.deleteButton.isEnabled)
+    }
+
+    @Test
+    fun `given episodes present, when disk space size unchecked, then delete button is disabled`() {
+        viewModel.onDiskSpaceCheckedChanged(isChecked = false, episodes = episodes)
 
         assertFalse(viewModel.state.value.deleteButton.isEnabled)
     }
 
     @Test
-    fun `given episodes present, when ui is built, then delete button is enabled`() {
-        whenever(episodeManager.observeDownloadedEpisodes())
-            .thenReturn(Flowable.generate { listOf(episode) })
+    fun `given episodes not present, when disk space size checked, then delete button is disabled`() {
+        viewModel.onDiskSpaceCheckedChanged(isChecked = true, episodes = emptyList())
 
         assertFalse(viewModel.state.value.deleteButton.isEnabled)
     }
