@@ -1,4 +1,4 @@
-Note: (A) means Automated Test. If automated UI tests were executed for the app, there's no need to run tests marked with (A) manually.
+(A) means Automated Test. If automated UI tests were executed for the app, there's no need to run tests marked with (A) manually.
 
 ## Manual Tests
 
