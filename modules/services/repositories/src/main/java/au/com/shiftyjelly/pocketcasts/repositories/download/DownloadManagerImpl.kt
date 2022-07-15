@@ -162,8 +162,7 @@ class DownloadManagerImpl @Inject constructor(
 
                                 episodeManager.findPlayableByUuid(episodeUUID)?.let {
                                     episodeManager.updateDownloadTaskId(it, null)
-                                    val episode = episodeManager.findPlayableByUuid(episodeUUID)
-                                    if (episode?.isDownloaded == false && it.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
+                                    if (!it.isDownloaded && it.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
                                         episodeManager.updateEpisodeStatus(it, EpisodeStatusEnum.NOT_DOWNLOADED)
                                     }
                                 }
