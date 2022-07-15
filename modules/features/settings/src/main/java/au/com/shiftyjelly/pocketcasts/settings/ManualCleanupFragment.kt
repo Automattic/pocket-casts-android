@@ -7,10 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentManualcleanupBinding
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
@@ -46,9 +48,18 @@ class ManualCleanupFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentManualcleanupBinding.inflate(inflater, container, false)
-        return binding?.root
+    ): View {
+//        binding = FragmentManualcleanupBinding.inflate(inflater, container, false)
+//        return binding?.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme(theme.activeTheme) {
+                    ManualCleanupPage(
+                        viewModel = viewModel
+                    )
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -58,11 +69,11 @@ class ManualCleanupFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val fragmentBinding = this.binding ?: return
-        with(fragmentBinding) {
-            setupUi()
-            setupObservers()
-        }
+//        val fragmentBinding = this.binding ?: return
+//        with(fragmentBinding) {
+//            setupUi()
+//            setupObservers()
+//        }
     }
 
     private fun FragmentManualcleanupBinding.setupUi() {
