@@ -417,12 +417,8 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findFolderPodcastsOrderByLatestEpisode(folderUuid)
     }
 
-    override fun findPodcastsOrderByTitle(): List<Podcast> {
-        return podcastDao.findSubscribedOrderByTitleAsc()
-    }
-
-    override fun findPodcastsOrderByTitleRx(): Single<List<Podcast>> {
-        return Single.fromCallable { podcastDao.findSubscribedOrderByTitleAsc() }
+    override suspend fun findPodcastsOrderByTitle(): List<Podcast> {
+        return podcastDao.findSubscribedNoOrder().sortedWith(PodcastsSortType.NAME_A_TO_Z.podcastComparator)
     }
 
     override fun searchPodcastByTitle(title: String): Podcast? {

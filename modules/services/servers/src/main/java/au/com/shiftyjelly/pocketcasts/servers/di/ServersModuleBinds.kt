@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
-import au.com.shiftyjelly.pocketcasts.servers.ShareServerManager
-import au.com.shiftyjelly.pocketcasts.servers.ShareServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
@@ -28,7 +28,7 @@ abstract class ServersModuleBinds {
 
     @Binds
     @Singleton
-    abstract fun provideShareServerManager(shareServerManagerImpl: ShareServerManagerImpl): ShareServerManager
+    abstract fun provideShareServerManager(shareServerManagerImpl: ListServerManagerImpl): ListServerManager
 
     @Binds
     @Singleton

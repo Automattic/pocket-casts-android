@@ -294,6 +294,28 @@ class ServersModule {
     }
 
     @Provides
+    @ListDownloadServerRetrofit
+    @Singleton
+    internal fun provideListDownloadRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl(Settings.SERVER_LIST_URL)
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Provides
+    @ListUploadServerRetrofit
+    @Singleton
+    internal fun provideListUploadRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl(Settings.SERVER_SHARING_URL)
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Provides
     @DiscoverServerRetrofit
     @Singleton
     internal fun provideRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshiBuilder: Moshi.Builder): Retrofit {
@@ -364,6 +386,14 @@ annotation class RefreshServerRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class StaticServerRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ListDownloadServerRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ListUploadServerRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

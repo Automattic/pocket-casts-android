@@ -3,10 +3,11 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.ShareServerManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +20,7 @@ import kotlin.coroutines.CoroutineContext
 class ShareListIncomingViewModel
 @Inject constructor(
     val podcastManager: PodcastManager,
-    val shareServerManager: ShareServerManager,
+    val listServerManager: ListServerManager,
     val playbackManager: PlaybackManager
 ) : ViewModel(), CoroutineScope {
 
@@ -36,19 +37,15 @@ class ShareListIncomingViewModel
 
     fun loadShareUrl(url: String) {
         share.postValue(ShareState.Loading)
-        val id = shareServerManager.extractShareListIdFromWebUrl(url) ?: return
-        shareServerManager.loadPodcastList(
-            id,
-            object : ShareServerManager.PodcastListCallback {
-                override fun onSuccess(title: String?, description: String?, podcasts: List<Podcast>?) {
-                    share.postValue(ShareState.Loaded(title, description, podcasts))
-                }
-
-                override fun onFailed() {
-                    share.postValue(ShareState.Error)
-                }
+        val id = listServerManager.extractShareListIdFromWebUrl(url) ?: return
+        viewModelScope.launch {
+            try {
+                val list = listServerManager.openPodcastList(id)
+                share.postValue(ShareState.Loaded(title = list.title, description = list.description, podcasts = list.fullPodcasts))
+            } catch (ex: Exception) {
+                share.postValue(ShareState.Error)
             }
-        )
+        }
     }
 
     fun subscribeToPodcast(uuid: String) {
