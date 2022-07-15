@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.settings.components.DiskSpaceSizeView
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -55,6 +56,9 @@ fun ManualCleanupPage(
         }
         ManageDownloadsView(
             state = state,
+            onDiskSpaceCheckedChanged = { isChecked, episodes ->
+                viewModel.onDiskSpaceCheckedChanged(isChecked, episodes)
+            },
             onStarredSwitchClicked = { viewModel.onStarredSwitchClicked(it) },
             onDeleteButtonClicked = { viewModel.onDeleteButtonClicked() },
         )
@@ -70,15 +74,25 @@ fun ManualCleanupPage(
 @Composable
 private fun ManageDownloadsView(
     state: ManualCleanupViewModel.State,
+    onDiskSpaceCheckedChanged: (Boolean, List<Episode>) -> Unit,
     onStarredSwitchClicked: (Boolean) -> Unit,
     onDeleteButtonClicked: () -> Unit,
 ) {
     val deleteButtonContentColor =
         Color(LocalContext.current.getThemeColor(state.deleteButton.contentColor))
     Column {
-        DiskSpaceSizeView(stringResource(LR.string.unplayed), "")
-        DiskSpaceSizeView(stringResource(LR.string.in_progress), "")
-        DiskSpaceSizeView(stringResource(LR.string.played), "")
+        DiskSpaceSizeView(
+            diskSpaceView = state.unplayedDiskSpaceView,
+            onCheckedChange = onDiskSpaceCheckedChanged,
+        )
+        DiskSpaceSizeView(
+            diskSpaceView = state.inProgressDiskSpaceView,
+            onCheckedChange = onDiskSpaceCheckedChanged,
+        )
+        DiskSpaceSizeView(
+            diskSpaceView = state.playedDiskSpaceView,
+            onCheckedChange = onDiskSpaceCheckedChanged,
+        )
         TotalDownloadSizeRow(state.totalDownloadSize)
         IncludeStarredRow(onStarredSwitchClicked)
         RowButton(
@@ -149,6 +163,7 @@ private fun ManualCleanupPagePreview(
     AppTheme(themeType) {
         ManageDownloadsView(
             state = ManualCleanupViewModel.State(),
+            onDiskSpaceCheckedChanged = { _, _ -> },
             onStarredSwitchClicked = {},
             onDeleteButtonClicked = {},
         )

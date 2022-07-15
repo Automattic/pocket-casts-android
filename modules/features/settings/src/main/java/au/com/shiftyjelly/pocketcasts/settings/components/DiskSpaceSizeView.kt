@@ -1,12 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.settings.components
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Checkbox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -15,32 +21,52 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun DiskSpaceSizeView(
-    title: String,
-    subtitle: String,
-    modifier: Modifier = Modifier
+    diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView,
+    onCheckedChange: (Boolean, List<Episode>) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    var checkedState: Boolean by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(start = 16.dp)
     ) {
         TextH30(
-            text = title,
-            modifier = modifier.weight(1f)
+            text = stringResource(diskSpaceView.title),
+            modifier = modifier.weight(1f),
         )
         TextC70(
-            text = subtitle,
-            modifier = modifier.padding(start = 16.dp)
+            text = getFormattedSubtitle(diskSpaceView, context),
+            modifier = modifier.padding(start = 16.dp),
         )
         Checkbox(
-            checked = false,
-            onCheckedChange = {}
+            checked = checkedState,
+            onCheckedChange = {
+                onCheckedChange(it, diskSpaceView.episodes)
+                checkedState = it
+            },
         )
+    }
+}
+private fun getFormattedSubtitle(
+    diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView,
+    context: Context
+): String {
+    val byteString = Util.formattedBytes(bytes = diskSpaceView.episodesBytesSize, context = context)
+    return if (diskSpaceView.episodes.isEmpty()) {
+        ""
+    } else {
+        "${context.resources.getStringPluralEpisodes(diskSpaceView.episodesSize)} · $byteString"
     }
 }
 
@@ -48,6 +74,9 @@ fun DiskSpaceSizeView(
 @Composable
 private fun DiskSpaceSizeViewPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppTheme(themeType) {
-        DiskSpaceSizeView(stringResource(LR.string.unplayed), "1 episode - 10mb")
+        DiskSpaceSizeView(
+            diskSpaceView = ManualCleanupViewModel.State.DiskSpaceView(title = LR.string.unplayed),
+            onCheckedChange = { _, _ -> },
+        )
     }
 }

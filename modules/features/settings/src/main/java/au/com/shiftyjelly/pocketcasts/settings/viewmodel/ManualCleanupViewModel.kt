@@ -29,13 +29,14 @@ class ManualCleanupViewModel
     private val playbackManager: PlaybackManager,
 ) : ViewModel() {
     data class State(
-        val unplayedDiskSpaceView: DiskSpaceView = DiskSpaceView(),
-        val inProgressDiskSpaceView: DiskSpaceView = DiskSpaceView(),
-        val playedDiskSpaceView: DiskSpaceView = DiskSpaceView(),
+        val unplayedDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.unplayed),
+        val inProgressDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.in_progress),
+        val playedDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.played),
         val totalDownloadSize: Long = 0L,
         val deleteButton: DeleteButton = DeleteButton(),
     ) {
         data class DiskSpaceView(
+            @StringRes val title: Int,
             val episodes: List<Episode> = emptyList(),
         ) {
             val episodesBytesSize = episodes.sumOf { it.sizeInBytes }
@@ -89,9 +90,9 @@ class ManualCleanupViewModel
                     val downloadSize = downloadedAdjustedForStarred.sumOf { it.sizeInBytes }
                     episodesToDelete.clear()
                     _state.value = State(
-                        unplayedDiskSpaceView = State.DiskSpaceView(unplayedEpisodes),
-                        inProgressDiskSpaceView = State.DiskSpaceView(inProgressEpisodes),
-                        playedDiskSpaceView = State.DiskSpaceView(playedEpisodes),
+                        unplayedDiskSpaceView = _state.value.unplayedDiskSpaceView.copy(episodes = unplayedEpisodes),
+                        inProgressDiskSpaceView = _state.value.inProgressDiskSpaceView.copy(episodes = inProgressEpisodes),
+                        playedDiskSpaceView = _state.value.playedDiskSpaceView.copy(episodes = playedEpisodes),
                         totalDownloadSize = downloadSize,
                         deleteButton = deleteButton
                     )

@@ -7,12 +7,8 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
-import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentManualcleanupBinding
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
-import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,7 +28,6 @@ class ManualCleanupFragment : BaseFragment() {
         }
     }
 
-    private var binding: FragmentManualcleanupBinding? = null
     private val viewModel: ManualCleanupViewModel by viewModels()
     private val showToolbar: Boolean
         get() = arguments?.getBoolean(ARG_TOOLBAR) ?: false
@@ -42,8 +37,6 @@ class ManualCleanupFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        binding = FragmentManualcleanupBinding.inflate(inflater, container, false)
-//        return binding?.root
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme(theme.activeTheme) {
@@ -57,49 +50,11 @@ class ManualCleanupFragment : BaseFragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!showToolbar) {
             parentFragment?.view?.findToolbar()?.title =
                 getString(LR.string.settings_title_manage_downloads)
         }
-//        val fragmentBinding = this.binding ?: return
-//        with(fragmentBinding) {
-//            setupUi()
-//            setupObservers()
-//        }
-    }
-
-    private fun FragmentManualcleanupBinding.setupUi() {
-        unplayed.setup(LR.string.unplayed, "")
-        inProgress.setup(LR.string.in_progress, "")
-        played.setup(LR.string.played, "")
-    }
-
-    private fun FragmentManualcleanupBinding.setupObservers() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.state.collect {
-                it.unplayedDiskSpaceView.update(unplayed)
-                it.inProgressDiskSpaceView.update(inProgress)
-                it.playedDiskSpaceView.update(played)
-            }
-        }
-    }
-
-    private fun ManualCleanupViewModel.State.DiskSpaceView.update(
-        view: DiskSpaceSizeView
-    ) {
-        val context = context ?: return
-        val byteString = Util.formattedBytes(bytes = episodesBytesSize, context = context)
-        val subtitle = "${resources.getStringPluralEpisodes(episodesSize)} · $byteString"
-        view.update(subtitle)
-        viewModel.updateDeleteList(view.isChecked, episodes)
-        view.onCheckedChanged =
-            { isChecked -> viewModel.onDiskSpaceCheckedChanged(isChecked, episodes) }
     }
 }
