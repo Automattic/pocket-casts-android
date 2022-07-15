@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveDataReactiveStreams
@@ -19,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentManualcleanupBinding
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
@@ -86,7 +86,7 @@ class ManualCleanupFragment : BaseFragment(), CoroutineScope {
             toolbar.setup(title = getString(LR.string.settings_title_manage_downloads), navigationIcon = BackArrow, activity = activity, theme = theme)
         } else {
             toolbar.isVisible = false
-            (activity as AppCompatActivity).supportActionBar?.title = getString(LR.string.settings_title_manage_downloads)
+            parentFragment?.view?.findToolbar()?.title = getString(LR.string.settings_title_manage_downloads)
         }
 
         val downloadedEpisodes = LiveDataReactiveStreams.fromPublisher(
