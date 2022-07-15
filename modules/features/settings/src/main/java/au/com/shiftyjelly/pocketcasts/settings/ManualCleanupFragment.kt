@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -19,9 +18,7 @@ import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
-import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,7 +52,9 @@ class ManualCleanupFragment : BaseFragment() {
             setContent {
                 AppTheme(theme.activeTheme) {
                     ManualCleanupPage(
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        showToolbar = showToolbar,
+                        onBackClick = { activity?.onBackPressed() },
                     )
                 }
             }
@@ -69,6 +68,10 @@ class ManualCleanupFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (!showToolbar) {
+            parentFragment?.view?.findToolbar()?.title =
+                getString(LR.string.settings_title_manage_downloads)
+        }
 //        val fragmentBinding = this.binding ?: return
 //        with(fragmentBinding) {
 //            setupUi()
@@ -77,7 +80,6 @@ class ManualCleanupFragment : BaseFragment() {
     }
 
     private fun FragmentManualcleanupBinding.setupUi() {
-        setupToolbar()
         unplayed.setup(LR.string.unplayed, "")
         inProgress.setup(LR.string.in_progress, "")
         played.setup(LR.string.played, "")
@@ -103,21 +105,6 @@ class ManualCleanupFragment : BaseFragment() {
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.snackbarMessage.collect { showSnackbar(it) }
-        }
-    }
-
-    private fun FragmentManualcleanupBinding.setupToolbar() {
-        if (showToolbar) {
-            toolbar.setup(
-                title = getString(LR.string.settings_title_manage_downloads),
-                navigationIcon = BackArrow,
-                activity = activity,
-                theme = theme
-            )
-        } else {
-            toolbar.isVisible = false
-            parentFragment?.view?.findToolbar()?.title =
-                getString(LR.string.settings_title_manage_downloads)
         }
     }
 

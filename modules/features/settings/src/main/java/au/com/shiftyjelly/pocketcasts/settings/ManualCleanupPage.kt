@@ -15,6 +15,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -27,9 +29,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ManualCleanupPage(
     viewModel: ManualCleanupViewModel,
+    showToolbar: Boolean,
+    onBackClick: () -> Unit,
 ) {
     val state: ManualCleanupViewModel.State by viewModel.state.collectAsState()
-    ManageDownloadsView(state)
+    Column {
+        if (showToolbar) {
+            ThemedTopAppBar(
+                title = stringResource(id = LR.string.settings_title_manage_downloads),
+                navigationButton = NavigationButton.Back,
+                onNavigationClick = { onBackClick() },
+            )
+        }
+        ManageDownloadsView(state)
+    }
 }
 
 @Composable
