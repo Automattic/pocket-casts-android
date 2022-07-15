@@ -52,6 +52,8 @@
         ([#83](https://github.com/Automattic/pocket-casts-android/pull/83)).
     *   Fix back navigation for full screen player 'Rearrange Actions' page
         ([#76](https://github.com/Automattic/pocket-casts-android/pull/76)).
+    *   Fix showing paused downloads as in progress
+        ([#113](https://github.com/Automattic/pocket-casts-android/pull/113)).
 
 ### 7.19.2 (2022-02-11)
 
