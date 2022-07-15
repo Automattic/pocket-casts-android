@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Surface
 import androidx.compose.material.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,33 +80,36 @@ private fun ManageDownloadsView(
     onDiskSpaceCheckedChanged: (Boolean, List<Episode>) -> Unit,
     onStarredSwitchClicked: (Boolean) -> Unit,
     onDeleteButtonClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val deleteButtonContentColor =
         Color(LocalContext.current.getThemeColor(state.deleteButton.contentColor))
-    Column {
-        DiskSpaceSizeView(
-            diskSpaceView = state.unplayedDiskSpaceView,
-            onCheckedChange = onDiskSpaceCheckedChanged,
-        )
-        DiskSpaceSizeView(
-            diskSpaceView = state.inProgressDiskSpaceView,
-            onCheckedChange = onDiskSpaceCheckedChanged,
-        )
-        DiskSpaceSizeView(
-            diskSpaceView = state.playedDiskSpaceView,
-            onCheckedChange = onDiskSpaceCheckedChanged,
-        )
-        TotalDownloadSizeRow(state.totalDownloadSize)
-        IncludeStarredRow(onStarredSwitchClicked)
-        RowButton(
-            text = state.deleteButton.title,
-            enabled = state.deleteButton.isEnabled,
-            colors = ButtonDefaults.buttonColors(
-                contentColor = deleteButtonContentColor,
-                disabledContentColor = deleteButtonContentColor.copy(alpha = ContentAlpha.disabled),
-            ),
-            onClick = { onDeleteButtonClicked() },
-        )
+    Surface(modifier = modifier.verticalScroll(rememberScrollState())) {
+        Column {
+            DiskSpaceSizeView(
+                diskSpaceView = state.unplayedDiskSpaceView,
+                onCheckedChange = onDiskSpaceCheckedChanged,
+            )
+            DiskSpaceSizeView(
+                diskSpaceView = state.inProgressDiskSpaceView,
+                onCheckedChange = onDiskSpaceCheckedChanged,
+            )
+            DiskSpaceSizeView(
+                diskSpaceView = state.playedDiskSpaceView,
+                onCheckedChange = onDiskSpaceCheckedChanged,
+            )
+            TotalDownloadSizeRow(state.totalDownloadSize)
+            IncludeStarredRow(onStarredSwitchClicked)
+            RowButton(
+                text = state.deleteButton.title,
+                enabled = state.deleteButton.isEnabled,
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = deleteButtonContentColor,
+                    disabledContentColor = deleteButtonContentColor.copy(alpha = ContentAlpha.disabled),
+                ),
+                onClick = { onDeleteButtonClicked() },
+            )
+        }
     }
 }
 
@@ -157,8 +163,21 @@ private fun IncludeStarredRow(
 
 @Preview(showBackground = true)
 @Composable
-private fun ManualCleanupPagePreview(
+private fun ManualCleanupPageNormalPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    ManualCleanupPagePreview(themeType)
+}
+
+@Preview(name = "Small", showBackground = true, heightDp = 150)
+@Composable
+private fun ManualCleanupPageSmallPreview() {
+    ManualCleanupPagePreview()
+}
+
+@Composable
+private fun ManualCleanupPagePreview(
+    themeType: Theme.ThemeType = Theme.ThemeType.LIGHT
 ) {
     AppTheme(themeType) {
         ManageDownloadsView(
