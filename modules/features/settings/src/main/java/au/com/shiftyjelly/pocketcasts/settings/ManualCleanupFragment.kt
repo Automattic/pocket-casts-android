@@ -90,10 +90,6 @@ class ManualCleanupFragment : BaseFragment() {
                 it.unplayedDiskSpaceView.update(unplayed)
                 it.inProgressDiskSpaceView.update(inProgress)
                 it.playedDiskSpaceView.update(played)
-                lblTotal.text = Util.formattedBytes(
-                    bytes = it.totalDownloadSize,
-                    context = lblTotal.context
-                )
             }
         }
     }

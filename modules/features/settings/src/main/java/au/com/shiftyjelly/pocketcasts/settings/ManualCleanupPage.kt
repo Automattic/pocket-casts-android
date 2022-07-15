@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.settings.components.DiskSpaceSizeView
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -73,7 +74,7 @@ private fun ManageDownloadsView(
         DiskSpaceSizeView(stringResource(LR.string.unplayed), "")
         DiskSpaceSizeView(stringResource(LR.string.in_progress), "")
         DiskSpaceSizeView(stringResource(LR.string.played), "")
-        TotalDownloadSizeRow("100mb")
+        TotalDownloadSizeRow(state.totalDownloadSize)
         IncludeStarredRow()
         RowButton(
             text = stringResource(id = state.deleteButton.title),
@@ -89,7 +90,7 @@ private fun ManageDownloadsView(
 
 @Composable
 private fun TotalDownloadSizeRow(
-    totalSize: String,
+    totalDownloadSize: Long,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -101,7 +102,12 @@ private fun TotalDownloadSizeRow(
             text = stringResource(LR.string.settings_manage_downloads_total),
             modifier = modifier.weight(1f)
         )
-        TextC70(text = totalSize)
+        TextC70(
+            text = Util.formattedBytes(
+                bytes = totalDownloadSize,
+                context = LocalContext.current,
+            )
+        )
     }
 }
 
