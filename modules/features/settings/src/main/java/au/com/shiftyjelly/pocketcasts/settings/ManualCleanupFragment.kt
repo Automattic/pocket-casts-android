@@ -77,9 +77,9 @@ class ManualCleanupFragment : BaseFragment(), CoroutineScope {
 
         val binding = binding ?: return
 
-        binding.unplayed.setup(LR.string.unplayed, 0, "")
-        binding.inProgress.setup(LR.string.in_progress, 0, "")
-        binding.played.setup(LR.string.played, 0, "")
+        binding.unplayed.setup(LR.string.unplayed, "")
+        binding.inProgress.setup(LR.string.in_progress, "")
+        binding.played.setup(LR.string.played, "")
 
         val toolbar = binding.toolbar
         if (showToolbar) {
@@ -109,9 +109,9 @@ class ManualCleanupFragment : BaseFragment(), CoroutineScope {
 
                 episodesToDelete.clear()
 
-                updateDiskSpaceView(unplayedEpisodes, downloadSize, fragmentBinding.unplayed)
-                updateDiskSpaceView(inProgressEpisodes, downloadSize, fragmentBinding.inProgress)
-                updateDiskSpaceView(playedEpisodes, downloadSize, fragmentBinding.played)
+                updateDiskSpaceView(unplayedEpisodes, fragmentBinding.unplayed)
+                updateDiskSpaceView(inProgressEpisodes, fragmentBinding.inProgress)
+                updateDiskSpaceView(playedEpisodes, fragmentBinding.played)
 
                 fragmentBinding.lblTotal.text = Util.formattedBytes(bytes = downloadSize, context = context)
 
@@ -130,13 +130,12 @@ class ManualCleanupFragment : BaseFragment(), CoroutineScope {
         binding.switchStarred.setOnCheckedChangeListener { _, isChecked -> switchState.accept(isChecked) }
     }
 
-    private fun updateDiskSpaceView(episodes: List<Episode>, totalSize: Long, view: DiskSpaceSizeView) {
+    private fun updateDiskSpaceView(episodes: List<Episode>, view: DiskSpaceSizeView) {
         val context = context ?: return
         val size = episodes.map { it.sizeInBytes }.sum()
-        val percentage = size.toDouble() / totalSize.toDouble() * 100.0
         val byteString = Util.formattedBytes(bytes = size, context = context)
         val subtitle = "${resources.getStringPluralEpisodes(episodes.size)} · $byteString"
-        view.update(percentage.toInt(), subtitle)
+        view.update(subtitle)
         updateDeleteList(view.isChecked, episodes)
         view.onCheckedChanged = { isChecked ->
             updateDeleteList(isChecked, episodes)

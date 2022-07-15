@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.CheckBox
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -22,14 +21,12 @@ class DiskSpaceSizeView @JvmOverloads constructor(
     private val checkbox: CheckBox
     private val lblTitle: TextView
     private val lblSubtitle: TextView
-    private val bar: ProgressBar
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_diskspace, this, true)
         checkbox = findViewById(R.id.checkbox)
         lblTitle = findViewById(R.id.lblTitle)
         lblSubtitle = findViewById(R.id.lblSubtitle)
-        bar = findViewById(R.id.bar)
         setOnClickListener {
             checkbox.isChecked = !checkbox.isChecked
         }
@@ -38,15 +35,13 @@ class DiskSpaceSizeView @JvmOverloads constructor(
         setRippleBackground()
     }
 
-    fun setup(@StringRes title: Int, percentage: Int, subtitle: String) {
+    fun setup(@StringRes title: Int, subtitle: String) {
         lblTitle.setText(title)
         lblSubtitle.text = subtitle
-        bar.progress = percentage
         checkbox.isChecked = false
     }
 
-    fun update(percentage: Int, subtitle: String) {
+    fun update(subtitle: String) {
         lblSubtitle.text = subtitle
-        bar.progress = percentage
     }
 }
