@@ -6,40 +6,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.lifecycle.LiveDataReactiveStreams
-import androidx.lifecycle.Observer
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentManualcleanupBinding
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
-import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.BackpressureStrategy
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.combineLatest
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val ARG_TOOLBAR = "showtoolbar"
 
 @AndroidEntryPoint
-class ManualCleanupFragment : BaseFragment(), CoroutineScope {
+class ManualCleanupFragment : BaseFragment() {
     companion object {
         fun newInstance(showToolbar: Boolean = false): ManualCleanupFragment {
             val fragment = ManualCleanupFragment()
@@ -50,19 +37,16 @@ class ManualCleanupFragment : BaseFragment(), CoroutineScope {
         }
     }
 
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
-
-    @Inject lateinit var episodeManager: EpisodeManager
-    @Inject lateinit var playbackManager: PlaybackManager
-
     private var binding: FragmentManualcleanupBinding? = null
-    private val switchState: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
-    private val episodesToDelete: MutableList<Episode> = mutableListOf()
+    private val viewModel: ManualCleanupViewModel by viewModels()
     private val showToolbar: Boolean
         get() = arguments?.getBoolean(ARG_TOOLBAR) ?: false
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         binding = FragmentManualcleanupBinding.inflate(inflater, container, false)
         return binding?.root
     }
@@ -74,94 +58,80 @@ class ManualCleanupFragment : BaseFragment(), CoroutineScope {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val fragmentBinding = this.binding ?: return
+        with(fragmentBinding) {
+            setupUi()
+            setupObservers()
+        }
+    }
 
-        val binding = binding ?: return
+    private fun FragmentManualcleanupBinding.setupUi() {
+        setupToolbar()
+        unplayed.setup(LR.string.unplayed, "")
+        inProgress.setup(LR.string.in_progress, "")
+        played.setup(LR.string.played, "")
+        btnDelete.setOnClickListener { viewModel.onDeleteButtonClicked() }
+        switchStarred.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.onStarredSwitchClicked(isChecked)
+        }
+    }
 
-        binding.unplayed.setup(LR.string.unplayed, "")
-        binding.inProgress.setup(LR.string.in_progress, "")
-        binding.played.setup(LR.string.played, "")
+    private fun FragmentManualcleanupBinding.setupObservers() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.state.collect {
+                it.unplayedDiskSpaceView.update(unplayed)
+                it.inProgressDiskSpaceView.update(inProgress)
+                it.playedDiskSpaceView.update(played)
+                updateButton(it.deleteButton)
+                lblTotal.text = Util.formattedBytes(
+                    bytes = it.totalDownloadSize,
+                    context = lblTotal.context
+                )
+            }
+        }
 
-        val toolbar = binding.toolbar
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.snackbarMessage.collect { showSnackbar(it) }
+        }
+    }
+
+    private fun FragmentManualcleanupBinding.setupToolbar() {
         if (showToolbar) {
-            toolbar.setup(title = getString(LR.string.settings_title_manage_downloads), navigationIcon = BackArrow, activity = activity, theme = theme)
+            toolbar.setup(
+                title = getString(LR.string.settings_title_manage_downloads),
+                navigationIcon = BackArrow,
+                activity = activity,
+                theme = theme
+            )
         } else {
             toolbar.isVisible = false
-            parentFragment?.view?.findToolbar()?.title = getString(LR.string.settings_title_manage_downloads)
+            parentFragment?.view?.findToolbar()?.title =
+                getString(LR.string.settings_title_manage_downloads)
         }
-
-        val downloadedEpisodes = LiveDataReactiveStreams.fromPublisher(
-            episodeManager.observeDownloadedEpisodes()
-                .combineLatest(switchState.toFlowable(BackpressureStrategy.LATEST))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-        )
-        downloadedEpisodes.observe(
-            viewLifecycleOwner,
-            Observer { (downloadedEpisodes, _) ->
-                val fragmentBinding = this.binding ?: return@Observer
-                val context = this.context ?: return@Observer
-                val downloadedAdjustedForStarred = downloadedEpisodes.filter { !it.isStarred || fragmentBinding.switchStarred.isChecked }
-                val unplayedEpisodes = downloadedAdjustedForStarred.filter { it.playingStatus == EpisodePlayingStatus.NOT_PLAYED }
-                val inProgressEpisodes = downloadedAdjustedForStarred.filter { it.playingStatus == EpisodePlayingStatus.IN_PROGRESS }
-                val playedEpisodes = downloadedAdjustedForStarred.filter { it.playingStatus == EpisodePlayingStatus.COMPLETED }
-
-                val downloadSize = downloadedAdjustedForStarred.map { it.sizeInBytes }.sum()
-
-                episodesToDelete.clear()
-
-                updateDiskSpaceView(unplayedEpisodes, fragmentBinding.unplayed)
-                updateDiskSpaceView(inProgressEpisodes, fragmentBinding.inProgress)
-                updateDiskSpaceView(playedEpisodes, fragmentBinding.played)
-
-                fragmentBinding.lblTotal.text = Util.formattedBytes(bytes = downloadSize, context = context)
-
-                updateButton()
-            }
-        )
-        updateButton()
-
-        binding.btnDelete.setOnClickListener {
-            if (episodesToDelete.isNotEmpty()) {
-                launch { episodeManager.deleteEpisodeFiles(episodesToDelete, playbackManager) }
-                Toast.makeText(binding.btnDelete.context, LR.string.settings_manage_downloads_deleting, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        binding.switchStarred.setOnCheckedChangeListener { _, isChecked -> switchState.accept(isChecked) }
     }
 
-    private fun updateDiskSpaceView(episodes: List<Episode>, view: DiskSpaceSizeView) {
+    private fun ManualCleanupViewModel.State.DiskSpaceView.update(
+        view: DiskSpaceSizeView
+    ) {
         val context = context ?: return
-        val size = episodes.map { it.sizeInBytes }.sum()
-        val byteString = Util.formattedBytes(bytes = size, context = context)
-        val subtitle = "${resources.getStringPluralEpisodes(episodes.size)} · $byteString"
+        val byteString = Util.formattedBytes(bytes = episodesBytesSize, context = context)
+        val subtitle = "${resources.getStringPluralEpisodes(episodesSize)} · $byteString"
         view.update(subtitle)
-        updateDeleteList(view.isChecked, episodes)
-        view.onCheckedChanged = { isChecked ->
-            updateDeleteList(isChecked, episodes)
-            updateButton()
+        viewModel.updateDeleteList(view.isChecked, episodes)
+        view.onCheckedChanged =
+            { isChecked -> viewModel.onDiskSpaceCheckedChanged(isChecked, episodes) }
+    }
+
+    private fun FragmentManualcleanupBinding.updateButton(deleteButton: ManualCleanupViewModel.State.DeleteButton) {
+        with(btnDelete) {
+            setText(deleteButton.title)
+            isEnabled = deleteButton.isEnabled
+            backgroundTintList =
+                ColorStateList.valueOf(context.getThemeColor(deleteButton.contentColor))
         }
     }
 
-    private fun updateDeleteList(isChecked: Boolean, episodes: List<Episode>) {
-        if (isChecked) {
-            episodesToDelete.addAll(episodes)
-        } else {
-            episodesToDelete.removeAll(episodes)
-        }
-    }
-
-    private fun updateButton() {
-        val binding = binding ?: return
-        val btnDelete = binding.btnDelete
-        if (episodesToDelete.isEmpty()) {
-            btnDelete.setText(LR.string.settings_select_episodes_to_delete)
-            btnDelete.isEnabled = false
-            btnDelete.backgroundTintList = ColorStateList.valueOf(btnDelete.context.getThemeColor(UR.attr.primary_interactive_01_disabled))
-        } else {
-            btnDelete.text = getString(LR.string.settings_delete_episodes, episodesToDelete.size)
-            btnDelete.isEnabled = true
-            btnDelete.backgroundTintList = ColorStateList.valueOf(btnDelete.context.getThemeColor(UR.attr.primary_interactive_01))
-        }
+    private fun FragmentManualcleanupBinding.showSnackbar(@StringRes stringResId: Int) {
+        Toast.makeText(btnDelete.context, stringResId, Toast.LENGTH_SHORT).show()
     }
 }
