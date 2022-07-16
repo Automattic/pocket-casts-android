@@ -267,7 +267,7 @@ internal class DiscoverAdapter(
                         loadPodcastList(row.source),
                         onNext = {
                             holder.adapter.fromListId = row.listUuid
-                            holder.adapter.submitList(it.podcasts)
+                            holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
                         }
                     )
                     row.listUuid?.let { AnalyticsHelper.listImpression(it) }
@@ -294,7 +294,7 @@ internal class DiscoverAdapter(
                         loadingFlowable,
                         onNext = {
                             holder.adapter.pillText = row.title.tryToLocalise(resources)
-                            holder.adapter.submitList(it)
+                            holder.adapter.submitList(it) { onRestoreInstanceState(holder) }
                             holder.binding.pageIndicatorView.count = it.count()
                         }
                     )
@@ -309,7 +309,7 @@ internal class DiscoverAdapter(
                             val podcasts = it.podcasts.subList(0, Math.min(MAX_ROWS_SMALL_LIST, it.podcasts.count()))
                             holder.binding.pageIndicatorView.count = Math.ceil(podcasts.count().toDouble() / SmallListRowAdapter.SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE.toDouble()).toInt()
                             holder.adapter.fromListId = row.listUuid
-                            holder.adapter.submitPodcastList(podcasts)
+                            holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
                         }
                     )
                     row.listUuid?.let { AnalyticsHelper.listImpression(it) }
@@ -321,7 +321,7 @@ internal class DiscoverAdapter(
                     holder.loadSingle(
                         service.getCategoriesList(row.source),
                         onSuccess = {
-                            adapter.submitList(it)
+                            adapter.submitList(it) { onRestoreInstanceState(holder) }
                         }
                     )
                 }
@@ -364,6 +364,7 @@ internal class DiscoverAdapter(
 
                             val textSize = if ((podcastTitle ?: "").length < 15) 18f else 15f
                             holder.binding.lblTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
+                            onRestoreInstanceState(holder)
                         }
                     )
                 }
@@ -423,6 +424,7 @@ internal class DiscoverAdapter(
                                 }
                                 listener.onEpisodeClicked(episode = episode, listUuid = row.listUuid)
                             }
+                            onRestoreInstanceState(holder)
                             row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
                         }
                     )
@@ -469,6 +471,8 @@ internal class DiscoverAdapter(
 
                             holder.binding.lblSubtitle.text = it.subtitle?.tryToLocalise(resources)?.uppercase(Locale.getDefault())
 
+                            onRestoreInstanceState(holder)
+
                             row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
                         }
                     )
@@ -477,12 +481,6 @@ internal class DiscoverAdapter(
 
             if (holder is ShowAllRow) {
                 holder.showAllButton.setOnClickListener { listener.onPodcastListClicked(row) }
-            }
-
-            if (holder is NetworkLoadableViewHolder) {
-                savedState[holder.itemId]?.let {
-                    holder.recyclerView?.layoutManager?.onRestoreInstanceState(it)
-                }
             }
         } else if (row is ChangeRegionRow) {
             val changeRegionRowViewHolder = holder as ChangeRegionViewHolder
@@ -498,6 +496,12 @@ internal class DiscoverAdapter(
     }
 
     private val savedState: MutableMap<Long, Parcelable?> = mutableMapOf()
+
+    private fun onRestoreInstanceState(holder: NetworkLoadableViewHolder) {
+        savedState[holder.itemId]?.let {
+            holder.recyclerView?.layoutManager?.onRestoreInstanceState(it)
+        }
+    }
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
         when (holder) {

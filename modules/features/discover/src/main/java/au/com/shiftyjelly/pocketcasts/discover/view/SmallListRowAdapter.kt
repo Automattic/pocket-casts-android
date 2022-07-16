@@ -40,8 +40,8 @@ internal class SmallListRowAdapter(val onPodcastClicked: ((DiscoverPodcast, Stri
 
     var fromListId: String? = null
 
-    fun submitPodcastList(list: List<DiscoverPodcast>) {
-        submitList(list.chunked(SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE))
+    fun submitPodcastList(list: List<DiscoverPodcast>, commitCallback: Runnable?) {
+        submitList(list.chunked(SmallListViewHolder.NUMBER_OF_ROWS_PER_PAGE), commitCallback)
     }
 
     fun showLoadingList() {
