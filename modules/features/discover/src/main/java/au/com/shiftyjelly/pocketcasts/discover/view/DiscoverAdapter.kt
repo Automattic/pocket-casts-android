@@ -121,6 +121,16 @@ internal class DiscoverAdapter(
         fun cancelLoading() {
             loadingDisposable?.dispose()
         }
+
+        open fun onRestoreInstanceState(state: Parcelable?) {
+            if (state != null) {
+                recyclerView?.layoutManager?.onRestoreInstanceState(state)
+            }
+        }
+
+        fun onSaveInstanceState(): Parcelable? {
+            return recyclerView?.layoutManager?.onSaveInstanceState()
+        }
     }
 
     interface ShowAllRow {
@@ -183,6 +193,13 @@ internal class DiscoverAdapter(
             recyclerView?.adapter = adapter
 
             adapter.showLoadingList()
+        }
+
+        override fun onRestoreInstanceState(state: Parcelable?) {
+            super.onRestoreInstanceState(state)
+            recyclerView?.post {
+                binding.pageIndicatorView.position = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+            }
         }
     }
 
@@ -498,16 +515,14 @@ internal class DiscoverAdapter(
     private val savedState: MutableMap<Long, Parcelable?> = mutableMapOf()
 
     private fun onRestoreInstanceState(holder: NetworkLoadableViewHolder) {
-        savedState[holder.itemId]?.let {
-            holder.recyclerView?.layoutManager?.onRestoreInstanceState(it)
-        }
+        holder.onRestoreInstanceState(savedState[holder.itemId])
     }
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
         when (holder) {
             is NetworkLoadableViewHolder -> {
                 holder.cancelLoading()
-                savedState[holder.itemId] = holder.recyclerView?.layoutManager?.onSaveInstanceState()
+                savedState[holder.itemId] = holder.onSaveInstanceState()
             }
         }
     }
