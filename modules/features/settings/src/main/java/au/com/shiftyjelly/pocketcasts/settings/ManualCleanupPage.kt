@@ -48,6 +48,7 @@ fun ManualCleanupPage(
     onBackClick: () -> Unit,
 ) {
     val state: ManualCleanupViewModel.State by viewModel.state.collectAsState()
+    var includeStarredSwitchState: Boolean by remember { mutableStateOf(false) }
     val context = LocalContext.current
     Column {
         if (showToolbar) {
@@ -59,10 +60,14 @@ fun ManualCleanupPage(
         }
         ManageDownloadsView(
             state = state,
+            includeStarredSwitchState = includeStarredSwitchState,
             onDiskSpaceCheckedChanged = { isChecked, episodes ->
                 viewModel.onDiskSpaceCheckedChanged(isChecked, episodes)
             },
-            onStarredSwitchClicked = { viewModel.onStarredSwitchClicked(it) },
+            onStarredSwitchClicked = {
+                viewModel.onStarredSwitchClicked(it)
+                includeStarredSwitchState = it
+            },
             onDeleteButtonClicked = { viewModel.onDeleteButtonClicked() },
         )
         LaunchedEffect(Unit) {
@@ -77,6 +82,7 @@ fun ManualCleanupPage(
 @Composable
 private fun ManageDownloadsView(
     state: ManualCleanupViewModel.State,
+    includeStarredSwitchState: Boolean,
     onDiskSpaceCheckedChanged: (Boolean, List<Episode>) -> Unit,
     onStarredSwitchClicked: (Boolean) -> Unit,
     onDeleteButtonClicked: () -> Unit,
@@ -99,7 +105,7 @@ private fun ManageDownloadsView(
                 onCheckedChange = onDiskSpaceCheckedChanged,
             )
             TotalDownloadSizeRow(state.totalDownloadSize)
-            IncludeStarredRow(onStarredSwitchClicked)
+            IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
             RowButton(
                 text = state.deleteButton.title,
                 enabled = state.deleteButton.isEnabled,
@@ -138,10 +144,10 @@ private fun TotalDownloadSizeRow(
 
 @Composable
 private fun IncludeStarredRow(
+    checkedState: Boolean,
     onStarredSwitchClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var checkedState: Boolean by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -153,10 +159,7 @@ private fun IncludeStarredRow(
         )
         Switch(
             checked = checkedState,
-            onCheckedChange = {
-                onStarredSwitchClicked(it)
-                checkedState = it
-            },
+            onCheckedChange = onStarredSwitchClicked,
         )
     }
 }
@@ -186,6 +189,7 @@ private fun ManualCleanupPagePreview(
                     title = stringResource(id = LR.string.settings_select_episodes_to_delete)
                 )
             ),
+            includeStarredSwitchState = false,
             onDiskSpaceCheckedChanged = { _, _ -> },
             onStarredSwitchClicked = {},
             onDeleteButtonClicked = {},
