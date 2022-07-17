@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -40,6 +41,7 @@ class ManualCleanupFragment : BaseFragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme(theme.activeTheme) {
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     ManualCleanupPage(
                         viewModel = viewModel,
                         showToolbar = showToolbar,
