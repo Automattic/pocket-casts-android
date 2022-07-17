@@ -157,9 +157,12 @@ internal class DiscoverAdapter(
     inner class CarouselListViewHolder(var binding: RowCarouselListBinding) : NetworkLoadableViewHolder(binding.root) {
         val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe)
 
+        private val linearLayoutManager =
+            LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
+                initialPrefetchItemCount = 1
+            }
+
         init {
-            val linearLayoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
-            linearLayoutManager.initialPrefetchItemCount = 1
             recyclerView?.layoutManager = linearLayoutManager
             recyclerView?.itemAnimator = null
             val snapHelper = HorizontalPeekSnapHelper(0)
@@ -170,6 +173,13 @@ internal class DiscoverAdapter(
 
             recyclerView?.adapter = adapter
             adapter.submitList(listOf(LoadingItem()))
+        }
+
+        override fun onRestoreInstanceState(state: Parcelable?) {
+            super.onRestoreInstanceState(state)
+            recyclerView?.post {
+                binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
+            }
         }
     }
 
