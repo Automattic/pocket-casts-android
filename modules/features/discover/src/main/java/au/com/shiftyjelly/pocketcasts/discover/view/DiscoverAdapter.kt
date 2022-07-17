@@ -179,9 +179,12 @@ internal class DiscoverAdapter(
         override val showAllButton: TextView
             get() = binding.btnShowAll
 
+        private val linearLayoutManager =
+            LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
+                initialPrefetchItemCount = 2
+            }
+
         init {
-            val linearLayoutManager = LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false)
-            linearLayoutManager.initialPrefetchItemCount = 2
             recyclerView?.layoutManager = linearLayoutManager
             recyclerView?.itemAnimator = null
             val snapHelper = HorizontalPeekSnapHelper(0.dpToPx(itemView.context))
@@ -198,7 +201,7 @@ internal class DiscoverAdapter(
         override fun onRestoreInstanceState(state: Parcelable?) {
             super.onRestoreInstanceState(state)
             recyclerView?.post {
-                binding.pageIndicatorView.position = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
             }
         }
     }
