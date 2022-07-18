@@ -6,10 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Checkbox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -31,11 +26,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun DiskSpaceSizeView(
     diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView,
-    onCheckedChange: (Boolean, List<Episode>) -> Unit,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    var checkedState: Boolean by remember { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -50,11 +44,8 @@ fun DiskSpaceSizeView(
             modifier = modifier.padding(start = 16.dp),
         )
         Checkbox(
-            checked = checkedState,
-            onCheckedChange = {
-                onCheckedChange(it, diskSpaceView.episodes)
-                checkedState = it
-            },
+            checked = diskSpaceView.isChecked,
+            onCheckedChange = { onCheckedChange(it) },
         )
     }
 }
@@ -76,7 +67,7 @@ private fun DiskSpaceSizeViewPreview(@PreviewParameter(ThemePreviewParameterProv
     AppTheme(themeType) {
         DiskSpaceSizeView(
             diskSpaceView = ManualCleanupViewModel.State.DiskSpaceView(title = LR.string.unplayed),
-            onCheckedChange = { _, _ -> },
+            onCheckedChange = { _ -> },
         )
     }
 }

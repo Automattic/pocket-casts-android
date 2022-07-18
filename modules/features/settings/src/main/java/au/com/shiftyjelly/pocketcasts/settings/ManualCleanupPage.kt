@@ -33,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.settings.components.DiskSpaceSizeView
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -55,14 +54,14 @@ fun ManualCleanupPage(
             ThemedTopAppBar(
                 title = stringResource(id = LR.string.settings_title_manage_downloads),
                 navigationButton = NavigationButton.Back,
-                onNavigationClick = { onBackClick() },
+                onNavigationClick = onBackClick,
             )
         }
         ManageDownloadsView(
             state = state,
             includeStarredSwitchState = includeStarredSwitchState,
-            onDiskSpaceCheckedChanged = { isChecked, episodes ->
-                viewModel.onDiskSpaceCheckedChanged(isChecked, episodes)
+            onDiskSpaceCheckedChanged = { isChecked, diskSpaceView ->
+                viewModel.onDiskSpaceCheckedChanged(isChecked, diskSpaceView)
             },
             onStarredSwitchClicked = {
                 viewModel.onStarredSwitchClicked(it)
@@ -83,27 +82,21 @@ fun ManualCleanupPage(
 private fun ManageDownloadsView(
     state: ManualCleanupViewModel.State,
     includeStarredSwitchState: Boolean,
-    onDiskSpaceCheckedChanged: (Boolean, List<Episode>) -> Unit,
+    onDiskSpaceCheckedChanged: (Boolean, diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView) -> Unit,
     onStarredSwitchClicked: (Boolean) -> Unit,
     onDeleteButtonClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val deleteButtonContentColor =
         Color(LocalContext.current.getThemeColor(state.deleteButton.contentColor))
     Surface(modifier = modifier.verticalScroll(rememberScrollState())) {
         Column {
-            DiskSpaceSizeView(
-                diskSpaceView = state.unplayedDiskSpaceView,
-                onCheckedChange = onDiskSpaceCheckedChanged,
-            )
-            DiskSpaceSizeView(
-                diskSpaceView = state.inProgressDiskSpaceView,
-                onCheckedChange = onDiskSpaceCheckedChanged,
-            )
-            DiskSpaceSizeView(
-                diskSpaceView = state.playedDiskSpaceView,
-                onCheckedChange = onDiskSpaceCheckedChanged,
-            )
+            state.diskSpaceViews.forEach { diskSpaceSizeView ->
+                DiskSpaceSizeView(
+                    diskSpaceView = diskSpaceSizeView,
+                    onCheckedChange = { onDiskSpaceCheckedChanged(it, diskSpaceSizeView) },
+                )
+            }
             TotalDownloadSizeRow(state.totalDownloadSize)
             IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
             RowButton(
@@ -113,7 +106,7 @@ private fun ManageDownloadsView(
                     contentColor = deleteButtonContentColor,
                     disabledContentColor = deleteButtonContentColor.copy(alpha = ContentAlpha.disabled),
                 ),
-                onClick = { onDeleteButtonClicked() },
+                onClick = onDeleteButtonClicked,
             )
         }
     }

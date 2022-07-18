@@ -32,14 +32,17 @@ class ManualCleanupViewModel
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     data class State(
-        val unplayedDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.unplayed),
-        val inProgressDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.in_progress),
-        val playedDiskSpaceView: DiskSpaceView = DiskSpaceView(title = LR.string.played),
+        val diskSpaceViews: List<DiskSpaceView> = listOf(
+            DiskSpaceView(title = LR.string.unplayed),
+            DiskSpaceView(title = LR.string.in_progress),
+            DiskSpaceView(title = LR.string.played)
+        ),
         val totalDownloadSize: Long = 0L,
         val deleteButton: DeleteButton,
     ) {
         data class DiskSpaceView(
             @StringRes val title: Int,
+            val isChecked: Boolean = false,
             val episodes: List<Episode> = emptyList(),
         ) {
             val episodesBytesSize = episodes.sumOf { it.sizeInBytes }
@@ -94,18 +97,12 @@ class ManualCleanupViewModel
                     val (downloadedEpisodes, isStarredSwitchChecked) = result
                     val downloadedAdjustedForStarred =
                         downloadedEpisodes.filter { !it.isStarred || isStarredSwitchChecked }
-                    val unplayedEpisodes =
-                        downloadedAdjustedForStarred.filter { it.playingStatus == EpisodePlayingStatus.NOT_PLAYED }
-                    val inProgressEpisodes =
-                        downloadedAdjustedForStarred.filter { it.playingStatus == EpisodePlayingStatus.IN_PROGRESS }
-                    val playedEpisodes =
-                        downloadedAdjustedForStarred.filter { it.playingStatus == EpisodePlayingStatus.COMPLETED }
                     val downloadSize = downloadedAdjustedForStarred.sumOf { it.sizeInBytes }
                     episodesToDelete.clear()
+                    val updatedDiskSpaceViews = EpisodePlayingStatus.values()
+                        .mapToDiskSpaceViewsForEpisodes(downloadedAdjustedForStarred)
                     _state.value = State(
-                        unplayedDiskSpaceView = _state.value.unplayedDiskSpaceView.copy(episodes = unplayedEpisodes),
-                        inProgressDiskSpaceView = _state.value.inProgressDiskSpaceView.copy(episodes = inProgressEpisodes),
-                        playedDiskSpaceView = _state.value.playedDiskSpaceView.copy(episodes = playedEpisodes),
+                        diskSpaceViews = updatedDiskSpaceViews,
                         totalDownloadSize = downloadSize,
                         deleteButton = deleteButton
                     )
@@ -113,9 +110,13 @@ class ManualCleanupViewModel
         }
     }
 
-    fun onDiskSpaceCheckedChanged(isChecked: Boolean, episodes: List<Episode>) {
-        updateDeleteList(isChecked, episodes)
+    fun onDiskSpaceCheckedChanged(
+        isChecked: Boolean,
+        diskSpaceView: State.DiskSpaceView,
+    ) {
+        updateDeleteList(isChecked, diskSpaceView.episodes)
         updateDeleteButton()
+        updateDiskSpaceCheckedState(diskSpaceView, isChecked)
     }
 
     fun onStarredSwitchClicked(isChecked: Boolean) {
@@ -142,4 +143,33 @@ class ManualCleanupViewModel
     private fun updateDeleteButton() {
         _state.value = _state.value.copy(deleteButton = deleteButton)
     }
+
+    private fun updateDiskSpaceCheckedState(
+        diskSpaceView: State.DiskSpaceView,
+        isChecked: Boolean,
+    ) {
+        _state.value = _state.value.copy(
+            diskSpaceViews = _state.value.diskSpaceViews.map {
+                if (it == diskSpaceView) {
+                    it.copy(isChecked = isChecked)
+                } else {
+                    it
+                }
+            }
+        )
+    }
+
+    private fun Array<EpisodePlayingStatus>.mapToDiskSpaceViewsForEpisodes(
+        episodes: List<Episode>,
+    ) = map { episodePlayingStatus ->
+        _state.value.diskSpaceViews.first { it.title == episodePlayingStatus.mapToDiskSpaceViewTitle() }
+            .copy(episodes = episodes.filter { it.playingStatus == episodePlayingStatus })
+    }
+
+    private fun EpisodePlayingStatus.mapToDiskSpaceViewTitle() =
+        when (this) {
+            EpisodePlayingStatus.NOT_PLAYED -> LR.string.unplayed
+            EpisodePlayingStatus.IN_PROGRESS -> LR.string.in_progress
+            EpisodePlayingStatus.COMPLETED -> LR.string.played
+        }
 }
