@@ -31,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.settings.components.DiskSpaceSizeView
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
@@ -90,7 +90,7 @@ private fun ManageDownloadsView(
     val deleteButtonContentColor =
         Color(LocalContext.current.getThemeColor(state.deleteButton.contentColor))
     Surface(modifier = modifier.verticalScroll(rememberScrollState())) {
-        Column {
+        Column(modifier = modifier.padding(top = 8.dp)) {
             state.diskSpaceViews.forEach { diskSpaceSizeView ->
                 DiskSpaceSizeView(
                     diskSpaceView = diskSpaceSizeView,
@@ -120,9 +120,9 @@ private fun TotalDownloadSizeRow(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        TextH30(
+        TextH40(
             text = stringResource(LR.string.settings_manage_downloads_total),
             modifier = modifier.weight(1f)
         )
@@ -146,7 +146,7 @@ private fun IncludeStarredRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(horizontal = 16.dp)
     ) {
-        TextH30(
+        TextH40(
             text = stringResource(LR.string.settings_manage_downloads_include_starred),
             modifier = modifier.weight(1f)
         )

@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
@@ -35,7 +35,7 @@ fun DiskSpaceSizeView(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(start = 16.dp)
     ) {
-        TextH30(
+        TextH40(
             text = stringResource(diskSpaceView.title),
             modifier = modifier.weight(1f),
         )
