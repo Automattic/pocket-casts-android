@@ -73,6 +73,7 @@ private fun CreateBuildingContent(title: String, podcasts: List<Podcast>, modifi
             TextH30(title)
             Spacer(Modifier.height(32.dp))
             Box {
+                // artwork stacked on top of each other
                 if (podcasts.size > 2) {
                     SharePodcastImage(podcast = podcasts[2], modifier = Modifier.rotate(-2f))
                 }

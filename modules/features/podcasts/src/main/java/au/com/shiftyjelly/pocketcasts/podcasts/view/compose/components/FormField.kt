@@ -60,9 +60,11 @@ fun FormField(
             .fillMaxWidth()
             .onPreviewKeyEvent {
                 if (singeLine && it.key == Key.Enter && it.nativeKeyEvent.action == ACTION_DOWN) {
+                    // the enter key for a single line field should call the next event, but for multiline fields it should be a new line.
                     onNext()
                     true
                 } else if (it.key == Key.Tab && it.nativeKeyEvent.action == ACTION_DOWN) {
+                    // tab should focus on the next field
                     focusManager.moveFocus(FocusDirection.Down)
                     true
                 } else {
@@ -74,7 +76,7 @@ fun FormField(
 
 @Preview
 @Composable
-fun FormFieldPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+private fun FormFieldPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppTheme(themeType) {
         Box(Modifier.background(MaterialTheme.theme.colors.primaryUi03).padding(8.dp)) {
             FormField(

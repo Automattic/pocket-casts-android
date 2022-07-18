@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.podcast
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,9 +39,11 @@ fun PodcastSelectGrid(
     onSelectNone: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val configuration = LocalConfiguration.current
+    val imageMinSize = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 120.dp else 80.dp
     Column(modifier = modifier.fillMaxSize()) {
         LazyVerticalGrid(
-            cells = GridCells.Adaptive(minSize = 80.dp),
+            cells = GridCells.Adaptive(minSize = imageMinSize),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),

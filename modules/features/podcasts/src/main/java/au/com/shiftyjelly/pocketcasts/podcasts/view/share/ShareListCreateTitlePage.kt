@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +23,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -68,7 +72,7 @@ fun ShareListCreateTitlePage(
             description = state.description,
             onTitleChange = { viewModel.changeTitle(it) },
             onDescriptionChange = { viewModel.changeDescription(it) },
-            onDoneClick = {}
+            onDoneClick = onNextClick
         )
     }
 }
@@ -84,9 +88,12 @@ private fun ShareListCreateTitleContent(
     onDoneClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusRequester = remember { FocusRequester() }
+    val focusRequesterTitle = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    val configuration = LocalConfiguration.current
+    val imageMinSize = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 120.dp else 80.dp
     LazyVerticalGrid(
-        cells = GridCells.Adaptive(minSize = 80.dp),
+        cells = GridCells.Adaptive(minSize = imageMinSize),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -99,16 +106,17 @@ private fun ShareListCreateTitleContent(
                     placeholder = stringResource(LR.string.podcasts_share_title),
                     onValueChange = onTitleChange,
                     imeAction = ImeAction.Next,
-                    modifier = Modifier
-                        .focusRequester(focusRequester)
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                    modifier = Modifier.focusRequester(focusRequesterTitle)
                 )
                 Spacer(Modifier.height(16.dp))
                 FormField(
                     value = description,
                     placeholder = stringResource(LR.string.podcasts_share_description),
                     onValueChange = onDescriptionChange,
-                    onNext = { onDoneClick() },
-                    singeLine = false,
+                    onNext = onDoneClick,
+                    imeAction = ImeAction.Default,
+                    singeLine = false
                 )
                 Spacer(Modifier.height(16.dp))
             }
@@ -123,6 +131,6 @@ private fun ShareListCreateTitleContent(
         }
     }
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        focusRequesterTitle.requestFocus()
     }
 }
