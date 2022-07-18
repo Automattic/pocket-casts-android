@@ -3,25 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:persistent="true" >
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="backgroundRefresh"
-        android:title="@string/settings_storage_background_refresh"
-        android:summaryOn="@string/settings_storage_background_refresh_on"
-        android:summaryOff="@string/settings_storage_background_refresh_off" />
-
-    <SwitchPreference
-        android:persistent="false"
-        android:defaultValue="false"
-        android:key="useMobileData"
-        android:title="@string/settings_storage_data_warning"
-        android:summary="@string/settings_storage_data_warning_summary" />
-
-    <Preference
-        android:layout_height="wrap_content"
-        android:key="extraWarning"
-        app:summary="@string/settings_storage_data_warning_car" />
-
     <PreferenceCategory
         android:key="storageTitle"
         android:title="@string/settings_storage" >
@@ -44,6 +25,30 @@
             android:key="storageCustomFolder"
             android:summary=""
             android:title="@string/settings_storage_custom_folder_location" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="storageWarning">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="backgroundRefresh"
+            android:title="@string/settings_storage_background_refresh"
+            android:summaryOn="@string/settings_storage_background_refresh_on"
+            android:summaryOff="@string/settings_storage_background_refresh_off" />
+
+        <SwitchPreference
+            android:persistent="false"
+            android:defaultValue="false"
+            android:key="useMobileData"
+            android:title="@string/settings_storage_data_warning"
+            android:summary="@string/settings_storage_data_warning_summary" />
+
+        <Preference
+            android:layout_height="wrap_content"
+            android:key="extraWarning"
+            app:summary="@string/settings_storage_data_warning_car" />
 
     </PreferenceCategory>
 
