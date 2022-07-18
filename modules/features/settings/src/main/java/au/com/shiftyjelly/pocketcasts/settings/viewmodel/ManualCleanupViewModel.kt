@@ -101,6 +101,7 @@ class ManualCleanupViewModel
                     episodesToDelete.clear()
                     val updatedDiskSpaceViews = EpisodePlayingStatus.values()
                         .mapToDiskSpaceViewsForEpisodes(downloadedAdjustedForStarred)
+                    updatedDiskSpaceViews.forEach { updateDeleteList(it.isChecked, it.episodes) }
                     _state.value = State(
                         diskSpaceViews = updatedDiskSpaceViews,
                         totalDownloadSize = downloadSize,
