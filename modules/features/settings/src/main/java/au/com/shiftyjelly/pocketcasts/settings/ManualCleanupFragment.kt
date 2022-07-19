@@ -54,6 +54,11 @@ class ManualCleanupFragment private constructor() : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        /* When this fragment is
+         - added as a child fragment to it's parent, which already has it's toolbar,`showToolbar` is set to false
+         and the title is updated on the parent's toolbar.
+         - added to fragment host, the fragment needs to add it's own toolbar, `showToolbar` is set to true
+         and toolbar is added to fragment's compose view. */
         if (!showToolbar) {
             parentFragment?.view?.findToolbar()?.title =
                 getString(LR.string.settings_title_manage_downloads)
