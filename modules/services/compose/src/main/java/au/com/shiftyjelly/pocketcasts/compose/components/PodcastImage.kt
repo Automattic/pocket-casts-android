@@ -87,7 +87,7 @@ private fun CoilImage(uuid: String, title: String, showTitle: Boolean, modifier:
     Box(contentAlignment = Alignment.Center) {
         Image(
             painter = painter,
-            contentDescription = null,
+            contentDescription = title,
             modifier = modifier
                 .clip(if (corners == null) RectangleShape else RoundedCornerShape(corners))
         )

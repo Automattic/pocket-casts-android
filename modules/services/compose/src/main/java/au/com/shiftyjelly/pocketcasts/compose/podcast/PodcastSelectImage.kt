@@ -21,14 +21,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val colorSelectedAlpha = Color(0x7FFFFFFF)
 
@@ -75,13 +77,14 @@ fun PodcastSelectImage(
                         .background(Color(0xFF78D549))
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_tick),
-                        contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.selected),
+                        painter = painterResource(IR.drawable.ic_tick),
+                        contentDescription = stringResource(LR.string.selected),
                         tint = Color.White,
                         modifier = Modifier.size(16.dp)
                     )
                 }
             } else {
+                val notSelected = stringResource(LR.string.not_selected)
                 Box(
                     modifier = Modifier
                         .border(width = 1.5.dp, color = Color.White, shape = CircleShape)
@@ -89,6 +92,7 @@ fun PodcastSelectImage(
                         .shadow(1.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(Color(0x75FFFFFF))
+                        .semantics { contentDescription = notSelected }
                 )
             }
         }
