@@ -37,7 +37,7 @@ class ManualCleanupViewModel
             DiskSpaceView(title = LR.string.in_progress),
             DiskSpaceView(title = LR.string.played)
         ),
-        val totalDownloadSize: Long = 0L,
+        val totalSelectedDownloadSize: Long = 0L,
         val deleteButton: DeleteButton,
     ) {
         data class DiskSpaceView(
@@ -97,14 +97,14 @@ class ManualCleanupViewModel
                     val (downloadedEpisodes, isStarredSwitchChecked) = result
                     val downloadedAdjustedForStarred =
                         downloadedEpisodes.filter { !it.isStarred || isStarredSwitchChecked }
-                    val downloadSize = downloadedAdjustedForStarred.sumOf { it.sizeInBytes }
                     episodesToDelete.clear()
                     val updatedDiskSpaceViews = EpisodePlayingStatus.values()
                         .mapToDiskSpaceViewsForEpisodes(downloadedAdjustedForStarred)
                     updatedDiskSpaceViews.forEach { updateDeleteList(it.isChecked, it.episodes) }
+                    val downloadSize = updatedDiskSpaceViews.filter { it.isChecked }.sumOf { it.episodesBytesSize }
                     _state.value = State(
                         diskSpaceViews = updatedDiskSpaceViews,
-                        totalDownloadSize = downloadSize,
+                        totalSelectedDownloadSize = downloadSize,
                         deleteButton = deleteButton
                     )
                 }
@@ -117,7 +117,7 @@ class ManualCleanupViewModel
     ) {
         updateDeleteList(isChecked, diskSpaceView.episodes)
         updateDeleteButton()
-        updateDiskSpaceCheckedState(diskSpaceView, isChecked)
+        updateDiskSpaceCheckedStateAndDownloadSize(diskSpaceView, isChecked)
     }
 
     fun onStarredSwitchClicked(isChecked: Boolean) {
@@ -145,18 +145,21 @@ class ManualCleanupViewModel
         _state.value = _state.value.copy(deleteButton = deleteButton)
     }
 
-    private fun updateDiskSpaceCheckedState(
+    private fun updateDiskSpaceCheckedStateAndDownloadSize(
         diskSpaceView: State.DiskSpaceView,
         isChecked: Boolean,
     ) {
-        _state.value = _state.value.copy(
-            diskSpaceViews = _state.value.diskSpaceViews.map {
-                if (it == diskSpaceView) {
-                    it.copy(isChecked = isChecked)
-                } else {
-                    it
-                }
+        val updatedDiskSpaceViews = _state.value.diskSpaceViews.map {
+            if (it == diskSpaceView) {
+                it.copy(isChecked = isChecked)
+            } else {
+                it
             }
+        }
+        val downloadSize = updatedDiskSpaceViews.filter { it.isChecked }.sumOf { it.episodesBytesSize }
+        _state.value = _state.value.copy(
+            diskSpaceViews = updatedDiskSpaceViews,
+            totalSelectedDownloadSize = downloadSize
         )
     }
 

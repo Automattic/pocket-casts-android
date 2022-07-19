@@ -91,7 +91,7 @@ private fun ManageDownloadsView(
         Column(modifier = modifier.padding(top = 8.dp)) {
             state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }
             IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
-            TotalDownloadSizeRow(state.totalDownloadSize)
+            TotalSelectedDownloadSizeRow(state.totalSelectedDownloadSize)
             RowButton(
                 text = state.deleteButton.title,
                 enabled = state.deleteButton.isEnabled,
@@ -140,15 +140,15 @@ private fun IncludeStarredRow(
 }
 
 @Composable
-private fun TotalDownloadSizeRow(
-    totalDownloadSize: Long,
+private fun TotalSelectedDownloadSizeRow(
+    totalSelectedDownloadSize: Long,
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_manage_downloads_total),
         secondaryText = Util.formattedBytes(
-            bytes = totalDownloadSize,
+            bytes = totalSelectedDownloadSize,
             context = LocalContext.current,
-        )
+        ).replace("-", "0 bytes")
     )
 }
 
