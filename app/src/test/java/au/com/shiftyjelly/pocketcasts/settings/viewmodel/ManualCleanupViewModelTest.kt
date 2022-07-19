@@ -21,46 +21,55 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
-import java.util.Date
+import java.util.*
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class ManualCleanupViewModelTest {
-    private val episodeManager: EpisodeManager = mock()
-    private val playbackManager: PlaybackManager = mock()
-    private val episode: Episode = Episode(uuid = "1", publishedDate = Date())
+    private lateinit var episodeManager: EpisodeManager
+    private lateinit var playbackManager: PlaybackManager
+    private lateinit var viewModel: ManualCleanupViewModel
 
     @ApplicationContext
     private val context: Context = mock()
 
-    lateinit var viewModel: ManualCleanupViewModel
+    private val episode: Episode = Episode(uuid = "1", publishedDate = Date())
     private val episodes = listOf(episode)
+    private val diskSpaceView =
+        ManualCleanupViewModel.State.DiskSpaceView(title = LR.string.unplayed, episodes = episodes)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        episodeManager = mock()
+        playbackManager = mock()
         whenever(context.getString(anyInt())).thenReturn("")
         whenever(context.getString(anyInt(), anyOrNull())).thenReturn("")
-        whenever(episodeManager.observeDownloadedEpisodes()).thenReturn(Flowable.generate { listOf(episodes) })
+        whenever(episodeManager.observeDownloadedEpisodes())
+            .thenReturn(Flowable.generate { listOf(episodes) })
         viewModel = ManualCleanupViewModel(episodeManager, playbackManager, context)
     }
 
     @Test
     fun `given episodes present, when disk space size checked, then delete button is enabled`() {
-        viewModel.onDiskSpaceCheckedChanged(isChecked = true, episodes = episodes)
+        viewModel.onDiskSpaceCheckedChanged(isChecked = true, diskSpaceView = diskSpaceView)
 
         assertTrue(viewModel.state.value.deleteButton.isEnabled)
     }
 
     @Test
     fun `given episodes present, when disk space size unchecked, then delete button is disabled`() {
-        viewModel.onDiskSpaceCheckedChanged(isChecked = false, episodes = episodes)
+        viewModel.onDiskSpaceCheckedChanged(isChecked = false, diskSpaceView = diskSpaceView)
 
         assertFalse(viewModel.state.value.deleteButton.isEnabled)
     }
 
     @Test
     fun `given episodes not present, when disk space size checked, then delete button is disabled`() {
-        viewModel.onDiskSpaceCheckedChanged(isChecked = true, episodes = emptyList())
+        viewModel.onDiskSpaceCheckedChanged(
+            isChecked = true,
+            diskSpaceView = diskSpaceView.copy(episodes = emptyList())
+        )
 
         assertFalse(viewModel.state.value.deleteButton.isEnabled)
     }
@@ -69,7 +78,7 @@ class ManualCleanupViewModelTest {
     fun `given episodes selected, when delete button clicked, then episodes are deleted`() {
         whenever(episodeManager.observeDownloadedEpisodes())
             .thenReturn(Flowable.generate { listOf(episode) })
-        viewModel.onDiskSpaceCheckedChanged(isChecked = true, episodes = episodes)
+        viewModel.onDiskSpaceCheckedChanged(isChecked = true, diskSpaceView = diskSpaceView)
 
         viewModel.onDeleteButtonClicked()
 
@@ -82,7 +91,7 @@ class ManualCleanupViewModelTest {
     fun `given episodes not selected, when delete button clicked, then episodes are not deleted`() {
         whenever(episodeManager.observeDownloadedEpisodes())
             .thenReturn(Flowable.generate { listOf(episode) })
-        viewModel.onDiskSpaceCheckedChanged(isChecked = false, episodes = episodes)
+        viewModel.onDiskSpaceCheckedChanged(isChecked = false, diskSpaceView = diskSpaceView)
 
         viewModel.onDeleteButtonClicked()
 
