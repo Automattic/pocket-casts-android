@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
@@ -108,6 +109,7 @@ fun SettingRow(
     icon: GradientIconData? = null,
     @DrawableRes primaryTextEndDrawable: Int? = null,
     switchState: Boolean? = null,
+    checkBoxState: Boolean? = null,
     additionalContent: @Composable () -> Unit = {},
 ) {
     Row(
@@ -168,6 +170,14 @@ fun SettingRow(
                     uncheckedThumbColor = Color.Gray,
                     uncheckedTrackColor = Color.Gray,
                 )
+            )
+        }
+
+        if (checkBoxState != null) {
+            Spacer(Modifier.width(12.dp))
+            Checkbox(
+                checked = checkBoxState,
+                onCheckedChange = null,
             )
         }
     }
