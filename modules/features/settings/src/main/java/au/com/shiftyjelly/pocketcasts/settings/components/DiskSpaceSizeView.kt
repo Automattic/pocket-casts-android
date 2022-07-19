@@ -55,7 +55,7 @@ private fun getFormattedSubtitle(
 ): String {
     val byteString = Util.formattedBytes(bytes = diskSpaceView.episodesBytesSize, context = context)
     return if (diskSpaceView.episodes.isEmpty()) {
-        ""
+        context.resources.getStringPluralEpisodes(0)
     } else {
         "${context.resources.getStringPluralEpisodes(diskSpaceView.episodesSize)} · $byteString"
     }
