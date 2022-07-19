@@ -127,7 +127,7 @@ class StorageSettingsFragment :
     }
 
     private fun showDownloadedFiles() {
-        val fragment = ManualCleanupFragment()
+        val fragment = ManualCleanupFragment.newInstance()
         childFragmentManager.beginTransaction()
             .replace(UR.id.frameChildFragment, fragment)
             .addToBackStack("podcastSelect")
