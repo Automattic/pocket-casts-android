@@ -1,16 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Surface
-import androidx.compose.material.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,11 +17,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -30,10 +29,9 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.settings.components.DiskSpaceSizeView
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -91,14 +89,9 @@ private fun ManageDownloadsView(
         Color(LocalContext.current.getThemeColor(state.deleteButton.contentColor))
     Surface(modifier = modifier.verticalScroll(rememberScrollState())) {
         Column(modifier = modifier.padding(top = 8.dp)) {
-            state.diskSpaceViews.forEach { diskSpaceSizeView ->
-                DiskSpaceSizeView(
-                    diskSpaceView = diskSpaceSizeView,
-                    onCheckedChange = { onDiskSpaceCheckedChanged(it, diskSpaceSizeView) },
-                )
-            }
-            TotalDownloadSizeRow(state.totalDownloadSize)
+            state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }
             IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
+            TotalDownloadSizeRow(state.totalDownloadSize)
             RowButton(
                 text = state.deleteButton.title,
                 enabled = state.deleteButton.isEnabled,
@@ -113,26 +106,21 @@ private fun ManageDownloadsView(
 }
 
 @Composable
-private fun TotalDownloadSizeRow(
-    totalDownloadSize: Long,
-    modifier: Modifier = Modifier
+private fun DiskSpaceSizeRow(
+    diskSpaceSizeView: ManualCleanupViewModel.State.DiskSpaceView,
+    onDiskSpaceCheckedChanged: (Boolean, diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        TextH40(
-            text = stringResource(LR.string.settings_manage_downloads_total),
-            modifier = modifier.weight(1f)
-        )
-        TextC70(
-            text = Util.formattedBytes(
-                bytes = totalDownloadSize,
-                context = LocalContext.current,
-            )
-        )
-    }
+    val context = LocalContext.current
+    SettingRow(
+        primaryText = stringResource(diskSpaceSizeView.title),
+        secondaryText = getFormattedSubtitle(diskSpaceSizeView, context),
+        checkBoxState = diskSpaceSizeView.isChecked,
+        modifier = modifier.toggleable(
+            value = diskSpaceSizeView.isChecked,
+            role = Role.Checkbox
+        ) { onDiskSpaceCheckedChanged(it, diskSpaceSizeView) }
+    )
 }
 
 @Composable
@@ -141,19 +129,38 @@ private fun IncludeStarredRow(
     onStarredSwitchClicked: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(horizontal = 16.dp)
-    ) {
-        TextH40(
-            text = stringResource(LR.string.settings_manage_downloads_include_starred),
-            modifier = modifier.weight(1f)
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_manage_downloads_include_starred),
+        switchState = checkedState,
+        modifier = modifier.toggleable(
+            value = checkedState,
+            role = Role.Switch
+        ) { onStarredSwitchClicked(it) },
+    )
+}
+
+@Composable
+private fun TotalDownloadSizeRow(
+    totalDownloadSize: Long,
+) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_manage_downloads_total),
+        secondaryText = Util.formattedBytes(
+            bytes = totalDownloadSize,
+            context = LocalContext.current,
         )
-        Switch(
-            checked = checkedState,
-            onCheckedChange = onStarredSwitchClicked,
-        )
+    )
+}
+
+private fun getFormattedSubtitle(
+    diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView,
+    context: Context
+): String {
+    val byteString = Util.formattedBytes(bytes = diskSpaceView.episodesBytesSize, context = context)
+    return if (diskSpaceView.episodes.isEmpty()) {
+        context.resources.getStringPluralEpisodes(diskSpaceView.episodesSize)
+    } else {
+        "${context.resources.getStringPluralEpisodes(diskSpaceView.episodesSize)} · $byteString"
     }
 }
 
