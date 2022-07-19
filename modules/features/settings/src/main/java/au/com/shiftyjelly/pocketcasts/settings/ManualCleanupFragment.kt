@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private const val ARG_TOOLBAR = "showtoolbar"
 
 @AndroidEntryPoint
-class ManualCleanupFragment : BaseFragment() {
+class ManualCleanupFragment private constructor() : BaseFragment() {
     companion object {
         fun newInstance(showToolbar: Boolean = false): ManualCleanupFragment {
             val fragment = ManualCleanupFragment()
