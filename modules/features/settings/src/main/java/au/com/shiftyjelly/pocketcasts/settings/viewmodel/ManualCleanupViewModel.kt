@@ -51,9 +51,11 @@ class ManualCleanupViewModel
 
         data class DeleteButton(
             val title: String,
-            @AttrRes val contentColor: Int = UR.attr.primary_interactive_01,
             val isEnabled: Boolean = false,
-        )
+        ) {
+            @AttrRes val contentColor =
+                if (isEnabled) UR.attr.primary_interactive_01 else UR.attr.primary_interactive_01_disabled
+        }
     }
 
     private val _state = MutableStateFlow(
@@ -71,18 +73,16 @@ class ManualCleanupViewModel
 
     private val deleteButton: State.DeleteButton
         get() = if (episodesToDelete.isEmpty()) {
-            _state.value.deleteButton.copy(
+            State.DeleteButton(
                 title = context.getString(LR.string.settings_select_episodes_to_delete),
-                contentColor = UR.attr.primary_interactive_01_disabled,
                 isEnabled = false,
             )
         } else {
-            _state.value.deleteButton.copy(
+            State.DeleteButton(
                 title = context.getString(
                     LR.string.settings_delete_episodes,
                     episodesToDelete.size
                 ),
-                contentColor = UR.attr.primary_interactive_01,
                 isEnabled = true,
             )
         }
