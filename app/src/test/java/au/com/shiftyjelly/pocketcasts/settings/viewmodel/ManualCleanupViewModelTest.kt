@@ -1,16 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verifyBlocking
 import com.nhaarman.mockitokotlin2.whenever
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -20,7 +17,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyInt
 import java.util.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -28,9 +24,6 @@ class ManualCleanupViewModelTest {
     private lateinit var episodeManager: EpisodeManager
     private lateinit var playbackManager: PlaybackManager
     private lateinit var viewModel: ManualCleanupViewModel
-
-    @ApplicationContext
-    private val context: Context = mock()
 
     private val episode: Episode = Episode(uuid = "1", publishedDate = Date())
     private val episodes = listOf(episode)
@@ -43,11 +36,9 @@ class ManualCleanupViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         episodeManager = mock()
         playbackManager = mock()
-        whenever(context.getString(anyInt())).thenReturn("")
-        whenever(context.getString(anyInt(), anyOrNull())).thenReturn("")
         whenever(episodeManager.observeDownloadedEpisodes())
             .thenReturn(Flowable.generate { listOf(episodes) })
-        viewModel = ManualCleanupViewModel(episodeManager, playbackManager, context)
+        viewModel = ManualCleanupViewModel(episodeManager, playbackManager)
     }
 
     @Test
