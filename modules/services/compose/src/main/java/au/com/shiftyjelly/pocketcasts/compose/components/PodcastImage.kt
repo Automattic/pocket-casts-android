@@ -37,7 +37,7 @@ fun podcastImageCornerSize(width: Dp): Dp {
 fun PodcastImage(
     uuid: String,
     modifier: Modifier = Modifier,
-    title: String = "",
+    title: String = "", // also used as the image's content description
     showTitle: Boolean = false,
     roundCorners: Boolean = true,
     dropShadow: Boolean = true
