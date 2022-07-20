@@ -263,7 +263,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     private fun showCleanupSettings() {
-        val fragment = ManualCleanupFragment.newInstance(showToolbar = true)
+        val fragment = ManualCleanupFragment.newInstance(addToolbar = true)
         showFragment(fragment)
     }
 
