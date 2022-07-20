@@ -39,13 +39,13 @@ fun FormField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     onNext: () -> Unit = {},
-    singeLine: Boolean = true,
+    singleLine: Boolean = true,
     imeAction: ImeAction = ImeAction.Done
 ) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
         value = value,
-        onValueChange = { onValueChange(if (singeLine) it.removeNewLines() else it) },
+        onValueChange = { onValueChange(if (singleLine) it.removeNewLines() else it) },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = MaterialTheme.theme.colors.primaryText01,
             placeholderColor = MaterialTheme.theme.colors.primaryText02,
@@ -59,7 +59,7 @@ fun FormField(
         modifier = modifier
             .fillMaxWidth()
             .onPreviewKeyEvent {
-                if (singeLine && it.key == Key.Enter && it.nativeKeyEvent.action == ACTION_DOWN) {
+                if (singleLine && it.key == Key.Enter && it.nativeKeyEvent.action == ACTION_DOWN) {
                     // the enter key for a single line field should call the next event, but for multiline fields it should be a new line.
                     onNext()
                     true

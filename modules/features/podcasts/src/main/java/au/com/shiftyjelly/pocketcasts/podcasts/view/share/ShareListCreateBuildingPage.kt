@@ -56,7 +56,7 @@ fun ShareListCreateBuildingPage(
             onNavigationClick = onCloseClick
         )
 
-        CreateBuildingContent(title = state.title, podcasts = state.selectedPodcasts)
+        CreateBuildingContent(title = state.title, podcasts = state.selectedPodcastsOrdered)
     }
 }
 

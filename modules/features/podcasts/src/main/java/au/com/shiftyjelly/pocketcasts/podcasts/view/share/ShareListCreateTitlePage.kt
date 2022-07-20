@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
@@ -67,7 +68,7 @@ fun ShareListCreateTitlePage(
             }
         )
         ShareListCreateTitleContent(
-            podcasts = state.selectedPodcasts,
+            podcasts = state.selectedPodcastsOrdered,
             title = state.title,
             description = state.description,
             onTitleChange = { viewModel.changeTitle(it) },
@@ -88,49 +89,85 @@ private fun ShareListCreateTitleContent(
     onDoneClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusRequesterTitle = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
     val configuration = LocalConfiguration.current
-    val imageMinSize = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 120.dp else 80.dp
-    LazyVerticalGrid(
-        cells = GridCells.Adaptive(minSize = imageMinSize),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier
-    ) {
-        header {
-            Column {
-                FormField(
-                    value = title,
-                    placeholder = stringResource(LR.string.podcasts_share_title),
-                    onValueChange = onTitleChange,
-                    imeAction = ImeAction.Next,
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                    modifier = Modifier.focusRequester(focusRequesterTitle)
-                )
-                Spacer(Modifier.height(16.dp))
-                FormField(
-                    value = description,
-                    placeholder = stringResource(LR.string.podcasts_share_description),
-                    onValueChange = onDescriptionChange,
-                    onNext = onDoneClick,
-                    imeAction = ImeAction.Default,
-                    singeLine = false
-                )
-                Spacer(Modifier.height(16.dp))
-            }
-        }
-        items(items = podcasts) { podcast ->
-            PodcastImage(
-                uuid = podcast.uuid,
-                title = podcast.title,
-                showTitle = true,
-                modifier = Modifier.fillMaxSize()
+    val inLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val imageMinSize = if (inLandscape) 120.dp else 80.dp
+    Column {
+        if (!inLandscape) {
+            TitleDescriptionFields(
+                title = title,
+                description = description,
+                onTitleChange = onTitleChange,
+                onDescriptionChange = onDescriptionChange,
+                onDoneClick = onDoneClick,
+                focusRequester = focusRequester,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
+        }
+        LazyVerticalGrid(
+            cells = GridCells.Adaptive(minSize = imageMinSize),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier
+        ) {
+            if (inLandscape) {
+                header {
+                    TitleDescriptionFields(
+                        title = title,
+                        description = description,
+                        onTitleChange = onTitleChange,
+                        onDescriptionChange = onDescriptionChange,
+                        onDoneClick = onDoneClick,
+                        focusRequester = focusRequester
+                    )
+                }
+            }
+            items(items = podcasts) { podcast ->
+                PodcastImage(
+                    uuid = podcast.uuid,
+                    title = podcast.title,
+                    showTitle = true,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
     LaunchedEffect(Unit) {
-        focusRequesterTitle.requestFocus()
+        focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun TitleDescriptionFields(
+    title: String,
+    description: String,
+    onTitleChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onDoneClick: () -> Unit,
+    focusRequester: FocusRequester,
+    modifier: Modifier = Modifier
+) {
+    val focusManager = LocalFocusManager.current
+    Column(modifier = modifier) {
+        FormField(
+            value = title,
+            placeholder = stringResource(LR.string.podcasts_share_title),
+            onValueChange = onTitleChange,
+            imeAction = ImeAction.Next,
+            onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            modifier = Modifier.focusRequester(focusRequester)
+        )
+        Spacer(Modifier.height(8.dp))
+        FormField(
+            value = description,
+            placeholder = stringResource(LR.string.podcasts_share_description),
+            onValueChange = onDescriptionChange,
+            onNext = onDoneClick,
+            imeAction = ImeAction.Default,
+            singleLine = false
+        )
+        Spacer(Modifier.height(16.dp))
     }
 }

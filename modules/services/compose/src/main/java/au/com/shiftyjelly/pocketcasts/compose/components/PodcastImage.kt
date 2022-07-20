@@ -25,6 +25,14 @@ import coil.compose.AsyncImagePainter
 import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 
+fun podcastImageCornerSize(width: Dp): Dp {
+    return when {
+        width <= 50.dp -> 3.dp
+        width <= 200.dp -> 4.dp
+        else -> 8.dp
+    }
+}
+
 @Composable
 fun PodcastImage(
     uuid: String,
@@ -35,12 +43,7 @@ fun PodcastImage(
     dropShadow: Boolean = true
 ) {
     BoxWithConstraints(modifier = modifier) {
-        val corners = when {
-            !roundCorners -> null
-            maxWidth <= 50.dp -> 3.dp
-            maxWidth <= 200.dp -> 4.dp
-            else -> 8.dp
-        }
+        val corners = if (roundCorners) podcastImageCornerSize(maxWidth) else null
         if (dropShadow) {
             val elevation = when {
                 maxWidth <= 50.dp -> 1.dp

@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun PodcastSelectGrid(
     podcasts: List<Podcast>,
-    selectedUuids: Set<String>,
+    selectedPodcasts: Set<Podcast>,
     onPodcastSelected: (Podcast) -> Unit,
     onPodcastUnselected: (Podcast) -> Unit,
     onSelectAll: () -> Unit,
@@ -52,7 +52,7 @@ fun PodcastSelectGrid(
             items(items = podcasts) { podcast ->
                 PodcastSelectImage(
                     podcast = podcast,
-                    selected = selectedUuids.contains(podcast.uuid),
+                    selected = selectedPodcasts.contains(podcast),
                     onPodcastSelected = { onPodcastSelected(podcast) },
                     onPodcastUnselected = { onPodcastUnselected(podcast) }
                 )
@@ -60,7 +60,7 @@ fun PodcastSelectGrid(
         }
         SelectGridFooter(
             podcasts = podcasts,
-            selectedUuids = selectedUuids,
+            selectedPodcasts = selectedPodcasts,
             onSelectAll = onSelectAll,
             onSelectNone = onSelectNone
         )
@@ -70,15 +70,15 @@ fun PodcastSelectGrid(
 @Composable
 private fun SelectGridFooter(
     podcasts: List<Podcast>,
-    selectedUuids: Set<String>,
+    selectedPodcasts: Set<Podcast>,
     onSelectAll: () -> Unit,
     onSelectNone: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier.padding(top = 4.dp, start = 16.dp, bottom = 4.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        val amountSelected = when (selectedUuids.size) {
+        val amountSelected = when (selectedPodcasts.size) {
             podcasts.size -> stringResource(LR.string.podcasts_share_all_selected)
-            else -> stringResource(LR.string.podcasts_share_selected, selectedUuids.size)
+            else -> stringResource(LR.string.podcasts_share_selected, selectedPodcasts.size)
         }
         TextH40(
             text = amountSelected,
@@ -86,9 +86,9 @@ private fun SelectGridFooter(
         )
         Spacer(Modifier.weight(1f))
         LinkText(
-            text = stringResource(if (podcasts.size == selectedUuids.size) LR.string.select_none else LR.string.select_all),
+            text = stringResource(if (podcasts.size == selectedPodcasts.size) LR.string.select_none else LR.string.select_all),
             onClick = {
-                if (podcasts.size == selectedUuids.size) {
+                if (podcasts.size == selectedPodcasts.size) {
                     onSelectNone()
                 } else {
                     onSelectAll()
@@ -105,7 +105,7 @@ private fun PodcastSelectListPreview() {
         Column {
             PodcastSelectGrid(
                 podcasts = listOf(Podcast(uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb"), Podcast(uuid = "3782b780-0bc5-012e-fb02-00163e1b201c")),
-                selectedUuids = setOf("3782b780-0bc5-012e-fb02-00163e1b201c"),
+                selectedPodcasts = setOf(Podcast(uuid = "3782b780-0bc5-012e-fb02-00163e1b201c")),
                 onPodcastSelected = {},
                 onPodcastUnselected = {},
                 onSelectAll = {},

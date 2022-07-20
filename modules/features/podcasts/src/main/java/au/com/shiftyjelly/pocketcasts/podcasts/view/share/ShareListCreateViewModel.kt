@@ -25,13 +25,13 @@ class ShareListCreateViewModel @Inject constructor(
         val title: String = "",
         val description: String = "",
         val podcasts: List<Podcast> = emptyList(),
-        val selectedUuids: Set<String> = emptySet(),
-        val selectedPodcasts: List<Podcast> = emptyList()
-    )
+        val selectedPodcasts: Set<Podcast> = emptySet()
+    ) {
+        val selectedPodcastsOrdered = podcasts.filter { selectedPodcasts.contains(it) }
+    }
 
     private val mutableState = MutableStateFlow(State())
-    val state: StateFlow<State>
-        get() = mutableState
+    val state: StateFlow<State> = mutableState
 
     init {
         viewModelScope.launch {
@@ -42,36 +42,27 @@ class ShareListCreateViewModel @Inject constructor(
 
     fun selectPodcast(podcast: Podcast) {
         val state = mutableState.value
-        val selectedUuids = state.selectedUuids.toMutableSet().apply {
-            add(podcast.uuid)
-        }
-        val selectedPodcasts = calculateSelectedPodcasts(podcasts = state.podcasts, selectedUuids = selectedUuids)
-        mutableState.value = state.copy(selectedUuids = selectedUuids, selectedPodcasts = selectedPodcasts)
+        val selectedPodcasts = state.selectedPodcasts
+            .toMutableSet()
+            .apply { add(podcast) }
+        mutableState.value = state.copy(selectedPodcasts = selectedPodcasts)
     }
 
     fun unselectPodcast(podcast: Podcast) {
         val state = mutableState.value
-        val selectedUuids = state.selectedUuids.toMutableSet().apply {
-            remove(podcast.uuid)
-        }
-        val selectedPodcasts = calculateSelectedPodcasts(podcasts = state.podcasts, selectedUuids = selectedUuids)
-        mutableState.value = state.copy(selectedUuids = selectedUuids, selectedPodcasts = selectedPodcasts)
-    }
-
-    private fun calculateSelectedPodcasts(podcasts: List<Podcast>, selectedUuids: MutableSet<String>): List<Podcast> {
-        return podcasts.filter { podcast -> selectedUuids.contains(podcast.uuid) }
+        val selectedPodcasts = state.selectedPodcasts
+            .toMutableSet()
+            .apply { remove(podcast) }
+        mutableState.value = state.copy(selectedPodcasts = selectedPodcasts)
     }
 
     fun selectNone() {
-        mutableState.value = mutableState.value.copy(selectedUuids = emptySet(), selectedPodcasts = emptyList())
+        mutableState.value = mutableState.value.copy(selectedPodcasts = emptySet())
     }
 
     fun selectAll() {
         val state = mutableState.value
-        val selectedUuids = state.selectedUuids.toMutableSet().apply {
-            addAll(state.podcasts.map { it.uuid })
-        }
-        mutableState.value = state.copy(selectedUuids = selectedUuids, selectedPodcasts = state.podcasts)
+        mutableState.value = state.copy(selectedPodcasts = state.podcasts.toSet())
     }
 
     fun changeTitle(title: String) {
@@ -87,7 +78,7 @@ class ShareListCreateViewModel @Inject constructor(
         val title = stateValue.title
         val description = stateValue.description
 
-        val selectedPodcasts = stateValue.selectedPodcasts
+        val selectedPodcasts = stateValue.selectedPodcastsOrdered
         onBefore()
         viewModelScope.launch {
             try {
