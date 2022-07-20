@@ -55,7 +55,7 @@ fun FormField(
         shape = RoundedCornerShape(6.dp),
         keyboardOptions = KeyboardOptions(imeAction = imeAction, capitalization = KeyboardCapitalization.Sentences),
         keyboardActions = KeyboardActions(onAny = { onNext() }),
-        singleLine = false,
+        singleLine = singleLine,
         modifier = modifier
             .fillMaxWidth()
             .onPreviewKeyEvent {
