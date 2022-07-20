@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
@@ -115,7 +116,7 @@ private fun DiskSpaceSizeRow(
     SettingRow(
         primaryText = stringResource(diskSpaceSizeView.title),
         secondaryText = getFormattedSubtitle(diskSpaceSizeView, context),
-        checkBoxState = diskSpaceSizeView.isChecked,
+        toggle = SettingRowToggle.Checkbox(checked = diskSpaceSizeView.isChecked),
         modifier = modifier.toggleable(
             value = diskSpaceSizeView.isChecked,
             role = Role.Checkbox
@@ -131,7 +132,7 @@ private fun IncludeStarredRow(
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_manage_downloads_include_starred),
-        switchState = checkedState,
+        toggle = SettingRowToggle.Switch(checked = checkedState),
         modifier = modifier.toggleable(
             value = checkedState,
             role = Role.Switch

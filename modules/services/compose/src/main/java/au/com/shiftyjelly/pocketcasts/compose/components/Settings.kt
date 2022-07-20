@@ -38,6 +38,12 @@ private val startPadding = 72.dp
 private val endPadding = 24.dp
 private val verticalPadding = 12.dp
 
+sealed class SettingRowToggle {
+    data class Checkbox(val checked: Boolean) : SettingRowToggle()
+    data class Switch(val checked: Boolean) : SettingRowToggle()
+    object None : SettingRowToggle()
+}
+
 @Composable
 fun SettingSection(
     modifier: Modifier = Modifier,
@@ -108,8 +114,7 @@ fun SettingRow(
     secondaryText: String? = null,
     icon: GradientIconData? = null,
     @DrawableRes primaryTextEndDrawable: Int? = null,
-    switchState: Boolean? = null,
-    checkBoxState: Boolean? = null,
+    toggle: SettingRowToggle = SettingRowToggle.None,
     additionalContent: @Composable () -> Unit = {},
 ) {
     Row(
@@ -161,24 +166,27 @@ fun SettingRow(
             additionalContent()
         }
 
-        if (switchState != null) {
-            Spacer(Modifier.width(12.dp))
-            Switch(
-                checked = switchState,
-                onCheckedChange = null,
-                colors = SwitchDefaults.colors(
-                    uncheckedThumbColor = Color.Gray,
-                    uncheckedTrackColor = Color.Gray,
+        when (toggle) {
+            is SettingRowToggle.Checkbox -> {
+                Spacer(Modifier.width(12.dp))
+                Checkbox(
+                    checked = toggle.checked,
+                    onCheckedChange = null,
                 )
-            )
-        }
-
-        if (checkBoxState != null) {
-            Spacer(Modifier.width(12.dp))
-            Checkbox(
-                checked = checkBoxState,
-                onCheckedChange = null,
-            )
+            }
+            is SettingRowToggle.Switch -> {
+                Spacer(Modifier.width(12.dp))
+                Switch(
+                    checked = toggle.checked,
+                    onCheckedChange = null,
+                    colors = SwitchDefaults.colors(
+                        uncheckedThumbColor = Color.Gray,
+                        uncheckedTrackColor = Color.Gray,
+                    )
+                )
+            }
+            SettingRowToggle.None -> { /* Nothing */
+            }
         }
     }
 }
@@ -196,13 +204,17 @@ private fun SettingSectionPreview(
                 secondaryText = "Because secondary text is great and why wouldn't you want it?!?!",
             )
             SettingRow(
-                primaryText = "Toggles are the best",
-                switchState = true
+                primaryText = "Row with switch",
+                toggle = SettingRowToggle.Switch(checked = true)
+            )
+            SettingRow(
+                primaryText = "Row with checkbox",
+                toggle = SettingRowToggle.Checkbox(checked = true)
             )
             SettingRow(
                 primaryText = "Such very very very very very very very long text",
                 secondaryText = "I know you want to flip this toggle, so just do it. DO IT!",
-                switchState = false,
+                toggle = SettingRowToggle.Switch(checked = false),
                 icon = GradientIconData(
                     res = IR.drawable.ic_podcasts,
                     colors = listOf(Color.Red, Color.Yellow)
