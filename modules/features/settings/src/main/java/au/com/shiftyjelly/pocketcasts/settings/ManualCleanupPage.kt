@@ -18,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -34,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getComposeThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -86,19 +85,19 @@ private fun ManageDownloadsView(
     onDeleteButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val deleteButtonContentColor =
-        Color(LocalContext.current.getThemeColor(state.deleteButton.contentColor))
+    val context = LocalContext.current
+    val deleteButtonColor = context.getComposeThemeColor(state.deleteButton.color)
     Surface(modifier = modifier.verticalScroll(rememberScrollState())) {
         Column(modifier = modifier.padding(top = 8.dp)) {
             state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }
             IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
             TotalSelectedDownloadSizeRow(state.totalSelectedDownloadSize)
             RowButton(
-                text = state.deleteButton.title,
+                text = stringResource(state.deleteButton.title),
                 enabled = state.deleteButton.isEnabled,
                 colors = ButtonDefaults.buttonColors(
-                    contentColor = deleteButtonContentColor,
-                    disabledContentColor = deleteButtonContentColor.copy(alpha = ContentAlpha.disabled),
+                    backgroundColor = deleteButtonColor,
+                    disabledBackgroundColor = deleteButtonColor.copy(alpha = ContentAlpha.disabled),
                 ),
                 onClick = onDeleteButtonClicked,
             )
@@ -187,7 +186,7 @@ private fun ManualCleanupPagePreview(
         ManageDownloadsView(
             state = ManualCleanupViewModel.State(
                 deleteButton = ManualCleanupViewModel.State.DeleteButton(
-                    title = stringResource(id = LR.string.settings_select_episodes_to_delete)
+                    title = LR.string.settings_downloads_clean_up
                 )
             ),
             includeStarredSwitchState = false,
