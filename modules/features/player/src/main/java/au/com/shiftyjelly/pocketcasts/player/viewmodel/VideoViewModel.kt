@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +23,7 @@ class VideoViewModel @Inject constructor(
     val playbackState: LiveData<PlaybackState> = LiveDataReactiveStreams.fromPublisher(playbackManager.playbackStateRelay.toFlowable(BackpressureStrategy.LATEST))
 
     private var hideControlsTimer: Disposable? = null
+    private var lastTimeHidingControls = 0L
 
     private var controlsVisibleMutable = MutableLiveData(true)
     val controlsVisible: LiveData<Boolean> get() = controlsVisibleMutable
@@ -67,12 +69,17 @@ class VideoViewModel @Inject constructor(
     }
 
     fun showControls() {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q && System.currentTimeMillis() - lastTimeHidingControls < 200L) {
+            // Avoids an issue with API 29 and below where extra calls to showControl get triggered after hiding the controls
+            return
+        }
         controlsVisibleMutable.value = true
         startHideControlsTimer()
     }
 
     fun hideControls() {
         controlsVisibleMutable.value = false
+        lastTimeHidingControls = System.currentTimeMillis()
     }
 
     fun toggleControls() {

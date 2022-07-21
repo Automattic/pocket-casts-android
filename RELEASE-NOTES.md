@@ -44,6 +44,8 @@
         ([#3246](https://github.com/shiftyjelly/pocketcasts-android/pull/3426)).
     *   Fix crash when switching to podcast without chapters 
         ([#3450](https://github.com/shiftyjelly/pocketcasts-android/pull/3450)).
+    *   Improve sharing a list of podcasts
+        ([#97](https://github.com/shiftyjelly/pocketcasts-android/pull/97)).
     *   Fix displaying previous show notes briefly when switching episodes.
         ([#35](https://github.com/Automattic/pocket-casts-android/pull/35)).
     *   Fix same chapter click behaviour 
@@ -52,6 +54,12 @@
         ([#83](https://github.com/Automattic/pocket-casts-android/pull/83)).
     *   Fix back navigation for full screen player 'Rearrange Actions' page
         ([#76](https://github.com/Automattic/pocket-casts-android/pull/76)).
+    *   Prevent video player controls from getting stuck on the screen
+        ([#77](https://github.com/Automattic/pocket-casts-android/pull/77)).
+    *   Fix showing paused downloads as in progress
+        ([#113](https://github.com/Automattic/pocket-casts-android/pull/113)).
+    *   Fix issues with discover feed state when scrolling through the feed
+        ([#120](https://github.com/Automattic/pocket-casts-android/pull/120)).
 
 ### 7.19.2 (2022-02-11)
 

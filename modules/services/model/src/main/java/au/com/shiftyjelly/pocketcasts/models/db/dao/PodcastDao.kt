@@ -120,9 +120,6 @@ abstract class PodcastDao {
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY sort_order ASC")
     abstract fun observeFolderOrderByUserSort(folderUuid: String): Flowable<List<Podcast>>
 
-    @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY UPPER(title) ASC")
-    abstract fun findSubscribedOrderByTitleAsc(): List<Podcast>
-
     @Query("SELECT * FROM podcasts WHERE uuid = :uuid")
     abstract fun findByUuid(uuid: String): Podcast?
 
