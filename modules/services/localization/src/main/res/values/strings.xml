@@ -45,6 +45,8 @@
     <string name="played">Played</string>
     <string name="remove_from_up_next">Remove from Up Next</string>
     <string name="search">Search</string>
+    <string name="selected">Selected</string>
+    <string name="not_selected">Not selected</string>
     <string name="select_all">Select all</string>
     <string name="select_none">Select none</string>
     <string name="select_all_above">Select all above</string>
@@ -103,6 +105,8 @@
     <string name="expand_details">Expand details</string>
     <string name="add_podcasts">Add podcasts</string>
     <string name="please_try_again">Please try again</string>
+    <string name="next">Next</string>
+    <string name="select_podcasts">Select podcasts</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -301,20 +305,23 @@
     <string name="podcasts_plural">%d Podcasts</string>
     <string name="podcasts_share">Share podcasts</string>
     <string name="podcasts_share_0_selected">0 selected</string>
+    <string name="podcasts_share_all_selected">All selected</string>
     <string name="podcasts_share_description">Description (optional)</string>
     <string name="podcasts_share_list">Shared list</string>
+    <string name="podcasts_share_select_podcasts" translatable="false">@string/select_podcasts</string>
+    <string name="podcasts_share_create_list">Create list</string>
+    <string name="podcasts_share_creating_list">Creating list</string>
+    <string name="podcasts_share_failed">Sharing Failed</string>
+    <string name="podcasts_share_failed_description">Something went wrong creating your share page.</string>
     <string name="podcasts_share_select_all">Select all</string>
     <string name="podcasts_share_selected_podcasts">Share selected podcasts</string>
     <string name="podcasts_share_subscribe_to_all">SUBSCRIBE TO ALL</string>
     <string name="podcasts_share_title">Title</string>
-    <string name="podcasts_share_warning">This page will be viewable by anyone with the link. Do not share your own private podcasts.</string>
     <string name="podcasts_share_create_error">Oops unable to share</string>
     <string name="podcasts_share_missing_title">Please enter a title for your list.</string>
     <string name="podcasts_share_missing_podcast">Please choose at least one podcast.</string>
     <string name="podcasts_share_generating_list">Generating list…</string>
     <string name="podcasts_share_via">Share via</string>
-    <string name="podcasts_share_failed">Sorry unfortunately that didn\'t work. Please try again later.</string>
-    <string name="podcasts_share_failed_title">Oops</string>
     <string name="podcasts_share_selected">%d selected</string>
     <string name="podcasts_share_all_podcasts_selected">All podcasts selected. Unselect all button.</string>
     <string name="podcasts_share_action_select_all">Select all podcasts</string>
@@ -728,7 +735,7 @@
     <string name="profile_new_email_address">New Email Address</string>
     <string name="profile_new_password">New Password</string>
     <string name="profile_newsletter_detail">Receive news, app updates, themed playlists, interviews, and more.</string>
-    <string name="profile_next">Next</string>
+    <string name="profile_next" translatable="false">@string/next</string>
     <string name="profile_next_payment">Next payment: %s</string>
     <string name="profile_none">None</string>
     <string name="profile_not_signed_in">NOT SIGNED IN</string>
@@ -1119,7 +1126,7 @@
     <string name="settings_select_podcasts">Select Podcasts</string>
     <string name="settings_notification_silent">Silent</string>
     <string name="settings_whats_new">What\'s New</string>
-    <string name="settings_whats_new_next">Next</string>
+    <string name="settings_whats_new_next" translatable="false">@string/next</string>
     <string name="settings_whats_new_done">Done</string>
     <string name="settings_manage_downloads_deleting">Deleting episodes…</string>
     <string name="settings_storage_phone">Phone</string>

@@ -41,8 +41,7 @@ interface PodcastManager {
 
     fun observePodcastsOrderByLatestEpisode(): Flowable<List<Podcast>>
     fun observeSubscribed(): Flowable<List<Podcast>>
-    fun findPodcastsOrderByTitle(): List<Podcast>
-    fun findPodcastsOrderByTitleRx(): Single<List<Podcast>>
+    suspend fun findPodcastsOrderByTitle(): List<Podcast>
     fun findPodcastsToSync(): List<Podcast>
     suspend fun findPodcastsOrderByLatestEpisode(orderAsc: Boolean): List<Podcast>
     suspend fun findFolderPodcastsOrderByLatestEpisode(folderUuid: String): List<Podcast>

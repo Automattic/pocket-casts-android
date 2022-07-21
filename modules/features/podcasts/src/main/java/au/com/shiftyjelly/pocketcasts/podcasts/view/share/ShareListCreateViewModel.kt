@@ -1,72 +1,104 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
-import androidx.lifecycle.LiveDataReactiveStreams
-import androidx.lifecycle.MutableLiveData
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class ShareListCreateViewModel @Inject constructor(val podcastManager: PodcastManager) : ViewModel() {
+class ShareListCreateViewModel @Inject constructor(
+    private val podcastManager: PodcastManager,
+    private val listServerManager: ListServerManager
+) : ViewModel() {
 
-    val podcastsLive = LiveDataReactiveStreams.fromPublisher(podcastManager.findPodcastsOrderByTitleRx().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).toFlowable())
-    val selectedUuidsLive = MutableLiveData<Set<String>>().apply { postValue(selectedUuids) }
+    data class State(
+        val title: String = "",
+        val description: String = "",
+        val podcasts: List<Podcast> = emptyList(),
+        val selectedPodcasts: Set<Podcast> = emptySet()
+    ) {
+        val selectedPodcastsOrdered = podcasts.filter { selectedPodcasts.contains(it) }
+    }
 
-    val podcasts: List<Podcast>
-        get() { return podcastsLive.value ?: emptyList() }
+    private val mutableState = MutableStateFlow(State())
+    val state: StateFlow<State> = mutableState
 
-    val selectedUuids = mutableSetOf<String>()
-
-    private val disposables: CompositeDisposable = CompositeDisposable()
-
-    val allPodcastSelected: Boolean
-        get() = podcasts.isNotEmpty() && podcasts.size == selectedUuids.size
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
+    init {
+        viewModelScope.launch {
+            val podcasts = podcastManager.findPodcastsOrderByTitle()
+            mutableState.value = mutableState.value.copy(podcasts = podcasts)
+        }
     }
 
     fun selectPodcast(podcast: Podcast) {
-        selectedUuids.add(podcast.uuid)
-        selectedUuidsLive.postValue(selectedUuids)
+        val state = mutableState.value
+        val selectedPodcasts = state.selectedPodcasts
+            .toMutableSet()
+            .apply { add(podcast) }
+        mutableState.value = state.copy(selectedPodcasts = selectedPodcasts)
     }
 
     fun unselectPodcast(podcast: Podcast) {
-        selectedUuids.remove(podcast.uuid)
-        selectedUuidsLive.postValue(selectedUuids)
+        val state = mutableState.value
+        val selectedPodcasts = state.selectedPodcasts
+            .toMutableSet()
+            .apply { remove(podcast) }
+        mutableState.value = state.copy(selectedPodcasts = selectedPodcasts)
     }
 
-    fun unselectAll() {
-        selectedUuids.clear()
-        selectedUuidsLive.postValue(selectedUuids)
+    fun selectNone() {
+        mutableState.value = mutableState.value.copy(selectedPodcasts = emptySet())
     }
 
     fun selectAll() {
-        for (podcast in podcasts) {
-            selectedUuids.add(podcast.uuid)
-        }
-        selectedUuidsLive.postValue(selectedUuids)
+        val state = mutableState.value
+        mutableState.value = state.copy(selectedPodcasts = state.podcasts.toSet())
     }
 
-    // sort podcasts by title before sending them to the server
-    fun getSelectedPodcasts(): List<Podcast> {
-        val uuidToPodcast = mutableMapOf<String, Podcast>()
-        for (podcast in podcasts) {
-            uuidToPodcast[podcast.uuid] = podcast
-        }
-        val selectedPodcasts = mutableListOf<Podcast>()
-        for (uuid in selectedUuids) {
-            val podcast = uuidToPodcast[uuid] ?: continue
-            selectedPodcasts.add(podcast)
-        }
-        selectedPodcasts.sortedWith { podcastOne, podcastTwo -> podcastOne.title.compareTo(podcastTwo.title, ignoreCase = true) }
+    fun changeTitle(title: String) {
+        mutableState.value = mutableState.value.copy(title = title)
+    }
 
-        return selectedPodcasts
+    fun changeDescription(description: String) {
+        mutableState.value = mutableState.value.copy(description = description)
+    }
+
+    fun sharePodcasts(context: Context, label: String, onBefore: () -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        val stateValue = state.value
+        val title = stateValue.title
+        val description = stateValue.description
+
+        val selectedPodcasts = stateValue.selectedPodcastsOrdered
+        onBefore()
+        viewModelScope.launch {
+            try {
+                val url = listServerManager.createPodcastList(
+                    title = title,
+                    description = description,
+                    podcasts = selectedPodcasts
+                )
+
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, url)
+                }
+                startActivity(context, Intent.createChooser(intent, label), null)
+
+                onSuccess()
+            } catch (ex: Exception) {
+                Timber.e(ex)
+                onFailure()
+            }
+        }
     }
 }

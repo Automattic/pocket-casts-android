@@ -145,6 +145,7 @@ fun TextP60(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE
 ) {
     Text(
@@ -155,6 +156,7 @@ fun TextP60(
         letterSpacing = 0.sp,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
+        textAlign = textAlign,
         modifier = modifier
     )
 }
