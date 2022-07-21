@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -9,7 +10,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Surface
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,9 +32,9 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralEpisodes
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getComposeThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -85,23 +86,25 @@ private fun ManageDownloadsView(
     onDeleteButtonClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val deleteButtonColor = context.getComposeThemeColor(state.deleteButton.color)
-    Surface(modifier = modifier.verticalScroll(rememberScrollState())) {
-        Column(modifier = modifier.padding(top = 8.dp)) {
-            state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }
-            IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
-            TotalSelectedDownloadSizeRow(state.totalSelectedDownloadSize)
-            RowButton(
-                text = stringResource(state.deleteButton.title),
-                enabled = state.deleteButton.isEnabled,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = deleteButtonColor,
-                    disabledBackgroundColor = deleteButtonColor.copy(alpha = ContentAlpha.disabled),
-                ),
-                onClick = onDeleteButtonClicked,
-            )
-        }
+    val deleteButtonColor = MaterialTheme.theme.colors.support05
+    Column(
+        modifier = modifier
+            .background(MaterialTheme.theme.colors.primaryUi01)
+            .padding(top = 8.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }
+        IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
+        TotalSelectedDownloadSizeRow(state.totalSelectedDownloadSize)
+        RowButton(
+            text = stringResource(LR.string.settings_downloads_clean_up),
+            enabled = state.deleteButton.isEnabled,
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = deleteButtonColor,
+                disabledBackgroundColor = deleteButtonColor.copy(alpha = ContentAlpha.disabled),
+            ),
+            onClick = onDeleteButtonClicked,
+        )
     }
 }
 
@@ -184,11 +187,7 @@ private fun ManualCleanupPagePreview(
 ) {
     AppTheme(themeType) {
         ManageDownloadsView(
-            state = ManualCleanupViewModel.State(
-                deleteButton = ManualCleanupViewModel.State.DeleteButton(
-                    title = LR.string.settings_downloads_clean_up
-                )
-            ),
+            state = ManualCleanupViewModel.State(),
             includeStarredSwitchState = false,
             onDiskSpaceCheckedChanged = { _, _ -> },
             onStarredSwitchClicked = {},

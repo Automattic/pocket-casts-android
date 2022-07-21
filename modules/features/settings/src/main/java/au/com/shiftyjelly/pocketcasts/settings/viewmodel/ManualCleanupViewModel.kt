@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import androidx.annotation.AttrRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @HiltViewModel
 class ManualCleanupViewModel
@@ -47,9 +45,7 @@ class ManualCleanupViewModel
         }
 
         data class DeleteButton(
-            val title: Int = LR.string.settings_downloads_clean_up,
             val isEnabled: Boolean = false,
-            @AttrRes val color: Int = UR.attr.support_05,
         )
     }
 
