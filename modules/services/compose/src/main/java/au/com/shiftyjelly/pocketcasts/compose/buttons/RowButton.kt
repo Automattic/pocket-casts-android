@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +23,8 @@ fun RowButton(
     text: String,
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
+    enabled: Boolean = true,
+    colors: ButtonColors = ButtonDefaults.buttonColors(),
     onClick: () -> Unit
 ) {
     Row(
@@ -31,7 +35,9 @@ fun RowButton(
         Button(
             onClick = { onClick() },
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = colors,
+            enabled = enabled
         ) {
             Text(
                 text = text,

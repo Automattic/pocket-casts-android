@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
@@ -370,7 +371,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_keep_screen_awake),
             secondaryText = stringResource(LR.string.settings_keep_screen_awake_summary),
-            switchState = saved,
+            toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )
 
@@ -379,7 +380,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_playback_resumption),
             secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
-            switchState = saved,
+            toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )
 
@@ -388,7 +389,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_up_next_tap),
             secondaryText = stringResource(LR.string.settings_up_next_tap_summary),
-            switchState = saved,
+            toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )
 

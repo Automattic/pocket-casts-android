@@ -23,7 +23,7 @@
     <string name="downloads">Downloads</string>
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
-    <string name="in_progress">In Progress</string>
+    <string name="in_progress">In progress</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
@@ -960,8 +960,8 @@
     <string name="settings_battery_learn_more_url" translatable="false">https://support.pocketcasts.com/article/playback-pausing-randomly-or-when-screen-is-locked/</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
-    <string name="settings_delete_episodes">Delete %d episodes</string>
     <string name="settings_developer">Developer</string>
+    <string name="settings_downloads_clean_up">Clean up</string>
     <string name="settings_embedded_artwork_details">Shows artwork from the downloaded file (if it exists) in the player instead of using the show\'s artwork.</string>
     <string name="settings_export_save_file">Save file</string>
     <string name="settings_export_save_file_summary">Export the OPML file to your storage.</string>
@@ -1030,7 +1030,6 @@
     <string name="settings_row_action_download" translatable="false">@string/download</string>
     <string name="settings_row_action_play" translatable="false">@string/play</string>
     <string name="settings_row_action_summary">For episodes that aren\'t downloaded yet, lists will show %s buttons.</string>
-    <string name="settings_select_episodes_to_delete">Select episodes to delete</string>
     <string name="settings_show_archived" translatable="false">@string/show_archived</string>
     <string name="settings_show_archived_action_hide">Hide</string>
     <string name="settings_show_archived_action_show">Show</string>

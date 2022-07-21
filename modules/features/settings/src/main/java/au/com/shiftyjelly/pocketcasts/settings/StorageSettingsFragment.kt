@@ -8,7 +8,6 @@ import android.os.StatFs
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.EditTextPreference
@@ -128,7 +127,7 @@ class StorageSettingsFragment :
     }
 
     private fun showDownloadedFiles() {
-        val fragment = ManualCleanupFragment()
+        val fragment = ManualCleanupFragment.newInstance()
         childFragmentManager.beginTransaction()
             .replace(UR.id.frameChildFragment, fragment)
             .addToBackStack("podcastSelect")
@@ -364,7 +363,7 @@ class StorageSettingsFragment :
     override fun onBackPressed(): Boolean {
         if (childFragmentManager.backStackEntryCount > 0) {
             childFragmentManager.popBackStack()
-            (activity as AppCompatActivity).supportActionBar?.setTitle(LR.string.settings_title_storage)
+            view?.findToolbar()?.title = getString(LR.string.settings_title_storage)
             return true
         }
 

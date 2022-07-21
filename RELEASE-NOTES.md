@@ -60,6 +60,8 @@
         ([#113](https://github.com/Automattic/pocket-casts-android/pull/113)).
     *   Fix issues with discover feed state when scrolling through the feed
         ([#120](https://github.com/Automattic/pocket-casts-android/pull/120)).
+    *   Improve manage downloads screen
+        ([#117](https://github.com/Automattic/pocket-casts-android/pull/117)).
 
 ### 7.19.2 (2022-02-11)
 
