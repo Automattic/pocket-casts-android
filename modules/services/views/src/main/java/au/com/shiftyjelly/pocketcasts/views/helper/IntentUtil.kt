@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AlertDialog
+import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import java.io.UnsupportedEncodingException
@@ -13,6 +14,10 @@ import java.util.Arrays
 import java.util.regex.Matcher
 
 object IntentUtil {
+
+    fun isPocketCastsWebsite(intent: Intent): Boolean {
+        return intent.data?.host == BuildConfig.WEB_BASE_HOST
+    }
 
     fun isPodloveUrl(intent: Intent): Boolean {
         val scheme = intent.scheme
