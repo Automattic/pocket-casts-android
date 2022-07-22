@@ -41,3 +41,9 @@ fastlane/test_output
 
 # secrets
 secret.properties
+
+# Silver Searcher ignore file
+.agignore
+
+# ripgrep ignore file
+.rgignore
