@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.StatFs
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -26,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -91,13 +89,6 @@ class StorageSettingsFragment :
 
         findPreference<Preference>("manualCleanup")?.setOnPreferenceClickListener { _ ->
             showDownloadedFiles()
-            true
-        }
-
-        findPreference<Preference>("clearDownloadCache")?.setOnPreferenceClickListener {
-            val tempPath = fileStorage.tempPodcastDirectory
-            FileUtil.deleteDirectoryContents(tempPath.absolutePath)
-            Toast.makeText(context, LR.string.settings_storage_clear_cache, Toast.LENGTH_SHORT).show()
             true
         }
 

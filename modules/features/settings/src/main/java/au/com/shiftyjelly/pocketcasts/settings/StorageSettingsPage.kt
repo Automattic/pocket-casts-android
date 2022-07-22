@@ -1,13 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -19,21 +23,35 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun StorageSettingsPage() {
-    StorageSettingsView()
+fun StorageSettingsPage(
+    viewModel: StorageSettingsViewModel
+) {
+    val context = LocalContext.current
+    StorageSettingsView(
+        { viewModel.onClearDownloadCacheClick() }
+    )
+    LaunchedEffect(Unit) {
+        viewModel.snackbarMessage
+            .collect { message ->
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+    }
 }
 
 @Composable
-fun StorageSettingsView() {
+fun StorageSettingsView(
+    onClearDownloadCacheClick: () -> Unit
+) {
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_storage),
             bottomShadow = true,
-            onNavigationClick = {},
+            onNavigationClick = {}
         )
 
         Column(
@@ -43,7 +61,7 @@ fun StorageSettingsView() {
                 .padding(vertical = 8.dp)
         ) {
             DownloadedFilesRow()
-            ClearDownloadCacheRow()
+            ClearDownloadCacheRow(onClearDownloadCacheClick)
             StorageChoiceRow()
             StorageFolderRow()
             BackgroundRefreshRow()
@@ -60,9 +78,15 @@ private fun DownloadedFilesRow() {
 }
 
 @Composable
-private fun ClearDownloadCacheRow() {
+private fun ClearDownloadCacheRow(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_storage_clear_download_cache),
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(vertical = 6.dp)
     )
 }
 
@@ -114,6 +138,8 @@ private fun StorageSettingsPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        StorageSettingsView()
+        StorageSettingsView(
+            onClearDownloadCacheClick = {}
+        )
     }
 }
