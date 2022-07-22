@@ -38,3 +38,6 @@ fastlane/test_output
 
 # Downloaded dependencies such as 'configure' plugin: https://github.com/Automattic/configure
 /vendor
+
+# secrets
+secret.properties
