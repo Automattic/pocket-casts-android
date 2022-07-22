@@ -28,6 +28,9 @@ android {
         buildConfigField 'int', 'VERSION_CODE', "${project.versionCode}"
         buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
 
+        // TODO: Enable this when we start utilizing `secret.properties` and keep the existing implementation until then
+        //buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", getSecretProperty("pocketcastsSettingsEncryptSecret", "")
+        //buildConfigField "String", "SHARING_SERVER_SECRET", getSecretProperty("pocketcastsSharingServerSecret", "")
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.properties["pocketcastsSettingsEncryptSecret"] ?: ""}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.properties["pocketcastsSharingServerSecret"] ?: ""}\""
 
