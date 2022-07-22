@@ -19,6 +19,7 @@ build/
 
 # Android
 google-services.json
+google-upload-credentials.json
 
 ### fastlane ###
 # fastlane - A streamlined workflow tool for Cocoa deployment
