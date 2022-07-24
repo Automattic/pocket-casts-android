@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -66,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
+import au.com.shiftyjelly.pocketcasts.ui.MainActivity.Companion.PROMOCODE_REQUEST_CODE
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -834,6 +836,9 @@ class MainActivity :
                             }
                         }
                     }
+                } else if (IntentUtil.isPocketCastsWebsite(intent)) {
+                    // when the user goes to https://pocketcasts.com/get it should either open the play store or the user's app
+                    return
                 } else if (IntentUtil.isPodloveUrl(intent)) {
                     openPodcastUrl(IntentUtil.getPodloveUrl(intent))
                     return
