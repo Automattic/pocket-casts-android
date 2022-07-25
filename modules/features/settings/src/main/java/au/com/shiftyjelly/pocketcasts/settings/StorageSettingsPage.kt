@@ -118,7 +118,7 @@ fun StorageSettingsView(
             DownloadedFilesRow()
             ClearDownloadCacheRow(onClearDownloadCacheClick)
             StorageChoiceRow(state.storageChoiceState)
-            StorageFolderRow()
+            StorageFolderRow(state.storageFolderState)
             BackgroundRefreshRow()
             StorageDataWarningRow(state.storageDataWarningState)
         }
@@ -135,7 +135,7 @@ private fun DownloadedFilesRow() {
 @Composable
 private fun ClearDownloadCacheRow(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_storage_clear_download_cache),
@@ -170,10 +170,19 @@ fun mapToStringRes(storageLocation: String?): Int {
 }
 
 @Composable
-private fun StorageFolderRow() {
-    SettingRow(
-        primaryText = stringResource(LR.string.settings_storage_custom_folder_location),
-    )
+private fun StorageFolderRow(
+    storageFolderState: StorageSettingsViewModel.State.StorageFolderState,
+    modifier: Modifier = Modifier,
+) {
+    if (storageFolderState.isVisible) {
+        SettingRow(
+            primaryText = stringResource(LR.string.settings_storage_custom_folder_location),
+            secondaryText = storageFolderState.summary,
+            modifier = modifier
+                .clickable { storageFolderState.onStateChange }
+                .padding(vertical = 6.dp)
+        )
+    }
 }
 
 @Composable
@@ -219,7 +228,11 @@ private fun StorageSettingsPreview(
                 ),
                 storageChoiceState = StorageSettingsViewModel.State.StorageChoiceState(
                     onStateChange = {}
-                )
+                ),
+                storageFolderState = StorageSettingsViewModel.State.StorageFolderState(
+                    summary = "Custom Folder",
+                    onStateChange = {}
+                ),
             ),
             onBackPressed = {},
             onClearDownloadCacheClick = {},

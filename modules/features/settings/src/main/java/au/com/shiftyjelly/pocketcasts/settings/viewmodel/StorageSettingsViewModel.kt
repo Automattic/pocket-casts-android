@@ -54,6 +54,13 @@ class StorageSettingsViewModel
             settings.getStorageChoiceName()
         }
 
+    private val storageFolderSummary: String
+        get() = if (settings.usingCustomFolderStorage()) {
+            settings.getStorageCustomFolder()
+        } else {
+            context.getString(LR.string.settings_storage_using, settings.getStorageChoiceName())
+        }
+
     private lateinit var foldersAvailable: List<FolderLocation>
     private lateinit var folderLocations: () -> List<FolderLocation>
 
@@ -70,6 +77,11 @@ class StorageSettingsViewModel
             title = settings.getStorageChoice(),
             summary = storageChoiceSummary,
             onStateChange = { onStorageChoiceChange(it) }
+        ),
+        storageFolderState = State.StorageFolderState(
+            isVisible = settings.usingCustomFolderStorage(),
+            summary = storageFolderSummary,
+            onStateChange = {}
         )
     )
 
@@ -281,6 +293,7 @@ class StorageSettingsViewModel
     data class State(
         val storageDataWarningState: StorageDataWarningState,
         val storageChoiceState: StorageChoiceState,
+        val storageFolderState: StorageFolderState
     ) {
         data class StorageDataWarningState(
             val isChecked: Boolean = false,
@@ -292,6 +305,12 @@ class StorageSettingsViewModel
             val summary: String? = null,
             val choices: Pair<Array<String?>, Array<String?>> = Pair(emptyArray(), emptyArray()),
             val onStateChange: (String?) -> Unit
+        )
+
+        data class StorageFolderState(
+            val isVisible: Boolean = false,
+            val summary: String? = null,
+            val onStateChange: (newPath: String?) -> Unit
         )
     }
 
