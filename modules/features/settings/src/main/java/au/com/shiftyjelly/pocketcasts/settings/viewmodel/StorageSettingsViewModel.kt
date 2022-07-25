@@ -111,13 +111,13 @@ class StorageSettingsViewModel
         var i = 0
         for (folderLocation in foldersAvailable) {
             entries[i] =
-                folderLocation.label + ", " + getStorageSpaceString(folderLocation.filePath)
+                folderLocation.label/* + ", " + getStorageSpaceString(folderLocation.filePath)*/
             entryValues[i] = folderLocation.filePath
 
             i++
         }
         if (android.os.Build.VERSION.SDK_INT < 29) {
-            entries[i] = context.getString(LR.string.settings_storage_custom_folder) + "…"
+            entries[i] = context.getString(LR.string.settings_storage_custom_folder)/* + "…"*/
             entryValues[i] = Settings.STORAGE_ON_CUSTOM_FOLDER
         }
 
@@ -168,9 +168,10 @@ class StorageSettingsViewModel
         }
 
         if (android.os.Build.VERSION.SDK_INT >= 29 && settings.usingCustomFolderStorage()) {
+            val (_, folderPaths) = mutableState.value.storageChoiceState.choices
             mutableState.value = mutableState.value.copy(
                 storageChoiceState = mutableState.value.storageChoiceState.copy(
-                    summary = mutableState.value.storageChoiceState.choices?.second?.first() ?: ""
+                    summary = folderPaths.firstOrNull() ?: ""
                 )
             )
             viewModelScope.launch {
@@ -289,7 +290,7 @@ class StorageSettingsViewModel
         data class StorageChoiceState(
             val title: String? = null,
             val summary: String? = null,
-            val choices: Pair<Array<String?>, Array<String?>>? = null,
+            val choices: Pair<Array<String?>, Array<String?>> = Pair(emptyArray(), emptyArray()),
             val onStateChange: (String?) -> Unit
         )
     }

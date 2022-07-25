@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -148,10 +149,24 @@ private fun ClearDownloadCacheRow(
 private fun StorageChoiceRow(
     storageChoiceState: StorageSettingsViewModel.State.StorageChoiceState,
 ) {
-    SettingRow(
+    val (folderLabels, folderPaths) = storageChoiceState.choices
+    SettingRadioDialogRow(
         primaryText = stringResource(LR.string.settings_storage_store_on),
-        secondaryText = storageChoiceState.summary
+        secondaryText = storageChoiceState.summary,
+        options = folderLabels.asList(),
+        savedOption = storageChoiceState.summary,
+        optionToStringRes = ::mapToStringRes,
+        onSave = { storageChoiceState.onStateChange(folderPaths[folderLabels.indexOf(it)]) }
     )
+}
+
+fun mapToStringRes(storageLocation: String?): Int {
+    return when (storageLocation?.lowercase()) {
+        "custom folder" -> LR.string.settings_storage_custom_folder
+        "sd card" -> LR.string.settings_storage_sd_card
+        "phone" -> LR.string.settings_storage_phone
+        else -> LR.string.settings_storage_phone
+    }
 }
 
 @Composable
