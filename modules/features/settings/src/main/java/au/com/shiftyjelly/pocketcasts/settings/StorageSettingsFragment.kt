@@ -14,7 +14,6 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
@@ -64,7 +63,6 @@ class StorageSettingsFragment :
 
     private var storageChoicePreference: ListPreference? = null
     private var storageFolderPreference: EditTextPreference? = null
-    private var useMobileDataPreference: SwitchPreference? = null
 
     private var foldersAvailable: List<FolderLocation>? = null
     private var permissionRequestedForPath: String? = null
@@ -90,19 +88,6 @@ class StorageSettingsFragment :
         findPreference<Preference>("manualCleanup")?.setOnPreferenceClickListener { _ ->
             showDownloadedFiles()
             true
-        }
-
-        updateUseMobileData()
-    }
-
-    private fun updateUseMobileData() {
-        useMobileDataPreference = preferenceManager.findPreference<SwitchPreference>("useMobileData")?.apply {
-            isChecked = settings.warnOnMeteredNetwork()
-            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                val warnMobileData = newValue as Boolean
-                settings.setWarnOnMeteredNetwork(warnMobileData)
-                true
-            }
         }
     }
 

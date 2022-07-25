@@ -6,13 +6,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -31,9 +35,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun StorageSettingsPage(
     viewModel: StorageSettingsViewModel
 ) {
+    val state: StorageSettingsViewModel.State by viewModel.state.collectAsState()
     val context = LocalContext.current
     StorageSettingsView(
-        { viewModel.onClearDownloadCacheClick() }
+        state = state,
+        onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() }
     )
     LaunchedEffect(Unit) {
         viewModel.snackbarMessage
@@ -45,7 +51,8 @@ fun StorageSettingsPage(
 
 @Composable
 fun StorageSettingsView(
-    onClearDownloadCacheClick: () -> Unit
+    state: StorageSettingsViewModel.State,
+    onClearDownloadCacheClick: () -> Unit,
 ) {
     Column {
         ThemedTopAppBar(
@@ -65,7 +72,7 @@ fun StorageSettingsView(
             StorageChoiceRow()
             StorageFolderRow()
             BackgroundRefreshRow()
-            StorageDataWarningRow()
+            StorageDataWarningRow(state.storageDataWarningState)
         }
     }
 }
@@ -115,12 +122,14 @@ private fun BackgroundRefreshRow() {
 
 @Composable
 private fun StorageDataWarningRow(
-    modifier: Modifier = Modifier
+    state: StorageSettingsViewModel.State.StorageDataWarningState,
+    modifier: Modifier = Modifier,
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_storage_data_warning),
         secondaryText = stringResource(LR.string.settings_storage_data_warning_summary),
-        toggle = SettingRowToggle.Switch(checked = false),
+        toggle = SettingRowToggle.Switch(checked = state.isChecked),
+        modifier = modifier.toggleable(value = state.isChecked, role = Role.Switch) { state.onCheckedChange(it) }
     ) {
         TextP50(
             text = stringResource(LR.string.settings_storage_data_warning_car),
@@ -139,7 +148,12 @@ private fun StorageSettingsPreview(
 ) {
     AppTheme(themeType) {
         StorageSettingsView(
-            onClearDownloadCacheClick = {}
+            state = StorageSettingsViewModel.State(
+                storageDataWarningState = StorageSettingsViewModel.State.StorageDataWarningState(
+                    onCheckedChange = {}
+                )
+            ),
+            onClearDownloadCacheClick = {},
         )
     }
 }
