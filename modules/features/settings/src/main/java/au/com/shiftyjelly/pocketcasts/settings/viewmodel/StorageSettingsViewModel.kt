@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
+import android.Manifest
 import android.content.Context
 import android.os.StatFs
 import androidx.annotation.IntegerRes
@@ -47,6 +48,9 @@ class StorageSettingsViewModel
     private val mutableAlertDialog = MutableSharedFlow<AlertDialogState>()
     val alertDialog = mutableAlertDialog.asSharedFlow()
 
+    private val mutablePermissionRequest = MutableSharedFlow<String>()
+    val permissionRequest = mutablePermissionRequest.asSharedFlow()
+
     private val storageChoiceSummary: String?
         get() = if (settings.usingCustomFolderStorage()) {
             context.getString(LR.string.settings_storage_custom_folder)
@@ -63,9 +67,15 @@ class StorageSettingsViewModel
 
     private lateinit var foldersAvailable: List<FolderLocation>
     private lateinit var folderLocations: () -> List<FolderLocation>
+    private lateinit var permissionGranted: () -> Boolean
+    private var permissionRequestedForPath: String? = null
 
-    fun start(folderLocations: () -> List<FolderLocation>) {
+    fun start(
+        folderLocations: () -> List<FolderLocation>,
+        permissionGranted: () -> Boolean
+    ) {
         this.folderLocations = folderLocations
+        this.permissionGranted = permissionGranted
     }
 
     private fun initState() = State(
@@ -81,7 +91,7 @@ class StorageSettingsViewModel
         storageFolderState = State.StorageFolderState(
             isVisible = settings.usingCustomFolderStorage(),
             summary = storageFolderSummary,
-            onStateChange = {}
+            onStateChange = { onStorageFolderChange(it) }
         )
     )
 
@@ -197,6 +207,57 @@ class StorageSettingsViewModel
         }
     }
 
+    private fun onStorageFolderChange(
+        newPath: String?
+    ) {
+        viewModelScope.launch {
+            if (newPath == null) {
+                return@launch
+            }
+
+            // validate the path
+            if (newPath.trim().isEmpty()) {
+                mutableAlertDialog.emit(createAlertDialogState(context.getString(LR.string.settings_storage_folder_blank)))
+                return@launch
+            }
+
+            var oldDirectory: File? = null
+            try {
+                oldDirectory = fileStorage.baseStorageDirectory
+            } catch (e: StorageException) {
+                // ignore error
+            }
+
+            if (!permissionGranted()) {
+                mutablePermissionRequest.emit(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                permissionRequestedForPath = newPath
+                return@launch
+            }
+
+            val newDirectory = File(newPath)
+            if (!newDirectory.exists()) {
+                val success = newDirectory.mkdirs()
+                if (!success && !newDirectory.exists()) {
+                    mutableAlertDialog.emit(createAlertDialogState(context.getString(LR.string.settings_storage_folder_not_found)))
+                    return@launch
+                }
+            }
+
+            if (!newDirectory.canWrite()) {
+                mutableAlertDialog.emit(createAlertDialogState(context.getString(LR.string.settings_storage_folder_write_failed)))
+                return@launch
+            }
+
+            // move the podcasts if the user wants
+            if (oldDirectory != null) {
+                movePodcastStorage(oldDirectory.absolutePath, newDirectory.absolutePath)
+            }
+
+            settings.setStorageCustomFolder(newPath)
+            changeStorageLabels()
+        }
+    }
+
     private fun movePodcastStorage(oldDirectory: String?, newDirectory: String?) {
         if (oldDirectory == null || newDirectory != oldDirectory) {
             viewModelScope.launch {
@@ -231,6 +292,10 @@ class StorageSettingsViewModel
         mutableState.value = mutableState.value.copy(
             storageChoiceState = mutableState.value.storageChoiceState.copy(
                 summary = storageChoiceSummary
+            ),
+            storageFolderState = mutableState.value.storageFolderState.copy(
+                isVisible = settings.usingCustomFolderStorage(),
+                summary = storageFolderSummary
             )
         )
     }
@@ -245,6 +310,13 @@ class StorageSettingsViewModel
             )
         } catch (e: Exception) {
             ""
+        }
+    }
+
+    fun onPermissionGrantedStorage() {
+        val path = permissionRequestedForPath
+        if (path?.isNotBlank() == true) {
+            onStorageFolderChange(path)
         }
     }
 
