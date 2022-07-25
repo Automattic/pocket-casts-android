@@ -51,7 +51,6 @@ class StorageSettingsFragment : BaseFragment() {
 
     /*
     PreferenceFragmentCompat(),
-    SharedPreferences.OnSharedPreferenceChangeListener,
     Preference.OnPreferenceChangeListener,
     CoroutineScope,
     HasBackstack {
@@ -81,30 +80,12 @@ class StorageSettingsFragment : BaseFragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
     private fun showDownloadedFiles() {
         val fragment = ManualCleanupFragment.newInstance()
         childFragmentManager.beginTransaction()
             .replace(UR.id.frameChildFragment, fragment)
             .addToBackStack("podcastSelect")
             .commit()
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        if (Settings.PREFERENCE_STORAGE_CHOICE == key) {
-            changeStorageLabels()
-        } else if (Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER == key) {
-            changeStorageLabels()
-        }
     }
 
     private fun changeStorageLabels() {

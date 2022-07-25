@@ -136,6 +136,7 @@ class StorageSettingsViewModel
                 val baseDirectory = fileStorage.baseStorageDirectory
                 baseDirectory?.absolutePath?.let { basePath ->
                     settings.setStorageCustomFolder(basePath)
+                    changeStorageLabels()
                 }
             } catch (e: StorageException) {
                 viewModelScope.launch {
@@ -157,6 +158,7 @@ class StorageSettingsViewModel
             for (folder in foldersAvailable) {
                 if (folder.filePath == folderPathChosen) {
                     settings.setStorageChoice(folderPathChosen, folder.label)
+                    changeStorageLabels()
                     break
                 }
             }
