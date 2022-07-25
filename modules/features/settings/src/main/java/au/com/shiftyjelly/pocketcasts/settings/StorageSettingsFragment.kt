@@ -101,8 +101,6 @@ class StorageSettingsFragment : BaseFragment() {
 
     private fun changeStorageLabels() {
         val storageFolderPreference = storageFolderPreference ?: return
-        val space = calcSpaceString()
-        preferenceManager.findPreference<PreferenceCategory>("storageTitle")?.title = getString(LR.string.settings_storage) + " - $space"
 
         if (settings.usingCustomFolderStorage()) {
             storageFolderPreference.summary = settings.getStorageCustomFolder()
@@ -119,19 +117,6 @@ class StorageSettingsFragment : BaseFragment() {
             } else {
                 it.removePreference(storageFolderPreference)
             }
-        }
-    }
-
-    private fun calcSpaceString(): String {
-        try {
-            val file = fileStorage.baseStorageDirectory
-            val stat = StatFs(file.absolutePath)
-            val total = stat.blockCountLong * stat.blockSizeLong
-            val free = stat.availableBlocksLong * stat.blockSizeLong
-            return getString(LR.string.settings_storage_free_out_of, Util.formattedBytes(free, context = requireContext()), Util.formattedBytes(total, context = requireContext()))
-        } catch (e: Exception) {
-            Timber.e(e, "Unable to calculate free space.")
-            return ""
         }
     }
 
