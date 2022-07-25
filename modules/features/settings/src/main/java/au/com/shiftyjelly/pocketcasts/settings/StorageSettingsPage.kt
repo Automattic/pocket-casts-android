@@ -72,7 +72,7 @@ fun StorageSettingsView(
         ) {
             DownloadedFilesRow()
             ClearDownloadCacheRow(onClearDownloadCacheClick)
-            StorageChoiceRow()
+            StorageChoiceRow(state.storageChoiceState)
             StorageFolderRow()
             BackgroundRefreshRow()
             StorageDataWarningRow(state.storageDataWarningState)
@@ -101,9 +101,12 @@ private fun ClearDownloadCacheRow(
 }
 
 @Composable
-private fun StorageChoiceRow() {
+private fun StorageChoiceRow(
+    storageChoiceState: StorageSettingsViewModel.State.StorageChoiceState,
+) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_storage_store_on),
+        secondaryText = storageChoiceState.summary
     )
 }
 
@@ -154,7 +157,8 @@ private fun StorageSettingsPreview(
             state = StorageSettingsViewModel.State(
                 storageDataWarningState = StorageSettingsViewModel.State.StorageDataWarningState(
                     onCheckedChange = {}
-                )
+                ),
+                storageChoiceState = StorageSettingsViewModel.State.StorageChoiceState()
             ),
             onBackPressed = {},
             onClearDownloadCacheClick = {},
