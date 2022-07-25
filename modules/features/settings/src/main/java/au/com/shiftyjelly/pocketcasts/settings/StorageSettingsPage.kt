@@ -202,7 +202,9 @@ private fun StorageSettingsPreview(
                 storageDataWarningState = StorageSettingsViewModel.State.StorageDataWarningState(
                     onCheckedChange = {}
                 ),
-                storageChoiceState = StorageSettingsViewModel.State.StorageChoiceState()
+                storageChoiceState = StorageSettingsViewModel.State.StorageChoiceState(
+                    onStateChange = {}
+                )
             ),
             onBackPressed = {},
             onClearDownloadCacheClick = {},

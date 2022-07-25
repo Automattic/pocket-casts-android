@@ -9,15 +9,21 @@ import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
+import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.*
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -25,6 +31,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class StorageSettingsViewModel
 @Inject constructor(
+    private val podcastManager: PodcastManager,
+    private val episodeManager: EpisodeManager,
     private val fileStorage: FileStorage,
     private val fileUtil: FileUtilWrapper,
     private val settings: Settings,
@@ -60,7 +68,8 @@ class StorageSettingsViewModel
         ),
         storageChoiceState = State.StorageChoiceState(
             title = settings.getStorageChoice(),
-            summary = storageChoiceSummary
+            summary = storageChoiceSummary,
+            onStateChange = { onStorageChoiceChange(it) }
         )
     )
 
@@ -121,6 +130,88 @@ class StorageSettingsViewModel
         changeStorageLabels()
     }
 
+    private fun onStorageChoiceChange(folderPathChosen: String?) {
+        if (folderPathChosen == Settings.STORAGE_ON_CUSTOM_FOLDER) {
+            try {
+                val baseDirectory = fileStorage.baseStorageDirectory
+                baseDirectory?.absolutePath?.let { basePath ->
+                    settings.setStorageCustomFolder(basePath)
+                }
+            } catch (e: StorageException) {
+                viewModelScope.launch {
+                    mutableAlertDialog.emit(
+                        createAlertDialogState(
+                            title = context.getString(LR.string.settings_storage_folder_change_failed) + " " + e.message,
+                            message = LR.string.settings_storage_android_10_custom,
+                        )
+                    )
+                    return@launch
+                }
+            }
+        } else {
+            // store the old folder value, this is still available until we set it below
+            val oldFolderValue =
+                if (settings.usingCustomFolderStorage()) settings.getStorageCustomFolder() else settings.getStorageChoice()
+
+            // set the name for this folder
+            for (folder in foldersAvailable) {
+                if (folder.filePath == folderPathChosen) {
+                    settings.setStorageChoice(folderPathChosen, folder.label)
+                    break
+                }
+            }
+
+            // if it's a new folder, ask the user if they want to move their files there
+            movePodcastStorage(oldFolderValue, folderPathChosen)
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= 29 && settings.usingCustomFolderStorage()) {
+            mutableState.value = mutableState.value.copy(
+                storageChoiceState = mutableState.value.storageChoiceState.copy(
+                    summary = mutableState.value.storageChoiceState.choices?.second?.first() ?: ""
+                )
+            )
+            viewModelScope.launch {
+                mutableAlertDialog.emit(
+                    createAlertDialogState(
+                        title = context.getString(LR.string.settings_storage_folder_write_failed),
+                        message = LR.string.settings_storage_android_10_custom,
+                    )
+                )
+            }
+        }
+    }
+
+    private fun movePodcastStorage(oldDirectory: String?, newDirectory: String?) {
+        if (oldDirectory == null || newDirectory != oldDirectory) {
+            viewModelScope.launch {
+                mutableAlertDialog.emit(
+                    createStorageMoveLocationAlertDialogState(oldDirectory, newDirectory)
+                )
+            }
+        }
+    }
+
+    private fun movePodcasts(oldDirectory: String?, newDirectory: String?) {
+        if (oldDirectory == null || newDirectory == null) {
+            return
+        }
+        LogBuffer.i(
+            LogBuffer.TAG_BACKGROUND_TASKS,
+            "Moving storage from $oldDirectory to $newDirectory"
+        )
+        // TODO: Add progress bar
+        viewModelScope.launch(Dispatchers.IO) {
+            fileStorage.moveStorage(
+                File(oldDirectory),
+                File(newDirectory),
+                podcastManager,
+                episodeManager
+            )
+        }
+        setupStorage()
+    }
+
     private fun changeStorageLabels() {
         mutableState.value = mutableState.value.copy(
             storageChoiceState = mutableState.value.storageChoiceState.copy(
@@ -141,6 +232,27 @@ class StorageSettingsViewModel
             ""
         }
     }
+
+    private fun createStorageMoveLocationAlertDialogState(
+        oldDirectory: String?,
+        newDirectory: String?,
+    ) = AlertDialogState(
+        title = context.getString(LR.string.settings_storage_move_are_you_sure),
+        message = context.getString(LR.string.settings_storage_move_message),
+        buttons = listOf(
+            DialogButtonState(
+                text = context.getString(LR.string.settings_storage_move_cancel).uppercase(
+                    Locale.getDefault()
+                ),
+                onClick = {}
+
+            ),
+            DialogButtonState(
+                text = context.getString(LR.string.settings_storage_move),
+                onClick = { movePodcasts(oldDirectory, newDirectory) },
+            )
+        )
+    )
 
     private fun createAlertDialogState(
         @IntegerRes title: String,
@@ -176,6 +288,7 @@ class StorageSettingsViewModel
             val title: String? = null,
             val summary: String? = null,
             val choices: Pair<Array<String?>, Array<String?>>? = null,
+            val onStateChange: (String?) -> Unit
         )
     }
 
