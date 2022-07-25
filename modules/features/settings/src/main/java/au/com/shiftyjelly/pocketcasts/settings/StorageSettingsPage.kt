@@ -11,8 +11,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -22,13 +26,17 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
+import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import java.util.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -47,6 +55,42 @@ fun StorageSettingsPage(
         viewModel.snackbarMessage
             .collect { message ->
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            }
+    }
+    var showAlertDialog by remember<MutableState<StorageSettingsViewModel.AlertDialogState?>> {
+        mutableStateOf(null)
+    }
+    showAlertDialog?.let { dialogState ->
+        DialogFrame(
+            title = dialogState.title,
+            buttons = dialogState.buttons.map { button ->
+                DialogButtonState(
+                    text = button.text.uppercase(
+                        Locale.getDefault()
+                    ),
+                    onClick = {
+                        button.onClick()
+                        showAlertDialog = null
+                    }
+                )
+            },
+            onDismissRequest = { showAlertDialog = null },
+            content = {
+                dialogState.message?.let {
+                    TextP40(
+                        text = dialogState.message,
+                        modifier = Modifier
+                            .padding(bottom = 12.dp)
+                            .padding(horizontal = 24.dp)
+                    )
+                }
+            }
+        )
+    }
+    LaunchedEffect(Unit) {
+        viewModel.alertDialog
+            .collect { dialog ->
+                showAlertDialog = dialog
             }
     }
 }
