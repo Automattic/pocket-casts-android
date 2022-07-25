@@ -7,8 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -18,9 +22,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -37,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import kotlinx.coroutines.delay
 import java.util.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -175,13 +184,69 @@ private fun StorageFolderRow(
     modifier: Modifier = Modifier,
 ) {
     if (storageFolderState.isVisible) {
+        var showDialog by remember { mutableStateOf(false) }
         SettingRow(
             primaryText = stringResource(LR.string.settings_storage_custom_folder_location),
             secondaryText = storageFolderState.summary,
             modifier = modifier
-                .clickable { storageFolderState.onStateChange }
-                .padding(vertical = 6.dp)
-        )
+                .clickable { showDialog = true }
+        ) {
+            if (showDialog) {
+                val focusRequester = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    // delay apparently needed to ensure the soft keyboard opens
+                    delay(100)
+                    focusRequester.requestFocus()
+                }
+
+                var value by remember {
+                    mutableStateOf(
+                        TextFieldValue(
+                            text = storageFolderState.summary ?: ""
+                        )
+                    )
+                }
+
+                val onFinish = {
+                    storageFolderState.onStateChange(value.text)
+                    showDialog = false
+                }
+
+                DialogFrame(
+                    title = stringResource(LR.string.settings_storage_custom_folder_location),
+                    buttons = listOf(
+                        DialogButtonState(
+                            text = stringResource(LR.string.cancel).uppercase(
+                                Locale.getDefault()
+                            ),
+                            onClick = { showDialog = false }
+                        ),
+                        DialogButtonState(
+                            text = stringResource(LR.string.ok),
+                            onClick = onFinish
+                        )
+                    ),
+                    onDismissRequest = { showDialog = false }
+                ) {
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = {
+                            value = it
+                        },
+                        colors = TextFieldDefaults.textFieldColors(
+                            textColor = MaterialTheme.theme.colors.primaryText01,
+                            placeholderColor = MaterialTheme.theme.colors.primaryText02,
+                            backgroundColor = MaterialTheme.theme.colors.primaryUi01
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        keyboardActions = KeyboardActions { onFinish() },
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .focusRequester(focusRequester)
+                    )
+                }
+            }
+        }
     }
 }
 
