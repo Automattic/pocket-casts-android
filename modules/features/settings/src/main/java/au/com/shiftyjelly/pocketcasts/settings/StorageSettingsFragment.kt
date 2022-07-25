@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,6 +34,20 @@ class StorageSettingsFragment : BaseFragment() {
             }
         }
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.start(
+            folderLocations = ::getFileLocations
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onFragmentResume()
+    }
+
+    private fun getFileLocations() = StorageOptions().getFolderLocations(activity)
 
     /*
     PreferenceFragmentCompat(),

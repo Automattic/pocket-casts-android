@@ -1,13 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
+import android.os.StatFs
 import androidx.annotation.IntegerRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
+import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -43,6 +46,13 @@ class StorageSettingsViewModel
             settings.getStorageChoiceName()
         }
 
+    private lateinit var foldersAvailable: List<FolderLocation>
+    private lateinit var folderLocations: () -> List<FolderLocation>
+
+    fun start(folderLocations: () -> List<FolderLocation>) {
+        this.folderLocations = folderLocations
+    }
+
     private fun initState() = State(
         storageDataWarningState = State.StorageDataWarningState(
             isChecked = settings.warnOnMeteredNetwork(),
@@ -53,6 +63,10 @@ class StorageSettingsViewModel
             summary = storageChoiceSummary
         )
     )
+
+    fun onFragmentResume() {
+        setupStorage()
+    }
 
     fun onClearDownloadCacheClick() {
         viewModelScope.launch {
@@ -73,6 +87,59 @@ class StorageSettingsViewModel
                 isChecked = settings.warnOnMeteredNetwork(),
             )
         )
+    }
+
+    private fun setupStorage() {
+        // find all the places the user might want to store their podcasts, but still give them a custom folder option
+        foldersAvailable = folderLocations()
+        var optionsCount = foldersAvailable.size
+        if (android.os.Build.VERSION.SDK_INT < 29) {
+            optionsCount++
+        }
+
+        val entries = arrayOfNulls<String>(optionsCount)
+        val entryValues = arrayOfNulls<String>(optionsCount)
+        var i = 0
+        for (folderLocation in foldersAvailable) {
+            entries[i] =
+                folderLocation.label + ", " + getStorageSpaceString(folderLocation.filePath)
+            entryValues[i] = folderLocation.filePath
+
+            i++
+        }
+        if (android.os.Build.VERSION.SDK_INT < 29) {
+            entries[i] = context.getString(LR.string.settings_storage_custom_folder) + "…"
+            entryValues[i] = Settings.STORAGE_ON_CUSTOM_FOLDER
+        }
+
+        mutableState.value = mutableState.value.copy(
+            storageChoiceState = mutableState.value.storageChoiceState.copy(
+                choices = Pair(entries, entryValues)
+            )
+        )
+
+        changeStorageLabels()
+    }
+
+    private fun changeStorageLabels() {
+        mutableState.value = mutableState.value.copy(
+            storageChoiceState = mutableState.value.storageChoiceState.copy(
+                summary = storageChoiceSummary
+            )
+        )
+    }
+
+    private fun getStorageSpaceString(path: String): String {
+        return try {
+            val stat = StatFs(path)
+            val free = stat.availableBlocksLong * stat.blockSizeLong
+            context.getString(
+                LR.string.settings_storage_size_free,
+                Util.formattedBytes(free, context = context)
+            )
+        } catch (e: Exception) {
+            ""
+        }
     }
 
     private fun createAlertDialogState(
