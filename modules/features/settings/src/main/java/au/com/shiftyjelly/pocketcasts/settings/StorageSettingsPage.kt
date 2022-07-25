@@ -15,7 +15,6 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,46 +62,28 @@ fun StorageSettingsPage(
         onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
         onManageDownloadedFilesClick = onManageDownloadedFilesClick
     )
-    LaunchedEffect(Unit) {
-        viewModel.snackbarMessage
-            .collect { message ->
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            }
+
+    var alertDialogState by remember {
+        mutableStateOf(StorageSettingsViewModel.AlertDialogState(title = "", buttons = emptyList()))
     }
-    var showAlertDialog by remember<MutableState<StorageSettingsViewModel.AlertDialogState?>> {
-        mutableStateOf(null)
-    }
-    showAlertDialog?.let { dialogState ->
-        DialogFrame(
-            title = dialogState.title,
-            buttons = dialogState.buttons.map { button ->
-                DialogButtonState(
-                    text = button.text.uppercase(
-                        Locale.getDefault()
-                    ),
-                    onClick = {
-                        button.onClick()
-                        showAlertDialog = null
-                    }
-                )
-            },
-            onDismissRequest = { showAlertDialog = null },
-            content = {
-                dialogState.message?.let {
-                    TextP40(
-                        text = dialogState.message,
-                        modifier = Modifier
-                            .padding(bottom = 12.dp)
-                            .padding(horizontal = 24.dp)
-                    )
-                }
-            }
+    var showAlertDialog by remember { mutableStateOf(false) }
+    if (showAlertDialog) {
+        AlertDialogView(
+            alertDialogState = alertDialogState,
+            onDismiss = { showAlertDialog = false }
         )
     }
     LaunchedEffect(Unit) {
         viewModel.alertDialog
-            .collect { dialog ->
-                showAlertDialog = dialog
+            .collect { state ->
+                alertDialogState = state
+                showAlertDialog = true
+            }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.snackbarMessage
+            .collect { message ->
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
     }
 }
@@ -287,6 +268,36 @@ private fun StorageDataWarningRow(
                 .padding(top = 16.dp)
         )
     }
+}
+
+@Composable
+private fun AlertDialogView(
+    alertDialogState: StorageSettingsViewModel.AlertDialogState,
+    onDismiss: () -> Unit,
+) {
+    DialogFrame(
+        title = alertDialogState.title,
+        buttons = alertDialogState.buttons.map {
+            DialogButtonState(
+                text = it.text,
+                onClick = {
+                    it.onClick()
+                    onDismiss()
+                }
+            )
+        },
+        onDismissRequest = { onDismiss() },
+        content = {
+            alertDialogState.message?.let {
+                TextP40(
+                    text = it,
+                    modifier = Modifier
+                        .padding(bottom = 12.dp)
+                        .padding(horizontal = 24.dp)
+                )
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)

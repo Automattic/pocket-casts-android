@@ -208,7 +208,7 @@ class StorageSettingsViewModel
     }
 
     private fun onStorageFolderChange(
-        newPath: String?
+        newPath: String?,
     ) {
         viewModelScope.launch {
             if (newPath == null) {
@@ -356,10 +356,9 @@ class StorageSettingsViewModel
             ),
             DialogButtonState(
                 text = context.getString(LR.string.ok),
-                onClick = {},
+                onClick = {}
             )
-        ),
-        onDismissRequest = {}
+        )
     )
 
     data class State(
@@ -390,6 +389,5 @@ class StorageSettingsViewModel
         val title: String,
         val message: String? = null,
         val buttons: List<DialogButtonState>,
-        val onDismissRequest: (() -> Unit)? = null,
     )
 }
