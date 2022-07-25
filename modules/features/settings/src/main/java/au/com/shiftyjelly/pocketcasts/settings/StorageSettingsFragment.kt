@@ -56,14 +56,9 @@ class StorageSettingsFragment : BaseFragment() {
     CoroutineScope,
     HasBackstack {
 
-
-    @Inject lateinit var podcastManager: PodcastManager
-    @Inject lateinit var episodeManager: EpisodeManager
-    @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var fileStorage: FileStorage
 
-    private var storageChoicePreference: ListPreference? = null
     private var storageFolderPreference: EditTextPreference? = null
 
     private var foldersAvailable: List<FolderLocation>? = null
@@ -78,7 +73,6 @@ class StorageSettingsFragment : BaseFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_storage, rootKey)
-        storageChoicePreference = preferenceManager.findPreference(Settings.PREFERENCE_STORAGE_CHOICE)
         storageFolderPreference = preferenceManager.findPreference(Settings.PREFERENCE_STORAGE_CUSTOM_FOLDER)
 
         findPreference<Preference>("manualCleanup")?.setOnPreferenceClickListener { _ ->
@@ -89,7 +83,6 @@ class StorageSettingsFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
-        setupStorage()
         preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
     }
 
@@ -119,10 +112,8 @@ class StorageSettingsFragment : BaseFragment() {
 
         if (settings.usingCustomFolderStorage()) {
             storageFolderPreference.summary = settings.getStorageCustomFolder()
-            storageChoicePreference?.summary = getString(LR.string.settings_storage_custom_folder)
         } else {
             storageFolderPreference.summary = getString(LR.string.settings_storage_using, settings.getStorageChoiceName())
-            storageChoicePreference?.summary = settings.getStorageChoiceName()
         }
 
         // Custom Folder Location shown?
@@ -132,125 +123,6 @@ class StorageSettingsFragment : BaseFragment() {
             } else {
                 it.removePreference(storageFolderPreference)
             }
-        }
-    }
-
-    private fun setupStorage() {
-        // find all the places the user might want to store their podcasts, but still give them a custom folder option
-        val storageOptions = StorageOptions()
-        val foldersAvailable = storageOptions.getFolderLocations(activity)
-        var optionsCount = foldersAvailable.size
-        if (android.os.Build.VERSION.SDK_INT < 29) {
-            optionsCount++
-        }
-
-        this.foldersAvailable = foldersAvailable
-        val entries = arrayOfNulls<String>(optionsCount)
-        val entryValues = arrayOfNulls<String>(optionsCount)
-        var i = 0
-        for (folderLocation in foldersAvailable) {
-            entries[i] = folderLocation.label + ", " + getStorageSpaceString(folderLocation.filePath)
-            entryValues[i] = folderLocation.filePath
-
-            i++
-        }
-        if (android.os.Build.VERSION.SDK_INT < 29) {
-            entries[i] = getString(LR.string.settings_storage_custom_folder) + "…"
-            entryValues[i] = Settings.STORAGE_ON_CUSTOM_FOLDER
-        }
-
-        storageChoicePreference?.let {
-            it.entries = entries
-            it.entryValues = entryValues
-            it.value = settings.getStorageChoice()
-            it.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                val folderPathChosen = newValue as String
-                if (folderPathChosen == Settings.STORAGE_ON_CUSTOM_FOLDER) {
-                    try {
-                        val baseDirectory = fileStorage.baseStorageDirectory
-                        baseDirectory?.absolutePath?.let { basePath ->
-                            settings.setStorageCustomFolder(basePath)
-                            storageFolderPreference?.text = basePath
-                        }
-                    } catch (e: StorageException) {
-                        UiUtil.displayAlertError(activity, getString(LR.string.settings_storage_folder_change_failed) + " " + e.message, null)
-                        return@OnPreferenceChangeListener false
-                    }
-                } else {
-                    // store the old folder value, this is still available until we set it below
-                    val oldFolderValue = if (settings.usingCustomFolderStorage()) settings.getStorageCustomFolder() else settings.getStorageChoice()
-
-                    // set the name for this folder
-                    for (folder in foldersAvailable) {
-                        if (folder.filePath == folderPathChosen) {
-                            settings.setStorageChoice(folderPathChosen, folder.label)
-                            break
-                        }
-                    }
-
-                    // if it's a new folder, ask the user if they want to move their files there
-                    movePodcastStorage(oldFolderValue, folderPathChosen)
-                }
-                true
-            }
-
-            if (android.os.Build.VERSION.SDK_INT >= 29 && settings.usingCustomFolderStorage()) {
-                it.value = entryValues.first()
-                UiUtil.displayAlert(requireContext(), getString(LR.string.settings_storage_sorry), getString(LR.string.settings_storage_android_10_custom), null)
-            }
-        }
-
-        // Custom Folder Location
-        storageFolderPreference?.onPreferenceChangeListener = this
-
-        changeStorageLabels()
-    }
-
-    private fun getStorageSpaceString(path: String): String {
-        try {
-            val stat = StatFs(path)
-            val free = stat.availableBlocksLong * stat.blockSizeLong
-            return getString(LR.string.settings_storage_size_free, Util.formattedBytes(free, context = requireContext()))
-        } catch (e: Exception) {
-            return ""
-        }
-    }
-
-    private fun movePodcastStorage(oldDirectory: String?, newDirectory: String) {
-        if (oldDirectory == null || newDirectory != oldDirectory) {
-            val activity = activity ?: return
-            val builder = AlertDialog.Builder(activity)
-            builder.setTitle(LR.string.settings_storage_move_are_you_sure)
-                .setMessage(LR.string.settings_storage_move_message)
-                .setCancelable(true)
-                .setPositiveButton(LR.string.settings_storage_move) { dialog, _ ->
-                    dialog.dismiss()
-                    movePodcasts(oldDirectory, newDirectory)
-                }
-                .setNegativeButton(LR.string.settings_storage_move_cancel) { dialog, _ -> dialog.cancel() }
-            val alert = builder.create()
-            alert.setOnShowListener {
-                alert.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(activity.getThemeColor(UR.attr.primary_text_01))
-                alert.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(activity.getThemeColor(UR.attr.primary_text_01))
-            }
-            alert.show()
-        }
-    }
-
-    @Suppress("NAME_SHADOWING", "DEPRECATION")
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun movePodcasts(oldDirectory: String?, newDirectory: String?) {
-        val oldDirectory = oldDirectory ?: return
-        val newDirectory = newDirectory ?: return
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Moving storage from $oldDirectory to $newDirectory")
-        GlobalScope.launch(Dispatchers.Main) {
-            val progressDialog = android.app.ProgressDialog.show(activity, "", getString(LR.string.settings_storage_move_podcasts), true, false)
-            progressDialog.show()
-            withContext(Dispatchers.IO) {
-                fileStorage.moveStorage(File(oldDirectory), File(newDirectory), podcastManager, episodeManager)
-            }
-            UiUtil.hideProgressDialog(progressDialog)
-            setupStorage()
         }
     }
 
