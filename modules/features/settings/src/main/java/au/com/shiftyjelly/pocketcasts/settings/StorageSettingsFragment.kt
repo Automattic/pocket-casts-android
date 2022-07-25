@@ -25,7 +25,10 @@ class StorageSettingsFragment : BaseFragment() {
             setContent {
                 AppTheme(theme.activeTheme) {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    StorageSettingsPage(viewModel)
+                    StorageSettingsPage(
+                        viewModel = viewModel,
+                        onBackPressed = { activity?.onBackPressed() }
+                    )
                 }
             }
         }
@@ -44,7 +47,6 @@ class StorageSettingsFragment : BaseFragment() {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var fileStorage: FileStorage
-    @Inject lateinit var theme: Theme
 
     private var storageChoicePreference: ListPreference? = null
     private var storageFolderPreference: EditTextPreference? = null
@@ -58,12 +60,6 @@ class StorageSettingsFragment : BaseFragment() {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        view.findToolbar().setup(title = getString(LR.string.settings_title_storage), navigationIcon = BackArrow, activity = activity, theme = theme)
-    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_storage, rootKey)
@@ -324,7 +320,6 @@ class StorageSettingsFragment : BaseFragment() {
     override fun onBackPressed(): Boolean {
         if (childFragmentManager.backStackEntryCount > 0) {
             childFragmentManager.popBackStack()
-            view?.findToolbar()?.title = getString(LR.string.settings_title_storage)
             return true
         }
 

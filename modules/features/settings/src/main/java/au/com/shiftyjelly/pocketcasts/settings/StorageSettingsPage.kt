@@ -33,12 +33,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun StorageSettingsPage(
-    viewModel: StorageSettingsViewModel
+    viewModel: StorageSettingsViewModel,
+    onBackPressed: () -> Unit
 ) {
     val state: StorageSettingsViewModel.State by viewModel.state.collectAsState()
     val context = LocalContext.current
     StorageSettingsView(
         state = state,
+        onBackPressed = onBackPressed,
         onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() }
     )
     LaunchedEffect(Unit) {
@@ -52,13 +54,14 @@ fun StorageSettingsPage(
 @Composable
 fun StorageSettingsView(
     state: StorageSettingsViewModel.State,
+    onBackPressed: () -> Unit,
     onClearDownloadCacheClick: () -> Unit,
 ) {
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_storage),
             bottomShadow = true,
-            onNavigationClick = {}
+            onNavigationClick = { onBackPressed() }
         )
 
         Column(
@@ -153,6 +156,7 @@ private fun StorageSettingsPreview(
                     onCheckedChange = {}
                 )
             ),
+            onBackPressed = {},
             onClearDownloadCacheClick = {},
         )
     }
