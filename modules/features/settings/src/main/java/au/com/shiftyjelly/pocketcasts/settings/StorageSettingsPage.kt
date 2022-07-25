@@ -52,14 +52,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun StorageSettingsPage(
     viewModel: StorageSettingsViewModel,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onManageDownloadedFilesClick: () -> Unit,
 ) {
     val state: StorageSettingsViewModel.State by viewModel.state.collectAsState()
     val context = LocalContext.current
     StorageSettingsView(
         state = state,
         onBackPressed = onBackPressed,
-        onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() }
+        onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
+        onManageDownloadedFilesClick = onManageDownloadedFilesClick
     )
     LaunchedEffect(Unit) {
         viewModel.snackbarMessage
@@ -110,6 +112,7 @@ fun StorageSettingsView(
     state: StorageSettingsViewModel.State,
     onBackPressed: () -> Unit,
     onClearDownloadCacheClick: () -> Unit,
+    onManageDownloadedFilesClick: () -> Unit,
 ) {
     Column {
         ThemedTopAppBar(
@@ -124,7 +127,7 @@ fun StorageSettingsView(
                 .background(MaterialTheme.theme.colors.primaryUi02)
                 .padding(vertical = 8.dp)
         ) {
-            DownloadedFilesRow()
+            DownloadedFilesRow(onManageDownloadedFilesClick)
             ClearDownloadCacheRow(onClearDownloadCacheClick)
             StorageChoiceRow(state.storageChoiceState)
             StorageFolderRow(state.storageFolderState)
@@ -135,9 +138,15 @@ fun StorageSettingsView(
 }
 
 @Composable
-private fun DownloadedFilesRow() {
+private fun DownloadedFilesRow(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_storage_manage_downloads),
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(vertical = 6.dp)
     )
 }
 
@@ -301,6 +310,7 @@ private fun StorageSettingsPreview(
             ),
             onBackPressed = {},
             onClearDownloadCacheClick = {},
+            onManageDownloadedFilesClick = {}
         )
     }
 }

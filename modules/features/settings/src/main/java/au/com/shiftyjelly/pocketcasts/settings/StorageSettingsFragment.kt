@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,7 +40,8 @@ class StorageSettingsFragment : BaseFragment() {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     StorageSettingsPage(
                         viewModel = viewModel,
-                        onBackPressed = { activity?.onBackPressed() }
+                        onBackPressed = { activity?.onBackPressed() },
+                        onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance(addToolbar = true)) }
                     )
                 }
             }
@@ -74,37 +76,4 @@ class StorageSettingsFragment : BaseFragment() {
             requireContext(),
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
-
-    /*
-    HasBackstack {
-
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preferences_storage, rootKey)
-        findPreference<Preference>("manualCleanup")?.setOnPreferenceClickListener { _ ->
-            showDownloadedFiles()
-            true
-        }
-    }
-
-    private fun showDownloadedFiles() {
-        val fragment = ManualCleanupFragment.newInstance()
-        childFragmentManager.beginTransaction()
-            .replace(UR.id.frameChildFragment, fragment)
-            .addToBackStack("podcastSelect")
-            .commit()
-    }
-
-    override fun onBackPressed(): Boolean {
-        if (childFragmentManager.backStackEntryCount > 0) {
-            childFragmentManager.popBackStack()
-            return true
-        }
-
-        return false
-    }
-
-    override fun getBackstackCount(): Int {
-        return childFragmentManager.backStackEntryCount
-    }
-    */
 }
