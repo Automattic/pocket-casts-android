@@ -41,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -111,6 +112,7 @@ fun StorageSettingsView(
     onBackPressed: () -> Unit,
     onClearDownloadCacheClick: () -> Unit,
     onManageDownloadedFilesClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column {
         ThemedTopAppBar(
@@ -120,17 +122,21 @@ fun StorageSettingsView(
         )
 
         Column(
-            Modifier
+            modifier
                 .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.theme.colors.primaryUi02)
                 .padding(vertical = 8.dp)
         ) {
-            DownloadedFilesRow(onManageDownloadedFilesClick)
-            ClearDownloadCacheRow(onClearDownloadCacheClick)
-            StorageChoiceRow(state.storageChoiceState)
-            StorageFolderRow(state.storageFolderState)
-            BackgroundRefreshRow(state.backgroundRefreshState)
-            StorageDataWarningRow(state.storageDataWarningState)
+            SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_usage)) {
+                DownloadedFilesRow(onManageDownloadedFilesClick)
+                ClearDownloadCacheRow(onClearDownloadCacheClick)
+                StorageChoiceRow(state.storageChoiceState)
+                StorageFolderRow(state.storageFolderState)
+            }
+            SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
+                BackgroundRefreshRow(state.backgroundRefreshState)
+                StorageDataWarningRow(state.storageDataWarningState)
+            }
         }
     }
 }

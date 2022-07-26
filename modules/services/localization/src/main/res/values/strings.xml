@@ -1063,6 +1063,8 @@
     <string name="settings_storage_move_cancel" translatable="false">@string/cancel</string>
     <string name="settings_storage_move_message">This will move existing podcast files to this new location.</string>
     <string name="settings_storage_move_podcasts">Moving podcasts&#x2026;</string>
+    <string name="settings_storage_section_heading_usage">Usage</string>
+    <string name="settings_storage_section_heading_mobile_data">Mobile Data</string>
     <string name="settings_storage_size_free">%s free</string>
     <string name="settings_storage_sorry">Sorry</string>
     <string name="settings_storage_store_on">Store podcasts on</string>
