@@ -140,7 +140,7 @@ private fun DialogButtons(
 @Composable
 fun <T> RadioDialog(
     title: String,
-    options: List<Pair<T, Int>>,
+    options: List<Pair<T, String>>,
     savedOption: T,
     onSave: (T) -> Unit,
     dismissDialog: () -> Unit,
@@ -165,9 +165,9 @@ fun <T> RadioDialog(
         onDismissRequest = dismissDialog,
     ) {
         Column {
-            options.forEach { (item, stringRes) ->
+            options.forEach { (item, itemLabel) ->
                 DialogRadioButton(
-                    text = stringResource(stringRes),
+                    text = itemLabel,
                     selected = selected == item,
                     onClick = { selected = item }
                 )
@@ -305,8 +305,8 @@ private fun RadioDialogPreview(theme: Theme.ThemeType) {
         RadioDialog(
             title = "Title",
             options = listOf(
-                Pair(true, LR.string.player_up_next_empty_desc),
-                Pair(false, LR.string.player_up_next_clear),
+                Pair(true, stringResource(LR.string.player_up_next_empty_desc)),
+                Pair(false, stringResource(LR.string.player_up_next_clear)),
             ),
             savedOption = true,
             onSave = {},

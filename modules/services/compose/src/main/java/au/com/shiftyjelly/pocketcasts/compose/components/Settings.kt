@@ -81,7 +81,7 @@ fun <T> SettingRadioDialogRow(
     secondaryText: String? = null,
     options: List<T>,
     savedOption: T,
-    optionToStringRes: (T) -> Int,
+    optionToLocalisedString: (T) -> String,
     onSave: (T) -> Unit,
 ) {
 
@@ -94,7 +94,7 @@ fun <T> SettingRadioDialogRow(
         if (showDialog) {
             RadioDialog(
                 title = primaryText,
-                options = options.map { Pair(it, optionToStringRes(it)) },
+                options = options.map { Pair(it, optionToLocalisedString(it)) },
                 savedOption = savedOption,
                 onSave = onSave,
                 dismissDialog = { showDialog = false }
