@@ -94,7 +94,6 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
         context?.let {
             menu.tintIcons(it.getThemeColor(UR.attr.secondary_icon_01))
         }

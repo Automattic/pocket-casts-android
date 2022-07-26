@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
@@ -52,12 +53,6 @@ class NotesFragment : BaseFragment() {
                 )
             }
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -118,10 +113,8 @@ class NotesFragment : BaseFragment() {
                 isVerticalScrollBarEnabled = false
                 setBackgroundColor(Color.TRANSPARENT)
                 webViewClient = object : WebViewClient() {
-                    override fun shouldOverrideUrlLoading(view: WebView, url: String?): Boolean {
-                        if (url == null) {
-                            return false
-                        }
+                    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                        val url = request.url.toString()
                         if (url.startsWith("http://localhost/#playerJumpTo=")) {
                             val time = url.split("=").last()
                             jumpToTime(time)
