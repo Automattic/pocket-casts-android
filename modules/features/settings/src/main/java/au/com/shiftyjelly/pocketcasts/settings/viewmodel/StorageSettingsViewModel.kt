@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.collect
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -85,18 +86,19 @@ class StorageSettingsViewModel
     ) {
         this.folderLocations = folderLocations
         this.permissionGranted = permissionGranted
+        viewModelScope.launch {
+            episodeManager.observeDownloadedEpisodes()
+                .collect { downloadedEpisodes ->
+                    val downloadSize = downloadedEpisodes.sumOf { it.sizeInBytes }
+                    mutableState.value = mutableState.value.copy(
+                        downloadedFilesState = mutableState.value.downloadedFilesState.copy(size = downloadSize)
+                    )
+                }
+        }
     }
 
     private fun initState() = State(
-        backgroundRefreshState = State.BackgroundRefreshState(
-            summary = backgroundRefreshSummary,
-            isChecked = settings.refreshPodcastsAutomatically(),
-            onCheckedChange = { onBackgroundRefreshCheckedChange(it) }
-        ),
-        storageDataWarningState = State.StorageDataWarningState(
-            isChecked = settings.warnOnMeteredNetwork(),
-            onCheckedChange = { onStorageDataWarningCheckedChange(it) }
-        ),
+        downloadedFilesState = State.DownloadedFilesState(),
         storageChoiceState = State.StorageChoiceState(
             title = settings.getStorageChoice(),
             summary = storageChoiceSummary,
@@ -106,7 +108,16 @@ class StorageSettingsViewModel
             isVisible = settings.usingCustomFolderStorage(),
             summary = storageFolderSummary,
             onStateChange = { onStorageFolderChange(it) }
-        )
+        ),
+        backgroundRefreshState = State.BackgroundRefreshState(
+            summary = backgroundRefreshSummary,
+            isChecked = settings.refreshPodcastsAutomatically(),
+            onCheckedChange = { onBackgroundRefreshCheckedChange(it) }
+        ),
+        storageDataWarningState = State.StorageDataWarningState(
+            isChecked = settings.warnOnMeteredNetwork(),
+            onCheckedChange = { onStorageDataWarningCheckedChange(it) }
+        ),
     )
 
     fun onFragmentResume() {
@@ -377,20 +388,14 @@ class StorageSettingsViewModel
     )
 
     data class State(
+        val downloadedFilesState: DownloadedFilesState,
+        val storageChoiceState: StorageChoiceState,
+        val storageFolderState: StorageFolderState,
         val backgroundRefreshState: BackgroundRefreshState,
         val storageDataWarningState: StorageDataWarningState,
-        val storageChoiceState: StorageChoiceState,
-        val storageFolderState: StorageFolderState
     ) {
-        data class BackgroundRefreshState(
-            @StringRes val summary: Int,
-            val isChecked: Boolean = true,
-            val onCheckedChange: (Boolean) -> Unit,
-        )
-
-        data class StorageDataWarningState(
-            val isChecked: Boolean = false,
-            val onCheckedChange: (Boolean) -> Unit,
+        data class DownloadedFilesState(
+            val size: Long = 0L,
         )
 
         data class StorageChoiceState(
@@ -404,6 +409,17 @@ class StorageSettingsViewModel
             val isVisible: Boolean = false,
             val summary: String? = null,
             val onStateChange: (newPath: String?) -> Unit
+        )
+
+        data class BackgroundRefreshState(
+            @StringRes val summary: Int,
+            val isChecked: Boolean = true,
+            val onCheckedChange: (Boolean) -> Unit,
+        )
+
+        data class StorageDataWarningState(
+            val isChecked: Boolean = false,
+            val onCheckedChange: (Boolean) -> Unit,
         )
     }
 

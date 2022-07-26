@@ -9,7 +9,7 @@
 
         <Preference
             android:key="manualCleanup"
-            android:title="@string/settings_storage_manage_downloads" />
+            android:title="@string/settings_storage_downloaded_files" />
 
         <Preference
             android:key="clearDownloadCache"

@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
@@ -51,7 +52,7 @@ fun ManualCleanupPage(
     Column {
         if (showToolbar) {
             ThemedTopAppBar(
-                title = stringResource(id = LR.string.settings_title_manage_downloads),
+                title = stringResource(LR.string.settings_title_manage_downloads),
                 navigationButton = NavigationButton.Back,
                 onNavigationClick = onBackClick,
             )
@@ -89,8 +90,9 @@ private fun ManageDownloadsView(
     val deleteButtonColor = MaterialTheme.theme.colors.support05
     Column(
         modifier = modifier
-            .background(MaterialTheme.theme.colors.primaryUi01)
+            .background(MaterialTheme.theme.colors.primaryUi02)
             .padding(top = 8.dp)
+            .fillMaxHeight()
             .verticalScroll(rememberScrollState())
     ) {
         state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }

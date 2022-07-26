@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
@@ -123,12 +124,16 @@ fun StorageSettingsView(
 
         Column(
             modifier
-                .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.theme.colors.primaryUi02)
                 .padding(vertical = 8.dp)
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
         ) {
             SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_usage)) {
-                DownloadedFilesRow(onManageDownloadedFilesClick)
+                DownloadedFilesRow(
+                    state = state.downloadedFilesState,
+                    onClick = onManageDownloadedFilesClick
+                )
                 ClearDownloadCacheRow(onClearDownloadCacheClick)
                 StorageChoiceRow(state.storageChoiceState)
                 StorageFolderRow(state.storageFolderState)
@@ -143,11 +148,16 @@ fun StorageSettingsView(
 
 @Composable
 private fun DownloadedFilesRow(
+    state: StorageSettingsViewModel.State.DownloadedFilesState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingRow(
-        primaryText = stringResource(LR.string.settings_storage_manage_downloads),
+        primaryText = stringResource(LR.string.settings_storage_downloaded_files),
+        secondaryText = Util.formattedBytes(
+            bytes = state.size,
+            context = LocalContext.current,
+        ).replace("-", "0 bytes"),
         modifier = modifier
             .clickable { onClick() }
             .padding(vertical = 6.dp)
@@ -366,6 +376,7 @@ private fun StorageSettingsPreview(
     AppTheme(themeType) {
         StorageSettingsView(
             state = StorageSettingsViewModel.State(
+                downloadedFilesState = StorageSettingsViewModel.State.DownloadedFilesState(),
                 storageChoiceState = StorageSettingsViewModel.State.StorageChoiceState(
                     onStateChange = {}
                 ),

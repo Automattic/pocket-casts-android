@@ -1053,11 +1053,11 @@
     <string name="settings_storage_data_warning">Warn before using data</string>
     <string name="settings_storage_data_warning_car">Please note that this setting does not apply to episodes played via Android Auto. Episodes that are not downloaded will be streamed on metered networks and no warning will be shown.</string>
     <string name="settings_storage_data_warning_summary">Warn before allowing metered networks to download or stream episodes.</string>
+    <string name="settings_storage_downloaded_files">Downloaded files</string>
     <string name="settings_storage_folder_blank">The folder can not be blank.</string>
     <string name="settings_storage_folder_change_failed">Unable to change to custom folder.</string>
     <string name="settings_storage_folder_not_found">The folder cannot be found or created.</string>
     <string name="settings_storage_folder_write_failed">This folder cannot be written to.</string>
-    <string name="settings_storage_manage_downloads">Manage downloaded files</string>
     <string name="settings_storage_move">Move</string>
     <string name="settings_storage_move_are_you_sure" translatable="false">@string/are_you_sure</string>
     <string name="settings_storage_move_cancel" translatable="false">@string/cancel</string>
@@ -1079,7 +1079,7 @@
     <string name="settings_title_excluded_podcasts">Excluded Podcasts</string>
     <string name="settings_title_help">Help &amp; feedback</string>
     <string name="settings_title_import_export">Import &amp; export OPML</string>
-    <string name="settings_title_manage_downloads">Manage downloads</string>
+    <string name="settings_title_manage_downloads" translatable="false">@string/settings_storage_downloaded_files</string>
     <string name="settings_title_notifications">Notifications</string>
     <string name="settings_title_playback">General</string>
     <string name="settings_title_signin" translatable="false">@string/sign_in</string>
