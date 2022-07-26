@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.Manifest
 import android.content.Context
-import android.os.StatFs
 import androidx.annotation.IntegerRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
-import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -135,14 +133,13 @@ class StorageSettingsViewModel
         val entryValues = arrayOfNulls<String>(optionsCount)
         var i = 0
         for (folderLocation in foldersAvailable) {
-            entries[i] =
-                folderLocation.label/* + ", " + getStorageSpaceString(folderLocation.filePath)*/
+            entries[i] = folderLocation.label
             entryValues[i] = folderLocation.filePath
 
             i++
         }
         if (android.os.Build.VERSION.SDK_INT < 29) {
-            entries[i] = context.getString(LR.string.settings_storage_custom_folder)/* + "…"*/
+            entries[i] = context.getString(LR.string.settings_storage_custom_folder)
             entryValues[i] = Settings.STORAGE_ON_CUSTOM_FOLDER
         }
 
@@ -302,19 +299,6 @@ class StorageSettingsViewModel
                 summary = storageFolderSummary
             )
         )
-    }
-
-    private fun getStorageSpaceString(path: String): String {
-        return try {
-            val stat = StatFs(path)
-            val free = stat.availableBlocksLong * stat.blockSizeLong
-            context.getString(
-                LR.string.settings_storage_size_free,
-                Util.formattedBytes(free, context = context)
-            )
-        } catch (e: Exception) {
-            ""
-        }
     }
 
     fun onPermissionGrantedStorage() {

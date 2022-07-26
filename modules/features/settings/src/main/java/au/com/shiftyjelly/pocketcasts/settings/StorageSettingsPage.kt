@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.content.Context
+import android.os.StatFs
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,8 +45,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import kotlinx.coroutines.delay
 import java.util.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -161,24 +165,29 @@ private fun ClearDownloadCacheRow(
 private fun StorageChoiceRow(
     storageChoiceState: StorageSettingsViewModel.State.StorageChoiceState,
 ) {
-    val (folderLabels, folderPaths) = storageChoiceState.choices
+    val context = LocalContext.current
+    val (storageLabels, storagePaths) = storageChoiceState.choices
+    val defaultStorageFolderLabel = stringResource(LR.string.settings_storage_phone)
     SettingRadioDialogRow(
         primaryText = stringResource(LR.string.settings_storage_store_on),
         secondaryText = storageChoiceState.summary,
-        options = folderLabels.asList(),
+        options = storageLabels.asList(),
         savedOption = storageChoiceState.summary,
-        optionToStringRes = ::mapToStringRes,
-        onSave = { storageChoiceState.onStateChange(folderPaths[folderLabels.indexOf(it)]) }
+        optionToLocalisedString = {
+            val label = it ?: defaultStorageFolderLabel
+            val path = storagePaths[storageLabels.indexOf(it)]
+            if (path == Settings.STORAGE_ON_CUSTOM_FOLDER) {
+                "$label…"
+            } else {
+                mapToStringWithStorageSpace(label, path, context)
+            }
+        },
+        onSave = {
+            storageChoiceState.onStateChange(
+                storagePaths[storageLabels.indexOf(it)]
+            )
+        }
     )
-}
-
-fun mapToStringRes(storageLocation: String?): Int {
-    return when (storageLocation?.lowercase()) {
-        "custom folder" -> LR.string.settings_storage_custom_folder
-        "sd card" -> LR.string.settings_storage_sd_card
-        "phone" -> LR.string.settings_storage_phone
-        else -> LR.string.settings_storage_phone
-    }
 }
 
 @Composable
@@ -271,7 +280,10 @@ private fun StorageDataWarningRow(
         primaryText = stringResource(LR.string.settings_storage_data_warning),
         secondaryText = stringResource(LR.string.settings_storage_data_warning_summary),
         toggle = SettingRowToggle.Switch(checked = state.isChecked),
-        modifier = modifier.toggleable(value = state.isChecked, role = Role.Switch) { state.onCheckedChange(it) }
+        modifier = modifier.toggleable(
+            value = state.isChecked,
+            role = Role.Switch
+        ) { state.onCheckedChange(it) }
     ) {
         TextP50(
             text = stringResource(LR.string.settings_storage_data_warning_car),
@@ -311,6 +323,26 @@ private fun AlertDialogView(
             }
         }
     )
+}
+
+fun mapToStringWithStorageSpace(
+    option: String,
+    path: String?,
+    context: Context,
+) = path?.let { option + ", " + getStorageSpaceString(it, context) } ?: option
+
+private fun getStorageSpaceString(
+    path: String,
+    context: Context,
+) = try {
+    val stat = StatFs(path)
+    val free = stat.availableBlocksLong * stat.blockSizeLong
+    context.getString(
+        LR.string.settings_storage_size_free,
+        Util.formattedBytes(free, context = context)
+    )
+} catch (e: Exception) {
+    ""
 }
 
 @Preview(showBackground = true)
