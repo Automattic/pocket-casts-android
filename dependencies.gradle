@@ -80,7 +80,7 @@ project.ext {
             lifecycleScope: "androidx.lifecycle:lifecycle-runtime-ktx:$versionLifecycle",
             lifecycleLiveData: "androidx.lifecycle:lifecycle-livedata-ktx:$versionLifecycle",
             lifecycleProcess: "androidx.lifecycle:lifecycle-process:$versionLifecycle",
-            billing: "com.android.billingclient:billing:3.0.3",
+            billing: "com.android.billingclient:billing:5.0.0",
             openSource: 'com.google.android.gms:play-services-oss-licenses:17.0.0',
             browserHelper: 'com.google.androidbrowserhelper:androidbrowserhelper:2.3.0',
             flexbox: 'com.google.android.flexbox:flexbox:3.0.0',

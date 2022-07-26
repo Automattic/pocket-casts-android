@@ -31,7 +31,7 @@ interface SubscriptionManager {
     fun handlePurchase(purchase: Purchase)
     suspend fun sendPurchaseToServer(purchase: Purchase)
     fun refreshPurchases()
-    fun getPurchases(): List<Purchase>
+    suspend fun getPurchases(): List<Purchase>
     fun launchBillingFlow(activity: Activity, skuDetails: SkuDetails): BillingResult
     fun getCachedStatus(): SubscriptionStatus?
     fun clearCachedStatus()
