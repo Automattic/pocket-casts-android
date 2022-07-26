@@ -160,7 +160,7 @@ class StorageSettingsViewModel
     }
 
     private fun setupStorage() {
-        // find all the places the user might want to store their podcasts, but still give them a custom folder option
+        /* Find all the places the user might want to store their podcasts, but still give them a custom folder option on SDK_INT < 29 */
         foldersAvailable = folderLocations()
         var optionsCount = foldersAvailable.size
         if (android.os.Build.VERSION.SDK_INT < 29) {
@@ -169,16 +169,14 @@ class StorageSettingsViewModel
 
         val entries = arrayOfNulls<String>(optionsCount)
         val entryValues = arrayOfNulls<String>(optionsCount)
-        var i = 0
-        for (folderLocation in foldersAvailable) {
-            entries[i] = folderLocation.label
-            entryValues[i] = folderLocation.filePath
-
-            i++
+        foldersAvailable.mapIndexed { index, folderLocation ->
+            entries[index] = folderLocation.label
+            entryValues[index] = folderLocation.filePath
         }
+
         if (android.os.Build.VERSION.SDK_INT < 29) {
-            entries[i] = context.getString(LR.string.settings_storage_custom_folder)
-            entryValues[i] = Settings.STORAGE_ON_CUSTOM_FOLDER
+            entries[foldersAvailable.size] = context.getString(LR.string.settings_storage_custom_folder)
+            entryValues[foldersAvailable.size] = Settings.STORAGE_ON_CUSTOM_FOLDER
         }
 
         mutableState.value = mutableState.value.copy(
@@ -187,7 +185,7 @@ class StorageSettingsViewModel
             )
         )
 
-        changeStorageLabels()
+        updateStorageLabels()
     }
 
     private fun onStorageChoiceChange(folderPathChosen: String?) {
@@ -196,7 +194,7 @@ class StorageSettingsViewModel
                 val baseDirectory = fileStorage.baseStorageDirectory
                 baseDirectory?.absolutePath?.let { basePath ->
                     settings.setStorageCustomFolder(basePath)
-                    changeStorageLabels()
+                    updateStorageLabels()
                 }
             } catch (e: StorageException) {
                 viewModelScope.launch {
@@ -218,7 +216,7 @@ class StorageSettingsViewModel
             for (folder in foldersAvailable) {
                 if (folder.filePath == folderPathChosen) {
                     settings.setStorageChoice(folderPathChosen, folder.label)
-                    changeStorageLabels()
+                    updateStorageLabels()
                     break
                 }
             }
@@ -292,7 +290,7 @@ class StorageSettingsViewModel
             }
 
             settings.setStorageCustomFolder(newPath)
-            changeStorageLabels()
+            updateStorageLabels()
         }
     }
 
@@ -327,7 +325,7 @@ class StorageSettingsViewModel
         setupStorage()
     }
 
-    private fun changeStorageLabels() {
+    private fun updateStorageLabels() {
         mutableState.value = mutableState.value.copy(
             storageChoiceState = mutableState.value.storageChoiceState.copy(
                 summary = storageChoiceSummary
