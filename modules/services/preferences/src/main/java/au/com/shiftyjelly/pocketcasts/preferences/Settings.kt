@@ -256,6 +256,7 @@ interface Settings {
     fun setLastScreenOpened(screenId: String)
 
     fun refreshPodcastsAutomatically(): Boolean
+    fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean)
     fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean)
     fun setPodcastsSortTypeNeedsSync(value: Boolean)
     fun getPodcastsSortTypeNeedsSync(): Boolean

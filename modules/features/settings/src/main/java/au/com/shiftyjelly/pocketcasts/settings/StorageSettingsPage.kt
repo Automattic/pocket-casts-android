@@ -129,7 +129,7 @@ fun StorageSettingsView(
             ClearDownloadCacheRow(onClearDownloadCacheClick)
             StorageChoiceRow(state.storageChoiceState)
             StorageFolderRow(state.storageFolderState)
-            BackgroundRefreshRow()
+            BackgroundRefreshRow(state.backgroundRefreshState)
             StorageDataWarningRow(state.storageDataWarningState)
         }
     }
@@ -263,11 +263,18 @@ private fun StorageFolderRow(
 }
 
 @Composable
-private fun BackgroundRefreshRow() {
+private fun BackgroundRefreshRow(
+    state: StorageSettingsViewModel.State.BackgroundRefreshState,
+    modifier: Modifier = Modifier,
+) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_storage_background_refresh),
-        secondaryText = stringResource(LR.string.settings_storage_background_refresh_on),
-        toggle = SettingRowToggle.Switch(checked = true),
+        secondaryText = stringResource(state.summary),
+        toggle = SettingRowToggle.Switch(state.isChecked),
+        modifier = modifier.toggleable(
+            value = state.isChecked,
+            role = Role.Switch
+        ) { state.onCheckedChange(it) }
     )
 }
 
@@ -353,15 +360,20 @@ private fun StorageSettingsPreview(
     AppTheme(themeType) {
         StorageSettingsView(
             state = StorageSettingsViewModel.State(
-                storageDataWarningState = StorageSettingsViewModel.State.StorageDataWarningState(
-                    onCheckedChange = {}
-                ),
                 storageChoiceState = StorageSettingsViewModel.State.StorageChoiceState(
                     onStateChange = {}
                 ),
                 storageFolderState = StorageSettingsViewModel.State.StorageFolderState(
                     summary = "Custom Folder",
                     onStateChange = {}
+                ),
+                backgroundRefreshState = StorageSettingsViewModel.State.BackgroundRefreshState(
+                    isChecked = true,
+                    summary = LR.string.settings_storage_background_refresh_on,
+                    onCheckedChange = {}
+                ),
+                storageDataWarningState = StorageSettingsViewModel.State.StorageDataWarningState(
+                    onCheckedChange = {}
                 ),
             ),
             onBackPressed = {},

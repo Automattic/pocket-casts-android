@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import android.Manifest
 import android.content.Context
 import androidx.annotation.IntegerRes
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
@@ -52,6 +53,13 @@ class StorageSettingsViewModel
     private val mutablePermissionRequest = MutableSharedFlow<String>()
     val permissionRequest = mutablePermissionRequest.asSharedFlow()
 
+    private val backgroundRefreshSummary: Int
+        get() = if (settings.refreshPodcastsAutomatically()) {
+            LR.string.settings_storage_background_refresh_on
+        } else {
+            LR.string.settings_storage_background_refresh_off
+        }
+
     private val storageChoiceSummary: String?
         get() = if (settings.usingCustomFolderStorage()) {
             context.getString(LR.string.settings_storage_custom_folder)
@@ -80,6 +88,11 @@ class StorageSettingsViewModel
     }
 
     private fun initState() = State(
+        backgroundRefreshState = State.BackgroundRefreshState(
+            summary = backgroundRefreshSummary,
+            isChecked = settings.refreshPodcastsAutomatically(),
+            onCheckedChange = { onBackgroundRefreshCheckedChange(it) }
+        ),
         storageDataWarningState = State.StorageDataWarningState(
             isChecked = settings.warnOnMeteredNetwork(),
             onCheckedChange = { onStorageDataWarningCheckedChange(it) }
@@ -117,6 +130,20 @@ class StorageSettingsViewModel
         mutableState.value = mutableState.value.copy(
             storageDataWarningState = mutableState.value.storageDataWarningState.copy(
                 isChecked = settings.warnOnMeteredNetwork(),
+            )
+        )
+    }
+
+    private fun onBackgroundRefreshCheckedChange(isChecked: Boolean) {
+        settings.setRefreshPodcastsAutomatically(isChecked)
+        updateBackgroundRefreshState()
+    }
+
+    private fun updateBackgroundRefreshState() {
+        mutableState.value = mutableState.value.copy(
+            backgroundRefreshState = mutableState.value.backgroundRefreshState.copy(
+                isChecked = settings.refreshPodcastsAutomatically(),
+                summary = backgroundRefreshSummary
             )
         )
     }
@@ -350,10 +377,17 @@ class StorageSettingsViewModel
     )
 
     data class State(
+        val backgroundRefreshState: BackgroundRefreshState,
         val storageDataWarningState: StorageDataWarningState,
         val storageChoiceState: StorageChoiceState,
         val storageFolderState: StorageFolderState
     ) {
+        data class BackgroundRefreshState(
+            @StringRes val summary: Int,
+            val isChecked: Boolean = true,
+            val onCheckedChange: (Boolean) -> Unit,
+        )
+
         data class StorageDataWarningState(
             val isChecked: Boolean = false,
             val onCheckedChange: (Boolean) -> Unit,
