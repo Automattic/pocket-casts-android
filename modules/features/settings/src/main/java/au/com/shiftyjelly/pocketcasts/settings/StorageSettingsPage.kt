@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
+import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
@@ -62,7 +63,19 @@ fun StorageSettingsPage(
         onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
         onManageDownloadedFilesClick = onManageDownloadedFilesClick
     )
-
+    var showProgressDialog by remember { mutableStateOf(false) }
+    if (showProgressDialog) {
+        ProgressDialog(
+            text = stringResource(LR.string.settings_storage_move_podcasts),
+            onDismiss = { showProgressDialog = false }
+        )
+    }
+    LaunchedEffect(Unit) {
+        viewModel.progressDialog
+            .collect { showDialog ->
+                showProgressDialog = showDialog
+            }
+    }
     var alertDialogState by remember {
         mutableStateOf(StorageSettingsViewModel.AlertDialogState(title = "", buttons = emptyList()))
     }

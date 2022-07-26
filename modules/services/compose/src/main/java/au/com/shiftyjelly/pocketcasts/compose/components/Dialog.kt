@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.TextButton
@@ -27,9 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.*
@@ -231,6 +237,38 @@ private fun DialogButton(button: DialogButtonState) {
 }
 
 @Composable
+fun ProgressDialog(
+    text: String,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .background(
+                    color = MaterialTheme.theme.colors.primaryInteractive02,
+                    shape = RoundedCornerShape(8.dp)
+                )
+        ) {
+            Row(
+                modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                CircularProgressIndicator()
+                TextP40(
+                    text = text,
+                    modifier = modifier.padding(start = 16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun DialogFramePreview(
     theme: Theme.ThemeType = Theme.ThemeType.LIGHT,
     orientation: DialogButtonOrientation,
@@ -284,3 +322,16 @@ private fun RadioDialogPreview_light() = RadioDialogPreview(Theme.ThemeType.LIGH
 @Preview
 @Composable
 private fun RadioDialogPreview_dark() = RadioDialogPreview(Theme.ThemeType.DARK)
+
+@Preview(showBackground = true)
+@Composable
+private fun ProgressDialogPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType
+) {
+    AppTheme(themeType) {
+        ProgressDialog(
+            text = "In Progress",
+            onDismiss = {}
+        )
+    }
+}

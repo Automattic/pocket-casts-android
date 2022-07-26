@@ -48,6 +48,9 @@ class StorageSettingsViewModel
     private val mutableAlertDialog = MutableSharedFlow<AlertDialogState>()
     val alertDialog = mutableAlertDialog.asSharedFlow()
 
+    private val mutableProgressDialog = MutableSharedFlow<Boolean>()
+    val progressDialog = mutableProgressDialog.asSharedFlow()
+
     private val mutablePermissionRequest = MutableSharedFlow<String>()
     val permissionRequest = mutablePermissionRequest.asSharedFlow()
 
@@ -276,14 +279,15 @@ class StorageSettingsViewModel
             LogBuffer.TAG_BACKGROUND_TASKS,
             "Moving storage from $oldDirectory to $newDirectory"
         )
-        // TODO: Add progress bar
         viewModelScope.launch(Dispatchers.IO) {
+            mutableProgressDialog.emit(true)
             fileStorage.moveStorage(
                 File(oldDirectory),
                 File(newDirectory),
                 podcastManager,
                 episodeManager
             )
+            mutableProgressDialog.emit(false)
         }
         setupStorage()
     }
