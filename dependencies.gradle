@@ -75,7 +75,7 @@ project.ext {
             ktx: "androidx.core:core-ktx:1.8.0",
             ktxFragment: "androidx.fragment:fragment-ktx:1.5.0",
             ktxPreference: "androidx.preference:preference-ktx:1.2.0",
-            annotations: "androidx.annotation:annotation:1.4.0",
+            annotations: "androidx.annotation:annotation:1.3.0",
             liveDataReactiveStreams: "androidx.lifecycle:lifecycle-reactivestreams-ktx:$versionLifecycle",
             lifecycleViewModel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$versionLifecycle",
             lifecycleScope: "androidx.lifecycle:lifecycle-runtime-ktx:$versionLifecycle",
