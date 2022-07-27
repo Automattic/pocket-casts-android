@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsSt
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import com.android.billingclient.api.SkuDetails
+import com.android.billingclient.api.ProductDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -47,18 +47,18 @@ class CreateAccountViewModel
 
                         val list = mutableListOf<SubscriptionFrequency>()
 
-                        productDetailsState.productDetails.forEach { skuDetail ->
+                        productDetailsState.productDetails.forEach { productDetails ->
                             var period: Int? = null
                             var renews: Int? = null
                             var hint: Int? = null
                             var isMonth = true
 
                             // need to check subscriptionPeriod code types
-                            if (skuDetail.subscriptionPeriod.contains("M")) {
+                            if (productDetails.subscriptionOfferDetails?.firstOrNull()?.offerTags?.firstOrNull()?.contains("M") == true) {
                                 period = LR.string.plus_month
                                 renews = LR.string.plus_renews_automatically_yearly
                                 isMonth = true
-                            } else if (skuDetail.subscriptionPeriod.contains("Y")) {
+                            } else if (productDetails.subscriptionOfferDetails?.firstOrNull()?.offerTags?.firstOrNull()?.contains("Y") == true) {
                                 period = LR.string.plus_year
                                 hint = LR.string.plus_best_value
                                 renews = LR.string.plus_renews_automatically_monthly
@@ -66,7 +66,7 @@ class CreateAccountViewModel
                             }
 
                             val subscriptionFrequency = SubscriptionFrequency(
-                                product = skuDetail,
+                                product = productDetails,
                                 period = period,
                                 renews = renews,
                                 hint = hint,
@@ -250,7 +250,7 @@ enum class SubscriptionType(val value: String) {
 }
 
 data class SubscriptionFrequency(
-    val product: SkuDetails,
+    val product: ProductDetails,
     @StringRes val period: Int?,
     @StringRes val renews: Int?,
     @StringRes val hint: Int?,

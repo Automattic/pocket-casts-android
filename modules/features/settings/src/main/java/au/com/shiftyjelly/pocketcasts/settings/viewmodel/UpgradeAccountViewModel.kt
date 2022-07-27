@@ -16,7 +16,7 @@ class UpgradeAccountViewModel
 ) : ViewModel() {
     private val productDetails = subscriptionManager.observeProductDetails().map {
         if (it is ProductDetailsState.Loaded) {
-            val price = it.productDetails.find { detail -> detail.sku == SubscriptionManager.MONTHLY_SKU }?.price
+            val price = it.productDetails.find { detail -> detail.productId == SubscriptionManager.MONTHLY_SKU }?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice
             if (price != null) {
                 Optional.of(price)
             } else {

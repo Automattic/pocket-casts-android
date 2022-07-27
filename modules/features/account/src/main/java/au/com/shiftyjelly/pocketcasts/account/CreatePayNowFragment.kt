@@ -62,7 +62,7 @@ class CreatePayNowFragment : BaseFragment() {
 
         viewModel.subscriptionFrequency.value?.let {
             sub = getString(LR.string.pocket_casts_plus)
-            charge = it.product.price + " / " + (if (it.period == null) "" else getString(it.period))
+            charge = it.product.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice + " / " + (if (it.period == null) "" else getString(it.period))
             renews = it.renews
         }
 

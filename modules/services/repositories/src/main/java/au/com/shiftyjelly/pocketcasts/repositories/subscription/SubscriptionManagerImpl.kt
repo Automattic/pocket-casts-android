@@ -95,7 +95,10 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun observePrices(): Flowable<PricePair> {
         return observeProductDetails().map { state ->
             if (state is ProductDetailsState.Loaded) {
-                PricePair(state.productDetails.find { it.sku == MONTHLY_SKU }?.price, state.productDetails.find { it.sku == YEARLY_SKU }?.price)
+                PricePair(
+                    state.productDetails.find { it.productId == MONTHLY_SKU }?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice,
+                    state.productDetails.find { it.productId == YEARLY_SKU }?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice,
+                )
             } else {
                 PricePair(null, null)
             }
@@ -287,7 +290,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override suspend fun sendPurchaseToServer(purchase: Purchase) {
-        val response = syncServerManager.subscriptionPurchase(SubscriptionPurchaseRequest(purchase.purchaseToken, purchase.sku)).await()
+        val response = syncServerManager.subscriptionPurchase(SubscriptionPurchaseRequest(purchase.purchaseToken, purchase.products.first())).await()
         val newStatus = response.toStatus()
         cachedSubscriptionStatus = newStatus
         subscriptionStatus.accept(Optional.of(newStatus))
