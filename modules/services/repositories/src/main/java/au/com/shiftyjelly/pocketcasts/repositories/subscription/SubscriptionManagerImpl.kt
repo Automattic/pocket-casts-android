@@ -95,7 +95,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun observePrices(): Flowable<PricePair> {
         return observeProductDetails().map { state ->
             if (state is ProductDetailsState.Loaded) {
-                PricePair(state.skuDetails.find { it.sku == MONTHLY_SKU }?.price, state.skuDetails.find { it.sku == YEARLY_SKU }?.price)
+                PricePair(state.productDetails.find { it.sku == MONTHLY_SKU }?.price, state.productDetails.find { it.sku == YEARLY_SKU }?.price)
             } else {
                 PricePair(null, null)
             }
@@ -362,7 +362,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
 }
 
 sealed class ProductDetailsState {
-    data class Loaded(val skuDetails: List<SkuDetails>) : ProductDetailsState()
+    data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState()
     data class Error(val message: String) : ProductDetailsState()
 }
 

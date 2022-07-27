@@ -76,7 +76,7 @@ class DeveloperFragment : PreferenceFragmentCompat(), CoroutineScope {
             .subscribeBy(
                 onSuccess = {
                     if (it is ProductDetailsState.Loaded) {
-                        subscriptionManager.launchBillingFlow(requireActivity(), it.skuDetails.first())
+                        subscriptionManager.launchBillingFlow(requireActivity(), it.productDetails.first())
                     } else {
                         Timber.d("Couldn't get sku details")
                     }

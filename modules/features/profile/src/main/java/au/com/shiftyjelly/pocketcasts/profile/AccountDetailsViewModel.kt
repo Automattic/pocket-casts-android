@@ -41,7 +41,7 @@ class AccountDetailsViewModel
 
     private val productDetails = subscriptionManager.observeProductDetails().map { state ->
         if (state is ProductDetailsState.Loaded) {
-            val price = state.skuDetails.find { it.sku == SubscriptionManager.MONTHLY_SKU }?.price
+            val price = state.productDetails.find { it.sku == SubscriptionManager.MONTHLY_SKU }?.price
             if (price != null) {
                 Optional.of(price)
             } else {

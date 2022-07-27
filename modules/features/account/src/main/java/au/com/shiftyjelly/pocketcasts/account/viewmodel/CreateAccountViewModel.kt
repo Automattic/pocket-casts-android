@@ -47,7 +47,7 @@ class CreateAccountViewModel
 
                         val list = mutableListOf<SubscriptionFrequency>()
 
-                        productDetailsState.skuDetails.forEach { skuDetail ->
+                        productDetailsState.productDetails.forEach { skuDetail ->
                             var period: Int? = null
                             var renews: Int? = null
                             var hint: Int? = null
