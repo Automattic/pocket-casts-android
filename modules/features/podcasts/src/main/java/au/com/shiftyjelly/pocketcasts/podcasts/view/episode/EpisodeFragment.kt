@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -463,7 +464,8 @@ class EpisodeFragment : BaseDialogFragment() {
                     setBackgroundColor(Color.argb(1, 0, 0, 0))
                     isVerticalScrollBarEnabled = false
                     webViewClient = object : WebViewClient() {
-                        override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                            val url = request.url.toString()
                             if (url.startsWith("http://localhost/#playerJumpTo=")) {
                                 val time = url.split("=").last()
                                 jumpToTime(time)

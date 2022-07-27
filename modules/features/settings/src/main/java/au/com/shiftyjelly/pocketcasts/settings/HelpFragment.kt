@@ -68,7 +68,6 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setHasOptionsMenu(true)
         savedInstanceState?.let {
             loadedUrl = savedInstanceState.getString("url")
         }
@@ -125,8 +124,8 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
     private inner class SupportWebViewClient : WebViewClient() {
         @Suppress("NAME_SHADOWING")
-        override fun shouldOverrideUrlLoading(view: WebView, url: String?): Boolean {
-            var url = url ?: return false
+        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+            var url = request.url.toString()
             Timber.i("Webview loading url $url")
 
             when {

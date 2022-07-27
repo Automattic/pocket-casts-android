@@ -372,11 +372,11 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
     }
 
     private fun startGestureDetection() {
-        mItemTouchHelperGestureListener = ItemTouchHelperGestureListener()
-        mGestureDetector = GestureDetectorCompat(
-            mRecyclerView!!.context,
-            mItemTouchHelperGestureListener
-        )
+        val context = mRecyclerView?.context ?: return
+        val gestureListener = ItemTouchHelperGestureListener().apply {
+            mItemTouchHelperGestureListener = this
+        }
+        mGestureDetector = GestureDetectorCompat(context, gestureListener)
     }
 
     private fun stopGestureDetection() {

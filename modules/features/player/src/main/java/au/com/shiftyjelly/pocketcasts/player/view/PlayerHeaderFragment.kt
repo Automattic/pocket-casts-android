@@ -254,6 +254,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun setupUpNextDrag(view: View) {
+        val context = context ?: return
         val swipeGesture = GestureDetectorCompat(
             context,
             object : GestureDetector.OnGestureListener {

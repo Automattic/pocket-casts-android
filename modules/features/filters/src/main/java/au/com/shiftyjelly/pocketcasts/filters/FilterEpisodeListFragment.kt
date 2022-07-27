@@ -94,7 +94,6 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
 
         listSavedState = savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
         showingFilterOptionsBeforeModal = arguments?.getBoolean(ARG_FILTER_IS_NEW) ?: false
