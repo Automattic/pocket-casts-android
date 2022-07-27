@@ -97,8 +97,6 @@ project.ext {
             testRules: "androidx.test:rules:$versionTest",
             testEspressoCore: "androidx.test.espresso:espresso-core:$versionEspresso",
             testEspressoContrib: "androidx.test.espresso:espresso-contrib:$versionEspresso",
-            testExpressoIntents: "androidx.test.espresso:espresso-intents:$versionEspresso",
-            testExpressoAccessibility: "androidx.test.espresso:espresso-accessibility:$versionEspresso",
             testExpressoWeb: "androidx.test.espresso:espresso-web:$versionEspresso",
             testExpressoIdlingConcurrent: "androidx.test.espresso.idling:idling-concurrent:$versionEspresso",
             testExpressoIdlingResouce: "androidx.test.espresso:espresso-idling-resource:$versionEspresso",

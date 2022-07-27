@@ -237,8 +237,6 @@ dependencies {
     androidTestImplementation androidLibs.testRules
     androidTestImplementation androidLibs.testEspressoCore
     androidTestImplementation androidLibs.testEspressoContrib
-    androidTestImplementation androidLibs.testExpressoIntents
-    androidTestImplementation androidLibs.testExpressoAccessibility
     androidTestImplementation androidLibs.testExpressoWeb
     androidTestImplementation androidLibs.testExpressoIdlingConcurrent
     androidTestImplementation androidLibs.testExpressoIdlingResouce
