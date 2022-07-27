@@ -23,8 +23,8 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchasesResponseListener
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.SkuDetails
@@ -44,7 +44,6 @@ import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class SubscriptionManagerImpl @Inject constructor(private val syncServerManager: SyncServerManager, private val settings: Settings) :
@@ -301,11 +300,27 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         }
     }
 
-    override fun launchBillingFlow(activity: Activity, skuDetails: SkuDetails): BillingResult {
-        val flow = BillingFlowParams.newBuilder()
+    override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult? {
+        /*val flow = BillingFlowParams.newBuilder()
             .setSkuDetails(skuDetails)
             .build()
-        return billingClient.launchBillingFlow(activity, flow)
+        return billingClient.launchBillingFlow(activity, flow)*/
+
+        val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken
+        return offerToken?.let {
+            val productDetailsParamsList =
+                listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails)
+                        .setOfferToken(offerToken)
+                        .build()
+                )
+            val billingFlowParams =
+                BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(productDetailsParamsList)
+                    .build()
+            billingClient.launchBillingFlow(activity, billingFlowParams)
+        }
     }
 
     override fun getCachedStatus(): SubscriptionStatus? {
