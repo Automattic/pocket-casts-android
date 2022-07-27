@@ -26,9 +26,9 @@ import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.SkuDetails
-import com.android.billingclient.api.SkuDetailsParams
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.BackpressureStrategy
@@ -162,13 +162,41 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override fun loadProducts() {
-        val skus = listOf(MONTHLY_SKU, YEARLY_SKU)
+        /*val skus = listOf(MONTHLY_SKU, YEARLY_SKU)
         val params = SkuDetailsParams.newBuilder()
         params.setSkusList(skus).setType(BillingClient.SkuType.SUBS)
         billingClient.querySkuDetailsAsync(params.build()) { billingResult, skuDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 Timber.d("Billing products loaded")
                 productDetails.accept(ProductDetailsState.Loaded(skuDetailsList ?: emptyList()))
+
+                refreshPurchases()
+            } else {
+                productDetails.accept(ProductDetailsState.Error(billingResult.debugMessage))
+            }
+        }*/
+
+        val productList =
+            listOf(
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(MONTHLY_SKU)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(YEARLY_SKU)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build()
+            )
+
+        val params = QueryProductDetailsParams.newBuilder().setProductList(productList)
+
+        billingClient.queryProductDetailsAsync(params.build()) {
+                billingResult,
+                productDetailsList
+            ->
+            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                Timber.d("Billing products loaded")
+                productDetails.accept(ProductDetailsState.Loaded(productDetailsList))
 
                 refreshPurchases()
             } else {
