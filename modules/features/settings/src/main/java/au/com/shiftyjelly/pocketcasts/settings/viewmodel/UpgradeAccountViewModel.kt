@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -16,7 +17,7 @@ class UpgradeAccountViewModel
 ) : ViewModel() {
     private val productDetails = subscriptionManager.observeProductDetails().map {
         if (it is ProductDetailsState.Loaded) {
-            val price = it.productDetails.find { detail -> detail.productId == SubscriptionManager.MONTHLY_SKU }?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice
+            val price = it.productDetails.find { detail -> detail.productId == SubscriptionManager.MONTHLY_SKU }?.price
             if (price != null) {
                 Optional.of(price)
             } else {

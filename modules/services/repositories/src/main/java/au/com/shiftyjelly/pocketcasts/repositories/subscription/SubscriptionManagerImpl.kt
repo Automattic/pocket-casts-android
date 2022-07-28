@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
-import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_SKU
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_SKU
@@ -16,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -28,7 +28,6 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
-import com.android.billingclient.api.SkuDetails
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.BackpressureStrategy
@@ -53,10 +52,10 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     PurchasesUpdatedListener,
     AcknowledgePurchaseResponseListener {
     companion object {
-        private val TEST_SKU_DETAILS = listOf(
-            SkuDetails("""{ "productId": "$MONTHLY_SKU", "price": "$10.49", "type": "subs" }"""),
-            SkuDetails("""{ "productId": "$YEARLY_SKU", "price": "$120.99", "type": "subs" }""")
-        )
+//        private val TEST_SKU_DETAILS = listOf(
+//            SkuDetails("""{ "productId": "$MONTHLY_SKU", "price": "$10.49", "type": "subs" }"""),
+//            SkuDetails("""{ "productId": "$YEARLY_SKU", "price": "$120.99", "type": "subs" }""")
+//        )
     }
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
@@ -86,20 +85,21 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override fun observeProductDetails(): Flowable<ProductDetailsState> {
-        return if (BuildConfig.DEBUG) {
+        /*return if (BuildConfig.DEBUG) {
             // Return test data in development so we can layout the screens
             Flowable.just(ProductDetailsState.Loaded(TEST_SKU_DETAILS))
         } else {
             productDetails.toFlowable(BackpressureStrategy.LATEST)
-        }
+        }*/
+        return productDetails.toFlowable(BackpressureStrategy.LATEST)
     }
 
     override fun observePrices(): Flowable<PricePair> {
         return observeProductDetails().map { state ->
             if (state is ProductDetailsState.Loaded) {
                 PricePair(
-                    state.productDetails.find { it.productId == MONTHLY_SKU }?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice,
-                    state.productDetails.find { it.productId == YEARLY_SKU }?.subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.formattedPrice,
+                    state.productDetails.find { it.productId == MONTHLY_SKU }?.price,
+                    state.productDetails.find { it.productId == YEARLY_SKU }?.price,
                 )
             } else {
                 PricePair(null, null)
@@ -317,7 +317,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
-        billingClient.queryPurchasesAsync(queryPurchasesParams) { billingResult, purchases ->
+        billingClient.queryPurchasesAsync(queryPurchasesParams) { _, purchases ->
             purchases.forEach {
                 if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
                     handlePurchase(it)
