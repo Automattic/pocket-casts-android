@@ -271,6 +271,10 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override suspend fun sendPurchaseToServer(purchase: Purchase) {
+        if (purchase.products.size != 1) {
+            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "expected 1 product when sending purchase to server, but there were ${purchase.products.size}")
+        }
+
         val response = syncServerManager.subscriptionPurchase(SubscriptionPurchaseRequest(purchase.purchaseToken, purchase.products.first())).await()
         val newStatus = response.toStatus()
         cachedSubscriptionStatus = newStatus
@@ -306,6 +310,11 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult? {
+        if (productDetails.subscriptionOfferDetails?.size != 1) {
+            val message = "Expected 1 subscription offer when launching billing flow, but there were ${productDetails.subscriptionOfferDetails?.size}"
+            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, message)
+        }
+
         val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken
         return offerToken?.let {
             val productDetailsParamsList =
