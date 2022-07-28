@@ -42,6 +42,8 @@ fastlane/test_output
 
 # secrets
 secret.properties
+.configure-files/firebase.secrets.json
+firebase.secrets.json
 
 # Silver Searcher ignore file
 .agignore

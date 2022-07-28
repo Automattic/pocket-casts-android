@@ -1,7 +1,7 @@
 {
   "project_name": "pocketcasts-android",
   "branch": "trunk",
-  "pinned_hash": "bcf196f12a1d9953c8dfe9997e358217d17ffdd3",
+  "pinned_hash": "1642f841540e0feebc53ee2fdf8a9b0a1f1b8f37",
   "files_to_copy": [
     {
       "file": "android/pocket-casts/secret.properties",
@@ -18,6 +18,10 @@
     {
       "file": "android/pocket-casts/google-upload-credentials.json",
       "destination": "google-upload-credentials.json"
+    },
+    {
+      "file": "android/pocket-casts/firebase.secrets.json",
+      "destination": ".configure-files/firebase.secrets.json"
     }
   ]
 }
