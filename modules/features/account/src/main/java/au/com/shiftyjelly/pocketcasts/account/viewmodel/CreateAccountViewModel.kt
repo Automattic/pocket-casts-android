@@ -56,12 +56,12 @@ class CreateAccountViewModel
                             // need to check subscriptionPeriod code types
                             if (skuDetail.subscriptionPeriod.contains("M")) {
                                 period = LR.string.plus_month
-                                renews = LR.string.plus_renews_automatically_yearly
+                                renews = LR.string.plus_renews_automatically_monthly
                                 isMonth = true
                             } else if (skuDetail.subscriptionPeriod.contains("Y")) {
                                 period = LR.string.plus_year
                                 hint = LR.string.plus_best_value
-                                renews = LR.string.plus_renews_automatically_monthly
+                                renews = LR.string.plus_renews_automatically_yearly
                                 isMonth = false
                             }
 
