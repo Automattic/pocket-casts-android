@@ -51,12 +51,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     SubscriptionManager,
     PurchasesUpdatedListener,
     AcknowledgePurchaseResponseListener {
-    companion object {
-//        private val TEST_SKU_DETAILS = listOf(
-//            SkuDetails("""{ "productId": "$MONTHLY_SKU", "price": "$10.49", "type": "subs" }"""),
-//            SkuDetails("""{ "productId": "$YEARLY_SKU", "price": "$120.99", "type": "subs" }""")
-//        )
-    }
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
         get() = settings.getCachedSubscription()
@@ -85,12 +79,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override fun observeProductDetails(): Flowable<ProductDetailsState> {
-        /*return if (BuildConfig.DEBUG) {
-            // Return test data in development so we can layout the screens
-            Flowable.just(ProductDetailsState.Loaded(TEST_SKU_DETAILS))
-        } else {
-            productDetails.toFlowable(BackpressureStrategy.LATEST)
-        }*/
         return productDetails.toFlowable(BackpressureStrategy.LATEST)
     }
 
