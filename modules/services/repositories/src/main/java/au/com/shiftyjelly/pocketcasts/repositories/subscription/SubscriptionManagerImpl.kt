@@ -155,20 +155,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override fun loadProducts() {
-        /*val skus = listOf(MONTHLY_SKU, YEARLY_SKU)
-        val params = SkuDetailsParams.newBuilder()
-        params.setSkusList(skus).setType(BillingClient.SkuType.SUBS)
-        billingClient.querySkuDetailsAsync(params.build()) { billingResult, skuDetailsList ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                Timber.d("Billing products loaded")
-                productDetails.accept(ProductDetailsState.Loaded(skuDetailsList ?: emptyList()))
-
-                refreshPurchases()
-            } else {
-                productDetails.accept(ProductDetailsState.Error(billingResult.debugMessage))
-            }
-        }*/
-
         val productList =
             listOf(
                 QueryProductDetailsParams.Product.newBuilder()
@@ -295,13 +281,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun refreshPurchases() {
         if (!billingClient.isReady) return
 
-//        val purchases = billingClient.queryPurchases(BillingClient.SkuType.SUBS)
-//        purchases.purchasesList?.forEach {
-//            if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
-//                handlePurchase(it)
-//            }
-//        }
-
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
@@ -327,11 +306,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult? {
-        /*val flow = BillingFlowParams.newBuilder()
-            .setSkuDetails(skuDetails)
-            .build()
-        return billingClient.launchBillingFlow(activity, flow)*/
-
         val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken
         return offerToken?.let {
             val productDetailsParamsList =
