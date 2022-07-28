@@ -84,7 +84,7 @@ project.ext {
     versionComposeCompiler = '1.3.0'
     versionDagger = '2.41'
     versionEspresso = '3.4.0'
-    versionExoplayer = '2.16.1'
+    versionExoplayer = '2.18.2'
     versionGlide = '4.13.2'
     versionHilt = '2.43.2'
     versionKotlinCoroutines = '1.6.4'
