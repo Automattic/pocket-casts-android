@@ -22,3 +22,8 @@ val ProductDetails.priceCurrencyCode: String
     get() {
         return subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.priceCurrencyCode ?: ""
     }
+
+val ProductDetails.billingPeriod: String?
+    get() {
+        return subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()?.billingPeriod
+    }

@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsSt
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.billingPeriod
 import com.android.billingclient.api.ProductDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -54,11 +55,11 @@ class CreateAccountViewModel
                             var isMonth = true
 
                             // need to check subscriptionPeriod code types
-                            if (productDetails.subscriptionOfferDetails?.firstOrNull()?.offerTags?.firstOrNull()?.contains("M") == true) {
+                            if (productDetails.billingPeriod?.contains("M") == true) {
                                 period = LR.string.plus_month
                                 renews = LR.string.plus_renews_automatically_yearly
                                 isMonth = true
-                            } else if (productDetails.subscriptionOfferDetails?.firstOrNull()?.offerTags?.firstOrNull()?.contains("Y") == true) {
+                            } else if (productDetails.billingPeriod?.contains("Y") == true) {
                                 period = LR.string.plus_year
                                 hint = LR.string.plus_best_value
                                 renews = LR.string.plus_renews_automatically_monthly
