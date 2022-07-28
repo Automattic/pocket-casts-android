@@ -40,7 +40,7 @@ project.ext {
     versionComposeCompiler = '1.2.0'
     versionRoom = '2.4.2'
     versionLifecycle = '2.5.1'
-    versionExoplayer = '2.16.1'
+    versionExoplayer = '2.18.1'
     versionDagger = '2.41'
     versionGlide = '4.13.1'
     versionKotlinCoroutines = '1.6.4'
