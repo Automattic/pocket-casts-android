@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-05-11 15:54:03+0000
+Translation-Revision-Date: 2022-07-25 15:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+	<string name="settings_downloads_clean_up">Limpar</string>
+	<string name="podcasts_share_failed_description">Ocorreu um erro ao criar sua página de compartilhamento.</string>
+	<string name="podcasts_share_failed">Falha no compartilhamento</string>
+	<string name="podcasts_share_creating_list">Criando lista</string>
+	<string name="podcasts_share_create_list">Criar lista</string>
+	<string name="podcasts_share_all_selected">Tudo selecionado</string>
+	<string name="select_podcasts">Selecionar podcasts</string>
+	<string name="next">Seguir</string>
+	<string name="not_selected">Não selecionado</string>
+	<string name="selected">Selecionado</string>
+	<string name="profile_create_failed_title">Não foi possível criar a conta</string>
+	<string name="please_try_again">Tente novamente</string>
+	<string name="player_battery_warning_snackbar_action">atualização</string>
+	<string name="player_battery_warning_snackbar">As restrições de bateria podem causar interrupções na reprodução.</string>
+	<string name="settings_battery_usage_message">O uso da bateria deve ser irrestrito para garantir a reprodução ininterrupta quando a tela estiver desligada.</string>
+	<string name="settings_battery_update_message">Toque em \"%s\" para atualizar as configurações da bateria.</string>
+	<string name="settings_battery_unrestricted_accessibility_label">atualizar configurações da bateria</string>
+	<string name="settings_battery_unrestricted">Irrestrito</string>
+	<string name="settings_battery_learn_more">Saiba mais</string>
+	<string name="settings_battery_settings">Configurações da bateria</string>
+	<string name="settings_battery">Bateria</string>
+	<string name="stream_warning_summary">Reproduzir este episódio consumirá seus dados.</string>
+	<string name="seconds_label">Segundos</string>
+	<string name="youre_on_metered_wifi">\"Você está usando rede Wi-Fi limitada\"</string>
 	<string name="go_to_folder">Ir para pasta</string>
 	<string name="change_folder">Mudar pasta</string>
 	<string name="remove_from_folder">Remover da pasta</string>
@@ -283,7 +307,6 @@ Language: pt_BR
 	<string name="settings_storage_phone">Telefone</string>
 	<string name="settings_manage_downloads_deleting">Excluindo episódios…</string>
 	<string name="settings_whats_new_done">Concluído</string>
-	<string name="settings_whats_new_next">Próximo</string>
 	<string name="settings_whats_new">Novidades</string>
 	<string name="settings_notification_silent">Silencioso</string>
 	<string name="settings_select_podcasts">Selecionar podcasts</string>
@@ -370,7 +393,6 @@ Language: pt_BR
 	<string name="settings_show_archived_summary_hide">Os novos podcasts que você assinar não exibirão os episódios arquivados.</string>
 	<string name="settings_show_archived_action_show">Mostrar</string>
 	<string name="settings_show_archived_action_hide">Ocultar</string>
-	<string name="settings_select_episodes_to_delete">Selecionar episódios para excluir</string>
 	<string name="settings_row_action_summary">Para episódios que ainda não foram baixados, a lista mostrará %s botões.</string>
 	<string name="settings_row_action">Ação por linha</string>
 	<string name="settings_refresh_artwork_title">É pra já!</string>
@@ -434,7 +456,6 @@ Language: pt_BR
 	<string name="settings_export_save_file">Salvar arquivo</string>
 	<string name="settings_embedded_artwork_details">Mostra a arte dos arquivos baixados (se houver) no reprodutor, em vez da arte do programa.</string>
 	<string name="settings_developer">Desenvolvedor</string>
-	<string name="settings_delete_episodes">Excluir %d episódios</string>
 	<string name="settings_close_upgrade_offer">fechar oferta de upgrade</string>
 	<string name="settings_choose_podcasts">Escolher podcasts</string>
 	<string name="settings_auto_play_summary">Escolher um episódio para mim automaticamente quando não houver mais nada na fila</string>
@@ -618,7 +639,6 @@ Language: pt_BR
 	<string name="profile_not_signed_in">NÃO CONECTADO</string>
 	<string name="profile_none">Nenhum</string>
 	<string name="profile_next_payment">Próximo pagamento: %s</string>
-	<string name="profile_next">Próximo</string>
 	<string name="profile_newsletter_detail">Receba novidades, atualizações do aplicativo, playlists temáticas, entrevistas e muito mais.</string>
 	<string name="profile_new_password">Nova senha</string>
 	<string name="profile_new_email_address">Novo endereço de e-mail</string>
@@ -939,14 +959,11 @@ Language: pt_BR
 	<string name="podcasts_share_action_select_all">Selecionar todos os podcasts</string>
 	<string name="podcasts_share_all_podcasts_selected">Todos os podcasts selecionados. Botão desmarcar todos.</string>
 	<string name="podcasts_share_selected">%d selecionado</string>
-	<string name="podcasts_share_failed_title">Ops</string>
-	<string name="podcasts_share_failed">Infelizmente não deu certo. Tente novamente mais tarde.</string>
 	<string name="podcasts_share_via">Compartilhar por</string>
 	<string name="podcasts_share_generating_list">Criando lista…</string>
 	<string name="podcasts_share_missing_podcast">Escolha pelo menos um podcast.</string>
 	<string name="podcasts_share_missing_title">Dê um título para sua lista.</string>
 	<string name="podcasts_share_create_error">Ops, não foi possível compartilhar</string>
-	<string name="podcasts_share_warning">Esta página poderá ser vista por qualquer pessoa que tenha o link. Não compartilhe os seus podcasts privados.</string>
 	<string name="podcasts_share_title">Título</string>
 	<string name="podcasts_share_subscribe_to_all">ASSINAR TUDO</string>
 	<string name="podcasts_share_selected_podcasts">Compartilhar podcasts selecionados</string>
@@ -1051,7 +1068,6 @@ Language: pt_BR
 	<string name="search_hint">Pesquisar pelo nome do podcast</string>
 	<string name="search_podcasts">Pesquisar podcasts</string>
 	<string name="stream_warning_button">Reproduzir mesmo assim</string>
-	<string name="stream_warning_summary">Reproduzir este episódio consumirá seus dados.</string>
 	<string name="profile_cloud_upload_warning_button">Fazer upload agora</string>
 	<string name="profile_cloud_upload_warning_summary">Fazer upload deste episódio consumirá seus dados.</string>
 	<string name="download_warning_on_wifi_button">Fazer download agora</string>

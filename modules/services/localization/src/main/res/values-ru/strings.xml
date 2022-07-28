@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-05-11 15:54:03+0000
+Translation-Revision-Date: 2022-07-26 12:54:07+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+	<string name="settings_downloads_clean_up">Очистить</string>
+	<string name="podcasts_share_failed_description">При создании общей страницы что-то пошло не так</string>
+	<string name="podcasts_share_failed">Не удалось поделиться</string>
+	<string name="podcasts_share_creating_list">Создание списка...</string>
+	<string name="podcasts_share_create_list">Создать список</string>
+	<string name="podcasts_share_all_selected">ВЫБРАНО ВСЕ</string>
+	<string name="select_podcasts">Выбрать подкасты</string>
+	<string name="next">Далее</string>
+	<string name="not_selected">Не выбран</string>
+	<string name="selected">Выбрано</string>
+	<string name="profile_create_failed_title">Не удалось создать учётную запись</string>
+	<string name="please_try_again">Попробуйте еще раз</string>
+	<string name="player_battery_warning_snackbar_action">обновить</string>
+	<string name="player_battery_warning_snackbar">Воспроизведение может прерваться из-за ограниченного ресурса батареи.</string>
+	<string name="settings_battery_usage_message">Использование заряда аккумулятора нельзя ограничивать, чтобы воспроизведение не прерывалось, когда экран погашен.</string>
+	<string name="settings_battery_update_message">Коснитесь переключателя «%s» выше, чтобы обновить настройки аккумулятора.</string>
+	<string name="settings_battery_unrestricted_accessibility_label">обновить настройки аккумулятора</string>
+	<string name="settings_battery_unrestricted">Без ограничения</string>
+	<string name="settings_battery_learn_more">Узнать больше</string>
+	<string name="settings_battery_settings">Настройки аккумулятора</string>
+	<string name="settings_battery">Аккумулятор</string>
+	<string name="stream_warning_summary">При трансляции этого выпуска будет расходоваться трафик.</string>
+	<string name="seconds_label">Секунды </string>
+	<string name="youre_on_metered_wifi">\"Вы используете WiFi с регистрируемым объемом потребления данных\"</string>
 	<string name="go_to_folder">Перейти в папку</string>
 	<string name="change_folder">Изменить папку</string>
 	<string name="remove_from_folder">Удалить из папки</string>
@@ -283,7 +307,6 @@ Language: ru
 	<string name="settings_storage_phone">Телефон</string>
 	<string name="settings_manage_downloads_deleting">Удаление выпусков…</string>
 	<string name="settings_whats_new_done">Готово</string>
-	<string name="settings_whats_new_next">Вперёд</string>
 	<string name="settings_whats_new">Что нового</string>
 	<string name="settings_notification_silent">Без звука</string>
 	<string name="settings_select_podcasts">Выбрать подкасты</string>
@@ -370,7 +393,6 @@ Language: ru
 	<string name="settings_show_archived_summary_hide">Новые подкасты, на которые вы подписались, не будут показывать архивные выпуски.</string>
 	<string name="settings_show_archived_action_show">Показать</string>
 	<string name="settings_show_archived_action_hide">Скрыть</string>
-	<string name="settings_select_episodes_to_delete">Выбрать выпуски для удаления</string>
 	<string name="settings_row_action_summary">Для эпизодов, которые ещё не скачаны, в списках будут показаны кнопки %s.</string>
 	<string name="settings_row_action">Действие для строки</string>
 	<string name="settings_refresh_artwork_title">Прямо сейчас!</string>
@@ -434,7 +456,6 @@ Language: ru
 	<string name="settings_export_save_file">Сохранить файл</string>
 	<string name="settings_embedded_artwork_details">Показывает в плеере тему из загруженного файла (при наличии) вместо темы шоу.</string>
 	<string name="settings_developer">Разработчик</string>
-	<string name="settings_delete_episodes">Удалить выпуски (%d)</string>
 	<string name="settings_close_upgrade_offer">закрыть предложение платной услуги</string>
 	<string name="settings_choose_podcasts">Выбрать подкасты</string>
 	<string name="settings_auto_play_summary">Если ничего не осталось, выбирать для меня выпуск автоматически.</string>
@@ -618,7 +639,6 @@ Language: ru
 	<string name="profile_not_signed_in">ВХОД НЕ ВЫПОЛНЕН</string>
 	<string name="profile_none">Пусто</string>
 	<string name="profile_next_payment">Следующий платеж: %s</string>
-	<string name="profile_next">Вперёд</string>
 	<string name="profile_newsletter_detail">Получайте новости, обновления приложения, тематические плейлисты, интервью и многое другое.</string>
 	<string name="profile_new_password">Новый пароль</string>
 	<string name="profile_new_email_address">Новый адрес электронной почты</string>
@@ -939,14 +959,11 @@ Language: ru
 	<string name="podcasts_share_action_select_all">Выбрать все подкасты</string>
 	<string name="podcasts_share_all_podcasts_selected">Выбраны все подкасты. Кнопка «Снять все выделения».</string>
 	<string name="podcasts_share_selected">%d выбрано</string>
-	<string name="podcasts_share_failed_title">Ой</string>
-	<string name="podcasts_share_failed">К сожалению, это не сработало. Повторите попытку позже.</string>
 	<string name="podcasts_share_via">Поделиться в</string>
 	<string name="podcasts_share_generating_list">Создаётся список…</string>
 	<string name="podcasts_share_missing_podcast">Выберите хотя бы один подкаст.</string>
 	<string name="podcasts_share_missing_title">Укажите заголовок для вашего списка.</string>
 	<string name="podcasts_share_create_error">Ой, не удаётся поделиться</string>
-	<string name="podcasts_share_warning">Эта страница будет доступна для просмотра всем, у кого есть ссылка. Не делитесь своими личными подкастами.</string>
 	<string name="podcasts_share_title">Заголовок</string>
 	<string name="podcasts_share_subscribe_to_all">ПОДПИСАТЬСЯ НА ВСЁ</string>
 	<string name="podcasts_share_selected_podcasts">Поделиться выбранными подкастами</string>
@@ -1051,7 +1068,6 @@ Language: ru
 	<string name="search_hint">Поиск по названию подкаста</string>
 	<string name="search_podcasts">Поиск подкастов</string>
 	<string name="stream_warning_button">Транслировать в любом случае</string>
-	<string name="stream_warning_summary">При трансляции этого выпуска будут использоваться мобильные данные.</string>
 	<string name="profile_cloud_upload_warning_button">Загрузить сейчас</string>
 	<string name="profile_cloud_upload_warning_summary">При загрузке этого выпуска будет расходоваться трафик.</string>
 	<string name="download_warning_on_wifi_button">Скачать</string>
