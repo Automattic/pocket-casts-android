@@ -198,6 +198,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
 
         setPlayerEffects()
         player.addListener(object : Player.Listener {
+            @Deprecated("Deprecated. Use onTracksInfoChanged(TracksInfo) instead.")
             override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
                 val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
                 episodeMetadata.read(trackSelections, settings, context)

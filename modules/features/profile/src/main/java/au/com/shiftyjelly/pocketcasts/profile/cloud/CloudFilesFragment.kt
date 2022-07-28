@@ -67,11 +67,6 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         CloudFileBottomSheetFragment.newInstance(episode.uuid).show(parentFragmentManager, "cloud_bottom_sheet")
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentCloudFilesBinding.inflate(inflater, container, false)
         return binding?.root

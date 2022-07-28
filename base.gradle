@@ -54,13 +54,13 @@ android {
         jvmTarget = "1.8"
         // disable Kotlin warnings for Coroutines, working with the annotation @OptIn(DelicateCoroutinesApi::class)
         freeCompilerArgs += [
-            "-Xopt-in=kotlin.RequiresOptIn"
+            "-opt-in=kotlin.RequiresOptIn"
         ]
         kotlinOptions.allWarningsAsErrors = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion project.versionCompose
+        kotlinCompilerExtensionVersion project.versionComposeCompiler
     }
 
     testOptions {
@@ -238,8 +238,6 @@ dependencies {
     androidTestImplementation androidLibs.testRules
     androidTestImplementation androidLibs.testEspressoCore
     androidTestImplementation androidLibs.testEspressoContrib
-    androidTestImplementation androidLibs.testExpressoIntents
-    androidTestImplementation androidLibs.testExpressoAccessibility
     androidTestImplementation androidLibs.testExpressoWeb
     androidTestImplementation androidLibs.testExpressoIdlingConcurrent
     androidTestImplementation androidLibs.testExpressoIdlingResouce

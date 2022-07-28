@@ -199,12 +199,13 @@ private fun Page(
                         )
                     }
 
+                    val learnMoreString = stringResource(LR.string.learn_more)
                     TextP50(
                         text = buildAnnotatedString {
                             append(stringResource(LR.string.settings_battery_usage_message))
                             append(" ")
                             withStyle(SpanStyle(color = MaterialTheme.theme.colors.primaryInteractive01)) {
-                                append(stringResource(LR.string.learn_more))
+                                append(learnMoreString)
                             }
                         },
                         style = MaterialTheme.typography.body1,

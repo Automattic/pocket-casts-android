@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-05-11 09:54:03+0000
+Translation-Revision-Date: 2022-07-26 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+	<string name="settings_downloads_clean_up">クリーンアップ</string>
+	<string name="podcasts_share_failed_description">共有ページの作成中に問題が発生しました。</string>
+	<string name="podcasts_share_failed">共有に失敗</string>
+	<string name="podcasts_share_creating_list">リストを作成しています</string>
+	<string name="podcasts_share_create_list">リストを作成する</string>
+	<string name="podcasts_share_all_selected">すべて選択済み</string>
+	<string name="select_podcasts">ポッドキャストを選択する</string>
+	<string name="next">次へ</string>
+	<string name="not_selected">未選択</string>
+	<string name="selected">選択済み</string>
+	<string name="profile_create_failed_title">アカウントを作成できませんでした</string>
+	<string name="please_try_again">もう一度お試しください</string>
+	<string name="player_battery_warning_snackbar_action">更新</string>
+	<string name="player_battery_warning_snackbar">バッテリーの制限により再生が中断される可能性があります。</string>
+	<string name="settings_battery_usage_message">画面がオフのときに再生が中断されないよう、バッテリーの使用を無制限に設定する必要があります。</string>
+	<string name="settings_battery_update_message">上の「%s」スイッチをタップしてバッテリー設定を更新してください。</string>
+	<string name="settings_battery_unrestricted_accessibility_label">バッテリー設定を更新</string>
+	<string name="settings_battery_unrestricted">無制限</string>
+	<string name="settings_battery_learn_more">さらに詳しく</string>
+	<string name="settings_battery_settings">バッテリー設定</string>
+	<string name="settings_battery">バッテリー</string>
+	<string name="stream_warning_summary">このエピソードのストリーミングではデータが消費されます。</string>
+	<string name="seconds_label">秒</string>
+	<string name="youre_on_metered_wifi">「従量制の Wi-Fi に接続しています」</string>
 	<string name="go_to_folder">フォルダーに移動</string>
 	<string name="change_folder">フォルダーを変更</string>
 	<string name="remove_from_folder">フォルダーから消去</string>
@@ -51,7 +75,7 @@ Language: ja_JP
 	<string name="update">更新</string>
 	<string name="name">名前</string>
 	<string name="navigation_continue">次へ</string>
-	<string name="player_sleep_timer_start_failed">タイマーを開始できません。「アラームとリマインダー」の許可を許可してください。</string>
+	<string name="player_sleep_timer_start_failed">タイマーを開始できません。 「アラームとリマインダー」の権限を許可してください。</string>
 	<string name="episodes">エピソード</string>
 	<string name="discover_button_play_trailer">トレーラーを再生</string>
 	<string name="discover_button_play_episode">エピソードを再生</string>
@@ -283,7 +307,6 @@ Language: ja_JP
 	<string name="settings_storage_phone">スマートフォン</string>
 	<string name="settings_manage_downloads_deleting">エピソードを削除しています…</string>
 	<string name="settings_whats_new_done">終了</string>
-	<string name="settings_whats_new_next">次へ</string>
 	<string name="settings_whats_new">新着情報</string>
 	<string name="settings_notification_silent">サイレント</string>
 	<string name="settings_select_podcasts">ポッドキャストを選択</string>
@@ -370,7 +393,6 @@ Language: ja_JP
 	<string name="settings_show_archived_summary_hide">登録する新しいポッドキャストにアーカイブ済みエピソードが表示されません。</string>
 	<string name="settings_show_archived_action_show">表示</string>
 	<string name="settings_show_archived_action_hide">非表示</string>
-	<string name="settings_select_episodes_to_delete">削除するエピソードを選択</string>
 	<string name="settings_row_action_summary">まだダウンロードしていないエピソードでは、リストに %s のボタンが表示されます。</string>
 	<string name="settings_row_action">行の操作</string>
 	<string name="settings_refresh_artwork_title">少々お待ちください。</string>
@@ -434,7 +456,6 @@ Language: ja_JP
 	<string name="settings_export_save_file">ファイルを保存</string>
 	<string name="settings_embedded_artwork_details">番組のアートワークを使用する代わりに、プレーヤーのダウンロードファイルからのアートワークを表示します (存在する場合)。</string>
 	<string name="settings_developer">開発者</string>
-	<string name="settings_delete_episodes">%d件のエピソードを削除</string>
 	<string name="settings_close_upgrade_offer">アップグレードのオファーを閉じる</string>
 	<string name="settings_choose_podcasts">ポッドキャストを選択</string>
 	<string name="settings_auto_play_summary">再生するものが残っていない場合はエピソードを自動的に取得</string>
@@ -618,7 +639,6 @@ Language: ja_JP
 	<string name="profile_not_signed_in">ログインしていません</string>
 	<string name="profile_none">なし</string>
 	<string name="profile_next_payment">次回の支払い: %s</string>
-	<string name="profile_next">次へ</string>
 	<string name="profile_newsletter_detail">ニュースやアプリの更新、特定のテーマを取り上げたプレイリスト、インタビューなどをお楽しみください。</string>
 	<string name="profile_new_password">新規パスワード</string>
 	<string name="profile_new_email_address">新しいメールアドレス</string>
@@ -939,14 +959,11 @@ Language: ja_JP
 	<string name="podcasts_share_action_select_all">すべてのポッドキャストを選択</string>
 	<string name="podcasts_share_all_podcasts_selected">すべてのポッドキャストが選択されました。 すべてのボタンを選択解除します。</string>
 	<string name="podcasts_share_selected">%d選択済み</string>
-	<string name="podcasts_share_failed_title">おっと</string>
-	<string name="podcasts_share_failed">問題が発生しました。 後ほど、もう一度お試しください。</string>
 	<string name="podcasts_share_via">次で共有</string>
 	<string name="podcasts_share_generating_list">リストを生成中…</string>
 	<string name="podcasts_share_missing_podcast">ポッドキャストを少なくとも1件選択してください。</string>
 	<string name="podcasts_share_missing_title">リストのタイトルを入力してください。</string>
 	<string name="podcasts_share_create_error">共有に失敗しました</string>
-	<string name="podcasts_share_warning">誰でもリンクからこのページを表示できます。 ご自身のプライベートなポッドキャストは共有しないでください。</string>
 	<string name="podcasts_share_title">タイトル</string>
 	<string name="podcasts_share_subscribe_to_all">すべてに登録</string>
 	<string name="podcasts_share_selected_podcasts">選択したポッドキャストを共有</string>
@@ -1051,7 +1068,6 @@ Language: ja_JP
 	<string name="search_hint">ポッドキャスト名で検索</string>
 	<string name="search_podcasts">ポッドキャストを検索</string>
 	<string name="stream_warning_button">ストリーミング</string>
-	<string name="stream_warning_summary">このエピソードのストリーミングでは携帯データネットワークが使用されます。</string>
 	<string name="profile_cloud_upload_warning_button">今すぐアップロード</string>
 	<string name="profile_cloud_upload_warning_summary">このエピソードのアップロードではデータが消費されます。</string>
 	<string name="download_warning_on_wifi_button">今すぐダウンロード</string>

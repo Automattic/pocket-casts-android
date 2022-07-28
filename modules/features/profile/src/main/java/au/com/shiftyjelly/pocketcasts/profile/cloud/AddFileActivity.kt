@@ -652,6 +652,7 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
         val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(0, 0, 0, 0).build()
         val player = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
         player.addListener(object : Player.Listener {
+            @Deprecated("Deprecated. Use onTracksInfoChanged(TracksInfo) instead.")
             override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
                 val episodeMetadata = EpisodeFileMetadata()
                 episodeMetadata.read(trackSelections, true, this@AddFileActivity)
@@ -669,6 +670,7 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
                 }
             }
 
+            @Deprecated("Deprecated. Use onPlaybackStateChanged(int) and onPlayWhenReadyChanged(boolean, int) instead.")
             override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
                 if (playbackState == ExoPlayer.STATE_READY) {
                     length = player.duration

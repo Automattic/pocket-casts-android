@@ -4,8 +4,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -90,11 +88,6 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
             field = value
             updateIconViews()
         }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onPause() {
         super.onPause()
@@ -275,10 +268,5 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
     private fun setDownloadLimit(limit: Int) {
         binding?.lblDownloadLimit?.text = getString(LR.string.filters_auto_download_limit, limit)
         viewModel.updateDownloadLimit(limit)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        menu.clear()
     }
 }

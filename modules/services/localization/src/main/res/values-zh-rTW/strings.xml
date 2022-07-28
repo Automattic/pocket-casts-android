@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-05-11 09:54:03+0000
+Translation-Revision-Date: 2022-07-26 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+	<string name="settings_downloads_clean_up">清理</string>
+	<string name="podcasts_share_failed_description">建立分享頁面時發生問題。</string>
+	<string name="podcasts_share_failed">分享失敗</string>
+	<string name="podcasts_share_creating_list">正在建立清單</string>
+	<string name="podcasts_share_create_list">建立清單</string>
+	<string name="podcasts_share_all_selected">已全部選取</string>
+	<string name="select_podcasts">選取 Podcast 節目</string>
+	<string name="next">下一頁</string>
+	<string name="not_selected">未選取</string>
+	<string name="selected">已選取</string>
+	<string name="profile_create_failed_title">無法建立帳號</string>
+	<string name="please_try_again">請再試一次</string>
+	<string name="player_battery_warning_snackbar_action">更新</string>
+	<string name="player_battery_warning_snackbar">你的電池限制可能會導致播放中斷。</string>
+	<string name="settings_battery_usage_message">電池用量必須不受限制，才能確保螢幕關閉時播放不受中斷。</string>
+	<string name="settings_battery_update_message">請點選上方的「%s」切換以更新你的電池設定。</string>
+	<string name="settings_battery_unrestricted_accessibility_label">更新你的電池設定</string>
+	<string name="settings_battery_unrestricted">不受限制</string>
+	<string name="settings_battery_learn_more">瞭解更多</string>
+	<string name="settings_battery_settings">電池設定</string>
+	<string name="settings_battery">電池</string>
+	<string name="stream_warning_summary">本集將使用行動數據串流。</string>
+	<string name="seconds_label">秒數</string>
+	<string name="youre_on_metered_wifi">「你正在使用計量付費 WiFi」</string>
 	<string name="go_to_folder">前往資料夾</string>
 	<string name="change_folder">變更資料夾</string>
 	<string name="remove_from_folder">從資料夾移除</string>
@@ -283,7 +307,6 @@ Language: zh_TW
 	<string name="settings_storage_phone">手機</string>
 	<string name="settings_manage_downloads_deleting">正在刪除單集…</string>
 	<string name="settings_whats_new_done">完成</string>
-	<string name="settings_whats_new_next">下一篇</string>
 	<string name="settings_whats_new">新功能</string>
 	<string name="settings_notification_silent">靜音</string>
 	<string name="settings_select_podcasts">選取 Podcast 節目</string>
@@ -370,7 +393,6 @@ Language: zh_TW
 	<string name="settings_show_archived_summary_hide">新訂閱的 Podcast 不會顯示封存單集。</string>
 	<string name="settings_show_archived_action_show">顯示</string>
 	<string name="settings_show_archived_action_hide">隱藏</string>
-	<string name="settings_select_episodes_to_delete">選取要刪除的單集</string>
 	<string name="settings_row_action_summary">對於尚未下載的單集，清單將顯示 %s 按鈕。</string>
 	<string name="settings_row_action">資料列動作</string>
 	<string name="settings_refresh_artwork_title">立即！</string>
@@ -434,7 +456,6 @@ Language: zh_TW
 	<string name="settings_export_save_file">儲存檔案</string>
 	<string name="settings_embedded_artwork_details">在播放器中顯示下載檔案的封面 (如有)，而不使用節目的封面。</string>
 	<string name="settings_developer">開發人員</string>
-	<string name="settings_delete_episodes">刪除 %d 集</string>
 	<string name="settings_close_upgrade_offer">關閉升級方案</string>
 	<string name="settings_choose_podcasts">選擇 Podcast</string>
 	<string name="settings_auto_play_summary">全部播完時，自動為我挑選單集</string>
@@ -618,7 +639,6 @@ Language: zh_TW
 	<string name="profile_not_signed_in">未登入</string>
 	<string name="profile_none">無</string>
 	<string name="profile_next_payment">下一次付款：%s</string>
-	<string name="profile_next">下一篇</string>
 	<string name="profile_newsletter_detail">接收最新消息、應用程式更新、佈景主題播放清單、訪談等內容。</string>
 	<string name="profile_new_password">新密碼</string>
 	<string name="profile_new_email_address">新電子郵件地址</string>
@@ -939,14 +959,11 @@ Language: zh_TW
 	<string name="podcasts_share_action_select_all">選取所有 Podcast</string>
 	<string name="podcasts_share_all_podcasts_selected">已選取所有 Podcast。 取消選取所有按鈕。</string>
 	<string name="podcasts_share_selected">已選取 %d 個</string>
-	<string name="podcasts_share_failed_title">糟糕</string>
-	<string name="podcasts_share_failed">抱歉，動作無效。 請稍後再試一次。</string>
 	<string name="podcasts_share_via">分享方式：</string>
 	<string name="podcasts_share_generating_list">正在產生清單…</string>
 	<string name="podcasts_share_missing_podcast">請至少選擇一個 Podcast。</string>
 	<string name="podcasts_share_missing_title">請為清單輸入標題。</string>
 	<string name="podcasts_share_create_error">糟糕，無法分享</string>
-	<string name="podcasts_share_warning">任何擁有此連結的人都可以檢視此頁面。 請勿分享你自己的私人 Podcast。</string>
 	<string name="podcasts_share_title">標題</string>
 	<string name="podcasts_share_subscribe_to_all">全部訂閱</string>
 	<string name="podcasts_share_selected_podcasts">分享選取的 Podcast</string>
@@ -1051,7 +1068,6 @@ Language: zh_TW
 	<string name="search_hint">依 Podcast 名稱搜尋</string>
 	<string name="search_podcasts">搜尋 Podcast</string>
 	<string name="stream_warning_button">仍要串流</string>
-	<string name="stream_warning_summary">將使用行動數據串流此單集。</string>
 	<string name="profile_cloud_upload_warning_button">立即上傳</string>
 	<string name="profile_cloud_upload_warning_summary">將使用行動數據上傳此單集。</string>
 	<string name="download_warning_on_wifi_button">立即下載</string>
