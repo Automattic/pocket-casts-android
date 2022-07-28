@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchasesResult
 import io.reactivex.Flowable
 import io.reactivex.Single
 
@@ -31,7 +32,7 @@ interface SubscriptionManager {
     fun handlePurchase(purchase: Purchase)
     suspend fun sendPurchaseToServer(purchase: Purchase)
     fun refreshPurchases()
-    suspend fun getPurchases(onPurchasesResponse: (BillingResult, List<Purchase>) -> Unit)
+    suspend fun getPurchases(): PurchasesResult?
     fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult?
     fun getCachedStatus(): SubscriptionStatus?
     fun clearCachedStatus()

@@ -25,9 +25,11 @@ import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchasesResult
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
+import com.android.billingclient.api.queryPurchasesAsync
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.BackpressureStrategy
@@ -36,11 +38,9 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
@@ -194,44 +194,33 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
             purchaseEvents.accept(PurchaseEvent.Cancelled)
         } else {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-                val onPurchasesResponse = { _: BillingResult, existingPurchases: List<Purchase> ->
-                    if (existingPurchases.isNotEmpty()) {
-                        val existingPurchase = existingPurchases.first()
+                GlobalScope.launch {
+                    val purchasesResult = getPurchases()
+                    if (purchasesResult == null) {
+                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to update purchase because billing result returned null purchases")
+                        return@launch
+                    }
 
-                        GlobalScope.launch {
-                            try {
-                                sendPurchaseToServer(existingPurchase)
-                            } catch (e: Exception) {
-                                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
+                    if (purchasesResult.purchasesList.isNotEmpty()) {
+                        val existingPurchase = purchasesResult.purchasesList.first()
 
-                                purchaseEvents.accept(
-                                    PurchaseEvent.Failure(
-                                        e.message
-                                            ?: "Unknown error"
-                                    )
-                                )
-                            }
+                        try {
+                            sendPurchaseToServer(existingPurchase)
+                        } catch (e: Exception) {
+                            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
+                            val failureEvent = PurchaseEvent.Failure(e.message ?: "Unknown error")
+                            purchaseEvents.accept(failureEvent)
                         }
                     } else {
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Subscription purchase returned already owned but we couldn't load it")
-                        purchaseEvents.accept(
-                            PurchaseEvent.Failure(
-                                billingResult.debugMessage
-                            )
-                        )
+                        val failureEvent = PurchaseEvent.Failure(purchasesResult.billingResult.debugMessage)
+                        purchaseEvents.accept(failureEvent)
                     }
-                    Unit
-                }
-                GlobalScope.launch {
-                    getPurchases(onPurchasesResponse)
                 }
             } else {
                 LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Could not purchase subscription: ${billingResult.debugMessage}")
-                purchaseEvents.accept(
-                    PurchaseEvent.Failure(
-                        billingResult.debugMessage
-                    )
-                )
+                val failureEvent = PurchaseEvent.Failure(billingResult.debugMessage)
+                purchaseEvents.accept(failureEvent)
             }
         }
     }
@@ -297,16 +286,13 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         }
     }
 
-    override suspend fun getPurchases(onPurchasesResponse: (BillingResult, List<Purchase>) -> Unit) {
-        if (!billingClient.isReady) return
+    override suspend fun getPurchases(): PurchasesResult? {
+        if (!billingClient.isReady) return null
 
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
-
-        withContext(Dispatchers.IO) {
-            billingClient.queryPurchasesAsync(queryPurchasesParams, onPurchasesResponse)
-        }
+        return billingClient.queryPurchasesAsync(params = queryPurchasesParams)
     }
 
     override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult? {
