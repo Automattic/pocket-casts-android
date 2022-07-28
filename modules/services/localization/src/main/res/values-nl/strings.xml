@@ -1,11 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-05-11 13:54:03+0000
+Translation-Revision-Date: 2022-07-26 12:54:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+	<string name="settings_downloads_clean_up">Opschonen</string>
+	<string name="podcasts_share_failed_description">Er is iets verkeerd gegaan tijdens het aanmaken van je deelpagina.</string>
+	<string name="podcasts_share_failed">Delen mislukt</string>
+	<string name="podcasts_share_creating_list">Lijst maken...</string>
+	<string name="podcasts_share_create_list">Lijst maken</string>
+	<string name="podcasts_share_all_selected">ALLES GESELECTEERD</string>
+	<string name="select_podcasts">Selecteer podcasts</string>
+	<string name="next">Volgende</string>
+	<string name="not_selected">Niet geselecteerd</string>
+	<string name="selected">Geselecteerd</string>
+	<string name="profile_create_failed_title">Kon geen account aanmaken</string>
+	<string name="please_try_again">Probeer het nog eens</string>
+	<string name="player_battery_warning_snackbar_action">Bijwerken:</string>
+	<string name="player_battery_warning_snackbar">Beperkende batterijfuncties zorgen mogelijk voor afspeelonderbrekingen.</string>
+	<string name="settings_battery_usage_message">Batterijverbruik moet onbeperkt zijn om ervoor te zorgen dat het afspelen niet wordt onderbroken wanneer je scherm uit staat.</string>
+	<string name="settings_battery_update_message">Tik op de \'%s\'-schakelaar hierboven om je batterij-instellingen te updaten.</string>
+	<string name="settings_battery_unrestricted_accessibility_label">je batterij-instellingen bijwerken</string>
+	<string name="settings_battery_unrestricted">Onbeperkt</string>
+	<string name="settings_battery_learn_more">Meer informatie.</string>
+	<string name="settings_battery_settings">Batterij-instellingen</string>
+	<string name="settings_battery">Batterij</string>
+	<string name="stream_warning_summary">Voor het streamen van deze aflevering wordt data gebruikt.</string>
+	<string name="seconds_label">Seconden</string>
+	<string name="youre_on_metered_wifi">\"Je dataverbruik op dit wifi-netwerk wordt bijgehouden\"</string>
 	<string name="go_to_folder">Ga naar map</string>
 	<string name="change_folder">Map wijzigen</string>
 	<string name="remove_from_folder">Verwijderen uit map</string>
@@ -283,7 +307,6 @@ Language: nl
 	<string name="settings_storage_phone">Telefoon</string>
 	<string name="settings_manage_downloads_deleting">Afleveringen verwijderen...</string>
 	<string name="settings_whats_new_done">Klaar</string>
-	<string name="settings_whats_new_next">Volgende</string>
 	<string name="settings_whats_new">Wat is nieuw</string>
 	<string name="settings_notification_silent">Stil</string>
 	<string name="settings_select_podcasts">Selecteer podcasts</string>
@@ -370,7 +393,6 @@ Language: nl
 	<string name="settings_show_archived_summary_hide">Nieuwe podcasts waarop je je abonneert tonen geen gearchiveerde afleveringen.</string>
 	<string name="settings_show_archived_action_show">Tonen</string>
 	<string name="settings_show_archived_action_hide">Verbergen</string>
-	<string name="settings_select_episodes_to_delete">Selecteer afleveringen om te verwijderen</string>
 	<string name="settings_row_action_summary">Voor afleveringen die nog niet gedownload zijn, tonen de lijsten %s knoppen.</string>
 	<string name="settings_row_action">Rij-actie</string>
 	<string name="settings_refresh_artwork_title">Meteen!</string>
@@ -434,7 +456,6 @@ Language: nl
 	<string name="settings_export_save_file">Bestand opslaan</string>
 	<string name="settings_embedded_artwork_details">Geeft de artwork van het gedownloade bestand weer (als het bestaat) in de speler, in plaats van de artwork van de serie te gebruiken.</string>
 	<string name="settings_developer">Ontwikkelaar</string>
-	<string name="settings_delete_episodes">%d afleveringen verwijderen</string>
 	<string name="settings_close_upgrade_offer">upgrade-aanbod sluiten</string>
 	<string name="settings_choose_podcasts">Podcasts kiezen</string>
 	<string name="settings_auto_play_summary">Kies automatisch een aflevering voor me als er niets meer is om af te spelen</string>
@@ -618,7 +639,6 @@ Language: nl
 	<string name="profile_not_signed_in">NIET AANGEMELD</string>
 	<string name="profile_none">Geen</string>
 	<string name="profile_next_payment">Volgende betaling: %s</string>
-	<string name="profile_next">Volgende</string>
 	<string name="profile_newsletter_detail">Ontvang nieuws, app-updates, thematische afspeellijsten, interviews en meer.</string>
 	<string name="profile_new_password">Nieuw wachtwoord</string>
 	<string name="profile_new_email_address">Nieuw e-mailadres</string>
@@ -939,14 +959,11 @@ Language: nl
 	<string name="podcasts_share_action_select_all">Alle podcasts selecteren</string>
 	<string name="podcasts_share_all_podcasts_selected">Alle podcasts geselecteerd. Knop Alles deselecteren.</string>
 	<string name="podcasts_share_selected">%d geselecteerd</string>
-	<string name="podcasts_share_failed_title">Oeps</string>
-	<string name="podcasts_share_failed">Dat werkte helaas niet. Probeer het later opnieuw.</string>
 	<string name="podcasts_share_via">Delen via</string>
 	<string name="podcasts_share_generating_list">Lijst genereren...</string>
 	<string name="podcasts_share_missing_podcast">Kies ten minste één podcast.</string>
 	<string name="podcasts_share_missing_title">Voer een titel in voor je lijst.</string>
 	<string name="podcasts_share_create_error">Oeps, we kunnen dit niet delen</string>
-	<string name="podcasts_share_warning">Deze pagina kan bekeken worden door iedereen met de link. Deel je eigen privé-podcasts niet.</string>
 	<string name="podcasts_share_title">Titel</string>
 	<string name="podcasts_share_subscribe_to_all">OP ALLES ABONNEREN</string>
 	<string name="podcasts_share_selected_podcasts">Geselecteerde podcasts delen</string>
@@ -1051,7 +1068,6 @@ Language: nl
 	<string name="search_hint">Zoeken op podcastnaam</string>
 	<string name="search_podcasts">Podcasts zoeken</string>
 	<string name="stream_warning_button">Toch streamen</string>
-	<string name="stream_warning_summary">Voor het streamen van deze aflevering wordt mobiele data gebruikt.</string>
 	<string name="profile_cloud_upload_warning_button">Nu uploaden</string>
 	<string name="profile_cloud_upload_warning_summary">Voor het uploaden van deze aflevering wordt data gebruikt.</string>
 	<string name="download_warning_on_wifi_button">Nu downloaden</string>
