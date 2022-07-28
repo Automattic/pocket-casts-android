@@ -37,9 +37,11 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
@@ -218,31 +220,36 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
             purchaseEvents.accept(PurchaseEvent.Cancelled)
         } else {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-                val existingPurchases = getPurchases()
-                if (existingPurchases.isNotEmpty()) {
-                    val existingPurchase = existingPurchases.first()
+                val onPurchasesResponse = { _: BillingResult, existingPurchases: List<Purchase> ->
+                    if (existingPurchases.isNotEmpty()) {
+                        val existingPurchase = existingPurchases.first()
 
-                    GlobalScope.launch {
-                        try {
-                            sendPurchaseToServer(existingPurchase)
-                        } catch (e: Exception) {
-                            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
+                        GlobalScope.launch {
+                            try {
+                                sendPurchaseToServer(existingPurchase)
+                            } catch (e: Exception) {
+                                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
 
-                            purchaseEvents.accept(
-                                PurchaseEvent.Failure(
-                                    e.message
-                                        ?: "Unknown error"
+                                purchaseEvents.accept(
+                                    PurchaseEvent.Failure(
+                                        e.message
+                                            ?: "Unknown error"
+                                    )
                                 )
-                            )
+                            }
                         }
-                    }
-                } else {
-                    LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Subscription purchase returned already owned but we couldn't load it")
-                    purchaseEvents.accept(
-                        PurchaseEvent.Failure(
-                            billingResult.debugMessage
+                    } else {
+                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Subscription purchase returned already owned but we couldn't load it")
+                        purchaseEvents.accept(
+                            PurchaseEvent.Failure(
+                                billingResult.debugMessage
+                            )
                         )
-                    )
+                    }
+                    Unit
+                }
+                GlobalScope.launch {
+                    getPurchases(onPurchasesResponse)
                 }
             } else {
                 LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Could not purchase subscription: ${billingResult.debugMessage}")
@@ -319,15 +326,15 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         }
     }
 
-    override suspend fun getPurchases(): List<Purchase> {
-
-        if (!billingClient.isReady) return emptyList()
+    override suspend fun getPurchases(onPurchasesResponse: (BillingResult, List<Purchase>) -> Unit) {
+        if (!billingClient.isReady) return
 
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
-        billingClient.queryPurchasesAsync(queryPurchasesParams) { _, purchases ->
-            // FIXME --------------------------
+
+        withContext(Dispatchers.IO) {
+            billingClient.queryPurchasesAsync(queryPurchasesParams, onPurchasesResponse)
         }
     }
 
