@@ -71,7 +71,9 @@ class Support @Inject constructor(
 
     @Suppress("DEPRECATION")
     suspend fun sendEmail(subject: String, intro: String, context: Context): Intent {
-        val dialog = android.app.ProgressDialog.show(context, context.getString(R.string.loading), this.context.getString(R.string.settings_support_please_wait), true)
+        val dialog = withContext(Dispatchers.Main) {
+            android.app.ProgressDialog.show(context, context.getString(R.string.loading), context.getString(R.string.settings_support_please_wait), true)
+        }
         val intent = Intent(Intent.ACTION_SEND)
 
         withContext(Dispatchers.IO) {
