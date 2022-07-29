@@ -172,12 +172,11 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                     .build()
             )
 
-        val params = QueryProductDetailsParams.newBuilder().setProductList(productList)
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(productList)
+            .build()
 
-        billingClient.queryProductDetailsAsync(params.build()) {
-                billingResult,
-                productDetailsList
-            ->
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 Timber.d("Billing products loaded")
                 productDetails.accept(ProductDetailsState.Loaded(productDetailsList))
