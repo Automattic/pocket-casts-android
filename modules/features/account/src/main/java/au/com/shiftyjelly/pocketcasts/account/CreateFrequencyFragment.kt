@@ -80,7 +80,6 @@ class CreateFrequencyFragment : BaseFragment() {
             if (frequency != null) {
                 val product = frequency.product
                 AnalyticsHelper.plusPlanChosen(sku = product.productId, title = product.title, price = product.priceDouble, currency = product.priceCurrencyCode)
-
                 it.findNavController().navigate(R.id.action_createFrequencyFragment_to_createTOSFragment)
             }
         }

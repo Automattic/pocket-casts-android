@@ -229,7 +229,7 @@ object AnalyticsHelper {
         logEvent("select_sign_in_account")
     }
 
-    fun plusPlanChosen(sku: String, title: String, price: Double, currency: String) {
+    fun plusPlanChosen(sku: String, title: String, price: Double?, currency: String?) {
         val plan = bundleOf(
             Param.ITEM_ID to sku,
             Param.ITEM_NAME to title,

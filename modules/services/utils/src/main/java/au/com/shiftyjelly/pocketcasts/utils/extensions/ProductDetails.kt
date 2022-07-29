@@ -8,14 +8,14 @@ val ProductDetails.shortTitle: String
 val ProductDetails.firstSubscriptionPricingPhase: ProductDetails.PricingPhase?
     get() = subscriptionOfferDetails?.firstOrNull()?.pricingPhases?.pricingPhaseList?.firstOrNull()
 
-val ProductDetails.price: String
-    get() = firstSubscriptionPricingPhase?.formattedPrice ?: "0"
+val ProductDetails.price: String?
+    get() = firstSubscriptionPricingPhase?.formattedPrice
 
-val ProductDetails.priceDouble: Double
-    get() = (firstSubscriptionPricingPhase?.priceAmountMicros ?: 0) * 1_000_000.0
+val ProductDetails.priceDouble: Double?
+    get() = firstSubscriptionPricingPhase?.priceAmountMicros?.let { it * 1_000_000.0 }
 
-val ProductDetails.priceCurrencyCode: String
-    get() = firstSubscriptionPricingPhase?.priceCurrencyCode ?: ""
+val ProductDetails.priceCurrencyCode: String?
+    get() = firstSubscriptionPricingPhase?.priceCurrencyCode
 
 val ProductDetails.billingPeriod: String?
     get() = firstSubscriptionPricingPhase?.billingPeriod
