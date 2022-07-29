@@ -5,23 +5,31 @@
   "files_to_copy": [
     {
       "file": "android/pocket-casts/secret.properties",
-      "destination": "secret.properties"
+      "destination": "secret.properties",
+      "encrypt": true
     },
     {
       "file": "android/pocket-casts/google-services.json",
-      "destination": "app/google-services.json"
+      "destination": "app/google-services.json",
+      "encrypt": true
     },
     {
       "file": "android/pocket-casts/google-services.json",
-      "destination": "automotive/google-services.json"
+      "destination": "automotive/google-services.json",
+      "encrypt": true
     },
     {
       "file": "android/pocket-casts/google-upload-credentials.json",
-      "destination": "google-upload-credentials.json"
+      "destination": "google-upload-credentials.json",
+      "encrypt": true
     },
     {
       "file": "android/pocket-casts/firebase.secrets.json",
-      "destination": ".configure-files/firebase.secrets.json"
+      "destination": ".configure-files/firebase.secrets.json",
+      "encrypt": true
     }
+  ],
+  "file_dependencies": [
+
   ]
 }
