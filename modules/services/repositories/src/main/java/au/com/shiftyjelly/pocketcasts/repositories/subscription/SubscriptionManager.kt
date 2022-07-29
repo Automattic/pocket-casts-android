@@ -16,6 +16,7 @@ interface SubscriptionManager {
     companion object {
         const val MONTHLY_SKU = "com.pocketcasts.plus.monthly"
         const val YEARLY_SKU = "com.pocketcasts.plus.yearly"
+        const val TEST_FREE_TRIAL_SKU = "com.pocketcasts.plus.testfreetrialoffer"
     }
 
     fun signOut()
