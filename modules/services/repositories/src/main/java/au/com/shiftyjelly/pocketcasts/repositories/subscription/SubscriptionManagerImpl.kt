@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
-import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_SKU
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_SKU
@@ -16,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -23,10 +23,13 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchasesResult
 import com.android.billingclient.api.PurchasesUpdatedListener
-import com.android.billingclient.api.SkuDetails
-import com.android.billingclient.api.SkuDetailsParams
+import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchasesParams
+import com.android.billingclient.api.queryPurchasesAsync
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.BackpressureStrategy
@@ -48,12 +51,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     SubscriptionManager,
     PurchasesUpdatedListener,
     AcknowledgePurchaseResponseListener {
-    companion object {
-        private val TEST_SKU_DETAILS = listOf(
-            SkuDetails("""{ "productId": "$MONTHLY_SKU", "price": "$10.49", "type": "subs" }"""),
-            SkuDetails("""{ "productId": "$YEARLY_SKU", "price": "$120.99", "type": "subs" }""")
-        )
-    }
 
     private var cachedSubscriptionStatus: SubscriptionStatus?
         get() = settings.getCachedSubscription()
@@ -82,18 +79,16 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override fun observeProductDetails(): Flowable<ProductDetailsState> {
-        return if (BuildConfig.DEBUG) {
-            // Return test data in development so we can layout the screens
-            Flowable.just(ProductDetailsState.Loaded(TEST_SKU_DETAILS))
-        } else {
-            productDetails.toFlowable(BackpressureStrategy.LATEST)
-        }
+        return productDetails.toFlowable(BackpressureStrategy.LATEST)
     }
 
     override fun observePrices(): Flowable<PricePair> {
         return observeProductDetails().map { state ->
             if (state is ProductDetailsState.Loaded) {
-                PricePair(state.skuDetails.find { it.sku == MONTHLY_SKU }?.price, state.skuDetails.find { it.sku == YEARLY_SKU }?.price)
+                PricePair(
+                    state.productDetails.find { it.productId == MONTHLY_SKU }?.price,
+                    state.productDetails.find { it.productId == YEARLY_SKU }?.price,
+                )
             } else {
                 PricePair(null, null)
             }
@@ -160,13 +155,27 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override fun loadProducts() {
-        val skus = listOf(MONTHLY_SKU, YEARLY_SKU)
-        val params = SkuDetailsParams.newBuilder()
-        params.setSkusList(skus).setType(BillingClient.SkuType.SUBS)
-        billingClient.querySkuDetailsAsync(params.build()) { billingResult, skuDetailsList ->
+        val productList =
+            listOf(
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(MONTHLY_SKU)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(YEARLY_SKU)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build()
+            )
+
+        val params = QueryProductDetailsParams.newBuilder().setProductList(productList)
+
+        billingClient.queryProductDetailsAsync(params.build()) {
+                billingResult,
+                productDetailsList
+            ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 Timber.d("Billing products loaded")
-                productDetails.accept(ProductDetailsState.Loaded(skuDetailsList ?: emptyList()))
+                productDetails.accept(ProductDetailsState.Loaded(productDetailsList))
 
                 refreshPurchases()
             } else {
@@ -185,39 +194,33 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
             purchaseEvents.accept(PurchaseEvent.Cancelled)
         } else {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-                val existingPurchases = getPurchases()
-                if (existingPurchases.isNotEmpty()) {
-                    val existingPurchase = existingPurchases.first()
+                GlobalScope.launch {
+                    val purchasesResult = getPurchases()
+                    if (purchasesResult == null) {
+                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to update purchase because billing result returned null purchases")
+                        return@launch
+                    }
 
-                    GlobalScope.launch {
+                    if (purchasesResult.purchasesList.isNotEmpty()) {
+                        val existingPurchase = purchasesResult.purchasesList.first()
+
                         try {
                             sendPurchaseToServer(existingPurchase)
                         } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
-
-                            purchaseEvents.accept(
-                                PurchaseEvent.Failure(
-                                    e.message
-                                        ?: "Unknown error"
-                                )
-                            )
+                            val failureEvent = PurchaseEvent.Failure(e.message ?: "Unknown error")
+                            purchaseEvents.accept(failureEvent)
                         }
+                    } else {
+                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Subscription purchase returned already owned but we couldn't load it")
+                        val failureEvent = PurchaseEvent.Failure(purchasesResult.billingResult.debugMessage)
+                        purchaseEvents.accept(failureEvent)
                     }
-                } else {
-                    LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Subscription purchase returned already owned but we couldn't load it")
-                    purchaseEvents.accept(
-                        PurchaseEvent.Failure(
-                            billingResult.debugMessage
-                        )
-                    )
                 }
             } else {
                 LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Could not purchase subscription: ${billingResult.debugMessage}")
-                purchaseEvents.accept(
-                    PurchaseEvent.Failure(
-                        billingResult.debugMessage
-                    )
-                )
+                val failureEvent = PurchaseEvent.Failure(billingResult.debugMessage)
+                purchaseEvents.accept(failureEvent)
             }
         }
     }
@@ -257,7 +260,11 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     }
 
     override suspend fun sendPurchaseToServer(purchase: Purchase) {
-        val response = syncServerManager.subscriptionPurchase(SubscriptionPurchaseRequest(purchase.purchaseToken, purchase.sku)).await()
+        if (purchase.products.size != 1) {
+            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "expected 1 product when sending purchase to server, but there were ${purchase.products.size}")
+        }
+
+        val response = syncServerManager.subscriptionPurchase(SubscriptionPurchaseRequest(purchase.purchaseToken, purchase.products.first())).await()
         val newStatus = response.toStatus()
         cachedSubscriptionStatus = newStatus
         subscriptionStatus.accept(Optional.of(newStatus))
@@ -267,25 +274,48 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun refreshPurchases() {
         if (!billingClient.isReady) return
 
-        val purchases = billingClient.queryPurchases(BillingClient.SkuType.SUBS)
-        purchases.purchasesList?.forEach {
-            if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
-                handlePurchase(it)
+        val queryPurchasesParams = QueryPurchasesParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+        billingClient.queryPurchasesAsync(queryPurchasesParams) { _, purchases ->
+            purchases.forEach {
+                if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
+                    handlePurchase(it)
+                }
             }
         }
     }
 
-    override fun getPurchases(): List<Purchase> {
-        if (!billingClient.isReady) return emptyList()
-        return billingClient.queryPurchases(BillingClient.SkuType.SUBS).purchasesList
-            ?: emptyList()
+    override suspend fun getPurchases(): PurchasesResult? {
+        if (!billingClient.isReady) return null
+
+        val queryPurchasesParams = QueryPurchasesParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+        return billingClient.queryPurchasesAsync(params = queryPurchasesParams)
     }
 
-    override fun launchBillingFlow(activity: Activity, skuDetails: SkuDetails): BillingResult {
-        val flow = BillingFlowParams.newBuilder()
-            .setSkuDetails(skuDetails)
-            .build()
-        return billingClient.launchBillingFlow(activity, flow)
+    override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult? {
+        if (productDetails.subscriptionOfferDetails?.size != 1) {
+            val message = "Expected 1 subscription offer when launching billing flow, but there were ${productDetails.subscriptionOfferDetails?.size}"
+            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, message)
+        }
+
+        val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken
+        return offerToken?.let {
+            val productDetailsParamsList =
+                listOf(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails)
+                        .setOfferToken(offerToken)
+                        .build()
+                )
+            val billingFlowParams =
+                BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(productDetailsParamsList)
+                    .build()
+            billingClient.launchBillingFlow(activity, billingFlowParams)
+        }
     }
 
     override fun getCachedStatus(): SubscriptionStatus? {
@@ -299,7 +329,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
 }
 
 sealed class ProductDetailsState {
-    data class Loaded(val skuDetails: List<SkuDetails>) : ProductDetailsState()
+    data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState()
     data class Error(val message: String) : ProductDetailsState()
 }
 

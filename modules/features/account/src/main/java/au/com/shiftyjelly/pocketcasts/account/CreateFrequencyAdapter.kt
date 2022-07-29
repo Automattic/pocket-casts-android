@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import au.com.shiftyjelly.pocketcasts.account.databinding.AdapterFrequencyItemBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import au.com.shiftyjelly.pocketcasts.utils.extensions.shortTitle
 
 class CreateFrequencyAdapter(
@@ -47,7 +48,7 @@ class CreateFrequencyAdapter(
 
         fun bind(subscriptionFrequency: SubscriptionFrequency, selected: Boolean) {
             binding.btnFrequency.isChecked = selected
-            binding.txtTitle.text = subscriptionFrequency.product.shortTitle().tryToLocalise(binding.root.resources)
+            binding.txtTitle.text = subscriptionFrequency.product.shortTitle.tryToLocalise(binding.root.resources)
             if (subscriptionFrequency.hint == null) {
                 binding.txtDescription.text = null
             } else {

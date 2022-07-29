@@ -166,6 +166,7 @@ dependencies {
     implementation androidLibs.navigationFragment
     implementation androidLibs.navigationUi
     implementation androidLibs.billing
+    implementation androidLibs.billingKtx
     implementation androidLibs.openSource
     implementation androidLibs.viewPager
     implementation androidLibs.swipeToRefresh
