@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.plus
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,10 +37,14 @@ import au.com.shiftyjelly.pocketcasts.compose.images.VerticalLogoPlus
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.LinkText
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDays
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralMonths
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYears
 import au.com.shiftyjelly.pocketcasts.settings.R
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.UpgradeAccountViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import java.time.Period
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -135,11 +141,27 @@ private fun PlusInformation(
             .padding(vertical = 16.dp)
             .fillMaxWidth()
     ) {
+        val context = LocalContext.current
         Spacer(modifier = modifier.height(10.dp))
         VerticalLogoPlus()
         Spacer(modifier = modifier.height(32.dp))
         TextH20(
-            text = stringResource(if (featureBlocked) LR.string.profile_feature_requires else LR.string.profile_help_support),
+            text =
+            if (featureBlocked) {
+                if (productState?.trialBillingPeriod != null) {
+                    stringResource(
+                        LR.string.profile_feature_try_trial,
+                        getFormattedTrialPeriod(
+                            productState.trialBillingPeriod,
+                            context
+                        )
+                    )
+                } else {
+                    stringResource(LR.string.profile_feature_requires)
+                }
+            } else {
+                stringResource(LR.string.profile_help_support)
+            },
             textAlign = TextAlign.Center
         )
         Spacer(modifier = modifier.height(12.dp))
@@ -199,6 +221,16 @@ private fun PlusFeature(
     }
 }
 
+private fun getFormattedTrialPeriod(
+    trialBillingPeriod: Period,
+    context: Context,
+) = when {
+    trialBillingPeriod.days > 0 -> context.resources.getStringPluralDays(trialBillingPeriod.days)
+    trialBillingPeriod.months > 0 -> context.resources.getStringPluralMonths(trialBillingPeriod.months)
+    trialBillingPeriod.years > 0 -> context.resources.getStringPluralYears(trialBillingPeriod.years)
+    else -> context.resources.getStringPluralMonths(trialBillingPeriod.months)
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun PlusUpgradePagePreview(
@@ -211,7 +243,12 @@ private fun PlusUpgradePagePreview(
             onLearnMoreClick = {},
             featureBlocked = true,
             storageLimitGb = 10L,
-            productState = Optional.of(UpgradeAccountViewModel.ProductState("$0.99"))
+            productState = Optional.of(
+                UpgradeAccountViewModel.ProductState(
+                    price = "$0.99",
+                    trialBillingPeriod = Period.ofMonths(1),
+                )
+            )
         )
     }
 }

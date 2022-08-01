@@ -21,7 +21,7 @@ val ProductDetails.recurringBillingPeriod: Period?
     get() = getPeriod(recurringSubscriptionPricingPhase?.billingPeriod)
 
 val ProductDetails.trialBillingPeriod: Period?
-    get() = getPeriod(trialSubscriptionPricingPhase?.billingPeriod)
+    get() = trialSubscriptionPricingPhase?.billingPeriod?.let { getPeriod(it) }
 
 private val ProductDetails.recurringSubscriptionPricingPhase: ProductDetails.PricingPhase?
     get() = findOnlyMatchingPricingPhase(

@@ -7,7 +7,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsSt
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.price
+import au.com.shiftyjelly.pocketcasts.utils.extensions.trialBillingPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Period
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,10 +19,16 @@ class UpgradeAccountViewModel
 ) : ViewModel() {
     private val productDetails = subscriptionManager.observeProductDetails().map {
         if (it is ProductDetailsState.Loaded) {
-            val price =
-                it.productDetails.find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_SKU }?.price
+            val product =
+                it.productDetails.find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_SKU }
+            val price = product?.price
             if (price != null) {
-                Optional.of(ProductState(price))
+                Optional.of(
+                    ProductState(
+                        price = price,
+                        trialBillingPeriod = product.trialBillingPeriod?.takeIf { trialPeriod -> !trialPeriod.isZero },
+                    )
+                )
             } else {
                 Optional.empty()
             }
@@ -33,5 +41,6 @@ class UpgradeAccountViewModel
 
     data class ProductState(
         val price: String,
+        val trialBillingPeriod: Period? = null,
     )
 }
