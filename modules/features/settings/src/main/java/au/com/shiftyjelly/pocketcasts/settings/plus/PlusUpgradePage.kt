@@ -57,7 +57,7 @@ fun PlusUpgradePage(
         onLearnMoreClick = onLearnMoreClick,
         featureBlocked = featureBlocked,
         storageLimitGb = storageLimitGb,
-        priceState = priceState
+        productState = priceState
     )
 }
 
@@ -68,7 +68,7 @@ private fun PlusUpgradePageView(
     onLearnMoreClick: () -> Unit,
     featureBlocked: Boolean,
     storageLimitGb: Long,
-    priceState: Optional<String>?,
+    productState: Optional<UpgradeAccountViewModel.ProductState>?,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
@@ -80,7 +80,7 @@ private fun PlusUpgradePageView(
         )
         PlusInformation(
             storageLimitGb = storageLimitGb,
-            price = priceState?.get(),
+            productState = productState?.get(),
             onLearnMoreClick = onLearnMoreClick,
             featureBlocked = featureBlocked,
             modifier = modifier.weight(1f),
@@ -122,7 +122,7 @@ fun ButtonPanel(
 @Composable
 private fun PlusInformation(
     storageLimitGb: Long,
-    price: String?,
+    productState: UpgradeAccountViewModel.ProductState?,
     onLearnMoreClick: () -> Unit,
     featureBlocked: Boolean,
     modifier: Modifier = Modifier,
@@ -154,9 +154,9 @@ private fun PlusInformation(
             onClick = onLearnMoreClick
         )
         Spacer(modifier = modifier.height(6.dp))
-        if (price != null) {
+        if (productState?.price != null) {
             TextH40(
-                text = stringResource(LR.string.plus_per_month, price),
+                text = stringResource(LR.string.plus_per_month, productState.price),
                 color = MaterialTheme.theme.colors.primaryText02
             )
             Spacer(modifier = modifier.height(6.dp))
@@ -211,7 +211,7 @@ private fun PlusUpgradePagePreview(
             onLearnMoreClick = {},
             featureBlocked = true,
             storageLimitGb = 10L,
-            priceState = Optional.of("$0.99")
+            productState = Optional.of(UpgradeAccountViewModel.ProductState("$0.99"))
         )
     }
 }

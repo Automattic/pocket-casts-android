@@ -13,13 +13,14 @@ import javax.inject.Inject
 @HiltViewModel
 class UpgradeAccountViewModel
 @Inject constructor(
-    subscriptionManager: SubscriptionManager
+    subscriptionManager: SubscriptionManager,
 ) : ViewModel() {
     private val productDetails = subscriptionManager.observeProductDetails().map {
         if (it is ProductDetailsState.Loaded) {
-            val price = it.productDetails.find { detail -> detail.productId == SubscriptionManager.MONTHLY_SKU }?.price
+            val price =
+                it.productDetails.find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_SKU }?.price
             if (price != null) {
-                Optional.of(price)
+                Optional.of(ProductState(price))
             } else {
                 Optional.empty()
             }
@@ -27,5 +28,10 @@ class UpgradeAccountViewModel
             Optional.empty()
         }
     }
-    val productState: LiveData<Optional<String>> = LiveDataReactiveStreams.fromPublisher(productDetails)
+    val productState: LiveData<Optional<ProductState>> =
+        LiveDataReactiveStreams.fromPublisher(productDetails)
+
+    data class ProductState(
+        val price: String,
+    )
 }
