@@ -151,10 +151,7 @@ private fun PlusInformation(
                 if (productState?.trialBillingPeriod != null) {
                     stringResource(
                         LR.string.profile_feature_try_trial,
-                        getFormattedTrialPeriod(
-                            productState.trialBillingPeriod,
-                            context
-                        )
+                        getFormattedTrialPeriod(productState.trialBillingPeriod, context)
                     )
                 } else {
                     stringResource(LR.string.profile_feature_requires)
@@ -164,6 +161,13 @@ private fun PlusInformation(
             },
             textAlign = TextAlign.Center
         )
+
+        if (productState?.trialBillingPeriod != null) {
+            TextH40(
+                text = stringResource(LR.string.profile_feature_try_trial_secondary_info),
+                modifier = modifier.padding(top = 4.dp)
+            )
+        }
         Spacer(modifier = modifier.height(12.dp))
         if (storageLimitGb > 0) {
             PlusFeatureList(
@@ -178,7 +182,15 @@ private fun PlusInformation(
         Spacer(modifier = modifier.height(6.dp))
         if (productState?.price != null) {
             TextH40(
-                text = stringResource(LR.string.plus_per_month, productState.price),
+                text = if (productState.trialBillingPeriod != null) {
+                    stringResource(
+                        LR.string.plus_per_month_with_trial,
+                        getFormattedTrialPeriod(productState.trialBillingPeriod, context),
+                        productState.price
+                    )
+                } else {
+                    stringResource(LR.string.plus_per_month, productState.price)
+                },
                 color = MaterialTheme.theme.colors.primaryText02
             )
             Spacer(modifier = modifier.height(6.dp))

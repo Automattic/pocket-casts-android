@@ -705,6 +705,7 @@
     <string name="profile_extra_themes">Extra Themes</string>
     <string name="profile_feature_requires">This feature requires\nPocket Casts Plus</string>
     <string name="profile_feature_try_trial">Try Pocket Casts Plus \n free for %s</string>
+    <string name="profile_feature_try_trial_secondary_info">No Payments Now - Cancel Anytime</string>
     <string name="profile_file">File</string>
     <string name="profile_file_locked">locked</string>
     <string name="profile_files_add_custom_image">Add Custom Image</string>
@@ -878,6 +879,7 @@
     <string name="plus_lifetime_member">Lifetime Member</string>
     <string name="plus_month_price">%s per month</string>
     <string name="plus_per_month">%s / month</string>
+    <string name="plus_per_month_with_trial">%s free then %s / month</string>
     <string name="plus_thanks_for_your_support_bang">Thanks for your support!</string>
     <string name="plus_themes_icons">Themes and Icons</string>
     <string name="plus_themes_icons_body">Fly your true colors. Exclusive icons and themes for the plus club only.</string>
