@@ -405,13 +405,16 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1">
+
                     <androidx.mediarouter.app.MediaRouteButton
                         android:id="@+id/castButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:mediaRouteTypes="user" />
+
                 </FrameLayout>
+
                 <ImageButton
                     android:id="@+id/played"
                     android:contentDescription="@string/mark_as_played"
@@ -450,4 +453,5 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
+
 </layout>
