@@ -30,7 +30,7 @@ class UpgradeAccountViewModel
     private val productDetails = subscriptionManager.observeProductDetails().map {
         if (it is ProductDetailsState.Loaded) {
             val product =
-                it.productDetails.find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_SKU }
+                it.productDetails.find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
             val price = product?.price
             val isYearlyPlan = product?.recurringBillingPeriod?.years.isPositive()
             if (price != null) {

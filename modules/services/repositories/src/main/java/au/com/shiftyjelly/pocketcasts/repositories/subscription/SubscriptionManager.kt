@@ -14,9 +14,9 @@ import io.reactivex.Single
 interface SubscriptionManager {
 
     companion object {
-        const val MONTHLY_SKU = "com.pocketcasts.plus.monthly"
-        const val YEARLY_SKU = "com.pocketcasts.plus.yearly"
-        const val TEST_FREE_TRIAL_SKU = "com.pocketcasts.plus.testfreetrialoffer"
+        const val MONTHLY_PRODUCT_ID = "com.pocketcasts.plus.monthly"
+        const val YEARLY_PRODUCT_ID = "com.pocketcasts.plus.yearly"
+        const val TEST_FREE_TRIAL_PRODUCT_ID = "com.pocketcasts.plus.testfreetrialoffer"
     }
 
     fun signOut()
