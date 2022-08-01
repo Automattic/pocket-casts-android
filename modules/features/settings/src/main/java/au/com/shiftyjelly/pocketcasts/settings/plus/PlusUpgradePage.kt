@@ -167,18 +167,18 @@ private fun PlusInformation(
                 modifier = modifier.padding(top = 4.dp)
             )
         }
-        Spacer(modifier = modifier.height(12.dp))
+        Spacer(modifier = modifier.height(16.dp))
         if (storageLimitGb > 0) {
             PlusFeatureList(
                 storageLimitGb = storageLimitGb
             )
-            Spacer(modifier = modifier.height(12.dp))
+            Spacer(modifier = modifier.height(8.dp))
         }
         LinkText(
             text = stringResource(LR.string.plus_learn_more_about_plus),
             onClick = onLearnMoreClick
         )
-        Spacer(modifier = modifier.height(6.dp))
+        Spacer(modifier = modifier.height(4.dp))
         if (productState?.price != null) {
             TextH40(
                 text = if (productState.trialBillingPeriod != null) {
