@@ -20,7 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -29,10 +32,13 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.VerticalLogoPlus
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.LinkText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.R
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.UpgradeAccountViewModel
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -42,10 +48,30 @@ fun PlusUpgradePage(
     onLearnMoreClick: () -> Unit,
     featureBlocked: Boolean,
     storageLimitGb: Long,
-    viewModel: UpgradeAccountViewModel
+    viewModel: UpgradeAccountViewModel,
 ) {
     val priceState by viewModel.productState.observeAsState()
-    Column(modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
+    PlusUpgradePageView(
+        onCloseClick = onCloseClick,
+        onUpgradeClick = onUpgradeClick,
+        onLearnMoreClick = onLearnMoreClick,
+        featureBlocked = featureBlocked,
+        storageLimitGb = storageLimitGb,
+        priceState = priceState
+    )
+}
+
+@Composable
+private fun PlusUpgradePageView(
+    onCloseClick: () -> Unit,
+    onUpgradeClick: () -> Unit,
+    onLearnMoreClick: () -> Unit,
+    featureBlocked: Boolean,
+    storageLimitGb: Long,
+    priceState: Optional<String>?,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
         ThemedTopAppBar(
             title = "",
             navigationButton = NavigationButton.Close,
@@ -57,7 +83,7 @@ fun PlusUpgradePage(
             price = priceState?.get(),
             onLearnMoreClick = onLearnMoreClick,
             featureBlocked = featureBlocked,
-            modifier = Modifier.weight(1f),
+            modifier = modifier.weight(1f),
         )
         ButtonPanel(
             onUpgradeClick = onUpgradeClick,
@@ -69,7 +95,8 @@ fun PlusUpgradePage(
 @Composable
 fun ButtonPanel(
     onUpgradeClick: () -> Unit,
-    onCloseClick: () -> Unit
+    onCloseClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         elevation = 8.dp,
@@ -80,13 +107,13 @@ fun ButtonPanel(
                 text = stringResource(LR.string.profile_upgrade_to_plus),
                 onClick = onUpgradeClick,
                 includePadding = false,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
+                modifier = modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
             )
             RowOutlinedButton(
                 text = stringResource(LR.string.profile_create_tos_disagree),
                 onClick = onCloseClick,
                 includePadding = false,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
     }
@@ -98,7 +125,7 @@ private fun PlusInformation(
     price: String?,
     onLearnMoreClick: () -> Unit,
     featureBlocked: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -108,38 +135,41 @@ private fun PlusInformation(
             .padding(vertical = 16.dp)
             .fillMaxWidth()
     ) {
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = modifier.height(10.dp))
         VerticalLogoPlus()
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = modifier.height(32.dp))
         TextH20(
             text = stringResource(if (featureBlocked) LR.string.profile_feature_requires else LR.string.profile_help_support),
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = modifier.height(12.dp))
         if (storageLimitGb > 0) {
             PlusFeatureList(
                 storageLimitGb = storageLimitGb
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = modifier.height(12.dp))
         }
         LinkText(
             text = stringResource(LR.string.plus_learn_more_about_plus),
             onClick = onLearnMoreClick
         )
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = modifier.height(6.dp))
         if (price != null) {
             TextH40(
                 text = stringResource(LR.string.plus_per_month, price),
                 color = MaterialTheme.theme.colors.primaryText02
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = modifier.height(6.dp))
         }
     }
 }
 
 @Composable
-private fun PlusFeatureList(storageLimitGb: Long) {
-    Column(modifier = Modifier.padding(end = 32.dp)) {
+private fun PlusFeatureList(
+    storageLimitGb: Long,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.padding(end = 32.dp)) {
         PlusFeature(text = stringResource(id = LR.string.profile_web_player))
         PlusFeature(text = stringResource(id = LR.string.profile_extra_themes))
         PlusFeature(text = stringResource(id = LR.string.profile_extra_app_icons))
@@ -149,16 +179,39 @@ private fun PlusFeatureList(storageLimitGb: Long) {
 }
 
 @Composable
-private fun PlusFeature(text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 5.dp)) {
+private fun PlusFeature(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(vertical = 5.dp)
+    ) {
         Image(
             painter = painterResource(R.drawable.ic_plus),
             contentDescription = null,
-            modifier = Modifier.padding(end = 16.dp)
+            modifier = modifier.padding(end = 16.dp)
         )
         TextP40(
             text = text,
             color = MaterialTheme.theme.colors.primaryText02
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PlusUpgradePagePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        PlusUpgradePageView(
+            onCloseClick = {},
+            onUpgradeClick = {},
+            onLearnMoreClick = {},
+            featureBlocked = true,
+            storageLimitGb = 10L,
+            priceState = Optional.of("$0.99")
         )
     }
 }
