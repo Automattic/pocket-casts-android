@@ -667,7 +667,7 @@
     <string name="profile_create_subscription_failed">Could not create subscription. Please try again</string>
     <string name="profile_create_tos">Before we can let you into the Plus club we need you to agree to our Terms of Use. You can peruse them at your leisure using the link below.</string>
     <string name="profile_create_tos_agree">I Agree</string>
-    <string name="profile_create_tos_disagree">No Thanks</string>
+    <string name="profile_create_tos_disagree">No thanks</string>
     <string name="profile_create_tos_full_terms_of_use">Full Terms of Use</string>
     <string name="profile_create_terms_of_use">Terms of Use</string>
     <string name="profile_create_completed">Complete Account</string>
@@ -828,6 +828,7 @@
     <string name="profile_stats_total">TOTAL</string>
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
+    <string name="profile_start_free_trial">Start free trial</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>

@@ -43,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYea
 import au.com.shiftyjelly.pocketcasts.settings.R
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.UpgradeAccountViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import java.time.Period
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -56,14 +55,14 @@ fun PlusUpgradePage(
     storageLimitGb: Long,
     viewModel: UpgradeAccountViewModel,
 ) {
-    val priceState by viewModel.productState.observeAsState()
+    val productState by viewModel.productState.observeAsState()
     PlusUpgradePageView(
         onCloseClick = onCloseClick,
         onUpgradeClick = onUpgradeClick,
         onLearnMoreClick = onLearnMoreClick,
         featureBlocked = featureBlocked,
         storageLimitGb = storageLimitGb,
-        productState = priceState
+        productState = productState?.get()
     )
 }
 
@@ -74,7 +73,7 @@ private fun PlusUpgradePageView(
     onLearnMoreClick: () -> Unit,
     featureBlocked: Boolean,
     storageLimitGb: Long,
-    productState: Optional<UpgradeAccountViewModel.ProductState>?,
+    productState: UpgradeAccountViewModel.ProductState?,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
@@ -86,14 +85,15 @@ private fun PlusUpgradePageView(
         )
         PlusInformation(
             storageLimitGb = storageLimitGb,
-            productState = productState?.get(),
+            productState = productState,
             onLearnMoreClick = onLearnMoreClick,
             featureBlocked = featureBlocked,
             modifier = modifier.weight(1f),
         )
         ButtonPanel(
             onUpgradeClick = onUpgradeClick,
-            onCloseClick = onCloseClick
+            onCloseClick = onCloseClick,
+            productState = productState
         )
     }
 }
@@ -102,6 +102,7 @@ private fun PlusUpgradePageView(
 fun ButtonPanel(
     onUpgradeClick: () -> Unit,
     onCloseClick: () -> Unit,
+    productState: UpgradeAccountViewModel.ProductState?,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -110,7 +111,13 @@ fun ButtonPanel(
     ) {
         Column {
             RowButton(
-                text = stringResource(LR.string.profile_upgrade_to_plus),
+                text = stringResource(
+                    if (productState?.trialBillingPeriod != null) {
+                        LR.string.profile_start_free_trial
+                    } else {
+                        LR.string.profile_upgrade_to_plus
+                    }
+                ),
                 onClick = onUpgradeClick,
                 includePadding = false,
                 modifier = modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)
@@ -255,11 +262,9 @@ private fun PlusUpgradePagePreview(
             onLearnMoreClick = {},
             featureBlocked = true,
             storageLimitGb = 10L,
-            productState = Optional.of(
-                UpgradeAccountViewModel.ProductState(
-                    price = "$0.99",
-                    trialBillingPeriod = Period.ofMonths(1),
-                )
+            productState = UpgradeAccountViewModel.ProductState(
+                price = "$0.99",
+                trialBillingPeriod = Period.ofMonths(1),
             )
         )
     }
