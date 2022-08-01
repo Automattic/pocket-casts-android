@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings.plus
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,13 +33,9 @@ import au.com.shiftyjelly.pocketcasts.compose.images.VerticalLogoPlus
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.LinkText
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDays
-import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralMonths
-import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYears
 import au.com.shiftyjelly.pocketcasts.settings.R
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.UpgradeAccountViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import java.time.Period
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -104,11 +98,7 @@ fun ButtonPanel(
         Column {
             RowButton(
                 text = stringResource(
-                    if (productState?.trialBillingPeriod != null) {
-                        LR.string.profile_start_free_trial
-                    } else {
-                        LR.string.profile_upgrade_to_plus
-                    }
+                    productState?.buttonLabel ?: LR.string.profile_upgrade_to_plus
                 ),
                 onClick = onUpgradeClick,
                 includePadding = false,
@@ -140,28 +130,20 @@ private fun PlusInformation(
             .padding(vertical = 16.dp)
             .fillMaxWidth()
     ) {
-        val context = LocalContext.current
         Spacer(modifier = modifier.height(10.dp))
         VerticalLogoPlus()
         Spacer(modifier = modifier.height(32.dp))
         TextH20(
             text =
             if (featureBlocked) {
-                if (productState?.trialBillingPeriod != null) {
-                    stringResource(
-                        LR.string.profile_feature_try_trial,
-                        getFormattedTrialPeriod(productState.trialBillingPeriod, context)
-                    )
-                } else {
-                    stringResource(LR.string.profile_feature_requires)
-                }
+                productState?.featureLabel ?: stringResource(LR.string.profile_upgrade_to_plus)
             } else {
                 stringResource(LR.string.profile_help_support)
             },
             textAlign = TextAlign.Center
         )
 
-        if (productState?.trialBillingPeriod != null) {
+        if (productState is UpgradeAccountViewModel.ProductState.ProductWithTrial) {
             TextH40(
                 text = stringResource(LR.string.profile_feature_try_trial_secondary_info),
                 modifier = modifier.padding(top = 4.dp)
@@ -181,15 +163,7 @@ private fun PlusInformation(
         Spacer(modifier = modifier.height(4.dp))
         if (productState?.price != null) {
             TextH40(
-                text = if (productState.trialBillingPeriod != null) {
-                    stringResource(
-                        LR.string.plus_per_month_with_trial,
-                        getFormattedTrialPeriod(productState.trialBillingPeriod, context),
-                        productState.price
-                    )
-                } else {
-                    stringResource(LR.string.plus_per_month, productState.price)
-                },
+                text = productState.price,
                 color = MaterialTheme.theme.colors.primaryText02
             )
             Spacer(modifier = modifier.height(6.dp))
@@ -232,16 +206,6 @@ private fun PlusFeature(
     }
 }
 
-private fun getFormattedTrialPeriod(
-    trialBillingPeriod: Period,
-    context: Context,
-) = when {
-    trialBillingPeriod.days > 0 -> context.resources.getStringPluralDays(trialBillingPeriod.days)
-    trialBillingPeriod.months > 0 -> context.resources.getStringPluralMonths(trialBillingPeriod.months)
-    trialBillingPeriod.years > 0 -> context.resources.getStringPluralYears(trialBillingPeriod.years)
-    else -> context.resources.getStringPluralMonths(trialBillingPeriod.months)
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun PlusUpgradePagePreview(
@@ -254,9 +218,9 @@ private fun PlusUpgradePagePreview(
             onLearnMoreClick = {},
             featureBlocked = true,
             storageLimitGb = 10L,
-            productState = UpgradeAccountViewModel.ProductState(
-                price = "$0.99",
-                trialBillingPeriod = Period.ofMonths(1),
+            productState = UpgradeAccountViewModel.ProductState.ProductWithTrial(
+                featureLabel = "Try Pocket Casts Plus \n free for 1 month",
+                price = "1 month free then $0.99 / month"
             )
         )
     }
