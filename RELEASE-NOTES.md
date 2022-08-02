@@ -2,6 +2,11 @@
 
 ### 7.20.0
 
+*   Bug Fixes:    
+    *   Fix an issue where the podcasts order was being changed after migrating to the latest version.
+
+### 7.20.0
+
 *   New Features:
     *   Folders!
 *   Health:

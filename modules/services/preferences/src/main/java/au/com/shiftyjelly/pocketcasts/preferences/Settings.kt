@@ -48,7 +48,7 @@ interface Settings {
         const val SERVER_DEVICE_TYPE = "2"
         const val SYNC_API_VERSION = 2
         const val SYNC_HISTORY_VERSION = 1
-        const val SYNC_API_MODEL = "android"
+        const val SYNC_API_MODEL = "mobile"
         const val LAST_UPDATE_TIME = "LastUpdateTime"
         const val LAST_SYNC_TIME = "LastSyncTime"
         const val PREFERENCE_SKIP_FORWARD = "skipForward"
