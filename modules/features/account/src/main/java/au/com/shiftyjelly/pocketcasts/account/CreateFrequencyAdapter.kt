@@ -67,7 +67,10 @@ class CreateFrequencyAdapter(
                 binding.txtDescription.visibility = View.VISIBLE
             }
 
-            if (subscriptionFrequency.product.trialBillingPeriod != null) {
+            if (subscriptionFrequency.product.trialBillingPeriod == null) {
+                binding.txtAmountTop.text = subscriptionFrequency.product.recurringPrice
+                binding.txtAmountBottom.visibility = View.GONE
+            } else {
                 val trialPeriod = subscriptionFrequency.product.trialBillingPeriod as Period
                 val billingDetails = billingPeriodHelper.mapToBillingDetails(trialPeriod)
                 binding.txtAmountTop.text = binding.root.resources.getString(LR.string.profile_amount_free, billingDetails.periodValue ?: "")
@@ -88,9 +91,6 @@ class CreateFrequencyAdapter(
                         binding.txtAmountBottom.visibility = View.VISIBLE
                     }
                 }
-            } else {
-                binding.txtAmountTop.text = subscriptionFrequency.product.recurringPrice
-                binding.txtAmountBottom.visibility = View.GONE
             }
 
             binding.outlinePanel.isSelected = selected
