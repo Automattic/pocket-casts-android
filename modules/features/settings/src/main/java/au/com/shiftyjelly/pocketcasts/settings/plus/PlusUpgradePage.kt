@@ -162,6 +162,7 @@ private fun PlusInformation(
         }
         LinkText(
             text = stringResource(LR.string.plus_learn_more_about_plus),
+            textAlign = TextAlign.Center,
             onClick = onLearnMoreClick
         )
         Spacer(modifier = modifier.height(4.dp))
