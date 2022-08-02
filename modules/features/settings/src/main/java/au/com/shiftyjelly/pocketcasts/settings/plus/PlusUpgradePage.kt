@@ -134,15 +134,19 @@ private fun PlusInformation(
         VerticalLogoPlus()
         Spacer(modifier = modifier.height(32.dp))
         TextH20(
-            text =
-            if (featureBlocked) {
-                productState?.featureLabel ?: stringResource(LR.string.profile_upgrade_to_plus)
-            } else {
-                stringResource(LR.string.profile_help_support)
-            },
+            text = stringResource(
+                if (featureBlocked) {
+                    productState?.featureLabelLine1 ?: LR.string.profile_upgrade_to_plus
+                } else {
+                    LR.string.profile_help_support
+                }
+            ),
             textAlign = TextAlign.Center
         )
-
+        TextH20(
+            text = productState?.featureLabelLine2 ?: stringResource(LR.string.pocket_casts_plus),
+            textAlign = TextAlign.Center
+        )
         if (productState is UpgradeAccountViewModel.ProductState.ProductWithTrial) {
             TextH40(
                 text = stringResource(LR.string.profile_feature_try_trial_secondary_info),
@@ -219,7 +223,8 @@ private fun PlusUpgradePagePreview(
             featureBlocked = true,
             storageLimitGb = 10L,
             productState = UpgradeAccountViewModel.ProductState.ProductWithTrial(
-                featureLabel = "Try Pocket Casts Plus \n free for 1 month",
+                featureLabelLine1 = LR.string.profile_feature_try_trial,
+                featureLabelLine2 = "free for 1 month",
                 price = "1 month free then $0.99 / month"
             )
         )
