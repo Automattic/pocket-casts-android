@@ -902,6 +902,7 @@
     <string name="plus_renews_automatically_monthly">Renews automatically monthly</string>
     <string name="plus_year">year</string>
     <string name="plus_month">month</string>
+    <string name="plus_day">day</string>
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
 
