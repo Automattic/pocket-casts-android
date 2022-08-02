@@ -130,9 +130,9 @@ private fun PlusInformation(
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        Spacer(modifier = modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         VerticalLogoPlus()
-        Spacer(modifier = modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         TextH20(
             text = stringResource(
                 if (featureBlocked) {
@@ -150,28 +150,28 @@ private fun PlusInformation(
         if (productState is UpgradeAccountViewModel.ProductState.ProductWithTrial) {
             TextH40(
                 text = stringResource(LR.string.profile_feature_try_trial_secondary_info),
-                modifier = modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
-        Spacer(modifier = modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         if (storageLimitGb > 0) {
             PlusFeatureList(
                 storageLimitGb = storageLimitGb
             )
-            Spacer(modifier = modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
         }
         LinkText(
             text = stringResource(LR.string.plus_learn_more_about_plus),
             textAlign = TextAlign.Center,
             onClick = onLearnMoreClick
         )
-        Spacer(modifier = modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         if (productState?.price != null) {
             TextH40(
                 text = productState.price,
                 color = MaterialTheme.theme.colors.primaryText02
             )
-            Spacer(modifier = modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(6.dp))
         }
     }
 }
