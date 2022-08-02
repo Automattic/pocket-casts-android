@@ -705,7 +705,7 @@
     <string name="profile_extra_themes">Extra Themes</string>
     <string name="profile_feature_requires">This feature requires\nPocket Casts Plus</string>
     <string name="profile_feature_try_trial">Try Pocket Casts Plus \n free for %s</string>
-    <string name="profile_feature_try_trial_secondary_info">No Payments Now - Cancel Anytime</string>
+    <string name="profile_feature_try_trial_secondary_info">No Payments Now — Cancel Anytime</string>
     <string name="profile_file">File</string>
     <string name="profile_file_locked">locked</string>
     <string name="profile_files_add_custom_image">Add Custom Image</string>
