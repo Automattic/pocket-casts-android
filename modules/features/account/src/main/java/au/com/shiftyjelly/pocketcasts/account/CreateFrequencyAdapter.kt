@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import au.com.shiftyjelly.pocketcasts.utils.extensions.shortTitle
+import au.com.shiftyjelly.pocketcasts.utils.extensions.trialBillingPeriod
 
 class CreateFrequencyAdapter(
     private var list: List<SubscriptionFrequency>,
@@ -49,12 +50,30 @@ class CreateFrequencyAdapter(
         fun bind(subscriptionFrequency: SubscriptionFrequency, selected: Boolean) {
             binding.btnFrequency.isChecked = selected
             binding.txtTitle.text = subscriptionFrequency.product.shortTitle.tryToLocalise(binding.root.resources)
+
             if (subscriptionFrequency.hint == null) {
                 binding.txtDescription.text = null
+                binding.txtDescription.visibility = View.GONE
             } else {
                 binding.txtDescription.setText(subscriptionFrequency.hint)
+                binding.txtDescription.visibility = View.VISIBLE
             }
-            binding.txtAmount.text = subscriptionFrequency.product.price
+
+            if (subscriptionFrequency.product.trialBillingPeriod != null) {
+                // FIXME use Ashita's logic from UpgradeAccountViewModel
+                // FIXME string resource
+                binding.txtAmountTop.text = "${subscriptionFrequency.product.trialBillingPeriod?.days} ${"days"} free"
+
+                // FIXME use Ashita's logic from UpgradeAccountViewModel
+                // FIXME string resource
+                binding.txtAmountBottom.text = "then ${subscriptionFrequency.product.price} / ${"month"}"
+
+                binding.txtAmountBottom.visibility = View.VISIBLE
+            } else {
+                binding.txtAmountTop.text = subscriptionFrequency.product.price
+                binding.txtAmountBottom.visibility = View.GONE
+            }
+
             binding.outlinePanel.isSelected = selected
         }
 

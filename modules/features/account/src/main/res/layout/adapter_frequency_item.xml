@@ -53,7 +53,7 @@
             android:layout_marginStart="10dp"
             android:textAppearance="@style/H30"
             android:textColor="?attr/primary_text_01"
-            app:layout_constraintBottom_toTopOf="@+id/spaceBottom"
+            app:layout_constraintBottom_toTopOf="@+id/txtDescription"
             app:layout_constraintStart_toEndOf="@+id/btnFrequency"
             app:layout_constraintTop_toBottomOf="@+id/spaceTop"
             tools:text="Title" />
@@ -62,27 +62,41 @@
             android:id="@+id/txtDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="16dp"
             android:gravity="end"
             android:textAppearance="@style/H60"
             android:textColor="?attr/primary_interactive_01"
-            app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
-            app:layout_constraintEnd_toStartOf="@+id/txtAmount"
-            app:layout_constraintStart_toEndOf="@+id/txtTitle"
-            app:layout_constraintTop_toTopOf="@+id/outlinePanel"
+            app:layout_constraintBottom_toTopOf="@+id/spaceBottom"
+            app:layout_constraintStart_toEndOf="@+id/btnFrequency"
+            app:layout_constraintTop_toBottomOf="@+id/txtTitle"
             tools:text="DESCRIPTION" />
 
         <TextView
-            android:id="@+id/txtAmount"
+            android:id="@+id/txtAmountTop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
+            android:layout_gravity="end"
             android:textAppearance="@style/H30"
             android:textColor="?attr/primary_text_01"
-            app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
+            app:layout_constraintBottom_toTopOf="@+id/txtAmountBottom"
             app:layout_constraintEnd_toEndOf="@+id/outlinePanel"
-            app:layout_constraintTop_toTopOf="@+id/outlinePanel"
+            app:layout_constraintTop_toBottomOf="@+id/spaceTop"
+            tools:text="$100" />
+
+        <TextView
+            android:id="@+id/txtAmountBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:textAppearance="@style/H60"
+            android:layout_marginTop="2dp"
+            android:textColor="?attr/primary_text_02"
+            app:layout_constraintBottom_toTopOf="@+id/spaceBottom"
+            app:layout_constraintTop_toBottomOf="@+id/txtAmountTop"
+            app:layout_constraintEnd_toEndOf="@+id/outlinePanel"
             tools:text="$100" />
 
 
