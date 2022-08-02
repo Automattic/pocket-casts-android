@@ -42,6 +42,7 @@
             android:layout_marginStart="24dp"
             android:checked="false"
             android:clickable="false"
+            android:importantForAccessibility="no"
             app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
             app:layout_constraintStart_toStartOf="@+id/outlinePanel"
             app:layout_constraintTop_toTopOf="@+id/outlinePanel" />
