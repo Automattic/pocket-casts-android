@@ -20,7 +20,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun VerticalLogoPlus(modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.semantics(mergeDescendants = true) {}
+        modifier = modifier.clearAndSetSemantics {
+            contentDescription = pocketCastsPlusString
+        }
     ) {
         VerticalLogo()
         Image(
