@@ -43,7 +43,7 @@ class CreateFrequencyFragment : BaseFragment() {
         val binding = binding ?: return
 
         binding.paymentsRecyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = CreateFrequencyAdapter(emptyList()) {
+        adapter = CreateFrequencyAdapter(emptyList(), viewModel.billingPeriodHelper) {
             subscriptionFrequencySelected(it)
         }
         binding.paymentsRecyclerView.adapter = adapter

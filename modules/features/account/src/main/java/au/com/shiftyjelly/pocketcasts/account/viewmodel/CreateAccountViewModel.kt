@@ -24,7 +24,7 @@ class CreateAccountViewModel
 @Inject constructor(
     private val auth: AccountAuth,
     private val settings: Settings,
-    private val billingPeriodHelper: BillingPeriodHelper,
+    val billingPeriodHelper: BillingPeriodHelper,
 ) : AccountViewModel() {
 
     val upgradeMode = MutableLiveData<Boolean>()

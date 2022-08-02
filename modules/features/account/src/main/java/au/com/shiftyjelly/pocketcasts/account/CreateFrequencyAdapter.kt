@@ -8,12 +8,15 @@ import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import au.com.shiftyjelly.pocketcasts.account.databinding.AdapterFrequencyItemBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.settings.util.BillingPeriodHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import au.com.shiftyjelly.pocketcasts.utils.extensions.shortTitle
 import au.com.shiftyjelly.pocketcasts.utils.extensions.trialBillingPeriod
+import java.time.Period
 
 class CreateFrequencyAdapter(
     private var list: List<SubscriptionFrequency>,
+    private var billingPeriodHelper: BillingPeriodHelper,
     private val clickListener: (SubscriptionFrequency) -> Unit
 ) : RecyclerView.Adapter<CreateFrequencyAdapter.ViewHolder>() {
 
@@ -60,9 +63,9 @@ class CreateFrequencyAdapter(
             }
 
             if (subscriptionFrequency.product.trialBillingPeriod != null) {
-                // FIXME use Ashita's logic from UpgradeAccountViewModel
-                // FIXME string resource
-                binding.txtAmountTop.text = "${subscriptionFrequency.product.trialBillingPeriod?.days} ${"days"} free"
+                val trialPeriod = subscriptionFrequency.product.trialBillingPeriod as Period
+                val billingDetails = billingPeriodHelper.mapToBillingDetails(trialPeriod)
+                binding.txtAmountTop.text = "${billingDetails.periodValue} free"
 
                 // FIXME use Ashita's logic from UpgradeAccountViewModel
                 // FIXME string resource
