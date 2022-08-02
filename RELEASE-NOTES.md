@@ -1,8 +1,15 @@
 # Release notes
 
-### 7.20.1
+### 7.20.2
 
 *   Bug Fixes:    
+    *   Fix OPML import.
+
+### 7.20.1
+
+*   New Features:
+    *   Add localizations for English (UK), Arabic, and Norwegian.
+*   Bug Fixes:
     *   Fix an issue where the podcasts order was being changed after migrating to the latest version.
 
 ### 7.20.0
