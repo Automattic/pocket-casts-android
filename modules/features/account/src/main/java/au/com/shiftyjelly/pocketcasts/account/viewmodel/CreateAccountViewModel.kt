@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.util.BillingPeriodHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.SubscriptionBillingUnit
 import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringBillingPeriod
 import com.android.billingclient.api.ProductDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,14 +54,12 @@ class CreateAccountViewModel
                             val billingPeriod = productDetails.recurringBillingPeriod
                             val billingDetails = billingPeriod?.let { billingPeriodHelper.mapToBillingDetails(it) }
 
-                            // FIXME Include trial information for displaying in the UI
-
                             val subscriptionFrequency = SubscriptionFrequency(
                                 product = productDetails,
                                 period = billingDetails?.periodUnit,
                                 renews = billingDetails?.renews,
                                 hint = billingDetails?.hint,
-                                isMonth = billingDetails?.isMonth ?: true
+                                subscriptionBillingUnit = billingDetails?.subscriptionBillingUnit
                             )
                             list.add(subscriptionFrequency)
                         }
@@ -244,7 +243,7 @@ data class SubscriptionFrequency(
     @StringRes val period: Int?,
     @StringRes val renews: Int?,
     @StringRes val hint: Int?,
-    val isMonth: Boolean
+    val subscriptionBillingUnit: SubscriptionBillingUnit?
 )
 
 enum class CreateAccountError {

@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
-import au.com.shiftyjelly.pocketcasts.utils.extensions.price
+import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPrice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.disposables.CompositeDisposable
@@ -42,7 +42,7 @@ class AccountDetailsViewModel
 
     private val productDetails = subscriptionManager.observeProductDetails().map { state ->
         if (state is ProductDetailsState.Loaded) {
-            val price = state.productDetails.find { it.productId == SubscriptionManager.MONTHLY_PRODUCT_ID }?.price
+            val price = state.productDetails.find { it.productId == SubscriptionManager.MONTHLY_PRODUCT_ID }?.recurringPrice
             if (price != null) {
                 Optional.of(price)
             } else {

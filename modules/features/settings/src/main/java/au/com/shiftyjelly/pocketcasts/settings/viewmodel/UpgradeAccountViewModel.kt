@@ -10,8 +10,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.settings.util.BillingPeriodHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
-import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringBillingPeriod
+import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPrice
 import au.com.shiftyjelly.pocketcasts.utils.extensions.trialBillingPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,7 +29,7 @@ class UpgradeAccountViewModel
         if (it is ProductDetailsState.Loaded) {
             val product =
                 it.productDetails.find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
-            val price = product?.price
+            val price = product?.recurringPrice
             val isYearlyPlan = product?.recurringBillingPeriod?.years.isPositive()
             if (price != null) {
                 Optional.of(

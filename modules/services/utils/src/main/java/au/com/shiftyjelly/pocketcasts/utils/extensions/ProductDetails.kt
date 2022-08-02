@@ -8,13 +8,13 @@ import java.time.format.DateTimeParseException
 val ProductDetails.shortTitle: String
     get() = title.split(" (").first()
 
-val ProductDetails.price: String?
+val ProductDetails.recurringPrice: String?
     get() = recurringSubscriptionPricingPhase?.formattedPrice
 
-val ProductDetails.priceDouble: Double?
+val ProductDetails.recurringPriceDouble: Double?
     get() = recurringSubscriptionPricingPhase?.priceAmountMicros?.let { it * 1_000_000.0 }
 
-val ProductDetails.priceCurrencyCode: String?
+val ProductDetails.recurringPriceCurrencyCode: String?
     get() = recurringSubscriptionPricingPhase?.priceCurrencyCode
 
 val ProductDetails.recurringBillingPeriod: Period?
