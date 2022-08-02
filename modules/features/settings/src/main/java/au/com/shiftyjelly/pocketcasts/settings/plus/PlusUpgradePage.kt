@@ -127,7 +127,7 @@ private fun PlusInformation(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .verticalScroll(scrollState)
-            .padding(vertical = 16.dp)
+            .padding(16.dp)
             .fillMaxWidth()
     ) {
         Spacer(modifier = modifier.height(10.dp))
