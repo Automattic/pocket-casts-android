@@ -8,7 +8,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.settings.util.BillingPeriodHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.SubscriptionBillingUnit
 import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringBillingPeriod
 import com.android.billingclient.api.ProductDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,13 +19,13 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class CreateAccountViewModel
 @Inject constructor(
     private val auth: AccountAuth,
-    private val settings: Settings
+    private val settings: Settings,
+    val billingPeriodHelper: BillingPeriodHelper,
 ) : AccountViewModel() {
 
     val upgradeMode = MutableLiveData<Boolean>()
@@ -49,33 +51,15 @@ class CreateAccountViewModel
                         val list = mutableListOf<SubscriptionFrequency>()
 
                         productDetailsState.productDetails.forEach { productDetails ->
-                            var period: Int? = null
-                            var renews: Int? = null
-                            var hint: Int? = null
-                            var isMonth = true
-
                             val billingPeriod = productDetails.recurringBillingPeriod
-                            if (billingPeriod != null) {
-                                if (billingPeriod.years > 0) {
-                                    period = LR.string.plus_year
-                                    hint = LR.string.plus_best_value
-                                    renews = LR.string.plus_renews_automatically_yearly
-                                    isMonth = false
-                                } else if (billingPeriod.months > 0) {
-                                    period = LR.string.plus_month
-                                    renews = LR.string.plus_renews_automatically_monthly
-                                    isMonth = true
-                                }
-                            }
-
-                            // FIXME Include trial information for displaying in the UI
+                            val billingDetails = billingPeriod?.let { billingPeriodHelper.mapToBillingDetails(it) }
 
                             val subscriptionFrequency = SubscriptionFrequency(
                                 product = productDetails,
-                                period = period,
-                                renews = renews,
-                                hint = hint,
-                                isMonth = isMonth
+                                period = billingDetails?.periodUnit,
+                                renews = billingDetails?.renews,
+                                hint = billingDetails?.hint,
+                                subscriptionBillingUnit = billingDetails?.subscriptionBillingUnit
                             )
                             list.add(subscriptionFrequency)
                         }
@@ -259,7 +243,7 @@ data class SubscriptionFrequency(
     @StringRes val period: Int?,
     @StringRes val renews: Int?,
     @StringRes val hint: Int?,
-    val isMonth: Boolean
+    val subscriptionBillingUnit: SubscriptionBillingUnit?
 )
 
 enum class CreateAccountError {
