@@ -7,8 +7,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_SKU
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_SKU
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.TEST_FREE_TRIAL_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
@@ -86,8 +87,8 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         return observeProductDetails().map { state ->
             if (state is ProductDetailsState.Loaded) {
                 PricePair(
-                    state.productDetails.find { it.productId == MONTHLY_SKU }?.price,
-                    state.productDetails.find { it.productId == YEARLY_SKU }?.price,
+                    state.productDetails.find { it.productId == MONTHLY_PRODUCT_ID }?.price,
+                    state.productDetails.find { it.productId == YEARLY_PRODUCT_ID }?.price,
                 )
             } else {
                 PricePair(null, null)
@@ -158,21 +159,24 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         val productList =
             listOf(
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(MONTHLY_SKU)
+                    .setProductId(MONTHLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(YEARLY_SKU)
+                    .setProductId(YEARLY_PRODUCT_ID)
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId(TEST_FREE_TRIAL_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build()
             )
 
-        val params = QueryProductDetailsParams.newBuilder().setProductList(productList)
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(productList)
+            .build()
 
-        billingClient.queryProductDetailsAsync(params.build()) {
-                billingResult,
-                productDetailsList
-            ->
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 Timber.d("Billing products loaded")
                 productDetails.accept(ProductDetailsState.Loaded(productDetailsList))
