@@ -58,7 +58,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                             val chapter = convertFrameToChapter(frame, newChapters.size, context) ?: continue
                             newChapters.add(chapter)
                         } else if (frame is ApicFrame && TAG_APIC == frame.id && loadArtwork) {
-                            val file = File.createTempFile("$filenamePrefix-podcast_embedded_artwork", ".jpg", context.cacheDir)
+                            val file = File.createTempFile("$filenamePrefix-podcast_embedded_artwork", "jpg", context.cacheDir)
                             val filePath = saveToDisk(frame.pictureData, file, context)
                             this.embeddedArtworkPath = filePath
                         } else if (frame is TextInformationFrame && TAG_TITLE == frame.id) {
