@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import au.com.shiftyjelly.pocketcasts.account.util.ProductAmount
+import au.com.shiftyjelly.pocketcasts.account.util.ProductAmountUtil
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
@@ -15,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPrice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.disposables.CompositeDisposable
@@ -34,7 +35,8 @@ class AccountDetailsViewModel
     userManager: UserManager,
     statsManager: StatsManager,
     settings: Settings,
-    val syncServerManager: SyncServerManager
+    productAmountUtil: ProductAmountUtil,
+    private val syncServerManager: SyncServerManager
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -42,7 +44,9 @@ class AccountDetailsViewModel
 
     private val productDetails = subscriptionManager.observeProductDetails().map { state ->
         if (state is ProductDetailsState.Loaded) {
-            val price = state.productDetails.find { it.productId == SubscriptionManager.MONTHLY_PRODUCT_ID }?.recurringPrice
+            val price = state.productDetails
+                .find { it.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
+                ?.let { productAmountUtil.get(it) }
             if (price != null) {
                 Optional.of(price)
             } else {
@@ -53,7 +57,7 @@ class AccountDetailsViewModel
         }
     }
     val signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
-    val viewState: LiveData<Triple<SignInState, Optional<String>, DeleteAccountState>> = LiveDataReactiveStreams
+    val viewState: LiveData<Triple<SignInState, Optional<ProductAmount>, DeleteAccountState>> = LiveDataReactiveStreams
         .fromPublisher(userManager.getSignInState().combineLatest(productDetails))
         .combineLatest(deleteAccountState)
         .map { Triple(it.first.first, it.first.second, it.second) }

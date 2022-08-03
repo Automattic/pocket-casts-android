@@ -86,7 +86,7 @@ class AccountDetailsFragment : BaseFragment() {
             binding.userView.signedInState = signInState
         }
 
-        viewModel.viewState.observe(viewLifecycleOwner) { (signInState, displayPrice, deleteAccountState) ->
+        viewModel.viewState.observe(viewLifecycleOwner) { (signInState, productAmount, deleteAccountState) ->
             var giftExpiring = false
             (signInState as? SignInState.SignedIn)?.subscriptionStatus?.let { status ->
                 val plusStatus = status as? SubscriptionStatus.Plus ?: return@let
@@ -105,7 +105,7 @@ class AccountDetailsFragment : BaseFragment() {
                             Column {
                                 HorizontalDivider()
                                 UserUpgradeView(
-                                    pricePerMonth = displayPrice.get(),
+                                    productAmount = productAmount.get(),
                                     storageLimit = settings.getCustomStorageLimitGb(),
                                     onLearnMoreClick = {
                                         WebViewActivity.show(

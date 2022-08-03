@@ -19,6 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
+import au.com.shiftyjelly.pocketcasts.account.util.ProductAmount
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -32,7 +34,7 @@ import au.com.shiftyjelly.pocketcasts.settings.R as SR
 
 @Composable
 fun UserUpgradeView(
-    pricePerMonth: String?,
+    productAmount: ProductAmount?,
     storageLimit: Long,
     onLearnMoreClick: () -> Unit,
     onUpgradeClick: () -> Unit,
@@ -45,23 +47,22 @@ fun UserUpgradeView(
             .padding(vertical = 16.dp, horizontal = 24.dp)
     ) {
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(26.dp)
-                .fillMaxWidth()
-        ) {
-            HorizontalLogoPlus()
-            if (pricePerMonth != null) {
-                TextH40(
-                    text = stringResource(LR.string.plus_month_price, pricePerMonth),
-                    color = MaterialTheme.theme.colors.primaryText02
+        if (productAmount != null) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .height(26.dp)
+                    .fillMaxWidth()
+            ) {
+                HorizontalLogoPlus()
+                ProductAmountView(
+                    productAmount = productAmount,
+                    emphasized = false
                 )
             }
+            Spacer(Modifier.height(16.dp))
         }
-
-        Spacer(Modifier.height(16.dp))
 
         PlusFeatureRow(stringResource(LR.string.profile_web_player))
         Spacer(Modifier.height(8.dp))
@@ -115,7 +116,7 @@ private fun UserUpgradeViewPreview(
 ) {
     AppTheme(themeType) {
         UserUpgradeView(
-            pricePerMonth = "$0.99",
+            productAmount = ProductAmount("1 month free", "then $0.99 / month"),
             storageLimit = 10L,
             onLearnMoreClick = {},
             onUpgradeClick = {}
