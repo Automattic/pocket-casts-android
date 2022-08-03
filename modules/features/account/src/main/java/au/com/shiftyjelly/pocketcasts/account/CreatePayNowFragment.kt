@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -68,7 +69,10 @@ class CreatePayNowFragment : BaseFragment() {
                 AppTheme(theme.activeTheme) {
                     val productAmount = subscriptionFrequency?.productAmount
                     if (productAmount != null) {
-                        ProductAmountView(productAmount)
+                        ProductAmountView(
+                            productAmount = productAmount,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        )
                     }
                 }
             }

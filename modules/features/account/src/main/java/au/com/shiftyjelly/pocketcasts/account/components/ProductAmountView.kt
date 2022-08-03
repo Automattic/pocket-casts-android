@@ -19,10 +19,11 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun ProductAmountView(
     productAmount: ProductAmount,
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.End,
 ) {
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.End
+        horizontalAlignment = horizontalAlignment
     ) {
         TextH30(
             text = productAmount.primaryText,
