@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.adapter
 
 import android.content.Context
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 
 class PodcastTouchCallback(val adapter: ItemTouchHelperAdapter, val context: Context) : ItemTouchHelper.Callback() {
 
@@ -17,22 +18,28 @@ class PodcastTouchCallback(val adapter: ItemTouchHelperAdapter, val context: Con
         fun onItemClear()
     }
 
-    override fun getMovementFlags(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder): Int {
+    override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT or ItemTouchHelper.START or ItemTouchHelper.END
         val swipeFlags = 0
         return ItemTouchHelper.SimpleCallback.makeMovementFlags(dragFlags, swipeFlags)
     }
 
-    override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
-        adapter.onPodcastMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        val position = viewHolder.bindingAdapterPosition
+        val targetPosition = target.bindingAdapterPosition
+        if (position == RecyclerView.NO_POSITION || targetPosition == RecyclerView.NO_POSITION) {
+            return false
+        }
+
+        adapter.onPodcastMove(position, targetPosition)
         isMoving = true
         return true
     }
 
-    override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
     }
 
-    override fun onSelectedChanged(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder?, actionState: Int) {
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         if (viewHolder is ItemTouchHelperViewHolder) {
             when (actionState) {
                 ItemTouchHelper.ACTION_STATE_DRAG -> viewHolder.onItemDrag()
@@ -42,7 +49,7 @@ class PodcastTouchCallback(val adapter: ItemTouchHelperAdapter, val context: Con
         super.onSelectedChanged(viewHolder, actionState)
     }
 
-    override fun clearView(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder) {
+    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
 
         if (viewHolder is ItemTouchHelperViewHolder) {

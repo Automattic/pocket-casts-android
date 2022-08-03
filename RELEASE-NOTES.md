@@ -4,6 +4,8 @@
 
 *   Bug Fixes:    
     *   Fix OPML import.
+    *   Fix podcasts and folders rearrange crash.
+        ([#200](https://github.com/Automattic/pocket-casts-android/issues/200)).
 
 ### 7.20.1
 
