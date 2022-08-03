@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
 import au.com.shiftyjelly.pocketcasts.account.databinding.AdapterFrequencyItemBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.shortTitle
 
 class CreateFrequencyAdapter(
     private var list: List<SubscriptionFrequency>,
+    private val activeTheme: Theme.ThemeType,
     private val clickListener: (SubscriptionFrequency) -> Unit,
 ) : RecyclerView.Adapter<CreateFrequencyAdapter.ViewHolder>() {
 
@@ -59,7 +62,9 @@ class CreateFrequencyAdapter(
             }
 
             binding.productAmountView.setContent {
-                ProductAmountView(subscriptionFrequency.productAmount)
+                AppTheme(activeTheme) {
+                    ProductAmountView(subscriptionFrequency.productAmount)
+                }
             }
             binding.outlinePanel.isSelected = selected
         }
