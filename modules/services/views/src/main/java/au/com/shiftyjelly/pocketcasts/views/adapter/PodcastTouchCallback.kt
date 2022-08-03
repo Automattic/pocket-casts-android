@@ -25,7 +25,13 @@ class PodcastTouchCallback(val adapter: ItemTouchHelperAdapter, val context: Con
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        adapter.onPodcastMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
+        val position = viewHolder.bindingAdapterPosition
+        val targetPosition = target.bindingAdapterPosition
+        if (position == RecyclerView.NO_POSITION || targetPosition == RecyclerView.NO_POSITION) {
+            return false
+        }
+
+        adapter.onPodcastMove(position, targetPosition)
         isMoving = true
         return true
     }
