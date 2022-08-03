@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.account
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
 import au.com.shiftyjelly.pocketcasts.account.databinding.AdapterFrequencyItemBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -58,9 +58,9 @@ class CreateFrequencyAdapter(
                 binding.txtDescription.visibility = View.VISIBLE
             }
 
-            binding.txtAmountTop.text = subscriptionFrequency.productAmount.primaryText
-            binding.txtAmountBottom.text = subscriptionFrequency.productAmount.secondaryText
-            binding.txtAmountBottom.isVisible = subscriptionFrequency.productAmount.secondaryText != null
+            binding.productAmountView.setContent {
+                ProductAmountView(subscriptionFrequency.productAmount)
+            }
             binding.outlinePanel.isSelected = selected
         }
 
