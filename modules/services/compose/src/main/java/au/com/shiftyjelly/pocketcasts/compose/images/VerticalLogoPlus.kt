@@ -8,7 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -18,9 +19,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun VerticalLogoPlus(modifier: Modifier = Modifier) {
+    val pocketCastsPlusString = stringResource(LR.string.pocket_casts_plus)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.semantics(mergeDescendants = true) {}
+        modifier = modifier.clearAndSetSemantics {
+            contentDescription = pocketCastsPlusString
+        }
     ) {
         VerticalLogo()
         Image(
