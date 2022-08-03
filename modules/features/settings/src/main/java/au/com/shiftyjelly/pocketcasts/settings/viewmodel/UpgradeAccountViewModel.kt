@@ -37,8 +37,8 @@ class UpgradeAccountViewModel
                 Optional.of(
                     product.trialBillingPeriod?.let { trialBillingPeriod ->
                         ProductState.ProductWithTrial(
-                            featureLabelLine2 = context.resources.getString(
-                                LR.string.profile_feature_try_trial_billing_info,
+                            featureLabel = context.resources.getString(
+                                LR.string.profile_feature_try_trial,
                                 getFormattedTrialPeriod(trialBillingPeriod)
                             ),
                             price = context.resources.getString(
@@ -48,7 +48,7 @@ class UpgradeAccountViewModel
                             )
                         )
                     } ?: ProductState.ProductWithoutTrial(
-                        featureLabelLine2 = context.resources.getString(LR.string.pocket_casts_plus),
+                        featureLabel = context.resources.getString(LR.string.profile_feature_requires),
                         price = context.resources.getString(
                             if (isYearlyPlan) LR.string.plus_per_year else LR.string.plus_per_month,
                             price
@@ -76,20 +76,17 @@ class UpgradeAccountViewModel
         LiveDataReactiveStreams.fromPublisher(productDetails)
 
     sealed class ProductState {
-        abstract val featureLabelLine1: Int
-        abstract val featureLabelLine2: String
+        abstract val featureLabel: String
         abstract val price: String
         abstract val buttonLabel: Int
         data class ProductWithTrial(
-            @StringRes override val featureLabelLine1: Int = LR.string.profile_feature_try_trial,
-            override val featureLabelLine2: String,
+            override val featureLabel: String,
             override val price: String,
             @StringRes override val buttonLabel: Int = LR.string.profile_start_free_trial
         ) : ProductState()
 
         data class ProductWithoutTrial(
-            @StringRes override val featureLabelLine1: Int = LR.string.profile_feature_requires,
-            override val featureLabelLine2: String,
+            override val featureLabel: String,
             override val price: String,
             @StringRes override val buttonLabel: Int = LR.string.profile_upgrade_to_plus
         ) : ProductState()
