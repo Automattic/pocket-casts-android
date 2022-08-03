@@ -10,14 +10,16 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreatePaynowBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPrice
+import au.com.shiftyjelly.pocketcasts.utils.extensions.setTextSafe
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -57,25 +59,19 @@ class CreatePayNowFragment : BaseFragment() {
 
         binding?.profileCircleView?.setup(1.0f, true)
 
-        var sub = ""
-        var charge = ""
-        var renews: Int? = null
+        val subscriptionFrequency = viewModel.subscriptionFrequency.value
 
-        viewModel.subscriptionFrequency.value?.let {
-            sub = getString(LR.string.pocket_casts_plus)
-            charge = it.product.recurringPrice + " / " + (if (it.period == null) "" else getString(it.period))
-            renews = it.renews
+        binding?.txtCharge?.setContent {
+            AppTheme(theme.activeTheme) {
+                val productAmount = subscriptionFrequency?.productAmount
+                if (productAmount != null) {
+                    ProductAmountView(productAmount)
+                }
+            }
         }
-
+        binding?.txtRenews?.setTextSafe(subscriptionFrequency?.renews)
         binding?.txtEmail?.text = viewModel.email.value
-        binding?.txtSubscription?.text = sub
-        binding?.txtCharge?.text = charge
-        val renewsFound = renews
-        if (renewsFound == null) {
-            binding?.txtRenews?.text = null
-        } else {
-            binding?.txtRenews?.setText(renewsFound)
-        }
+        binding?.txtSubscription?.text = getString(LR.string.pocket_casts_plus)
 
         displayMainLayout(true)
 
