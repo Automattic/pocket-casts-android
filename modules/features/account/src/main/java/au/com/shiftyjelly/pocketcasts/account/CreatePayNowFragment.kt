@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -61,11 +62,14 @@ class CreatePayNowFragment : BaseFragment() {
 
         val subscriptionFrequency = viewModel.subscriptionFrequency.value
 
-        binding?.txtCharge?.setContent {
-            AppTheme(theme.activeTheme) {
-                val productAmount = subscriptionFrequency?.productAmount
-                if (productAmount != null) {
-                    ProductAmountView(productAmount)
+        binding?.txtCharge?.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppTheme(theme.activeTheme) {
+                    val productAmount = subscriptionFrequency?.productAmount
+                    if (productAmount != null) {
+                        ProductAmountView(productAmount)
+                    }
                 }
             }
         }
