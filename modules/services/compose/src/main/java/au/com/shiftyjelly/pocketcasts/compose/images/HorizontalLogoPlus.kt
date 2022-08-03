@@ -23,7 +23,8 @@ fun HorizontalLogoPlus(modifier: Modifier = Modifier) {
 
     Image(
         painter = painterResource(resourceId),
-        contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.pocket_casts_plus)
+        contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.pocket_casts_plus),
+        modifier = modifier
     )
 }
 
