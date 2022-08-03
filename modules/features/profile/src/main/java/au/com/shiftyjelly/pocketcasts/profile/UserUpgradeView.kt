@@ -1,34 +1,124 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
-import android.content.Context
-import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.google.android.material.button.MaterialButton
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogoPlus
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.settings.R as SR
 
-class UserUpgradeView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+@Composable
+fun UserUpgradeView(
+    pricePerMonth: String?,
+    storageLimit: Long,
+    onLearnMoreClick: () -> Unit,
+    onUpgradeClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
 
-    val txtSubscription: TextView
-    val lblFeature3: TextView
-    val lblFindMore: TextView
-    val btnUpgrade: MaterialButton
+    Column(
+        modifier = modifier
+            .background(MaterialTheme.theme.colors.primaryUi02)
+            .padding(vertical = 16.dp, horizontal = 24.dp)
+    ) {
 
-    init {
-        LayoutInflater.from(context).inflate(R.layout.view_user_upgrade, this, true)
-        txtSubscription = findViewById(R.id.txtSubscription)
-        lblFeature3 = findViewById(R.id.lblFeature3)
-        lblFindMore = findViewById(R.id.lblFindMore)
-        btnUpgrade = findViewById(R.id.btnUpgrade)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .height(26.dp)
+                .fillMaxWidth()
+        ) {
+            HorizontalLogoPlus()
+            if (pricePerMonth != null) {
+                TextH40(
+                    text = stringResource(LR.string.plus_month_price, pricePerMonth),
+                    color = MaterialTheme.theme.colors.primaryText02
+                )
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        PlusFeatureRow(stringResource(LR.string.profile_web_player))
+        Spacer(Modifier.height(8.dp))
+        PlusFeatureRow(stringResource(LR.string.profile_extra_themes))
+        Spacer(Modifier.height(8.dp))
+        PlusFeatureRow(stringResource(LR.string.profile_extra_app_icons))
+        Spacer(Modifier.height(8.dp))
+        PlusFeatureRow(stringResource(LR.string.plus_cloud_storage_limit, storageLimit))
+
+        Spacer(Modifier.height(32.dp))
+
+        TextH50(
+            text = stringResource(LR.string.plus_learn_more_about_plus),
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clickable { onLearnMoreClick() }
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        RowButton(
+            text = stringResource(LR.string.profile_upgrade_to_plus),
+            onClick = onUpgradeClick,
+            includePadding = false
+        )
     }
+}
 
-    fun setup(pricePerMonth: String?, storageLimit: Long) {
-        txtSubscription.text = if (pricePerMonth == null) null else resources.getString(LR.string.plus_month_price, pricePerMonth)
-        lblFeature3.text = resources.getString(LR.string.plus_cloud_storage_limit, storageLimit)
+@Composable
+private fun PlusFeatureRow(text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Image(
+            painter = painterResource(SR.drawable.ic_plus),
+            contentDescription = null,
+            modifier = Modifier.padding(top = 3.dp) // for better visual alignment of image with text
+        )
+
+        TextH40(
+            text = text,
+            color = MaterialTheme.theme.colors.primaryText02,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun UserUpgradeViewPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        UserUpgradeView(
+            pricePerMonth = "$0.99",
+            storageLimit = 10L,
+            onLearnMoreClick = {},
+            onUpgradeClick = {}
+        )
     }
 }

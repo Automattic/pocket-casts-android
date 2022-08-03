@@ -10,11 +10,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -89,19 +93,39 @@ class AccountDetailsFragment : BaseFragment() {
                 val daysLessThan30 = plusStatus.expiry.before(Date(Date().time + 30.days()))
                 giftExpiring = (daysLessThan30 && !status.autoRenew)
             }
-            binding.userUpgradeView?.isVisible = signInState.isSignedInAsFree || giftExpiring
 
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPlusPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPlusPaid
 
-            binding.userUpgradeView?.setup(displayPrice.get(), settings.getCustomStorageLimitGb())
-
-            binding.userUpgradeView?.lblFindMore?.setOnClickListener {
-                WebViewActivity.show(context, "Learn more", Settings.INFO_LEARN_MORE_URL)
-            }
-
-            binding.userUpgradeView?.btnUpgrade?.setOnClickListener {
-                activity?.startActivity(AccountActivity.newUpgradeInstance(context))
+            binding.userUpgradeComposeView?.apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    AppTheme(theme.activeTheme) {
+                        if (signInState.isSignedInAsFree || giftExpiring) {
+                            Column {
+                                HorizontalDivider()
+                                UserUpgradeView(
+                                    pricePerMonth = displayPrice.get(),
+                                    storageLimit = settings.getCustomStorageLimitGb(),
+                                    onLearnMoreClick = {
+                                        WebViewActivity.show(
+                                            context,
+                                            "Learn more",
+                                            Settings.INFO_LEARN_MORE_URL
+                                        )
+                                    },
+                                    onUpgradeClick = {
+                                        activity?.startActivity(
+                                            AccountActivity.newUpgradeInstance(
+                                                context
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             updateDeleteAccountState(deleteAccountState)
