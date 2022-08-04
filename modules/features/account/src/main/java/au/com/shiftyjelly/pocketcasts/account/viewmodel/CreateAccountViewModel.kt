@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
@@ -12,12 +14,18 @@ import au.com.shiftyjelly.pocketcasts.settings.util.BillingPeriodHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.SubscriptionBillingUnit
 import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringBillingPeriod
+import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPrice
+import au.com.shiftyjelly.pocketcasts.utils.extensions.toSubscriptionBillingUnit
+import au.com.shiftyjelly.pocketcasts.utils.extensions.trialBillingPeriod
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.launch
+import java.time.Period
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,6 +34,7 @@ class CreateAccountViewModel
     private val auth: AccountAuth,
     private val settings: Settings,
     val billingPeriodHelper: BillingPeriodHelper,
+    @ApplicationContext private val context: Context
 ) : AccountViewModel() {
 
     val upgradeMode = MutableLiveData<Boolean>()
@@ -59,6 +68,7 @@ class CreateAccountViewModel
                                 period = billingDetails?.periodUnit,
                                 renews = billingDetails?.renews,
                                 hint = billingDetails?.hint,
+                                productAmount = productDetails.mapToProductAmount(),
                                 subscriptionBillingUnit = billingDetails?.subscriptionBillingUnit
                             )
                             list.add(subscriptionFrequency)
@@ -76,6 +86,44 @@ class CreateAccountViewModel
                 }
             )
             .addTo(disposables)
+    }
+
+    private fun ProductDetails.mapToProductAmount(): ProductAmount {
+        val primaryText: String?
+        var secondaryText: String? = null
+        if (trialBillingPeriod == null) {
+            primaryText = recurringPrice ?: ""
+        } else {
+            val trialPeriod = trialBillingPeriod as Period
+            val billingDetails = billingPeriodHelper.mapToBillingDetails(trialPeriod)
+            primaryText = context.getString(
+                R.string.profile_amount_free,
+                billingDetails.periodValue ?: ""
+            )
+
+            val subscriptionBillingUnit =
+                recurringBillingPeriod?.toSubscriptionBillingUnit()
+
+            when (subscriptionBillingUnit) {
+                SubscriptionBillingUnit.MONTHS -> R.string.plus_per_month_then
+                SubscriptionBillingUnit.YEARS -> R.string.plus_per_year_then
+                else -> null
+            }.let { stringRes ->
+                if (stringRes == null) {
+                    LogBuffer.e(
+                        LogBuffer.TAG_SUBSCRIPTIONS,
+                        "unexpected recurring billing frequency: $subscriptionBillingUnit"
+                    )
+                } else {
+                    val text = context.getString(stringRes, recurringPrice)
+                    secondaryText = text
+                }
+            }
+        }
+        return ProductAmount(
+            primaryText = primaryText,
+            secondaryText = secondaryText
+        )
     }
 
     private fun errorUpdate(error: CreateAccountError, add: Boolean) {
@@ -243,7 +291,13 @@ data class SubscriptionFrequency(
     @StringRes val period: Int?,
     @StringRes val renews: Int?,
     @StringRes val hint: Int?,
+    val productAmount: ProductAmount,
     val subscriptionBillingUnit: SubscriptionBillingUnit?
+)
+
+data class ProductAmount(
+    val primaryText: String,
+    val secondaryText: String? = null,
 )
 
 enum class CreateAccountError {
