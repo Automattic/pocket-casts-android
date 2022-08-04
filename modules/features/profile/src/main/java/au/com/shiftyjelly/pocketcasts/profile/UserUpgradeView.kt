@@ -55,7 +55,7 @@ fun UserUpgradeView(
                     .height(26.dp)
                     .fillMaxWidth()
             ) {
-                HorizontalLogoPlus()
+                HorizontalLogoPlus(Modifier.weight(1f, fill = false))
                 ProductAmountView(
                     productAmount = productAmount,
                     emphasized = false
