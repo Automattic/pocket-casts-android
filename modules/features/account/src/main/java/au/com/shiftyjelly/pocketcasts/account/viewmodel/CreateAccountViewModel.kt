@@ -1,20 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.util.ProductAmount
-import au.com.shiftyjelly.pocketcasts.account.util.ProductAmountUtil
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.settings.util.BillingPeriodHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.extensions.SubscriptionBillingUnit
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringBillingPeriod
-import com.android.billingclient.api.ProductDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -27,13 +21,11 @@ class CreateAccountViewModel
 @Inject constructor(
     private val auth: AccountAuth,
     private val settings: Settings,
-    private val billingPeriodHelper: BillingPeriodHelper,
-    private val productAmountUtil: ProductAmountUtil,
 ) : AccountViewModel() {
 
     val upgradeMode = MutableLiveData<Boolean>()
     val subscriptionType = MutableLiveData<SubscriptionType>().apply { value = SubscriptionType.FREE }
-    val subscriptionFrequency = MutableLiveData<SubscriptionFrequency?>()
+    val subscription = MutableLiveData<Subscription?>()
     val newsletter = MutableLiveData<Boolean>().apply { postValue(false) }
     val termsOfUse = MutableLiveData<Boolean?>()
 
@@ -50,27 +42,10 @@ class CreateAccountViewModel
             .subscribeBy(
                 onSuccess = { productDetailsState ->
                     if (productDetailsState is ProductDetailsState.Loaded) {
-
-                        val list = mutableListOf<SubscriptionFrequency>()
-
-                        productDetailsState.productDetails.forEach { productDetails ->
-                            val billingPeriod = productDetails.recurringBillingPeriod
-                            val billingDetails = billingPeriod?.let { billingPeriodHelper.mapToBillingDetails(it) }
-
-                            val subscriptionFrequency = SubscriptionFrequency(
-                                product = productDetails,
-                                period = billingDetails?.periodUnit,
-                                renews = billingDetails?.renews,
-                                hint = billingDetails?.hint,
-                                productAmount = productAmountUtil.get(productDetails),
-                                subscriptionBillingUnit = billingDetails?.subscriptionBillingUnit
-                            )
-                            list.add(subscriptionFrequency)
-                        }
-                        if (list.isNotEmpty()) {
-                            updateSubscriptionFrequency(list.last())
-                        }
-                        createAccountState.postValue(CreateAccountState.ProductsLoaded(list))
+                        val subscriptions = productDetailsState.productDetails
+                            .mapNotNull { Subscription.fromProductDetails(it) }
+                        subscriptions.lastOrNull()?.let { updateSubscription(it) }
+                        createAccountState.postValue(CreateAccountState.ProductsLoaded(subscriptions))
                     } else {
                         errorUpdate(CreateAccountError.CANNOT_LOAD_SUBS, true)
                     }
@@ -109,8 +84,8 @@ class CreateAccountViewModel
         createAccountState.postValue(CreateAccountState.SubscriptionTypeChosen)
     }
 
-    fun updateSubscriptionFrequency(value: SubscriptionFrequency) {
-        subscriptionFrequency.value = value
+    fun updateSubscription(value: Subscription) {
+        subscription.value = value
     }
 
     fun updateEmailRefresh() {
@@ -159,7 +134,7 @@ class CreateAccountViewModel
     fun clearValues() {
         upgradeMode.value = false
         subscriptionType.value = defaultSubscriptionType
-        subscriptionFrequency.value = null
+        subscription.value = null
         newsletter.value = false
         termsOfUse.value = null
     }
@@ -242,15 +217,6 @@ enum class SubscriptionType(val value: String) {
     PLUS("Pocket Casts Plus")
 }
 
-data class SubscriptionFrequency(
-    val product: ProductDetails,
-    @StringRes val period: Int?,
-    @StringRes val renews: Int?,
-    @StringRes val hint: Int?,
-    val productAmount: ProductAmount,
-    val subscriptionBillingUnit: SubscriptionBillingUnit?
-)
-
 enum class CreateAccountError {
     CANNOT_LOAD_SUBS,
     INVALID_EMAIL,
@@ -264,7 +230,7 @@ sealed class CreateAccountState {
     object CurrentlyValid : CreateAccountState()
     object SubscriptionTypeChosen : CreateAccountState()
     object ProductsLoading : CreateAccountState()
-    data class ProductsLoaded(val list: List<SubscriptionFrequency>) : CreateAccountState()
+    data class ProductsLoaded(val list: List<Subscription>) : CreateAccountState()
     object AccountCreating : CreateAccountState()
     object AccountCreated : CreateAccountState()
     object SubscriptionCreating : CreateAccountState()

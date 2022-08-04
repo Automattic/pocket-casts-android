@@ -86,7 +86,7 @@ class AccountDetailsFragment : BaseFragment() {
             binding.userView.signedInState = signInState
         }
 
-        viewModel.viewState.observe(viewLifecycleOwner) { (signInState, productAmount, deleteAccountState) ->
+        viewModel.viewState.observe(viewLifecycleOwner) { (signInState, subscription, deleteAccountState) ->
             var giftExpiring = false
             (signInState as? SignInState.SignedIn)?.subscriptionStatus?.let { status ->
                 val plusStatus = status as? SubscriptionStatus.Plus ?: return@let
@@ -101,11 +101,17 @@ class AccountDetailsFragment : BaseFragment() {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     AppTheme(theme.activeTheme) {
-                        if (signInState.isSignedInAsFree || giftExpiring) {
+                        if (subscription != null && (signInState.isSignedInAsFree || giftExpiring)) {
                             Column {
+
                                 HorizontalDivider()
+
                                 UserUpgradeView(
-                                    productAmount = productAmount.get(),
+                                    data = UserUpgradeViewData(
+                                        numFreeDays = subscription.trialSubscriptionPhase?.numFree(resources),
+                                        thenPriceSlashPeriod = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(resources),
+                                        pricePerPeriod = subscription.recurringSubscriptionPhase.pricePerPeriod(resources)
+                                    ),
                                     storageLimit = settings.getCustomStorageLimitGb(),
                                     onLearnMoreClick = {
                                         WebViewActivity.show(

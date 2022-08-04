@@ -5,9 +5,8 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import au.com.shiftyjelly.pocketcasts.account.util.ProductAmount
-import au.com.shiftyjelly.pocketcasts.account.util.ProductAmountUtil
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -35,7 +34,6 @@ class AccountDetailsViewModel
     userManager: UserManager,
     statsManager: StatsManager,
     settings: Settings,
-    productAmountUtil: ProductAmountUtil,
     private val syncServerManager: SyncServerManager
 ) : ViewModel() {
 
@@ -46,21 +44,17 @@ class AccountDetailsViewModel
         if (state is ProductDetailsState.Loaded) {
             val price = state.productDetails
                 .find { it.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
-                ?.let { productAmountUtil.get(it) }
-            if (price != null) {
-                Optional.of(price)
-            } else {
-                Optional.empty()
-            }
+                ?.let { Subscription.fromProductDetails(it) }
+            Optional.of(price)
         } else {
             Optional.empty()
         }
     }
     val signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
-    val viewState: LiveData<Triple<SignInState, Optional<ProductAmount>, DeleteAccountState>> = LiveDataReactiveStreams
+    val viewState: LiveData<Triple<SignInState, Subscription?, DeleteAccountState>> = LiveDataReactiveStreams
         .fromPublisher(userManager.getSignInState().combineLatest(productDetails))
         .combineLatest(deleteAccountState)
-        .map { Triple(it.first.first, it.first.second, it.second) }
+        .map { Triple(it.first.first, it.first.second.get(), it.second) }
 
     val accountStartDate: LiveData<Date> = MutableLiveData<Date>().apply { value = Date(statsManager.statsStartTime) }
 

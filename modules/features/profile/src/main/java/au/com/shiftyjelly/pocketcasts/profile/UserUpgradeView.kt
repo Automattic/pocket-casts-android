@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
-import au.com.shiftyjelly.pocketcasts.account.util.ProductAmount
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -34,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.settings.R as SR
 
 @Composable
 fun UserUpgradeView(
-    productAmount: ProductAmount?,
+    data: UserUpgradeViewData,
     storageLimit: Long,
     onLearnMoreClick: () -> Unit,
     onUpgradeClick: () -> Unit,
@@ -47,22 +46,29 @@ fun UserUpgradeView(
             .padding(vertical = 16.dp, horizontal = 24.dp)
     ) {
 
-        if (productAmount != null) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .height(26.dp)
-                    .fillMaxWidth()
-            ) {
-                HorizontalLogoPlus(Modifier.weight(1f, fill = false))
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .height(26.dp)
+                .fillMaxWidth()
+        ) {
+            HorizontalLogoPlus(Modifier.weight(1f, fill = false))
+
+            if (data.numFreeDays != null) {
                 ProductAmountView(
-                    productAmount = productAmount,
+                    primaryText = data.numFreeDays,
+                    secondaryText = data.thenPriceSlashPeriod,
+                    emphasized = false
+                )
+            } else {
+                ProductAmountView(
+                    primaryText = data.pricePerPeriod,
                     emphasized = false
                 )
             }
-            Spacer(Modifier.height(16.dp))
         }
+        Spacer(Modifier.height(16.dp))
 
         PlusFeatureRow(stringResource(LR.string.profile_web_player))
         Spacer(Modifier.height(8.dp))
@@ -92,6 +98,12 @@ fun UserUpgradeView(
     }
 }
 
+data class UserUpgradeViewData(
+    val numFreeDays: String?,
+    val thenPriceSlashPeriod: String,
+    val pricePerPeriod: String
+)
+
 @Composable
 private fun PlusFeatureRow(text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -111,12 +123,35 @@ private fun PlusFeatureRow(text: String) {
 
 @Preview(showBackground = true)
 @Composable
-private fun UserUpgradeViewPreview(
+private fun UserUpgradeViewPreview_with_trial(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
         UserUpgradeView(
-            productAmount = ProductAmount("1 month free", "then $0.99 / month"),
+            data = UserUpgradeViewData(
+                numFreeDays = "1 month free",
+                thenPriceSlashPeriod = "then $0.99 / month",
+                pricePerPeriod = "THIS IS NOT USED"
+            ),
+            storageLimit = 10L,
+            onLearnMoreClick = {},
+            onUpgradeClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun UserUpgradeViewPreview_without_trial(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        UserUpgradeView(
+            data = UserUpgradeViewData(
+                numFreeDays = null,
+                thenPriceSlashPeriod = "THIS IS ALSO NOT USED",
+                pricePerPeriod = "$0.99 per month"
+            ),
             storageLimit = 10L,
             onLearnMoreClick = {},
             onUpgradeClick = {}
