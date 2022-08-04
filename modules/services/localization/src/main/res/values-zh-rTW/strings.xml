@@ -524,8 +524,8 @@ Language: zh_TW
 	<string name="plus_themes_icons_body">展現你最真實的色彩。 僅供 Plus 社群使用的獨家圖示和主題。</string>
 	<string name="plus_themes_icons">佈景主題與圖示</string>
 	<string name="plus_thanks_for_your_support_bang">感謝你的支持！</string>
-	<string name="plus_per_month">%s / 月</string>
-	<string name="plus_month_price">%s 每月</string>
+	<string name="plus_slash_month">%s / 月</string>
+	<string name="plus_per_month">%s 每月</string>
 	<string name="plus_lifetime_member">終身會員</string>
 	<string name="plus_learn_more_button">瞭解詳情</string>
 	<string name="plus_learn_more_about_plus">深入瞭解 Pocket Casts Plus</string>

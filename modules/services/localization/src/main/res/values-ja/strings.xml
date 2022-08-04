@@ -524,8 +524,8 @@ Language: ja_JP
 	<string name="plus_themes_icons_body">あなたの個性を表現しましょう。 Plus クラブ限定の特別なアイコンとテーマ。</string>
 	<string name="plus_themes_icons">テーマとアイコン</string>
 	<string name="plus_thanks_for_your_support_bang">ご支援いただきありがとうございます。</string>
+	<string name="plus_slash_month">%s / 月</string>
 	<string name="plus_per_month">%s / 月</string>
-	<string name="plus_month_price">%s / 月</string>
 	<string name="plus_lifetime_member">無期限メンバー</string>
 	<string name="plus_learn_more_button">もっと詳しく知る</string>
 	<string name="plus_learn_more_about_plus">Pocket Casts Plus の詳細</string>

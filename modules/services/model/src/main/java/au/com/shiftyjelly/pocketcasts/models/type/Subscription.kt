@@ -94,7 +94,7 @@ sealed class SubscriptionPricingPhase(
         RecurringSubscriptionPhase {
 
         override val formattedPrice = pricingPhase.formattedPrice
-        override val numFreeThenPricePerPeriodRes = LR.string.plus_per_year_with_trial
+        override val numFreeThenPricePerPeriodRes = LR.string.plus_trial_then_slash_year
         override val renews = LR.string.plus_renews_automatically_yearly
         override val hint = LR.string.plus_best_value
 
@@ -102,13 +102,13 @@ sealed class SubscriptionPricingPhase(
             res.getStringPluralYears(period.years)
 
         override fun pricePerPeriod(res: Resources): String =
-            res.getString(LR.string.plus_year_price, pricingPhase.formattedPrice)
-
-        override fun priceSlashPeriod(res: Resources): String =
             res.getString(LR.string.plus_per_year, pricingPhase.formattedPrice)
 
+        override fun priceSlashPeriod(res: Resources): String =
+            res.getString(LR.string.plus_slash_year, pricingPhase.formattedPrice)
+
         override fun thenPriceSlashPeriod(res: Resources): String =
-            res.getString(LR.string.plus_per_year_then, pricingPhase.formattedPrice)
+            res.getString(LR.string.plus_then_slash_year, pricingPhase.formattedPrice)
     }
 
     class Months(pricingPhase: PricingPhase, period: Period) :
@@ -120,7 +120,7 @@ sealed class SubscriptionPricingPhase(
         RecurringSubscriptionPhase {
 
         override val formattedPrice = pricingPhase.formattedPrice
-        override val numFreeThenPricePerPeriodRes = LR.string.plus_per_month_with_trial
+        override val numFreeThenPricePerPeriodRes = LR.string.plus_trial_then_slash_month
         override val renews = LR.string.plus_renews_automatically_monthly
         override val hint = null
 
@@ -128,13 +128,13 @@ sealed class SubscriptionPricingPhase(
             res.getStringPluralMonths(period.months)
 
         override fun pricePerPeriod(res: Resources): String =
-            res.getString(LR.string.plus_month_price, pricingPhase.formattedPrice)
-
-        override fun priceSlashPeriod(res: Resources): String =
             res.getString(LR.string.plus_per_month, pricingPhase.formattedPrice)
 
+        override fun priceSlashPeriod(res: Resources): String =
+            res.getString(LR.string.plus_slash_month, pricingPhase.formattedPrice)
+
         override fun thenPriceSlashPeriod(res: Resources): String =
-            res.getString(LR.string.plus_per_month_then, pricingPhase.formattedPrice)
+            res.getString(LR.string.plus_then_slash_month, pricingPhase.formattedPrice)
     }
 
     class Days(pricingPhase: PricingPhase, period: Period) :

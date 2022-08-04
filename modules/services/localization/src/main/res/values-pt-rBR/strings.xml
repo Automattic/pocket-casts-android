@@ -524,8 +524,8 @@ Language: pt_BR
 	<string name="plus_themes_icons_body">Expresse sua individualidade. Temas e ícones exclusivos para o Plus.</string>
 	<string name="plus_themes_icons">Temas e ícones</string>
 	<string name="plus_thanks_for_your_support_bang">Obrigado pelo apoio!</string>
-	<string name="plus_per_month">%s / mês</string>
-	<string name="plus_month_price">%s por mês</string>
+	<string name="plus_slash_month">%s / mês</string>
+	<string name="plus_per_month">%s por mês</string>
 	<string name="plus_lifetime_member">Membro vitalício</string>
 	<string name="plus_learn_more_button">Saiba mais</string>
 	<string name="plus_learn_more_about_plus">Saiba mais sobre o Pocket Casts Plus</string>
