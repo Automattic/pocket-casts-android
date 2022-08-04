@@ -71,14 +71,8 @@ class CreatePayNowFragment : BaseFragment() {
                 AppTheme(theme.activeTheme) {
                     val productAmount = subscriptionFrequency?.productAmount
                     if (productAmount != null) {
-                        val updatedProductAmount = if (productAmount.secondaryText == null) {
-                            val perSuffix = subscriptionFrequency.period?.let { getString(it) } ?: ""
-                            productAmount.copy(primaryText = "${productAmount.primaryText} / $perSuffix")
-                        } else {
-                            productAmount
-                        }
                         ProductAmountView(
-                            productAmount = updatedProductAmount,
+                            productAmount = productAmount,
                             horizontalAlignment = Alignment.CenterHorizontally
                         )
                     }
