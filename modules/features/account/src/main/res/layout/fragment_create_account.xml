@@ -161,14 +161,18 @@
 
                 <TextView
                     android:id="@+id/lblEverything"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
+                    android:layout_marginEnd="4dp"
                     android:text="@string/profile_everything_unlocked"
                     android:textAppearance="@style/H60"
                     android:textColor="?attr/primary_text_02"
+                    app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="@+id/lblPlus"
-                    app:layout_constraintTop_toBottomOf="@+id/lblPlus" />
+                    app:layout_constraintTop_toBottomOf="@+id/lblPlus"
+                    app:layout_constraintEnd_toStartOf="@+id/chargeComposeView"
+                    />
 
                 <androidx.compose.ui.platform.ComposeView
                     android:id="@+id/chargeComposeView"
