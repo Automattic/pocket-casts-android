@@ -1,5 +1,11 @@
 # Release notes
 
+### 7.21.0
+
+*   Bug Fixes:    
+    *   Fix the mini player's play icon showing the wrong icon.
+        ([#208](https://github.com/Automattic/pocket-casts-android/pull/208)).
+
 ### 7.20.2
 
 *   Bug Fixes:    
