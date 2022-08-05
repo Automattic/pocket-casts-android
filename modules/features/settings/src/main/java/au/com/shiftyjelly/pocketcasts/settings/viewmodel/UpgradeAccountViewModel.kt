@@ -31,13 +31,13 @@ class UpgradeAccountViewModel
                 is Subscription.WithTrial -> ProductState.ProductWithTrial(
                     featureLabel = context.resources.getString(
                         LR.string.profile_feature_try_trial,
-                        subscription.trialSubscriptionPhase.periodValue(context.resources)
+                        subscription.trialPricingPhase.periodValue(context.resources)
                     ),
                     price = subscription.numFreeThenPricePerPeriod(context.resources)
                 )
                 else -> ProductState.ProductWithoutTrial(
                     featureLabel = context.resources.getString(LR.string.profile_feature_requires),
-                    price = subscription.recurringSubscriptionPhase.priceSlashPeriod(context.resources),
+                    price = subscription.recurringPricingPhase.priceSlashPeriod(context.resources),
                 )
             }
 

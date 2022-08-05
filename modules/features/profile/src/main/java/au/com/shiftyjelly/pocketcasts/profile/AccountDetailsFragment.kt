@@ -110,11 +110,11 @@ class AccountDetailsFragment : BaseFragment() {
                                 UserUpgradeView(
                                     data = when (subscription) {
                                         is Subscription.Simple -> UserUpgradeViewData.WithoutTrial(
-                                            subscription.recurringSubscriptionPhase.pricePerPeriod(resources)
+                                            subscription.recurringPricingPhase.pricePerPeriod(resources)
                                         )
                                         is Subscription.WithTrial -> UserUpgradeViewData.WithTrial(
-                                            numFree = subscription.trialSubscriptionPhase.numFree(resources),
-                                            thenPriceSlashPeriod = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(resources),
+                                            numFree = subscription.trialPricingPhase.numFree(resources),
+                                            thenPriceSlashPeriod = subscription.recurringPricingPhase.thenPriceSlashPeriod(resources),
                                         )
                                     },
                                     storageLimit = settings.getCustomStorageLimitGb(),

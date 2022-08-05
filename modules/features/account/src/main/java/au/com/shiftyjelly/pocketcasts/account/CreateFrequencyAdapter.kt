@@ -53,7 +53,7 @@ class CreateFrequencyAdapter(
             binding.btnFrequency.isChecked = selected
             binding.txtTitle.text = subscription.shortTitle.tryToLocalise(binding.root.resources)
 
-            val hint = subscription.recurringSubscriptionPhase.hint
+            val hint = subscription.recurringPricingPhase.hint
             if (hint == null) {
                 binding.txtDescription.text = null
                 binding.txtDescription.visibility = View.GONE
@@ -66,12 +66,12 @@ class CreateFrequencyAdapter(
                 AppTheme(activeTheme) {
                     when (subscription) {
                         is Subscription.Simple ->
-                            ProductAmountView(subscription.recurringSubscriptionPhase.formattedPrice)
+                            ProductAmountView(subscription.recurringPricingPhase.formattedPrice)
                         is Subscription.WithTrial -> {
                             val res = LocalContext.current.resources
                             ProductAmountView(
-                                primaryText = subscription.trialSubscriptionPhase.numFree(res),
-                                secondaryText = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(res),
+                                primaryText = subscription.trialPricingPhase.numFree(res),
+                                secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
                             )
                         }
                     }

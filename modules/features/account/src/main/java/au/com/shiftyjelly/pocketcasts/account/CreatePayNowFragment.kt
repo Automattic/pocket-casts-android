@@ -71,19 +71,19 @@ class CreatePayNowFragment : BaseFragment() {
                         val res = LocalContext.current.resources
                         when (subscription) {
                             is Subscription.Simple -> ProductAmountView(
-                                primaryText = subscription.recurringSubscriptionPhase.priceSlashPeriod(res),
+                                primaryText = subscription.recurringPricingPhase.priceSlashPeriod(res),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             )
                             is Subscription.WithTrial -> ProductAmountView(
-                                primaryText = subscription.trialSubscriptionPhase.numFree(res),
-                                secondaryText = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(res),
+                                primaryText = subscription.trialPricingPhase.numFree(res),
+                                secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             )
                         }
                     }
                 }
             }
-            binding?.txtRenews?.setText(subscription.recurringSubscriptionPhase.renews)
+            binding?.txtRenews?.setText(subscription.recurringPricingPhase.renews)
             binding?.txtEmail?.text = viewModel.email.value
             binding?.txtSubscription?.text = getString(LR.string.pocket_casts_plus)
             displayMainLayout(show = true, subscription = subscription)

@@ -10,8 +10,8 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 
 sealed interface Subscription {
-    val recurringSubscriptionPhase: RecurringSubscriptionPhase
-    val trialSubscriptionPhase: TrialSubscriptionPhase?
+    val recurringPricingPhase: RecurringSubscriptionPricingPhase
+    val trialPricingPhase: TrialSubscriptionPricingPhase?
     val productDetails: ProductDetails
     val shortTitle: String
         get() = productDetails.title.split(" (").first()
@@ -20,24 +20,24 @@ sealed interface Subscription {
 
     // Simple subscriptions do not have a trial phase
     class Simple(
-        override val recurringSubscriptionPhase: RecurringSubscriptionPhase,
+        override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val productDetails: ProductDetails
     ) : Subscription {
-        override val trialSubscriptionPhase = null
+        override val trialPricingPhase = null
         override fun numFreeThenPricePerPeriod(res: Resources): String? = null
     }
 
     class WithTrial(
-        override val recurringSubscriptionPhase: RecurringSubscriptionPhase,
-        override val trialSubscriptionPhase: TrialSubscriptionPhase, // override to not be nullable
+        override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
+        override val trialPricingPhase: TrialSubscriptionPricingPhase, // override to not be nullable
         override val productDetails: ProductDetails
     ) : Subscription {
 
         override fun numFreeThenPricePerPeriod(res: Resources): String =
             res.getString(
-                recurringSubscriptionPhase.numFreeThenPricePerPeriodRes,
-                trialSubscriptionPhase.periodValue(res),
-                recurringSubscriptionPhase.formattedPrice
+                recurringPricingPhase.numFreeThenPricePerPeriodRes,
+                trialPricingPhase.periodValue(res),
+                recurringPricingPhase.formattedPrice
             )
     }
 
@@ -48,30 +48,30 @@ sealed interface Subscription {
             val trialPhase = productDetails.trialSubscriptionPricingPhase?.fromPricingPhase()
 
             return when {
-                recurringPhase !is RecurringSubscriptionPhase -> {
+                recurringPhase !is RecurringSubscriptionPricingPhase -> {
                     // This should never happen. Every subscription is expected to have a recurring phase.
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to convert product details to a subscription")
                     null
                 }
-                trialPhase is TrialSubscriptionPhase -> WithTrial(
-                    recurringSubscriptionPhase = recurringPhase,
-                    trialSubscriptionPhase = trialPhase,
+                trialPhase is TrialSubscriptionPricingPhase -> WithTrial(
+                    recurringPricingPhase = recurringPhase,
+                    trialPricingPhase = trialPhase,
                     productDetails = productDetails
                 )
                 else -> Simple(
-                    recurringSubscriptionPhase = recurringPhase,
+                    recurringPricingPhase = recurringPhase,
                     productDetails = productDetails
                 )
             }
         }
 
-        private fun PricingPhase.fromPricingPhase(): SubscriptionPhase? =
+        private fun PricingPhase.fromPricingPhase(): SubscriptionPricingPhase? =
             try {
                 val period = Period.parse(this.billingPeriod)
                 when {
-                    period.years > 0 -> SubscriptionPhase.Years(this, period)
-                    period.months > 0 -> SubscriptionPhase.Months(this, period)
-                    period.days > 0 -> SubscriptionPhase.Days(period)
+                    period.years > 0 -> SubscriptionPricingPhase.Years(this, period)
+                    period.months > 0 -> SubscriptionPricingPhase.Months(this, period)
+                    period.days > 0 -> SubscriptionPricingPhase.Days(period)
                     else -> null
                 }
             } catch (_: DateTimeParseException) {

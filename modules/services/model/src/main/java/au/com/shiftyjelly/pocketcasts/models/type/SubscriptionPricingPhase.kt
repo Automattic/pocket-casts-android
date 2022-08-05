@@ -8,12 +8,12 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYea
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
 
-interface TrialSubscriptionPhase : SubscriptionPhase {
+interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
     fun numFree(res: Resources): String =
         res.getString(R.string.profile_amount_free, periodValue(res))
 }
 
-interface RecurringSubscriptionPhase : SubscriptionPhase {
+interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
     val pricingPhase: ProductDetails.PricingPhase
     val formattedPrice: String
         get() = pricingPhase.formattedPrice
@@ -25,14 +25,14 @@ interface RecurringSubscriptionPhase : SubscriptionPhase {
     fun thenPriceSlashPeriod(res: Resources): String
 }
 
-sealed interface SubscriptionPhase {
+sealed interface SubscriptionPricingPhase {
     val periodRes: Int
     fun periodValue(res: Resources): String
 
     class Years(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period
-    ) : RecurringSubscriptionPhase {
+    ) : RecurringSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_year
         override val numFreeThenPricePerPeriodRes = R.string.plus_trial_then_slash_year
@@ -55,7 +55,7 @@ sealed interface SubscriptionPhase {
     class Months(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period
-    ) : RecurringSubscriptionPhase {
+    ) : RecurringSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_month
         override val numFreeThenPricePerPeriodRes = R.string.plus_trial_then_slash_month
@@ -75,7 +75,7 @@ sealed interface SubscriptionPhase {
             res.getString(R.string.plus_then_slash_month, pricingPhase.formattedPrice)
     }
 
-    class Days(private val period: Period) : TrialSubscriptionPhase {
+    class Days(private val period: Period) : TrialSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_day
 
