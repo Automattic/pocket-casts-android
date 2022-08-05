@@ -271,6 +271,7 @@
     <string name="player_sleep_time_fired">Sleep timer stopped at the end of your episode.\nNight night!</string>
     <string name="player_skipped_last">Skipped the last %d seconds</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
+    <string name="player_open_full_size_player">Activate to open full size player</string>
 
     <!-- Podcasts -->
 

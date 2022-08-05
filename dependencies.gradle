@@ -170,7 +170,7 @@ project.ext {
             hiltCompiler: "androidx.hilt:hilt-compiler:1.0.0",
             hiltWorkManager: "androidx.hilt:hilt-work:1.0.0",
             // Lottie
-            lottie: "com.airbnb.android:lottie:4.2.2",
+            lottie: "com.airbnb.android:lottie:5.2.0",
             // JUnit
             junit: "junit:junit:4.13.2",
             // Mockito
