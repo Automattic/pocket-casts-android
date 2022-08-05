@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">Pocket Casts</string>
     <string name="pocket_casts" translatable="false">@string/app_name</string>
     <string name="pocket_casts_plus" translatable="false">Pocket Casts Plus</string>
+    <string name="pocket_casts_plus_short" translatable="false">Plus</string>
 
     <string name="empty" translatable="false" />
 
@@ -600,7 +601,6 @@
     <!-- Profile -->
 
     <string name="profile">Profile</string>
-    <string name="profile_1_year_free">1 Year Free</string>
     <string name="profile_access_ended">Access ended: %s</string>
     <string name="profile_access_ends">Access ends: %s</string>
     <string name="profile_account_created">Account Created</string>
@@ -751,6 +751,7 @@
     <string name="profile_payment_try_again">Try Again</string>
     <string name="profile_per">per</string>
     <string name="profile_per_month">Per month</string>
+    <string name="profile_per_year">Per year</string>
     <string name="profile_plus">plus</string>
     <string name="profile_plus_expired">Plus expired</string>
     <string name="profile_plus_expires">Expires %s</string>
@@ -877,6 +878,7 @@
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_lifetime_member">Lifetime Member</string>
+    <string name="plus_trial_duration_free">%s FREE</string>
     <string name="plus_per_month">%s per month</string>
     <string name="plus_per_year">%s per year</string>
     <string name="plus_slash_month">%s / month</string>
