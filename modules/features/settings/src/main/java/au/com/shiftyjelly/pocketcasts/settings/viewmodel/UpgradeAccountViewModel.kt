@@ -24,25 +24,23 @@ class UpgradeAccountViewModel
         if (productDetailsState is ProductDetailsState.Loaded) {
             val product = productDetailsState.productDetails
                 .find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
+
             val subscription = product?.let { Subscription.fromProductDetails(it) }
-            val trialPhase = subscription?.trialSubscriptionPhase
-            val trialString = subscription?.numFreeThenPricePerPeriod(context.resources)
-            val productState = if (trialPhase != null && trialString != null) {
-                ProductState.ProductWithTrial(
+            val productState = when (subscription) {
+                null -> null
+                is Subscription.WithTrial -> ProductState.ProductWithTrial(
                     featureLabel = context.resources.getString(
                         LR.string.profile_feature_try_trial,
-                        trialPhase.periodValue(context.resources)
+                        subscription.trialSubscriptionPhase.periodValue(context.resources)
                     ),
-                    price = trialString
+                    price = subscription.numFreeThenPricePerPeriod(context.resources)
                 )
-            } else {
-                subscription?.recurringSubscriptionPhase?.priceSlashPeriod(context.resources)?.let { price ->
-                    ProductState.ProductWithoutTrial(
-                        featureLabel = context.resources.getString(LR.string.profile_feature_requires),
-                        price = price,
-                    )
-                }
+                else -> ProductState.ProductWithoutTrial(
+                    featureLabel = context.resources.getString(LR.string.profile_feature_requires),
+                    price = subscription.recurringSubscriptionPhase.priceSlashPeriod(context.resources),
+                )
             }
+
             Optional.of(productState)
         } else {
             Optional.empty()
