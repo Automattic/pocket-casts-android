@@ -63,12 +63,12 @@ sealed class Subscription private constructor(
             }
         }
 
-        private fun PricingPhase.fromPricingPhase(): SubscriptionPhaseImpl? =
+        private fun PricingPhase.fromPricingPhase(): SubscriptionPhase? =
             period()?.let { period ->
                 when {
-                    period.years > 0 -> SubscriptionPhaseImpl.Years(this, period)
-                    period.months > 0 -> SubscriptionPhaseImpl.Months(this, period)
-                    period.days > 0 -> SubscriptionPhaseImpl.Days(this, period)
+                    period.years > 0 -> SubscriptionPhase.Years(this, period)
+                    period.months > 0 -> SubscriptionPhase.Months(this, period)
+                    period.days > 0 -> SubscriptionPhase.Days(period)
                     else -> null
                 }
             }
