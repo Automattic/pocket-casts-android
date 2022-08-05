@@ -16,10 +16,7 @@ sealed interface Subscription {
     val shortTitle: String
         get() = productDetails.title.split(" (").first()
 
-    fun numFreeThenPricePerPeriod(res: Resources): String? =
-        trialSubscriptionPhase?.let { trialPhase ->
-            numFreeThenPricePerPeriod(res, trialPhase, recurringSubscriptionPhase)
-        }
+    fun numFreeThenPricePerPeriod(res: Resources): String?
 
     // Simple subscriptions do not have a trial phase
     class Simple(
@@ -27,6 +24,7 @@ sealed interface Subscription {
         override val productDetails: ProductDetails
     ) : Subscription {
         override val trialSubscriptionPhase = null
+        override fun numFreeThenPricePerPeriod(res: Resources): String? = null
     }
 
     class WithTrial(
@@ -36,7 +34,11 @@ sealed interface Subscription {
     ) : Subscription {
 
         override fun numFreeThenPricePerPeriod(res: Resources): String =
-            numFreeThenPricePerPeriod(res, trialSubscriptionPhase, recurringSubscriptionPhase)
+            res.getString(
+                recurringSubscriptionPhase.numFreeThenPricePerPeriodRes,
+                trialSubscriptionPhase.periodValue(res),
+                recurringSubscriptionPhase.formattedPrice
+            )
     }
 
     companion object {
@@ -47,6 +49,7 @@ sealed interface Subscription {
 
             return when {
                 recurringPhase !is RecurringSubscriptionPhase -> {
+                    // This should never happen. Every subscription is expected to have a recurring phase.
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to convert product details to a subscription")
                     null
                 }
@@ -63,35 +66,17 @@ sealed interface Subscription {
         }
 
         private fun PricingPhase.fromPricingPhase(): SubscriptionPhase? =
-            period()?.let { period ->
+            try {
+                val period = Period.parse(this.billingPeriod)
                 when {
                     period.years > 0 -> SubscriptionPhase.Years(this, period)
                     period.months > 0 -> SubscriptionPhase.Months(this, period)
                     period.days > 0 -> SubscriptionPhase.Days(period)
                     else -> null
                 }
-            }
-
-        private fun PricingPhase.period(): Period? =
-            try {
-                Period.parse(this.billingPeriod)
             } catch (_: DateTimeParseException) {
-                LogBuffer.e(
-                    LogBuffer.TAG_SUBSCRIPTIONS,
-                    "Unable to parse billingPeriod: $billingPeriod"
-                )
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Unable to parse billingPeriod: $billingPeriod")
                 null
             }
-
-        private fun numFreeThenPricePerPeriod(
-            res: Resources,
-            trialSubscriptionPhase: TrialSubscriptionPhase,
-            recurringSubscriptionPhase: RecurringSubscriptionPhase
-        ): String =
-            res.getString(
-                recurringSubscriptionPhase.numFreeThenPricePerPeriodRes,
-                trialSubscriptionPhase.periodValue(res),
-                recurringSubscriptionPhase.formattedPrice
-            )
     }
 }

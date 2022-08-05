@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
-import au.com.shiftyjelly.pocketcasts.utils.extensions.setTextSafe
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -63,22 +62,20 @@ class CreatePayNowFragment : BaseFragment() {
 
         binding?.profileCircleView?.setup(1.0f, true)
 
-        val subscription = viewModel.subscription.value
-        binding?.txtCharge?.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                if (subscription != null) {
+        viewModel.subscription.value?.let { subscription ->
+            binding?.txtCharge?.apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
                     AppTheme(theme.activeTheme) {
+
                         val res = LocalContext.current.resources
-                        val trialPhase = subscription.trialSubscriptionPhase
-                        if (trialPhase == null) {
-                            ProductAmountView(
+                        when (subscription) {
+                            is Subscription.Simple -> ProductAmountView(
                                 primaryText = subscription.recurringSubscriptionPhase.priceSlashPeriod(res),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             )
-                        } else {
-                            ProductAmountView(
-                                primaryText = trialPhase.numFree(res),
+                            is Subscription.WithTrial -> ProductAmountView(
+                                primaryText = subscription.trialSubscriptionPhase.numFree(res),
                                 secondaryText = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(res),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             )
@@ -86,65 +83,71 @@ class CreatePayNowFragment : BaseFragment() {
                     }
                 }
             }
-        }
-        binding?.txtRenews?.setTextSafe(subscription?.recurringSubscriptionPhase?.renews)
-        binding?.txtEmail?.text = viewModel.email.value
-        binding?.txtSubscription?.text = getString(LR.string.pocket_casts_plus)
-        displayMainLayout(show = true, subscription = subscription)
+            binding?.txtRenews?.setText(subscription.recurringSubscriptionPhase.renews)
+            binding?.txtEmail?.text = viewModel.email.value
+            binding?.txtSubscription?.text = getString(LR.string.pocket_casts_plus)
+            displayMainLayout(show = true, subscription = subscription)
 
-        viewModel.createAccountState.observe(
-            viewLifecycleOwner,
-            Observer {
-                val binding = binding ?: return@Observer
-                val progress = binding.progress
-                val txtError = binding.txtError
-                when (it) {
-                    is CreateAccountState.AccountCreated -> {
-                        progress.isVisible = false
-                        txtError.text = ""
-                    }
-                    is CreateAccountState.SubscriptionCreating -> {
-                        progress.isVisible = true
-                        txtError.text = ""
-                    }
-                    is CreateAccountState.SubscriptionCreated -> {
-                        progress.isVisible = false
-                        txtError.text = ""
-                        if (view.findNavController().currentDestination?.id == R.id.createPayNowFragment) {
-                            view.findNavController().navigate(R.id.action_createPayNowFragment_to_createDoneFragment)
+            viewModel.createAccountState.observe(
+                viewLifecycleOwner,
+                Observer {
+                    val binding = binding ?: return@Observer
+                    val progress = binding.progress
+                    val txtError = binding.txtError
+                    when (it) {
+                        is CreateAccountState.AccountCreated -> {
+                            progress.isVisible = false
+                            txtError.text = ""
                         }
-                    }
-                    is CreateAccountState.Failure -> {
-                        progress.isVisible = false
-                        // val cancelled = it.errors.contains(CreateAccountError.CANCELLED_CREATE_SUB)
-                        val serverFail = it.errors.contains(CreateAccountError.CANNOT_CREATE_SUB)
-                        if (serverFail) {
-                            displayMainLayout(false, subscription = subscription)
-                            txtError.text = getString(LR.string.profile_create_subscription_failed)
-                            viewModel.clearError(CreateAccountError.CANNOT_CREATE_SUB)
+                        is CreateAccountState.SubscriptionCreating -> {
+                            progress.isVisible = true
+                            txtError.text = ""
                         }
+                        is CreateAccountState.SubscriptionCreated -> {
+                            progress.isVisible = false
+                            txtError.text = ""
+                            if (view.findNavController().currentDestination?.id == R.id.createPayNowFragment) {
+                                view.findNavController()
+                                    .navigate(R.id.action_createPayNowFragment_to_createDoneFragment)
+                            }
+                        }
+                        is CreateAccountState.Failure -> {
+                            progress.isVisible = false
+                            // val cancelled = it.errors.contains(CreateAccountError.CANCELLED_CREATE_SUB)
+                            val serverFail =
+                                it.errors.contains(CreateAccountError.CANNOT_CREATE_SUB)
+                            if (serverFail) {
+                                displayMainLayout(false, subscription = subscription)
+                                txtError.text =
+                                    getString(LR.string.profile_create_subscription_failed)
+                                viewModel.clearError(CreateAccountError.CANNOT_CREATE_SUB)
+                            }
+                        }
+                        else -> {}
                     }
-                    else -> {}
                 }
-            }
-        )
+            )
 
-        binding?.btnSubmit?.setOnClickListener {
-            if (viewModel.createAccountState.value == CreateAccountState.AccountCreated ||
-                viewModel.createAccountState.value == CreateAccountState.CurrentlyValid
-            ) {
+            binding?.btnSubmit?.setOnClickListener {
+                if (viewModel.createAccountState.value == CreateAccountState.AccountCreated ||
+                    viewModel.createAccountState.value == CreateAccountState.CurrentlyValid
+                ) {
 
-                binding?.txtError?.text = ""
-                displayMainLayout(true, subscription = subscription)
-                viewModel.subscription.value?.let { subscription ->
-                    viewModel.sendCreateSubscriptions()
-                    subscriptionManager.launchBillingFlow(requireActivity(), subscription.productDetails)
+                    binding?.txtError?.text = ""
+                    displayMainLayout(true, subscription = subscription)
+                    viewModel.subscription.value?.let { subscription ->
+                        viewModel.sendCreateSubscriptions()
+                        subscriptionManager.launchBillingFlow(
+                            requireActivity(),
+                            subscription.productDetails
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun displayMainLayout(show: Boolean, subscription: Subscription?) {
+    private fun displayMainLayout(show: Boolean, subscription: Subscription) {
         val binding = binding ?: return
         val failedLayout = binding.failedLayout
         val mainLayout = binding.mainLayout
@@ -153,10 +156,9 @@ class CreatePayNowFragment : BaseFragment() {
             failedLayout.visibility = View.INVISIBLE
             mainLayout.visibility = View.VISIBLE
             btnSubmit.text = getString(
-                if (subscription?.trialSubscriptionPhase == null) {
-                    LR.string.profile_confirm
-                } else {
-                    LR.string.profile_start_free_trial
+                when (subscription) {
+                    is Subscription.WithTrial -> LR.string.profile_start_free_trial
+                    is Subscription.Simple -> LR.string.profile_confirm
                 }
             )
         } else {

@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -107,11 +108,15 @@ class AccountDetailsFragment : BaseFragment() {
                                 HorizontalDivider()
 
                                 UserUpgradeView(
-                                    data = UserUpgradeViewData(
-                                        numFreeDays = subscription.trialSubscriptionPhase?.numFree(resources),
-                                        thenPriceSlashPeriod = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(resources),
-                                        pricePerPeriod = subscription.recurringSubscriptionPhase.pricePerPeriod(resources)
-                                    ),
+                                    data = when (subscription) {
+                                        is Subscription.Simple -> UserUpgradeViewData.WithoutTrial(
+                                            subscription.recurringSubscriptionPhase.pricePerPeriod(resources)
+                                        )
+                                        is Subscription.WithTrial -> UserUpgradeViewData.WithTrial(
+                                            numFree = subscription.trialSubscriptionPhase.numFree(resources),
+                                            thenPriceSlashPeriod = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(resources),
+                                        )
+                                    },
                                     storageLimit = settings.getCustomStorageLimitGb(),
                                     onLearnMoreClick = {
                                         WebViewActivity.show(

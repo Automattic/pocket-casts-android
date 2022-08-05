@@ -27,6 +27,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogoPlus
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.profile.UserUpgradeViewData.WithTrial
+import au.com.shiftyjelly.pocketcasts.profile.UserUpgradeViewData.WithoutTrial
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
@@ -55,14 +57,13 @@ fun UserUpgradeView(
         ) {
             HorizontalLogoPlus(Modifier.weight(1f, fill = false))
 
-            if (data.numFreeDays != null) {
-                ProductAmountView(
-                    primaryText = data.numFreeDays,
+            when (data) {
+                is WithTrial -> ProductAmountView(
+                    primaryText = data.numFree,
                     secondaryText = data.thenPriceSlashPeriod,
                     emphasized = false
                 )
-            } else {
-                ProductAmountView(
+                is WithoutTrial -> ProductAmountView(
                     primaryText = data.pricePerPeriod,
                     emphasized = false
                 )
@@ -98,11 +99,16 @@ fun UserUpgradeView(
     }
 }
 
-data class UserUpgradeViewData(
-    val numFreeDays: String?,
-    val thenPriceSlashPeriod: String,
-    val pricePerPeriod: String
-)
+sealed interface UserUpgradeViewData {
+    class WithTrial(
+        val numFree: String,
+        val thenPriceSlashPeriod: String,
+    ) : UserUpgradeViewData
+
+    class WithoutTrial(
+        val pricePerPeriod: String
+    ) : UserUpgradeViewData
+}
 
 @Composable
 private fun PlusFeatureRow(text: String) {
@@ -128,10 +134,9 @@ private fun UserUpgradeViewPreview_with_trial(
 ) {
     AppTheme(themeType) {
         UserUpgradeView(
-            data = UserUpgradeViewData(
-                numFreeDays = "1 month free",
+            data = WithTrial(
+                numFree = "1 month free",
                 thenPriceSlashPeriod = "then $0.99 / month",
-                pricePerPeriod = "THIS IS NOT USED"
             ),
             storageLimit = 10L,
             onLearnMoreClick = {},
@@ -147,11 +152,7 @@ private fun UserUpgradeViewPreview_without_trial(
 ) {
     AppTheme(themeType) {
         UserUpgradeView(
-            data = UserUpgradeViewData(
-                numFreeDays = null,
-                thenPriceSlashPeriod = "THIS IS ALSO NOT USED",
-                pricePerPeriod = "$0.99 per month"
-            ),
+            data = WithoutTrial(pricePerPeriod = "$0.99 per month"),
             storageLimit = 10L,
             onLearnMoreClick = {},
             onUpgradeClick = {}

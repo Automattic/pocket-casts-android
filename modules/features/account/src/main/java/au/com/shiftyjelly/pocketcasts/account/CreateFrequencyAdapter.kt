@@ -64,15 +64,16 @@ class CreateFrequencyAdapter(
 
             binding.productAmountView.setContent {
                 AppTheme(activeTheme) {
-                    val trialPhase = subscription.trialSubscriptionPhase
-                    if (trialPhase == null) {
-                        ProductAmountView(subscription.recurringSubscriptionPhase.formattedPrice)
-                    } else {
-                        val res = LocalContext.current.resources
-                        ProductAmountView(
-                            primaryText = trialPhase.numFree(res),
-                            secondaryText = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(res),
-                        )
+                    when (subscription) {
+                        is Subscription.Simple ->
+                            ProductAmountView(subscription.recurringSubscriptionPhase.formattedPrice)
+                        is Subscription.WithTrial -> {
+                            val res = LocalContext.current.resources
+                            ProductAmountView(
+                                primaryText = subscription.trialSubscriptionPhase.numFree(res),
+                                secondaryText = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(res),
+                            )
+                        }
                     }
                 }
             }
