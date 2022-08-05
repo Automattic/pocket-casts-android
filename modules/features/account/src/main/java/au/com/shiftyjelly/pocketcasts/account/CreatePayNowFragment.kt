@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
@@ -72,16 +73,14 @@ class CreatePayNowFragment : BaseFragment() {
                         val trialPhase = subscription.trialSubscriptionPhase
                         if (trialPhase == null) {
                             ProductAmountView(
-                                primaryText = subscription.recurringSubscriptionPhase.priceSlashPeriod(
-                                    res
-                                )
+                                primaryText = subscription.recurringSubscriptionPhase.priceSlashPeriod(res),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             )
                         } else {
                             ProductAmountView(
                                 primaryText = trialPhase.numFree(res),
-                                secondaryText = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(
-                                    res
-                                )
+                                secondaryText = subscription.recurringSubscriptionPhase.thenPriceSlashPeriod(res),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             )
                         }
                     }

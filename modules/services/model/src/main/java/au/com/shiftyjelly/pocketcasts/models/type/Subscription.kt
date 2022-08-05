@@ -37,7 +37,7 @@ sealed class Subscription private constructor(
 
     class WithTrial(
         recurringSubscriptionPhase: RecurringSubscriptionPhase,
-        override val trialSubscriptionPhase: TrialSubscriptionPhase,
+        override val trialSubscriptionPhase: TrialSubscriptionPhase, // override to not be nullable
         productDetails: ProductDetails
     ) : Subscription(recurringSubscriptionPhase, trialSubscriptionPhase, productDetails) {
 
