@@ -13,12 +13,11 @@ sealed interface SubscriptionPhase {
     fun periodValue(res: Resources): String
 
     class Years(
-        private val pricingPhase: ProductDetails.PricingPhase,
+        override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period
     ) : RecurringSubscriptionPhase {
 
         override val periodRes = R.string.plus_year
-        override val formattedPrice = pricingPhase.formattedPrice
         override val numFreeThenPricePerPeriodRes = R.string.plus_trial_then_slash_year
         override val renews = R.string.plus_renews_automatically_yearly
         override val hint = R.string.plus_best_value
@@ -37,12 +36,11 @@ sealed interface SubscriptionPhase {
     }
 
     class Months(
-        private val pricingPhase: ProductDetails.PricingPhase,
+        override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period
     ) : RecurringSubscriptionPhase {
 
         override val periodRes = R.string.plus_month
-        override val formattedPrice = pricingPhase.formattedPrice
         override val numFreeThenPricePerPeriodRes = R.string.plus_trial_then_slash_month
         override val renews = R.string.plus_renews_automatically_monthly
         override val hint = null
@@ -74,7 +72,9 @@ interface TrialSubscriptionPhase : SubscriptionPhase {
 }
 
 interface RecurringSubscriptionPhase : SubscriptionPhase {
+    val pricingPhase: ProductDetails.PricingPhase
     val formattedPrice: String
+        get() = pricingPhase.formattedPrice
     val numFreeThenPricePerPeriodRes: Int
     val renews: Int
     val hint: Int?

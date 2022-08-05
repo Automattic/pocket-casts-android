@@ -9,40 +9,33 @@ import com.android.billingclient.api.ProductDetails.PricingPhase
 import java.time.Period
 import java.time.format.DateTimeParseException
 
-sealed class Subscription private constructor(
-    val recurringSubscriptionPhase: RecurringSubscriptionPhase,
-    open val trialSubscriptionPhase: TrialSubscriptionPhase?,
+sealed interface Subscription {
+    val recurringSubscriptionPhase: RecurringSubscriptionPhase
+    val trialSubscriptionPhase: TrialSubscriptionPhase?
     val productDetails: ProductDetails
-) {
+    val shortTitle: String
+        get() = productDetails.title.split(" (").first()
 
-    val shortTitle = productDetails.title.split(" (").first()
-
-    open fun numFreeThenPricePerPeriod(res: Resources): String? =
-        trialSubscriptionPhase?.let { numFreeThenPricePerPeriod(res, it) }
-
-    protected fun numFreeThenPricePerPeriod(
-        res: Resources,
-        trialSubscriptionPhase: TrialSubscriptionPhase
-    ): String =
-        res.getString(
-            recurringSubscriptionPhase.numFreeThenPricePerPeriodRes,
-            trialSubscriptionPhase.periodValue(res),
-            recurringSubscriptionPhase.formattedPrice
-        )
+    fun numFreeThenPricePerPeriod(res: Resources): String? =
+        trialSubscriptionPhase?.let { trialPhase ->
+            numFreeThenPricePerPeriod(res, trialPhase, recurringSubscriptionPhase)
+        }
 
     class Simple(
-        recurringSubscriptionPhase: RecurringSubscriptionPhase,
-        productDetails: ProductDetails
-    ) : Subscription(recurringSubscriptionPhase, null, productDetails)
+        override val recurringSubscriptionPhase: RecurringSubscriptionPhase,
+        override val productDetails: ProductDetails
+    ) : Subscription {
+        override val trialSubscriptionPhase = null
+    }
 
     class WithTrial(
-        recurringSubscriptionPhase: RecurringSubscriptionPhase,
+        override val recurringSubscriptionPhase: RecurringSubscriptionPhase,
         override val trialSubscriptionPhase: TrialSubscriptionPhase, // override to not be nullable
-        productDetails: ProductDetails
-    ) : Subscription(recurringSubscriptionPhase, trialSubscriptionPhase, productDetails) {
+        override val productDetails: ProductDetails
+    ) : Subscription {
 
         override fun numFreeThenPricePerPeriod(res: Resources): String =
-            numFreeThenPricePerPeriod(res, trialSubscriptionPhase)
+            numFreeThenPricePerPeriod(res, trialSubscriptionPhase, recurringSubscriptionPhase)
     }
 
     companion object {
@@ -83,5 +76,16 @@ sealed class Subscription private constructor(
                 )
                 null
             }
+
+        private fun numFreeThenPricePerPeriod(
+            res: Resources,
+            trialSubscriptionPhase: TrialSubscriptionPhase,
+            recurringSubscriptionPhase: RecurringSubscriptionPhase
+        ): String =
+            res.getString(
+                recurringSubscriptionPhase.numFreeThenPricePerPeriodRes,
+                trialSubscriptionPhase.periodValue(res),
+                recurringSubscriptionPhase.formattedPrice
+            )
     }
 }
