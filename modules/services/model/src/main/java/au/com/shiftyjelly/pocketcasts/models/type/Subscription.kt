@@ -21,6 +21,7 @@ sealed interface Subscription {
             numFreeThenPricePerPeriod(res, trialPhase, recurringSubscriptionPhase)
         }
 
+    // Simple subscriptions do not have a trial phase
     class Simple(
         override val recurringSubscriptionPhase: RecurringSubscriptionPhase,
         override val productDetails: ProductDetails
@@ -40,10 +41,15 @@ sealed interface Subscription {
 
     companion object {
         fun fromProductDetails(productDetails: ProductDetails): Subscription? {
+
             val recurringPhase = productDetails.recurringSubscriptionPricingPhase?.fromPricingPhase()
             val trialPhase = productDetails.trialSubscriptionPricingPhase?.fromPricingPhase()
+
             return when {
-                recurringPhase !is RecurringSubscriptionPhase -> null
+                recurringPhase !is RecurringSubscriptionPhase -> {
+                    LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to convert product details to a subscription")
+                    null
+                }
                 trialPhase is TrialSubscriptionPhase -> WithTrial(
                     recurringSubscriptionPhase = recurringPhase,
                     trialSubscriptionPhase = trialPhase,

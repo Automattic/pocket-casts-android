@@ -8,6 +8,23 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYea
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
 
+interface TrialSubscriptionPhase : SubscriptionPhase {
+    fun numFree(res: Resources): String =
+        res.getString(R.string.profile_amount_free, periodValue(res))
+}
+
+interface RecurringSubscriptionPhase : SubscriptionPhase {
+    val pricingPhase: ProductDetails.PricingPhase
+    val formattedPrice: String
+        get() = pricingPhase.formattedPrice
+    val numFreeThenPricePerPeriodRes: Int
+    val renews: Int
+    val hint: Int?
+    fun pricePerPeriod(res: Resources): String
+    fun priceSlashPeriod(res: Resources): String
+    fun thenPriceSlashPeriod(res: Resources): String
+}
+
 sealed interface SubscriptionPhase {
     val periodRes: Int
     fun periodValue(res: Resources): String
@@ -64,21 +81,4 @@ sealed interface SubscriptionPhase {
 
         override fun periodValue(res: Resources): String = res.getStringPluralDays(period.days)
     }
-}
-
-interface TrialSubscriptionPhase : SubscriptionPhase {
-    fun numFree(res: Resources): String =
-        res.getString(R.string.profile_amount_free, periodValue(res))
-}
-
-interface RecurringSubscriptionPhase : SubscriptionPhase {
-    val pricingPhase: ProductDetails.PricingPhase
-    val formattedPrice: String
-        get() = pricingPhase.formattedPrice
-    val numFreeThenPricePerPeriodRes: Int
-    val renews: Int
-    val hint: Int?
-    fun pricePerPeriod(res: Resources): String
-    fun priceSlashPeriod(res: Resources): String
-    fun thenPriceSlashPeriod(res: Resources): String
 }
