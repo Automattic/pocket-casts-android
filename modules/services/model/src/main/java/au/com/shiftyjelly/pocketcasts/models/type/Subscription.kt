@@ -14,6 +14,25 @@ import java.time.Period
 import java.time.format.DateTimeParseException
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+interface SubscriptionPhase {
+    val periodRes: Int
+    fun periodValue(res: Resources): String
+}
+
+interface TrialSubscriptionPhase : SubscriptionPhase {
+    fun numFree(res: Resources): String
+}
+
+interface RecurringSubscriptionPhase : SubscriptionPhase {
+    val formattedPrice: String
+    val numFreeThenPricePerPeriodRes: Int
+    val renews: Int
+    val hint: Int?
+    fun pricePerPeriod(res: Resources): String
+    fun priceSlashPeriod(res: Resources): String
+    fun thenPriceSlashPeriod(res: Resources): String
+}
+
 data class Subscription(
     val recurringSubscriptionPhase: RecurringSubscriptionPhase,
     val trialSubscriptionPhase: TrialSubscriptionPhase?,
@@ -35,12 +54,9 @@ data class Subscription(
 
     companion object {
         fun fromProductDetails(productDetails: ProductDetails): Subscription? {
-            val recurringPhase = productDetails.recurringSubscriptionPricingPhase?.let {
-                SubscriptionPricingPhase.fromPricingPhase(it)
-            }
-            val trialPhase = productDetails.trialSubscriptionPricingPhase?.let {
-                SubscriptionPricingPhase.fromPricingPhase(it)
-            }
+            val recurringPhase =
+                productDetails.recurringSubscriptionPricingPhase?.fromPricingPhase()
+            val trialPhase = productDetails.trialSubscriptionPricingPhase?.fromPricingPhase()
 
             return if (recurringPhase is RecurringSubscriptionPhase &&
                 (trialPhase == null || trialPhase is TrialSubscriptionPhase)
@@ -55,30 +71,32 @@ data class Subscription(
                 null
             }
         }
+
+        private fun PricingPhase.fromPricingPhase(): SubscriptionPhaseImpl? =
+            period()?.let { period ->
+                when {
+                    period.years > 0 -> SubscriptionPhaseImpl.Years(this, period)
+                    period.months > 0 -> SubscriptionPhaseImpl.Months(this, period)
+                    period.days > 0 -> SubscriptionPhaseImpl.Days(this, period)
+                    else -> null
+                }
+            }
+
+        private fun PricingPhase.period(): Period? =
+            try {
+                Period.parse(this.billingPeriod)
+            } catch (_: DateTimeParseException) {
+                LogBuffer.e(
+                    LogBuffer.TAG_SUBSCRIPTIONS,
+                    "Unable to parse billingPeriod: $billingPeriod"
+                )
+                null
+            }
     }
 }
 
-interface SubscriptionPhase {
-    val periodRes: Int
-    fun periodValue(res: Resources): String
-}
-
-interface TrialSubscriptionPhase : SubscriptionPhase {
-    fun numFree(res: Resources): String
-}
-
-interface RecurringSubscriptionPhase : SubscriptionPhase {
-    val formattedPrice: String
-    val numFreeThenPricePerPeriodRes: Int
-    val renews: Int
-    val hint: Int?
-    fun pricePerPeriod(res: Resources): String
-    fun priceSlashPeriod(res: Resources): String
-    fun thenPriceSlashPeriod(res: Resources): String
-}
-
-sealed class SubscriptionPricingPhase(
-    protected val pricingPhase: ProductDetails.PricingPhase,
+sealed class SubscriptionPhaseImpl(
+    protected val pricingPhase: PricingPhase,
     protected val period: Period,
     @StringRes override val periodRes: Int,
 ) : SubscriptionPhase {
@@ -86,7 +104,7 @@ sealed class SubscriptionPricingPhase(
     abstract override fun periodValue(res: Resources): String
 
     class Years(pricingPhase: PricingPhase, period: Period) :
-        SubscriptionPricingPhase(
+        SubscriptionPhaseImpl(
             pricingPhase = pricingPhase,
             period = period,
             periodRes = LR.string.plus_year,
@@ -112,7 +130,7 @@ sealed class SubscriptionPricingPhase(
     }
 
     class Months(pricingPhase: PricingPhase, period: Period) :
-        SubscriptionPricingPhase(
+        SubscriptionPhaseImpl(
             pricingPhase = pricingPhase,
             period = period,
             periodRes = LR.string.plus_month,
@@ -138,7 +156,7 @@ sealed class SubscriptionPricingPhase(
     }
 
     class Days(pricingPhase: PricingPhase, period: Period) :
-        SubscriptionPricingPhase(
+        SubscriptionPhaseImpl(
             pricingPhase = pricingPhase,
             period = period,
             periodRes = LR.string.plus_day,
@@ -149,26 +167,5 @@ sealed class SubscriptionPricingPhase(
 
         override fun numFree(res: Resources): String =
             res.getString(LR.string.profile_amount_free, periodValue(res))
-    }
-
-    companion object {
-
-        fun fromPricingPhase(pricingPhase: PricingPhase): SubscriptionPricingPhase? =
-            pricingPhase.period()?.let { period ->
-                when {
-                    period.years > 0 -> Years(pricingPhase, period)
-                    period.months > 0 -> Months(pricingPhase, period)
-                    period.days > 0 -> Days(pricingPhase, period)
-                    else -> null
-                }
-            }
-
-        private fun PricingPhase.period(): Period? =
-            try {
-                Period.parse(this.billingPeriod)
-            } catch (_: DateTimeParseException) {
-                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Unable to parse billingPeriod: $billingPeriod")
-                null
-            }
     }
 }
