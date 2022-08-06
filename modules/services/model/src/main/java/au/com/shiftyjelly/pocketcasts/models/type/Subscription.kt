@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.models.type
 
 import android.content.res.Resources
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringSubscriptionPricingPhase
-import au.com.shiftyjelly.pocketcasts.utils.extensions.trialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.PricingPhase
@@ -69,6 +67,39 @@ sealed interface Subscription {
                     productDetails = productDetails
                 )
             }
+        }
+
+        private val ProductDetails.recurringSubscriptionPricingPhase: PricingPhase?
+            get() = findOnlyMatchingPricingPhase(
+                predicate = { it.recurrenceMode == ProductDetails.RecurrenceMode.INFINITE_RECURRING },
+                errorMessageIfNotSingleMatch = { "ProductDetails did not have a single infinite recurring pricing phase, instead it had $it" }
+            )
+
+        private val ProductDetails.trialSubscriptionPricingPhase: PricingPhase?
+            get() = findOnlyMatchingPricingPhase(
+                predicate = { it.recurrenceMode == ProductDetails.RecurrenceMode.FINITE_RECURRING },
+                errorMessageIfNotSingleMatch = { "ProductDetails did not have a single finite recurring pricing phase, instead it had $it" }
+            )
+
+        private fun ProductDetails.findOnlyMatchingPricingPhase(
+            predicate: (PricingPhase) -> Boolean,
+            errorMessageIfNotSingleMatch: (Int) -> String
+        ): PricingPhase? {
+            val subscriptionOfferDetailsSafe = subscriptionOfferDetails
+            if (subscriptionOfferDetailsSafe == null) {
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "ProductDetails had null subscriptionOfferDetails")
+                return null
+            }
+
+            // TODO just taking the first one doesn't seem like the way to go here
+            val pricingPhases = subscriptionOfferDetailsSafe.first().pricingPhases.pricingPhaseList
+            val matchingPhases = pricingPhases.filter(predicate)
+
+            if (matchingPhases.size != 1) {
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, errorMessageIfNotSingleMatch(matchingPhases.size))
+                return null
+            }
+            return matchingPhases.first()
         }
 
         private fun PricingPhase.fromPricingPhase(): SubscriptionPricingPhase? =
