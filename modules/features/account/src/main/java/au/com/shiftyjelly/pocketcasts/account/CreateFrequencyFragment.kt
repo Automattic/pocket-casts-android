@@ -14,8 +14,6 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPriceCurrencyCode
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPriceDouble
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,9 +76,12 @@ class CreateFrequencyFragment : BaseFragment() {
         binding.btnNext.setOnClickListener {
             val subscription = viewModel.subscription.value
             if (subscription != null) {
-                val product = subscription.productDetails
-                AnalyticsHelper.plusPlanChosen(sku = product.productId, title = product.title, price = product.recurringPriceDouble, currency = product.recurringPriceCurrencyCode)
-
+                AnalyticsHelper.plusPlanChosen(
+                    sku = subscription.productDetails.productId,
+                    title = subscription.productDetails.title,
+                    price = subscription.recurringPricingPhase.pricingPhase.priceAmountMicros * 1_000_000.0,
+                    currency = subscription.recurringPricingPhase.pricingPhase.priceCurrencyCode
+                )
                 it.findNavController().navigate(R.id.action_createFrequencyFragment_to_createTOSFragment)
             }
         }
