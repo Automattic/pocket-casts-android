@@ -91,8 +91,14 @@ fun UserUpgradeView(
 
         Spacer(Modifier.height(8.dp))
 
+        val buttonText = stringResource(
+            when (data) {
+                is WithTrial -> LR.string.profile_start_free_trial
+                is WithoutTrial -> LR.string.profile_upgrade_to_plus
+            }
+        )
         RowButton(
-            text = stringResource(LR.string.profile_upgrade_to_plus),
+            text = buttonText,
             onClick = onUpgradeClick,
             includePadding = false
         )
