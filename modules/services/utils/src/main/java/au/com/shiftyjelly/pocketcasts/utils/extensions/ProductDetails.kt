@@ -5,9 +5,6 @@ import com.android.billingclient.api.ProductDetails
 import java.time.Period
 import java.time.format.DateTimeParseException
 
-val ProductDetails.recurringPrice: String?
-    get() = recurringSubscriptionPricingPhase?.formattedPrice
-
 val ProductDetails.recurringSubscriptionPricingPhase: ProductDetails.PricingPhase?
     get() = findOnlyMatchingPricingPhase(
         predicate = { it.recurrenceMode == ProductDetails.RecurrenceMode.INFINITE_RECURRING },
