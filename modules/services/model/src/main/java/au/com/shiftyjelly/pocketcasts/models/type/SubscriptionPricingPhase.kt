@@ -8,16 +8,15 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYea
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
 
-interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
+sealed interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
     fun numFree(res: Resources): String =
         res.getString(R.string.profile_amount_free, periodValue(res))
 }
 
-interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
+sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
     val pricingPhase: ProductDetails.PricingPhase
     val formattedPrice: String
         get() = pricingPhase.formattedPrice
-    val numFreeThenPricePerPeriodRes: Int
     val renews: Int
     val hint: Int?
     fun pricePerPeriod(res: Resources): String
@@ -35,7 +34,6 @@ sealed interface SubscriptionPricingPhase {
     ) : RecurringSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_year
-        override val numFreeThenPricePerPeriodRes = R.string.plus_trial_then_slash_year
         override val renews = R.string.plus_renews_automatically_yearly
         override val hint = R.string.plus_best_value
 
@@ -58,7 +56,6 @@ sealed interface SubscriptionPricingPhase {
     ) : RecurringSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_month
-        override val numFreeThenPricePerPeriodRes = R.string.plus_trial_then_slash_month
         override val renews = R.string.plus_renews_automatically_monthly
         override val hint = null
 

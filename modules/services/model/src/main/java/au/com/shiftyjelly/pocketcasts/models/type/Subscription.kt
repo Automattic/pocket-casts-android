@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import android.content.res.Resources
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.utils.extensions.trialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -33,12 +34,17 @@ sealed interface Subscription {
         override val productDetails: ProductDetails
     ) : Subscription {
 
-        override fun numFreeThenPricePerPeriod(res: Resources): String =
-            res.getString(
-                recurringPricingPhase.numFreeThenPricePerPeriodRes,
+        override fun numFreeThenPricePerPeriod(res: Resources): String {
+            val stringRes = when (recurringPricingPhase) {
+                is SubscriptionPricingPhase.Years -> R.string.plus_trial_then_slash_year
+                is SubscriptionPricingPhase.Months -> R.string.plus_trial_then_slash_month
+            }
+            return res.getString(
+                stringRes,
                 trialPricingPhase.periodValue(res),
                 recurringPricingPhase.formattedPrice
             )
+        }
     }
 
     companion object {
