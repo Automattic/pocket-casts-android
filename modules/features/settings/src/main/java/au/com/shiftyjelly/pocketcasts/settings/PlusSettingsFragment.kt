@@ -141,6 +141,14 @@ private class PlusAdapter(val onAccountUpgradeClick: () -> Unit) : ListAdapter<P
 
             upgrade.subscriptions?.let { subscriptions ->
                 val trials = subscriptions.filterIsInstance<Subscription.WithTrial>()
+                btnUpgrade.text = root.resources.getString(
+                    if (trials.isEmpty()) {
+                        LR.string.profile_upgrade_to_plus
+                    } else {
+                        LR.string.profile_start_free_trial
+                    }
+                )
+
                 lblSubtitle.text = when (trials.size) {
                     0 -> {
                         val monthlySub = subscriptions
