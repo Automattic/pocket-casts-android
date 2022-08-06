@@ -5,9 +5,6 @@ import com.android.billingclient.api.ProductDetails
 import java.time.Period
 import java.time.format.DateTimeParseException
 
-// val ProductDetails.shortTitle: String
-//    get() = title.split(" (").first()
-
 val ProductDetails.recurringPrice: String?
     get() = recurringSubscriptionPricingPhase?.formattedPrice
 
@@ -16,12 +13,6 @@ val ProductDetails.recurringPriceDouble: Double?
 
 val ProductDetails.recurringPriceCurrencyCode: String?
     get() = recurringSubscriptionPricingPhase?.priceCurrencyCode
-
-val ProductDetails.recurringBillingPeriod: Period?
-    get() = getPeriod(recurringSubscriptionPricingPhase?.billingPeriod)
-
-val ProductDetails.trialBillingPeriod: Period?
-    get() = trialSubscriptionPricingPhase?.billingPeriod?.let { getPeriod(it) }
 
 val ProductDetails.recurringSubscriptionPricingPhase: ProductDetails.PricingPhase?
     get() = findOnlyMatchingPricingPhase(
