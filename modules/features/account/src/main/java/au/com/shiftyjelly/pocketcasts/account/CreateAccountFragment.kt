@@ -18,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
@@ -75,14 +74,7 @@ class CreateAccountFragment : BaseFragment() {
             when (state) {
                 is CreateAccountState.ProductsLoaded -> {
 
-                    val trialsIfPresent = state.list
-                        .filterIsInstance<Subscription.WithTrial>()
-                        .ifEmpty { state.list }
-
-                    val subscription = trialsIfPresent.find {
-                        it.recurringPricingPhase is SubscriptionPricingPhase.Months
-                    } ?: trialsIfPresent.firstOrNull() // if no monthly subscriptions, just display the first
-
+                    val subscription = CreateAccountViewModel.defaultSubscription(state.list)
                     val plusLabel = when (subscription) {
                         is Subscription.Simple, null -> binding.root.resources.getString(LR.string.pocket_casts_plus)
                         is Subscription.WithTrial -> binding.root.resources.getString(LR.string.pocket_casts_plus_short)
