@@ -1,5 +1,11 @@
 # Release notes
 
+### 7.20.3
+
+*   Bug Fixes:
+    *   Fixes folder mapping at the time of folders full sync.
+        ([#214](https://github.com/Automattic/pocket-casts-android/pull/214)).
+
 ### 7.20.2
 
 *   Bug Fixes:    
