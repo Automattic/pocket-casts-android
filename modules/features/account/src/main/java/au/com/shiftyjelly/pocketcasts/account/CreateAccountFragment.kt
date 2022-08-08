@@ -11,10 +11,9 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateAccountB
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.extensions.SubscriptionBillingUnit
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPrice
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -68,8 +67,8 @@ class CreateAccountFragment : BaseFragment() {
             when (state) {
                 is CreateAccountState.ProductsLoaded -> {
                     binding.txtSubCharge.text = state.list.find {
-                        it.subscriptionBillingUnit == null || it.subscriptionBillingUnit == SubscriptionBillingUnit.MONTHS
-                    }?.product?.recurringPrice
+                        it.recurringPricingPhase is SubscriptionPricingPhase.Months
+                    }?.recurringPricingPhase?.formattedPrice
                 }
                 is CreateAccountState.CurrentlyValid -> {
                 }

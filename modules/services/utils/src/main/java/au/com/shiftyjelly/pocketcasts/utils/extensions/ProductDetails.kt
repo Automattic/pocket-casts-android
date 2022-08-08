@@ -5,31 +5,16 @@ import com.android.billingclient.api.ProductDetails
 import java.time.Period
 import java.time.format.DateTimeParseException
 
-val ProductDetails.shortTitle: String
-    get() = title.split(" (").first()
-
 val ProductDetails.recurringPrice: String?
     get() = recurringSubscriptionPricingPhase?.formattedPrice
 
-val ProductDetails.recurringPriceDouble: Double?
-    get() = recurringSubscriptionPricingPhase?.priceAmountMicros?.let { it * 1_000_000.0 }
-
-val ProductDetails.recurringPriceCurrencyCode: String?
-    get() = recurringSubscriptionPricingPhase?.priceCurrencyCode
-
-val ProductDetails.recurringBillingPeriod: Period?
-    get() = getPeriod(recurringSubscriptionPricingPhase?.billingPeriod)
-
-val ProductDetails.trialBillingPeriod: Period?
-    get() = trialSubscriptionPricingPhase?.billingPeriod?.let { getPeriod(it) }
-
-private val ProductDetails.recurringSubscriptionPricingPhase: ProductDetails.PricingPhase?
+val ProductDetails.recurringSubscriptionPricingPhase: ProductDetails.PricingPhase?
     get() = findOnlyMatchingPricingPhase(
         predicate = { it.recurrenceMode == ProductDetails.RecurrenceMode.INFINITE_RECURRING },
         errorMessageIfNotSingleMatch = { "ProductDetails did not have a single infinite recurring pricing phase, instead it had $it" }
     )
 
-private val ProductDetails.trialSubscriptionPricingPhase: ProductDetails.PricingPhase?
+val ProductDetails.trialSubscriptionPricingPhase: ProductDetails.PricingPhase?
     get() = findOnlyMatchingPricingPhase(
         predicate = { it.recurrenceMode == ProductDetails.RecurrenceMode.FINITE_RECURRING },
         errorMessageIfNotSingleMatch = { "ProductDetails did not have a single finite recurring pricing phase, instead it had $it" }

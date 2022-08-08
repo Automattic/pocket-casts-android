@@ -5,14 +5,10 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.settings.util.BillingPeriodHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringBillingPeriod
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPrice
-import au.com.shiftyjelly.pocketcasts.utils.extensions.trialBillingPeriod
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -22,41 +18,30 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class UpgradeAccountViewModel
 @Inject constructor(
     subscriptionManager: SubscriptionManager,
-    billingPeriodHelper: BillingPeriodHelper,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
-    private val productDetails = subscriptionManager.observeProductDetails().map {
-        if (it is ProductDetailsState.Loaded) {
-            val product =
-                it.productDetails.find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
-            val price = product?.recurringPrice
-            val isYearlyPlan = product?.recurringBillingPeriod?.years.isPositive()
-            if (price != null) {
-                Optional.of(
-                    product.trialBillingPeriod?.let { trialBillingPeriod ->
-                        val billingDetails = billingPeriodHelper.mapToBillingDetails(trialBillingPeriod)
-                        ProductState.ProductWithTrial(
-                            featureLabel = context.resources.getString(
-                                LR.string.profile_feature_try_trial,
-                                billingDetails.periodValue
-                            ),
-                            price = context.resources.getString(
-                                if (isYearlyPlan) LR.string.plus_per_year_with_trial else LR.string.plus_per_month_with_trial,
-                                billingDetails.periodValue,
-                                price
-                            )
-                        )
-                    } ?: ProductState.ProductWithoutTrial(
-                        featureLabel = context.resources.getString(LR.string.profile_feature_requires),
-                        price = context.resources.getString(
-                            if (isYearlyPlan) LR.string.plus_per_year else LR.string.plus_per_month,
-                            price
-                        )
-                    )
+    private val productDetails = subscriptionManager.observeProductDetails().map { productDetailsState ->
+        if (productDetailsState is ProductDetailsState.Loaded) {
+            val product = productDetailsState.productDetails
+                .find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
+
+            val subscription = product?.let { Subscription.fromProductDetails(it) }
+            val productState = when (subscription) {
+                null -> null
+                is Subscription.WithTrial -> ProductState.ProductWithTrial(
+                    featureLabel = context.resources.getString(
+                        LR.string.profile_feature_try_trial,
+                        subscription.trialPricingPhase.periodValue(context.resources)
+                    ),
+                    price = subscription.numFreeThenPricePerPeriod(context.resources)
                 )
-            } else {
-                Optional.empty()
+                else -> ProductState.ProductWithoutTrial(
+                    featureLabel = context.resources.getString(LR.string.profile_feature_requires),
+                    price = subscription.recurringPricingPhase.priceSlashPeriod(context.resources),
+                )
             }
+
+            Optional.of(productState)
         } else {
             Optional.empty()
         }
