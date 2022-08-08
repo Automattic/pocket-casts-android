@@ -22,7 +22,6 @@ interface SubscriptionManager {
     fun signOut()
     fun observeSubscriptionChangeEvents(): Flowable<SubscriptionChangedEvent>
     fun observeProductDetails(): Flowable<ProductDetailsState>
-    fun observePrices(): Flowable<PricePair>
     fun observePurchaseEvents(): Flowable<PurchaseEvent>
     fun observeSubscriptionStatus(): Flowable<Optional<SubscriptionStatus>>
     fun getSubscriptionStatus(allowCache: Boolean = true): Single<SubscriptionStatus>

@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.extensions.recurringPrice
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -81,19 +80,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
 
     override fun observeProductDetails(): Flowable<ProductDetailsState> {
         return productDetails.toFlowable(BackpressureStrategy.LATEST)
-    }
-
-    override fun observePrices(): Flowable<PricePair> {
-        return observeProductDetails().map { state ->
-            if (state is ProductDetailsState.Loaded) {
-                PricePair(
-                    state.productDetails.find { it.productId == MONTHLY_PRODUCT_ID }?.recurringPrice,
-                    state.productDetails.find { it.productId == YEARLY_PRODUCT_ID }?.recurringPrice,
-                )
-            } else {
-                PricePair(null, null)
-            }
-        }
     }
 
     override fun observePurchaseEvents(): Flowable<PurchaseEvent> {
