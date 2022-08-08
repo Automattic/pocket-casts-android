@@ -333,7 +333,6 @@
                 app:lottie_loop="true"
                 app:lottie_progress="0.5"
                 app:lottie_rawRes="@raw/sleep_button"
-                app:lottie_scale="2"
                 app:play="@{viewModel.isSleepRunning}" />
 
             <ImageButton

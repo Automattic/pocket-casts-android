@@ -15,7 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="68dp"
         android:focusable="true"
-        android:clickable="true">
+        android:clickable="true"
+        android:contentDescription="@string/player_open_full_size_player">
 
         <View
             android:id="@+id/miniPlayerTint"
