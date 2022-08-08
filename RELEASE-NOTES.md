@@ -5,8 +5,11 @@
 *   Bug Fixes:    
     *   Fix the mini player's play icon showing the wrong icon.
         ([#208](https://github.com/Automattic/pocket-casts-android/pull/208)).
+    *   Fix embedded artwork not showing on player screen.
+        ([#16](https://github.com/Automattic/pocket-casts-android/issues/16)).
     *   Fixes folder mapping at the time of folders full sync.
         ([#214](https://github.com/Automattic/pocket-casts-android/pull/214)).
+
 ### 7.20.2
 
 *   Bug Fixes:    
