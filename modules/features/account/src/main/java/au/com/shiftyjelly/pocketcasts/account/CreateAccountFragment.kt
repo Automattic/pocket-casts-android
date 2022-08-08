@@ -5,19 +5,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import au.com.shiftyjelly.pocketcasts.account.components.ProductAmountView
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateAccountBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -66,9 +73,46 @@ class CreateAccountFragment : BaseFragment() {
         viewModel.createAccountState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is CreateAccountState.ProductsLoaded -> {
-                    binding.txtSubCharge.text = state.list.find {
-                        it.recurringPricingPhase is SubscriptionPricingPhase.Months
-                    }?.recurringPricingPhase?.formattedPrice
+
+                    val subscription = CreateAccountViewModel.defaultSubscription(state.list)
+                    val plusLabel = when (subscription) {
+                        is Subscription.Simple, null -> binding.root.resources.getString(LR.string.pocket_casts_plus)
+                        is Subscription.WithTrial -> binding.root.resources.getString(LR.string.pocket_casts_plus_short)
+                    }
+                    binding.lblPlus.text = plusLabel
+
+                    binding.chargeComposeView.apply {
+                        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                        setContent {
+                            AppTheme(theme.activeTheme) {
+
+                                val emphasized = true
+                                when (subscription) {
+                                    is Subscription.Simple -> ProductAmountView(
+                                        primaryText = subscription.recurringPricingPhase.formattedPrice,
+                                        secondaryText = stringResource(subscription.recurringPricingPhase.perPeriod)
+                                            .lowercase(Locale.getDefault()),
+                                        horizontalAlignment = Alignment.End,
+                                        emphasized = emphasized
+                                    )
+                                    is Subscription.WithTrial -> {
+                                        val res = LocalContext.current.resources
+                                        val primaryText = stringResource(
+                                            LR.string.plus_trial_duration_free,
+                                            subscription.trialPricingPhase.periodValue(res)
+                                        )
+                                        ProductAmountView(
+                                            primaryText = primaryText,
+                                            secondaryText = subscription.recurringPricingPhase.thenPriceSlashPeriod(res),
+                                            horizontalAlignment = Alignment.End,
+                                            emphasized = emphasized
+                                        )
+                                    }
+                                    null -> { /* show nothing */ }
+                                }
+                            }
+                        }
+                    }
                 }
                 is CreateAccountState.CurrentlyValid -> {
                 }

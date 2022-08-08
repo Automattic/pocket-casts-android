@@ -17,6 +17,7 @@ sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
     val pricingPhase: ProductDetails.PricingPhase
     val formattedPrice: String
         get() = pricingPhase.formattedPrice
+    val perPeriod: Int
     val renews: Int
     val hint: Int?
     fun pricePerPeriod(res: Resources): String
@@ -34,6 +35,7 @@ sealed interface SubscriptionPricingPhase {
     ) : RecurringSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_year
+        override val perPeriod = R.string.profile_per_year
         override val renews = R.string.plus_renews_automatically_yearly
         override val hint = R.string.plus_best_value
 
@@ -56,6 +58,7 @@ sealed interface SubscriptionPricingPhase {
     ) : RecurringSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_month
+        override val perPeriod = R.string.profile_per_month
         override val renews = R.string.plus_renews_automatically_monthly
         override val hint = null
 
