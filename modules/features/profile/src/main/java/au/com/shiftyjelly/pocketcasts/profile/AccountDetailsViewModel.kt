@@ -40,19 +40,20 @@ class AccountDetailsViewModel
     private val disposables = CompositeDisposable()
     private val deleteAccountState = MutableLiveData<DeleteAccountState>().apply { value = DeleteAccountState.Empty }
 
-    private val productDetails = subscriptionManager.observeProductDetails().map { state ->
+    private val subscription = subscriptionManager.observeProductDetails().map { state ->
         if (state is ProductDetailsState.Loaded) {
-            val price = state.productDetails
-                .find { it.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
-                ?.let { Subscription.fromProductDetails(it) }
-            Optional.of(price)
+            Optional.of(
+                state.productDetails
+                    .find { it.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
+                    ?.let { Subscription.fromProductDetails(it) }
+            )
         } else {
             Optional.empty()
         }
     }
     val signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
     val viewState: LiveData<Triple<SignInState, Subscription?, DeleteAccountState>> = LiveDataReactiveStreams
-        .fromPublisher(userManager.getSignInState().combineLatest(productDetails))
+        .fromPublisher(userManager.getSignInState().combineLatest(subscription))
         .combineLatest(deleteAccountState)
         .map { Triple(it.first.first, it.first.second.get(), it.second) }
 
