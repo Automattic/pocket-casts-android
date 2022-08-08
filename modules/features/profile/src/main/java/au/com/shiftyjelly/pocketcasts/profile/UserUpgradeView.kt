@@ -33,6 +33,17 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
 
+sealed interface UserUpgradeViewData {
+    class WithTrial(
+        val numFree: String,
+        val thenPriceSlashPeriod: String,
+    ) : UserUpgradeViewData
+
+    class WithoutTrial(
+        val pricePerPeriod: String
+    ) : UserUpgradeViewData
+}
+
 @Composable
 fun UserUpgradeView(
     data: UserUpgradeViewData,
@@ -103,17 +114,6 @@ fun UserUpgradeView(
             includePadding = false
         )
     }
-}
-
-sealed interface UserUpgradeViewData {
-    class WithTrial(
-        val numFree: String,
-        val thenPriceSlashPeriod: String,
-    ) : UserUpgradeViewData
-
-    class WithoutTrial(
-        val pricePerPeriod: String
-    ) : UserUpgradeViewData
 }
 
 @Composable
