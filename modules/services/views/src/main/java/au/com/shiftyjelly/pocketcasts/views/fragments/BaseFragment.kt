@@ -38,7 +38,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (view.background == null) {
-            view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
+            view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_04))
         }
         view.isClickable = true
         view.isFocusable = true
