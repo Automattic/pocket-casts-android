@@ -898,7 +898,7 @@
     <string name="plus_trial_finished_files_removed">Files uploaded to your account will be removed after a week</string>
     <string name="plus_trial_finished_locked">Access to Pocket Casts Plus features will be locked</string>
     <string name="plus_upgrade_to_pocket_casts_plus">Upgrade to Pocket Casts Plus</string>
-    <string name="plus_year_month_price">%1$s per year / %2$s per month</string>
+    <string name="plus_month_year_price">%1$s per month / %2$s per year</string>
     <string name="plus_select_payment_frequency">Select Payment Frequency</string>
     <string name="plus_best_value">BEST VALUE</string>
     <string name="plus_renews_automatically_yearly">Renews automatically yearly</string>
