@@ -81,14 +81,13 @@ class CreateAccountFragment : BaseFragment() {
 
                     val subscription = trialsIfPresent.find {
                         it.recurringPricingPhase is SubscriptionPricingPhase.Months
-                    } ?: trialsIfPresent.first() // if no monthly subscriptions, just display the first
+                    } ?: trialsIfPresent.firstOrNull() // if no monthly subscriptions, just display the first
 
-                    binding.lblPlus.setText(
-                        when (subscription) {
-                            is Subscription.Simple -> LR.string.pocket_casts_plus
-                            is Subscription.WithTrial -> LR.string.pocket_casts_plus_short
-                        }
-                    )
+                    val plusLabel = when (subscription) {
+                        is Subscription.Simple, null -> binding.root.resources.getString(LR.string.pocket_casts_plus)
+                        is Subscription.WithTrial -> binding.root.resources.getString(LR.string.pocket_casts_plus_short)
+                    }
+                    binding.lblPlus.text = plusLabel
 
                     binding.chargeComposeView.apply {
                         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -117,6 +116,7 @@ class CreateAccountFragment : BaseFragment() {
                                             emphasized = emphasized
                                         )
                                     }
+                                    null -> { /* show nothing */ }
                                 }
                             }
                         }
