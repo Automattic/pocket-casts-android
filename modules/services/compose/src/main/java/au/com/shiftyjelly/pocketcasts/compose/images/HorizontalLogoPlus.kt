@@ -40,6 +40,6 @@ private fun HorizontalLogoPlusDarkPreview() {
 @Composable
 private fun VerticalLogoPlusLightPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        VerticalLogoPlus()
+        HorizontalLogoPlus()
     }
 }
