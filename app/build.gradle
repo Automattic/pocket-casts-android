@@ -47,6 +47,7 @@ android {
             def (gitTag, versionBuild, gitHash, gitDirty) = gitLongVersion.tokenize('-')
 
             manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher_radioactive",
                     gitHash: gitHash + (gitDirty ? ("-" + gitDirty) : "")
             ]
         }
@@ -57,6 +58,7 @@ android {
 
         release {
             manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher",
                     gitHash: ""
             ]
 
