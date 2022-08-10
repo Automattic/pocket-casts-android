@@ -2,7 +2,7 @@
 common_params:
   # Common plugin settings to use with the `plugins` key.
   - &common_plugins
-    - automattic/bash-cache#2.6.0
+    - automattic/bash-cache#2.7.0
 
 steps:
   - label: 'Unit tests'
