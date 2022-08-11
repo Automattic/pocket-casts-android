@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -33,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class CreateAccountFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
+    @Inject lateinit var subscriptionManager: SubscriptionManager
 
     private val viewModel: CreateAccountViewModel by activityViewModels()
 
@@ -74,7 +76,7 @@ class CreateAccountFragment : BaseFragment() {
             when (state) {
                 is CreateAccountState.ProductsLoaded -> {
 
-                    val subscription = CreateAccountViewModel.defaultSubscription(state.list)
+                    val subscription = subscriptionManager.getDefaultSubscription(state.list)
                     val plusLabel = when (subscription) {
                         is Subscription.Simple, null -> binding.root.resources.getString(LR.string.pocket_casts_plus)
                         is Subscription.WithTrial -> binding.root.resources.getString(LR.string.pocket_casts_plus_short)

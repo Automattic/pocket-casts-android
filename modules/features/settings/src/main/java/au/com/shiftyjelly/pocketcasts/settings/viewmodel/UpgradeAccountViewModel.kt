@@ -22,11 +22,9 @@ class UpgradeAccountViewModel
 ) : ViewModel() {
     private val productDetails = subscriptionManager.observeProductDetails().map { productDetailsState ->
         if (productDetailsState is ProductDetailsState.Loaded) {
-            val product = productDetailsState.productDetails
-                .find { detail -> detail.productId == SubscriptionManager.TEST_FREE_TRIAL_PRODUCT_ID }
-
-            val subscription = product?.let { Subscription.fromProductDetails(it) }
-            val productState = when (subscription) {
+            val subscriptions = productDetailsState.productDetails
+                .mapNotNull { Subscription.fromProductDetails(it) }
+            val productState = when (val subscription = subscriptionManager.getDefaultSubscription(subscriptions)) {
                 null -> null
                 is Subscription.WithTrial -> ProductState.ProductWithTrial(
                     featureLabel = context.resources.getString(
