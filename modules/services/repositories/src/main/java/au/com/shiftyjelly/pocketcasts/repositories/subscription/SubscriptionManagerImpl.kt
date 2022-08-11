@@ -316,6 +316,11 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         cachedSubscriptionStatus = null
         subscriptionStatus.accept(Optional.empty())
     }
+
+    override fun isEligibleForFreeTrial(): Boolean {
+        /* TODO: Add server check */
+        return true
+    }
 }
 
 sealed class ProductDetailsState {
