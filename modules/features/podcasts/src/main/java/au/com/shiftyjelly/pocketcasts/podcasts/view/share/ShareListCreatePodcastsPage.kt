@@ -1,21 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.podcast.PodcastSelectGrid
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
@@ -25,11 +21,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ShareListCreatePodcastsPage(
     onCloseClick: () -> Unit,
     onNextClick: () -> Unit,
-    viewModel: ShareListCreateViewModel,
-    modifier: Modifier = Modifier
+    viewModel: ShareListCreateViewModel
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
-    Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+    Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.podcasts_share_select_podcasts),
             navigationButton = NavigationButton.Close,
