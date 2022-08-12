@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
@@ -35,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.header
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -48,11 +45,10 @@ fun ShareListCreateTitlePage(
     onBackClick: () -> Unit,
     onNextClick: () -> Unit,
     viewModel: ShareListCreateViewModel,
-    modifier: Modifier = Modifier
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
 
-    Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+    Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.podcasts_share_create_list),
             navigationButton = NavigationButton.Back,

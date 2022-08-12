@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -80,7 +79,6 @@ private fun FolderEditColorForm(
             )
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.theme.colors.primaryUi01)
                     .verticalScroll(rememberScrollState())
                     .weight(1f)
             ) {
