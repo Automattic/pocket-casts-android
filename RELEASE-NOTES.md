@@ -11,6 +11,8 @@
         ([#16](https://github.com/Automattic/pocket-casts-android/issues/16)).
     *   Fix long podcast website links overflowing.
         ([#230](https://github.com/Automattic/pocket-casts-android/issues/230)).
+    *   Fix OPML import failing with invalid XML characters.
+        ([#51](https://github.com/Automattic/pocket-casts-android/issues/51)).
 
 ### 7.20.3
 
