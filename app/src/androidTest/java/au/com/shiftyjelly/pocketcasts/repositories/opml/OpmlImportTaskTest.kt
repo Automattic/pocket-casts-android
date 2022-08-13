@@ -39,6 +39,22 @@ class OpmlImportTaskTest {
     }
 
     @Test
+    fun invalidXmlSingleLine() {
+        runBlocking {
+            val opml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <opml version='1.0'><head></head><body><outline text="Left, Right &amp; Center" type="rss" xmlUrl="https://leftrightandcenter-feed.kcrw.com" htmlUrl="https://www.kcrw.com/news/shows/left-right-center?utm_source=KCRW&utm_medium=RSS&utm_campaign=kcrw-show-rss" /><outline type="rss" text="Tiedetrippi" xmlUrl="https://feeds.yle.fi/areena/v1/series/1-50438875.rss?lang=fi&amp;downloadable=true" /></body></opml>
+            """.trimIndent()
+
+            val urls = OpmlImportTask.readOpmlUrlsRegex(opml.byteInputStream())
+
+            assertEquals(2, urls.size)
+            assertEquals("https://leftrightandcenter-feed.kcrw.com", urls[0])
+            assertEquals("https://feeds.yle.fi/areena/v1/series/1-50438875.rss?lang=fi&downloadable=true", urls[1])
+        }
+    }
+
+    @Test
     fun validXml() {
         runBlocking {
             val opml = """
