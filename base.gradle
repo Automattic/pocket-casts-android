@@ -24,8 +24,9 @@ android {
     defaultConfig {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
-        versionCode project.versionCode
-        versionName project.versionName
+        versionCode getVersionProperty("versionCode").toInteger()
+        versionName getVersionProperty("versionName")
+        // TODO: Use versionCode & versionName from version.properties
         buildConfigField 'int', 'VERSION_CODE', "${project.versionCode}"
         buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
 
