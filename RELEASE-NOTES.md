@@ -11,6 +11,8 @@
         ([#16](https://github.com/Automattic/pocket-casts-android/issues/16)).
     *   Fix long podcast website links overflowing.
         ([#230](https://github.com/Automattic/pocket-casts-android/issues/230)).
+    *   Fix the listening stats not being sent to the server correctly.
+        ([#238](https://github.com/Automattic/pocket-casts-android/issues/238)).
 
 ### 7.20.3
 
