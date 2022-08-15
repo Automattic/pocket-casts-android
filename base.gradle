@@ -14,7 +14,8 @@ def SERVER_SHORT_URL_PROD = "\"https://pca.st\""
 def WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
 
 ext {
-    canSignRelease = project.hasProperty('pocketcastsKeyStoreFile')
+    releaseStoreFile = file("$rootDir/${getSecretProperty("signingKeyStoreFile", null)}")
+    canSignRelease = releaseStoreFile.exists()
 }
 
 android {

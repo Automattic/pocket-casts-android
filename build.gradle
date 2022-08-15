@@ -87,10 +87,17 @@ allprojects {
 def secretPropertiesFile = file("$rootDir/secret.properties") 
 def secretProperties = new Properties()
 if (secretPropertiesFile.exists()) {
-    secretPropertiesFile.withInputStream {
-        secretProperties.load(it)
-    }
+    secretProperties = loadPropertiesFromFile(secretPropertiesFile)
 }
+
 ext.getSecretProperty = { String propertyName, String defaultValue ->
     secretProperties.getProperty(propertyName, defaultValue)
+}
+
+static def loadPropertiesFromFile(inputFile) {
+    def properties = new Properties()
+    inputFile.withInputStream { stream ->
+        properties.load(stream)
+    }
+    return properties
 }
