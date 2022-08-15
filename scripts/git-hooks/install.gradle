@@ -18,8 +18,3 @@ task installGitHooks(type: Exec) {
         logger.info('Git hook installed successfully.')
     }
 }
-
-afterEvaluate {
-    tasks['clean'].dependsOn installGitHooks
-    tasks['assemble'].dependsOn installGitHooks
-}

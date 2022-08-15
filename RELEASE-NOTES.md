@@ -9,7 +9,9 @@
         ([#206](https://github.com/Automattic/pocket-casts-android/issues/206)).
     *   Fix embedded artwork not showing on player screen.
         ([#16](https://github.com/Automattic/pocket-casts-android/issues/16)).
-    
+    *   Fix long podcast website links overflowing.
+        ([#230](https://github.com/Automattic/pocket-casts-android/issues/230)).
+
 ### 7.20.3
 
 *   Bug Fixes:

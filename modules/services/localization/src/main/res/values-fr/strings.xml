@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-07-25 15:54:03+0000
+Translation-Revision-Date: 2022-08-09 16:54:17+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+	<string name="player_open_full_size_player">Activer pour ouvrir le lecteur grand format</string>
 	<string name="settings_downloads_clean_up">Nettoyer</string>
 	<string name="podcasts_share_failed_description">Un problème est survenu lors de la création de votre page de partage.</string>
 	<string name="podcasts_share_failed">Échec du partage</string>

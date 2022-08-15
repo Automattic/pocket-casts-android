@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-07-27 09:54:23+0000
+Translation-Revision-Date: 2022-08-09 21:08:40+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nb_NO
@@ -109,13 +109,13 @@ Language: nb_NO
 	<string name="profile_stats_minute_listened">Minutt lyttet</string>
 	<string name="profile_stats_hours_listened">Timer lyttet</string>
 	<string name="profile_stats_hour_listened">Time lyttet</string>
-	<string name="profile_stats_seconds_saved">Sekunder lagret</string>
-	<string name="profile_stats_second_saved">Sekund lagret</string>
-	<string name="profile_stats_minutes_saved">Minutter lagret</string>
-	<string name="profile_stats_minute_saved">Minutt lagret</string>
-	<string name="profile_stats_hours_saved">Timer lagret</string>
-	<string name="profile_stats_hour_saved">Time lagret</string>
-	<string name="profile_stats_day_saved">Dag lagret</string>
+	<string name="profile_stats_seconds_saved">Sekunder spart</string>
+	<string name="profile_stats_second_saved">Sekund spart</string>
+	<string name="profile_stats_minutes_saved">Minutter spart</string>
+	<string name="profile_stats_minute_saved">Minutt spart</string>
+	<string name="profile_stats_hours_saved">Timer spart</string>
+	<string name="profile_stats_hour_saved">Time spart</string>
+	<string name="profile_stats_day_saved">Dag spart</string>
 	<string name="filters_download_options">Nedlastingsalternativer</string>
 	<string name="filters_release_date">Lanseringsdato</string>
 	<string name="filters_duration">Varighet</string>
@@ -569,7 +569,7 @@ Language: nb_NO
 	<string name="profile_stats_share_to">Del til ...</string>
 	<string name="profile_stats_trim_silence">Kutt av stillhet</string>
 	<string name="profile_stats_listened_for">Du har lyttet for</string>
-	<string name="profile_stats_days_saved">Dager lagret</string>
+	<string name="profile_stats_days_saved">Dager spart</string>
 	<string name="profile_stats_auto_skipping">Hopp over automatisk</string>
 	<string name="profile_stats_days_listened">Dager lyttet</string>
 	<string name="profile_stat_days_listened">Dager lyttet</string>
@@ -1051,7 +1051,7 @@ Language: nb_NO
 	<string name="player_actions">Episodehandlinger</string>
 	<string name="player_action_previous_chapter">Forrige kapittel</string>
 	<string name="player_action_next_chapter">Neste kapittel</string>
-	<string name="time_left">%s venstre</string>
+	<string name="time_left">%s gjenstår</string>
 	<string name="time_short_seconds">%d s</string>
 	<string name="time_short_minutes">%d m</string>
 	<string name="time_short_hours_minutes">%1$d t %2$d m</string>

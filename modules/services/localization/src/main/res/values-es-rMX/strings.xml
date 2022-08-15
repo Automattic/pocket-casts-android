@@ -6,6 +6,7 @@ Generator: GlotPress/2.4.0-alpha
 Language: es_MX
 -->
 <resources>
+	<string name="player_open_full_size_player">Activar para abrir el reproductor a tamaño completo</string>
 	<string name="settings_downloads_clean_up">Vaciar</string>
 	<string name="podcasts_share_failed_description">Se ha producido un error al crear tu página compartida.</string>
 	<string name="podcasts_share_failed">Se ha producido un error al compartir</string>
