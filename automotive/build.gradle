@@ -102,3 +102,7 @@ task useGoogleServicesDebugFile {
     }
 }
 preBuild.dependsOn(useGoogleServicesDebugFile)
+
+tasks.register("preBundleLint") {
+    dependsOn(tasks.named("lintAutomotiveRelease"))
+}
