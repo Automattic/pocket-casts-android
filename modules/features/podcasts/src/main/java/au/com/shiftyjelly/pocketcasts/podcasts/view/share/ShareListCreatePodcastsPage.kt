@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -21,7 +22,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ShareListCreatePodcastsPage(
     onCloseClick: () -> Unit,
     onNextClick: () -> Unit,
-    viewModel: ShareListCreateViewModel
+    viewModel: ShareListCreateViewModel,
+    modifier: Modifier = Modifier
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
     Column {
@@ -44,7 +46,8 @@ fun ShareListCreatePodcastsPage(
             onPodcastSelected = { podcast -> viewModel.selectPodcast(podcast) },
             onPodcastUnselected = { podcast -> viewModel.unselectPodcast(podcast) },
             onSelectAll = { viewModel.selectAll() },
-            onSelectNone = { viewModel.selectNone() }
+            onSelectNone = { viewModel.selectNone() },
+            modifier = modifier
         )
     }
 }

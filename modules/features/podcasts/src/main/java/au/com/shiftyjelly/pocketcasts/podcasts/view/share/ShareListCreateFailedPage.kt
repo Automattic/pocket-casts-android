@@ -38,7 +38,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ShareListCreateFailedPage(
     onCloseClick: () -> Unit,
-    onRetryClick: () -> Unit
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column {
         ThemedTopAppBar(
@@ -49,7 +50,7 @@ fun ShareListCreateFailedPage(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier
+            modifier = modifier
                 .padding(16.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
