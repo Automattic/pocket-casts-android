@@ -21,12 +21,10 @@ GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files'
 # Environment
 ########################################################################
 Dotenv.load('~/.pocketcastsandroid-env.default')
-ENV[GHHELPER_REPO = "automattic/pocket-casts-android"]
 ENV["PROJECT_NAME"] = "pocket-casts-android"
 ENV["PROJECT_ROOT_FOLDER"] = "./"
 ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
-REPOSITORY_NAME = "pocket-casts-android"
-GH_ORG_NAME = "automattic"
+GH_REPOSITORY = "automattic/pocket-casts-android"
 # TODO: Disable building/uploading automative artifacts until we get everything working
 #APPS = ["app", "automotive"]
 APPS = ["app"]
@@ -137,7 +135,7 @@ platform :android do
     release_assets = options[:release_assets]
 
     create_release(
-      repository: GHHELPER_REPO,
+      repository: GH_REPOSITORY,
       version: version["name"],
       release_notes_file_path: nil,
       prerelease: prerelease,
