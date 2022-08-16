@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.Manifest
 import android.content.Context
-import androidx.annotation.IntegerRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -79,13 +78,16 @@ class StorageSettingsViewModel
     private lateinit var folderLocations: () -> List<FolderLocation>
     private lateinit var permissionGranted: () -> Boolean
     private var permissionRequestedForPath: String? = null
+    private var sdkVersion: Int = 0
 
     fun start(
         folderLocations: () -> List<FolderLocation>,
-        permissionGranted: () -> Boolean
+        permissionGranted: () -> Boolean,
+        sdkVersion: Int,
     ) {
         this.folderLocations = folderLocations
         this.permissionGranted = permissionGranted
+        this.sdkVersion = sdkVersion
         viewModelScope.launch {
             episodeManager.observeDownloadedEpisodes()
                 .collect { downloadedEpisodes ->
@@ -160,10 +162,10 @@ class StorageSettingsViewModel
     }
 
     private fun setupStorage() {
-        /* Find all the places the user might want to store their podcasts, but still give them a custom folder option on SDK_INT < 29 */
+        /* Find all the places the user might want to store their podcasts, but still give them a custom folder option on sdk version < 29 */
         foldersAvailable = folderLocations()
         var optionsCount = foldersAvailable.size
-        if (android.os.Build.VERSION.SDK_INT < 29) {
+        if (sdkVersion < 29) {
             optionsCount++
         }
 
@@ -174,7 +176,7 @@ class StorageSettingsViewModel
             entryValues[index] = folderLocation.filePath
         }
 
-        if (android.os.Build.VERSION.SDK_INT < 29) {
+        if (sdkVersion < 29) {
             entries[foldersAvailable.size] = context.getString(LR.string.settings_storage_custom_folder)
             entryValues[foldersAvailable.size] = Settings.STORAGE_ON_CUSTOM_FOLDER
         }
@@ -225,7 +227,7 @@ class StorageSettingsViewModel
             movePodcastStorage(oldFolderValue, folderPathChosen)
         }
 
-        if (android.os.Build.VERSION.SDK_INT >= 29 && settings.usingCustomFolderStorage()) {
+        if (sdkVersion >= 29 && settings.usingCustomFolderStorage()) {
             val (_, folderPaths) = mutableState.value.storageChoiceState.choices
             mutableState.value = mutableState.value.copy(
                 storageChoiceState = mutableState.value.storageChoiceState.copy(
@@ -366,8 +368,8 @@ class StorageSettingsViewModel
     )
 
     private fun createAlertDialogState(
-        @IntegerRes title: String,
-        @IntegerRes message: Int? = null,
+        title: String,
+        @StringRes message: Int? = null,
     ) = AlertDialogState(
         title = title,
         message = message?.let { context.getString(message) },
