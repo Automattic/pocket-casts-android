@@ -34,20 +34,14 @@ APPS = ["app"]
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
 
 platform :android do
-  #####################################################################################
-  # build_and_upload_beta
-  # -----------------------------------------------------------------------------------
-  # This lane builds the app for external beta distribution, and uploads the build
-  # to the beta channel (but does not release it).
-  # -----------------------------------------------------------------------------------
-  # Usage:
-  # bundle exec fastlane build_and_upload_beta [skip_confirm:<skip confirm>] [create_release:<Create release on GH> ]
+  # - Builds the app for external beta distribution
+  # - Uploads the builds to 'beta' channel in Play Store (but does not release it)
+  # - Creates draft Github release
   #
-  # Example:
-  # bundle exec fastlane build_and_upload_beta
-  # bundle exec fastlane build_and_upload_beta skip_confirm:true
-  # bundle exec fastlane build_and_upload_beta create_release:true
-  #####################################################################################
+  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
+  # @option [Boolean] skip_prechecks (default: false) If true, skips android_build_preflight
+  # @option [Boolean] create_gh_release (default: false) If true, creates a draft GitHub release
+  #
   desc "Builds and uploads a new beta build to Google Play (without releasing it)"
   lane :build_and_upload_beta do | options |
     android_build_prechecks(skip_confirm: options[:skip_confirm], alpha: false, beta: true, final: false) unless (options[:skip_prechecks])
@@ -81,14 +75,7 @@ platform :android do
     create_gh_release(version: version, prerelease: true, release_assets: release_assets.compact) if options[:create_release]
   end
 
-  #####################################################################################
-  # build_bundle
-  # -----------------------------------------------------------------------------------
-  # This lane builds an app bundle
-  # -----------------------------------------------------------------------------------
-  # Usage:
-  # bundle exec fastlane build_bundle [skip_confirm:<skip confirm>]
-  #####################################################################################
+  # Builds an app bundle
   desc "Builds an app bundle"
   lane :build_bundle do | options |
     # Create the file names
@@ -112,15 +99,7 @@ platform :android do
     end
   end
 
-  #####################################################################################
-  # build_and_instrumented_test
-  # -----------------------------------------------------------------------------------
   # Run instrumented tests in Google Firebase Test Lab
-  # -----------------------------------------------------------------------------------
-  # Usage:
-  # bundle exec fastlane build_and_instrumented_test
-  #
-  #####################################################################################
   desc "Build the application and instrumented tests, then run the tests in Firebase Test Lab"
   lane :build_and_instrumented_test do | options |
     gradle(tasks: ['assembleDebug', 'assembleDebugAndroidTest'])
