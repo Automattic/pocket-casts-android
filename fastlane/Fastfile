@@ -92,13 +92,11 @@ platform :android do
     build_dir = "artifacts/"
 
     # Build
-    Dir.chdir(".") do
-      gradle(task: "clean")
-      UI.message("Running lint...")
-      gradle(task: ":#{app}:preBundleLint")
-      UI.message("Building #{version["name"]} / #{version["code"]} - #{aab_artifact_path}...")
-      gradle(task: ":#{app}:bundle", build_type: "Release")
-    end
+    gradle(task: "clean")
+    UI.message("Running lint...")
+    gradle(task: ":#{app}:preBundleLint")
+    UI.message("Building #{version["name"]} / #{version["code"]} - #{aab_artifact_path}...")
+    gradle(task: ":#{app}:bundle", build_type: "Release")
 
     Dir.chdir("..") do
       sh("mkdir -p #{build_dir} && cp -v #{bundle_output_path(app)} #{aab_artifact_path}")
