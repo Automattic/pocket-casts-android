@@ -42,7 +42,7 @@ class StorageSettingsFragment : BaseFragment() {
                     StorageSettingsPage(
                         viewModel = viewModel,
                         onBackPressed = { activity?.onBackPressed() },
-                        onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance(addToolbar = true)) }
+                        onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance()) }
                     )
                 }
             }
