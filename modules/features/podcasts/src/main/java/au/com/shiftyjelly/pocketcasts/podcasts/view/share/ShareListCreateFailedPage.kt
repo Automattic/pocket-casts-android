@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -42,7 +41,7 @@ fun ShareListCreateFailedPage(
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+    Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.podcasts_share_creating_list),
             navigationButton = NavigationButton.Close,
@@ -51,7 +50,7 @@ fun ShareListCreateFailedPage(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier
+            modifier = modifier
                 .padding(16.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
@@ -80,7 +79,7 @@ fun ShareListCreateFailedPage(
 @Preview(showBackground = true)
 @Composable
 private fun ShareListCreateFailedPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
-    AppTheme(themeType) {
+    AppThemeWithBackground(themeType) {
         ShareListCreateFailedPage(
             onCloseClick = {},
             onRetryClick = {}
