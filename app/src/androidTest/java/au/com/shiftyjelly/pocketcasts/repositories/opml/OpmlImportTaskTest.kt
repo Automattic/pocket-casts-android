@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 class OpmlImportTaskTest {
 
     @Test
-    fun invalidXml() {
+    fun invalidXmlWithAmpersandInUrl() {
         runBlocking {
             val opml = """
                 <?xml version="1.0" encoding="UTF-8"?>
