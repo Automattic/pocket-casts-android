@@ -5,14 +5,11 @@ unless FastlaneCore::Helper.bundler?
   UI.user_error!('Please run fastlane via `bundle exec`')
 end
 
-before_all do |lane|
-  # Ensure we use the latest version of the toolkit
-  check_for_toolkit_updates unless is_ci || ENV['FASTLANE_SKIP_TOOLKIT_UPDATE_CHECK']
-end
-
 ########################################################################
 # Constants
 ########################################################################
+ENV_FILE_NAME = '.pocketcastsandroid-env.default'
+USER_ENV_FILE_PATH = File.join(Dir.home, ENV_FILE_NAME)
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 APP_PACKAGE_NAME = 'au.com.shiftyjelly.pocketcasts'
 GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
@@ -20,7 +17,7 @@ GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files'
 ########################################################################
 # Environment
 ########################################################################
-Dotenv.load('~/.pocketcastsandroid-env.default')
+Dotenv.load(USER_ENV_FILE_PATH)
 ENV["PROJECT_NAME"] = "pocket-casts-android"
 ENV["PROJECT_ROOT_FOLDER"] = "./"
 ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
@@ -30,6 +27,18 @@ GH_REPOSITORY = "automattic/pocket-casts-android"
 APPS = ["app"]
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
+
+before_all do |lane|
+  # Ensure we use the latest version of the toolkit
+  check_for_toolkit_updates unless is_ci || ENV['FASTLANE_SKIP_TOOLKIT_UPDATE_CHECK']
+
+  # Check that the env files exist
+  # rubocop:disable Style/IfUnlessModifier
+  unless is_ci || File.file?(USER_ENV_FILE_PATH)
+    example_path = File.join(PROJECT_ROOT_FOLDER, 'fastlane/env/user.env-example')
+    UI.user_error! "#{ENV_FILE_NAME} not found: Please copy '#{example_path}' to '#{USER_ENV_FILE_PATH}' and fill in the values."
+  end
+end
 
 platform :android do
   # - Builds the app for external beta distribution
