@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.settings
 import android.content.Context
 import android.os.StatFs
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -34,7 +33,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
@@ -60,6 +59,7 @@ fun StorageSettingsPage(
     viewModel: StorageSettingsViewModel,
     onBackPressed: () -> Unit,
     onManageDownloadedFilesClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val state: StorageSettingsViewModel.State by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -67,7 +67,8 @@ fun StorageSettingsPage(
         state = state,
         onBackPressed = onBackPressed,
         onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
-        onManageDownloadedFilesClick = onManageDownloadedFilesClick
+        onManageDownloadedFilesClick = onManageDownloadedFilesClick,
+        modifier = modifier
     )
     var showProgressDialog by remember { mutableStateOf(false) }
     if (showProgressDialog) {
@@ -124,7 +125,6 @@ fun StorageSettingsView(
 
         Column(
             modifier
-                .background(MaterialTheme.theme.colors.primaryUi02)
                 .padding(vertical = 8.dp)
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
@@ -373,7 +373,7 @@ private fun getStorageSpaceString(
 private fun StorageSettingsPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
-    AppTheme(themeType) {
+    AppThemeWithBackground(themeType) {
         StorageSettingsView(
             state = StorageSettingsViewModel.State(
                 downloadedFilesState = StorageSettingsViewModel.State.DownloadedFilesState(),
