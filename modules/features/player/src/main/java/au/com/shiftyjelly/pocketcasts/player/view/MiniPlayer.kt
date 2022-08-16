@@ -31,8 +31,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val binding = DataBindingUtil.inflate<ViewMiniPlayerBinding>(inflater, R.layout.view_mini_player, this, true)
     private var playing = false
-    private var touchX: Float = 0f
-    private var touchY: Float = 0f
     private val stringPause: String = context.resources.getString(LR.string.pause)
     private val stringPlay: String = context.resources.getString(LR.string.play)
 
@@ -41,13 +39,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     init {
         // open full screen player on click
         binding.root.setOnClickListener { openPlayer() }
-        binding.root.setOnTouchListener { _, event ->
-            touchX = event.x
-            touchY = event.y
-            false
-        }
         binding.root.setOnLongClickListener {
-            clickListener?.onLongClick(touchX, touchY)
+            clickListener?.onLongClick()
             true
         }
         // play / pause click
@@ -198,6 +191,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         fun onPauseClicked()
         fun onSkipBackwardClicked()
         fun onSkipForwardClicked()
-        fun onLongClick(x: Float, y: Float)
+        fun onLongClick()
     }
 }

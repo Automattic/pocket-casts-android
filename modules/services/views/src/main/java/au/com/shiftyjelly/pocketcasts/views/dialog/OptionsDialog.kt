@@ -61,8 +61,8 @@ class OptionsDialog : BottomSheetDialogFragment() {
         return this
     }
 
-    fun addTextOption(@StringRes titleId: Int? = null, titleString: String? = null, @ColorRes titleColor: Int? = null, @StringRes valueId: Int? = null, @DrawableRes imageId: Int? = null, click: (() -> Unit)): OptionsDialog {
-        addOption(titleId = titleId, titleString = titleString, titleColor = titleColor, valueId = valueId, imageId = imageId, click = click)
+    fun addTextOption(@StringRes titleId: Int? = null, titleString: String? = null, @ColorRes titleColor: Int? = null, @StringRes valueId: Int? = null, @DrawableRes imageId: Int? = null, @ColorRes imageColor: Int? = null, click: (() -> Unit)): OptionsDialog {
+        addOption(titleId = titleId, titleString = titleString, titleColor = titleColor, valueId = valueId, imageId = imageId, imageColor = imageColor, click = click)
         return this
     }
 
@@ -81,7 +81,7 @@ class OptionsDialog : BottomSheetDialogFragment() {
         onDismiss?.invoke()
     }
 
-    private fun addOption(@StringRes titleId: Int?, titleString: String? = null, @ColorRes titleColor: Int? = null, @StringRes valueId: Int? = null, @DrawableRes imageId: Int? = null, toggleOptions: List<ToggleButtonOption>? = null, checked: Boolean = false, click: (() -> Unit)? = null, onSwitch: ((switchedOn: Boolean) -> Unit)? = null) {
+    private fun addOption(@StringRes titleId: Int?, titleString: String? = null, @ColorRes titleColor: Int? = null, @StringRes valueId: Int? = null, @DrawableRes imageId: Int? = null, @ColorRes imageColor: Int? = null, toggleOptions: List<ToggleButtonOption>? = null, checked: Boolean = false, click: (() -> Unit)? = null, onSwitch: ((switchedOn: Boolean) -> Unit)? = null) {
         var closeAndClick: (() -> Unit)? = null
         if (click != null) {
             closeAndClick = {
@@ -90,7 +90,7 @@ class OptionsDialog : BottomSheetDialogFragment() {
             }
         }
 
-        options.add(OptionsDialogOption(titleId = titleId, titleString = titleString, titleColor = titleColor, valueId = valueId, imageId = imageId, checked = checked, click = closeAndClick, toggleOptions = toggleOptions, onSwitch = onSwitch))
+        options.add(OptionsDialogOption(titleId = titleId, titleString = titleString, titleColor = titleColor, valueId = valueId, imageId = imageId, imageColor = imageColor, checked = checked, click = closeAndClick, toggleOptions = toggleOptions, onSwitch = onSwitch))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

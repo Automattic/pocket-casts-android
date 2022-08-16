@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfItem
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfItems
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextPlaying
+import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -558,19 +559,10 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun clearUpNext(context: Context): ConfirmationDialog? {
-        return if (playbackManager.upNextQueue.queueEpisodes.size >= 3) {
-            ConfirmationDialog()
-                .setForceDarkTheme(true)
-                .setTitle(context.getString(LR.string.are_you_sure))
-                .setSummary(context.getString(LR.string.player_up_next_clear_queue_summary))
-                .setIconId(R.drawable.ic_upnext_remove)
-                .setButtonType(ConfirmationDialog.ButtonType.Danger(context.getString(LR.string.player_up_next_clear_queue_button)))
-                .setOnConfirm { playbackManager.clearUpNextAsync() }
-        } else {
-            playbackManager.clearUpNextAsync()
-            null
-        }
+    fun clearUpNext(context: Context): ClearUpNextDialog {
+        val dialog = ClearUpNextDialog(removeNowPlaying = false, playbackManager = playbackManager, context = context)
+        dialog.setForceDarkTheme(true)
+        return dialog
     }
 
     fun nextChapter() {
