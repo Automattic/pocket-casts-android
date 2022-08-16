@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -52,7 +51,7 @@ fun ManualCleanupPage(
     Column {
         if (showToolbar) {
             ThemedTopAppBar(
-                title = stringResource(LR.string.settings_title_manage_downloads),
+                title = stringResource(id = LR.string.settings_title_manage_downloads),
                 navigationButton = NavigationButton.Back,
                 onNavigationClick = onBackClick,
             )
@@ -90,7 +89,6 @@ private fun ManageDownloadsView(
     val deleteButtonColor = MaterialTheme.theme.colors.support05
     Column(
         modifier = modifier
-            .background(MaterialTheme.theme.colors.primaryUi02)
             .padding(top = 8.dp)
             .fillMaxHeight()
             .verticalScroll(rememberScrollState())
@@ -187,7 +185,7 @@ private fun ManualCleanupPageSmallPreview() {
 private fun ManualCleanupPagePreview(
     themeType: Theme.ThemeType = Theme.ThemeType.LIGHT
 ) {
-    AppTheme(themeType) {
+    AppThemeWithBackground(themeType) {
         ManageDownloadsView(
             state = ManualCleanupViewModel.State(),
             includeStarredSwitchState = false,

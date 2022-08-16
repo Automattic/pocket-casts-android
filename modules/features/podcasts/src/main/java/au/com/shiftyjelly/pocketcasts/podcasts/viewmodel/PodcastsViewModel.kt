@@ -23,6 +23,7 @@ import io.reactivex.rxkotlin.Observables
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Collections
 import java.util.Optional
 import javax.inject.Inject
@@ -179,24 +180,30 @@ class PodcastsViewModel
 
     val refreshObservable: LiveData<RefreshState> = LiveDataReactiveStreams.fromPublisher(settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST))
 
-    var adapterState: MutableList<FolderItem> = mutableListOf()
+    private var adapterState: MutableList<FolderItem> = mutableListOf()
+
     /**
      * User rearranges the grid with a drag
      */
     fun moveFolderItem(fromPosition: Int, toPosition: Int): List<FolderItem> {
-        if (adapterState.isEmpty() || toPosition >= adapterState.size) {
+        if (adapterState.isEmpty()) {
             return adapterState
         }
 
-        if (fromPosition < toPosition) {
-            for (index in fromPosition until toPosition) {
-                Collections.swap(adapterState, index, index + 1)
+        try {
+            if (fromPosition < toPosition) {
+                for (index in fromPosition until toPosition) {
+                    Collections.swap(adapterState, index, index + 1)
+                }
+            } else {
+                for (index in fromPosition downTo toPosition + 1) {
+                    Collections.swap(adapterState, index, index - 1)
+                }
             }
-        } else {
-            for (index in fromPosition downTo toPosition + 1) {
-                Collections.swap(adapterState, index, index - 1)
-            }
+        } catch (ex: IndexOutOfBoundsException) {
+            Timber.e("Move folder item failed.", ex)
         }
+
         return adapterState.toList()
     }
 

@@ -23,7 +23,7 @@ class UserNotLoggedInException : Exception()
 class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
 
     @ToJson
-    override fun toJson(writer: JsonWriter?, value: SyncUpdateResponse?) {}
+    override fun toJson(writer: JsonWriter, value: SyncUpdateResponse?) {}
 
     @FromJson
     override fun fromJson(reader: JsonReader): SyncUpdateResponse {

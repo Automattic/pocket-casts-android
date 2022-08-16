@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.podcast
 
 import android.content.res.Configuration
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,9 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PodcastSelectGrid(
     podcasts: List<Podcast>,
@@ -43,7 +41,7 @@ fun PodcastSelectGrid(
     val imageMinSize = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 120.dp else 80.dp
     Column(modifier = modifier.fillMaxSize()) {
         LazyVerticalGrid(
-            cells = GridCells.Adaptive(minSize = imageMinSize),
+            columns = GridCells.Adaptive(minSize = imageMinSize),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),

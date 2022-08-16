@@ -8,9 +8,6 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.hamcrest.CoreMatchers.equalTo
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -48,8 +45,8 @@ class ShareServerManagerImplTest {
 
     @Test
     fun buildSecurityHash() {
-        val hash = ListServerManagerImpl.buildSecurityHash("20160913144421")
-        assertThat<String>(hash, `is`(equalTo("fe6cec0d000c6d087d8f2c83912d5631b3161837")))
+        val hash = ListServerManagerImpl.buildSecurityHash(date = "20160913144421", serverSecret = "APP_SERVER_SECRET")
+        assertEquals("f91e649642ffb53813a79f816f2ef1ac36a52c4e", hash)
     }
 
     @Test
@@ -81,7 +78,8 @@ class ShareServerManagerImplTest {
                         Podcast(uuid = "77f1b350-5419-0134-ec2d-0d50f522381b", title = "Heavyweight", author = "Gimlet"),
                         Podcast(uuid = "30817be0-5675-0134-ec37-0d50f522381b", title = "Still Processing", author = "The New York Times"),
                         Podcast(uuid = "ac371bd0-094f-0134-9ce1-59d98c6b72b8", title = "Revisionist History", author = "Malcolm Gladwell / Panoply")
-                    )
+                    ),
+                    serverSecret = "APP_SERVER_SECRET"
                 )
 
             val request = mockWebServer.takeRequest()
@@ -93,7 +91,7 @@ class ShareServerManagerImplTest {
                         "title":"A fun title",
                         "description":"A even funnier description",
                         "datetime":"20211125152000",
-                        "h":"8027517bd5cf30c3dc2049d2a487a7fcbbaace46",
+                        "h":"0dc79dc94a3acea0618823a2a67b5a9a0ff5bbc9",
                         "podcasts":
                             [
                                 {"uuid":"77f1b350-5419-0134-ec2d-0d50f522381b","title":"Heavyweight","author":"Gimlet"},

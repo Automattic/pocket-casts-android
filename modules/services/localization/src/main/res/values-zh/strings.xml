@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-05-11 09:54:03+0000
+Translation-Revision-Date: 2022-08-09 09:54:15+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+	<string name="player_open_full_size_player">启用以打开全尺寸播放器</string>
+	<string name="settings_downloads_clean_up">清理</string>
+	<string name="podcasts_share_failed_description">创建共享页面时出错。</string>
+	<string name="podcasts_share_failed">共享失败</string>
+	<string name="podcasts_share_creating_list">创建列表</string>
+	<string name="podcasts_share_create_list">创建列表</string>
+	<string name="podcasts_share_all_selected">已全选</string>
+	<string name="select_podcasts">选择播客</string>
+	<string name="next">下一页</string>
+	<string name="not_selected">未选择</string>
+	<string name="selected">已选择</string>
+	<string name="profile_create_failed_title">无法创建账户</string>
+	<string name="please_try_again">请重试</string>
+	<string name="player_battery_warning_snackbar_action">更新</string>
+	<string name="player_battery_warning_snackbar">电池限制可能会导致播放中断。</string>
+	<string name="settings_battery_usage_message">不得限制电池用量，以确保屏幕关闭时，播放不会中断。</string>
+	<string name="settings_battery_update_message">请轻点上面的“%s”开关来更新电池设置。</string>
+	<string name="settings_battery_unrestricted_accessibility_label">更新您的电池设置</string>
+	<string name="settings_battery_unrestricted">不受限</string>
+	<string name="settings_battery_learn_more">了解更多</string>
+	<string name="settings_battery_settings">电池设置</string>
+	<string name="settings_battery">电池</string>
+	<string name="stream_warning_summary">流式传输此剧集将使用数据。</string>
+	<string name="seconds_label">秒</string>
+	<string name="youre_on_metered_wifi">“您正在使用计量的 WiFi”</string>
 	<string name="go_to_folder">前往文件夹</string>
 	<string name="change_folder">更改文件夹</string>
 	<string name="remove_from_folder">从文件夹中移除</string>
@@ -283,7 +308,6 @@ Language: zh_CN
 	<string name="settings_storage_phone">电话</string>
 	<string name="settings_manage_downloads_deleting">正在删除剧集…</string>
 	<string name="settings_whats_new_done">完成</string>
-	<string name="settings_whats_new_next">下一步</string>
 	<string name="settings_whats_new">新内容</string>
 	<string name="settings_notification_silent">静音</string>
 	<string name="settings_select_podcasts">选择播客</string>
@@ -370,7 +394,6 @@ Language: zh_CN
 	<string name="settings_show_archived_summary_hide">您订阅的新播客不会显示已存档的剧集。</string>
 	<string name="settings_show_archived_action_show">显示</string>
 	<string name="settings_show_archived_action_hide">隐藏</string>
-	<string name="settings_select_episodes_to_delete">选择要删除的剧集</string>
 	<string name="settings_row_action_summary">对于尚未下载的剧集，列表将显示%s按钮。</string>
 	<string name="settings_row_action">行操作</string>
 	<string name="settings_refresh_artwork_title">马上！</string>
@@ -434,7 +457,6 @@ Language: zh_CN
 	<string name="settings_export_save_file">保存文件</string>
 	<string name="settings_embedded_artwork_details">在播放器中显示下载文件（如果存在）中的插图，而不是使用节目的插图。</string>
 	<string name="settings_developer">开发人员</string>
-	<string name="settings_delete_episodes">删除 %d 集</string>
 	<string name="settings_close_upgrade_offer">关闭升级优惠</string>
 	<string name="settings_choose_podcasts">选择播客</string>
 	<string name="settings_auto_play_summary">当没有剩余内容可供播放时，自动为我选择一个剧集</string>
@@ -618,7 +640,6 @@ Language: zh_CN
 	<string name="profile_not_signed_in">未登录</string>
 	<string name="profile_none">无</string>
 	<string name="profile_next_payment">下次付款日期： %s</string>
-	<string name="profile_next">下一步</string>
 	<string name="profile_newsletter_detail">接收新闻、应用程序更新、主题播放列表、访谈等。</string>
 	<string name="profile_new_password">新密码</string>
 	<string name="profile_new_email_address">新电子邮件地址</string>
@@ -939,14 +960,11 @@ Language: zh_CN
 	<string name="podcasts_share_action_select_all">选择所有播客</string>
 	<string name="podcasts_share_all_podcasts_selected">已选择所有播客。 取消全选按钮。</string>
 	<string name="podcasts_share_selected">%d 已选择</string>
-	<string name="podcasts_share_failed_title">出错啦</string>
-	<string name="podcasts_share_failed">抱歉，这不起作用。 请稍后重试。</string>
 	<string name="podcasts_share_via">分享渠道</string>
 	<string name="podcasts_share_generating_list">正在生成列表…</string>
 	<string name="podcasts_share_missing_podcast">请至少选择一个播客。</string>
 	<string name="podcasts_share_missing_title">请为您的列表输入标题。</string>
 	<string name="podcasts_share_create_error">糟糕，无法共享</string>
-	<string name="podcasts_share_warning">任何带有该链接的人都可以查看此页面。 请勿共享您自己的私人播客。</string>
 	<string name="podcasts_share_title">标题</string>
 	<string name="podcasts_share_subscribe_to_all">订阅全部</string>
 	<string name="podcasts_share_selected_podcasts">共享选定的播客</string>
@@ -1051,7 +1069,6 @@ Language: zh_CN
 	<string name="search_hint">按播客名称搜索</string>
 	<string name="search_podcasts">搜索播客</string>
 	<string name="stream_warning_button">仍然流式传输</string>
-	<string name="stream_warning_summary">流式传输此剧集将使用蜂窝数据。</string>
 	<string name="profile_cloud_upload_warning_button">立即上传</string>
 	<string name="profile_cloud_upload_warning_summary">上传此剧集将使用数据。</string>
 	<string name="download_warning_on_wifi_button">立即下载</string>

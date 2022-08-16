@@ -3,9 +3,9 @@ name: Test & build
 # Run when a pull request is raised
 on:
   pull_request:
-    types: [review_requested, ready_for_review]
     branches:
       - main
+      - 'release/*'
 
 jobs:
   tests:

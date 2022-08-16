@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-05-12 09:54:04+0000
+Translation-Revision-Date: 2022-08-09 09:54:15+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+	<string name="player_open_full_size_player">Attivare per aprire il lettore a grandezza naturale</string>
+	<string name="settings_downloads_clean_up">Cancella</string>
+	<string name="podcasts_share_failed_description">Si è verificato un problema durante la creazione della tua pagina di condivisione.</string>
+	<string name="podcasts_share_failed">Condivisione non riuscita</string>
+	<string name="podcasts_share_creating_list">Creazione dell\'elenco</string>
+	<string name="podcasts_share_create_list">Crea elenco</string>
+	<string name="podcasts_share_all_selected">Tutti selezionati</string>
+	<string name="select_podcasts">Seleziona i podcast</string>
+	<string name="next">Successivo</string>
+	<string name="not_selected">Non selezionato</string>
+	<string name="selected">Selezionato</string>
+	<string name="profile_create_failed_title">Impossibile creare l\'account</string>
+	<string name="please_try_again">Riprova</string>
+	<string name="player_battery_warning_snackbar_action">aggiorna</string>
+	<string name="player_battery_warning_snackbar">Le limitazioni della batteria possono causare interruzioni della riproduzione.</string>
+	<string name="settings_battery_usage_message">L\'utilizzo della batteria deve essere senza restrizioni per assicurare una riproduzione continua quando lo schermo è spento.</string>
+	<string name="settings_battery_update_message">Tocca l\'interruttore \"%s\" sopra per aggiornare le impostazioni della batteria.</string>
+	<string name="settings_battery_unrestricted_accessibility_label">aggiornamento delle impostazioni della batteria</string>
+	<string name="settings_battery_unrestricted">Senza restrizioni</string>
+	<string name="settings_battery_learn_more">Scopri di più</string>
+	<string name="settings_battery_settings">Impostazioni della batteria</string>
+	<string name="settings_battery">Batteria</string>
+	<string name="stream_warning_summary">Lo streaming di questo episodio utilizzerà i dati.</string>
+	<string name="seconds_label">Secondi</string>
+	<string name="youre_on_metered_wifi">\"Sei sul Wi-Fi misurato\"</string>
 	<string name="go_to_folder">Vai alla cartella</string>
 	<string name="change_folder">Modifica la cartella</string>
 	<string name="remove_from_folder">Rimuovi dalla cartella</string>
@@ -283,7 +308,6 @@ Language: it
 	<string name="settings_storage_phone">Telefono</string>
 	<string name="settings_manage_downloads_deleting">Eliminazione degli episodi in corso...</string>
 	<string name="settings_whats_new_done">Fatto</string>
-	<string name="settings_whats_new_next">Prossimo</string>
 	<string name="settings_whats_new">Novità</string>
 	<string name="settings_notification_silent">Silenzioso</string>
 	<string name="settings_select_podcasts">Seleziona podcast</string>
@@ -370,7 +394,6 @@ Language: it
 	<string name="settings_show_archived_summary_hide">Per i nuovi podcast a cui ti abboni verranno mostrati gli episodi archiviati.</string>
 	<string name="settings_show_archived_action_show">Visualizza</string>
 	<string name="settings_show_archived_action_hide">Nascondi</string>
-	<string name="settings_select_episodes_to_delete">Seleziona gli episodi da eliminare</string>
 	<string name="settings_row_action_summary">Negli elenchi, accanto agli episodi non ancora scaricati ci saranno i pulsanti %s.</string>
 	<string name="settings_row_action">Azione riga</string>
 	<string name="settings_refresh_artwork_title">Immediatamente!</string>
@@ -434,7 +457,6 @@ Language: it
 	<string name="settings_export_save_file">Salva il file</string>
 	<string name="settings_embedded_artwork_details">Mostra l\'illustrazione legata al file scaricato (se esiste) nel lettore invece dell\'illustrazione del podcast.</string>
 	<string name="settings_developer">Sviluppatore</string>
-	<string name="settings_delete_episodes">Elimina %d episodi</string>
 	<string name="settings_close_upgrade_offer">chiudi l\'offerta di aggiornamento</string>
 	<string name="settings_choose_podcasts">Scegli i podcast</string>
 	<string name="settings_auto_play_summary">Quando non sono presenti più elementi da riprodurre, scegli automaticamente un episodio per me</string>
@@ -618,7 +640,6 @@ Language: it
 	<string name="profile_not_signed_in">ACCESSO NON ESEGUITO</string>
 	<string name="profile_none">Nessuna</string>
 	<string name="profile_next_payment">Prossimo pagamento: %s</string>
-	<string name="profile_next">Prossimo</string>
 	<string name="profile_newsletter_detail">Non perdere notizie, aggiornamenti delle app, playlist tematiche, interviste e altro ancora.</string>
 	<string name="profile_new_password">Nuova password</string>
 	<string name="profile_new_email_address">Nuovo indirizzo e-mail</string>
@@ -939,14 +960,11 @@ Language: it
 	<string name="podcasts_share_action_select_all">Seleziona tutti i podcast</string>
 	<string name="podcasts_share_all_podcasts_selected">Tutti i podcast selezionati. Pulsante Deseleziona tutto.</string>
 	<string name="podcasts_share_selected">%d selezionato/i</string>
-	<string name="podcasts_share_failed_title">Ops</string>
-	<string name="podcasts_share_failed">Spiacenti, purtroppo non ha funzionato. Riprova più tardi.</string>
 	<string name="podcasts_share_via">Condividi tramite</string>
 	<string name="podcasts_share_generating_list">Generazione dell\'elenco in corso...</string>
 	<string name="podcasts_share_missing_podcast">Scegli almeno un podcast.</string>
 	<string name="podcasts_share_missing_title">Inserisci un titolo per il tuo elenco.</string>
 	<string name="podcasts_share_create_error">Ops, impossibile effettuare la condivisione</string>
-	<string name="podcasts_share_warning">Questa pagina verrà visualizzabile da chiunque disponga del link. Non condividere i tuoi podcast privati.</string>
 	<string name="podcasts_share_title">Titolo</string>
 	<string name="podcasts_share_subscribe_to_all">ABBONATI A TUTTO</string>
 	<string name="podcasts_share_selected_podcasts">Condividi i podcast selezionati</string>
@@ -1051,7 +1069,6 @@ Language: it
 	<string name="search_hint">Cerca per nome del podcast</string>
 	<string name="search_podcasts">Cerca podcast</string>
 	<string name="stream_warning_button">Trasmetti comunque</string>
-	<string name="stream_warning_summary">Lo streaming di questo episodio utilizzerà la rete dati.</string>
 	<string name="profile_cloud_upload_warning_button">Carica ora</string>
 	<string name="profile_cloud_upload_warning_summary">Il caricamento di questo episodio utilizzerà i dati.</string>
 	<string name="download_warning_on_wifi_button">Scarica ora</string>

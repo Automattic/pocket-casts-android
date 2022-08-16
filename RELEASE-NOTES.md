@@ -1,5 +1,39 @@
 # Release notes
 
+### 7.21.0
+
+*   Bug Fixes:    
+    *   Fix the mini player's play icon showing the wrong icon.
+        ([#208](https://github.com/Automattic/pocket-casts-android/pull/208)).
+    *   Fix dark theme background color.
+        ([#206](https://github.com/Automattic/pocket-casts-android/issues/206)).
+    *   Fix embedded artwork not showing on player screen.
+        ([#16](https://github.com/Automattic/pocket-casts-android/issues/16)).
+    *   Fix long podcast website links overflowing.
+        ([#230](https://github.com/Automattic/pocket-casts-android/issues/230)).
+    *   Fix the listening stats not being sent to the server correctly.
+        ([#238](https://github.com/Automattic/pocket-casts-android/issues/238)).
+
+### 7.20.3
+
+*   Bug Fixes:
+    *   Fixes folder mapping at the time of folders full sync.
+        ([#214](https://github.com/Automattic/pocket-casts-android/pull/214)).
+
+### 7.20.2
+
+*   Bug Fixes:    
+    *   Fix OPML import.
+    *   Fix podcasts and folders rearrange crash.
+        ([#200](https://github.com/Automattic/pocket-casts-android/issues/200)).
+
+### 7.20.1
+
+*   New Features:
+    *   Add localizations for English (UK), Arabic, and Norwegian.
+*   Bug Fixes:
+    *   Fix an issue where the podcasts order was being changed after migrating to the latest version.
+
 ### 7.20.0
 
 *   New Features:

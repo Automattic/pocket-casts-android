@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
+import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -18,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -32,7 +35,14 @@ import javax.xml.parsers.SAXParserFactory
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class OpmlImportTask(context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
+@HiltWorker
+class OpmlImportTask @AssistedInject constructor(
+    @Assisted val context: Context,
+    @Assisted val parameters: WorkerParameters,
+    var podcastManager: PodcastManager,
+    var refreshServerManager: RefreshServerManager,
+    var notificationHelper: NotificationHelper
+) : CoroutineWorker(context, parameters) {
 
     companion object {
         const val INPUT_URI = "INPUT_URI"
@@ -53,10 +63,6 @@ class OpmlImportTask(context: Context, parameters: WorkerParameters) : Coroutine
             Toast.makeText(context, context.getString(LR.string.settings_import_opml_toast), Toast.LENGTH_LONG).show()
         }
     }
-
-    lateinit var podcastManager: PodcastManager
-    lateinit var refreshServerManager: RefreshServerManager
-    lateinit var notificationHelper: NotificationHelper
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

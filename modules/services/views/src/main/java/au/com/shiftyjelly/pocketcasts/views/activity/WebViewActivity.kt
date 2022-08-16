@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
@@ -75,7 +76,8 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
             }
 
             // Any link you tap on we will open in the external browser
-            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val url = request.url.toString()
                 if (extraUrl == url) {
                     return false
                 }

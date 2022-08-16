@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.runtime.Composable
@@ -38,7 +37,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.GradientIcon
@@ -77,7 +76,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
     ): View =
         ComposeView(requireContext()).apply {
             setContent {
-                AppTheme(theme.activeTheme) {
+                AppThemeWithBackground(theme.activeTheme) {
 
                     var isUnrestricted by remember { mutableStateOf(batteryRestrictions.isUnrestricted()) }
                     DisposableEffect(this) {
@@ -199,12 +198,13 @@ private fun Page(
                         )
                     }
 
+                    val learnMoreString = stringResource(LR.string.learn_more)
                     TextP50(
                         text = buildAnnotatedString {
                             append(stringResource(LR.string.settings_battery_usage_message))
                             append(" ")
                             withStyle(SpanStyle(color = MaterialTheme.theme.colors.primaryInteractive01)) {
-                                append(stringResource(LR.string.learn_more))
+                                append(learnMoreString)
                             }
                         },
                         style = MaterialTheme.typography.body1,
@@ -236,31 +236,27 @@ private fun Page(
 @Preview(showBackground = true)
 @Composable
 private fun PagePreview_restricted(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
-    AppTheme(themeType) {
-        Surface {
-            Page(
-                isUnrestricted = false,
-                navigationButton = NavigationButton.Close,
-                onBackPressed = {},
-                onClick = {},
-                openUrl = {}
-            )
-        }
+    AppThemeWithBackground(themeType) {
+        Page(
+            isUnrestricted = false,
+            navigationButton = NavigationButton.Close,
+            onBackPressed = {},
+            onClick = {},
+            openUrl = {}
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun PagePreview_unrestricted(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
-    AppTheme(themeType) {
-        Surface {
-            Page(
-                isUnrestricted = true,
-                navigationButton = NavigationButton.Back,
-                onBackPressed = {},
-                onClick = {},
-                openUrl = {}
-            )
-        }
+    AppThemeWithBackground(themeType) {
+        Page(
+            isUnrestricted = true,
+            navigationButton = NavigationButton.Back,
+            onBackPressed = {},
+            onClick = {},
+            openUrl = {}
+        )
     }
 }

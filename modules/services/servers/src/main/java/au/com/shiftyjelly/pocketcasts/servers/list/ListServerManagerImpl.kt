@@ -23,8 +23,8 @@ class ListServerManagerImpl @Inject constructor(
 
         private val DATE_FORMAT = SimpleDateFormat("yyyyMMddHHmmss", Locale.US)
 
-        fun buildSecurityHash(date: String): String? {
-            val stringToHash = date + Settings.SHARING_SERVER_SECRET
+        fun buildSecurityHash(date: String, serverSecret: String): String? {
+            val stringToHash = date + serverSecret
             return EncodingHelper.SHA1(stringToHash)
         }
 
@@ -34,9 +34,9 @@ class ListServerManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun createPodcastList(title: String, description: String, podcasts: List<Podcast>, date: Date): String? {
+    override suspend fun createPodcastList(title: String, description: String, podcasts: List<Podcast>, date: Date, serverSecret: String): String? {
         val dateString = DATE_FORMAT.format(date)
-        val hash = buildSecurityHash(dateString)
+        val hash = buildSecurityHash(dateString, serverSecret)
         val request = PodcastList(
             title = title,
             description = description,

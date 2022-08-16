@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -36,7 +35,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
@@ -76,7 +75,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View = ComposeView(requireContext()).apply {
         setContent {
-            AppTheme(theme.activeTheme) {
+            AppThemeWithBackground(theme.activeTheme) {
                 PlaybackSettings(
                     settings = settings,
                     onBackClick = { activity?.onBackPressed() },
@@ -98,7 +97,6 @@ class PlaybackSettingsFragment : BaseFragment() {
             )
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.theme.colors.primaryUi02)
                     .verticalScroll(rememberScrollState())
             ) {
                 SettingSection(heading = stringResource(LR.string.settings_general_defaults)) {

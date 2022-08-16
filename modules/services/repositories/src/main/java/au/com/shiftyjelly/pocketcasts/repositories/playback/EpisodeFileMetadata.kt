@@ -60,7 +60,9 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                         } else if (frame is ApicFrame && TAG_APIC == frame.id && loadArtwork) {
                             val file = File.createTempFile("$filenamePrefix-podcast_embedded_artwork", "jpg", context.cacheDir)
                             val filePath = saveToDisk(frame.pictureData, file, context)
-                            this.embeddedArtworkPath = filePath
+                            if (filePath != null) {
+                                this.embeddedArtworkPath = filePath
+                            }
                         } else if (frame is TextInformationFrame && TAG_TITLE == frame.id) {
                             this.embeddedTitle = frame.value
                         } else if (frame is TextInformationFrame && TAG_LENGTH == frame.id) {
@@ -100,76 +102,68 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                 val fileName = String.format("$filenamePrefix-chapterImage%s", chapterIndex)
                 val file = File(context.cacheDir, fileName)
                 val filePath = saveToDisk(subFrame.pictureData, file, context)
-                imagePath = filePath
-                mimeType = subFrame.mimeType
+                if (filePath != null) {
+                    imagePath = filePath
+                    mimeType = subFrame.mimeType
+                }
             }
         }
         return Chapter(
-            title,
-            url?.toHttpUrlOrNull(),
-            frame.startTimeMs,
-            frame.endTimeMs,
-            frame.startOffset,
-            frame.endOffset,
-            imagePath,
-            mimeType
+            title = title,
+            url = url?.toHttpUrlOrNull(),
+            startTime = frame.startTimeMs,
+            endTime = frame.endTimeMs,
+            startOffset = frame.startOffset,
+            endOffset = frame.endOffset,
+            imagePath = imagePath,
+            mimeType = mimeType
         )
     }
 
-    private fun saveToDisk(pictureData: ByteArray, file: File, context: Context): String {
-        var options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        BitmapFactory.decodeByteArray(pictureData, 0, pictureData.size, options)
-
-        val windowHeightPx = context.resources.displayMetrics.heightPixels
-        val windowWidthPx = context.resources.displayMetrics.widthPixels
-        val windowSizePx = Math.min(windowWidthPx, windowHeightPx)
-
-        val height = options.outHeight
-        val width = options.outWidth
-        // resize the chapter artwork if it is too large for example "Área de Transferência - Episode 013"
-        if (width > windowSizePx || height > windowSizePx) {
-            val scaleSize = Math.round(Math.log(windowSizePx / Math.max(height, width).toDouble()) / Math.log(0.5)).toInt()
-            val scale = Math.pow(2.0, scaleSize.toDouble()).toInt()
-
-            options = BitmapFactory.Options()
-            options.inSampleSize = scale
-            options.inPreferredConfig = Bitmap.Config.RGB_565
-
-            var fileOutputStream: FileOutputStream? = null
-            try {
-                val scaledBitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.size, options)
-                fileOutputStream = FileOutputStream(file)
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, fileOutputStream)
-                scaledBitmap.recycle()
-            } catch (e: Throwable) {
-                Timber.e(e, "Failed to scale chapter image.")
-            } finally {
-                try {
-                    fileOutputStream?.close()
-                } catch (e: IOException) {
-                }
-            }
-        } else {
-            var outputStream: BufferedOutputStream? = null
-            try {
-                outputStream = BufferedOutputStream(FileOutputStream(file))
-                outputStream.write(pictureData)
-            } catch (e: IOException) {
-                Timber.e(e)
-            } finally {
-                try {
-                    outputStream?.flush()
-                } catch (e: Exception) {
-                }
-
-                try {
-                    outputStream?.close()
-                } catch (e: Exception) {
-                }
-            }
+    private fun saveToDisk(pictureData: ByteArray, file: File, context: Context): String? {
+        val sampleSize = 4
+        val options = BitmapFactory.Options().apply {
+            // parse the image at a smaller sample size to save memory
+            inSampleSize = sampleSize
+        }
+        val bitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.size, options)
+        // check the embedded artwork can be decoded
+        if (bitmap == null) {
+            Timber.i("Failed to decode embedded artwork.")
+            return null
         }
 
-        return file.absolutePath
+        try {
+            val windowHeightPx = context.resources.displayMetrics.heightPixels
+            val windowWidthPx = context.resources.displayMetrics.widthPixels
+            val windowSizePx = Math.min(windowWidthPx, windowHeightPx)
+
+            val height = options.outHeight * sampleSize
+            val width = options.outWidth * sampleSize
+            // resize the chapter artwork if it is too large for example "Área de Transferência - Episode 013"
+            if (width > windowSizePx || height > windowSizePx) {
+                val scaleSize = Math.round(Math.log(windowSizePx / Math.max(height, width).toDouble()) / Math.log(0.5)).toInt()
+                val scale = Math.pow(2.0, scaleSize.toDouble()).toInt()
+
+                val resizeOptions = BitmapFactory.Options().apply {
+                    inSampleSize = scale
+                    inPreferredConfig = Bitmap.Config.RGB_565
+                }
+
+                FileOutputStream(file).use { outputStream ->
+                    val scaledBitmap = BitmapFactory.decodeByteArray(pictureData, 0, pictureData.size, resizeOptions)
+                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+                    scaledBitmap.recycle()
+                }
+            } else {
+                BufferedOutputStream(FileOutputStream(file)).use { outputStream ->
+                    outputStream.write(pictureData)
+                }
+            }
+            return file.absolutePath
+        } catch (e: IOException) {
+            Timber.e(e)
+        }
+        return null
     }
 }

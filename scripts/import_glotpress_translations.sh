@@ -21,7 +21,10 @@ languages = [
     { label: "Dutch", code: "nl", folder: "values-nl" },
     { label: "French (France)", code: "fr", folder: "values-fr" },
     { label: "French (Canada)", code: "fr-ca", folder: "values-fr-rCA" },
-    { label: "Russian", code: "ru", folder: "values-ru" }
+    { label: "Russian", code: "ru", folder: "values-ru" },
+    { label: "Arabic", code: "ar", folder: "values-ar" },
+    { label: "English (UK)", code: "en-gb", folder: "values-en-rGB" },
+    { label: "Norwegian", code: "nb", folder: "values-nb" }
 ]
 
 def write_string_to_file(contents, file_name)

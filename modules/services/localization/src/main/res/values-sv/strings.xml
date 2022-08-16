@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-05-11 13:54:03+0000
+Translation-Revision-Date: 2022-08-09 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+	<string name="player_open_full_size_player">Aktivera för att öppna spelare i full storlek</string>
+	<string name="settings_downloads_clean_up">Rensa</string>
+	<string name="podcasts_share_failed_description">Något gick fel när din delningssida skulle skapas.</string>
+	<string name="podcasts_share_failed">Delningen misslyckades</string>
+	<string name="podcasts_share_creating_list">Skapar lista</string>
+	<string name="podcasts_share_create_list">Skapa lista</string>
+	<string name="podcasts_share_all_selected">Alla har valts</string>
+	<string name="select_podcasts">Välj podcasts</string>
+	<string name="next">Nästa</string>
+	<string name="not_selected">Ej valda</string>
+	<string name="selected">Valda</string>
+	<string name="profile_create_failed_title">Det gick inte att skapa ett konto</string>
+	<string name="please_try_again">Vänligen försök igen</string>
+	<string name="player_battery_warning_snackbar_action">uppdatera</string>
+	<string name="player_battery_warning_snackbar">Dina batteribegränsningar kan orsaka uppspelningsavbrott.</string>
+	<string name="settings_battery_usage_message">Batterianvändningen måste vara obegränsad för att säkerställa oavbruten uppspelning när skärmen är avstängd.</string>
+	<string name="settings_battery_update_message">Tryck på omkopplaren \"%s\" ovan för att uppdatera dina batteriinställningar.</string>
+	<string name="settings_battery_unrestricted_accessibility_label">uppdatera dina batteriinställningar</string>
+	<string name="settings_battery_unrestricted">Obegränsad</string>
+	<string name="settings_battery_learn_more">Lär dig mer</string>
+	<string name="settings_battery_settings">Batteriinställningar</string>
+	<string name="settings_battery">Batteri</string>
+	<string name="stream_warning_summary">Att streama detta avsnitt kommer använda data.</string>
+	<string name="seconds_label">Sekunder</string>
+	<string name="youre_on_metered_wifi">\"Du använder WiFi med datapriser\"</string>
 	<string name="go_to_folder">Gå till mapp</string>
 	<string name="change_folder">Ändra mapp</string>
 	<string name="remove_from_folder">Ta bort från mapp</string>
@@ -225,6 +250,7 @@ Language: sv_SE
 	<string name="error_webview_not_installed">Det gick inte att läsa in anteckningarna för showen, eftersom WebView inte är installerat för systemet.</string>
 	<string name="settings_status_service_support_summary">Åtkomst till support med svar på vanliga frågor och möjlighet att kontakta oss.</string>
 	<string name="settings_status_service_support">Hjälp</string>
+	<string name="settings_status_service_hosts_help">Den vanligaste orsaken är att du har en annonsblockerare konfigurerad på din telefon eller i ditt nätverk. Du måste avblockera den här domänen för att ladda ner podcasts. Observera att Pocket Casts inte är värd för dina podcasts eller väljer vilken värdtjänst som används för dem. Det är upp till showens skapare och ligger utanför vår kontroll.</string>
 	<string name="settings_status_service_hosts_summary">Podcastskapare använder olika värdtjänster för sina avsnittsfiler. Dessa hanteras inte av Pocket Casts.</string>
 	<string name="settings_status_service_hosts">Vanliga podcastvärdar</string>
 	<string name="settings_status_service_ad_blocker_help_plural">Den vanligaste orsaken är att du har en annonsblockerare konfigurerad på din telefon eller i ditt nätverk. Du måste avblockera domänerna %s</string>
@@ -282,7 +308,6 @@ Language: sv_SE
 	<string name="settings_storage_phone">Telefon</string>
 	<string name="settings_manage_downloads_deleting">Tar bort avsnitt...</string>
 	<string name="settings_whats_new_done">Klart</string>
-	<string name="settings_whats_new_next">Nästa</string>
 	<string name="settings_whats_new">Nyheter</string>
 	<string name="settings_notification_silent">Tyst</string>
 	<string name="settings_select_podcasts">Välj podcasts</string>
@@ -369,7 +394,6 @@ Language: sv_SE
 	<string name="settings_show_archived_summary_hide">Nya podcasts som du prenumererar på kommer inte visa arkiverade avsnitt.</string>
 	<string name="settings_show_archived_action_show">Visa</string>
 	<string name="settings_show_archived_action_hide">Dölj</string>
-	<string name="settings_select_episodes_to_delete">Välj avsnitt att ta bort</string>
 	<string name="settings_row_action_summary">För avsnitt som inte har laddats ner än visar listor %s knappar.</string>
 	<string name="settings_row_action">Radåtgärd</string>
 	<string name="settings_refresh_artwork_title">Med en gång!</string>
@@ -433,7 +457,6 @@ Language: sv_SE
 	<string name="settings_export_save_file">Spara fil</string>
 	<string name="settings_embedded_artwork_details">Visar omslag från den nedladdade filen (om ett sådant finns) i spelaren istället för att använda showens omslag.</string>
 	<string name="settings_developer">Utvecklare</string>
-	<string name="settings_delete_episodes">Ta bort %d avsnitt</string>
 	<string name="settings_close_upgrade_offer">stäng uppgraderingserbjudande</string>
 	<string name="settings_choose_podcasts">Välj podcasts</string>
 	<string name="settings_auto_play_summary">När det inte finns något mer att spela upp, välj ett avsnitt åt mig automatiskt</string>
@@ -617,7 +640,6 @@ Language: sv_SE
 	<string name="profile_not_signed_in">EJ INLOGGAD</string>
 	<string name="profile_none">Ingen</string>
 	<string name="profile_next_payment">Nästa betalning: %s</string>
-	<string name="profile_next">Nästa</string>
 	<string name="profile_newsletter_detail">Få nyheter, app-uppdateringar, temabaserade spellistor, intervjuer med mera.</string>
 	<string name="profile_new_password">Nytt lösenord</string>
 	<string name="profile_new_email_address">Ny e-postadress</string>
@@ -936,15 +958,13 @@ Language: sv_SE
 	<string name="podcasts_singular">1 podcast</string>
 	<string name="podcasts_show_podcast_details">Visa podcastinformation</string>
 	<string name="podcasts_share_action_select_all">Välj alla podcasts</string>
+	<string name="podcasts_share_all_podcasts_selected">Alla podcasts valda. Knappen Avmarkera alla</string>
 	<string name="podcasts_share_selected">%d valt</string>
-	<string name="podcasts_share_failed_title">Hoppsan</string>
-	<string name="podcasts_share_failed">Det fungerade inte. Försök igen senare.</string>
 	<string name="podcasts_share_via">Dela via</string>
 	<string name="podcasts_share_generating_list">Genererar lista …</string>
 	<string name="podcasts_share_missing_podcast">Välj minst en podcast.</string>
 	<string name="podcasts_share_missing_title">Ange en rubrik för din lista.</string>
 	<string name="podcasts_share_create_error">Hoppsan, kan inte att dela</string>
-	<string name="podcasts_share_warning">Denna sida kommer vara synlig för alla med länken. Dela inte dina egna privata podcasts.</string>
 	<string name="podcasts_share_title">Rubrik</string>
 	<string name="podcasts_share_subscribe_to_all">PRENUMERERA PÅ ALLA</string>
 	<string name="podcasts_share_selected_podcasts">Dela valda podcasts</string>
@@ -1049,7 +1069,6 @@ Language: sv_SE
 	<string name="search_hint">Sök efter podcastnamn</string>
 	<string name="search_podcasts">Sök podcasts</string>
 	<string name="stream_warning_button">Streama ändå</string>
-	<string name="stream_warning_summary">Att streama det här avsnittet använder mobildata.</string>
 	<string name="profile_cloud_upload_warning_button">Ladda upp nu</string>
 	<string name="profile_cloud_upload_warning_summary">Att ladda upp det här avsnittet använder data.</string>
 	<string name="download_warning_on_wifi_button">Ladda ner nu</string>
