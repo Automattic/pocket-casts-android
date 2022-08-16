@@ -174,8 +174,8 @@ project.ext {
             // JUnit
             junit: "junit:junit:4.13.2",
             // Mockito
-            testMockitoAndroid: "org.mockito:mockito-android:4.3.1",
-            testMokitoKotlin: "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0",
+            testMockitoAndroid: "org.mockito:mockito-android:4.6.1",
+            testMokitoKotlin: "org.mockito.kotlin:mockito-kotlin:4.0.0",
             // MaterialProgressBar
             materialProgressBar: "me.zhanghai.android.materialprogressbar:library:1.6.1",
             // JSONassert - https://github.com/skyscreamer/JSONassert
