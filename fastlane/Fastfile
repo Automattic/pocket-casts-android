@@ -62,18 +62,18 @@ platform :android do
         aab_artifact_path = aab_artifact_path(app, version)
         UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
 
-        upload_to_play_store(
-          package_name: APP_PACKAGE_NAME,
-          aab: aab_artifact_path,
-          track: 'beta',
-          release_status: 'draft',
-          skip_upload_apk: true,
-          skip_upload_metadata: true,
-          skip_upload_changelogs: true,
-          skip_upload_images: true,
-          skip_upload_screenshots: true,
-          json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
-        )
+        # upload_to_play_store(
+        #   package_name: APP_PACKAGE_NAME,
+        #   aab: aab_artifact_path,
+        #   track: 'beta',
+        #   release_status: 'draft',
+        #   skip_upload_apk: true,
+        #   skip_upload_metadata: true,
+        #   skip_upload_changelogs: true,
+        #   skip_upload_images: true,
+        #   skip_upload_screenshots: true,
+        #   json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+        # )
 
         release_assets << aab_artifact_path
     end
