@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
@@ -206,7 +205,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             .build()
 
         episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOAD_FAILED)
-        val message = if (StringUtil.isBlank(downloadMessage)) "Download Failed" else downloadMessage
+        val message = if (downloadMessage.isNullOrBlank()) "Download Failed" else downloadMessage
         episodeManager.updateDownloadErrorDetails(episode, message)
 
         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Download failed ${episode.title} ${episode.uuid} - $message")
@@ -571,7 +570,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         if (statusCode in 400..599) {
             val responseReason = response.message
             val message = if (statusCode == 404) ERROR_FILE_NOT_FOUND else String.format(
-                ERROR_DOWNLOAD_MESSAGE, if (StringUtil.isBlank(responseReason)) "" else "(error $statusCode $responseReason)"
+                ERROR_DOWNLOAD_MESSAGE, if (responseReason.isBlank()) "" else "(error $statusCode $responseReason)"
             )
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Invalid response returned for episode download. ${response.code} $responseReason ${response.request.url}")
             return ResponseValidationResult(isValid = false, errorMessage = message)
