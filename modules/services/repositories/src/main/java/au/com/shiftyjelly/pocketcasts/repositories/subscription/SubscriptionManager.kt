@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
@@ -36,4 +37,6 @@ interface SubscriptionManager {
     fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult?
     fun getCachedStatus(): SubscriptionStatus?
     fun clearCachedStatus()
+    fun isEligibleForFreeTrial(): Boolean
+    fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription?
 }

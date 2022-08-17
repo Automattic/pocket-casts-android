@@ -13,14 +13,17 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateFrequencyFragment : BaseFragment() {
 
+    @Inject lateinit var subscriptionManager: SubscriptionManager
     private var adapter: CreateFrequencyAdapter? = null
     private val viewModel: CreateAccountViewModel by activityViewModels()
     private var binding: FragmentCreateFrequencyBinding? = null
@@ -80,7 +83,8 @@ class CreateFrequencyFragment : BaseFragment() {
                     sku = subscription.productDetails.productId,
                     title = subscription.productDetails.title,
                     price = subscription.recurringPricingPhase.pricingPhase.priceAmountMicros * 1_000_000.0,
-                    currency = subscription.recurringPricingPhase.pricingPhase.priceCurrencyCode
+                    currency = subscription.recurringPricingPhase.pricingPhase.priceCurrencyCode,
+                    isFreeTrial = subscriptionManager.isEligibleForFreeTrial() && subscription is Subscription.WithTrial
                 )
                 it.findNavController().navigate(R.id.action_createFrequencyFragment_to_createTOSFragment)
             }

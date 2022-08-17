@@ -3,8 +3,10 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
@@ -143,7 +145,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
 
     override fun loadProducts() {
         val productList =
-            listOf(
+            mutableListOf(
                 QueryProductDetailsParams.Product.newBuilder()
                     .setProductId(MONTHLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
@@ -152,11 +154,16 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                     .setProductId(YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(TEST_FREE_TRIAL_PRODUCT_ID)
-                    .setProductType(BillingClient.ProductType.SUBS)
-                    .build()
-            )
+            ).apply {
+                if (isEligibleForFreeTrial()) {
+                    add(
+                        QueryProductDetailsParams.Product.newBuilder()
+                            .setProductId(TEST_FREE_TRIAL_PRODUCT_ID)
+                            .setProductType(BillingClient.ProductType.SUBS)
+                            .build()
+                    )
+                }
+            }
 
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(productList)
@@ -315,6 +322,21 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun clearCachedStatus() {
         cachedSubscriptionStatus = null
         subscriptionStatus.accept(Optional.empty())
+    }
+
+    override fun isEligibleForFreeTrial(): Boolean {
+        /* TODO: Add server check */
+        return true
+    }
+
+    override fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription? {
+        val trialsIfPresent = subscriptions
+            .filterIsInstance<Subscription.WithTrial>()
+            .ifEmpty { subscriptions }
+
+        return trialsIfPresent.find {
+            it.recurringPricingPhase is SubscriptionPricingPhase.Months
+        } ?: trialsIfPresent.firstOrNull() // if no monthly subscriptions, just display the first
     }
 }
 

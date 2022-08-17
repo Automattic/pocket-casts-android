@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
@@ -45,7 +44,7 @@ class CreateAccountViewModel
                     if (productDetailsState is ProductDetailsState.Loaded) {
                         val subscriptions = productDetailsState.productDetails
                             .mapNotNull { Subscription.fromProductDetails(it) }
-                        defaultSubscription(subscriptions)?.let { updateSubscription(it) }
+                        subscriptionManager.getDefaultSubscription(subscriptions)?.let { updateSubscription(it) }
                         createAccountState.postValue(CreateAccountState.ProductsLoaded(subscriptions))
                     } else {
                         errorUpdate(CreateAccountError.CANNOT_LOAD_SUBS, true)
@@ -210,18 +209,6 @@ class CreateAccountViewModel
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
-    }
-
-    companion object {
-        fun defaultSubscription(subscriptions: List<Subscription>): Subscription? {
-            val trialsIfPresent = subscriptions
-                .filterIsInstance<Subscription.WithTrial>()
-                .ifEmpty { subscriptions }
-
-            return trialsIfPresent.find {
-                it.recurringPricingPhase is SubscriptionPricingPhase.Months
-            } ?: trialsIfPresent.firstOrNull() // if no monthly subscriptions, just display the first
-        }
     }
 }
 
