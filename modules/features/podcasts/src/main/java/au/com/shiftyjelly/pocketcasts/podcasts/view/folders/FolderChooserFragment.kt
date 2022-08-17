@@ -12,7 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -57,9 +57,9 @@ class FolderChooserFragment : BaseDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                AppTheme(theme.activeTheme) {
+                AppThemeWithBackground(theme.activeTheme) {
                     navHostController = rememberNavController()
-                    val navController = navHostController ?: return@AppTheme
+                    val navController = navHostController ?: return@AppThemeWithBackground
                     NavHost(navController = navController, startDestination = NavRoutes.folders) {
                         composable(NavRoutes.folders) {
                             FolderChooserPage(

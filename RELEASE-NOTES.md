@@ -15,6 +15,10 @@
         ([#237](https://github.com/Automattic/pocket-casts-android/issues/237)).
     *   Improve the mini player long press dialog.
         ([#240](https://github.com/Automattic/pocket-casts-android/issues/240)).
+    *   Fix OPML import failing with invalid XML characters.
+        ([#51](https://github.com/Automattic/pocket-casts-android/issues/51)).
+    *   Fix the listening stats not being sent to the server correctly.
+        ([#238](https://github.com/Automattic/pocket-casts-android/issues/238)).
 
 ### 7.20.3
 

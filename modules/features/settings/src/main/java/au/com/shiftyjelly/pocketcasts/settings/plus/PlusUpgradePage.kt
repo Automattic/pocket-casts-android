@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.plus
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,7 +44,7 @@ fun PlusUpgradePage(
     viewModel: UpgradeAccountViewModel
 ) {
     val priceState by viewModel.productState.observeAsState()
-    Column(modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
+    Column {
         ThemedTopAppBar(
             title = "",
             navigationButton = NavigationButton.Close,

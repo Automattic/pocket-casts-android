@@ -3,11 +3,6 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verifyBlocking
-import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Flowable
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -17,7 +12,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.whenever
+import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class ManualCleanupViewModelTest {

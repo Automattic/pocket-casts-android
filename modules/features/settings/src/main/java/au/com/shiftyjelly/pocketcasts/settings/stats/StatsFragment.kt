@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +41,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
@@ -65,7 +64,7 @@ class StatsFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = ComposeView(requireContext()).apply {
         setContent {
-            AppTheme(theme.activeTheme) {
+            AppThemeWithBackground(theme.activeTheme) {
                 val state: StatsViewModel.State by viewModel.state.collectAsState()
                 StatsPage(
                     state = state,
@@ -85,7 +84,7 @@ class StatsFragment : BaseFragment() {
 
 @Composable
 private fun StatsPage(state: StatsViewModel.State, onBackClick: () -> Unit, onRetryClick: () -> Unit) {
-    Column(Modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
+    Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.profile_navigation_stats),
             onNavigationClick = onBackClick,
@@ -261,7 +260,7 @@ private fun StatsPageLoadedPreview(@PreviewParameter(ThemePreviewParameterProvid
         funnyText = "During which time you blinked 637 times. Heyooo!",
         startedAt = Date()
     )
-    AppTheme(themeType) {
+    AppThemeWithBackground(themeType) {
         StatsPage(
             state = state,
             onBackClick = { },
@@ -273,7 +272,7 @@ private fun StatsPageLoadedPreview(@PreviewParameter(ThemePreviewParameterProvid
 @Preview(showBackground = true)
 @Composable
 private fun StatsPageErrorPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
-    AppTheme(themeType) {
+    AppThemeWithBackground(themeType) {
         StatsPage(
             state = StatsViewModel.State.Error,
             onBackClick = { },
