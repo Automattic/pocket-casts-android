@@ -4,13 +4,11 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.util.AttributeSet
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
-import android.widget.PopupMenu
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.databinding.DataBindingUtil
@@ -82,34 +80,10 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
                 listener?.onUpNextClicked()
             }
 
-            override fun onLongClick(x: Float, y: Float) {
-                showPlayerLongPressDialog(x, y)
+            override fun onLongClick() {
+                listener?.onMiniPlayerLongClick()
             }
         }
-    }
-
-    fun showPlayerLongPressDialog(x: Float, y: Float) {
-        // make the popup open from where the user long pressed
-        binding.popupAnchor.x = x
-        binding.popupAnchor.y = y
-
-        val popupMenu = PopupMenu(context, binding.popupAnchor, Gravity.CENTER).apply {
-            inflate(R.menu.player_long_press_menu)
-            setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.mark_as_played -> {
-                        listener?.onMarkAsPlayed()
-                        true
-                    }
-                    R.id.close_player -> {
-                        listener?.onEndPlaybackAndClearUpNext()
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }
-        popupMenu.show()
     }
 
     interface PlayerBottomSheetListener {
@@ -122,9 +96,8 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         fun onPauseClicked()
         fun onSkipBackwardClicked()
         fun onSkipForwardClicked()
-        fun onEndPlaybackAndClearUpNext()
-        fun onMarkAsPlayed()
         fun onUpNextClicked()
+        fun onMiniPlayerLongClick()
     }
 
     override fun onAttachedToWindow() {
