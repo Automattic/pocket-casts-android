@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -192,10 +191,5 @@ class StorageSettingsViewModelTest {
 
     private fun createNewTemporaryCustomFolder() {
         File(temporaryFolder.newFolder(CUSTOM_FOLDER_NEW_PATH), CUSTOM_FOLDER_NEW_LABEL).createNewFile()
-    }
-
-    @After
-    fun tearDown() {
-        temporaryFolder.delete()
     }
 }
