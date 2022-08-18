@@ -156,7 +156,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
             ).apply {
-                if (isEligibleForFreeTrial()) {
+                if (isFreeTrialEnabled()) {
                     add(
                         QueryProductDetailsParams.Product.newBuilder()
                             .setProductId(TEST_FREE_TRIAL_PRODUCT_ID)
@@ -325,10 +325,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         subscriptionStatus.accept(Optional.empty())
     }
 
-    override fun isEligibleForFreeTrial(): Boolean {
-        /* TODO: Add server check */
-        return BuildConfig.ENABLE_FREE_TRIAL
-    }
+    override fun isFreeTrialEnabled() = BuildConfig.ENABLE_FREE_TRIAL
 
     override fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription? {
         val trialsIfPresent = subscriptions
