@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.plus
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -68,7 +67,7 @@ private fun PlusUpgradePageView(
     productState: UpgradeAccountViewModel.ProductState?,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
+    Column {
         PlusInformation(
             storageLimitGb = storageLimitGb,
             productState = productState,
