@@ -229,13 +229,16 @@ object AnalyticsHelper {
         logEvent("select_sign_in_account")
     }
 
-    fun plusPlanChosen(sku: String, title: String, price: Double, currency: String) {
+    fun plusPlanChosen(sku: String, title: String, price: Double?, currency: String?, isFreeTrial: Boolean) {
         val plan = bundleOf(
             Param.ITEM_ID to sku,
             Param.ITEM_NAME to title,
             Param.PRICE to price,
             Param.QUANTITY to 1
         )
+        if (isFreeTrial) {
+            plan.putString(Param.COUPON, "FREE TRIAL")
+        }
         logEvent(
             Event.ADD_TO_CART,
             bundleOf(

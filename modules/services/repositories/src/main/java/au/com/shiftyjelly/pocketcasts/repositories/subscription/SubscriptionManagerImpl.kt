@@ -3,19 +3,22 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_SKU
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_SKU
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.TEST_FREE_TRIAL_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -82,19 +85,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         return productDetails.toFlowable(BackpressureStrategy.LATEST)
     }
 
-    override fun observePrices(): Flowable<PricePair> {
-        return observeProductDetails().map { state ->
-            if (state is ProductDetailsState.Loaded) {
-                PricePair(
-                    state.productDetails.find { it.productId == MONTHLY_SKU }?.price,
-                    state.productDetails.find { it.productId == YEARLY_SKU }?.price,
-                )
-            } else {
-                PricePair(null, null)
-            }
-        }
-    }
-
     override fun observePurchaseEvents(): Flowable<PurchaseEvent> {
         return purchaseEvents.toFlowable(BackpressureStrategy.LATEST)
     }
@@ -156,23 +146,31 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
 
     override fun loadProducts() {
         val productList =
-            listOf(
+            mutableListOf(
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(MONTHLY_SKU)
+                    .setProductId(MONTHLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(YEARLY_SKU)
+                    .setProductId(YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
-                    .build()
-            )
+                    .build(),
+            ).apply {
+                if (isFreeTrialEnabled()) {
+                    add(
+                        QueryProductDetailsParams.Product.newBuilder()
+                            .setProductId(TEST_FREE_TRIAL_PRODUCT_ID)
+                            .setProductType(BillingClient.ProductType.SUBS)
+                            .build()
+                    )
+                }
+            }
 
-        val params = QueryProductDetailsParams.newBuilder().setProductList(productList)
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(productList)
+            .build()
 
-        billingClient.queryProductDetailsAsync(params.build()) {
-                billingResult,
-                productDetailsList
-            ->
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 Timber.d("Billing products loaded")
                 productDetails.accept(ProductDetailsState.Loaded(productDetailsList))
@@ -325,6 +323,18 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun clearCachedStatus() {
         cachedSubscriptionStatus = null
         subscriptionStatus.accept(Optional.empty())
+    }
+
+    override fun isFreeTrialEnabled() = BuildConfig.ENABLE_FREE_TRIAL
+
+    override fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription? {
+        val trialsIfPresent = subscriptions
+            .filterIsInstance<Subscription.WithTrial>()
+            .ifEmpty { subscriptions }
+
+        return trialsIfPresent.find {
+            it.recurringPricingPhase is SubscriptionPricingPhase.Months
+        } ?: trialsIfPresent.firstOrNull() // if no monthly subscriptions, just display the first
     }
 }
 

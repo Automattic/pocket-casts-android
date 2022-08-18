@@ -12,17 +12,18 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateFrequenc
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
-import au.com.shiftyjelly.pocketcasts.utils.extensions.priceCurrencyCode
-import au.com.shiftyjelly.pocketcasts.utils.extensions.priceDouble
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CreateFrequencyFragment : BaseFragment() {
 
+    @Inject lateinit var subscriptionManager: SubscriptionManager
     private var adapter: CreateFrequencyAdapter? = null
     private val viewModel: CreateAccountViewModel by activityViewModels()
     private var binding: FragmentCreateFrequencyBinding? = null
@@ -43,8 +44,8 @@ class CreateFrequencyFragment : BaseFragment() {
         val binding = binding ?: return
 
         binding.paymentsRecyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = CreateFrequencyAdapter(emptyList()) {
-            subscriptionFrequencySelected(it)
+        adapter = CreateFrequencyAdapter(emptyList(), theme.activeTheme) {
+            subscriptionSelected(it)
         }
         binding.paymentsRecyclerView.adapter = adapter
 
@@ -68,7 +69,7 @@ class CreateFrequencyFragment : BaseFragment() {
                 is CreateAccountState.ProductsLoaded -> {
                     progress.isVisible = false
                     adapter?.submitList(it.list)
-                    adapter?.update(viewModel.subscriptionFrequency.value)
+                    adapter?.update(viewModel.subscription.value)
                     adapter?.notifyDataSetChanged()
                 }
                 else -> {}
@@ -76,18 +77,22 @@ class CreateFrequencyFragment : BaseFragment() {
         }
 
         binding.btnNext.setOnClickListener {
-            val frequency = viewModel.subscriptionFrequency.value
-            if (frequency != null) {
-                val product = frequency.product
-                AnalyticsHelper.plusPlanChosen(sku = product.productId, title = product.title, price = product.priceDouble, currency = product.priceCurrencyCode)
-
+            val subscription = viewModel.subscription.value
+            if (subscription != null) {
+                AnalyticsHelper.plusPlanChosen(
+                    sku = subscription.productDetails.productId,
+                    title = subscription.productDetails.title,
+                    price = subscription.recurringPricingPhase.pricingPhase.priceAmountMicros * 1_000_000.0,
+                    currency = subscription.recurringPricingPhase.pricingPhase.priceCurrencyCode,
+                    isFreeTrial = subscriptionManager.isFreeTrialEnabled() && subscription is Subscription.WithTrial
+                )
                 it.findNavController().navigate(R.id.action_createFrequencyFragment_to_createTOSFragment)
             }
         }
     }
 
-    private fun subscriptionFrequencySelected(subscriptionFrequency: SubscriptionFrequency) {
-        viewModel.updateSubscriptionFrequency(subscriptionFrequency)
+    private fun subscriptionSelected(subscription: Subscription) {
+        viewModel.updateSubscription(subscription)
     }
 
     private fun updateForm(cannotFindSubs: Boolean) {

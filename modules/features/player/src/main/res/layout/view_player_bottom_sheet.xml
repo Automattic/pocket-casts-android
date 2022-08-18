@@ -15,12 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="68dp" />
 
-        <View
-            android:id="@+id/popupAnchor"
-            android:layout_width="1dp"
-            android:layout_height="1dp"
-            android:background="@color/transparent"/>
-
         <FrameLayout
             android:id="@+id/player"
             android:layout_width="match_parent"

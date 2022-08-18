@@ -42,18 +42,23 @@
             android:layout_marginStart="24dp"
             android:checked="false"
             android:clickable="false"
+            android:importantForAccessibility="no"
             app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
             app:layout_constraintStart_toStartOf="@+id/outlinePanel"
             app:layout_constraintTop_toTopOf="@+id/outlinePanel" />
 
         <TextView
             android:id="@+id/txtTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textAppearance="@style/H30"
             android:textColor="?attr/primary_text_01"
-            app:layout_constraintBottom_toTopOf="@+id/spaceBottom"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toTopOf="@+id/txtDescription"
+            app:layout_constraintEnd_toStartOf="@+id/productAmountView"
             app:layout_constraintStart_toEndOf="@+id/btnFrequency"
             app:layout_constraintTop_toBottomOf="@+id/spaceTop"
             tools:text="Title" />
@@ -62,29 +67,27 @@
             android:id="@+id/txtDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="16dp"
-            android:gravity="end"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
             android:textAppearance="@style/H60"
             android:textColor="?attr/primary_interactive_01"
-            app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
-            app:layout_constraintEnd_toStartOf="@+id/txtAmount"
-            app:layout_constraintStart_toEndOf="@+id/txtTitle"
-            app:layout_constraintTop_toTopOf="@+id/outlinePanel"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toTopOf="@+id/spaceBottom"
+            app:layout_constraintEnd_toStartOf="@+id/productAmountView"
+            app:layout_constraintStart_toEndOf="@+id/btnFrequency"
+            app:layout_constraintTop_toBottomOf="@+id/txtTitle"
             tools:text="DESCRIPTION" />
 
-        <TextView
-            android:id="@+id/txtAmount"
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/productAmountView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
-            android:textAppearance="@style/H30"
-            android:textColor="?attr/primary_text_01"
-            app:layout_constraintBottom_toBottomOf="@+id/outlinePanel"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintBottom_toTopOf="@+id/spaceBottom"
             app:layout_constraintEnd_toEndOf="@+id/outlinePanel"
-            app:layout_constraintTop_toTopOf="@+id/outlinePanel"
-            tools:text="$100" />
-
+            app:layout_constraintStart_toEndOf="@+id/txtTitle"
+            app:layout_constraintTop_toBottomOf="@+id/spaceTop" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

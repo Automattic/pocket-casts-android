@@ -11,6 +11,12 @@
         ([#16](https://github.com/Automattic/pocket-casts-android/issues/16)).
     *   Fix long podcast website links overflowing.
         ([#230](https://github.com/Automattic/pocket-casts-android/issues/230)).
+    *   Add a confirmation prompt for "End playback & clear Up Next" to prevent accidental actions.
+        ([#237](https://github.com/Automattic/pocket-casts-android/issues/237)).
+    *   Improve the mini player long press dialog.
+        ([#240](https://github.com/Automattic/pocket-casts-android/issues/240)).
+    *   Fix OPML import failing with invalid XML characters.
+        ([#51](https://github.com/Automattic/pocket-casts-android/issues/51)).
     *   Fix the listening stats not being sent to the server correctly.
         ([#238](https://github.com/Automattic/pocket-casts-android/issues/238)).
 
