@@ -27,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -70,7 +69,7 @@ class MediaSessionManager(
                 for (i in parts.size - 1 downTo 1) {
                     val lessParts = arrayOfNulls<String>(i)
                     System.arraycopy(parts, 0, lessParts, 0, i)
-                    options.add(StringUtil.join(" ", lessParts))
+                    options.add(lessParts.joinToString(separator = " "))
                 }
             }
             return options
