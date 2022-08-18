@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,7 +62,7 @@ fun FolderEditPodcastsPage(
     val state: FolderEditViewModel.State by viewModel.state.collectAsState()
     val context = LocalContext.current
     Surface(modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection())) {
-        Column(modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+        Column {
             BottomSheetAppBar(
                 navigationButton = navigationButton,
                 onNavigationClick = onCloseClick

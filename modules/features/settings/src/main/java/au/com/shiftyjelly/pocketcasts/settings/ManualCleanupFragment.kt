@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -40,7 +40,7 @@ class ManualCleanupFragment private constructor() : BaseFragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                AppTheme(theme.activeTheme) {
+                AppThemeWithBackground(theme.activeTheme) {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     ManualCleanupPage(
                         viewModel = viewModel,

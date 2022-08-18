@@ -221,7 +221,7 @@
     <string name="player_effects_trim_silence">Trim Silence</string>
     <string name="player_effects_voices_sound_louder">Voices sound louder</string>
     <string name="player_effects_volume_boost">Volume Boost</string>
-    <string name="player_end_playback_clear_up_next">End playback &amp; clear Up Next</string>
+    <string name="player_end_playback_clear_up_next">Close and clear Up Next</string>
     <string name="player_full_screen">Full screen</string>
     <string name="player_more_actions">More actions</string>
     <string name="player_notification_skip_back">Back %d secs</string>
@@ -250,7 +250,8 @@
     <string name="player_trim_silence_detail">Reduces the length of an episode by trimming silence in conversations.</string>
     <string name="player_up_next" translatable="false">@string/up_next</string>
     <string name="player_up_next_clear_queue">Clear Queue</string>
-    <string name="player_up_next_clear_queue_summary">Clearing your Up Next list cannot be undone</string>
+    <string name="player_up_next_clear_queue_summary">Are you sure you want to clear your Up Next queue?</string>
+    <string name="player_up_next_clear_episodes_plural">Clear %1$d episodes</string>
     <string name="player_up_next_clear_queue_button">Clear Up Next</string>
     <string name="player_up_next_empty">Nothing in Up Next</string>
     <string name="player_up_next_empty_desc">You can queue episodes to play next by swiping right on episode rows, or tapping the icon on an episode card.</string>
@@ -272,6 +273,7 @@
     <string name="player_sleep_time_fired">Sleep timer stopped at the end of your episode.\nNight night!</string>
     <string name="player_skipped_last">Skipped the last %d seconds</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
+    <string name="player_open_full_size_player">Activate to open full size player</string>
 
     <!-- Podcasts -->
 

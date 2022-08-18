@@ -16,16 +16,16 @@ data class FolderResponse(
     @field:Json(name = "dateAdded") val dateAdded: Date?
 ) {
     fun toFolder(): Folder? {
-        if (folderUuid == null || name == null || color == null || sortPosition == null || podcastsSortType == null || dateAdded == null) {
+        if (folderUuid == null || name == null || dateAdded == null) {
             return null
         }
         return Folder(
             uuid = folderUuid,
             name = name,
-            color = color,
+            color = color ?: 0,
             addedDate = dateAdded,
-            sortPosition = sortPosition,
-            podcastsSortType = podcastsSortType,
+            sortPosition = sortPosition ?: 0,
+            podcastsSortType = PodcastsSortType.fromServerId(podcastsSortType?.serverId),
             deleted = false,
             syncModified = 0
         )

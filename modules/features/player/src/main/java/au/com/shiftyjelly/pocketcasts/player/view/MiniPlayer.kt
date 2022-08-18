@@ -31,21 +31,16 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     private val binding = DataBindingUtil.inflate<ViewMiniPlayerBinding>(inflater, R.layout.view_mini_player, this, true)
     private var playing = false
-    private var touchX: Float = 0f
-    private var touchY: Float = 0f
+    private val stringPause: String = context.resources.getString(LR.string.pause)
+    private val stringPlay: String = context.resources.getString(LR.string.play)
 
     var clickListener: OnMiniPlayerClicked? = null
 
     init {
         // open full screen player on click
         binding.root.setOnClickListener { openPlayer() }
-        binding.root.setOnTouchListener { _, event ->
-            touchX = event.x
-            touchY = event.y
-            false
-        }
         binding.root.setOnLongClickListener {
-            clickListener?.onLongClick(touchX, touchY)
+            clickListener?.onLongClick()
             true
         }
         // play / pause click
@@ -56,14 +51,17 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         // open Up Next
         binding.upNextButton.setOnClickListener { openUpNext() }
 
-        updatePlayButtonFrame(false)
-
-        contentDescription = "Mini player. Activate for more player options"
         setOnClickListener {
             if (Util.isTalkbackOn(context)) {
                 openPlayer()
             }
         }
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        // set the initial play button icon to the play triangle. This is run after the button has inflated or the Lottie drawable is null and it won't work.
+        updatePlayButton(isPlaying = false, animate = false)
     }
 
     fun setPlaybackState(playbackState: PlaybackState) {
@@ -74,11 +72,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             progress = playbackState.positionMs
             secondaryProgress = playbackState.bufferedMs
         }
-        updatePlaying(nowPlaying = playbackState.isPlaying, animate = true)
-    }
-
-    fun getPlaybackState(): PlaybackState? {
-        return binding.playbackState
+        updatePlaying(isPlaying = playbackState.isPlaying)
     }
 
     private fun updateTintColor(tintColor: Int, theme: Theme) {
@@ -135,7 +129,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         binding.upNextButton.setImageDrawable(upNextDrawable)
     }
 
-    fun openUpNext() {
+    private fun openUpNext() {
         clickListener?.onUpNextClicked()
     }
 
@@ -161,42 +155,33 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         clickListener?.onSkipForwardClicked()
     }
 
-    private fun updatePlaying(nowPlaying: Boolean, animate: Boolean) {
-        if (playing == nowPlaying) {
-            if ((binding.miniPlayButton.drawable as? LottieDrawable)?.isAnimating == false) {
-                updatePlayButtonFrame(nowPlaying)
+    private fun updatePlaying(isPlaying: Boolean) {
+        val drawable = binding.miniPlayButton.drawable as? LottieDrawable ?: return
+        if (playing == isPlaying) {
+            if (!drawable.isAnimating) {
+                updatePlayButton(isPlaying = isPlaying, animate = false)
             }
-            return
-        }
-        playing = nowPlaying
-        if (animate) {
-            animatePlayButton(playing)
         } else {
-            updatePlayButtonFrame(nowPlaying)
+            playing = isPlaying
+            updatePlayButton(isPlaying = playing, animate = true)
         }
     }
 
-    private fun animatePlayButton(isPlaying: Boolean) {
-        val drawable = binding.miniPlayButton.drawable
-        if (drawable is LottieDrawable) {
+    private fun updatePlayButton(isPlaying: Boolean, animate: Boolean) {
+        val button = binding.miniPlayButton
+        val drawable = button.drawable as? LottieDrawable ?: return
+        if (animate) {
             if (isPlaying) {
                 drawable.setMinAndMaxFrame(10, 20)
             } else {
                 drawable.setMinAndMaxFrame(0, 10)
             }
             drawable.playAnimation()
-            updatePlayButtonDescription(isPlaying)
+        } else {
+            drawable.setMinAndMaxFrame(0, 20)
+            drawable.frame = if (isPlaying) 0 else 10
         }
-    }
-
-    private fun updatePlayButtonDescription(isPlaying: Boolean) {
-        binding.miniPlayButton.contentDescription = resources.getString(if (isPlaying) LR.string.pause else LR.string.play)
-    }
-
-    private fun updatePlayButtonFrame(isPlaying: Boolean) {
-        binding.miniPlayButton.setMinAndMaxFrame(0, 20)
-        binding.miniPlayButton.frame = if (isPlaying) 0 else 10
-        updatePlayButtonDescription(isPlaying)
+        button.contentDescription = if (isPlaying) stringPause else stringPlay
     }
 
     interface OnMiniPlayerClicked {
@@ -206,6 +191,6 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         fun onPauseClicked()
         fun onSkipBackwardClicked()
         fun onSkipForwardClicked()
-        fun onLongClick(x: Float, y: Float)
+        fun onLongClick()
     }
 }

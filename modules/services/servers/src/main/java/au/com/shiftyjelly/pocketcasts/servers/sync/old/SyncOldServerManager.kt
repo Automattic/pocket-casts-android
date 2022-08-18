@@ -44,7 +44,9 @@ class SyncOldServerManager @Inject constructor(@OldSyncServerRetrofit retrofit: 
     }
 
     private fun addDeviceFields(fields: MutableMap<String, String>) {
+        val device = settings.getUniqueDeviceId()
         with(fields) {
+            put("device", device)
             put("v", Settings.PARSER_VERSION)
             put("av", settings.getVersion())
             put("ac", "" + settings.getVersionCode())

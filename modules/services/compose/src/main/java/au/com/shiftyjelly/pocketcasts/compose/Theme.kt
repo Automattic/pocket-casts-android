@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose
 
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -9,6 +10,21 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 private val LocalColors = staticCompositionLocalOf { PocketCastsTheme(colors = ThemeLightColors, isLight = true) }
+
+/**
+ * This theme should be used to support light/dark colors if the composable root of the view tree
+ * does not support the use of contentColor.
+ * @see <a href="https://developer.android.com/jetpack/compose/themes/material#content-color</a> for more details
+ */
+@Composable
+fun AppThemeWithBackground(
+    themeType: Theme.ThemeType,
+    content: @Composable () -> Unit
+) {
+    AppTheme(themeType) {
+        SurfacedContent(content)
+    }
+}
 
 @Composable
 fun AppTheme(
@@ -36,6 +52,15 @@ fun AppTheme(
             colors = buildMaterialColors(colors, isLight),
             content = content
         )
+    }
+}
+
+@Composable
+private fun SurfacedContent(
+    content: @Composable () -> Unit
+) {
+    Surface(color = MaterialTheme.colors.background) {
+        content()
     }
 }
 

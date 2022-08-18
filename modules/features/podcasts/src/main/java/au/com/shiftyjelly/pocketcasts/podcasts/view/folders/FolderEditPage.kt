@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,7 +41,7 @@ fun FolderEditPage(
     val colorId: Int by viewModel.colorId.collectAsState()
     val focusManager = LocalFocusManager.current
     val resources = LocalContext.current.resources
-    Column(modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+    Column {
         Column(
             modifier = Modifier
                 .padding(bottom = 16.dp)

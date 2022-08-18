@@ -10,7 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -30,9 +30,9 @@ class ShareListCreateFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = ComposeView(requireContext()).apply {
         setContent {
-            AppTheme(theme.activeTheme) {
+            AppThemeWithBackground(theme.activeTheme) {
                 navHostController = rememberNavController()
-                val navController = navHostController ?: return@AppTheme
+                val navController = navHostController ?: return@AppThemeWithBackground
                 NavHost(navController = navController, startDestination = NavRoutes.podcasts) {
                     composable(NavRoutes.podcasts) {
                         ShareListCreatePodcastsPage(

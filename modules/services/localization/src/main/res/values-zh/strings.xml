@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-07-26 14:54:23+0000
+Translation-Revision-Date: 2022-08-09 09:54:15+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+	<string name="player_open_full_size_player">启用以打开全尺寸播放器</string>
 	<string name="settings_downloads_clean_up">清理</string>
 	<string name="podcasts_share_failed_description">创建共享页面时出错。</string>
 	<string name="podcasts_share_failed">共享失败</string>

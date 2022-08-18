@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
+import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -18,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -26,13 +29,25 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
 import org.xml.sax.Attributes
+import org.xml.sax.InputSource
+import org.xml.sax.SAXException
 import org.xml.sax.helpers.DefaultHandler
 import java.io.InputStream
+import java.io.StringReader
+import java.util.Scanner
+import java.util.regex.Pattern
 import javax.xml.parsers.SAXParserFactory
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class OpmlImportTask(context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
+@HiltWorker
+class OpmlImportTask @AssistedInject constructor(
+    @Assisted val context: Context,
+    @Assisted val parameters: WorkerParameters,
+    var podcastManager: PodcastManager,
+    var refreshServerManager: RefreshServerManager,
+    var notificationHelper: NotificationHelper
+) : CoroutineWorker(context, parameters) {
 
     companion object {
         const val INPUT_URI = "INPUT_URI"
@@ -52,20 +67,72 @@ class OpmlImportTask(context: Context, parameters: WorkerParameters) : Coroutine
 
             Toast.makeText(context, context.getString(LR.string.settings_import_opml_toast), Toast.LENGTH_LONG).show()
         }
-    }
 
-    lateinit var podcastManager: PodcastManager
-    lateinit var refreshServerManager: RefreshServerManager
-    lateinit var notificationHelper: NotificationHelper
+        /**
+         * Extract the feed urls from an OPML file using a SAX Parser.
+         */
+        fun readOpmlUrlsSax(inputStream: InputStream): List<String> {
+            val parser = SAXParserFactory.newInstance().newSAXParser()
+            val urls = mutableListOf<String>()
+            parser.parse(
+                inputStream,
+                object : DefaultHandler() {
+                    override fun startElement(
+                        uri: String?,
+                        localName: String?,
+                        qName: String?,
+                        attributes: Attributes?
+                    ) {
+                        if (localName.equals("outline", ignoreCase = true)) {
+                            val url = attributes?.getValue("xmlUrl")
+                            if (!url.isNullOrBlank()) {
+                                urls.add(url)
+                            }
+                        }
+                    }
+                }
+            )
+            return urls
+        }
+
+        /**
+         * Extract the feed urls from an OPML file using a Regex.
+         */
+        fun readOpmlUrlsRegex(inputStream: InputStream): List<String> {
+            val urls = mutableListOf<String>()
+            val scanner = Scanner(inputStream, "UTF-8")
+            val pattern = Pattern.compile("xmlUrl=\"([^\"]+)\"")
+            while (scanner.findWithinHorizon(pattern, 0) != null) {
+                val result = scanner.match()
+                val url = encodeXmlString(result.group(1))
+                urls.add(url)
+            }
+            return urls
+        }
+
+        private fun encodeXmlString(url: String): String {
+            val parser = SAXParserFactory.newInstance().newSAXParser()
+            val decodedUrl = StringBuilder()
+            parser.parse(
+                InputSource().apply {
+                    characterStream = StringReader("<root>$url</root>")
+                },
+                object : DefaultHandler() {
+                    override fun characters(charArray: CharArray, start: Int, length: Int) {
+                        decodedUrl.append(String(charArray, start, length))
+                    }
+                }
+            )
+            return decodedUrl.toString()
+        }
+    }
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     override suspend fun doWork(): Result {
         try {
             val uri = Uri.parse(inputData.getString(INPUT_URI)) ?: return Result.failure()
-            applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
-                processFile(inputStream)
-            }
+            processFile(uri)
             return Result.success()
         } catch (t: Throwable) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
@@ -73,8 +140,19 @@ class OpmlImportTask(context: Context, parameters: WorkerParameters) : Coroutine
         }
     }
 
-    private suspend fun processFile(inputStream: InputStream) {
-        val urls = readOpmlFeedUrls(inputStream)
+    private suspend fun processFile(uri: Uri) {
+        var urls = emptyList<String>()
+
+        val resolver = applicationContext.contentResolver
+        try {
+            resolver.openInputStream(uri)?.use { inputStream ->
+                urls = readOpmlUrlsSax(inputStream)
+            }
+        } catch (e: SAXException) {
+            resolver.openInputStream(uri)?.use { inputStream ->
+                urls = readOpmlUrlsRegex(inputStream)
+            }
+        }
 
         val podcastCount = urls.size
         val initialDatabaseCount = podcastManager.countPodcasts()
@@ -113,28 +191,6 @@ class OpmlImportTask(context: Context, parameters: WorkerParameters) : Coroutine
             updateNotification(initialDatabaseCount, podcastCount)
             delay(1000)
         }
-    }
-
-    /**
-     * Extract the feed urls from an OPML file.
-     */
-    private fun readOpmlFeedUrls(inputStream: InputStream): List<String> {
-        val parser = SAXParserFactory.newInstance().newSAXParser()
-        val urls = mutableListOf<String>()
-        parser.parse(
-            inputStream,
-            object : DefaultHandler() {
-                override fun startElement(uri: String?, localName: String?, qName: String?, attributes: Attributes?) {
-                    if (localName.equals("outline", ignoreCase = true)) {
-                        val url = attributes?.getValue("xmlUrl")
-                        if (!url.isNullOrBlank()) {
-                            urls.add(url)
-                        }
-                    }
-                }
-            }
-        )
-        return urls
     }
 
     /**
