@@ -68,6 +68,7 @@
 # chrome cast
 -keep class com.google.android.exoplayer2.ext.cast.DefaultCastOptionsProvider { *; }
 -keep class androidx.mediarouter.app.MediaRouteActionProvider { *; }
+-keep class au.com.shiftyjelly.pocketcasts.CastOptionsProvider { *; }
 
 # glide
 -keep class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
