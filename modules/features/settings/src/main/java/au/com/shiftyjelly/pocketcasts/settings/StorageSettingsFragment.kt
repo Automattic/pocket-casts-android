@@ -27,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
@@ -312,7 +311,7 @@ class StorageSettingsFragment :
         if (preference.key == storageFolderPreference?.key) {
             val newPath = newValue as String
 
-            if (StringUtil.isBlank(newPath)) {
+            if (newPath.isBlank()) {
                 return false
             }
             var oldDirectory: File? = null
@@ -323,7 +322,7 @@ class StorageSettingsFragment :
             }
 
             // validate the path
-            if (StringUtil.isBlank(newPath)) {
+            if (newPath.isBlank()) {
                 UiUtil.displayAlertError(activity, getString(LR.string.settings_storage_folder_blank), null)
                 return false
             }

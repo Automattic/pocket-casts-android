@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -459,7 +458,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun markAsSubscribed(podcast: Podcast, subscribed: Boolean) {
         val podcastUuid = podcast.uuid
-        if (StringUtil.isBlank(podcastUuid)) {
+        if (podcastUuid.isBlank()) {
             return
         }
         podcast.isSubscribed = subscribed
@@ -642,7 +641,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateLatestEpisode(podcast: Podcast, latestEpisode: Episode) {
-        if (StringUtil.isBlank(latestEpisode.uuid)) {
+        if (latestEpisode.uuid.isBlank()) {
             return
         }
 

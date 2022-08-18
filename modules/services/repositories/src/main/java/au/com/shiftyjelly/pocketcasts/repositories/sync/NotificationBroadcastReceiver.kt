@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +56,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
         val bundle = intent.extras ?: return
 
         val episodeUuid = bundle.getString(INTENT_EXTRA_EPISODE_UUID, null)
-        if (StringUtil.isBlank(episodeUuid)) {
+        if (episodeUuid.isNullOrBlank()) {
             return
         }
 
