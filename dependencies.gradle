@@ -37,26 +37,26 @@ project.ext {
 
     // Library versions
     versionBillingClient = '5.0.0'
-    versionCompose = '1.2.0'
-    versionComposeCompiler = '1.2.0'
+    versionCompose = '1.2.1'
+    versionComposeCompiler = '1.3.0'
     versionDagger = '2.41'
     versionEspresso = '3.4.0'
     versionExoplayer = '2.16.1'
-    versionGlide = '4.13.1'
-    versionHilt = '2.43'
+    versionGlide = '4.13.2'
+    versionHilt = '2.43.2'
     versionKotlinCoroutines = '1.6.4'
     versionLifecycle = '2.5.1'
     versionMoshi = '1.13.0'
     versionNavigation = '2.5.1'
     versionPaging = '3.1.1'
     versionRetrofit = '2.9.0'
-    versionRoom = '2.4.2'
+    versionRoom = '2.4.3'
     versionTest = '1.4.0'
     versionWork = '2.7.1'
 
     androidLibs = [
-            appCompat: "androidx.appcompat:appcompat:1.4.2",
-            mediarouter: "androidx.mediarouter:mediarouter:1.2.6",
+            appCompat: "androidx.appcompat:appcompat:1.5.0",
+            mediarouter: "androidx.mediarouter:mediarouter:1.3.1",
             palette: "androidx.palette:palette:1.0.0",
             recyclerview: "androidx.recyclerview:recyclerview:1.2.1",
             swipeToRefresh: "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
@@ -68,13 +68,13 @@ project.ext {
             cast: "com.google.android.gms:play-services-cast-framework:21.0.1",
             desugarJdk: "com.android.tools:desugar_jdk_libs:1.1.5",
             // Firebase BoM (Bill of Materials enables you to manage all your Firebase library versions by specifying only one version)
-            firebaseBom: "com.google.firebase:firebase-bom:30.3.1",
+            firebaseBom: "com.google.firebase:firebase-bom:30.3.2",
             firebaseCrashlytics: "com.google.firebase:firebase-crashlytics-ktx",
             firebaseAnalytics: "com.google.firebase:firebase-analytics-ktx",
             firebaseConfig: "com.google.firebase:firebase-config-ktx",
             constraintLayout: "androidx.constraintlayout:constraintlayout:2.1.4",
             ktx: "androidx.core:core-ktx:1.8.0",
-            ktxFragment: "androidx.fragment:fragment-ktx:1.5.1",
+            ktxFragment: "androidx.fragment:fragment-ktx:1.5.2",
             ktxPreference: "androidx.preference:preference-ktx:1.2.0",
             annotations: "androidx.annotation:annotation:1.3.0",
             liveDataReactiveStreams: "androidx.lifecycle:lifecycle-reactivestreams-ktx:$versionLifecycle",
@@ -153,8 +153,8 @@ project.ext {
             glide: "com.github.bumptech.glide:glide:$versionGlide",
             glideOkHttp: "com.github.bumptech.glide:okhttp3-integration:$versionGlide",
             glideCompile: "com.github.bumptech.glide:compiler:$versionGlide",
-            coil: "io.coil-kt:coil:2.1.0",
-            coilCompose: "io.coil-kt:coil-compose:2.1.0",
+            coil: "io.coil-kt:coil:2.2.0",
+            coilCompose: "io.coil-kt:coil-compose:2.2.0",
             // OkHttp (http client) - https://github.com/square/okhttp
             okHttp: "com.squareup.okhttp3:okhttp:4.9.3",
             okHttpLogging: "com.squareup.okhttp3:logging-interceptor:4.9.3",
@@ -183,7 +183,7 @@ project.ext {
             mockWebServer: "com.squareup.okhttp3:mockwebserver:4.9.3",
             barista: "com.adevinta.android:barista:4.2.0",
             // Accompanist - https://google.github.io/accompanist/
-            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.23.1"
+            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1"
     ]
 
 }
