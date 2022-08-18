@@ -23,6 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -68,6 +70,12 @@ private fun PlusUpgradePageView(
     modifier: Modifier = Modifier,
 ) {
     Column {
+        ThemedTopAppBar(
+            title = "",
+            navigationButton = NavigationButton.Close,
+            onNavigationClick = onCloseClick,
+            backgroundColor = MaterialTheme.theme.colors.primaryUi02
+        )
         PlusInformation(
             storageLimitGb = storageLimitGb,
             productState = productState,
