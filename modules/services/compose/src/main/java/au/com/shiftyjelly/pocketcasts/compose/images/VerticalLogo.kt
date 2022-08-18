@@ -24,7 +24,7 @@ fun VerticalLogo(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun VerticalLogoLightPreview() {
+private fun VerticalLogoLightPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         VerticalLogo()
     }
@@ -32,7 +32,7 @@ fun VerticalLogoLightPreview() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-fun VerticalLogoDarkPreview() {
+private fun VerticalLogoDarkPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         VerticalLogo()
     }

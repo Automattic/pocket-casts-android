@@ -154,7 +154,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
                     android:layout_marginTop="16dp"
-                    android:text="@string/pocket_casts_plus"
                     android:textAppearance="@style/H30"
                     android:textColor="?attr/primary_text_01"
                     app:layout_constraintStart_toEndOf="@+id/btnPlus"
@@ -162,37 +161,27 @@
 
                 <TextView
                     android:id="@+id/lblEverything"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
+                    android:layout_marginEnd="4dp"
                     android:text="@string/profile_everything_unlocked"
                     android:textAppearance="@style/H60"
                     android:textColor="?attr/primary_text_02"
+                    app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="@+id/lblPlus"
-                    app:layout_constraintTop_toBottomOf="@+id/lblPlus" />
+                    app:layout_constraintTop_toBottomOf="@+id/lblPlus"
+                    app:layout_constraintEnd_toStartOf="@+id/chargeComposeView"
+                    />
 
-                <TextView
-                    android:id="@+id/txtSubCharge"
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/chargeComposeView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="40dp"
-                    android:textAppearance="@style/H30"
-                    android:textColor="?attr/primary_text_01"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="$1" />
-
-                <TextView
-                    android:id="@+id/lblSubFrequency"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:text="@string/profile_per_month"
-                    android:textAppearance="@style/H60"
-                    android:textColor="?attr/primary_text_02"
-                    app:layout_constraintEnd_toEndOf="@+id/txtSubCharge"
-                    app:layout_constraintTop_toBottomOf="@+id/lblPlus" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/imgFeature0"

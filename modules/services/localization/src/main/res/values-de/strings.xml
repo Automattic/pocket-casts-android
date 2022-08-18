@@ -525,8 +525,8 @@ Language: de
 	<string name="plus_themes_icons_body">Bekenne Farbe mit den exklusiven Icons und Themes nur für Plus-Abonnenten.</string>
 	<string name="plus_themes_icons">Themes und Icons</string>
 	<string name="plus_thanks_for_your_support_bang">Danke für deine Unterstützung!</string>
-	<string name="plus_per_month">%s /Monat</string>
-	<string name="plus_month_price">%s pro Monat</string>
+	<string name="plus_slash_month">%s /Monat</string>
+	<string name="plus_per_month">%s pro Monat</string>
 	<string name="plus_lifetime_member">Lebenslange Mitgliedschaft</string>
 	<string name="plus_learn_more_button">Weitere Informationen</string>
 	<string name="plus_learn_more_about_plus">Weitere Informationen zu Pocket Casts Plus</string>

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -13,9 +14,15 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
-fun LinkText(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun LinkText(
+    text: String,
+    textAlign: TextAlign? = null,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     TextH40(
         text = text,
+        textAlign = textAlign,
         color = MaterialTheme.theme.colors.primaryInteractive01,
         modifier = modifier.clickable { onClick() }.padding(8.dp),
     )

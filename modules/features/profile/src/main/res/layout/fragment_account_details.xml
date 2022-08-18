@@ -46,7 +46,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/userUpgradeView" />
+                app:layout_constraintTop_toBottomOf="@+id/userUpgradeComposeView" />
 
             <ImageView
                 android:id="@+id/imgMail"
@@ -527,11 +527,10 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <au.com.shiftyjelly.pocketcasts.profile.UserUpgradeView
-                android:id="@+id/userUpgradeView"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/userUpgradeComposeView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/userView" />

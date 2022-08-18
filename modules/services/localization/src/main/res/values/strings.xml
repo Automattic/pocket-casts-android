@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">Pocket Casts</string>
     <string name="pocket_casts" translatable="false">@string/app_name</string>
     <string name="pocket_casts_plus" translatable="false">Pocket Casts Plus</string>
+    <string name="pocket_casts_plus_short" translatable="false">Plus</string>
 
     <string name="empty" translatable="false" />
 
@@ -602,7 +603,6 @@
     <!-- Profile -->
 
     <string name="profile">Profile</string>
-    <string name="profile_1_year_free">1 Year Free</string>
     <string name="profile_access_ended">Access ended: %s</string>
     <string name="profile_access_ends">Access ends: %s</string>
     <string name="profile_account_created">Account Created</string>
@@ -669,7 +669,7 @@
     <string name="profile_create_subscription_failed">Could not create subscription. Please try again</string>
     <string name="profile_create_tos">Before we can let you into the Plus club we need you to agree to our Terms of Use. You can peruse them at your leisure using the link below.</string>
     <string name="profile_create_tos_agree">I Agree</string>
-    <string name="profile_create_tos_disagree">No Thanks</string>
+    <string name="profile_create_tos_disagree">No thanks</string>
     <string name="profile_create_tos_full_terms_of_use">Full Terms of Use</string>
     <string name="profile_create_terms_of_use">Terms of Use</string>
     <string name="profile_create_completed">Complete Account</string>
@@ -705,7 +705,9 @@
     <string name="profile_everything_unlocked">Everything Unlocked</string>
     <string name="profile_extra_app_icons">Extra App Icons</string>
     <string name="profile_extra_themes">Extra Themes</string>
-    <string name="profile_feature_requires">This feature requires\nPocket Casts Plus</string>
+    <string name="profile_feature_requires">This feature requires Pocket Casts Plus</string>
+    <string name="profile_feature_try_trial">Try Pocket Casts Plus free for %s</string>
+    <string name="profile_feature_try_trial_secondary_info">No Payments Now — Cancel Anytime</string>
     <string name="profile_file">File</string>
     <string name="profile_file_locked">locked</string>
     <string name="profile_files_add_custom_image">Add Custom Image</string>
@@ -745,13 +747,13 @@
     <string name="profile_password">Password</string>
     <string name="profile_password_changed">Password Changed</string>
     <string name="profile_password_changed_successful">Successful!</string>
-    <string name="profile_pay_now">Pay Now</string>
     <string name="profile_payment_cancelled">Payment Cancelled</string>
     <string name="profile_payment_failed">Payment Failed</string>
     <string name="profile_payment_failed_detail">It looks like there was a problem processing your payment. Please try again.</string>
     <string name="profile_payment_try_again">Try Again</string>
     <string name="profile_per">per</string>
     <string name="profile_per_month">Per month</string>
+    <string name="profile_per_year">Per year</string>
     <string name="profile_plus">plus</string>
     <string name="profile_plus_expired">Plus expired</string>
     <string name="profile_plus_expires">Expires %s</string>
@@ -828,6 +830,7 @@
     <string name="profile_stats_total">TOTAL</string>
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
+    <string name="profile_start_free_trial">Start free trial</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>
@@ -877,8 +880,15 @@
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_lifetime_member">Lifetime Member</string>
-    <string name="plus_month_price">%s per month</string>
-    <string name="plus_per_month">%s / month</string>
+    <string name="plus_trial_duration_free">%s FREE</string>
+    <string name="plus_per_month">%s per month</string>
+    <string name="plus_per_year">%s per year</string>
+    <string name="plus_slash_month">%s / month</string>
+    <string name="plus_slash_year">%s / year</string>
+    <string name="plus_then_slash_month">then %s / month</string>
+    <string name="plus_then_slash_year">then %s / year</string>
+    <string name="plus_trial_then_slash_month">%s free then %s / month</string>
+    <string name="plus_trial_then_slash_year">%s free then %s / year</string>
     <string name="plus_thanks_for_your_support_bang">Thanks for your support!</string>
     <string name="plus_themes_icons">Themes and Icons</string>
     <string name="plus_themes_icons_body">Fly your true colors. Exclusive icons and themes for the plus club only.</string>
@@ -890,13 +900,14 @@
     <string name="plus_trial_finished_files_removed">Files uploaded to your account will be removed after a week</string>
     <string name="plus_trial_finished_locked">Access to Pocket Casts Plus features will be locked</string>
     <string name="plus_upgrade_to_pocket_casts_plus">Upgrade to Pocket Casts Plus</string>
-    <string name="plus_year_month_price">%1$s per year / %2$s per month</string>
+    <string name="plus_month_year_price">%1$s per month / %2$s per year</string>
     <string name="plus_select_payment_frequency">Select Payment Frequency</string>
     <string name="plus_best_value">BEST VALUE</string>
     <string name="plus_renews_automatically_yearly">Renews automatically yearly</string>
     <string name="plus_renews_automatically_monthly">Renews automatically monthly</string>
     <string name="plus_year">year</string>
     <string name="plus_month">month</string>
+    <string name="plus_day">day</string>
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
 

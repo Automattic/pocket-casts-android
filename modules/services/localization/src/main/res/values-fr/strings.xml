@@ -525,8 +525,8 @@ Language: fr
 	<string name="plus_themes_icons_body">Affichez vos véritables couleurs. Des icônes et des thèmes exclusifs pour le club Plus uniquement.</string>
 	<string name="plus_themes_icons">Thèmes et icônes</string>
 	<string name="plus_thanks_for_your_support_bang">Merci pour votre soutien !</string>
-	<string name="plus_per_month">%s /mois</string>
-	<string name="plus_month_price">%s par mois</string>
+	<string name="plus_slash_month">%s /mois</string>
+	<string name="plus_per_month">%s par mois</string>
 	<string name="plus_lifetime_member">Membre à vie</string>
 	<string name="plus_learn_more_button">En savoir plus</string>
 	<string name="plus_learn_more_about_plus">En savoir plus sur Pocket Casts Plus</string>
