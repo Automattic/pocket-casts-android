@@ -21,6 +21,8 @@
         ([#238](https://github.com/Automattic/pocket-casts-android/issues/238)).
     *   Fix tapping on the cast notification.
         ([#26](https://github.com/Automattic/pocket-casts-android/issues/26)).
+    *   Fix episode row buffering state.
+        ([#53](https://github.com/Automattic/pocket-casts-android/issues/53)).
 
 ### 7.20.3
 
