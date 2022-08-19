@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.os.Build
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.View
@@ -120,14 +119,14 @@ class EpisodeViewHolder(
 
         val sameEpisode = episode.uuid == binding.episode?.uuid
 
-        val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
-        binding.playButtonType = playButtonType
+        // don't set initial values if it's already been done, a side effect is when an episode is playing that it will quickly toggle between the play and pause icon
+        if (!sameEpisode) {
+            val buttonType = PlayButton.calculateButtonType(episode, streamByDefault)
+            binding.playButton.setButtonType(episode, buttonType, tintColor, fromListUuid)
+            updateTimeLeft(textView = binding.lblStatus, episode = episode)
+        }
         binding.episode = episode
-        binding.fromListUuid = fromListUuid
-        binding.tintColor = tintColor
-        binding.publishedDate = dateFormatter.format(episode.publishedDate, context.resources)
         binding.playButton.listener = playButtonListener
-        binding.executePendingBindings()
 
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
@@ -141,9 +140,10 @@ class EpisodeViewHolder(
             .startWith(0)
 
         val isInUpNextObservable = upNextChangesObservable.containsUuid(episode.uuid)
+        val emptyState = PlaybackState(episodeUuid = episode.uuid)
         val playbackStateForThisEpisode = playbackStateUpdates
-            .startWith(PlaybackState(episodeUuid = episode.uuid)) // Pre load with a blank state so it doesn't wait for the first update
-            .filter { it.episodeUuid == episode.uuid } // We only care about playback for this row
+            .startWith(emptyState) // Pre load with a blank state so it doesn't wait for the first update
+            .map { if (it.episodeUuid == episode.uuid) it else emptyState } // When another episode is playing return an empty state to clear fields like the buffering status
 
         val imgIcon = binding.imgIcon
         val progressBar = binding.progressBar
@@ -162,61 +162,47 @@ class EpisodeViewHolder(
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { (downloadProgress, playbackState, isInUpNext) ->
                 episode.playing = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid
-                binding.playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
+                val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
+                binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid)
                 binding.inUpNext = isInUpNext
 
                 imgIcon.isVisible = false
+                progressCircle.isVisible = false
+                progressBar.isVisible = false
                 imgIcon.alpha = 1.0f
                 if (playbackState.episodeUuid == episode.uuid && playbackState.isBuffering) {
-                    imgIcon.isVisible = false
                     progressBar.isVisible = true
-                    progressCircle.isVisible = false
                     lblStatus.text = context.getString(LR.string.episode_row_buffering)
                 } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED) {
                     imgIcon.isVisible = true
-                    progressBar.isVisible = false
-                    progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_downloaded)
                     updateTimeLeft(textView = lblStatus, episode = episode)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(context.getThemeColor(UR.attr.support_02)))
                 } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADING) {
-                    imgIcon.isVisible = false
-                    progressBar.isVisible = false
                     progressCircle.isVisible = true
                     lblStatus.text = context.getString(LR.string.episode_row_downloading, downloadProgress)
                     progressCircle.setPercent(downloadProgress / 100.0f)
                 } else if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
                     imgIcon.isVisible = true
-                    progressBar.isVisible = false
-                    progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_download_failed_row)
                     lblStatus.text = context.getString(LR.string.episode_row_download_failed)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
                 } else if (episode.episodeStatus == EpisodeStatusEnum.WAITING_FOR_POWER) {
                     imgIcon.isVisible = true
-                    progressBar.isVisible = false
-                    progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_waitingforpower)
                     lblStatus.text = context.getString(LR.string.episode_row_waiting_for_power)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
                 } else if (episode.episodeStatus == EpisodeStatusEnum.WAITING_FOR_WIFI) {
                     imgIcon.isVisible = true
-                    progressBar.isVisible = false
-                    progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_waitingforwifi)
                     lblStatus.text = context.getString(LR.string.episode_row_waiting_for_wifi)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
                 } else if (episode.episodeStatus == EpisodeStatusEnum.QUEUED) {
-                    imgIcon.isVisible = false
-                    progressBar.isVisible = false
-                    progressCircle.isVisible = false
                     lblStatus.text = context.getString(LR.string.episode_row_queued)
                     imgIcon.setImageResource(IR.drawable.ic_waitingforwifi)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
                 } else if (episode.isArchived) {
                     imgIcon.isVisible = true
-                    progressBar.isVisible = false
-                    progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_archive)
                     imgIcon.alpha = 0.5f
                     val archivedString = context.getString(LR.string.archived)
@@ -226,15 +212,10 @@ class EpisodeViewHolder(
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
                 } else if (episode.playErrorDetails != null) {
                     imgIcon.isVisible = true
-                    progressBar.isVisible = false
-                    progressCircle.isVisible = false
                     imgIcon.setImageResource(IR.drawable.ic_alert_small)
                     lblStatus.text = episode.playErrorDetails
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(iconColor))
                 } else {
-                    imgIcon.isVisible = false
-                    progressBar.isVisible = false
-                    progressCircle.isVisible = false
                     updateTimeLeft(textView = lblStatus, episode = episode)
                 }
 
@@ -276,9 +257,7 @@ class EpisodeViewHolder(
             width = if (multiSelectEnabled) 16.dpToPx(context) else 52.dpToPx(context)
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            TransitionManager.endTransitions(episodeRow)
-        }
+        TransitionManager.endTransitions(episodeRow)
     }
 
     private fun updateTimeLeft(textView: TextView, episode: Episode) {
