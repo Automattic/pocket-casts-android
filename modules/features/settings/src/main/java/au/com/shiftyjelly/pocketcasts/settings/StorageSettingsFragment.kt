@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.os.Build.VERSION
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -62,7 +61,6 @@ class StorageSettingsFragment : BaseFragment() {
         viewModel.start(
             folderLocations = ::getFileLocations,
             permissionGranted = ::permissionGranted,
-            sdkVersion = VERSION.SDK_INT
         )
     }
 

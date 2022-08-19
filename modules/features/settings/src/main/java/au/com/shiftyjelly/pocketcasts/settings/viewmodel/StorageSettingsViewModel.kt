@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.Manifest
 import android.content.Context
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -83,7 +84,7 @@ class StorageSettingsViewModel
     fun start(
         folderLocations: () -> List<FolderLocation>,
         permissionGranted: () -> Boolean,
-        sdkVersion: Int,
+        sdkVersion: Int = Build.VERSION.SDK_INT,
     ) {
         this.folderLocations = folderLocations
         this.permissionGranted = permissionGranted
