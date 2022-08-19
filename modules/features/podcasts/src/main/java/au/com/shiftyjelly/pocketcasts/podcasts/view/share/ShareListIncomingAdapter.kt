@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -107,7 +106,7 @@ class ShareListIncomingAdapter(
         } else {
             holder.itemView.show()
             holder.titleText.text = title
-            if (StringUtil.isBlank(description)) {
+            if (description.isNullOrBlank()) {
                 holder.descText.hide()
             } else {
                 holder.descText.show()
