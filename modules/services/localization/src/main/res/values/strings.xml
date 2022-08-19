@@ -887,8 +887,8 @@
     <string name="plus_slash_year">%s / year</string>
     <string name="plus_then_slash_month">then %s / month</string>
     <string name="plus_then_slash_year">then %s / year</string>
-    <string name="plus_trial_then_slash_month">%s free then %s / month</string>
-    <string name="plus_trial_then_slash_year">%s free then %s / year</string>
+    <string name="plus_trial_then_slash_month">%1$s free then %2$s / month</string>
+    <string name="plus_trial_then_slash_year">%1$s free then %2$s / year</string>
     <string name="plus_thanks_for_your_support_bang">Thanks for your support!</string>
     <string name="plus_themes_icons">Themes and Icons</string>
     <string name="plus_themes_icons_body">Fly your true colors. Exclusive icons and themes for the plus club only.</string>
