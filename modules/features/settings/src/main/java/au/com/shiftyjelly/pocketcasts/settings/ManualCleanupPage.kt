@@ -148,7 +148,7 @@ private fun TotalSelectedDownloadSizeRow(
         secondaryText = Util.formattedBytes(
             bytes = totalSelectedDownloadSize,
             context = LocalContext.current,
-        ).replace("-", "0 bytes")
+        ).replace("-", stringResource(LR.string.settings_storage_downloaded_bytes, 0)),
     )
 }
 

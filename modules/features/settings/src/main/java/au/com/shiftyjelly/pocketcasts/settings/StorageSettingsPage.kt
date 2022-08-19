@@ -157,7 +157,7 @@ private fun DownloadedFilesRow(
         secondaryText = Util.formattedBytes(
             bytes = state.size,
             context = LocalContext.current,
-        ).replace("-", "0 bytes"),
+        ).replace("-", stringResource(LR.string.settings_storage_downloaded_bytes, 0)),
         modifier = modifier
             .clickable { onClick() }
             .padding(vertical = 6.dp)
