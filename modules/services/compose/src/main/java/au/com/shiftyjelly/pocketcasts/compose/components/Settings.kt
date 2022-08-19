@@ -78,6 +78,7 @@ fun SettingSection(
 @Composable
 fun <T> SettingRadioDialogRow(
     primaryText: String,
+    modifier: Modifier = Modifier,
     secondaryText: String? = null,
     options: List<T>,
     savedOption: T,
@@ -89,7 +90,7 @@ fun <T> SettingRadioDialogRow(
     SettingRow(
         primaryText = primaryText,
         secondaryText = secondaryText,
-        modifier = Modifier.clickable { showDialog = true }
+        modifier = modifier.clickable { showDialog = true }
     ) {
         if (showDialog) {
             RadioDialog(

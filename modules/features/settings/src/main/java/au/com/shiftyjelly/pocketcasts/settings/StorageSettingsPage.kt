@@ -180,12 +180,14 @@ private fun ClearDownloadCacheRow(
 @Composable
 private fun StorageChoiceRow(
     storageChoiceState: StorageSettingsViewModel.State.StorageChoiceState,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val (storageLabels, storagePaths) = storageChoiceState.choices
     val defaultStorageFolderLabel = stringResource(LR.string.settings_storage_phone)
     SettingRadioDialogRow(
         primaryText = stringResource(LR.string.settings_storage_store_on),
+        modifier = modifier,
         secondaryText = storageChoiceState.summary,
         options = storageLabels.asList(),
         savedOption = storageChoiceState.summary,
