@@ -348,7 +348,7 @@ private fun AlertDialogView(
     )
 }
 
-fun mapToStringWithStorageSpace(
+private fun mapToStringWithStorageSpace(
     option: String,
     path: String?,
     context: Context,
