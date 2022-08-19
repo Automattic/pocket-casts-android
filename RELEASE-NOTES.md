@@ -19,6 +19,8 @@
         ([#51](https://github.com/Automattic/pocket-casts-android/issues/51)).
     *   Fix the listening stats not being sent to the server correctly.
         ([#238](https://github.com/Automattic/pocket-casts-android/issues/238)).
+    *   Fix tapping on the cast notification.
+        ([#26](https://github.com/Automattic/pocket-casts-android/issues/26)).
 
 ### 7.20.3
 
