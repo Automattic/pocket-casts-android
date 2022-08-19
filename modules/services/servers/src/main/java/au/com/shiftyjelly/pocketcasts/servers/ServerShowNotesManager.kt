@@ -4,7 +4,6 @@ import android.os.Handler
 import android.os.Looper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.ShowNotesCache
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Completable
 import okhttp3.CacheControl
@@ -94,7 +93,7 @@ class ServerShowNotesManager @Inject constructor(@ShowNotesCache private val htt
         httpShowNotesCache.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Timber.e(e)
-                if (StringUtil.isBlank(cachedNotes)) {
+                if (cachedNotes.isNullOrBlank()) {
                     uiHandler?.post { callback?.notFound() }
                 }
             }
@@ -108,7 +107,7 @@ class ServerShowNotesManager @Inject constructor(@ShowNotesCache private val htt
                     } else {
                         uiHandler?.post { callback?.notFound() }
                     }
-                } else if (StringUtil.isBlank(cachedNotes)) {
+                } else if (cachedNotes.isNullOrBlank()) {
                     uiHandler?.post { callback?.notFound() }
                 }
             }

@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,14 +24,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute.uuid
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -44,12 +40,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ShareListCreateBuildingPage(
     onCloseClick: () -> Unit,
-    viewModel: ShareListCreateViewModel,
-    modifier: Modifier = Modifier
+    viewModel: ShareListCreateViewModel
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
 
-    Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+    Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.podcasts_share_creating_list),
             navigationButton = NavigationButton.Close,
@@ -100,8 +95,8 @@ private fun SharePodcastImage(podcast: Podcast, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun CreateBuildingContentPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
-    AppTheme(themeType) {
-        Column(Modifier.background(MaterialTheme.theme.colors.primaryUi03)) {
+    AppThemeWithBackground(themeType) {
+        Column {
             CreateBuildingContent(
                 title = "Top News Podcasts",
                 podcasts = listOf(Podcast(), Podcast(), Podcast())

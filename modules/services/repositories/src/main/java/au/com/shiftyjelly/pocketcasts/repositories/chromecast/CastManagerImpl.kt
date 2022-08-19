@@ -85,7 +85,7 @@ class CastManagerImpl @Inject constructor(@ApplicationContext private val contex
     private fun getSessionManager(): SessionManager? {
         if (!castAvailable()) return null
         return try {
-            CastContext.getSharedInstance(context).sessionManager
+            CastContext.getSharedInstance()?.sessionManager
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Couldn't load cast despite it reporting it is available")
             null

@@ -78,10 +78,11 @@ fun SettingSection(
 @Composable
 fun <T> SettingRadioDialogRow(
     primaryText: String,
+    modifier: Modifier = Modifier,
     secondaryText: String? = null,
     options: List<T>,
     savedOption: T,
-    optionToStringRes: (T) -> Int,
+    optionToLocalisedString: (T) -> String,
     onSave: (T) -> Unit,
 ) {
 
@@ -89,12 +90,12 @@ fun <T> SettingRadioDialogRow(
     SettingRow(
         primaryText = primaryText,
         secondaryText = secondaryText,
-        modifier = Modifier.clickable { showDialog = true }
+        modifier = modifier.clickable { showDialog = true }
     ) {
         if (showDialog) {
             RadioDialog(
                 title = primaryText,
-                options = options.map { Pair(it, optionToStringRes(it)) },
+                options = options.map { Pair(it, optionToLocalisedString(it)) },
                 savedOption = savedOption,
                 onSave = onSave,
                 dismissDialog = { showDialog = false }

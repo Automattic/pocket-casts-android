@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import timber.log.Timber
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -61,4 +62,15 @@ fun CharSequence.splitIgnoreEmpty(delimiter: String): List<String> {
 
 fun String.removeNewLines(): String {
     return this.replace("[\n\r]".toRegex(), "")
+}
+
+fun String.sha1(): String? {
+    return try {
+        val digest = MessageDigest.getInstance("SHA-1")
+        digest.update(this.toByteArray(charset("iso-8859-1")), 0, this.length)
+        val hash = digest.digest()
+        hash.joinToString("") { "%02x".format(it) }
+    } catch (e: Exception) {
+        null
+    }
 }

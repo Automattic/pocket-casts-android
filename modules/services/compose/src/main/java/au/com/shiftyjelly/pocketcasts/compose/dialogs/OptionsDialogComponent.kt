@@ -38,7 +38,7 @@ fun OptionsDialogComponent(title: String?, @ColorInt iconColor: Int?, options: L
         OptionsDialogHeader(title)
         options.forEachIndexed { index, option ->
             Column {
-                OptionsDialogRow(option = option, iconColor = iconColor, index = index)
+                OptionsDialogRow(option = option, iconColor = option.imageColor ?: iconColor, index = index)
                 if (index != options.size - 1) {
                     HorizontalDivider()
                 }

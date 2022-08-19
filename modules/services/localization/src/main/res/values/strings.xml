@@ -2,6 +2,7 @@
     <string name="app_name" translatable="false">Pocket Casts</string>
     <string name="pocket_casts" translatable="false">@string/app_name</string>
     <string name="pocket_casts_plus" translatable="false">Pocket Casts Plus</string>
+    <string name="pocket_casts_plus_short" translatable="false">Plus</string>
 
     <string name="empty" translatable="false" />
 
@@ -220,7 +221,7 @@
     <string name="player_effects_trim_silence">Trim Silence</string>
     <string name="player_effects_voices_sound_louder">Voices sound louder</string>
     <string name="player_effects_volume_boost">Volume Boost</string>
-    <string name="player_end_playback_clear_up_next">End playback &amp; clear Up Next</string>
+    <string name="player_end_playback_clear_up_next">Close and clear Up Next</string>
     <string name="player_full_screen">Full screen</string>
     <string name="player_more_actions">More actions</string>
     <string name="player_notification_skip_back">Back %d secs</string>
@@ -249,7 +250,8 @@
     <string name="player_trim_silence_detail">Reduces the length of an episode by trimming silence in conversations.</string>
     <string name="player_up_next" translatable="false">@string/up_next</string>
     <string name="player_up_next_clear_queue">Clear Queue</string>
-    <string name="player_up_next_clear_queue_summary">Clearing your Up Next list cannot be undone</string>
+    <string name="player_up_next_clear_queue_summary">Are you sure you want to clear your Up Next queue?</string>
+    <string name="player_up_next_clear_episodes_plural">Clear %1$d episodes</string>
     <string name="player_up_next_clear_queue_button">Clear Up Next</string>
     <string name="player_up_next_empty">Nothing in Up Next</string>
     <string name="player_up_next_empty_desc">You can queue episodes to play next by swiping right on episode rows, or tapping the icon on an episode card.</string>
@@ -601,7 +603,6 @@
     <!-- Profile -->
 
     <string name="profile">Profile</string>
-    <string name="profile_1_year_free">1 Year Free</string>
     <string name="profile_access_ended">Access ended: %s</string>
     <string name="profile_access_ends">Access ends: %s</string>
     <string name="profile_account_created">Account Created</string>
@@ -668,7 +669,7 @@
     <string name="profile_create_subscription_failed">Could not create subscription. Please try again</string>
     <string name="profile_create_tos">Before we can let you into the Plus club we need you to agree to our Terms of Use. You can peruse them at your leisure using the link below.</string>
     <string name="profile_create_tos_agree">I Agree</string>
-    <string name="profile_create_tos_disagree">No Thanks</string>
+    <string name="profile_create_tos_disagree">No thanks</string>
     <string name="profile_create_tos_full_terms_of_use">Full Terms of Use</string>
     <string name="profile_create_terms_of_use">Terms of Use</string>
     <string name="profile_create_completed">Complete Account</string>
@@ -704,7 +705,9 @@
     <string name="profile_everything_unlocked">Everything Unlocked</string>
     <string name="profile_extra_app_icons">Extra App Icons</string>
     <string name="profile_extra_themes">Extra Themes</string>
-    <string name="profile_feature_requires">This feature requires\nPocket Casts Plus</string>
+    <string name="profile_feature_requires">This feature requires Pocket Casts Plus</string>
+    <string name="profile_feature_try_trial">Try Pocket Casts Plus free for %s</string>
+    <string name="profile_feature_try_trial_secondary_info">No Payments Now — Cancel Anytime</string>
     <string name="profile_file">File</string>
     <string name="profile_file_locked">locked</string>
     <string name="profile_files_add_custom_image">Add Custom Image</string>
@@ -744,13 +747,13 @@
     <string name="profile_password">Password</string>
     <string name="profile_password_changed">Password Changed</string>
     <string name="profile_password_changed_successful">Successful!</string>
-    <string name="profile_pay_now">Pay Now</string>
     <string name="profile_payment_cancelled">Payment Cancelled</string>
     <string name="profile_payment_failed">Payment Failed</string>
     <string name="profile_payment_failed_detail">It looks like there was a problem processing your payment. Please try again.</string>
     <string name="profile_payment_try_again">Try Again</string>
     <string name="profile_per">per</string>
     <string name="profile_per_month">Per month</string>
+    <string name="profile_per_year">Per year</string>
     <string name="profile_plus">plus</string>
     <string name="profile_plus_expired">Plus expired</string>
     <string name="profile_plus_expires">Expires %s</string>
@@ -827,6 +830,7 @@
     <string name="profile_stats_total">TOTAL</string>
     <string name="profile_stats_variable_speed">Variable Speed</string>
     <string name="profile_status_error_internet">🤔\n\nUnable to load stats,\ncheck your internet connection.</string>
+    <string name="profile_start_free_trial">Start free trial</string>
     <string name="profile_sub_android_goto">To cancel your subscription, you&#x2019;ll need to cancel via the Google Play Store.</string>
     <string name="profile_sub_cancel_hint0">Your current subscription will remain active until</string>
     <string name="profile_sub_cancel_hint1">Access to Pocket Casts Plus features will be locked</string>
@@ -876,8 +880,15 @@
     <string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_lifetime_member">Lifetime Member</string>
-    <string name="plus_month_price">%s per month</string>
-    <string name="plus_per_month">%s / month</string>
+    <string name="plus_trial_duration_free">%s FREE</string>
+    <string name="plus_per_month">%s per month</string>
+    <string name="plus_per_year">%s per year</string>
+    <string name="plus_slash_month">%s / month</string>
+    <string name="plus_slash_year">%s / year</string>
+    <string name="plus_then_slash_month">then %s / month</string>
+    <string name="plus_then_slash_year">then %s / year</string>
+    <string name="plus_trial_then_slash_month">%1$s free then %2$s / month</string>
+    <string name="plus_trial_then_slash_year">%1$s free then %2$s / year</string>
     <string name="plus_thanks_for_your_support_bang">Thanks for your support!</string>
     <string name="plus_themes_icons">Themes and Icons</string>
     <string name="plus_themes_icons_body">Fly your true colors. Exclusive icons and themes for the plus club only.</string>
@@ -889,13 +900,14 @@
     <string name="plus_trial_finished_files_removed">Files uploaded to your account will be removed after a week</string>
     <string name="plus_trial_finished_locked">Access to Pocket Casts Plus features will be locked</string>
     <string name="plus_upgrade_to_pocket_casts_plus">Upgrade to Pocket Casts Plus</string>
-    <string name="plus_year_month_price">%1$s per year / %2$s per month</string>
+    <string name="plus_month_year_price">%1$s per month / %2$s per year</string>
     <string name="plus_select_payment_frequency">Select Payment Frequency</string>
     <string name="plus_best_value">BEST VALUE</string>
     <string name="plus_renews_automatically_yearly">Renews automatically yearly</string>
     <string name="plus_renews_automatically_monthly">Renews automatically monthly</string>
     <string name="plus_year">year</string>
     <string name="plus_month">month</string>
+    <string name="plus_day">day</string>
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
 
@@ -1054,16 +1066,19 @@
     <string name="settings_storage_data_warning">Warn before using data</string>
     <string name="settings_storage_data_warning_car">Please note that this setting does not apply to episodes played via Android Auto. Episodes that are not downloaded will be streamed on metered networks and no warning will be shown.</string>
     <string name="settings_storage_data_warning_summary">Warn before allowing metered networks to download or stream episodes.</string>
+    <string name="settings_storage_downloaded_bytes">%d bytes</string>
+    <string name="settings_storage_downloaded_files">Downloaded files</string>
     <string name="settings_storage_folder_blank">The folder can not be blank.</string>
     <string name="settings_storage_folder_change_failed">Unable to change to custom folder.</string>
     <string name="settings_storage_folder_not_found">The folder cannot be found or created.</string>
     <string name="settings_storage_folder_write_failed">This folder cannot be written to.</string>
-    <string name="settings_storage_manage_downloads">Manage downloaded files</string>
     <string name="settings_storage_move">Move</string>
     <string name="settings_storage_move_are_you_sure" translatable="false">@string/are_you_sure</string>
     <string name="settings_storage_move_cancel" translatable="false">@string/cancel</string>
     <string name="settings_storage_move_message">This will move existing podcast files to this new location.</string>
     <string name="settings_storage_move_podcasts">Moving podcasts&#x2026;</string>
+    <string name="settings_storage_section_heading_usage">Usage</string>
+    <string name="settings_storage_section_heading_mobile_data">Mobile Data</string>
     <string name="settings_storage_size_free">%s free</string>
     <string name="settings_storage_sorry">Sorry</string>
     <string name="settings_storage_store_on">Store podcasts on</string>
@@ -1078,7 +1093,7 @@
     <string name="settings_title_excluded_podcasts">Excluded Podcasts</string>
     <string name="settings_title_help">Help &amp; feedback</string>
     <string name="settings_title_import_export">Import &amp; export OPML</string>
-    <string name="settings_title_manage_downloads">Manage downloads</string>
+    <string name="settings_title_manage_downloads" translatable="false">@string/settings_storage_downloaded_files</string>
     <string name="settings_title_notifications">Notifications</string>
     <string name="settings_title_playback">General</string>
     <string name="settings_title_signin" translatable="false">@string/sign_in</string>

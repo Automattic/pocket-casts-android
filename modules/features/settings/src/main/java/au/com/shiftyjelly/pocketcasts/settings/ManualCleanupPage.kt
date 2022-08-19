@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
@@ -25,7 +25,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -42,20 +42,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ManualCleanupPage(
     viewModel: ManualCleanupViewModel,
-    showToolbar: Boolean,
     onBackClick: () -> Unit,
 ) {
     val state: ManualCleanupViewModel.State by viewModel.state.collectAsState()
     var includeStarredSwitchState: Boolean by remember { mutableStateOf(false) }
     val context = LocalContext.current
     Column {
-        if (showToolbar) {
-            ThemedTopAppBar(
-                title = stringResource(id = LR.string.settings_title_manage_downloads),
-                navigationButton = NavigationButton.Back,
-                onNavigationClick = onBackClick,
-            )
-        }
+        ThemedTopAppBar(
+            title = stringResource(id = LR.string.settings_title_manage_downloads),
+            navigationButton = NavigationButton.Back,
+            onNavigationClick = onBackClick,
+        )
         ManageDownloadsView(
             state = state,
             includeStarredSwitchState = includeStarredSwitchState,
@@ -89,8 +86,8 @@ private fun ManageDownloadsView(
     val deleteButtonColor = MaterialTheme.theme.colors.support05
     Column(
         modifier = modifier
-            .background(MaterialTheme.theme.colors.primaryUi01)
             .padding(top = 8.dp)
+            .fillMaxHeight()
             .verticalScroll(rememberScrollState())
     ) {
         state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }
@@ -151,7 +148,7 @@ private fun TotalSelectedDownloadSizeRow(
         secondaryText = Util.formattedBytes(
             bytes = totalSelectedDownloadSize,
             context = LocalContext.current,
-        ).replace("-", "0 bytes")
+        ).replace("-", stringResource(LR.string.settings_storage_downloaded_bytes, 0)),
     )
 }
 
@@ -185,7 +182,7 @@ private fun ManualCleanupPageSmallPreview() {
 private fun ManualCleanupPagePreview(
     themeType: Theme.ThemeType = Theme.ThemeType.LIGHT
 ) {
-    AppTheme(themeType) {
+    AppThemeWithBackground(themeType) {
         ManageDownloadsView(
             state = ManualCleanupViewModel.State(),
             includeStarredSwitchState = false,

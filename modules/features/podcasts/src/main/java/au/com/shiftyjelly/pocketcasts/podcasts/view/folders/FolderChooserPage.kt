@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +50,7 @@ fun FolderChooserPage(
 ) {
     val state: FolderEditViewModel.State by viewModel.state.collectAsState()
     Surface(modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection())) {
-        Column(modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+        Column {
             BottomSheetAppBar(
                 title = null,
                 navigationButton = NavigationButton.Close,
