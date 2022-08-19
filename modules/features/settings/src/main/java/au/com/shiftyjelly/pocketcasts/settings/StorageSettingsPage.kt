@@ -125,7 +125,6 @@ fun StorageSettingsView(
 
         Column(
             modifier
-                .padding(vertical = 8.dp)
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
         ) {
