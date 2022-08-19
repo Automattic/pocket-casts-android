@@ -243,6 +243,10 @@ class SettingsImpl @Inject constructor(
         return getBoolean("backgroundRefresh", true)
     }
 
+    override fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean) {
+        return setBoolean("backgroundRefresh", shouldRefresh)
+    }
+
     override fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean) {
         if (getPodcastsSortType() == sortType) {
             return

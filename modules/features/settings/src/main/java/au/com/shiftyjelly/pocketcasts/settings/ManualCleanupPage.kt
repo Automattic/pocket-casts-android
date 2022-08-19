@@ -42,20 +42,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ManualCleanupPage(
     viewModel: ManualCleanupViewModel,
-    showToolbar: Boolean,
     onBackClick: () -> Unit,
 ) {
     val state: ManualCleanupViewModel.State by viewModel.state.collectAsState()
     var includeStarredSwitchState: Boolean by remember { mutableStateOf(false) }
     val context = LocalContext.current
     Column {
-        if (showToolbar) {
-            ThemedTopAppBar(
-                title = stringResource(id = LR.string.settings_title_manage_downloads),
-                navigationButton = NavigationButton.Back,
-                onNavigationClick = onBackClick,
-            )
-        }
+        ThemedTopAppBar(
+            title = stringResource(id = LR.string.settings_title_manage_downloads),
+            navigationButton = NavigationButton.Back,
+            onNavigationClick = onBackClick,
+        )
         ManageDownloadsView(
             state = state,
             includeStarredSwitchState = includeStarredSwitchState,
@@ -151,7 +148,7 @@ private fun TotalSelectedDownloadSizeRow(
         secondaryText = Util.formattedBytes(
             bytes = totalSelectedDownloadSize,
             context = LocalContext.current,
-        ).replace("-", "0 bytes")
+        ).replace("-", stringResource(LR.string.settings_storage_downloaded_bytes, 0)),
     )
 }
 

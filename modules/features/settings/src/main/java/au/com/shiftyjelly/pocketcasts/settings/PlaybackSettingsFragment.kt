@@ -184,7 +184,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             options = listOf(true, false),
             savedOption = saved,
             onSave = onSave,
-            optionToStringRes = ::rowActionToStringRes,
+            optionToLocalisedString = { getString(rowActionToStringRes(it)) },
         )
     }
 
@@ -207,7 +207,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             secondaryText = secondaryText,
             options = listOf(Settings.UpNextAction.PLAY_NEXT, Settings.UpNextAction.PLAY_LAST),
             savedOption = saved,
-            optionToStringRes = ::upNextActionToStringRes,
+            optionToLocalisedString = { getString(upNextActionToStringRes(it)) },
             onSave = onSave
         )
     }
@@ -234,7 +234,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             },
             options = PodcastGrouping.All,
             savedOption = saved,
-            optionToStringRes = ::podcastGroupingToStringRes,
+            optionToLocalisedString = { getString(podcastGroupingToStringRes(it)) },
             onSave = onSave,
         )
     }
@@ -261,10 +261,10 @@ class PlaybackSettingsFragment : BaseFragment() {
         options = listOf(false, true),
         savedOption = saved,
         onSave = onSave,
-        optionToStringRes = {
+        optionToLocalisedString = {
             when (it) {
-                true -> LR.string.settings_show_archived_action_show
-                false -> LR.string.settings_show_archived_action_hide
+                true -> getString(LR.string.settings_show_archived_action_show)
+                false -> getString(LR.string.settings_show_archived_action_hide)
             }
         },
     )
