@@ -1,5 +1,11 @@
 # Release notes
 
+### 7.22.0
+
+*   Bug Fixes:
+    *   Fix playing on Chromecast always shows buffering.
+        ([#254](https://github.com/Automattic/pocket-casts-android/pull/254)).
+
 ### 7.21.0
 
 *   Bug Fixes:    
@@ -23,8 +29,6 @@
         ([#26](https://github.com/Automattic/pocket-casts-android/issues/26)).
     *   Fix episode row buffering state.
         ([#53](https://github.com/Automattic/pocket-casts-android/issues/53)).
-    *   Fix playing on Chromecast always shows buffering.
-        ([#254](https://github.com/Automattic/pocket-casts-android/pull/254)).
 
 ### 7.20.3
 
