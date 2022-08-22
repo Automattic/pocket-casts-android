@@ -43,7 +43,12 @@ class CreateAccountViewModel
                 onSuccess = { productDetailsState ->
                     if (productDetailsState is ProductDetailsState.Loaded) {
                         val subscriptions = productDetailsState.productDetails
-                            .mapNotNull { Subscription.fromProductDetails(it) }
+                            .mapNotNull {
+                                Subscription.fromProductDetails(
+                                    productDetails = it,
+                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                                )
+                            }
                         subscriptionManager.getDefaultSubscription(subscriptions)?.let { updateSubscription(it) }
                         createAccountState.postValue(CreateAccountState.ProductsLoaded(subscriptions))
                     } else {

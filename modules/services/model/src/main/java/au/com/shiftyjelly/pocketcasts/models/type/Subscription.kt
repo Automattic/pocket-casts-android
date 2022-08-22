@@ -46,7 +46,7 @@ sealed interface Subscription {
     }
 
     companion object {
-        fun fromProductDetails(productDetails: ProductDetails): Subscription? {
+        fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? {
 
             val recurringPhase = productDetails.recurringSubscriptionPricingPhase?.fromPricingPhase()
             val trialPhase = productDetails.trialSubscriptionPricingPhase?.fromPricingPhase()
@@ -57,7 +57,7 @@ sealed interface Subscription {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to convert product details to a subscription")
                     null
                 }
-                trialPhase is TrialSubscriptionPricingPhase -> WithTrial(
+                trialPhase is TrialSubscriptionPricingPhase && isFreeTrialEligible -> WithTrial(
                     recurringPricingPhase = recurringPhase,
                     trialPricingPhase = trialPhase,
                     productDetails = productDetails

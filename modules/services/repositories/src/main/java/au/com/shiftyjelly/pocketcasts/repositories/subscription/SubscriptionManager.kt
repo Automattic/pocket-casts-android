@@ -37,6 +37,6 @@ interface SubscriptionManager {
     fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult?
     fun getCachedStatus(): SubscriptionStatus?
     fun clearCachedStatus()
-    fun isFreeTrialEnabled(): Boolean
+    fun isFreeTrialEligible(): Boolean
     fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription?
 }
