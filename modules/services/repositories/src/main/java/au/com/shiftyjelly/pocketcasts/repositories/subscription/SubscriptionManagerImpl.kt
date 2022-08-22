@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.TEST_FREE_TRIAL_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
@@ -31,6 +32,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesResult
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryPurchasesAsync
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -274,6 +276,8 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun refreshPurchases() {
         if (!billingClient.isReady) return
 
+        updateFreeTrialEligibilityIfPurchaseHistoryExists()
+
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
@@ -282,6 +286,18 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                 if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
                     handlePurchase(it)
                 }
+            }
+        }
+    }
+
+    private fun updateFreeTrialEligibilityIfPurchaseHistoryExists() {
+        val queryPurchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+
+        billingClient.queryPurchaseHistoryAsync(queryPurchaseHistoryParams) { _, purchases ->
+            if (purchases?.any { it.products.toString().contains(PLUS_PRODUCT_BASE) } == true) {
+                updateFreeTrialEligible(false)
             }
         }
     }
