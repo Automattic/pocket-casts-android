@@ -84,7 +84,7 @@ class CreateFrequencyFragment : BaseFragment() {
                     title = subscription.productDetails.title,
                     price = subscription.recurringPricingPhase.pricingPhase.priceAmountMicros * 1_000_000.0,
                     currency = subscription.recurringPricingPhase.pricingPhase.priceCurrencyCode,
-                    isFreeTrial = subscriptionManager.isFreeTrialEnabled() && subscription is Subscription.WithTrial
+                    isFreeTrial = subscription is Subscription.WithTrial
                 )
                 it.findNavController().navigate(R.id.action_createFrequencyFragment_to_createTOSFragment)
             }

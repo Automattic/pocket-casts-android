@@ -51,7 +51,10 @@ class PlusSettingsFragment : BaseFragment() {
             val subscriptions = when (productDetailsState) {
                 is ProductDetailsState.Error -> null
                 is ProductDetailsState.Loaded -> productDetailsState.productDetails.mapNotNull {
-                    Subscription.fromProductDetails(it)
+                    Subscription.fromProductDetails(
+                        productDetails = it,
+                        isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                    )
                 }
             }
 

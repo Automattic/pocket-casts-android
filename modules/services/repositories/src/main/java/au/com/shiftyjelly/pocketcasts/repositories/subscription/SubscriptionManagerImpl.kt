@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.TEST_FREE_TRIAL_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
@@ -31,6 +32,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesResult
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryPurchasesAsync
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -72,6 +74,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
     private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
+    private var freeTrialEligible: Boolean = true
 
     override fun signOut() {
         clearCachedStatus()
@@ -156,7 +159,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
             ).apply {
-                if (isFreeTrialEnabled()) {
+                if (isFreeTrialEligible()) {
                     add(
                         QueryProductDetailsParams.Product.newBuilder()
                             .setProductId(TEST_FREE_TRIAL_PRODUCT_ID)
@@ -247,6 +250,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                             .build()
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
+                    updateFreeTrialEligible(false)
                     AnalyticsHelper.plusPurchased()
                 } catch (e: Exception) {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
@@ -272,6 +276,8 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun refreshPurchases() {
         if (!billingClient.isReady) return
 
+        updateFreeTrialEligibilityIfPurchaseHistoryExists()
+
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
@@ -280,6 +286,18 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                 if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
                     handlePurchase(it)
                 }
+            }
+        }
+    }
+
+    private fun updateFreeTrialEligibilityIfPurchaseHistoryExists() {
+        val queryPurchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+
+        billingClient.queryPurchaseHistoryAsync(queryPurchaseHistoryParams) { _, purchases ->
+            if (purchases?.any { it.products.toString().contains(PLUS_PRODUCT_BASE) } == true) {
+                updateFreeTrialEligible(false)
             }
         }
     }
@@ -325,7 +343,11 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         subscriptionStatus.accept(Optional.empty())
     }
 
-    override fun isFreeTrialEnabled() = BuildConfig.ENABLE_FREE_TRIAL
+    override fun isFreeTrialEligible() = freeTrialEligible && BuildConfig.ENABLE_FREE_TRIAL
+
+    override fun updateFreeTrialEligible(eligible: Boolean) {
+        freeTrialEligible = eligible
+    }
 
     override fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription? {
         val trialsIfPresent = subscriptions

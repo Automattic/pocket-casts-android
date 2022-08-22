@@ -23,7 +23,12 @@ class UpgradeAccountViewModel
     private val productDetails = subscriptionManager.observeProductDetails().map { productDetailsState ->
         if (productDetailsState is ProductDetailsState.Loaded) {
             val subscriptions = productDetailsState.productDetails
-                .mapNotNull { Subscription.fromProductDetails(it) }
+                .mapNotNull {
+                    Subscription.fromProductDetails(
+                        productDetails = it,
+                        isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                    )
+                }
             val productState = when (val subscription = subscriptionManager.getDefaultSubscription(subscriptions)) {
                 null -> null
                 is Subscription.WithTrial -> ProductState.ProductWithTrial(

@@ -43,7 +43,12 @@ class AccountDetailsViewModel
     private val subscription = subscriptionManager.observeProductDetails().map { state ->
         if (state is ProductDetailsState.Loaded) {
             val subscriptions = state.productDetails
-                .mapNotNull { Subscription.fromProductDetails(it) }
+                .mapNotNull {
+                    Subscription.fromProductDetails(
+                        productDetails = it,
+                        isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                    )
+                }
             Optional.of(subscriptionManager.getDefaultSubscription(subscriptions))
         } else {
             Optional.empty()
