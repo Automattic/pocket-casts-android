@@ -7,7 +7,6 @@ import android.net.Uri
 import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.util.Arrays
@@ -196,7 +195,7 @@ object IntentUtil {
     }
 
     fun getUrl(intent: Intent): String? {
-        return if (intent.data != null && StringUtil.isPresent(intent.data.toString())) intent.data.toString() else null
+        return if (intent.data != null && intent.data.toString().isNotBlank()) intent.data.toString() else null
     }
 
     fun isItunesLink(intent: Intent): Boolean {

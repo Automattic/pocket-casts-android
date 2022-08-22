@@ -4,7 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.ListDownloadServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.di.ListUploadServerRetrofit
-import au.com.shiftyjelly.pocketcasts.utils.EncodingHelper
+import au.com.shiftyjelly.pocketcasts.utils.extensions.sha1
 import retrofit2.Retrofit
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -25,7 +25,7 @@ class ListServerManagerImpl @Inject constructor(
 
         fun buildSecurityHash(date: String, serverSecret: String): String? {
             val stringToHash = date + serverSecret
-            return EncodingHelper.SHA1(stringToHash)
+            return stringToHash.sha1()
         }
 
         fun extractShareListIdFromWebUrl(id: String?): String? {

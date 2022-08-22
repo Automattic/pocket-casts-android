@@ -3,19 +3,21 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_SKU
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_SKU
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
-import au.com.shiftyjelly.pocketcasts.utils.extensions.price
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
@@ -28,6 +30,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesResult
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryProductDetailsParams
+import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.queryPurchasesAsync
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -69,6 +72,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
     private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
+    private var freeTrialEligible: Boolean = true
 
     override fun signOut() {
         clearCachedStatus()
@@ -80,19 +84,6 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
 
     override fun observeProductDetails(): Flowable<ProductDetailsState> {
         return productDetails.toFlowable(BackpressureStrategy.LATEST)
-    }
-
-    override fun observePrices(): Flowable<PricePair> {
-        return observeProductDetails().map { state ->
-            if (state is ProductDetailsState.Loaded) {
-                PricePair(
-                    state.productDetails.find { it.productId == MONTHLY_SKU }?.price,
-                    state.productDetails.find { it.productId == YEARLY_SKU }?.price,
-                )
-            } else {
-                PricePair(null, null)
-            }
-        }
     }
 
     override fun observePurchaseEvents(): Flowable<PurchaseEvent> {
@@ -156,23 +147,22 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
 
     override fun loadProducts() {
         val productList =
-            listOf(
+            mutableListOf(
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(MONTHLY_SKU)
+                    .setProductId(MONTHLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(YEARLY_SKU)
+                    .setProductId(YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
-                    .build()
+                    .build(),
             )
 
-        val params = QueryProductDetailsParams.newBuilder().setProductList(productList)
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(productList)
+            .build()
 
-        billingClient.queryProductDetailsAsync(params.build()) {
-                billingResult,
-                productDetailsList
-            ->
+        billingClient.queryProductDetailsAsync(params) { billingResult, productDetailsList ->
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 Timber.d("Billing products loaded")
                 productDetails.accept(ProductDetailsState.Loaded(productDetailsList))
@@ -249,6 +239,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                             .build()
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
+                    updateFreeTrialEligible(false)
                     AnalyticsHelper.plusPurchased()
                 } catch (e: Exception) {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
@@ -274,6 +265,8 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun refreshPurchases() {
         if (!billingClient.isReady) return
 
+        updateFreeTrialEligibilityIfPurchaseHistoryExists()
+
         val queryPurchasesParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
@@ -282,6 +275,18 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                 if (!it.isAcknowledged) { // Purchase was purchased in the play store, or in the background somehow
                     handlePurchase(it)
                 }
+            }
+        }
+    }
+
+    private fun updateFreeTrialEligibilityIfPurchaseHistoryExists() {
+        val queryPurchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+
+        billingClient.queryPurchaseHistoryAsync(queryPurchaseHistoryParams) { _, purchases ->
+            if (purchases?.any { it.products.toString().contains(PLUS_PRODUCT_BASE) } == true) {
+                updateFreeTrialEligible(false)
             }
         }
     }
@@ -325,6 +330,22 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     override fun clearCachedStatus() {
         cachedSubscriptionStatus = null
         subscriptionStatus.accept(Optional.empty())
+    }
+
+    override fun isFreeTrialEligible() = freeTrialEligible
+
+    override fun updateFreeTrialEligible(eligible: Boolean) {
+        freeTrialEligible = eligible
+    }
+
+    override fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription? {
+        val trialsIfPresent = subscriptions
+            .filterIsInstance<Subscription.WithTrial>()
+            .ifEmpty { subscriptions }
+
+        return trialsIfPresent.find {
+            it.recurringPricingPhase is SubscriptionPricingPhase.Months
+        } ?: trialsIfPresent.firstOrNull() // if no monthly subscriptions, just display the first
     }
 }
 

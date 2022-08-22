@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -31,7 +28,7 @@ fun FolderEditNamePage(
 ) {
     val folderName: String by viewModel.folderName.collectAsState()
     val focusRequester = remember { FocusRequester() }
-    Column(modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi01)) {
+    Column {
         BottomSheetAppBar(
             title = stringResource(LR.string.name_your_folder),
             navigationButton = NavigationButton.Back,

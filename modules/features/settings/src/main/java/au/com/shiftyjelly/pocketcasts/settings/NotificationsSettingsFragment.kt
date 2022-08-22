@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotifi
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
@@ -352,7 +351,7 @@ class NotificationsSettingsFragment :
     }
 
     private fun getRingtoneValue(ringtonePath: String): String {
-        if (StringUtil.isBlank(ringtonePath)) {
+        if (ringtonePath.isNullOrBlank()) {
             return getString(LR.string.settings_notification_silent)
         }
         val ringtone = RingtoneManager.getRingtone(activity, Uri.parse(ringtonePath))

@@ -525,8 +525,8 @@ Language: sv_SE
 	<string name="plus_themes_icons_body">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>
 	<string name="plus_themes_icons">Teman och ikoner</string>
 	<string name="plus_thanks_for_your_support_bang">Tack för ditt stöd!</string>
-	<string name="plus_per_month">%s /månad</string>
-	<string name="plus_month_price">%s per månad</string>
+	<string name="plus_slash_month">%s /månad</string>
+	<string name="plus_per_month">%s per månad</string>
 	<string name="plus_lifetime_member">Livstidsmedlem</string>
 	<string name="plus_learn_more_button">Lär dig mer</string>
 	<string name="plus_learn_more_about_plus">Läs mer om Pocket Casts Plus</string>

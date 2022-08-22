@@ -231,6 +231,7 @@ dependencies {
     testImplementation libs.jsonAssert
     testImplementation libs.mockWebServer
     testImplementation libs.testMokitoKotlin
+    testImplementation libs.testMokitoKotlinInline
     testImplementation libs.kotlinCoroutinesTest
     androidTestImplementation libs.jsonAssert
     androidTestImplementation androidLibs.androidTestCore

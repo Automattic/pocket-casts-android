@@ -8,6 +8,7 @@ data class OptionsDialogOption(
     val titleColor: Int?,
     val valueId: Int?,
     val imageId: Int?,
+    val imageColor: Int?,
     val toggleOptions: List<ToggleButtonOption>? = null,
     val checked: Boolean = false,
     val click: (() -> Unit)?,

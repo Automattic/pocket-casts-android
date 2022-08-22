@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentPlusSettingsBinding
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -44,13 +47,23 @@ class PlusSettingsFragment : BaseFragment() {
 
         val recyclerView = binding.recyclerView
 
-        LiveDataReactiveStreams.fromPublisher(subscriptionManager.observePrices()).observe(viewLifecycleOwner) { productDetails ->
+        LiveDataReactiveStreams.fromPublisher(subscriptionManager.observeProductDetails()).observe(viewLifecycleOwner) { productDetailsState ->
+            val subscriptions = when (productDetailsState) {
+                is ProductDetailsState.Error -> null
+                is ProductDetailsState.Loaded -> productDetailsState.productDetails.mapNotNull {
+                    Subscription.fromProductDetails(
+                        productDetails = it,
+                        isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                    )
+                }
+            }
+
             val headerText = PlusSection.TextBlock(LR.string.plus_description_title, LR.string.plus_description_body)
             val feature1 = PlusSection.Feature(R.drawable.ic_desktop_apps, LR.string.plus_desktop_apps, LR.string.plus_desktop_apps_body)
             val feature2 = PlusSection.Feature(R.drawable.ic_cloud_storage, LR.string.plus_cloud_storage, LR.string.plus_cloud_storage_body)
             val feature3 = PlusSection.Feature(R.drawable.ic_themes_icons, LR.string.plus_themes_icons, LR.string.plus_themes_icons_body)
             val feature4 = PlusSection.Feature(R.drawable.plus_folder, LR.string.plus_folder, LR.string.plus_folder_body)
-            val upgrade = PlusSection.UpgradeButton(productDetails.monthlyPrice, productDetails.yearlyPrice)
+            val upgrade = PlusSection.UpgradeButton(subscriptions)
             val link = PlusSection.LinkBlock(theme.verticalPlusLogoRes(), LR.string.plus_description_body, LR.string.plus_learn_more_about_plus, Settings.INFO_LEARN_MORE_URL)
 
             val sections = listOf(
@@ -89,7 +102,7 @@ class PlusSettingsFragment : BaseFragment() {
 }
 
 private sealed class PlusSection {
-    data class UpgradeButton(val monthlyPrice: String?, val yearlyPrice: String?) : PlusSection()
+    data class UpgradeButton(val subscriptions: List<Subscription>?) : PlusSection()
     data class Feature(@DrawableRes val icon: Int, @StringRes val title: Int, @StringRes val body: Int) : PlusSection()
     object Header : PlusSection()
     data class TextBlock(@StringRes val title: Int, @StringRes val body: Int) : PlusSection()
@@ -129,8 +142,41 @@ private class PlusAdapter(val onAccountUpgradeClick: () -> Unit) : ListAdapter<P
                 onAccountUpgradeClick()
             }
 
-            upgrade.monthlyPrice?.let {
-                lblSubtitle.text = root.resources.getString(LR.string.plus_year_month_price, upgrade.yearlyPrice, upgrade.monthlyPrice)
+            upgrade.subscriptions?.let { subscriptions ->
+                val trials = subscriptions.filterIsInstance<Subscription.WithTrial>()
+                btnUpgrade.text = root.resources.getString(
+                    if (trials.isEmpty()) {
+                        LR.string.profile_upgrade_to_plus
+                    } else {
+                        LR.string.profile_start_free_trial
+                    }
+                )
+
+                lblSubtitle.text = when (trials.size) {
+                    0 -> {
+                        val monthlySub = subscriptions
+                            .find { it.recurringPricingPhase is SubscriptionPricingPhase.Months }
+                        val yearlySub = subscriptions
+                            .find { it.recurringPricingPhase is SubscriptionPricingPhase.Years }
+
+                        if (monthlySub != null && yearlySub != null) {
+                            root.resources.getString(
+                                LR.string.plus_month_year_price,
+                                monthlySub.recurringPricingPhase.formattedPrice,
+                                yearlySub.recurringPricingPhase.formattedPrice
+                            )
+                        } else {
+                            null
+                        }
+                    }
+                    1 -> trials.first().numFreeThenPricePerPeriod(root.resources)
+                    else ->
+                        trials
+                            .filter { it.recurringPricingPhase is SubscriptionPricingPhase.Months }
+                            .ifEmpty { trials }
+                            .first()
+                            .numFreeThenPricePerPeriod(root.resources)
+                }
             }
         }
     }
