@@ -1,4 +1,6 @@
-# Release notes
+8.22
+-----
+* Test release note
 
 ### 7.21.0
 
