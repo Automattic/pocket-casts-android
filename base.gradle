@@ -31,7 +31,7 @@ android {
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.properties["pocketcastsSettingsEncryptSecret"] ?: ""}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.properties["pocketcastsSharingServerSecret"] ?: ""}\""
 
-        buildConfigField "boolean", "ENABLE_FREE_TRIAL", "false"
+        buildConfigField "boolean", "ENABLE_FREE_TRIAL", "true"
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
