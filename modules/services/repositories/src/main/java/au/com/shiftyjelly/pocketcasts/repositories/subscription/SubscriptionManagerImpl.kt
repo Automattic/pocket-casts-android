@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
@@ -333,7 +332,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         subscriptionStatus.accept(Optional.empty())
     }
 
-    override fun isFreeTrialEligible() = freeTrialEligible && BuildConfig.ENABLE_FREE_TRIAL
+    override fun isFreeTrialEligible() = freeTrialEligible
 
     override fun updateFreeTrialEligible(eligible: Boolean) {
         freeTrialEligible = eligible
