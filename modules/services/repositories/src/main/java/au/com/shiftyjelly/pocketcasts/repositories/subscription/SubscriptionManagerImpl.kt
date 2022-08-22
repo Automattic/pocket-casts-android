@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.TEST_FREE_TRIAL_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
@@ -158,16 +157,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                     .setProductId(YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
-            ).apply {
-                if (isFreeTrialEligible()) {
-                    add(
-                        QueryProductDetailsParams.Product.newBuilder()
-                            .setProductId(TEST_FREE_TRIAL_PRODUCT_ID)
-                            .setProductType(BillingClient.ProductType.SUBS)
-                            .build()
-                    )
-                }
-            }
+            )
 
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(productList)
