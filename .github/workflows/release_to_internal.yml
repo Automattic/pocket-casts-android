@@ -1,8 +1,7 @@
 name: Release to Internal
 
 # Run the deployment manually
-on:
-  workflow_dispatch:
+on: [workflow_dispatch]
 
 jobs:
   deployment:
