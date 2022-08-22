@@ -45,7 +45,6 @@ before_all do |lane|
 end
 
 platform :android do
-  desc "Creates a new release branch"
   lane :code_freeze do | options |
     android_codefreeze_prechecks(options)
 
@@ -63,6 +62,23 @@ platform :android do
     )
     #setbranchprotection(repository:GHHELPER_REPO, branch: "release/#{new_version}")
     #setfrozentag(repository:GHHELPER_REPO, milestone: new_version)
+  end
+
+  lane :complete_code_freeze do | options |
+    android_completecodefreeze_prechecks(options)
+
+    new_version = android_get_app_version()
+    trigger_release_build(branch_to_build: "release/#{new_version}")
+  end
+
+  desc "Tell Buildkite to trigger a release build"
+  lane :trigger_release_build do | options |
+    buildkite_trigger_build(
+      buildkite_organization: 'automattic',
+      buildkite_pipeline: 'pocket-casts-android',
+      branch: options[:branch_to_build] || git_branch,
+      pipeline_file: 'release-builds.yml'
+    )
   end
 
   # - Builds the app for external beta distribution
