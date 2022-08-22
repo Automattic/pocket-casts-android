@@ -72,6 +72,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
     private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
+    private var freeTrialEligible: Boolean = true
 
     override fun signOut() {
         clearCachedStatus()
@@ -247,6 +248,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                             .build()
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
+                    updateFreeTrialEligible(false)
                     AnalyticsHelper.plusPurchased()
                 } catch (e: Exception) {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
@@ -325,7 +327,11 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         subscriptionStatus.accept(Optional.empty())
     }
 
-    override fun isFreeTrialEligible() = BuildConfig.ENABLE_FREE_TRIAL
+    override fun isFreeTrialEligible() = freeTrialEligible && BuildConfig.ENABLE_FREE_TRIAL
+
+    override fun updateFreeTrialEligible(eligible: Boolean) {
+        freeTrialEligible = eligible
+    }
 
     override fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription? {
         val trialsIfPresent = subscriptions
