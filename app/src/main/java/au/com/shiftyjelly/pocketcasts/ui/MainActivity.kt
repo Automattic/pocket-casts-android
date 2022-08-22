@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.navigation.NavigatorAction
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerBottomSheet
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.UpNextFragment
+import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
@@ -427,6 +428,10 @@ class MainActivity :
         showBottomSheet(UpNextFragment())
     }
 
+    override fun onMiniPlayerLongClick() {
+        MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager).show(this)
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     @Suppress("DEPRECATION")
     private fun setupPlayerViews() {
@@ -706,17 +711,6 @@ class MainActivity :
 
     override fun onSkipForwardClicked() {
         playbackManager.skipForward()
-    }
-
-    override fun onEndPlaybackAndClearUpNext() {
-        playbackManager.endPlaybackAndClearUpNextAsync()
-    }
-
-    override fun onMarkAsPlayed() {
-        val episode = playbackManager.upNextQueue.currentEpisode ?: return
-        launch {
-            episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
-        }
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean) {

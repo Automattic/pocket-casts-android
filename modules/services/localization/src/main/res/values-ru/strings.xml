@@ -525,8 +525,8 @@ Language: ru
 	<string name="plus_themes_icons_body">Покажите себя во всей красе. Эксклюзивные темы и значки только для членов клуба Plus.</string>
 	<string name="plus_themes_icons">Темы и значки</string>
 	<string name="plus_thanks_for_your_support_bang">Спасибо за вашу поддержку!</string>
-	<string name="plus_per_month">%s в месяц</string>
-	<string name="plus_month_price">%s за месяц</string>
+	<string name="plus_slash_month">%s в месяц</string>
+	<string name="plus_per_month">%s за месяц</string>
 	<string name="plus_lifetime_member">Пожизненное членство</string>
 	<string name="plus_learn_more_button">Подробнее</string>
 	<string name="plus_learn_more_about_plus">Подробнее о Pocket Casts Plus</string>

@@ -525,8 +525,8 @@ Language: nl
 	<string name="plus_themes_icons_body">Toon je ware aard. Exclusieve pictogrammen en thema\'s voor Plus-abonnees.</string>
 	<string name="plus_themes_icons">Thema\'s en pictogrammen</string>
 	<string name="plus_thanks_for_your_support_bang">Bedankt voor je ondersteuning!</string>
-	<string name="plus_per_month">%s / maand</string>
-	<string name="plus_month_price">%s per maand</string>
+	<string name="plus_slash_month">%s / maand</string>
+	<string name="plus_per_month">%s per maand</string>
 	<string name="plus_lifetime_member">Levenslang lid</string>
 	<string name="plus_learn_more_button">Meer weten</string>
 	<string name="plus_learn_more_about_plus">Bekijk meer informatie over Pocket Casts Plus</string>

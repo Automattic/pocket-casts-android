@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.os.Build
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -15,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.GradientIconData
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
@@ -47,7 +46,6 @@ fun SettingsFragmentPage(
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
-                .background(MaterialTheme.theme.colors.primaryUi02)
                 .padding(vertical = 8.dp)
         ) {
             if (isDebug) {
@@ -223,7 +221,7 @@ private fun rowModifier(onClick: () -> Unit) =
 @Preview
 @Composable
 private fun SettingsPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
-    AppTheme(themeType) {
+    AppThemeWithBackground(themeType) {
         SettingsFragmentPage(
             signInState = SignInState.SignedOut(),
             isDebug = true,

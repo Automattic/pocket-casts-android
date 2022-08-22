@@ -1,8 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        kotlin_version = '1.7.0'
-        hilt_version = '2.43'
+        kotlin_version = '1.7.10'
+        hilt_version = '2.43.2'
     }
     repositories {
         google()
@@ -20,7 +20,7 @@ buildscript {
     // Gradle Plugins
     dependencies {
         // Android - https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:7.2.2'
 
         // Google Services - https://developers.google.com/android/guides/google-services-plugin
         classpath "com.google.gms:google-services:4.3.13"

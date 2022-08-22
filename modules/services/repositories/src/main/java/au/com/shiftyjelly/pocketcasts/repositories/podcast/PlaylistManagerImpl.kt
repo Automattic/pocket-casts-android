@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
-import au.com.shiftyjelly.pocketcasts.utils.StringUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -282,7 +281,7 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     override fun removePodcastFromPlaylists(podcastUuid: String) {
-        if (StringUtil.isBlank(podcastUuid)) {
+        if (podcastUuid.isBlank()) {
             return
         }
         val playlists = findAll()

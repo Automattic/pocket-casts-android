@@ -41,11 +41,11 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
     override var isPip: Boolean = false
 
-    private val sessionManager: SessionManager
-        get() = CastContext.getSharedInstance(this.context).sessionManager
+    private val sessionManager: SessionManager?
+        get() = CastContext.getSharedInstance()?.sessionManager
 
     private val castSession: CastSession?
-        get() = sessionManager.currentCastSession
+        get() = sessionManager?.currentCastSession
 
     private val remoteMediaClient: RemoteMediaClient?
         get() = castSession?.remoteMediaClient
@@ -77,8 +77,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
     private val isConnected: Boolean
         get() {
-            val castSession =
-                CastContext.getSharedInstance(this.context).sessionManager.currentCastSession
+            val castSession = CastContext.getSharedInstance()?.sessionManager?.currentCastSession
             return castSession != null && castSession.isConnected
         }
 
