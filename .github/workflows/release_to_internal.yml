@@ -1,11 +1,7 @@
 name: Release to Internal
 
-# Run when a pull request is merged
-on:
-  push:
-    branches:
-      - main
-      - 'release/*'
+# Run the deployment manually
+on: [workflow_dispatch]
 
 jobs:
   deployment:
