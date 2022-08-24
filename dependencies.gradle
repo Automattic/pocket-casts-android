@@ -54,6 +54,9 @@ project.ext {
     versionTest = '1.4.0'
     versionWork = '2.7.1'
 
+    // Automattic library versions
+    versionTracks = 'trunk-95d0743430d709a8ee1fdc128e726056cfd6bb09'
+
     androidLibs = [
             appCompat: "androidx.appcompat:appcompat:1.5.0",
             mediarouter: "androidx.mediarouter:mediarouter:1.3.1",
@@ -184,7 +187,9 @@ project.ext {
             mockWebServer: "com.squareup.okhttp3:mockwebserver:4.9.3",
             barista: "com.adevinta.android:barista:4.2.0",
             // Accompanist - https://google.github.io/accompanist/
-            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1"
+            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1",
+            //Automattic Tracks
+            automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks"
     ]
 
 }
