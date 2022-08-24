@@ -12,6 +12,7 @@ sealed interface Subscription {
     val recurringPricingPhase: RecurringSubscriptionPricingPhase
     val trialPricingPhase: TrialSubscriptionPricingPhase?
     val productDetails: ProductDetails
+    val offerToken: String?
     val shortTitle: String
         get() = productDetails.title.split(" (").first()
 
@@ -23,6 +24,7 @@ sealed interface Subscription {
         override val productDetails: ProductDetails
     ) : Subscription {
         override val trialPricingPhase = null
+        override val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull { !it.hasTrialOffers() }?.offerToken
         override fun numFreeThenPricePerPeriod(res: Resources): String? = null
     }
 
@@ -31,7 +33,7 @@ sealed interface Subscription {
         override val trialPricingPhase: TrialSubscriptionPricingPhase, // override to not be nullable
         override val productDetails: ProductDetails
     ) : Subscription {
-
+        override val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull { it.hasTrialOffers() }?.offerToken
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {
                 is SubscriptionPricingPhase.Years -> R.string.plus_trial_then_slash_year
@@ -68,6 +70,11 @@ sealed interface Subscription {
                 )
             }
         }
+
+        private fun ProductDetails.SubscriptionOfferDetails.getTrialOffers() =
+            pricingPhases.pricingPhaseList.filter { pricingPhase -> pricingPhase.recurrenceMode == ProductDetails.RecurrenceMode.FINITE_RECURRING }
+
+        private fun ProductDetails.SubscriptionOfferDetails.hasTrialOffers() = getTrialOffers().isNotEmpty()
 
         private val ProductDetails.recurringSubscriptionPricingPhase: PricingPhase?
             get() = findOnlyMatchingPricingPhase(
