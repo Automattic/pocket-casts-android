@@ -55,7 +55,7 @@ sealed interface SubscriptionPricingPhase {
     class Months(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period
-    ) : RecurringSubscriptionPricingPhase {
+    ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_month
         override val perPeriod = R.string.profile_per_month
