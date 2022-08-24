@@ -1,11 +1,7 @@
 name: Release to Internal
 
-# Run when a pull request is merged
-on:
-  push:
-    branches:
-      - main
-      - 'release/*'
+# Run the deployment manually
+on: [workflow_dispatch]
 
 jobs:
   deployment:
@@ -52,7 +48,7 @@ jobs:
       - name: Assemble Release
         run: ./gradlew :app:bundleRelease --no-daemon
         env:
-          VERSION_CODE_START: 8135
+          VERSION_CODE_START: 8937
       - name: Sign Release
         uses: r0adkll/sign-android-release@v1
         id: sign_app
