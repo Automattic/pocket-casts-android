@@ -26,8 +26,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 
-class CastPlayer(val context: Context, override val onPlayerEvent: (Player, PlayerEvent) -> Unit) :
-    Player {
+class CastPlayer(val context: Context, override val onPlayerEvent: (Player, PlayerEvent) -> Unit) : Player {
 
     private var customData: JSONObject? = null
     private var podcast: Podcast? = null
@@ -243,7 +242,6 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     }
 
     private fun loadEpisode(episodeUuid: String, currentPositionMs: Int, autoPlay: Boolean) {
-
         if (episodeUuid == remoteEpisodeUuid && autoPlay) {
             remoteMediaClient?.play()
             return
@@ -271,15 +269,14 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     }
 
     private fun buildMediaInfo(url: String, episode: Playable, podcast: Podcast): MediaInfo {
-        val mediaMetadata =
-            MediaMetadata(if (episode.isVideo) MediaMetadata.MEDIA_TYPE_MOVIE else MediaMetadata.MEDIA_TYPE_MUSIC_TRACK)
-        mediaMetadata.putString(MediaMetadata.KEY_TITLE, episode.title)
-        mediaMetadata.putString(MediaMetadata.KEY_SUBTITLE, podcast.title)
-        mediaMetadata.putString(MediaMetadata.KEY_ALBUM_ARTIST, podcast.author)
-        mediaMetadata.putString(MediaMetadata.KEY_ALBUM_TITLE, podcast.title)
-        mediaMetadata.addImage(WebImage(Uri.parse(podcast.getArtworkUrl(960))))
-        var mediaInfo = MediaInfo.Builder(url).setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
-            .setMetadata(mediaMetadata)
+        val mediaMetadata = MediaMetadata(if (episode.isVideo) MediaMetadata.MEDIA_TYPE_MOVIE else MediaMetadata.MEDIA_TYPE_MUSIC_TRACK).apply {
+            putString(MediaMetadata.KEY_TITLE, episode.title)
+            putString(MediaMetadata.KEY_SUBTITLE, podcast.title)
+            putString(MediaMetadata.KEY_ALBUM_ARTIST, podcast.author)
+            putString(MediaMetadata.KEY_ALBUM_TITLE, podcast.title)
+            addImage(WebImage(Uri.parse(podcast.getArtworkUrl(960))))
+        }
+        var mediaInfo = MediaInfo.Builder(url).setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(mediaMetadata)
         episode.fileType?.let {
             mediaInfo = mediaInfo.setContentType(it)
         }
@@ -324,10 +321,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     private fun updatePlaybackState() {
         val remoteMediaClient = remoteMediaClient
         if (remoteMediaClient == null) {
-            onPlayerEvent(
-                this,
-                PlayerEvent.PlayerPaused
-            )
+            onPlayerEvent(this, PlayerEvent.PlayerPaused)
             return
         }
 
@@ -337,51 +331,37 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
         if (localEpisodeUuid == null && remoteEpisodeUuid != null) {
             Timber.d("Remote has episode while local player is null. Remote: $remoteEpisodeUuid")
-            onPlayerEvent(
-                this,
-                PlayerEvent.RemoteMetadataNotMatched(
-                    remoteEpisodeUuid
-                )
-            )
+            onPlayerEvent(this, PlayerEvent.RemoteMetadataNotMatched(remoteEpisodeUuid))
             return
         }
 
         // Convert the remote playback states to media playback states.
         when (status) {
             MediaStatus.PLAYER_STATE_IDLE -> if (idleReason == MediaStatus.IDLE_REASON_FINISHED) {
-                onPlayerEvent(
-                    this,
-                    PlayerEvent.Completion(
-                        episodeUuid
-                    )
-                )
+                onPlayerEvent(this, PlayerEvent.Completion(episodeUuid))
             }
-            MediaStatus.PLAYER_STATE_BUFFERING -> {
+            MediaStatus.PLAYER_STATE_BUFFERING, MediaStatus.PLAYER_STATE_LOADING -> {
                 state = PlaybackStateCompat.STATE_BUFFERING
-                onPlayerEvent(
-                    this,
-                    PlayerEvent.BufferingStateChanged
-                )
+                onPlayerEvent(this, PlayerEvent.BufferingStateChanged)
             }
             MediaStatus.PLAYER_STATE_PLAYING -> {
                 state = PlaybackStateCompat.STATE_PLAYING
                 setMetadataFromRemote()
-                onPlayerEvent(
-                    this,
-                    PlayerEvent.PlayerPlaying
-                )
+                onPlayerEvent(this, PlayerEvent.PlayerPlaying)
             }
             MediaStatus.PLAYER_STATE_PAUSED -> {
                 state = PlaybackStateCompat.STATE_PAUSED
                 setMetadataFromRemote()
-                onPlayerEvent(
-                    this,
-                    PlayerEvent.PlayerPaused
-                )
+                onPlayerEvent(this, PlayerEvent.PlayerPaused)
             }
-            else // case unknown
-            -> {
+            else -> {
+                Timber.w("Unknown Cast event $status")
             }
+        }
+
+        // the MediaStatus of PLAYER_STATE_BUFFERING only reports when the media is buffering and not when it has stopped
+        if (status != MediaStatus.PLAYER_STATE_BUFFERING) {
+            onPlayerEvent(this, PlayerEvent.BufferingStateChanged)
         }
     }
 
@@ -391,10 +371,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
         }
         val duration = if (!isMediaLoaded) 0 else (remoteMediaClient?.streamDuration?.toInt() ?: 0)
         if (duration > 0) {
-            onPlayerEvent(
-                this,
-                PlayerEvent.DurationAvailable
-            )
+            onPlayerEvent(this, PlayerEvent.DurationAvailable)
             episode?.durationMs = duration
         }
     }
@@ -422,7 +399,6 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
     }
 
     companion object {
-
         private const val CUSTOM_DATA_EPISODE_UUID = "EPISODE_UUID"
     }
 }
