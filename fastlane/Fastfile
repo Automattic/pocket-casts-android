@@ -60,6 +60,7 @@ platform :android do
       new_version: new_version,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
+    # TODO: Enable these before merging to `main`
     #setbranchprotection(repository:GHHELPER_REPO, branch: "release/#{new_version}")
     #setfrozentag(repository:GHHELPER_REPO, milestone: new_version)
   end
@@ -122,16 +123,13 @@ platform :android do
     create_gh_release(version: version, prerelease: true, release_assets: release_assets.compact) if options[:create_release]
   end
 
-  # Builds an app bundle
-  desc "Builds an app bundle"
+  desc "Builds and bundles the given app"
   lane :build_bundle do | options |
-    # Create the file names
     version = options[:version]
     app = options[:app]
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = "artifacts/"
 
-    # Build
     gradle(task: "clean")
     UI.message("Running lint...")
     gradle(task: ":#{app}:preBundleLint")
@@ -204,9 +202,9 @@ platform :android do
   end
 
   def firebase_secret(name:)
-     UI.user_error!('Unable to locale Firebase Secrets File – did you run `bundle exec fastlane run configure_apply`?') unless File.file? GOOGLE_FIREBASE_SECRETS_PATH
-     key_file_secrets = JSON.parse(File.read(GOOGLE_FIREBASE_SECRETS_PATH))
-     UI.user_error!("Unable to find key `#{name}` in #{GOOGLE_FIREBASE_SECRETS_PATH}") if key_file_secrets[name].nil?
-     key_file_secrets[name]
-   end
+    UI.user_error!('Unable to locale Firebase Secrets File – did you run `bundle exec fastlane run configure_apply`?') unless File.file? GOOGLE_FIREBASE_SECRETS_PATH
+    key_file_secrets = JSON.parse(File.read(GOOGLE_FIREBASE_SECRETS_PATH))
+    UI.user_error!("Unable to find key `#{name}` in #{GOOGLE_FIREBASE_SECRETS_PATH}") if key_file_secrets[name].nil?
+    key_file_secrets[name]
+  end
 end
