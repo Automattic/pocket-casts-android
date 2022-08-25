@@ -12,7 +12,7 @@ sealed interface Subscription {
     val recurringPricingPhase: RecurringSubscriptionPricingPhase
     val trialPricingPhase: TrialSubscriptionPricingPhase?
     val productDetails: ProductDetails
-    val offerToken: String?
+    val offerToken: String
     val shortTitle: String
         get() = productDetails.title.split(" (").first()
 
@@ -21,19 +21,37 @@ sealed interface Subscription {
     // Simple subscriptions do not have a trial phase
     class Simple(
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
-        override val productDetails: ProductDetails
+        override val productDetails: ProductDetails,
+        override val offerToken: String
     ) : Subscription {
         override val trialPricingPhase = null
-        override val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull { !it.hasTrialOffers() }?.offerToken
         override fun numFreeThenPricePerPeriod(res: Resources): String? = null
+
+        companion object {
+            fun instanceOf(
+                recurringPricingPhase: RecurringSubscriptionPricingPhase,
+                productDetails: ProductDetails
+            ): Simple? =
+                productDetails
+                    .subscriptionOfferDetails
+                    ?.firstOrNull { !it.hasTrialOffers() }
+                    ?.offerToken
+                    ?.let { offerToken ->
+                        Simple(
+                            recurringPricingPhase = recurringPricingPhase,
+                            productDetails = productDetails,
+                            offerToken = offerToken
+                        )
+                    }
+        }
     }
 
     class WithTrial(
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val trialPricingPhase: TrialSubscriptionPricingPhase, // override to not be nullable
-        override val productDetails: ProductDetails
+        override val productDetails: ProductDetails,
+        override val offerToken: String
     ) : Subscription {
-        override val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull { it.hasTrialOffers() }?.offerToken
         override fun numFreeThenPricePerPeriod(res: Resources): String {
             val stringRes = when (recurringPricingPhase) {
                 is SubscriptionPricingPhase.Years -> R.string.plus_trial_then_slash_year
@@ -44,6 +62,26 @@ sealed interface Subscription {
                 trialPricingPhase.periodValue(res),
                 recurringPricingPhase.formattedPrice
             )
+        }
+
+        companion object {
+            fun instanceOf(
+                recurringPricingPhase: RecurringSubscriptionPricingPhase,
+                trialPricingPhase: TrialSubscriptionPricingPhase,
+                productDetails: ProductDetails,
+            ): WithTrial? =
+                productDetails
+                    .subscriptionOfferDetails
+                    ?.firstOrNull { it.hasTrialOffers() }
+                    ?.offerToken
+                    ?.let { offerToken ->
+                        WithTrial(
+                            recurringPricingPhase = recurringPricingPhase,
+                            trialPricingPhase = trialPricingPhase,
+                            productDetails = productDetails,
+                            offerToken = offerToken
+                        )
+                    }
         }
     }
 
@@ -59,12 +97,12 @@ sealed interface Subscription {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "unable to convert product details to a subscription")
                     null
                 }
-                trialPhase is TrialSubscriptionPricingPhase && isFreeTrialEligible -> WithTrial(
+                trialPhase is TrialSubscriptionPricingPhase && isFreeTrialEligible -> WithTrial.instanceOf(
                     recurringPricingPhase = recurringPhase,
                     trialPricingPhase = trialPhase,
                     productDetails = productDetails
                 )
-                else -> Simple(
+                else -> Simple.instanceOf(
                     recurringPricingPhase = recurringPhase,
                     productDetails = productDetails
                 )

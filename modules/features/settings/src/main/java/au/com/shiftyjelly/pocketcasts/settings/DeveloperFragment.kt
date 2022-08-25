@@ -78,9 +78,10 @@ class DeveloperFragment : PreferenceFragmentCompat(), CoroutineScope {
                 onSuccess = {
                     if (it is ProductDetailsState.Loaded) {
                         it.productDetails.firstOrNull()?.let { productDetails ->
-                            val subscription = Subscription
-                                .fromProductDetails(productDetails, subscriptionManager.isFreeTrialEligible())
-                            subscriptionManager.launchBillingFlow(requireActivity(), productDetails, subscription?.offerToken)
+                            val isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                            Subscription.fromProductDetails(productDetails, isFreeTrialEligible)?.let { subscription ->
+                                subscriptionManager.launchBillingFlow(requireActivity(), productDetails, subscription.offerToken)
+                            } ?: Timber.d("Subscription is null")
                         } ?: Timber.d("Products list is empty")
                     } else {
                         Timber.d("Couldn't get sku details")
