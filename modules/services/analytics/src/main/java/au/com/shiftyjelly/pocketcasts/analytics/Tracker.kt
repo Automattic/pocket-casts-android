@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 import android.content.Context
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import timber.log.Timber
 import java.util.UUID
 
 abstract class Tracker(@ApplicationContext private val appContext: Context) {
@@ -38,6 +39,7 @@ abstract class Tracker(@ApplicationContext private val appContext: Context) {
 
     fun generateNewAnonID(): String {
         val uuid = UUID.randomUUID().toString().replace("-", "")
+        Timber.d("New anonID generated in " + this.javaClass.simpleName + ": " + uuid)
         val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)
         val editor = preferences.edit()
         editor.putString(anonIdPrefKey, uuid)
