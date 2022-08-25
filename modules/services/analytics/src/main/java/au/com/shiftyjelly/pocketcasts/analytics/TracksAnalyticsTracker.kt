@@ -1,9 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.content.Context
-import androidx.preference.PreferenceManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker.PREFKEY_SEND_USAGE_STATS
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker.sendUsageStats
 import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -57,11 +54,6 @@ class TracksAnalyticsTracker @Inject constructor(
         super.clearAllData()
         tracksClient?.clearUserProperties()
         tracksClient?.clearQueues()
-    }
-
-    override fun storeUsagePref() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
-        prefs.edit().putBoolean(PREFKEY_SEND_USAGE_STATS, sendUsageStats).apply()
     }
 
     companion object {

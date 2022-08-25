@@ -16,8 +16,6 @@ abstract class Tracker(@ApplicationContext private val appContext: Context) {
         clearAnonID()
     }
 
-    abstract fun storeUsagePref()
-
     private fun clearAnonID() {
         anonymousID = null
         val preferences = PreferenceManager.getDefaultSharedPreferences(appContext)

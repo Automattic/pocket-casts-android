@@ -5,14 +5,16 @@ import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 
 object AnalyticsTracker {
-    const val PREFKEY_SEND_USAGE_STATS = "pc_pref_send_usage_stats"
+    private const val PREFKEY_SEND_USAGE_STATS = "pc_pref_send_usage_stats"
     private val trackers: MutableList<Tracker> = mutableListOf()
+    @ApplicationContext
+    private lateinit var appContext: Context
 
     var sendUsageStats: Boolean = true
         set(value) {
             if (value != field) {
                 field = value
-                trackers.forEach { it.storeUsagePref() }
+                storeUsagePref()
                 if (!field) {
                     trackers.forEach { it.clearAllData() }
                 }
@@ -20,8 +22,14 @@ object AnalyticsTracker {
         }
 
     fun init(@ApplicationContext appContext: Context) {
+        this.appContext = appContext
         val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
         sendUsageStats = prefs.getBoolean(PREFKEY_SEND_USAGE_STATS, true)
+    }
+
+    private fun storeUsagePref() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
+        prefs.edit().putBoolean(PREFKEY_SEND_USAGE_STATS, sendUsageStats).apply()
     }
 
     fun registerTracker(tracker: Tracker?) {
