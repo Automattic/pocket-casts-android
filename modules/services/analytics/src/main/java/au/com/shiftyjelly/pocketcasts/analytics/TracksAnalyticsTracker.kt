@@ -12,7 +12,7 @@ import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
 
-class AnalyticsTrackerTracks @Inject constructor(
+class TracksAnalyticsTracker @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val displayUtil: DisplayUtil,
 ) : Tracker(appContext) {

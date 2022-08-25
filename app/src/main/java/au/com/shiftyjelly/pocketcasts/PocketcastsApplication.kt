@@ -7,7 +7,7 @@ import androidx.core.os.ConfigurationCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerTracks
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -67,7 +67,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var appIcon: AppIcon
     @Inject lateinit var coilImageLoader: ImageLoader
     @Inject lateinit var userManager: UserManager
-    @Inject lateinit var tracker: AnalyticsTrackerTracks
+    @Inject lateinit var tracker: TracksAnalyticsTracker
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
