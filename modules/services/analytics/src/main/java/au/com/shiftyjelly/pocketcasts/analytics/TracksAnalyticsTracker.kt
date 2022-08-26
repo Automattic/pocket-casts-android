@@ -17,7 +17,7 @@ class TracksAnalyticsTracker @Inject constructor(
     override val anonIdPrefKey: String = TRACKS_ANON_ID
 
     private val predefinedEventProperties: Map<String, Any?>
-        get() = mapOf(AnalyticsEvent.HAS_DYNAMIC_FONT_SIZE.toName() to displayUtil.hasDynamicFontSize())
+        get() = mapOf(PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE.key to displayUtil.hasDynamicFontSize())
 
     override fun track(event: AnalyticsEvent, properties: Map<String, *>) {
         if (tracksClient == null) return
@@ -54,6 +54,10 @@ class TracksAnalyticsTracker @Inject constructor(
         super.clearAllData()
         tracksClient?.clearUserProperties()
         tracksClient?.clearQueues()
+    }
+
+    enum class PredefinedEventProperty(val key: String) {
+        HAS_DYNAMIC_FONT_SIZE("has_dynamic_font_size")
     }
 
     companion object {
