@@ -42,6 +42,10 @@ object AnalyticsTracker {
         }
     }
 
+    fun refreshMetadata() {
+        trackers.forEach { it.refreshMetadata() }
+    }
+
     fun flush() {
         trackers.forEach { it.flush() }
     }

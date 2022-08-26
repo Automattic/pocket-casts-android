@@ -23,6 +23,12 @@ abstract class Tracker(@ApplicationContext private val appContext: Context) {
         lastEventDate = Date()
     }
 
+    @CallSuper
+    open fun refreshMetadata() {
+        clearAnonID()
+        generateNewAnonID()
+    }
+
     abstract fun flush()
     open fun clearAllData() {
         // Reset the anon ID here
