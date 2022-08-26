@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.content.Context
+import android.content.SharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -9,9 +11,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class TracksAnalyticsTracker @Inject constructor(
-    @ApplicationContext private val appContext: Context,
+    @ApplicationContext appContext: Context,
+    @PublicSharedPreferences preferences: SharedPreferences,
     private val displayUtil: DisplayUtil,
-) : Tracker(appContext) {
+) : Tracker(preferences) {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
     override val anonIdPrefKey: String = TRACKS_ANON_ID
 
