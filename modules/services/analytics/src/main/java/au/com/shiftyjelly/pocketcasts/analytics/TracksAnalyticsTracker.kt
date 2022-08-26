@@ -19,6 +19,7 @@ class TracksAnalyticsTracker @Inject constructor(
         get() = mapOf(PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE.key to displayUtil.hasDynamicFontSize())
 
     override fun track(event: AnalyticsEvent, properties: Map<String, *>) {
+        super.track(event, properties)
         if (tracksClient == null) return
 
         val eventKey = event.key
