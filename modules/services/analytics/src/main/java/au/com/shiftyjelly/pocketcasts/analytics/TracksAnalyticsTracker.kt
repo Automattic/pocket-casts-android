@@ -6,7 +6,6 @@ import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
 import timber.log.Timber
-import java.util.Locale
 import javax.inject.Inject
 
 class TracksAnalyticsTracker @Inject constructor(
@@ -22,7 +21,7 @@ class TracksAnalyticsTracker @Inject constructor(
     override fun track(event: AnalyticsEvent, properties: Map<String, *>) {
         if (tracksClient == null) return
 
-        val eventName = event.toName()
+        val eventKey = event.key
         val user = anonID ?: generateNewAnonID()
         val userType = TracksClient.NosaraUserType.ANON
 
@@ -38,11 +37,11 @@ class TracksAnalyticsTracker @Inject constructor(
             }
         }
 
-        tracksClient.track(EVENTS_PREFIX + eventName, propertiesToJSON, user, userType)
+        tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
         if (propertiesToJSON.length() > 0) {
-            Timber.i("\uD83D\uDD35 Tracked: $eventName, Properties: $propertiesToJSON")
+            Timber.i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
         } else {
-            Timber.i("\uD83D\uDD35 Tracked: $eventName")
+            Timber.i("\uD83D\uDD35 Tracked: $eventKey")
         }
     }
 
@@ -63,6 +62,5 @@ class TracksAnalyticsTracker @Inject constructor(
     companion object {
         private const val TRACKS_ANON_ID = "nosara_tracks_anon_id"
         private const val EVENTS_PREFIX = "pcandroid_"
-        private fun AnalyticsEvent.toName() = name.lowercase(Locale.getDefault())
     }
 }
