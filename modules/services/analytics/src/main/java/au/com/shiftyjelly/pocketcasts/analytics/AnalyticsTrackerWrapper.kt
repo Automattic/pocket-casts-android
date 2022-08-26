@@ -10,4 +10,12 @@ class AnalyticsTrackerWrapper @Inject constructor() {
     fun refreshMetadata() {
         AnalyticsTracker.refreshMetadata()
     }
+
+    fun flush() {
+        AnalyticsTracker.flush()
+    }
+
+    fun clearAllData() {
+        AnalyticsTracker.clearAllData()
+    }
 }

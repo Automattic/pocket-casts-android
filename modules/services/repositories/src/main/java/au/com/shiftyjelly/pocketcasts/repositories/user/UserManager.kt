@@ -103,6 +103,8 @@ class UserManagerImpl @Inject constructor(
 
         settings.setMarketingOptIn(false)
         settings.setMarketingOptInNeedsSync(false)
+        analyticsTracker.flush()
+        analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()
 
         val accountManager = AccountManager.get(application)
