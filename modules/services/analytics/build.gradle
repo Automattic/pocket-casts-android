@@ -1,0 +1,7 @@
+apply from: "../../modules.gradle"
+apply plugin: 'kotlin-android'
+
+dependencies {
+    implementation libs.automatticTracks
+    implementation project(':modules:services:utils')
+}
