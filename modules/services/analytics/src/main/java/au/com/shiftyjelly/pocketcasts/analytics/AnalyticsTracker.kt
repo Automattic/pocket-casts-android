@@ -1,31 +1,26 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import android.content.SharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 
 object AnalyticsTracker {
-    private const val PREFKEY_SEND_USAGE_STATS = "pc_pref_send_usage_stats"
     private val trackers: MutableList<Tracker> = mutableListOf()
-    private lateinit var preferences: SharedPreferences
+    private lateinit var settings: Settings
 
     var sendUsageStats: Boolean = true
         set(value) {
             if (value != field) {
                 field = value
-                storeUsagePref()
+                settings.setSendUsageStats(sendUsageStats)
                 if (!field) {
                     trackers.forEach { it.clearAllData() }
                 }
             }
         }
 
-    fun init(preferences: SharedPreferences) {
-        this.preferences = preferences
+    fun init(settings: Settings) {
+        this.settings = settings
         trackers.forEach { it.clearAllData() }
-        sendUsageStats = preferences.getBoolean(PREFKEY_SEND_USAGE_STATS, true)
-    }
-
-    private fun storeUsagePref() {
-        preferences.edit().putBoolean(PREFKEY_SEND_USAGE_STATS, sendUsageStats).apply()
+        sendUsageStats = settings.getSendUsageStats()
     }
 
     fun registerTracker(tracker: Tracker?) {
@@ -33,6 +28,7 @@ object AnalyticsTracker {
     }
 
     fun track(event: AnalyticsEvent, properties: Map<String, *> = emptyMap<String, String>()) {
+        // TODO don't send usage stats for debug builds
         if (sendUsageStats) {
             trackers.forEach { it.track(event, properties) }
         }

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.os.Environment
 import android.os.StrictMode
 import androidx.core.os.ConfigurationCompat
@@ -11,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
@@ -70,7 +68,6 @@ class PocketcastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var coilImageLoader: ImageLoader
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var tracker: TracksAnalyticsTracker
-    @Inject @PublicSharedPreferences lateinit var preferences: SharedPreferences
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -100,7 +97,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
 
     private fun setupAnalytics() {
         AnalyticsTracker.registerTracker(tracker)
-        AnalyticsTracker.init(preferences)
+        AnalyticsTracker.init(settings)
         AnalyticsTracker.refreshMetadata()
     }
 
