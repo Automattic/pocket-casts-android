@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -37,7 +38,8 @@ class UserManagerImpl @Inject constructor(
     val syncServerManager: SyncServerManager,
     val subscriptionManager: SubscriptionManager,
     val podcastManager: PodcastManager,
-    val userEpisodeManager: UserEpisodeManager
+    val userEpisodeManager: UserEpisodeManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : UserManager {
 
     override fun beginMonitoringAccountManager(playbackManager: PlaybackManager) {
@@ -76,6 +78,7 @@ class UserManagerImpl @Inject constructor(
                             }
                         }
                         .map {
+                            analyticsTracker.refreshMetadata()
                             SignInState.SignedIn(email = settings.getSyncEmail() ?: "", subscriptionStatus = it)
                         }
                         .onErrorReturn {
@@ -100,6 +103,7 @@ class UserManagerImpl @Inject constructor(
 
         settings.setMarketingOptIn(false)
         settings.setMarketingOptInNeedsSync(false)
+        analyticsTracker.refreshMetadata()
 
         val accountManager = AccountManager.get(application)
         val account = accountManager.pocketCastsAccount() ?: return

@@ -25,8 +25,9 @@ abstract class Tracker(@ApplicationContext private val appContext: Context) {
 
     @CallSuper
     open fun refreshMetadata() {
-        clearAnonID()
-        generateNewAnonID()
+        if (anonID == null) {
+            generateNewAnonID()
+        }
     }
 
     abstract fun flush()
