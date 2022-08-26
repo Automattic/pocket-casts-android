@@ -23,6 +23,7 @@ object AnalyticsTracker {
 
     fun init(@ApplicationContext appContext: Context) {
         this.appContext = appContext
+        trackers.forEach { it.clearAllData() }
         val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
         sendUsageStats = prefs.getBoolean(PREFKEY_SEND_USAGE_STATS, true)
     }
