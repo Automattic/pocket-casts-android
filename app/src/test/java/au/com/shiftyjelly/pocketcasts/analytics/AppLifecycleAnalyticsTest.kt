@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics.Companion.KEY_PREVIOUS_VERSION_CODE
+import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics.Companion.KEY_TIME_IN_APP
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -80,21 +82,25 @@ class AppLifecycleAnalyticsTest {
     @Test
     fun `given current and last version code different, when app launched, then app updated event fired`() {
         whenever(settings.getLastAppVersionCode()).thenReturn(VERSION_CODE_AFTER_FIRST_INSTALL)
-        whenever(packageUtil.getVersionCode(anyOrNull())).thenReturn(VERSION_CODE_AFTER_SECOND_INSTALL)
+        whenever(packageUtil.getVersionCode(anyOrNull())).thenReturn(
+            VERSION_CODE_AFTER_SECOND_INSTALL
+        )
 
         appLifecycleAnalytics.onApplicationInstalledOrUpgraded()
 
         verify(analyticsTracker)
             .track(
                 AnalyticsEvent.APPLICATION_UPDATED,
-                mapOf("previous_version" to VERSION_CODE_AFTER_FIRST_INSTALL)
+                mapOf(KEY_PREVIOUS_VERSION_CODE to VERSION_CODE_AFTER_FIRST_INSTALL)
             )
     }
 
     @Test
     fun `given current and last version code same, when app launched, then app updated event not fired`() {
         whenever(settings.getLastAppVersionCode()).thenReturn(VERSION_CODE_AFTER_SECOND_INSTALL)
-        whenever(packageUtil.getVersionCode(anyOrNull())).thenReturn(VERSION_CODE_AFTER_SECOND_INSTALL)
+        whenever(packageUtil.getVersionCode(anyOrNull())).thenReturn(
+            VERSION_CODE_AFTER_SECOND_INSTALL
+        )
 
         appLifecycleAnalytics.onApplicationInstalledOrUpgraded()
 
@@ -120,7 +126,7 @@ class AppLifecycleAnalyticsTest {
 
         verify(analyticsTracker).track(
             AnalyticsEvent.APPLICATION_CLOSED,
-            mapOf("time_in_app" to 1)
+            mapOf(KEY_TIME_IN_APP to 1)
         )
     }
 }

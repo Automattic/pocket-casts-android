@@ -28,7 +28,7 @@ class AppLifecycleAnalytics @Inject constructor(
         }
         if (oldVersionCode != 0 && oldVersionCode < versionCode) {
             // app upgraded
-            analyticsTracker.track(AnalyticsEvent.APPLICATION_UPDATED, mapOf("previous_version" to oldVersionCode))
+            analyticsTracker.track(AnalyticsEvent.APPLICATION_UPDATED, mapOf(KEY_PREVIOUS_VERSION_CODE to oldVersionCode))
         }
         settings.setLastAppVersionCode(versionCode)
     }
@@ -41,7 +41,7 @@ class AppLifecycleAnalytics @Inject constructor(
     fun onApplicationEnterBackground() {
         val properties: MutableMap<String, Any> = HashMap()
         applicationOpenedDate?.let {
-            properties["time_in_app"] = (it.timeIntervalSinceNow().toDouble() / MILLISECS_PER_SEC).toInt()
+            properties[KEY_TIME_IN_APP] = (it.timeIntervalSinceNow().toDouble() / MILLISECS_PER_SEC).toInt()
             applicationOpenedDate = null
         }
         analyticsTracker.track(AnalyticsEvent.APPLICATION_CLOSED, properties)
@@ -49,5 +49,7 @@ class AppLifecycleAnalytics @Inject constructor(
 
     companion object {
         private const val MILLISECS_PER_SEC = 1000
+        const val KEY_PREVIOUS_VERSION_CODE = "previous_version_code"
+        const val KEY_TIME_IN_APP = "time_in_app"
     }
 }
