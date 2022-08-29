@@ -18,7 +18,6 @@ RELEASE_NOTES_SOURCE_PATH = File.join(PROJECT_ROOT_FOLDER, 'CHANGELOG.md')
 EXTRACTED_RELEASE_NOTES_PATH = File.join(ORIGINALS_METADATA_DIR_PATH, 'release_notes.txt')
 PLAY_STORE_TRACK_BETA = "beta"
 PLAY_STORE_TRACK_PRODUCTION = "production"
-PLAY_STORE_TRACKS = [PLAY_STORE_TRACK_BETA, PLAY_STORE_TRACK_PRODUCTION]
 
 ########################################################################
 # Environment
@@ -85,25 +84,22 @@ platform :android do
     )
   end
 
-  # - Builds the app for external beta distribution
-  # - Uploads the builds to 'beta' channel in Play Store (but does not release it)
+  # - Uses the current version to decide if this is a beta or production build
+  # - Builds the apps for external distribution
+  # - Uploads the builds to 'beta' or 'production' Play Store channel (but does not release it)
   # - Creates draft Github release
   #
-  # @option [String] play_store_track (required) The Play Store track the builds will upload to
   # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
   # @option [Boolean] skip_prechecks (default: false) If true, skips android_build_preflight
   # @option [Boolean] create_gh_release (default: false) If true, creates a draft GitHub release
   #
   desc "Builds and uploads a new build to Google Play (without releasing it)"
   lane :build_and_upload_to_play_store do | options |
-    track = options[:play_store_track]
-    UI.user_error!("play_store_track value must be one of the following: #{PLAY_STORE_TRACKS}") unless PLAY_STORE_TRACKS.include?(track)
-    is_beta = track.eql?(PLAY_STORE_TRACK_BETA)
-    is_final = track.eql?(PLAY_STORE_TRACK_PRODUCTION)
-    android_build_prechecks(skip_confirm: options[:skip_confirm], alpha: false, beta: is_beta, final: is_final) unless (options[:skip_prechecks])
+    version = android_get_release_version()
+    is_beta = is_beta_version(android_get_release_version)
+    android_build_prechecks(skip_confirm: options[:skip_confirm], alpha: false, beta: is_beta, final: !is_beta) unless (options[:skip_prechecks])
     android_build_preflight() unless options[:skip_prechecks]
 
-    version = android_get_release_version()
     release_assets = []
 
     APPS.each do |app|
@@ -115,7 +111,7 @@ platform :android do
         upload_to_play_store(
           package_name: APP_PACKAGE_NAME,
           aab: aab_artifact_path,
-          track: track,
+          track: is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION,
           release_status: 'draft',
           skip_upload_apk: true,
           skip_upload_metadata: true,
@@ -128,7 +124,7 @@ platform :android do
         release_assets << aab_artifact_path
     end
 
-    create_gh_release(version: version, prerelease: true, release_assets: release_assets.compact) if options[:create_release]
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_release]
   end
 
   desc "Builds and bundles the given app"
