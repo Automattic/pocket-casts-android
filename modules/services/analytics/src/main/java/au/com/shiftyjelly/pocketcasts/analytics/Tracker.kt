@@ -67,8 +67,7 @@ abstract class Tracker(
     private fun regenerateAnonIDIfNeeded() {
         lastEventDate?.let {
             if (it.timeIntervalSinceNow() < anonIDInactivityTimeout) return
-            clearAnonID()
             generateNewAnonID()
-        } ?: return
+        }
     }
 }
