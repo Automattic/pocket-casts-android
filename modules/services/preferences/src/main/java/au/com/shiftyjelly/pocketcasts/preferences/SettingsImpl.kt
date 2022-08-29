@@ -55,6 +55,7 @@ class SettingsImpl @Inject constructor(
     companion object {
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
+        private const val SEND_USAGE_STATS_KEY = "SendUsageStatsKey"
     }
 
     private var languageCode: String? = null
@@ -1347,4 +1348,11 @@ class SettingsImpl @Inject constructor(
 
     override fun getTimesToShowBatteryWarning(): Int =
         getInt(SHOWN_BATTERY_WARNING_KEY, 4)
+
+    override fun setSendUsageStats(value: Boolean) {
+        setBoolean(SEND_USAGE_STATS_KEY, value)
+    }
+
+    override fun getSendUsageStats(): Boolean =
+        getBoolean(SEND_USAGE_STATS_KEY, true)
 }

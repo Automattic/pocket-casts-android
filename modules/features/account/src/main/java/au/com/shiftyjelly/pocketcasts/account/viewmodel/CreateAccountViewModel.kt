@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
@@ -21,6 +22,7 @@ class CreateAccountViewModel
 @Inject constructor(
     private val auth: AccountAuth,
     private val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : AccountViewModel() {
 
     val upgradeMode = MutableLiveData<Boolean>()
@@ -176,6 +178,7 @@ class CreateAccountViewModel
         viewModelScope.launch {
             when (val result = auth.createUserWithEmailAndPassword(emailString, passwordString)) {
                 is AccountAuth.AuthResult.Success -> {
+                    analyticsTracker.refreshMetadata()
                     createAccountState.postValue(CreateAccountState.AccountCreated)
                 }
                 is AccountAuth.AuthResult.Failed -> {

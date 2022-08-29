@@ -97,7 +97,8 @@ class PocketcastsApplication : Application(), Configuration.Provider {
 
     private fun setupAnalytics() {
         AnalyticsTracker.registerTracker(tracker)
-        AnalyticsTracker.init(applicationContext)
+        AnalyticsTracker.init(settings)
+        AnalyticsTracker.refreshMetadata()
     }
 
     private fun setupCrashlytics() {

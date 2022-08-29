@@ -1,35 +1,26 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import android.content.Context
-import androidx.preference.PreferenceManager
-import dagger.hilt.android.qualifiers.ApplicationContext
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 
 object AnalyticsTracker {
-    private const val PREFKEY_SEND_USAGE_STATS = "pc_pref_send_usage_stats"
     private val trackers: MutableList<Tracker> = mutableListOf()
-    @ApplicationContext
-    private lateinit var appContext: Context
+    private lateinit var settings: Settings
 
     var sendUsageStats: Boolean = true
         set(value) {
             if (value != field) {
                 field = value
-                storeUsagePref()
+                settings.setSendUsageStats(sendUsageStats)
                 if (!field) {
                     trackers.forEach { it.clearAllData() }
                 }
             }
         }
 
-    fun init(@ApplicationContext appContext: Context) {
-        this.appContext = appContext
-        val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
-        sendUsageStats = prefs.getBoolean(PREFKEY_SEND_USAGE_STATS, true)
-    }
-
-    private fun storeUsagePref() {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(appContext)
-        prefs.edit().putBoolean(PREFKEY_SEND_USAGE_STATS, sendUsageStats).apply()
+    fun init(settings: Settings) {
+        this.settings = settings
+        trackers.forEach { it.clearAllData() }
+        sendUsageStats = settings.getSendUsageStats()
     }
 
     fun registerTracker(tracker: Tracker?) {
@@ -37,9 +28,14 @@ object AnalyticsTracker {
     }
 
     fun track(event: AnalyticsEvent, properties: Map<String, *> = emptyMap<String, String>()) {
+        // TODO don't send usage stats for debug builds
         if (sendUsageStats) {
             trackers.forEach { it.track(event, properties) }
         }
+    }
+
+    fun refreshMetadata() {
+        trackers.forEach { it.refreshMetadata() }
     }
 
     fun flush() {

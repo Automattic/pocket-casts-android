@@ -9,4 +9,5 @@ dependencies {
     implementation project(':modules:services:preferences')
     implementation project(':modules:services:servers')
     implementation project(':modules:services:model')
+    implementation project(':modules:services:analytics')
 }
