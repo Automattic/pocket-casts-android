@@ -211,4 +211,8 @@ platform :android do
     UI.user_error!("Unable to find key `#{name}` in #{GOOGLE_FIREBASE_SECRETS_PATH}") if key_file_secrets[name].nil?
     key_file_secrets[name]
   end
+
+  def is_beta_version(version)
+    version['name'].include? "-rc-"
+  end
 end
