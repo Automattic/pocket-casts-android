@@ -52,6 +52,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 class PocketcastsApplication : Application(), Configuration.Provider {
 
+    @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
     @Inject lateinit var statsManager: StatsManager
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var episodeManager: EpisodeManager
@@ -134,6 +135,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
 
             AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@PocketcastsApplication))
             notificationHelper.setupNotificationChannels()
+            appLifecycleObserver.setup()
 
             Coil.setImageLoader(coilImageLoader)
 
