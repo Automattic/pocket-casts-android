@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -70,7 +71,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
                 downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
 
                 if (!settings.isLoggedIn() && BuildConfig.SYNC_USERNAME != null) {
-                    val authResult = accountAuth.signInWithEmailAndPassword(BuildConfig.SYNC_USERNAME, BuildConfig.SYNC_PASSWORD)
+                    val authResult = accountAuth.signInWithEmailAndPassword(BuildConfig.SYNC_USERNAME, BuildConfig.SYNC_PASSWORD, SignInSource.AutomotiveApplication)
                     Log.i(Settings.LOG_TAG_AUTO, "$authResult")
                 } else {
                     RefreshPodcastsTask.runNow(this@AutomotiveApplication)

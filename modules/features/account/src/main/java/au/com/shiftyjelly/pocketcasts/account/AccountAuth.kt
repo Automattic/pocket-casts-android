@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.account
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -24,15 +26,28 @@ class AccountAuth @Inject constructor(
     private val settings: Settings,
     private val serverManager: ServerManager,
     private val podcastManager: PodcastManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext private val context: Context
 ) {
 
-    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult {
+    companion object {
+        const val KEY_SIGN_IN_SOURCE = "sign_in_source"
+    }
+
+    suspend fun signInWithEmailAndPassword(
+        email: String,
+        password: String,
+        signInSource: SignInSource
+    ): AuthResult {
         return withContext(Dispatchers.IO) {
             val authResult = loginToSyncServer(email, password)
             if (authResult is AuthResult.Success) {
                 val token = authResult.result
                 signInSuccessful(email, password, token)
+                analyticsTracker.track(
+                    AnalyticsEvent.USER_SIGNED_IN,
+                    mapOf(KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
+                )
             }
             authResult
         }
@@ -141,4 +156,10 @@ class AccountAuth @Inject constructor(
         val isSuccess: Boolean
             get() = this is Success
     }
+}
+
+enum class SignInSource(val analyticsValue: String) {
+    AccountAuthenticator("account_manager"),
+    SignInViewModel("sign_in_view_model"),
+    AutomotiveApplication("automotive_application")
 }
