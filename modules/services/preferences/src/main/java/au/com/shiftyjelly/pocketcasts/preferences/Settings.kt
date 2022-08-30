@@ -516,7 +516,4 @@ interface Settings {
 
     fun setSendUsageStats(value: Boolean)
     fun getSendUsageStats(): Boolean
-
-    fun setLastAppVersionCode(value: Int)
-    fun getLastAppVersionCode(): Int
 }

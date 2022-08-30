@@ -21,7 +21,7 @@ class AppLifecycleAnalytics @Inject constructor(
     fun onApplicationInstalledOrUpgraded() {
         // Track app upgrade and install
         val versionCode = packageUtil.getVersionCode(appContext)
-        val oldVersionCode = settings.getLastAppVersionCode()
+        val oldVersionCode = settings.getMigratedVersionCode()
 
         if (oldVersionCode == 0) {
             // Track application installed if there isn't old version code
@@ -30,7 +30,6 @@ class AppLifecycleAnalytics @Inject constructor(
             // app upgraded
             analyticsTracker.track(AnalyticsEvent.APPLICATION_UPDATED, mapOf(KEY_PREVIOUS_VERSION_CODE to oldVersionCode))
         }
-        settings.setLastAppVersionCode(versionCode)
     }
 
     fun onApplicationEnterForeground() {

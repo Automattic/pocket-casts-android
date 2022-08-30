@@ -56,7 +56,6 @@ class SettingsImpl @Inject constructor(
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
         private const val SEND_USAGE_STATS_KEY = "SendUsageStatsKey"
-        private const val LAST_APP_VERSION_CODE = "LastAppVersionCodeKey"
     }
 
     private var languageCode: String? = null
@@ -1356,10 +1355,4 @@ class SettingsImpl @Inject constructor(
 
     override fun getSendUsageStats(): Boolean =
         getBoolean(SEND_USAGE_STATS_KEY, true)
-
-    override fun setLastAppVersionCode(value: Int) {
-        setInt(LAST_APP_VERSION_CODE, value)
-    }
-    override fun getLastAppVersionCode(): Int =
-        getInt(LAST_APP_VERSION_CODE, 0)
 }
