@@ -5,9 +5,8 @@ import com.android.billingclient.api.ProductDetails
 import java.time.Period
 import java.time.format.DateTimeParseException
 
-object SubscriptionCreator {
-
-    fun create(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? {
+object SubscriptionMapper {
+    fun map(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? {
 
         val matchingSubscriptionOfferDetails = if (isFreeTrialEligible) {
             productDetails

@@ -45,6 +45,6 @@ sealed interface Subscription {
 
     companion object {
         fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? =
-            SubscriptionCreator.create(productDetails, isFreeTrialEligible)
+            SubscriptionMapper.map(productDetails, isFreeTrialEligible)
     }
 }
