@@ -82,6 +82,7 @@ class AccountAuth @Inject constructor(
                 object : ServerCallback<String> {
                     override fun dataReturned(result: String?) {
                         continuation.resume(AuthResult.Success(result))
+                        analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
                     }
 
                     override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
@@ -93,6 +94,7 @@ class AccountAuth @Inject constructor(
                                 errorCode = errorCode
                             )
                         )
+                        analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED, mapOf(KEY_ERROR_CODE to serverMessageId))
                     }
                 }
             )
