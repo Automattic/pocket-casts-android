@@ -52,7 +52,7 @@ class AppLifecycleAnalyticsTest {
 
     @Test
     fun `given no version code in prefs, when app launched, then app installed event fired`() {
-        whenever(settings.getLastAppVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
+        whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
 
         appLifecycleAnalytics.onApplicationInstalledOrUpgraded()
 
@@ -61,7 +61,7 @@ class AppLifecycleAnalyticsTest {
 
     @Test
     fun `given version code in prefs, when app launched, then app installed event not fired`() {
-        whenever(settings.getLastAppVersionCode()).thenReturn(VERSION_CODE_AFTER_FIRST_INSTALL)
+        whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_AFTER_FIRST_INSTALL)
 
         appLifecycleAnalytics.onApplicationInstalledOrUpgraded()
 
@@ -72,7 +72,7 @@ class AppLifecycleAnalyticsTest {
 
     @Test
     fun `given no version code in prefs, when app launched, then app updated event not fired`() {
-        whenever(settings.getLastAppVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
+        whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_DEFAULT)
 
         appLifecycleAnalytics.onApplicationInstalledOrUpgraded()
 
@@ -81,7 +81,7 @@ class AppLifecycleAnalyticsTest {
 
     @Test
     fun `given current and last version code different, when app launched, then app updated event fired`() {
-        whenever(settings.getLastAppVersionCode()).thenReturn(VERSION_CODE_AFTER_FIRST_INSTALL)
+        whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_AFTER_FIRST_INSTALL)
         whenever(packageUtil.getVersionCode(anyOrNull())).thenReturn(
             VERSION_CODE_AFTER_SECOND_INSTALL
         )
@@ -97,7 +97,7 @@ class AppLifecycleAnalyticsTest {
 
     @Test
     fun `given current and last version code same, when app launched, then app updated event not fired`() {
-        whenever(settings.getLastAppVersionCode()).thenReturn(VERSION_CODE_AFTER_SECOND_INSTALL)
+        whenever(settings.getMigratedVersionCode()).thenReturn(VERSION_CODE_AFTER_SECOND_INSTALL)
         whenever(packageUtil.getVersionCode(anyOrNull())).thenReturn(
             VERSION_CODE_AFTER_SECOND_INSTALL
         )
