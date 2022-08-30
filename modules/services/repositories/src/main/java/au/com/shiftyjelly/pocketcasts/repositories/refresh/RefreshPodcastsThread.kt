@@ -133,7 +133,13 @@ class RefreshPodcastsThread(
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Refresh failed")
 
             if (e is SecurityException || e is UserNotLoggedInException) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because there was a security exception")
+                val exceptionType = when (e) {
+                    is SecurityException -> "SecurityException"
+                    is UserNotLoggedInException -> "UserNotLoggedInException"
+                    else -> "unexpected exception"
+                }
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because there was a $exceptionType")
+
                 val userManager = entryPoint.userManager()
                 val playbackManager = entryPoint.playbackManager()
                 userManager.signOut(playbackManager)
