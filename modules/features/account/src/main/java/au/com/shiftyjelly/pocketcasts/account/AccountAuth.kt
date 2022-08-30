@@ -32,6 +32,7 @@ class AccountAuth @Inject constructor(
 
     companion object {
         const val KEY_SIGN_IN_SOURCE = "sign_in_source"
+        const val KEY_ERROR_CODE = "error_code"
     }
 
     suspend fun signInWithEmailAndPassword(
@@ -44,12 +45,22 @@ class AccountAuth @Inject constructor(
             if (authResult is AuthResult.Success) {
                 val token = authResult.result
                 signInSuccessful(email, password, token)
-                analyticsTracker.track(
-                    AnalyticsEvent.USER_SIGNED_IN,
-                    mapOf(KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
-                )
             }
+            trackSignIn(authResult, signInSource)
             authResult
+        }
+    }
+
+    private fun trackSignIn(authResult: AuthResult, signInSource: SignInSource) {
+        val properties = mapOf(KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
+        when (authResult) {
+            is AuthResult.Success -> {
+                analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
+            }
+            is AuthResult.Failed -> {
+                val errorProperties = properties.plus(KEY_ERROR_CODE to authResult.errorCode)
+                analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, errorProperties)
+            }
         }
     }
 
@@ -75,7 +86,13 @@ class AccountAuth @Inject constructor(
 
                     override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
                         val message = userMessageId?.let { getResourceString(userMessageId) } ?: userMessage ?: getResourceString(LR.string.error_login_failed)
-                        continuation.resume(AuthResult.Failed(message = message, field = InputField.GENERAL))
+                        continuation.resume(
+                            AuthResult.Failed(
+                                message = message,
+                                field = InputField.GENERAL,
+                                errorCode = errorCode
+                            )
+                        )
                     }
                 }
             )
@@ -93,7 +110,13 @@ class AccountAuth @Inject constructor(
 
                     override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
                         val message = userMessageId?.let { getResourceString(userMessageId) } ?: userMessage ?: getResourceString(LR.string.error_login_failed)
-                        continuation.resume(AuthResult.Failed(message = message, field = InputField.GENERAL))
+                        continuation.resume(
+                            AuthResult.Failed(
+                                message = message,
+                                field = InputField.GENERAL,
+                                errorCode = errorCode
+                            )
+                        )
                     }
                 }
             )
@@ -110,7 +133,13 @@ class AccountAuth @Inject constructor(
 
                 override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
                     val message = userMessageId?.let { getResourceString(userMessageId) } ?: userMessage ?: getResourceString(LR.string.profile_reset_password_failed)
-                    complete(AuthResult.Failed(message, InputField.GENERAL))
+                    complete(
+                        AuthResult.Failed(
+                            message = message,
+                            field = InputField.GENERAL,
+                            errorCode = errorCode
+                        )
+                    )
                 }
             }
         )
@@ -149,7 +178,7 @@ class AccountAuth @Inject constructor(
 
     sealed class AuthResult {
         data class Success(val result: String?) : AuthResult()
-        data class Failed(val message: String, val field: InputField) : AuthResult() {
+        data class Failed(val message: String, val field: InputField, val errorCode: Int) : AuthResult() {
             val isPasswordError: Boolean = field == InputField.PASSWORD
         }
 

@@ -9,5 +9,6 @@ enum class AnalyticsEvent(val key: String) {
     APPLICATION_CLOSED("application_closed"),
 
     // User lifecycle events
-    USER_SIGNED_IN("user_signed_in")
+    USER_SIGNED_IN("user_signed_in"),
+    USER_SIGNIN_FAILED("user_signin_failed")
 }
