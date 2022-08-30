@@ -129,6 +129,7 @@ class AccountAuth @Inject constructor(
             object : ServerCallback<String> {
                 override fun dataReturned(result: String?) {
                     complete(AuthResult.Success(result))
+                    analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_RESET)
                 }
 
                 override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {

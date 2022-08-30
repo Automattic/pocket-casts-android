@@ -13,5 +13,6 @@ enum class AnalyticsEvent(val key: String) {
     USER_SIGNIN_FAILED("user_signin_failed"),
     USER_ACCOUNT_DELETED("user_account_deleted"),
     USER_PASSWORD_UPDATED("user_password_updated"),
-    USER_EMAIL_UPDATED("user_email_updated")
+    USER_EMAIL_UPDATED("user_email_updated"),
+    USER_PASSWORD_RESET("user_password_reset")
 }
