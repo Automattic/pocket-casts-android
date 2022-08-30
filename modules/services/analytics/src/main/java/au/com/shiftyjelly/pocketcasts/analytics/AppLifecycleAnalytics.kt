@@ -25,8 +25,7 @@ class AppLifecycleAnalytics @Inject constructor(
         if (oldVersionCode == 0) {
             // Track application installed if there isn't old version code
             analyticsTracker.track(AnalyticsEvent.APPLICATION_INSTALLED)
-        }
-        if (oldVersionCode != 0 && oldVersionCode < versionCode) {
+        } else if (oldVersionCode < versionCode) {
             // app upgraded
             analyticsTracker.track(AnalyticsEvent.APPLICATION_UPDATED, mapOf(KEY_PREVIOUS_VERSION_CODE to oldVersionCode))
         }
