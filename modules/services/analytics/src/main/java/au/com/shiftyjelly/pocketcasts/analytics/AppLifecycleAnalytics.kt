@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AppLifecycleAnalytics @Inject constructor(
@@ -40,15 +41,14 @@ class AppLifecycleAnalytics @Inject constructor(
     fun onApplicationEnterBackground() {
         val properties: MutableMap<String, Any> = HashMap()
         applicationOpenedDate?.let {
-            properties[KEY_TIME_IN_APP] = (it.timeIntervalSinceNow().toDouble() / MILLISECS_PER_SEC).toInt()
+            properties[KEY_TIME_IN_APP] = TimeUnit.MILLISECONDS.toSeconds(it.timeIntervalSinceNow()).toInt()
             applicationOpenedDate = null
         }
         analyticsTracker.track(AnalyticsEvent.APPLICATION_CLOSED, properties)
     }
 
     companion object {
-        private const val MILLISECS_PER_SEC = 1000
         const val KEY_PREVIOUS_VERSION_CODE = "previous_version_code"
-        const val KEY_TIME_IN_APP = "time_in_app"
+        const val KEY_TIME_IN_APP = "time_in_app" // time in seconds
     }
 }
