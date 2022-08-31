@@ -118,6 +118,7 @@ class AccountActivity : AppCompatActivity() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_SHOWN
             R.id.signInFragment -> AnalyticsEvent.SIGNIN_SHOWN
+            R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_SHOWN
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }
@@ -127,6 +128,7 @@ class AccountActivity : AppCompatActivity() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_DISMISSED
             R.id.signInFragment -> AnalyticsEvent.SIGNIN_DISMISSED
+            R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_DISMISSED
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }
