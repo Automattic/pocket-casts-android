@@ -29,7 +29,7 @@ class AccountActivity : AppCompatActivity() {
 
     @Inject lateinit var theme: Theme
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-
+    private val viewModel: CreateAccountViewModel by viewModels()
     private lateinit var binding: AccountActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +46,6 @@ class AccountActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
 
-            val viewModel: CreateAccountViewModel by viewModels()
             if (isNewUpgradeInstance(intent)) {
                 viewModel.clearReadyForUpgrade()
                 graph.setStartDestination(R.id.createFrequencyFragment)
@@ -122,9 +121,15 @@ class AccountActivity : AppCompatActivity() {
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_SHOWN
             R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_SHOWN
             R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN
+            R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_SHOWN
             else -> null
         }
-        analyticsEvent?.let { analyticsTracker.track(it) }
+        val properties = HashMap<String, Any?>()
+        if (id == R.id.createPayNowFragment) {
+            val subscription = viewModel.subscription.value
+            subscription?.let { properties.put(PRODUCT, it.productDetails.productId) }
+        }
+        analyticsEvent?.let { analyticsTracker.track(it, properties) }
     }
 
     private fun NavDestination.trackDismissed() {
@@ -135,6 +140,7 @@ class AccountActivity : AppCompatActivity() {
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_DISMISSED
             R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_DISMISSED
             R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED
+            R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_DISMISSED
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }
@@ -160,7 +166,7 @@ class AccountActivity : AppCompatActivity() {
         fun isNewAutoSelectPlusInstance(intent: Intent): Boolean {
             return intent.getBooleanExtra(AUTO_SELECT_PLUS, false)
         }
-
+        private const val PRODUCT = "product"
         const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
         const val PROMO_CODE_RETURN_DESCRIPTION = "account_activity.promo_code_return_description"
