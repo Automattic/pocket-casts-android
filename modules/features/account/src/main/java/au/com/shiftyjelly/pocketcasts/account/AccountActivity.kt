@@ -120,6 +120,7 @@ class AccountActivity : AppCompatActivity() {
             R.id.signInFragment -> AnalyticsEvent.SIGNIN_SHOWN
             R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_SHOWN
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_SHOWN
+            R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_SHOWN
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }
@@ -131,6 +132,7 @@ class AccountActivity : AppCompatActivity() {
             R.id.signInFragment -> AnalyticsEvent.SIGNIN_DISMISSED
             R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_DISMISSED
             R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_DISMISSED
+            R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_DISMISSED
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }

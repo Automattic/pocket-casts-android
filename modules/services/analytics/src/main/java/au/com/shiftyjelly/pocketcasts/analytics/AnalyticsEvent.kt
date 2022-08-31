@@ -30,4 +30,10 @@ enum class AnalyticsEvent(val key: String) {
     CREATE_ACCOUNT_SHOWN("create_account_shown"),
     CREATE_ACCOUNT_DISMISSED("create_account_dismissed"),
     CREATE_ACCOUNT_NEXT_BUTTON_TAPPED("create_account_next_button_tapped"),
+
+    /* Terms of Use */
+    TERMS_OF_USE_SHOWN("terms_of_use_shown"),
+    TERMS_OF_USE_DISMISSED("terms_of_use_dismissed"),
+    TERMS_OF_USE_ACCEPTED("terms_of_use_accepted"),
+    TERMS_OF_USE_REJECTED("terms_of_use_rejected"),
 }
