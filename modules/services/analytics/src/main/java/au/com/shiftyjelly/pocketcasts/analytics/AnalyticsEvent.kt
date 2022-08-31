@@ -16,4 +16,8 @@ enum class AnalyticsEvent(val key: String) {
     SETUP_ACCOUNT_SHOWN("setup_account_shown"),
     SETUP_ACCOUNT_DISMISSED("setup_account_dismissed"),
     SETUP_ACCOUNT_BUTTON_TAPPED("setup_account_button_tapped"),
+
+    /* Sign in */
+    SIGNIN_SHOWN("signin_shown"),
+    SIGNIN_DISMISSED("signin_dismissed"),
 }

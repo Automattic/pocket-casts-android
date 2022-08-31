@@ -117,6 +117,7 @@ class AccountActivity : AppCompatActivity() {
     private fun NavDestination.trackShown() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_SHOWN
+            R.id.signInFragment -> AnalyticsEvent.SIGNIN_SHOWN
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }
@@ -125,6 +126,7 @@ class AccountActivity : AppCompatActivity() {
     private fun NavDestination.trackDismissed() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_DISMISSED
+            R.id.signInFragment -> AnalyticsEvent.SIGNIN_DISMISSED
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }
