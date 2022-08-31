@@ -94,7 +94,7 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
             serverTask = serverManager.exportFeedUrls(
                 uuids,
                 object : ServerCallback<Map<String, String>> {
-                    override fun callFailed(
+                    override fun onFailed(
                         errorCode: Int,
                         userMessage: String?,
                         serverMessageId: String?,

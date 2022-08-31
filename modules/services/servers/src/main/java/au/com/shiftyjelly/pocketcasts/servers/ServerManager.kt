@@ -47,7 +47,7 @@ open class ServerManager @Inject constructor(
     }
 
     private fun tokenExtractionCallback(callback: ServerCallback<String>): PostCallback {
-        return object : PostCallback {
+        return object : PostCallback, ServerFailure by callback {
             override fun onSuccess(data: String?, response: ServerResponse) {
                 try {
                     if (data == null) {
@@ -60,16 +60,6 @@ open class ServerManager @Inject constructor(
                     Timber.e(e)
                     callback.dataReturned(null)
                 }
-            }
-
-            override fun onFailed(
-                errorCode: Int,
-                userMessage: String?,
-                serverMessageId: String?,
-                serverMessage: String?,
-                throwable: Throwable?
-            ) {
-                callback.callFailed(errorCode, userMessage, serverMessageId, serverMessage, throwable)
             }
         }
     }
@@ -86,7 +76,7 @@ open class ServerManager @Inject constructor(
                 if (token != null) {
                     callback.dataReturned(token)
                 } else {
-                    callback.callFailed(
+                    callback.onFailed(
                         errorCode = -1,
                         userMessage = "Unable to link Pocket Casts account with Sonos.",
                         serverMessageId = null,
@@ -97,7 +87,7 @@ open class ServerManager @Inject constructor(
             }
 
             override fun onFailure(call: retrofit2.Call<ApiTokenResponse>, t: Throwable) {
-                callback.callFailed(
+                callback.onFailed(
                     errorCode = -1,
                     userMessage = "Unable to link Pocket Casts account with Sonos.",
                     serverMessageId = null,
@@ -119,25 +109,9 @@ open class ServerManager @Inject constructor(
         }
         return postToMainServer(
             "/podcasts/search", Parameters("q", searchTerm), true,
-            object : PostCallback {
+            object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parsePodcastSearch(data = data, searchTerm = searchTerm))
-                }
-
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?
-                ) {
-                    callback.callFailed(
-                        errorCode = errorCode,
-                        userMessage = userMessage,
-                        serverMessageId = serverMessageId,
-                        serverMessage = serverMessage,
-                        throwable = throwable
-                    )
                 }
             }
         )
@@ -153,25 +127,9 @@ open class ServerManager @Inject constructor(
         val uuidsJoined = TextUtils.join(",", uuids)
         return postToMainServer(
             "/import/export_feed_urls", Parameters("uuids", uuidsJoined), true,
-            object : PostCallback {
+            object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseExportFeedUrls(data))
-                }
-
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?
-                ) {
-                    callback.callFailed(
-                        errorCode = errorCode,
-                        userMessage = userMessage,
-                        serverMessageId = serverMessageId,
-                        serverMessage = serverMessage,
-                        throwable = throwable
-                    )
                 }
             }
         )
@@ -180,25 +138,9 @@ open class ServerManager @Inject constructor(
     fun getSharedItemDetails(strippedUrl: String, callback: ServerCallback<Share>): Call? {
         return postToMainServer(
             strippedUrl, null, true,
-            object : PostCallback {
+            object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseShareItem(data))
-                }
-
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?
-                ) {
-                    callback.callFailed(
-                        errorCode = errorCode,
-                        userMessage = userMessage,
-                        serverMessageId = serverMessageId,
-                        serverMessage = serverMessage,
-                        throwable = throwable
-                    )
                 }
             }
         )
@@ -230,25 +172,9 @@ open class ServerManager @Inject constructor(
 
         return postToMainServer(
             "/user/update", parameters, false,
-            object : PostCallback {
+            object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseRefreshPodcasts(data))
-                }
-
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?
-                ) {
-                    callback.callFailed(
-                        errorCode = errorCode,
-                        userMessage = userMessage,
-                        serverMessageId = serverMessageId,
-                        serverMessage = serverMessage,
-                        throwable = throwable
-                    )
                 }
             }
         )
@@ -262,7 +188,7 @@ open class ServerManager @Inject constructor(
                 emitter.onSuccess(result!!)
             }
 
-            override fun callFailed(
+            override fun onFailed(
                 errorCode: Int,
                 userMessage: String?,
                 serverMessageId: String?,

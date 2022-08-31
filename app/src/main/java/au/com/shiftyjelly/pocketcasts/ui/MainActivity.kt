@@ -970,7 +970,7 @@ class MainActivity :
                     openPodcastPage(uuid)
                 }
 
-                override fun callFailed(
+                override fun onFailed(
                     errorCode: Int,
                     userMessage: String?,
                     serverMessageId: String?,
@@ -1022,7 +1022,7 @@ class MainActivity :
                     }
                 }
 
-                override fun callFailed(
+                override fun onFailed(
                     errorCode: Int,
                     userMessage: String?,
                     serverMessageId: String?,

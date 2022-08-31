@@ -102,7 +102,7 @@ class SonosAppLinkActivity : AppCompatActivity() {
                     tokenObtained(result)
                 }
 
-                override fun callFailed(
+                override fun onFailed(
                     errorCode: Int,
                     userMessage: String?,
                     serverMessageId: String?,

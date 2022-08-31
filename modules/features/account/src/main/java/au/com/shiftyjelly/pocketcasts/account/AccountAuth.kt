@@ -86,7 +86,7 @@ class AccountAuth @Inject constructor(
                         analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
                     }
 
-                    override fun callFailed(
+                    override fun onFailed(
                         errorCode: Int,
                         userMessage: String?,
                         serverMessageId: String?,
@@ -118,7 +118,7 @@ class AccountAuth @Inject constructor(
                         continuation.resume(AuthResult.Success(result))
                     }
 
-                    override fun callFailed(
+                    override fun onFailed(
                         errorCode: Int,
                         userMessage: String?,
                         serverMessageId: String?,
@@ -149,7 +149,7 @@ class AccountAuth @Inject constructor(
                     analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_RESET)
                 }
 
-                override fun callFailed(
+                override fun onFailed(
                     errorCode: Int,
                     userMessage: String?,
                     serverMessageId: String?,
