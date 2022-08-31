@@ -25,8 +25,7 @@ PLAY_STORE_TRACK_PRODUCTION = "production"
 Dotenv.load(USER_ENV_FILE_PATH)
 ENV["PROJECT_NAME"] = "pocket-casts-android"
 ENV["PROJECT_ROOT_FOLDER"] = "./"
-# TODO: Change the default branch to `main`
-ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'fastlane/release-cycle'
+ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
 GH_REPOSITORY = "automattic/pocket-casts-android"
 # TODO: Disable building/uploading automative artifacts until we get everything working
 #APPS = ["app", "automotive"]
@@ -62,9 +61,8 @@ platform :android do
       new_version: new_version,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
-    # TODO: Enable these before merging to `main`
-    #setbranchprotection(repository:GHHELPER_REPO, branch: "release/#{new_version}")
-    #setfrozentag(repository:GHHELPER_REPO, milestone: new_version)
+    setbranchprotection(repository:GHHELPER_REPO, branch: "release/#{new_version}")
+    setfrozentag(repository:GHHELPER_REPO, milestone: new_version)
   end
 
   lane :complete_code_freeze do | options |
@@ -74,7 +72,7 @@ platform :android do
     trigger_release_build(branch_to_build: "release/#{new_version}")
   end
 
-  desc "Tell Buildkite to trigger a release build"
+  # @param [String] branch_to_build (default: current git branch) The branch to build
   lane :trigger_release_build do | options |
     buildkite_trigger_build(
       buildkite_organization: 'automattic',
@@ -103,7 +101,7 @@ platform :android do
     release_assets = []
 
     APPS.each do |app|
-        build_bundle(app: app, version: version)
+        build_bundle(app: app)
 
         aab_artifact_path = aab_artifact_path(app, version)
         UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
@@ -144,6 +142,8 @@ platform :android do
     trigger_release_build(branch_to_build: "release/#{version["name"]}")
   end
 
+  # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
+  # @param [String] app The Android app to build (i.e 'app' or 'automotive')
   desc "Builds and bundles the given app"
   lane :build_bundle do | options |
     version = options[:version]
