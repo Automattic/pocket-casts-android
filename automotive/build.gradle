@@ -4,11 +4,17 @@ plugins {
     id 'kotlin-parcelize'
 }
 apply from: "../base.gradle"
+apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
     defaultConfig {
         applicationId project.applicationId
         minSdkVersion 28
+    }
+
+    buildFeatures {
+        viewBinding true
+        compose true
     }
 
     if (canSignRelease) {
@@ -65,6 +71,7 @@ dependencies {
     implementation project(':modules:services:model')
     implementation project(':modules:services:ui')
     implementation project(':modules:services:views')
+    implementation project(':modules:services:compose')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:servers')
     implementation project(':modules:features:profile')

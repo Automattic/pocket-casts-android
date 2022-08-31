@@ -9,11 +9,13 @@ import androidx.lifecycle.Observer
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -36,6 +38,16 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedP
 
         changeSkipTitles()
         setupRefreshNow()
+        setupAbout()
+    }
+
+    private fun setupAbout() {
+        val preference = findPreference<Preference>("about") ?: return
+        preference.summary = getString(LR.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString())
+        preference.setOnPreferenceClickListener {
+            (activity as? FragmentHostListener)?.addFragment(AutomotiveAboutFragment())
+            true
+        }
     }
 
     private fun setupRefreshNow() {
