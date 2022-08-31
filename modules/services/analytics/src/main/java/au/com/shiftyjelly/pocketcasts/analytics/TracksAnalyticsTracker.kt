@@ -26,9 +26,9 @@ class TracksAnalyticsTracker @Inject constructor(
     private val predefinedEventProperties: Map<String, Any>
         get() {
             val isLoggedIn = settings.isLoggedIn()
-            val hasSubscription = if (isLoggedIn) plusSubscription != null else INVALID_OR_NULL_VALUE
+            val hasSubscription = plusSubscription != null
             val hasLifetime = plusSubscription?.isLifetimePlus
-                ?: INVALID_OR_NULL_VALUE
+                ?: false
             val subscriptionType = plusSubscription?.type?.toString()
                 ?: INVALID_OR_NULL_VALUE
             val subscriptionPlatform = plusSubscription?.platform?.toString()
