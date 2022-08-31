@@ -69,7 +69,7 @@ jobs:
           mappingFile: app/build/outputs/mapping/release/mapping.txt
       # Automotive
       - name: Assemble Automotive Release
-        run: ./gradlew assembleRelease bundleRelease --no-daemon
+        run: ./gradlew :automotive:assembleRelease :automotive:bundleRelease --no-daemon
         env:
           VERSION_CODE_START: 58135
       - name: Sign Automotive Bundle Release
