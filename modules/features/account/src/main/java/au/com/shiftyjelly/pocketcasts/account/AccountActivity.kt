@@ -7,12 +7,15 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.AccountActivityBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -25,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 class AccountActivity : AppCompatActivity() {
 
     @Inject lateinit var theme: Theme
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var binding: AccountActivityBinding
 
@@ -66,9 +70,11 @@ class AccountActivity : AppCompatActivity() {
 
             val navConfiguration = AppBarConfiguration(navController.graph)
             binding.toolbar?.setupWithNavController(navController, navConfiguration)
+            binding.toolbar?.setNavigationOnClickListener { _ -> onBackPressed() }
             binding.carHeader?.btnClose?.setOnClickListener { onBackPressed() }
 
             navController.addOnDestinationChangedListener { _, destination, _ ->
+                destination.trackShown()
                 if (!Util.isCarUiMode(this)) {
                     when (destination.id) {
                         R.id.createDoneFragment, R.id.accountFragment, R.id.promoCodeFragment -> {
@@ -95,6 +101,7 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val currentFragment = findNavController(R.id.nav_host_fragment).currentDestination
+        currentFragment?.trackDismissed()
         if (currentFragment?.id == R.id.createPayNowFragment || currentFragment?.id == R.id.createDoneFragment) {
             finish()
             return
@@ -105,6 +112,22 @@ class AccountActivity : AppCompatActivity() {
 
         UiUtil.hideKeyboard(binding.root)
         super.onBackPressed()
+    }
+
+    private fun NavDestination.trackShown() {
+        val analyticsEvent = when (id) {
+            R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_SHOWN
+            else -> null
+        }
+        analyticsEvent?.let { analyticsTracker.track(it) }
+    }
+
+    private fun NavDestination.trackDismissed() {
+        val analyticsEvent = when (id) {
+            R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_DISMISSED
+            else -> null
+        }
+        analyticsEvent?.let { analyticsTracker.track(it) }
     }
 
     companion object {
