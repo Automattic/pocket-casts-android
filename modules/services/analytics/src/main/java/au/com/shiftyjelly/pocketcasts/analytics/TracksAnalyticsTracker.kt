@@ -23,17 +23,31 @@ class TracksAnalyticsTracker @Inject constructor(
     private val plusSubscription: SubscriptionStatus.Plus?
         get() = settings.getCachedSubscription() as? SubscriptionStatus.Plus
 
-    private val predefinedEventProperties: Map<String, Any?>
-        get() = mapOf(
-            PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE.key to displayUtil.hasDynamicFontSize(),
-            PredefinedEventProperty.PLUS_HAS_SUBSCRIPTION.key to (plusSubscription != null),
-            PredefinedEventProperty.PLUS_HAS_LIFETIME.key to plusSubscription?.isLifetimePlus,
-            PredefinedEventProperty.PLUS_SUBSCRIPTION_TYPE.key to plusSubscription?.type?.toString(),
-            PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM.key to plusSubscription?.platform?.toString(),
-            PredefinedEventProperty.PLUS_SUBSCRIPTION_FREQUENCY.key to plusSubscription?.frequency?.toString(),
-        )
+    private val predefinedEventProperties: Map<String, Any>
+        get() {
+            val isLoggedIn = settings.isLoggedIn()
+            val hasSubscription = if (isLoggedIn) plusSubscription != null else INVALID_OR_NULL_VALUE
+            val hasLifetime = plusSubscription?.isLifetimePlus
+                ?: INVALID_OR_NULL_VALUE
+            val subscriptionType = plusSubscription?.type?.toString()
+                ?: INVALID_OR_NULL_VALUE
+            val subscriptionPlatform = plusSubscription?.platform?.toString()
+                ?: INVALID_OR_NULL_VALUE
+            val subscriptionFrequency = plusSubscription?.frequency?.toString()
+                ?: INVALID_OR_NULL_VALUE
 
-    override fun track(event: AnalyticsEvent, properties: Map<String, *>) {
+            return mapOf(
+                PredefinedEventProperty.HAS_DYNAMIC_FONT_SIZE to displayUtil.hasDynamicFontSize(),
+                PredefinedEventProperty.USER_IS_LOGGED_IN to isLoggedIn,
+                PredefinedEventProperty.PLUS_HAS_SUBSCRIPTION to hasSubscription,
+                PredefinedEventProperty.PLUS_HAS_LIFETIME to hasLifetime,
+                PredefinedEventProperty.PLUS_SUBSCRIPTION_TYPE to subscriptionType,
+                PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM to subscriptionPlatform,
+                PredefinedEventProperty.PLUS_SUBSCRIPTION_FREQUENCY to subscriptionFrequency,
+            ).mapKeys { it.key.analyticsKey }
+        }
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
         super.track(event, properties)
         if (tracksClient == null) return
 
@@ -71,8 +85,9 @@ class TracksAnalyticsTracker @Inject constructor(
         tracksClient?.clearQueues()
     }
 
-    enum class PredefinedEventProperty(val key: String) {
+    enum class PredefinedEventProperty(val analyticsKey: String) {
         HAS_DYNAMIC_FONT_SIZE("has_dynamic_font_size"),
+        USER_IS_LOGGED_IN("user_is_logged_in"),
         PLUS_HAS_SUBSCRIPTION("plus_has_subscription"),
         PLUS_HAS_LIFETIME("plus_has_lifetime"),
         PLUS_SUBSCRIPTION_TYPE("plus_subscription_type"),
@@ -83,5 +98,6 @@ class TracksAnalyticsTracker @Inject constructor(
     companion object {
         private const val TRACKS_ANON_ID = "nosara_tracks_anon_id"
         private const val EVENTS_PREFIX = "pcandroid_"
+        private const val INVALID_OR_NULL_VALUE = "none"
     }
 }
