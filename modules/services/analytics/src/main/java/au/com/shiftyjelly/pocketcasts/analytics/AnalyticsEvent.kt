@@ -36,4 +36,9 @@ enum class AnalyticsEvent(val key: String) {
     TERMS_OF_USE_DISMISSED("terms_of_use_dismissed"),
     TERMS_OF_USE_ACCEPTED("terms_of_use_accepted"),
     TERMS_OF_USE_REJECTED("terms_of_use_rejected"),
+
+    /* Select Payment Frequency */
+    SELECT_PAYMENT_FREQUENCY_SHOWN("select_payment_frequency_shown"),
+    SELECT_PAYMENT_FREQUENCY_DISMISSED("select_payment_frequency_dismissed"),
+    SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED("select_payment_frequency_next_button_tapped"),
 }
