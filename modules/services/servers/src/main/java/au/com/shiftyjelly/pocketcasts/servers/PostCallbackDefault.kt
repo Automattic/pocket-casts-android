@@ -6,7 +6,19 @@ class PostCallbackDefault(private val callback: ServerCallback<String>) : PostCa
         callback.dataReturned(data)
     }
 
-    override fun onFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-        callback.callFailed(errorCode, userMessage, userMessageId, serverMessage, throwable)
+    override fun onFailed(
+        errorCode: Int,
+        userMessage: String?,
+        serverMessageId: String?,
+        serverMessage: String?,
+        throwable: Throwable?
+    ) {
+        callback.callFailed(
+            errorCode = errorCode,
+            userMessage = userMessage,
+            serverMessageId = serverMessageId,
+            serverMessage = serverMessage,
+            throwable = throwable
+        )
     }
 }

@@ -94,7 +94,13 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
             serverTask = serverManager.exportFeedUrls(
                 uuids,
                 object : ServerCallback<Map<String, String>> {
-                    override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
+                    override fun callFailed(
+                        errorCode: Int,
+                        userMessage: String?,
+                        serverMessageId: String?,
+                        serverMessage: String?,
+                        throwable: Throwable?
+                    ) {
                         UiUtil.hideProgressDialog(progressDialog)
                     }
 

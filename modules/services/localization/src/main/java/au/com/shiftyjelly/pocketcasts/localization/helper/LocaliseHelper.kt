@@ -103,9 +103,12 @@ object LocaliseHelper {
         "promo_already_redeemed" to R.string.server_promo_already_redeemed
     )
 
-    fun findStringIdByServerMessageId(messageId: String): Int? {
-        return serverMessageIdToStringId[messageId]
-    }
+    fun serverMessageIdToMessage(serverMessageId: String?, getResourceString: (Int) -> String?) =
+        serverMessageId?.let { serverMessageIdString ->
+            serverMessageIdToStringId[serverMessageIdString]?.let { androidId ->
+                getResourceString(androidId)
+            }
+        }
 
     fun tryToLocalise(text: String, resources: Resources, args: List<String>? = null): String {
         val stringLower = text.lowercase()

@@ -171,7 +171,13 @@ class RefreshPodcastsThread(
                     processRefreshResponse(result)
                 }
 
-                override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
+                override fun callFailed(
+                    errorCode: Int,
+                    userMessage: String?,
+                    serverMessageId: String?,
+                    serverMessage: String?,
+                    throwable: Throwable?
+                ) {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
                     if (throwable != null) {
                         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")

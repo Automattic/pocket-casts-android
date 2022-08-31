@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers
 
 data class ServerResponse(
     var message: String? = null,
-    var messageId: Int? = null,
+    var serverMessageId: String? = null,
     var success: Boolean,
     var polling: Boolean = false,
     var data: String? = null,

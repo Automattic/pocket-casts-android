@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
+import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -972,14 +973,18 @@ class MainActivity :
                 override fun callFailed(
                     errorCode: Int,
                     userMessage: String?,
-                    userMessageId: Int?,
+                    serverMessageId: String?,
                     serverMessage: String?,
                     throwable: Throwable?
                 ) {
                     UiUtil.hideProgressDialog(dialog)
+
+                    val message = LocaliseHelper.serverMessageIdToMessage(serverMessageId, ::getString)
+                        ?: userMessage
+                        ?: getString(LR.string.podcast_add_failed)
                     UiUtil.displayAlertError(
                         context = this@MainActivity,
-                        message = userMessageId?.let { getString(userMessageId) } ?: userMessage ?: getString(LR.string.podcast_add_failed),
+                        message = message,
                         null
                     )
                 }
@@ -1020,7 +1025,7 @@ class MainActivity :
                 override fun callFailed(
                     errorCode: Int,
                     userMessage: String?,
-                    userMessageId: Int?,
+                    serverMessageId: String?,
                     serverMessage: String?,
                     throwable: Throwable?
                 ) {
