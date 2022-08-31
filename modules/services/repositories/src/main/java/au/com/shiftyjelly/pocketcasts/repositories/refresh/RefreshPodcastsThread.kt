@@ -142,7 +142,7 @@ class RefreshPodcastsThread(
 
                 val userManager = entryPoint.userManager()
                 val playbackManager = entryPoint.playbackManager()
-                userManager.signOut(playbackManager)
+                userManager.signOut(playbackManager, wasInitiatedByUser = false)
             } else {
                 refreshFailedOrCancelled(e.message ?: "Unknown error")
             }
@@ -259,7 +259,7 @@ class RefreshPodcastsThread(
 
             if (throwable is UserNotLoggedInException) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because server post failed to log in")
-                userManager.signOut(playbackManager)
+                userManager.signOut(playbackManager, wasInitiatedByUser = false)
             } else {
                 return RefreshState.Failed("Sync threw an error: ${throwable.message}")
             }
