@@ -32,8 +32,8 @@ class AccountAuth @Inject constructor(
 ) {
 
     companion object {
-        const val KEY_SIGN_IN_SOURCE = "sign_in_source"
-        const val KEY_ERROR_CODE = "error_code"
+        private const val KEY_SIGN_IN_SOURCE = "sign_in_source"
+        private const val KEY_ERROR_CODE = "error_code"
     }
 
     suspend fun signInWithEmailAndPassword(

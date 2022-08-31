@@ -44,7 +44,7 @@ class UserManagerImpl @Inject constructor(
 ) : UserManager {
 
     companion object {
-        const val KEY_USER_INITIATED = "user_initiated"
+        private const val KEY_USER_INITIATED = "user_initiated"
     }
 
     override fun beginMonitoringAccountManager(playbackManager: PlaybackManager) {
