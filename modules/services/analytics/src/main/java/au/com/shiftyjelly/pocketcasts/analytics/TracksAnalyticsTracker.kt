@@ -98,6 +98,6 @@ class TracksAnalyticsTracker @Inject constructor(
     companion object {
         private const val TRACKS_ANON_ID = "nosara_tracks_anon_id"
         private const val EVENTS_PREFIX = "pcandroid_"
-        private const val INVALID_OR_NULL_VALUE = "none"
+        const val INVALID_OR_NULL_VALUE = "none"
     }
 }

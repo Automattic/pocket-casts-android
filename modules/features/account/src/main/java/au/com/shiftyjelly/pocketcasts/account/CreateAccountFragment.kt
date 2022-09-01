@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker.Companion.INVALID_OR_NULL_VALUE
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -135,7 +136,8 @@ class CreateAccountFragment : BaseFragment() {
         }
 
         binding.btnNext.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.SELECT_ACCOUNT_TYPE_BUTTON_TAPPED, mapOf(KEY_ACCOUNT_TYPE to viewModel.subscriptionType.value?.trackingLabel))
+            val accountType = viewModel.subscriptionType.value?.trackingLabel ?: INVALID_OR_NULL_VALUE
+            analyticsTracker.track(AnalyticsEvent.SELECT_ACCOUNT_TYPE_BUTTON_TAPPED, mapOf(KEY_ACCOUNT_TYPE to accountType))
             if (viewModel.subscriptionType.value == SubscriptionType.FREE) {
                 it.findNavController().navigate(R.id.action_createAccountFragment_to_createEmailFragment)
             } else if (viewModel.subscriptionType.value == SubscriptionType.PLUS) {
