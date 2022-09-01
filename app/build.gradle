@@ -9,6 +9,11 @@ android {
     defaultConfig {
         applicationId project.applicationId
         multiDexEnabled true
+        versionCode project.appVersionCode
+        versionName project.versionName
+
+        buildConfigField 'int', 'VERSION_CODE', "${project.appVersionCode}"
+        buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
     }
 
     sourceSets {
@@ -23,17 +28,6 @@ android {
 
     lintOptions {
         abortOnError false
-    }
-
-    if (canSignRelease) {
-        signingConfigs {
-            release {
-                storeFile = releaseStoreFile
-                storePassword = getSecretProperty("signingKeyStorePassword", null)
-                keyAlias = getSecretProperty("signingKeyAlias", null)
-                keyPassword = getSecretProperty("signingKeyPassword", null)
-            }
-        }
     }
 
     buildTypes {
@@ -63,10 +57,6 @@ android {
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            if (canSignRelease) {
-                signingConfig signingConfigs.release
-            }
         }
     }
 }

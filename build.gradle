@@ -84,24 +84,3 @@ allprojects {
     }
 }
 
-def secretPropertiesFile = file("$rootDir/secret.properties") 
-def secretProperties = new Properties()
-if (secretPropertiesFile.exists()) {
-    secretProperties = loadPropertiesFromFile(secretPropertiesFile)
-}
-def versionProperties = loadPropertiesFromFile(file("${rootDir}/version.properties"))
-
-ext.getSecretProperty = { String propertyName, String defaultValue ->
-    secretProperties.getProperty(propertyName, defaultValue)
-}
-ext.getVersionProperty = { String propertyName ->
-    versionProperties.getProperty(propertyName, null)
-}
-
-static def loadPropertiesFromFile(inputFile) {
-    def properties = new Properties()
-    inputFile.withInputStream { stream ->
-        properties.load(stream)
-    }
-    return properties
-}

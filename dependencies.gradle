@@ -1,32 +1,25 @@
+final VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_AUTOMOTIVE = 50000
 
-def getVersionCode = { ->
-    def versionCodeNumber = null
-    if (System.getenv("VERSION_CODE_START") != null && System.getenv("GITHUB_RUN_NUMBER") != null) {
-        versionCodeNumber = Integer.parseInt(System.getenv("VERSION_CODE_START")) + Integer.parseInt(System.getenv("GITHUB_RUN_NUMBER"))
-    } else {
-        versionCodeNumber = 6474
-    }
-    println "App Version Code: " + versionCodeNumber
-    return versionCodeNumber
-}
+def secretProperties = loadPropertiesFromFile(file("$rootDir/secret.properties") )
+def versionProperties = loadPropertiesFromFile(file("${rootDir}/version.properties"))
 
-def getVersionNameSuffix = { ->
-    def versionNameSuffix = ""
-    if (System.getenv("BUILDKITE_BRANCH") != null && System.getenv("BUILDKITE_BUILD_NUMBER") != null) {
-        if (System.getenv("BUILDKITE_LABEL") == "Automotive") {
-            versionNameSuffix = "a"
+static def loadPropertiesFromFile(inputFile) {
+    def properties = new Properties()
+    if (inputFile.exists()) {
+        inputFile.withInputStream { stream ->
+            properties.load(stream)
         }
     }
-    println "Version name suffix: " + versionNameSuffix
-    return versionNameSuffix
+    return properties
 }
 
 project.ext {
     // Application
     applicationId = 'au.com.shiftyjelly.pocketcasts'
 
-    versionCode = getVersionCode()
-    versionName = '7.21.0' + getVersionNameSuffix()
+    versionName = versionProperties.getProperty("versionName", null)
+    appVersionCode = versionProperties.getProperty("versionCode", null).toInteger()
+    automotiveVersionCode = appVersionCode + VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_AUTOMOTIVE
 
     // Android
     minSdkVersion = 23
@@ -34,6 +27,17 @@ project.ext {
     targetSdkVersion = 31
     compileSdkVersion = 32
     testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
+
+    // App Signing
+    storeFile = file("$rootDir/${secretProperties.getProperty("signingKeyStoreFile", null)}")
+    storePassword = secretProperties.getProperty("signingKeyStorePassword", null)
+    keyAlias = secretProperties.getProperty("signingKeyAlias", null)
+    keyPassword = secretProperties.getProperty("signingKeyPassword", null)
+    canSignRelease = storeFile.exists()
+
+    // Secrets
+    settingsEncryptSecret = secretProperties.getProperty("pocketcastsSettingsEncryptSecret", "")
+    sharingServerSecret = secretProperties.getProperty("pocketcastsSharingServerSecret", "")
 
     // Library versions
     versionBillingClient = '5.0.0'

@@ -9,17 +9,11 @@ android {
     defaultConfig {
         applicationId project.applicationId
         minSdkVersion 28
-    }
+        versionCode project.automotiveVersionCode
+        versionName project.versionName
 
-    if (canSignRelease) {
-        signingConfigs {
-            release {
-                storeFile = releaseStoreFile
-                storePassword = getSecretProperty("signingKeyStorePassword", null)
-                keyAlias = getSecretProperty("signingKeyAlias", null)
-                keyPassword = getSecretProperty("signingKeyPassword", null)
-            }
-        }
+        buildConfigField 'int', 'VERSION_CODE', "${project.automotiveVersionCode}"
+        buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
     }
 
     buildTypes {
@@ -38,11 +32,6 @@ android {
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            if (canSignRelease) {
-                signingConfig signingConfigs.release
-            }
-
         }
     }
 
