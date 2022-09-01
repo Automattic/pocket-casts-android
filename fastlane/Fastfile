@@ -101,7 +101,7 @@ platform :android do
     release_assets = []
 
     APPS.each do |app|
-        build_bundle(app: app)
+        build_bundle(app: app, version: version)
 
         aab_artifact_path = aab_artifact_path(app, version)
         UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
