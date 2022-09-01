@@ -139,7 +139,8 @@ class CreatePayNowFragment : BaseFragment() {
                         viewModel.sendCreateSubscriptions()
                         subscriptionManager.launchBillingFlow(
                             requireActivity(),
-                            subscription.productDetails
+                            subscription.productDetails,
+                            subscription.offerToken
                         )
                     }
                 }

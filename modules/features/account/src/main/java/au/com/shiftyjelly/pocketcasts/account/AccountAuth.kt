@@ -5,6 +5,7 @@ import android.accounts.AccountManager
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -59,7 +60,8 @@ class AccountAuth @Inject constructor(
                 analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
             }
             is AuthResult.Failed -> {
-                val errorProperties = properties.plus(KEY_ERROR_CODE to authResult.serverMessageId)
+                val errorCodeValue = authResult.serverMessageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+                val errorProperties = properties.plus(KEY_ERROR_CODE to errorCodeValue)
                 analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, errorProperties)
             }
         }
@@ -102,7 +104,8 @@ class AccountAuth @Inject constructor(
                                 serverMessageId = serverMessageId
                             )
                         )
-                        analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED, mapOf(KEY_ERROR_CODE to serverMessageId))
+                        val errorCodeValue = serverMessageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+                        analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED, mapOf(KEY_ERROR_CODE to errorCodeValue))
                     }
                 }
             )
@@ -204,5 +207,4 @@ class AccountAuth @Inject constructor(
 enum class SignInSource(val analyticsValue: String) {
     AccountAuthenticator("account_manager"),
     SignInViewModel("sign_in_view_model"),
-    AutomotiveApplication("automotive_application")
 }

@@ -27,7 +27,7 @@ object AnalyticsTracker {
         tracker?.let { trackers.add(tracker) }
     }
 
-    fun track(event: AnalyticsEvent, properties: Map<String, *> = emptyMap<String, String>()) {
+    fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         // TODO don't send usage stats for debug builds
         if (sendUsageStats) {
             trackers.forEach { it.track(event, properties) }
