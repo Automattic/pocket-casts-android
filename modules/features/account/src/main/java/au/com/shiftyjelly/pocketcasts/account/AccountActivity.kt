@@ -124,11 +124,13 @@ class AccountActivity : AppCompatActivity() {
             R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_SHOWN
             else -> null
         }
-        val properties = HashMap<String, Any?>()
-        if (id == R.id.createPayNowFragment) {
-            val subscription = viewModel.subscription.value
-            subscription?.let { properties.put(PRODUCT, it.productDetails.productId) }
-        }
+        val properties = when (id) {
+            R.id.createPayNowFragment -> {
+                val subscription = viewModel.subscription.value
+                subscription?.let { mapOf(PRODUCT to it.productDetails.productId) }
+            }
+            else -> null
+        } ?: emptyMap()
         analyticsEvent?.let { analyticsTracker.track(it, properties) }
     }
 
