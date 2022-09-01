@@ -36,11 +36,13 @@ class PlusUpgradeFragment : BaseDialogFragment() {
         object Unknown : UpgradePage(promotionId = "UNKNOWN", promotionName = "Unknown", featureBlocked = false)
 
         companion object {
-            fun fromString(value: String): UpgradePage {
-                return when (value) {
-                    Folders.promotionId -> Folders
-                    else -> Unknown
-                }
+            fun fromString(value: String) = when (value) {
+                Profile.promotionId -> Profile
+                Files.promotionId -> Files
+                Folders.promotionId -> Folders
+                Themes.promotionId -> Themes
+                Icons.promotionId -> Icons
+                else -> Unknown
             }
         }
     }
@@ -64,7 +66,7 @@ class PlusUpgradeFragment : BaseDialogFragment() {
     private val upgradePage: UpgradePage
         get() = UpgradePage.fromString(arguments?.getString(EXTRA_START_PAGE) ?: "")
     private val promotionSource: String
-        get() = (arguments?.getString(EXTRA_START_PAGE) ?: "").lowercase(Locale.ENGLISH)
+        get() = upgradePage.promotionId.lowercase(Locale.ENGLISH)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
