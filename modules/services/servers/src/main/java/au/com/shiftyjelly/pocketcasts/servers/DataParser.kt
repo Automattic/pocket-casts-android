@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
-import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Share
@@ -208,8 +207,12 @@ object DataParser {
                 return ServerResponse(success = true, polling = true, message = message)
             } else {
                 val errorCode = allData.optInt("error_code", ServerResponse.ERROR_CODE_NO_ERROR_CODE)
-                val androidMessageId = if (messageId == null) null else LocaliseHelper.findStringIdByServerMessageId(messageId)
-                return ServerResponse(success = false, message = message, messageId = androidMessageId, errorCode = errorCode)
+                return ServerResponse(
+                    success = false,
+                    message = message,
+                    serverMessageId = messageId,
+                    errorCode = errorCode
+                )
             }
         } catch (e: Exception) {
             Timber.e(e, "Response data: %s", data)

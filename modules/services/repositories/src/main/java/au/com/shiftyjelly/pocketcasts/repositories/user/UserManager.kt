@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -29,7 +30,7 @@ import javax.inject.Inject
 interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
     fun getSignInState(): Flowable<SignInState>
-    fun signOut(playbackManager: PlaybackManager)
+    fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean)
 }
 
 class UserManagerImpl @Inject constructor(
@@ -42,15 +43,19 @@ class UserManagerImpl @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : UserManager {
 
+    companion object {
+        private const val KEY_USER_INITIATED = "user_initiated"
+    }
+
     override fun beginMonitoringAccountManager(playbackManager: PlaybackManager) {
         val accountListener = OnAccountsUpdateListener {
             try {
                 // Handle sign out from outside of the app
                 if (settings.getUsedAccountManager()) {
                     val accountManager = AccountManager.get(application)
-                    if (accountManager.pocketCastsAccount() == null) {
+                    if (accountManager.pocketCastsAccount() == null && settings.isLoggedIn()) {
                         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out because no account manager account found")
-                        signOut(playbackManager)
+                        signOut(playbackManager, wasInitiatedByUser = false)
                     }
                 }
 
@@ -92,7 +97,7 @@ class UserManagerImpl @Inject constructor(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    override fun signOut(playbackManager: PlaybackManager) {
+    override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
         subscriptionManager.clearCachedStatus()
         syncServerManager.signOut()
@@ -103,6 +108,7 @@ class UserManagerImpl @Inject constructor(
 
         settings.setMarketingOptIn(false)
         settings.setMarketingOptInNeedsSync(false)
+        analyticsTracker.track(AnalyticsEvent.USER_SIGNED_OUT, mapOf(KEY_USER_INITIATED to wasInitiatedByUser))
         analyticsTracker.flush()
         analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()
