@@ -27,9 +27,9 @@ ENV["PROJECT_NAME"] = "pocket-casts-android"
 ENV["PROJECT_ROOT_FOLDER"] = "./"
 ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
 GH_REPOSITORY = "automattic/pocket-casts-android"
-# TODO: Disable building/uploading automative artifacts until we get everything working
-#APPS = ["app", "automotive"]
-APPS = ["app"]
+APPS_APP = "app"
+APPS_AUTOMOTIVE = "automotive"
+APPS = [APPS_APP, APPS_AUTOMOTIVE]
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
 
@@ -219,7 +219,7 @@ platform :android do
   def bundle_output_path(app)
     output_dir = "#{app}/build/outputs/bundle"
     # TODO: Ideally we won't need this type of separation which is caused by the extra 'automotive` flavor
-    app == "app" ? "#{output_dir}/release/app-release.aab" : "#{output_dir}/automotiveRelease/automotive-automotive-release.aab"
+    app == APPS_APP ? "#{output_dir}/release/app-release.aab" : "#{output_dir}/automotiveRelease/automotive-automotive-release.aab"
   end
 
   def firebase_secret(name:)
