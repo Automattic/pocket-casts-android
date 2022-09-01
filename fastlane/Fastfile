@@ -94,7 +94,7 @@ platform :android do
   desc "Builds and uploads a new build to Google Play (without releasing it)"
   lane :build_and_upload_to_play_store do | options |
     version = android_get_release_version()
-    is_beta = is_beta_version(android_get_release_version)
+    is_beta = is_beta_version(version)
     android_build_prechecks(skip_confirm: options[:skip_confirm], alpha: false, beta: is_beta, final: !is_beta) unless (options[:skip_prechecks])
     android_build_preflight() unless options[:skip_prechecks]
 
