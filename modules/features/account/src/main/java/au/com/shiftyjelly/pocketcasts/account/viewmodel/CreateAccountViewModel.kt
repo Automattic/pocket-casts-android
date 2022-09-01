@@ -204,46 +204,56 @@ class CreateAccountViewModel
             .firstOrError()
             .subscribeBy(
                 onSuccess = { purchaseEvent ->
-
-                    val productValue = subscription.value?.shortTitle?.lowercase(Locale.ENGLISH)
-                        ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-                    val isFreeTrial = subscription.value is Subscription.WithTrial
-                    val analyticsProperties = mapOf(
-                        PRODUCT_KEY to productValue,
-                        IS_FREE_TRIAL_KEY to isFreeTrial
-                    )
-
                     when (purchaseEvent) {
                         is PurchaseEvent.Success -> {
                             createAccountState.postValue(CreateAccountState.SubscriptionCreated)
-                            analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
                         }
                         is PurchaseEvent.Cancelled -> {
                             errorUpdate(CreateAccountError.CANCELLED_CREATE_SUB, true)
-                            analyticsTracker.track(
-                                AnalyticsEvent.PURCHASE_CANCELLED,
-                                analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode)
-                            )
                         }
                         is PurchaseEvent.Failure -> {
                             errorUpdate(CreateAccountError.CANNOT_CREATE_SUB, true)
-
-                            analyticsTracker.apply {
-                                // Exclude error_code property if we do not have a responseCode
-                                val properties = purchaseEvent.responseCode?.let {
-                                    analyticsProperties.plus(ERROR_CODE_KEY to it)
-                                } ?: analyticsProperties
-
-                                track(AnalyticsEvent.PURCHASE_FAILED, properties)
-                            }
                         }
                     }
+                    trackPurchaseEvent(purchaseEvent)
                 },
                 onError = {
                     errorUpdate(CreateAccountError.CANNOT_CREATE_SUB, true)
                 }
             )
             .addTo(disposables)
+    }
+
+    private fun trackPurchaseEvent(purchaseEvent: PurchaseEvent) {
+
+        val productValue = subscription.value?.shortTitle?.lowercase(Locale.ENGLISH)
+            ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+        val isFreeTrial = subscription.value is Subscription.WithTrial
+
+        val analyticsProperties = mapOf(
+            PRODUCT_KEY to productValue,
+            IS_FREE_TRIAL_KEY to isFreeTrial
+        )
+
+        when (purchaseEvent) {
+
+            is PurchaseEvent.Success -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
+
+            is PurchaseEvent.Cancelled -> analyticsTracker.track(
+                AnalyticsEvent.PURCHASE_CANCELLED,
+                analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode)
+            )
+
+            is PurchaseEvent.Failure -> {
+
+                // Exclude error_code property if we do not have a responseCode
+                val properties = purchaseEvent.responseCode?.let {
+                    analyticsProperties.plus(ERROR_CODE_KEY to it)
+                } ?: analyticsProperties
+
+                analyticsTracker.track(AnalyticsEvent.PURCHASE_FAILED, properties)
+            }
+        }
     }
 
     override fun onCleared() {
