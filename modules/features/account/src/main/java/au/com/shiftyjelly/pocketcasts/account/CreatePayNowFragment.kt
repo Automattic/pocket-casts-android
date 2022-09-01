@@ -132,8 +132,13 @@ class CreatePayNowFragment : BaseFragment() {
             )
 
             binding?.btnSubmit?.setOnClickListener {
-                if (viewModel.createAccountState.value == CreateAccountState.AccountCreated ||
-                    viewModel.createAccountState.value == CreateAccountState.CurrentlyValid
+                val accountState = viewModel.createAccountState.value
+                if (accountState == CreateAccountState.AccountCreated ||
+                    accountState == CreateAccountState.CurrentlyValid ||
+                    (
+                        accountState is CreateAccountState.Failure &&
+                            accountState.errors.contains(CreateAccountError.CANCELLED_CREATE_SUB)
+                        )
                 ) {
 
                     binding?.txtError?.text = ""
