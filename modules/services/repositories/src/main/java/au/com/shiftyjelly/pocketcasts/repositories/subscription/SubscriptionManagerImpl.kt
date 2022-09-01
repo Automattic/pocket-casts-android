@@ -300,27 +300,18 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
         return billingClient.queryPurchasesAsync(params = queryPurchasesParams)
     }
 
-    override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails): BillingResult? {
-        if (productDetails.subscriptionOfferDetails?.size != 1) {
-            val message = "Expected 1 subscription offer when launching billing flow, but there were ${productDetails.subscriptionOfferDetails?.size}"
-            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, message)
-        }
-
-        val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken
-        return offerToken?.let {
-            val productDetailsParamsList =
-                listOf(
-                    BillingFlowParams.ProductDetailsParams.newBuilder()
-                        .setProductDetails(productDetails)
-                        .setOfferToken(offerToken)
-                        .build()
-                )
-            val billingFlowParams =
-                BillingFlowParams.newBuilder()
-                    .setProductDetailsParamsList(productDetailsParamsList)
-                    .build()
-            billingClient.launchBillingFlow(activity, billingFlowParams)
-        }
+    override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails, offerToken: String): BillingResult {
+        val productDetailsParams =
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(productDetails)
+                .setOfferToken(offerToken)
+                .build()
+        val productDetailsParamsList = listOf(productDetailsParams)
+        val billingFlowParams =
+            BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
+                .build()
+        return billingClient.launchBillingFlow(activity, billingFlowParams)
     }
 
     override fun getCachedStatus(): SubscriptionStatus? {

@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -76,7 +77,12 @@ class DeveloperFragment : PreferenceFragmentCompat(), CoroutineScope {
             .subscribeBy(
                 onSuccess = {
                     if (it is ProductDetailsState.Loaded) {
-                        subscriptionManager.launchBillingFlow(requireActivity(), it.productDetails.first())
+                        it.productDetails.firstOrNull()?.let { productDetails ->
+                            val isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                            Subscription.fromProductDetails(productDetails, isFreeTrialEligible)?.let { subscription ->
+                                subscriptionManager.launchBillingFlow(requireActivity(), productDetails, subscription.offerToken)
+                            } ?: Timber.d("Subscription is null")
+                        } ?: Timber.d("Products list is empty")
                     } else {
                         Timber.d("Couldn't get sku details")
                     }
