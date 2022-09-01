@@ -5,4 +5,5 @@ dependencies {
     implementation libs.automatticTracks
     implementation project(':modules:services:utils')
     implementation project(':modules:services:preferences')
+    implementation project(':modules:services:model')
 }
