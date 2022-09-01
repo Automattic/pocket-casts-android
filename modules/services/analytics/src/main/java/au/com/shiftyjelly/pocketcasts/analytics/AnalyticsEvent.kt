@@ -57,5 +57,10 @@ enum class AnalyticsEvent(val key: String) {
     /* Confirm Payment */
     CONFIRM_PAYMENT_SHOWN("confirm_payment_shown"),
     CONFIRM_PAYMENT_DISMISSED("confirm_payment_dismissed"),
-    CONFIRM_PAYMENT_CONFIRM_BUTTON_TAPPED("confirm_payment_confirm_button_tapped")
+    CONFIRM_PAYMENT_CONFIRM_BUTTON_TAPPED("confirm_payment_confirm_button_tapped"),
+
+    /* Purchase */
+    PURCHASE_SUCCESSFUL("purchase_successful"),
+    PURCHASE_CANCELLED("purchase_cancelled"),
+    PURCHASE_FAILED("purchase_failed")
 }

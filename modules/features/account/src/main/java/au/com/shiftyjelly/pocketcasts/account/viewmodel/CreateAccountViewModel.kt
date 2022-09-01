@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
@@ -15,6 +17,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,6 +40,12 @@ class CreateAccountViewModel
     var supporterInstance = false
 
     @Inject lateinit var subscriptionManager: SubscriptionManager
+
+    companion object {
+        private const val PRODUCT_KEY = "product"
+        private const val IS_FREE_TRIAL_KEY = "is_free_trial"
+        private const val ERROR_CODE_KEY = "error_code"
+    }
 
     fun loadSubs() {
         subscriptionManager.observeProductDetails()
@@ -195,15 +204,38 @@ class CreateAccountViewModel
             .firstOrError()
             .subscribeBy(
                 onSuccess = { purchaseEvent ->
+
+                    val productValue = subscription.value?.shortTitle?.lowercase(Locale.ENGLISH)
+                        ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+                    val isFreeTrial = subscription.value is Subscription.WithTrial
+                    val analyticsProperties = mapOf(
+                        PRODUCT_KEY to productValue,
+                        IS_FREE_TRIAL_KEY to isFreeTrial
+                    )
+
                     when (purchaseEvent) {
                         is PurchaseEvent.Success -> {
                             createAccountState.postValue(CreateAccountState.SubscriptionCreated)
+                            analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
                         }
                         is PurchaseEvent.Cancelled -> {
                             errorUpdate(CreateAccountError.CANCELLED_CREATE_SUB, true)
+                            analyticsTracker.track(
+                                AnalyticsEvent.PURCHASE_CANCELLED,
+                                analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode)
+                            )
                         }
-                        else -> {
+                        is PurchaseEvent.Failure -> {
                             errorUpdate(CreateAccountError.CANNOT_CREATE_SUB, true)
+
+                            analyticsTracker.apply {
+                                // Exclude error_code property if we do not have a responseCode
+                                val properties = purchaseEvent.responseCode?.let {
+                                    analyticsProperties.plus(ERROR_CODE_KEY to it)
+                                } ?: analyticsProperties
+
+                                track(AnalyticsEvent.PURCHASE_FAILED, properties)
+                            }
                         }
                     }
                 },
