@@ -18,7 +18,7 @@ abstract class Tracker(
     private val anonIDInactivityTimeout: Long = 30.minutes()
 
     @CallSuper
-    open fun track(event: AnalyticsEvent, properties: Map<String, *> = emptyMap<String, String>()) {
+    open fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         regenerateAnonIDIfNeeded()
         /* Update the last event date so we can monitor the anonID timeout */
         lastEventDate = Date()
