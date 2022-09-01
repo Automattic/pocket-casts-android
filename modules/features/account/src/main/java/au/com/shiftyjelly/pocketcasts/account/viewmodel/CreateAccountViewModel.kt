@@ -220,9 +220,9 @@ class CreateAccountViewModel
     }
 }
 
-enum class SubscriptionType(val value: String) {
-    FREE("Free"),
-    PLUS("Pocket Casts Plus")
+enum class SubscriptionType(val value: String, val trackingLabel: String) {
+    FREE("Free", "free"),
+    PLUS("Pocket Casts Plus", "plus")
 }
 
 enum class CreateAccountError {

@@ -14,6 +14,8 @@ import androidx.navigation.findNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentAccountBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
@@ -21,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -28,9 +31,13 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class AccountFragment : BaseFragment() {
     companion object {
+        private const val BUTTON = "button"
+        private const val SIGN_IN = "sign_in"
+        private const val CREATE_ACCOUNT = "create_account"
         fun newInstance() = AccountFragment()
     }
 
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val accountViewModel: CreateAccountViewModel by activityViewModels()
 
     private var realBinding: FragmentAccountBinding? = null
@@ -74,11 +81,13 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnClose?.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED)
             AnalyticsHelper.closeAccountMissingClicked()
             activity?.finish()
         }
 
         binding.btnCreate.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(BUTTON to CREATE_ACCOUNT))
             AnalyticsHelper.createAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 if (Util.isCarUiMode(view.context) || accountViewModel.supporterInstance) { // We can't sign up to plus on cars so skip that step
@@ -90,6 +99,7 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnSignIn.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(BUTTON to SIGN_IN))
             AnalyticsHelper.signInAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 view.findNavController().navigate(R.id.action_accountFragment_to_signInFragment)
