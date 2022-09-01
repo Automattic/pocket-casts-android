@@ -7,12 +7,15 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.AccountActivityBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -25,7 +28,8 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 class AccountActivity : AppCompatActivity() {
 
     @Inject lateinit var theme: Theme
-
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private val viewModel: CreateAccountViewModel by viewModels()
     private lateinit var binding: AccountActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +46,6 @@ class AccountActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
 
-            val viewModel: CreateAccountViewModel by viewModels()
             if (isNewUpgradeInstance(intent)) {
                 viewModel.clearReadyForUpgrade()
                 graph.setStartDestination(R.id.createFrequencyFragment)
@@ -66,9 +69,11 @@ class AccountActivity : AppCompatActivity() {
 
             val navConfiguration = AppBarConfiguration(navController.graph)
             binding.toolbar?.setupWithNavController(navController, navConfiguration)
+            binding.toolbar?.setNavigationOnClickListener { _ -> onBackPressed() }
             binding.carHeader?.btnClose?.setOnClickListener { onBackPressed() }
 
             navController.addOnDestinationChangedListener { _, destination, _ ->
+                destination.trackShown()
                 if (!Util.isCarUiMode(this)) {
                     when (destination.id) {
                         R.id.createDoneFragment, R.id.accountFragment, R.id.promoCodeFragment -> {
@@ -95,6 +100,7 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val currentFragment = findNavController(R.id.nav_host_fragment).currentDestination
+        currentFragment?.trackDismissed()
         if (currentFragment?.id == R.id.createPayNowFragment || currentFragment?.id == R.id.createDoneFragment) {
             finish()
             return
@@ -105,6 +111,41 @@ class AccountActivity : AppCompatActivity() {
 
         UiUtil.hideKeyboard(binding.root)
         super.onBackPressed()
+    }
+
+    private fun NavDestination.trackShown() {
+        val analyticsEvent = when (id) {
+            R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_SHOWN
+            R.id.signInFragment -> AnalyticsEvent.SIGNIN_SHOWN
+            R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_SHOWN
+            R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_SHOWN
+            R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_SHOWN
+            R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN
+            R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_SHOWN
+            else -> null
+        }
+        val properties = when (id) {
+            R.id.createPayNowFragment -> {
+                val subscription = viewModel.subscription.value
+                subscription?.let { mapOf(PRODUCT to it.productDetails.productId) }
+            }
+            else -> null
+        } ?: emptyMap()
+        analyticsEvent?.let { analyticsTracker.track(it, properties) }
+    }
+
+    private fun NavDestination.trackDismissed() {
+        val analyticsEvent = when (id) {
+            R.id.accountFragment -> AnalyticsEvent.SETUP_ACCOUNT_DISMISSED
+            R.id.signInFragment -> AnalyticsEvent.SIGNIN_DISMISSED
+            R.id.createAccountFragment -> AnalyticsEvent.SELECT_ACCOUNT_TYPE_DISMISSED
+            R.id.createEmailFragment -> AnalyticsEvent.CREATE_ACCOUNT_DISMISSED
+            R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_DISMISSED
+            R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED
+            R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_DISMISSED
+            else -> null
+        }
+        analyticsEvent?.let { analyticsTracker.track(it) }
     }
 
     companion object {
@@ -127,7 +168,7 @@ class AccountActivity : AppCompatActivity() {
         fun isNewAutoSelectPlusInstance(intent: Intent): Boolean {
             return intent.getBooleanExtra(AUTO_SELECT_PLUS, false)
         }
-
+        private const val PRODUCT = "product"
         const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
         const val PROMO_CODE_RETURN_DESCRIPTION = "account_activity.promo_code_return_description"
