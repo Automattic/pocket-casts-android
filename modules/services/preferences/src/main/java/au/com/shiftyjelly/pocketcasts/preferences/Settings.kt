@@ -123,10 +123,10 @@ interface Settings {
         const val LOG_TAG_AUTO = "PocketCastsAuto"
     }
 
-    enum class BadgeType(val labelId: Int) {
-        OFF(labelId = LR.string.podcasts_badges_off),
-        LATEST_EPISODE(labelId = LR.string.podcasts_badges_only_latest_episode),
-        ALL_UNFINISHED(labelId = LR.string.podcasts_badges_all_unfinished)
+    enum class BadgeType(val labelId: Int, val analyticsValue: String) {
+        OFF(labelId = LR.string.podcasts_badges_off, analyticsValue = "off"),
+        LATEST_EPISODE(labelId = LR.string.podcasts_badges_only_latest_episode, analyticsValue = "only_latest_episode"),
+        ALL_UNFINISHED(labelId = LR.string.podcasts_badges_all_unfinished, analyticsValue = "unfinished_episodes")
     }
 
     enum class PodcastGridLayoutType(val id: Int, val analyticsValue: String) {
