@@ -222,5 +222,7 @@ class AccountActivity : AppCompatActivity() {
     enum class AccountUpdatedSource(val analyticsValue: String) {
         CREATE_ACCOUNT("create_account"),
         CONFIRM_PAYMENT("confirm_payment"),
+        CHANGE_EMAIL("change_email"),
+        CHANGE_PASSWORD("change_password"),
     }
 }
