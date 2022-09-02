@@ -12,6 +12,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.AccountActivityBinding
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -123,12 +124,21 @@ class AccountActivity : AppCompatActivity() {
             R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN
             R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_SHOWN
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_SHOWN
+            R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_SHOWN
             else -> null
         }
         val properties = when (id) {
             R.id.createPayNowFragment -> {
                 val subscription = viewModel.subscription.value
                 subscription?.let { mapOf(PRODUCT to it.productDetails.productId) }
+            }
+            R.id.createDoneFragment -> {
+                val source = when (viewModel.createAccountState.value) {
+                    CreateAccountState.AccountCreated -> AccountUpdatedSource.CREATE_ACCOUNT.analyticsValue
+                    CreateAccountState.SubscriptionCreated -> AccountUpdatedSource.CONFIRM_PAYMENT.analyticsValue
+                    else -> null
+                }
+                source?.let { mapOf(SOURCE_KEY to source) }
             }
             else -> null
         } ?: emptyMap()
@@ -145,6 +155,7 @@ class AccountActivity : AppCompatActivity() {
             R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED
             R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_DISMISSED
             R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_DISMISSED
+            R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }
@@ -171,6 +182,7 @@ class AccountActivity : AppCompatActivity() {
             return intent.getBooleanExtra(AUTO_SELECT_PLUS, false)
         }
         private const val PRODUCT = "product"
+        private const val SOURCE_KEY = "source"
         const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
         const val PROMO_CODE_RETURN_DESCRIPTION = "account_activity.promo_code_return_description"
@@ -205,5 +217,10 @@ class AccountActivity : AppCompatActivity() {
             intent.putExtra(SUPPORTER_INTENT, true)
             return intent
         }
+    }
+
+    enum class AccountUpdatedSource(val analyticsValue: String) {
+        CREATE_ACCOUNT("create_account"),
+        CONFIRM_PAYMENT("confirm_payment"),
     }
 }

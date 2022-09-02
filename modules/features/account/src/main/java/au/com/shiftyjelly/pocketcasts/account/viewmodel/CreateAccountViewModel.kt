@@ -262,6 +262,10 @@ class CreateAccountViewModel
         }
     }
 
+    fun onCloseDoneForm() {
+        analyticsTracker.track(AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED)
+    }
+
     override fun onCleared() {
         super.onCleared()
         disposables.clear()

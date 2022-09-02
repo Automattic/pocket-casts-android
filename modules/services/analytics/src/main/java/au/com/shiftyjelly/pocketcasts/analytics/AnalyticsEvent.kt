@@ -70,4 +70,8 @@ enum class AnalyticsEvent(val key: String) {
     /* Forgot Password */
     FORGOT_PASSWORD_SHOWN("forgot_password_shown"),
     FORGOT_PASSWORD_DISMISSED("forgot_password_dismissed"),
+
+    /* Account Updated */
+    ACCOUNT_UPDATED_SHOWN("account_updated_shown"),
+    ACCOUNT_UPDATED_DISMISSED("account_updated_dismissed"),
 }
