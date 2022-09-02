@@ -31,6 +31,10 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
+
+            manifestPlaceholders = [
+                    sentryDsn: ""
+            ]
         }
 
         debugProd {
@@ -40,7 +44,8 @@ android {
 
         release {
             manifestPlaceholders = [
-                    gitHash: ""
+                    gitHash: "",
+                    sentryDsn: pocketcastsSentryDsn
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -84,7 +89,6 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
 
 task useGoogleServicesDebugFile {
     description 'Copies the debug google-services.json file if file is missing.'

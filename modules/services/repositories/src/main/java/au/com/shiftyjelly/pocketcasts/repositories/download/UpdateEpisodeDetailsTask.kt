@@ -6,7 +6,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
@@ -84,7 +84,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
                 }
             }
         } catch (t: Throwable) {
-            CrashlyticsHelper.recordException("Failed to update episode details", t)
+            SentryHelper.recordException("Failed to update episode details", t)
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "Unable to check episode file details with a head request.")
             return if (runAttemptCount < 3) {
                 Result.retry()
