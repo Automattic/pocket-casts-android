@@ -277,10 +277,11 @@
                 android:id="@+id/upgradeBannerBackground"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/dividerView"
-                app:layout_constraintBottom_toBottomOf="@+id/lblFindMore"
+                app:layout_constraintBottom_toBottomOf="@+id/footerPadding"
                 />
 
             <ImageView
