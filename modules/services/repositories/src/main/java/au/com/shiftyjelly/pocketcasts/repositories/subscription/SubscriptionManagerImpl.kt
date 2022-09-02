@@ -181,7 +181,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                 handlePurchase(purchase)
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            purchaseEvents.accept(PurchaseEvent.Cancelled)
+            purchaseEvents.accept(PurchaseEvent.Cancelled(billingResult.responseCode))
         } else {
             if (billingResult.responseCode == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
                 GlobalScope.launch {
@@ -198,18 +198,24 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                             sendPurchaseToServer(existingPurchase)
                         } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
-                            val failureEvent = PurchaseEvent.Failure(e.message ?: "Unknown error")
+                            val failureEvent = PurchaseEvent.Failure(
+                                e.message ?: "Unknown error",
+                                billingResult.responseCode
+                            )
                             purchaseEvents.accept(failureEvent)
                         }
                     } else {
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Subscription purchase returned already owned but we couldn't load it")
-                        val failureEvent = PurchaseEvent.Failure(purchasesResult.billingResult.debugMessage)
+                        val failureEvent = PurchaseEvent.Failure(
+                            purchasesResult.billingResult.debugMessage,
+                            billingResult.responseCode
+                        )
                         purchaseEvents.accept(failureEvent)
                     }
                 }
             } else {
                 LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Could not purchase subscription: ${billingResult.debugMessage}")
-                val failureEvent = PurchaseEvent.Failure(billingResult.debugMessage)
+                val failureEvent = PurchaseEvent.Failure(billingResult.debugMessage, billingResult.responseCode)
                 purchaseEvents.accept(failureEvent)
             }
         }
@@ -243,8 +249,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                     AnalyticsHelper.plusPurchased()
                 } catch (e: Exception) {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
-
-                    purchaseEvents.accept(PurchaseEvent.Failure(e.message ?: "Unknown error"))
+                    purchaseEvents.accept(PurchaseEvent.Failure(e.message ?: "Unknown error", null))
                 }
             }
         }
@@ -347,8 +352,11 @@ sealed class ProductDetailsState {
 
 sealed class PurchaseEvent {
     object Success : PurchaseEvent()
-    object Cancelled : PurchaseEvent()
-    data class Failure(val errorMessage: String) : PurchaseEvent()
+    data class Cancelled(@BillingClient.BillingResponseCode val responseCode: Int) : PurchaseEvent()
+    data class Failure(
+        val errorMessage: String,
+        @BillingClient.BillingResponseCode val responseCode: Int?
+    ) : PurchaseEvent()
 }
 
 sealed class SubscriptionChangedEvent {
