@@ -62,5 +62,9 @@ enum class AnalyticsEvent(val key: String) {
     /* Purchase */
     PURCHASE_SUCCESSFUL("purchase_successful"),
     PURCHASE_CANCELLED("purchase_cancelled"),
-    PURCHASE_FAILED("purchase_failed")
+    PURCHASE_FAILED("purchase_failed"),
+
+    /* Account Details */
+    ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
+    ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
 }
