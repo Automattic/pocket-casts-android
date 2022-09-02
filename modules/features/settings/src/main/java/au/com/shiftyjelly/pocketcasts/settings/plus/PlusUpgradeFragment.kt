@@ -49,7 +49,7 @@ class PlusUpgradeFragment : BaseDialogFragment() {
 
     companion object {
         private const val EXTRA_START_PAGE = "extra_start_page"
-        private const val SOURCE = "source"
+        private const val SOURCE_KEY = "source"
 
         fun newInstance(upgradePage: UpgradePage): PlusUpgradeFragment {
             return PlusUpgradeFragment().apply {
@@ -87,7 +87,7 @@ class PlusUpgradeFragment : BaseDialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, mapOf(SOURCE to promotionSource))
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, mapOf(SOURCE_KEY to promotionSource))
         AnalyticsHelper.plusUpgradeViewed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
     }
 
@@ -97,7 +97,7 @@ class PlusUpgradeFragment : BaseDialogFragment() {
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, mapOf(SOURCE to promotionSource))
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, mapOf(SOURCE_KEY to promotionSource))
         AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
     }
 
@@ -111,13 +111,13 @@ class PlusUpgradeFragment : BaseDialogFragment() {
             intent.data = Uri.parse(Settings.INTENT_LINK_UPGRADE)
             startActivity(intent)
         }
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, mapOf(SOURCE to promotionSource))
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, mapOf(SOURCE_KEY to promotionSource))
         AnalyticsHelper.plusUpgradeConfirmed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
         dismiss()
     }
 
     private fun closeUpgrade() {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, mapOf(SOURCE to promotionSource))
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, mapOf(SOURCE_KEY to promotionSource))
         AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
         dismiss()
     }

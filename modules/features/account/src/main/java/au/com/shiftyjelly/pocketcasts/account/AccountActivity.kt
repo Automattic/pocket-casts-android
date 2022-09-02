@@ -130,7 +130,7 @@ class AccountActivity : AppCompatActivity() {
         val properties = when (id) {
             R.id.createPayNowFragment -> {
                 val subscription = viewModel.subscription.value
-                subscription?.let { mapOf(PRODUCT to it.productDetails.productId) }
+                subscription?.let { mapOf(PRODUCT_KEY to it.productDetails.productId) }
             }
             R.id.createDoneFragment -> {
                 val source = when (viewModel.createAccountState.value) {
@@ -181,7 +181,7 @@ class AccountActivity : AppCompatActivity() {
         fun isNewAutoSelectPlusInstance(intent: Intent): Boolean {
             return intent.getBooleanExtra(AUTO_SELECT_PLUS, false)
         }
-        private const val PRODUCT = "product"
+        private const val PRODUCT_KEY = "product"
         private const val SOURCE_KEY = "source"
         const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
