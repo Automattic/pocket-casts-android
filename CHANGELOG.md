@@ -4,6 +4,7 @@
 *   Bug Fixes:
     *   Fix playing on Chromecast always shows buffering.
         ([#254](https://github.com/Automattic/pocket-casts-android/pull/254)).
+    *   Fix Chromecast not taking over playback after connection.
     *   Fix Plus subscription confirm button not always working.
         ([#284](https://github.com/Automattic/pocket-casts-android/pull/284)).
 

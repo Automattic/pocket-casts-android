@@ -36,7 +36,7 @@ interface Settings {
 
         const val USER_AGENT_POCKETCASTS_SERVER = "Pocket Casts/Android/" + BuildConfig.VERSION_NAME
 
-        const val CHROME_CAST_APP_ID = "6D389446"
+        const val CHROME_CAST_APP_ID = "2FA4D21B"
 
         const val WHATS_NEW_VERSION_CODE = 7566
 
