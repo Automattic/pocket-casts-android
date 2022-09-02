@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -61,6 +63,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     @Inject lateinit var settings: Settings
     @Inject lateinit var castManager: CastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
@@ -205,6 +208,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.more_options -> {
+                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_OPTIONS_BUTTON_TAPPED)
                 openOptions()
                 true
             }
@@ -213,6 +217,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 true
             }
             R.id.create_folder -> {
+                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
                 createFolder()
                 true
             }
@@ -315,14 +320,17 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     override fun onPodcastMoveFinished() {
         viewModel.commitMoves()
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_REORDERED)
     }
 
     override fun onPodcastClick(podcast: Podcast, view: View) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_PODCAST_TAPPED)
         val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
     override fun onFolderClick(folderUuid: String) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_TAPPED)
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
