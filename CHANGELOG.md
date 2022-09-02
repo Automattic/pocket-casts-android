@@ -4,6 +4,7 @@
 *   Bug Fixes:
     *   Fix playing on Chromecast always shows buffering.
         ([#254](https://github.com/Automattic/pocket-casts-android/pull/254)).
+    *   Fix Chromecast not taking over playback after connection.
 
 7.21.0
 -----
