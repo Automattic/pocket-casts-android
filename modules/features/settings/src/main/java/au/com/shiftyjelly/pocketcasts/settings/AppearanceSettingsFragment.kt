@@ -180,10 +180,8 @@ class AppearanceSettingsFragment : BaseFragment() {
             refreshArtwork()
         }
 
-        binding.upgradeLayout.referencedIds.forEach { id ->
-            binding.root.findViewById<View>(id).setOnClickListener {
-                WebViewActivity.show(context, getString(LR.string.learn_more), Settings.INFO_LEARN_MORE_URL)
-            }
+        binding.upgradeLayout.setOnClickListener {
+            WebViewActivity.show(context, getString(LR.string.learn_more), Settings.INFO_LEARN_MORE_URL)
         }
 
         binding.btnCloseUpgrade.setOnClickListener {
