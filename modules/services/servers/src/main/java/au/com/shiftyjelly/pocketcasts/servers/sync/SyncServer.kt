@@ -16,9 +16,6 @@ import retrofit2.http.Path
 import retrofit2.http.Url
 
 interface SyncServer {
-    @POST("/user/login")
-    fun login(@Body request: LoginRequest): Single<LoginResponse>
-
     @POST("/user/change_email")
     fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): Single<UserChangeResponse>
 

@@ -24,7 +24,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
-import timber.log.Timber
 import java.io.File
 import java.net.HttpURLConnection
 import javax.inject.Inject
@@ -39,14 +38,6 @@ open class SyncServerManager @Inject constructor(
 ) {
 
     val server = retrofit.create(SyncServer::class.java)
-
-    fun loginMobile(email: String, password: String): Single<String> {
-        return login(email, password, "mobile")
-    }
-
-    fun loginSonos(email: String, password: String): Single<String> {
-        return login(email, password, "sonos")
-    }
 
     fun emailChange(newEmail: String, password: String): Single<UserChangeResponse> {
         return getCacheTokenOrLogin { token ->
@@ -332,19 +323,6 @@ open class SyncServerManager @Inject constructor(
             model = Settings.SYNC_API_MODEL,
             version = Settings.SYNC_API_VERSION
         )
-    }
-
-    private fun login(email: String, password: String, scope: String): Single<String> {
-        val request = LoginRequest(email, password, scope)
-        return server.login(request)
-            .map { response ->
-                val token = response.token
-                if (token.isNullOrBlank()) {
-                    throw RuntimeException("Failed to get token.")
-                }
-                token
-            }
-            .doOnError { Timber.e(it) }
     }
 
     private suspend fun refreshTokenSuspend(): String {
