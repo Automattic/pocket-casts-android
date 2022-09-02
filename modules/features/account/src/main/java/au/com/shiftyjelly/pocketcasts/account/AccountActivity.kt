@@ -122,6 +122,7 @@ class AccountActivity : AppCompatActivity() {
             R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_SHOWN
             R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN
             R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_SHOWN
+            R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_SHOWN
             else -> null
         }
         val properties = when (id) {
@@ -143,6 +144,7 @@ class AccountActivity : AppCompatActivity() {
             R.id.createTOSFragment -> AnalyticsEvent.TERMS_OF_USE_DISMISSED
             R.id.createFrequencyFragment -> AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED
             R.id.createPayNowFragment -> AnalyticsEvent.CONFIRM_PAYMENT_DISMISSED
+            R.id.resetPasswordFragment -> AnalyticsEvent.FORGOT_PASSWORD_DISMISSED
             else -> null
         }
         analyticsEvent?.let { analyticsTracker.track(it) }

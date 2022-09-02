@@ -66,4 +66,8 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Newsletter Opt In */
     NEWSLETTER_OPT_IN_CHANGED("newsletter_opt_in_changed"),
+
+    /* Forgot Password */
+    FORGOT_PASSWORD_SHOWN("forgot_password_shown"),
+    FORGOT_PASSWORD_DISMISSED("forgot_password_dismissed"),
 }
