@@ -45,6 +45,8 @@ class CreateAccountViewModel
         private const val PRODUCT_KEY = "product"
         private const val IS_FREE_TRIAL_KEY = "is_free_trial"
         private const val ERROR_CODE_KEY = "error_code"
+        private const val SOURCE_KEY = "source"
+        private const val ENABLED_KEY = "enabled"
     }
 
     fun loadSubs() {
@@ -127,8 +129,12 @@ class CreateAccountViewModel
         errorUpdate(CreateAccountError.INVALID_PASSWORD, addError)
     }
 
-    fun updateNewsletter(value: Boolean) {
-        newsletter.value = value
+    fun trackAndUpdateNewsletter(isChecked: Boolean) {
+        analyticsTracker.track(
+            AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
+            mapOf(SOURCE_KEY to NewsletterSource.ACCOUNT_UPDATED.analyticsValue, ENABLED_KEY to isChecked)
+        )
+        newsletter.value = isChecked
         newsletter.value?.let {
             settings.setMarketingOptIn(it)
             settings.setMarketingOptInNeedsSync(true)
@@ -260,6 +266,11 @@ class CreateAccountViewModel
         super.onCleared()
         disposables.clear()
     }
+}
+
+enum class NewsletterSource(val analyticsValue: String) {
+    ACCOUNT_UPDATED("account_updated"),
+    PROFILE("profile")
 }
 
 enum class SubscriptionType(val value: String, val trackingLabel: String) {

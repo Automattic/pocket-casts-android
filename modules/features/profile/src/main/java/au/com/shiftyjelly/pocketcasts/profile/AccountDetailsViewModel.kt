@@ -5,6 +5,9 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -33,8 +36,9 @@ class AccountDetailsViewModel
     subscriptionManager: SubscriptionManager,
     userManager: UserManager,
     statsManager: StatsManager,
-    settings: Settings,
-    private val syncServerManager: SyncServerManager
+    private val settings: Settings,
+    private val syncServerManager: SyncServerManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -93,9 +97,23 @@ class AccountDetailsViewModel
         deleteAccountState.value = DeleteAccountState.Empty
     }
 
+    fun trackAndUpdateNewsletter(isChecked: Boolean) {
+        analyticsTracker.track(
+            AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
+            mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked)
+        )
+        settings.setMarketingOptIn(isChecked)
+        settings.setMarketingOptInNeedsSync(true)
+    }
+
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
+    }
+
+    companion object {
+        private const val SOURCE_KEY = "source"
+        private const val ENABLED_KEY = "enabled"
     }
 }
 
