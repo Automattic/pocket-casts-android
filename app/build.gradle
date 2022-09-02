@@ -57,7 +57,7 @@ android {
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher",
                     gitHash: "",
-                    sentryDsn: pocketcastsSentryDsn
+                    sentryDsn: project.properties['pocketcastsSentryDsn'] ?: ""
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
