@@ -293,8 +293,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     private fun setupGridView(savedInstanceState: Parcelable? = listState) {
         val layoutManager = when (settings.getPodcastsLayout()) {
-            Settings.PODCAST_GRID_LAYOUT_LARGE_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
-            Settings.PODCAST_GRID_LAYOUT_SMALL_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
+            Settings.PodcastGridLayoutType.LARGE_ARTWORK.id -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
+            Settings.PodcastGridLayoutType.SMALL_ARTWORK.id -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
             else -> LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         }
         val badgeType = settings.getPodcastBadgeType()

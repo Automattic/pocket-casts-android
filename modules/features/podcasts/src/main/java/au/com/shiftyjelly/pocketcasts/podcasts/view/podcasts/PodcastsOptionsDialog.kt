@@ -37,20 +37,20 @@ class PodcastsOptionsDialog(
                 ToggleButtonOption(
                     imageId = R.drawable.ic_largegrid,
                     descriptionId = LR.string.podcasts_layout_large_grid,
-                    isOn = { settings.getPodcastsLayout() == Settings.PODCAST_GRID_LAYOUT_LARGE_ARTWORK },
-                    click = { settings.setPodcastsLayout(Settings.PODCAST_GRID_LAYOUT_LARGE_ARTWORK) }
+                    isOn = { settings.getPodcastsLayout() == Settings.PodcastGridLayoutType.LARGE_ARTWORK.id },
+                    click = { settings.setPodcastsLayout(Settings.PodcastGridLayoutType.LARGE_ARTWORK.id) }
                 ),
                 ToggleButtonOption(
                     imageId = R.drawable.ic_smallgrid,
                     descriptionId = LR.string.podcasts_layout_small_grid,
-                    isOn = { settings.getPodcastsLayout() == Settings.PODCAST_GRID_LAYOUT_SMALL_ARTWORK },
-                    click = { settings.setPodcastsLayout(Settings.PODCAST_GRID_LAYOUT_SMALL_ARTWORK) }
+                    isOn = { settings.getPodcastsLayout() == Settings.PodcastGridLayoutType.SMALL_ARTWORK.id },
+                    click = { settings.setPodcastsLayout(Settings.PodcastGridLayoutType.SMALL_ARTWORK.id) }
                 ),
                 ToggleButtonOption(
                     imageId = R.drawable.ic_list,
                     descriptionId = LR.string.podcasts_layout_list_view,
-                    isOn = { settings.getPodcastsLayout() == Settings.PODCAST_GRID_LAYOUT_LIST_VIEW },
-                    click = { settings.setPodcastsLayout(Settings.PODCAST_GRID_LAYOUT_LIST_VIEW) }
+                    isOn = { settings.getPodcastsLayout() == Settings.PodcastGridLayoutType.LIST_VIEW.id },
+                    click = { settings.setPodcastsLayout(Settings.PodcastGridLayoutType.LIST_VIEW.id) }
                 )
             )
             .addTextOption(

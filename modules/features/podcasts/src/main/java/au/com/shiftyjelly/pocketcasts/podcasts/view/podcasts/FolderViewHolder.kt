@@ -43,7 +43,7 @@ class FolderViewHolder(
                 val color = MaterialTheme.theme.colors.getFolderColor(folder.color)
                 val podcastUuids = podcasts.map { it.uuid }
                 when (podcastsLayout) {
-                    Settings.PODCAST_GRID_LAYOUT_LIST_VIEW -> {
+                    Settings.PodcastGridLayoutType.LIST_VIEW.id -> {
                         FolderListAdapter(
                             color = color,
                             name = folder.name,
