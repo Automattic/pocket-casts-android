@@ -277,7 +277,6 @@
                 android:id="@+id/upgradeBannerBackground"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="@color/blue_30"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/dividerView"
