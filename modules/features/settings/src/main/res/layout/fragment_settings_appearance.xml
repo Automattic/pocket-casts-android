@@ -267,74 +267,80 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lblRefreshAllPodcastArtwork" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/upgradeLayout"
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/upgradeGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:constraint_referenced_ids="imgLogo,btnCloseUpgrade,footerPadding,lblGetMore,lblFindMore" />
+
+            <View
+                android:id="@+id/upgradeBannerBackground"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/blue_30"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dividerView" >
+                app:layout_constraintTop_toBottomOf="@+id/dividerView"
+                app:layout_constraintBottom_toBottomOf="@+id/lblFindMore"
+                />
 
-                <ImageView
-                    android:id="@+id/imgLogo"
-                    android:layout_width="232dp"
-                    android:layout_height="32dp"
-                    android:layout_marginTop="16dp"
-                    android:contentDescription="@string/pocket_casts_plus"
-                    android:scaleType="fitXY"
-                    android:src="?attr/plus_logo"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="232dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/pocket_casts_plus"
+                android:scaleType="fitXY"
+                android:src="?attr/plus_logo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView" />
 
-                <ImageView
-                    android:id="@+id/btnCloseUpgrade"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:contentDescription="@string/settings_close_upgrade_offer"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_close"
-                    app:tint="?attr/primary_text_02"
-                    android:background="?attr/actionBarItemBackground"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/btnCloseUpgrade"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@string/settings_close_upgrade_offer"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_close"
+                app:tint="?attr/primary_text_02"
+                android:background="?attr/actionBarItemBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView" />
 
-                <TextView
-                    android:id="@+id/lblGetMore"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginStart="64dp"
-                    android:layout_marginEnd="64dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/settings_get_plus_and_more"
-                    android:textAppearance="@style/H40"
-                    android:textColor="?attr/primary_text_02"
-                    android:lineSpacingMultiplier="1.1"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imgLogo" />
+            <TextView
+                android:id="@+id/lblGetMore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="64dp"
+                android:layout_marginEnd="64dp"
+                android:gravity="center_horizontal"
+                android:text="@string/settings_get_plus_and_more"
+                android:textAppearance="@style/H40"
+                android:textColor="?attr/primary_text_02"
+                android:lineSpacingMultiplier="1.1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imgLogo" />
 
-                <TextView
-                    android:id="@+id/lblFindMore"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="64dp"
-                    android:layout_marginStart="64dp"
-                    android:layout_marginEnd="64dp"
-                    android:gravity="center"
-                    android:text="@string/settings_learn_more"
-                    android:textAppearance="@style/H50"
-                    android:textColor="?attr/primary_interactive_01"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/lblGetMore" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/lblFindMore"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="64dp"
+                android:layout_marginStart="64dp"
+                android:layout_marginEnd="64dp"
+                android:gravity="center"
+                android:text="@string/settings_learn_more"
+                android:textAppearance="@style/H50"
+                android:textColor="?attr/primary_interactive_01"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lblGetMore" />
 
             <Space
                 android:id="@+id/footerPadding"
@@ -342,7 +348,7 @@
                 android:layout_height="64dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/upgradeLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/lblFindMore" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
