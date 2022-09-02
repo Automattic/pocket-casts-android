@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -203,19 +202,6 @@ class AccountActivity : AppCompatActivity() {
 
         fun isSignInInstance(intent: Intent): Boolean {
             return intent.getBooleanExtra(SIGN_IN_ONLY, false)
-        }
-
-        fun signInInstance(context: Context, intentOnSuccess: PendingIntent?): Intent {
-            val intent = Intent(context, AccountActivity::class.java)
-            intent.putExtra(SIGN_IN_ONLY, true)
-            intent.putExtra(SUCCESS_INTENT, intentOnSuccess)
-            return intent
-        }
-
-        fun supporterInstance(context: Context): Intent {
-            val intent = Intent(context, AccountActivity::class.java)
-            intent.putExtra(SUPPORTER_INTENT, true)
-            return intent
         }
     }
 
