@@ -129,7 +129,7 @@ class CreateAccountViewModel
         errorUpdate(CreateAccountError.INVALID_PASSWORD, addError)
     }
 
-    fun trackAndUpdateNewsletter(isChecked: Boolean) {
+    fun updateNewsletter(isChecked: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
             mapOf(SOURCE_KEY to NewsletterSource.ACCOUNT_UPDATED.analyticsValue, ENABLED_KEY to isChecked)

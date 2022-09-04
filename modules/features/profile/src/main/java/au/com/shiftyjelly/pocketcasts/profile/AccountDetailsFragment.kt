@@ -149,7 +149,7 @@ class AccountDetailsFragment : BaseFragment() {
         viewModel.marketingOptInState.observe(viewLifecycleOwner) { marketingOptIn ->
             binding.swtNewsletter?.isChecked = marketingOptIn
             binding.swtNewsletter?.setOnCheckedChangeListener { _, isChecked ->
-                viewModel.trackAndUpdateNewsletter(isChecked)
+                viewModel.updateNewsletter(isChecked)
             }
         }
 
