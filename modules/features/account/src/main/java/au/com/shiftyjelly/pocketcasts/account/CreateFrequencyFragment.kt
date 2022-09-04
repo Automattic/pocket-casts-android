@@ -82,7 +82,7 @@ class CreateFrequencyFragment : BaseFragment() {
         binding.btnNext.setOnClickListener {
             val subscription = viewModel.subscription.value
             if (subscription != null) {
-                analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED, mapOf(PRODUCT to subscription.productDetails.productId))
+                analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED, mapOf(PRODUCT_KEY to subscription.productDetails.productId))
                 AnalyticsHelper.plusPlanChosen(
                     sku = subscription.productDetails.productId,
                     title = subscription.productDetails.title,
@@ -111,6 +111,6 @@ class CreateFrequencyFragment : BaseFragment() {
     }
 
     companion object {
-        private const val PRODUCT = "product"
+        private const val PRODUCT_KEY = "product"
     }
 }
