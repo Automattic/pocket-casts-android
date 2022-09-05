@@ -79,4 +79,7 @@ abstract class FolderDao {
             updateSortPosition(sortPosition = folder.sortPosition, uuid = folder.uuid, syncModified = syncModified)
         }
     }
+
+    @Query("SELECT COUNT(*) FROM folders WHERE deleted = 0")
+    abstract fun count(): Int
 }
