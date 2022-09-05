@@ -1,3 +1,7 @@
+plugins {
+    id 'io.sentry.android.gradle' version '3.1.5'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
@@ -59,6 +63,14 @@ android {
                     gitHash: "",
                     sentryDsn: project.properties['pocketcastsSentryDsn'] ?: ""
             ]
+
+            if (!project.properties['pocketcastsSentryDsn']) {
+                println "WARNING: Sentry DSN gradle property 'pocketcastsSentryDsn' not found. Crash reporting won't work without this."
+            }
+            
+            if (!file("${project.rootDir}/sentry.properties").exists()) {
+                println "WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded."
+            }
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
