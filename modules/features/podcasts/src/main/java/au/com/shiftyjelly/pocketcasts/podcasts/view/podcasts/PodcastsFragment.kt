@@ -215,7 +215,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.more_options -> {
-                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_OPTIONS_BUTTON_TAPPED)
+                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_ELLIPSIS_BUTTON_TAPPED)
                 openOptions()
                 true
             }
