@@ -129,7 +129,7 @@ class CreateAccountViewModel
         errorUpdate(CreateAccountError.INVALID_PASSWORD, addError)
     }
 
-    fun trackAndUpdateNewsletter(isChecked: Boolean) {
+    fun updateNewsletter(isChecked: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
             mapOf(SOURCE_KEY to NewsletterSource.ACCOUNT_UPDATED.analyticsValue, ENABLED_KEY to isChecked)
@@ -231,13 +231,13 @@ class CreateAccountViewModel
     }
 
     private fun trackPurchaseEvent(purchaseEvent: PurchaseEvent) {
-
-        val productValue = subscription.value?.shortTitle?.lowercase(Locale.ENGLISH)
+        // extract part of the product id after the last period ("com.pocketcasts.plus.monthly" -> "monthly")
+        val shortProductId = subscription.value?.productDetails?.productId?.split('.')?.lastOrNull()
             ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
         val isFreeTrial = subscription.value is Subscription.WithTrial
 
         val analyticsProperties = mapOf(
-            PRODUCT_KEY to productValue,
+            PRODUCT_KEY to shortProductId,
             IS_FREE_TRIAL_KEY to isFreeTrial
         )
 

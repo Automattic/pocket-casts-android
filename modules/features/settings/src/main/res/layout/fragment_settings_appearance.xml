@@ -268,10 +268,21 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblRefreshAllPodcastArtwork" />
 
             <androidx.constraintlayout.widget.Group
-                android:id="@+id/upgradeLayout"
+                android:id="@+id/upgradeGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:constraint_referenced_ids="imgLogo,btnCloseUpgrade,footerPadding,lblGetMore,lblFindMore" />
+
+            <View
+                android:id="@+id/upgradeBannerBackground"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="?android:attr/selectableItemBackground"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividerView"
+                app:layout_constraintBottom_toBottomOf="@+id/footerPadding"
+                />
 
             <ImageView
                 android:id="@+id/imgLogo"

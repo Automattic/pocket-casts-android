@@ -150,7 +150,7 @@ class AppearanceSettingsFragment : BaseFragment() {
 
             (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updatePlusSignedIn(signInState.isSignedInAsPlus)
             (binding.appIconRecyclerView.adapter as? AppearanceIconSettingsAdapter)?.updatePlusSignedIn(signInState.isSignedInAsPlus)
-            binding.upgradeLayout.isVisible = !signInState.isSignedInAsPlus && !settings.getUpgradeClosedAppearSettings()
+            binding.upgradeGroup.isVisible = !signInState.isSignedInAsPlus && !settings.getUpgradeClosedAppearSettings()
         }
 
         viewModel.loadThemesAndIcons()
@@ -180,13 +180,13 @@ class AppearanceSettingsFragment : BaseFragment() {
             refreshArtwork()
         }
 
-        binding.lblFindMore.setOnClickListener {
+        binding.upgradeBannerBackground.setOnClickListener {
             WebViewActivity.show(context, getString(LR.string.learn_more), Settings.INFO_LEARN_MORE_URL)
         }
 
         binding.btnCloseUpgrade.setOnClickListener {
             settings.setUpgradeClosedAppearSettings(true)
-            binding.upgradeLayout.isVisible = false
+            binding.upgradeGroup.isVisible = false
         }
     }
 

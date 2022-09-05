@@ -97,7 +97,7 @@ class AccountDetailsViewModel
         deleteAccountState.value = DeleteAccountState.Empty
     }
 
-    fun trackAndUpdateNewsletter(isChecked: Boolean) {
+    fun updateNewsletter(isChecked: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
             mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked)
