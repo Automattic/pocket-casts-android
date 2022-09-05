@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTouchCallback.ItemTouchHelperAdapter, Toolbar.OnMenuItemClickListener {
 
     companion object {
+        private const val LAST_ORIENTATION_NOT_SET = -1
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -75,7 +76,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private val viewModel: PodcastsViewModel by viewModels()
     private val sharedViewModel: FolderCreateSharedViewModel by activityViewModels()
 
-    private var lastOrientationRefreshed = -1
+    private var lastOrientationRefreshed = LAST_ORIENTATION_NOT_SET
     private var lastWidthPx: Int = 0
     private var listState: Parcelable? = null
 
@@ -162,6 +163,12 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 sharedViewModel.folderUuid = null
                 onFolderClick(newFolderUuid)
             }
+        }
+
+        if (lastOrientationRefreshed == LAST_ORIENTATION_NOT_SET ||
+            lastOrientationRefreshed == resources.configuration.orientation
+        ) {
+            viewModel.trackPodcastsListShown()
         }
 
         val toolbar = binding.toolbar

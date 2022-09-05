@@ -76,6 +76,7 @@ enum class AnalyticsEvent(val key: String) {
     ACCOUNT_UPDATED_DISMISSED("account_updated_dismissed"),
 
     /* Podcasts List */
+    PODCASTS_LIST_SHOWN("podcasts_list_shown"),
     PODCASTS_LIST_FOLDER_BUTTON_TAPPED("podcasts_list_folder_button_tapped"),
     PODCASTS_LIST_PODCAST_TAPPED("podcasts_list_podcast_tapped"),
     PODCASTS_LIST_FOLDER_TAPPED("podcasts_list_folder_tapped"),

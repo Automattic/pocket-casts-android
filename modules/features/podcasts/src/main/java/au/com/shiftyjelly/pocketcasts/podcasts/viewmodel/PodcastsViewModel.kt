@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -10,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -36,6 +39,7 @@ class PodcastsViewModel
     private val episodeManager: EpisodeManager,
     private val folderManager: FolderManager,
     private val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     userManager: UserManager
 ) : ViewModel(), CoroutineScope {
 
@@ -240,5 +244,25 @@ class PodcastsViewModel
         launch {
             folderManager.updateSortType(folderUuid = uuid, podcastsSortType = podcastsSortType)
         }
+    }
+
+    fun trackPodcastsListShown() {
+        launch {
+            val properties = HashMap<String, Any>()
+            properties[NUMBER_OF_FOLDERS_KEY] = folderManager.countFolders()
+            properties[NUMBER_OF_PODCASTS_KEY] = podcastManager.countSubscribed()
+            properties[BADGE_TYPE_KEY] = settings.getPodcastBadgeType().analyticsValue
+            properties[LAYOUT_KEY] = PodcastGridLayoutType.fromLayoutId(settings.getPodcastsLayout()).analyticsValue
+            properties[SORT_ORDER_KEY] = settings.getPodcastsSortType().analyticsValue
+            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SHOWN, properties)
+        }
+    }
+
+    companion object {
+        private const val NUMBER_OF_FOLDERS_KEY = "number_of_folders"
+        private const val NUMBER_OF_PODCASTS_KEY = "number_of_podcasts"
+        private const val BADGE_TYPE_KEY = "badge_type"
+        private const val LAYOUT_KEY = "layout"
+        private const val SORT_ORDER_KEY = "sort_order"
     }
 }

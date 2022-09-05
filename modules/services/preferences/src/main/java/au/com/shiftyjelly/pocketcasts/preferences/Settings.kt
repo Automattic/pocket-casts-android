@@ -132,7 +132,11 @@ interface Settings {
     enum class PodcastGridLayoutType(val id: Int, val analyticsValue: String) {
         LARGE_ARTWORK(id = 0, analyticsValue = "large_artwork"),
         SMALL_ARTWORK(id = 1, analyticsValue = "small_artwork"),
-        LIST_VIEW(id = 2, analyticsValue = "list")
+        LIST_VIEW(id = 2, analyticsValue = "list");
+        companion object {
+            fun fromLayoutId(id: Int) =
+                PodcastGridLayoutType.values().find { it.id == id } ?: LARGE_ARTWORK
+        }
     }
 
     enum class UpNextAction {
