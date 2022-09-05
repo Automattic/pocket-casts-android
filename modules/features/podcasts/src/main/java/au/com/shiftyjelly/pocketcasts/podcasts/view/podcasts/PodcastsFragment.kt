@@ -165,9 +165,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
         }
 
-        if (lastOrientationRefreshed == LAST_ORIENTATION_NOT_SET ||
-            lastOrientationRefreshed == resources.configuration.orientation
-        ) {
+        if (shouldTrackPodcastsListShown()) {
             viewModel.trackPodcastsListShown()
         }
 
@@ -341,4 +339,9 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
+
+    private fun shouldTrackPodcastsListShown() = (
+        lastOrientationRefreshed == LAST_ORIENTATION_NOT_SET ||
+            lastOrientationRefreshed == resources.configuration.orientation
+        ) && (folderUuid == null)
 }
