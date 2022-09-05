@@ -90,6 +90,7 @@ class CreateDoneFragment : BaseFragment() {
     }
 
     private fun closeForm() {
+        viewModel.onCloseDoneForm()
         if (findNavController().graph.startDestinationId == R.id.promoCodeFragment) {
             findNavController().popBackStack(R.id.promoCodeFragment, false)
         } else {

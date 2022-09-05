@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentChangeEmailBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangeEmailError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangeEmailState
@@ -131,6 +132,7 @@ class ChangeEmailFragment : BaseFragment() {
                     doneViewModel.updateTitle(getString(LR.string.profile_email_address_changed))
                     doneViewModel.updateDetail(second)
                     doneViewModel.updateImage(R.drawable.ic_email_address_changed)
+                    doneViewModel.trackShown(AccountUpdatedSource.CHANGE_EMAIL)
 
                     val activity = requireActivity()
                     activity.onBackPressed() // done fragment needs to back to profile page
