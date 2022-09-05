@@ -35,6 +35,12 @@ jobs:
         run: |
           mkdir -p ~/.gradle/
           echo "${GRADLE_PROPERTIES}" > ~/.gradle/gradle.properties
+      - name: Add sentry.properties
+        env:
+          SENTRY_PROPERTIES: ${{ secrets.SENTRY_PROPERTIES }}
+        shell: bash
+        run: |
+          echo "${SENTRY_PROPERTIES}" > ~/sentry.properties
       - name: Cache Gradle
         uses: actions/cache@v3
         with:
