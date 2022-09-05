@@ -74,4 +74,8 @@ enum class AnalyticsEvent(val key: String) {
     /* Account Updated */
     ACCOUNT_UPDATED_SHOWN("account_updated_shown"),
     ACCOUNT_UPDATED_DISMISSED("account_updated_dismissed"),
+
+    /* Account Details */
+    ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
+    ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
 }
