@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
@@ -55,11 +57,12 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyl
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class StatsFragment : BaseFragment() {
-
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: StatsViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View = ComposeView(requireContext()).apply {
@@ -79,6 +82,11 @@ class StatsFragment : BaseFragment() {
         super.onResume()
 
         viewModel.loadStats()
+    }
+
+    override fun onBackPressed(): Boolean {
+        analyticsTracker.track(AnalyticsEvent.STATS_DISMISSED)
+        return super.onBackPressed()
     }
 }
 

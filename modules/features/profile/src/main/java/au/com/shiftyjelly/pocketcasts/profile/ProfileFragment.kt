@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -110,16 +111,24 @@ class ProfileFragment : BaseFragment() {
         recyclerView.addItemDecoration(divider)
         recyclerView.adapter = SettingsAdapter(sections) { section ->
             section.fragment?.let { fragmentClass ->
-                if (fragmentClass == ProfileEpisodeListFragment::class.java) {
-                    val fragment = when (section.title) {
-                        LR.string.profile_navigation_downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
-                        LR.string.profile_navigation_starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
-                        LR.string.profile_navigation_listening_history -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
-                        else -> throw IllegalStateException("Unknown row")
+                when (fragmentClass) {
+                    StatsFragment::class.java -> {
+                        analyticsTracker.track(AnalyticsEvent.STATS_SHOWN)
+                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
                     }
-                    (activity as? FragmentHostListener)?.addFragment(fragment)
-                } else {
-                    (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                    CloudFilesFragment::class.java -> {
+                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                    }
+                    ProfileEpisodeListFragment::class.java -> {
+                        val fragment = when (section.title) {
+                            LR.string.profile_navigation_downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
+                            LR.string.profile_navigation_starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
+                            LR.string.profile_navigation_listening_history -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
+                            else -> throw IllegalStateException("Unknown row")
+                        }
+                        (activity as? FragmentHostListener)?.addFragment(fragment)
+                    }
+                    else -> Timber.e("Profile section is invalid")
                 }
             }
 
