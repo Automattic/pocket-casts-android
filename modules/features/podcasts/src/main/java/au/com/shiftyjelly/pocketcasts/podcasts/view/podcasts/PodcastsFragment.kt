@@ -85,6 +85,9 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
 
+    private val shouldTrackPodcastsListShown: Boolean
+        get() = !viewModel.isFragmentChangingConfigurations && (folderUuid == null)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
@@ -167,7 +170,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
         }
 
-        if (shouldTrackPodcastsListShown()) {
+        if (shouldTrackPodcastsListShown) {
             viewModel.trackPodcastsListShown()
         }
 
@@ -265,6 +268,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     override fun onPause() {
         super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
         podcastOptionsDialog?.dismiss()
         folderOptionsDialog?.dismiss()
     }
@@ -342,9 +346,4 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
-
-    private fun shouldTrackPodcastsListShown() = (
-        lastOrientationRefreshed == LAST_ORIENTATION_NOT_SET ||
-            lastOrientationRefreshed == resources.configuration.orientation
-        ) && (folderUuid == null)
 }
