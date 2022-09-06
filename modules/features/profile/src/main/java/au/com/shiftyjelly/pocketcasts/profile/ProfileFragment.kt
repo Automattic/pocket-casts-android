@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
@@ -56,6 +58,7 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileViewModel by viewModels()
     private var binding: FragmentProfileBinding? = null
@@ -82,12 +85,18 @@ class ProfileFragment : BaseFragment() {
         viewModel.clearFailedRefresh()
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.isFragmentChangingConfigurations = activity?.isChangingConfigurations ?: false
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
 
         binding.btnSettings.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
             (activity as FragmentHostListener).addFragment(SettingsFragment())
         }
 
@@ -152,6 +161,7 @@ class ProfileFragment : BaseFragment() {
         }
 
         binding.userView.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
             if (viewModel.isSignedIn) {
                 val fragment = AccountDetailsFragment.newInstance()
                 (activity as FragmentHostListener).addFragment(fragment)
@@ -164,6 +174,7 @@ class ProfileFragment : BaseFragment() {
         binding.btnRefresh.setOnClickListener {
             updateRefreshUI(RefreshState.Refreshing)
             podcastManager.refreshPodcasts("profile")
+            analyticsTracker.track(AnalyticsEvent.PROFILE_REFRESH_BUTTON_TAPPED)
         }
 
         val upgradeLayout = binding.upgradeLayout
@@ -179,6 +190,10 @@ class ProfileFragment : BaseFragment() {
 
         viewModel.refreshObservable.observe(viewLifecycleOwner) { state ->
             updateRefreshUI(state)
+        }
+
+        if (!viewModel.isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.PROFILE_SHOWN)
         }
     }
 

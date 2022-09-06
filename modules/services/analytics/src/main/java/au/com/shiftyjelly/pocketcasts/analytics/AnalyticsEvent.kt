@@ -95,4 +95,10 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Table Swipe Actions for Podcast episodes */
     EPISODE_SWIPE_ACTION_PERFORMED("episode_swipe_action_performed"),
+
+    /* Profile View */
+    PROFILE_SHOWN("profile_shown"),
+    PROFILE_ACCOUNT_BUTTON_TAPPED("profile_account_button_tapped"),
+    PROFILE_SETTINGS_BUTTON_TAPPED("profile_settings_button_tapped"),
+    PROFILE_REFRESH_BUTTON_TAPPED("profile_refresh_button_tapped"),
 }
