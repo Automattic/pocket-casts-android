@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.profile.cloud
 
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -11,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -27,6 +31,7 @@ class CloudFilesViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val settings: Settings,
     userManager: UserManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     val sortOrderRelay = BehaviorRelay.create<Settings.CloudSortOrder>().apply { accept(settings.getCloudSortOrder()) }
@@ -44,8 +49,10 @@ class CloudFilesViewModel @Inject constructor(
         GlobalScope.launch(Dispatchers.Default) {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
                 playbackManager.playNext(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
     }
@@ -55,8 +62,10 @@ class CloudFilesViewModel @Inject constructor(
         GlobalScope.launch(Dispatchers.Default) {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
                 playbackManager.playLast(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
     }
@@ -67,6 +76,7 @@ class CloudFilesViewModel @Inject constructor(
 
     fun deleteEpisode(episode: UserEpisode, deleteState: DeleteState) {
         CloudDeleteHelper.deleteEpisode(episode, deleteState, playbackManager, episodeManager, userEpisodeManager)
+        trackSwipeAction(SwipeAction.DELETE)
     }
 
     fun changeSort(sortOrder: Settings.CloudSortOrder) {
@@ -76,5 +86,20 @@ class CloudFilesViewModel @Inject constructor(
 
     fun getSortOrder(): Settings.CloudSortOrder {
         return sortOrderRelay.value ?: settings.getCloudSortOrder()
+    }
+
+    private fun trackSwipeAction(swipeAction: SwipeAction) {
+        analyticsTracker.track(
+            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
+            mapOf(
+                ACTION_KEY to swipeAction.analyticsValue,
+                SOURCE_KEY to SwipeSource.FILES.analyticsValue
+            )
+        )
+    }
+
+    companion object {
+        private const val ACTION_KEY = "action"
+        private const val SOURCE_KEY = "source"
     }
 }

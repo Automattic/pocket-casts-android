@@ -118,7 +118,7 @@ class EpisodeItemTouchHelper(onLeftItem1: (episode: Playable, index: Int) -> Uni
         DOWNLOADS("downloads"),
         LISTENING_HISTORY("listening_history"),
         STARRED("starred"),
-        UPLOADED_FILES("uploaded_files"),
+        FILES("files"),
         UP_NEXT("up_next"),
     }
 }
