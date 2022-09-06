@@ -42,7 +42,7 @@ class PodcastsViewModel
     private val analyticsTracker: AnalyticsTrackerWrapper,
     userManager: UserManager
 ) : ViewModel(), CoroutineScope {
-
+    var isFragmentChangingConfigurations: Boolean = false
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -244,6 +244,10 @@ class PodcastsViewModel
         launch {
             folderManager.updateSortType(folderUuid = uuid, podcastsSortType = podcastsSortType)
         }
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
     fun trackPodcastsListShown() {
