@@ -280,7 +280,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun episodeDeleteSwiped(episode: Playable, index: Int) {
         val userEpisode = episode as? UserEpisode ?: return
-        val deleteState = viewModel.getDeleteState(userEpisode)
+        val deleteState = viewModel.getDeleteStateOnSwipeDelete(userEpisode)
         val confirmationDialog = CloudDeleteHelper.getDeleteDialog(userEpisode, deleteState, viewModel::deleteEpisode, resources)
         confirmationDialog
             .setOnDismiss {

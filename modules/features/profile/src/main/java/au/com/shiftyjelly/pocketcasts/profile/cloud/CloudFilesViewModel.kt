@@ -70,13 +70,13 @@ class CloudFilesViewModel @Inject constructor(
         }
     }
 
-    fun getDeleteState(episode: UserEpisode): DeleteState {
+    fun getDeleteStateOnSwipeDelete(episode: UserEpisode): DeleteState {
+        trackSwipeAction(SwipeAction.DELETE)
         return CloudDeleteHelper.getDeleteState(episode)
     }
 
     fun deleteEpisode(episode: UserEpisode, deleteState: DeleteState) {
         CloudDeleteHelper.deleteEpisode(episode, deleteState, playbackManager, episodeManager, userEpisodeManager)
-        trackSwipeAction(SwipeAction.DELETE)
     }
 
     fun changeSort(sortOrder: Settings.CloudSortOrder) {
