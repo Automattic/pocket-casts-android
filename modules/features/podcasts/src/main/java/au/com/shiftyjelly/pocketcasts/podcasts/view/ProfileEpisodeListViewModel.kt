@@ -89,6 +89,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
 
     fun clearAllEpisodeHistory() {
         launch {
+            analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_CLEARED)
             episodeManager.clearAllEpisodeHistory()
         }
     }

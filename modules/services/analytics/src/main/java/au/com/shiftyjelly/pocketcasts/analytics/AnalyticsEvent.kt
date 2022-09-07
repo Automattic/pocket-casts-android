@@ -120,4 +120,15 @@ enum class AnalyticsEvent(val key: String) {
     DOWNLOADS_CLEAN_UP_SHOWN("downloads_clean_up_shown"),
     DOWNLOADS_CLEAN_UP_BUTTON_TAPPED("downloads_clean_up_button_tapped"),
     DOWNLOADS_CLEAN_UP_COMPLETED("downloads_clean_up_completed"),
+
+    /* Listening History */
+    LISTENING_HISTORY_SHOWN("listening_history_shown"),
+    LISTENING_HISTORY_OPTIONS_BUTTON_TAPPED("listening_history_options_button_tapped"),
+    LISTENING_HISTORY_OPTIONS_MODAL_OPTION_TAPPED("listening_history_options_modal_option_tapped"),
+    LISTENING_HISTORY_SELECT_ALL_TAPPED("listening_history_select_all_tapped"),
+    LISTENING_HISTORY_SELECT_ALL_ABOVE_TAPPED("listening_history_select_all_above_tapped"),
+    LISTENING_HISTORY_SELECT_ALL_BELOW_TAPPED("listening_history_select_all_below_tapped"),
+    LISTENING_HISTORY_MULTI_SELECT_ENTERED("listening_history_multi_select_entered"),
+    LISTENING_HISTORY_MULTI_SELECT_EXITED("listening_history_multi_select_exited"),
+    LISTENING_HISTORY_CLEARED("listening_history_cleared"),
 }

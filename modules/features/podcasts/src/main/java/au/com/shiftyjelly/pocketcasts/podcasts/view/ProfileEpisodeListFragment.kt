@@ -63,6 +63,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         private const val AUTO_DOWNLOAD_SETTINGS = "auto_download_settings"
         private const val STOP_ALL_DOWNLOADS = "stop_all_downloads"
         private const val CLEAN_UP = "clean_up"
+        private const val CLEAR_HISTORY = "clear_history"
 
         fun newInstance(mode: Mode): ProfileEpisodeListFragment {
             val bundle = Bundle().apply {
@@ -260,6 +261,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
                 dialog.addTextOption(LR.string.profile_clean_up, imageId = VR.drawable.ic_delete, click = this::showCleanupSettings)
             } else if (mode is Mode.History) {
+                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_OPTIONS_BUTTON_TAPPED)
                 dialog.addTextOption(LR.string.profile_clear_listening_history, imageId = R.drawable.ic_history, click = this::clearListeningHistory)
             }
             dialog.show(parentFragmentManager, "more_options")
@@ -288,6 +290,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     private fun clearListeningHistory() {
+        analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAR_HISTORY))
         val dialog = ConfirmationDialog()
             .setIconId(R.drawable.ic_history)
             .setTitle(resources.getString(LR.string.profile_clear_listening_history_title))
@@ -337,7 +340,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     private fun trackSelectAll(selectAll: Boolean) {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_TAPPED
-            Mode.History, Mode.Starred -> null
+            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_TAPPED
+            Mode.Starred -> null
         }
         analyticsEvent?.let { analyticsTracker.track(analyticsEvent, mapOf(SELECT_ALL_KEY to selectAll)) }
     }
@@ -345,7 +349,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     private fun trackSelectAllAbove() {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_ABOVE_TAPPED
-            Mode.History, Mode.Starred -> null
+            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_ABOVE_TAPPED
+            Mode.Starred -> null
         }
         analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
     }
@@ -353,7 +358,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     private fun trackSelectAllBelow() {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_BELOW_TAPPED
-            Mode.History, Mode.Starred -> null
+            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_BELOW_TAPPED
+            Mode.Starred -> null
         }
         analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
     }
@@ -361,7 +367,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     private fun trackMultiSelectEntered() {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_MULTI_SELECT_ENTERED
-            Mode.History, Mode.Starred -> null
+            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_MULTI_SELECT_ENTERED
+            Mode.Starred -> null
         }
         analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
     }
@@ -369,7 +376,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     private fun trackMultiSelectExited() {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_MULTI_SELECT_EXITED
-            Mode.History, Mode.Starred -> null
+            Mode.History -> AnalyticsEvent.LISTENING_HISTORY_MULTI_SELECT_EXITED
+            Mode.Starred -> null
         }
         analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
     }
