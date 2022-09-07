@@ -48,4 +48,9 @@ class ManualCleanupFragment : BaseFragment() {
         viewModel.cleanupConfirmationDialog(requireContext())
             .show(parentFragmentManager, CLEAN_UP_CONFIRMATION_DIALOG_TAG)
     }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
 }

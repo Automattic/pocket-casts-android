@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -27,6 +29,7 @@ class ManualCleanupViewModel
 @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
     data class State(
         val diskSpaceViews: List<DiskSpaceView> = listOf(
@@ -51,6 +54,7 @@ class ManualCleanupViewModel
         )
     }
 
+    private var isFragmentChangingConfigurations: Boolean = false
     private val _state = MutableStateFlow(State())
     val state: StateFlow<State>
         get() = _state
@@ -89,6 +93,9 @@ class ManualCleanupViewModel
 
     fun setup(deleteButtonClickAction: () -> Unit) {
         this.deleteButtonAction = deleteButtonClickAction
+        if (!isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.DOWNLOADS_CLEAN_UP_SHOWN)
+        }
     }
 
     fun onDiskSpaceCheckedChanged(
@@ -105,11 +112,13 @@ class ManualCleanupViewModel
     }
 
     fun onDeleteButtonClicked() {
+        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_CLEAN_UP_BUTTON_TAPPED)
         deleteButtonAction?.invoke()
     }
 
     private fun onDeleteConfirmed() {
         if (episodesToDelete.isNotEmpty()) {
+            trackCleanupCompleted()
             viewModelScope.launch {
                 episodeManager.deleteEpisodeFiles(episodesToDelete, playbackManager)
                 _snackbarMessage.emit(LR.string.settings_manage_downloads_deleting)
@@ -147,6 +156,10 @@ class ManualCleanupViewModel
         )
     }
 
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
+
     fun cleanupConfirmationDialog(context: Context) =
         ManualCleanupConfirmationDialog(context = context, onConfirm = ::onDeleteConfirmed)
 
@@ -163,4 +176,24 @@ class ManualCleanupViewModel
             EpisodePlayingStatus.IN_PROGRESS -> LR.string.in_progress
             EpisodePlayingStatus.COMPLETED -> LR.string.played
         }
+
+    private fun trackCleanupCompleted() {
+        val properties = HashMap<String, Boolean>()
+        state.value.diskSpaceViews.forEach {
+            when (it.title) {
+                LR.string.unplayed -> properties[UNPLAYED_KEY] = it.isChecked
+                LR.string.played -> properties[PLAYED_KEY] = it.isChecked
+                LR.string.in_progress -> properties[IN_PROGRESS_KEY] = it.isChecked
+            }
+        }
+        properties[INCLUDE_STARRED_KEY] = switchState.value ?: false
+        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_CLEAN_UP_COMPLETED, properties)
+    }
+
+    companion object {
+        private const val INCLUDE_STARRED_KEY = "include_starred"
+        private const val PLAYED_KEY = "played"
+        private const val IN_PROGRESS_KEY = "in_progress"
+        private const val UNPLAYED_KEY = "unplayed"
+    }
 }

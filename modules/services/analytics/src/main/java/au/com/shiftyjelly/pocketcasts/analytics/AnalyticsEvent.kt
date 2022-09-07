@@ -115,4 +115,9 @@ enum class AnalyticsEvent(val key: String) {
     DOWNLOADS_SELECT_ALL_BELOW_TAPPED("downloads_select_all_below_tapped"),
     DOWNLOADS_MULTI_SELECT_ENTERED("downloads_multi_select_entered"),
     DOWNLOADS_MULTI_SELECT_EXITED("downloads_multi_select_exited"),
+
+    /* Downloads Clean Up View */
+    DOWNLOADS_CLEAN_UP_SHOWN("downloads_clean_up_shown"),
+    DOWNLOADS_CLEAN_UP_BUTTON_TAPPED("downloads_clean_up_button_tapped"),
+    DOWNLOADS_CLEAN_UP_COMPLETED("downloads_clean_up_completed"),
 }
