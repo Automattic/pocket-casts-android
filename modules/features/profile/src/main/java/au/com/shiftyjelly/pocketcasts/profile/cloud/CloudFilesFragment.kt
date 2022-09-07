@@ -67,7 +67,9 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     val adapter by lazy { EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager) }
 
     private val onRowClick = { episode: Playable ->
-        CloudFileBottomSheetFragment.newInstance(episode.uuid).show(parentFragmentManager, "cloud_bottom_sheet")
+        analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_SHOWN)
+        CloudFileBottomSheetFragment.newInstance(episode.uuid)
+            .show(parentFragmentManager, "cloud_bottom_sheet")
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
