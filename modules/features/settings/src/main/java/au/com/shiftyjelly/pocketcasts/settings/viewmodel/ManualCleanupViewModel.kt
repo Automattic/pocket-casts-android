@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupConfirmationDialog
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -61,6 +63,7 @@ class ManualCleanupViewModel
 
     private val episodesToDelete: MutableList<Episode> = mutableListOf()
     private val switchState: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
+    private var deleteButtonAction: (() -> Unit)? = null
 
     init {
         viewModelScope.launch {
@@ -84,6 +87,10 @@ class ManualCleanupViewModel
         }
     }
 
+    fun setup(deleteButtonClickAction: () -> Unit) {
+        this.deleteButtonAction = deleteButtonClickAction
+    }
+
     fun onDiskSpaceCheckedChanged(
         isChecked: Boolean,
         diskSpaceView: State.DiskSpaceView,
@@ -98,6 +105,10 @@ class ManualCleanupViewModel
     }
 
     fun onDeleteButtonClicked() {
+        deleteButtonAction?.invoke()
+    }
+
+    private fun onDeleteConfirmed() {
         if (episodesToDelete.isNotEmpty()) {
             viewModelScope.launch {
                 episodeManager.deleteEpisodeFiles(episodesToDelete, playbackManager)
@@ -135,6 +146,9 @@ class ManualCleanupViewModel
             totalSelectedDownloadSize = downloadSize
         )
     }
+
+    fun cleanupConfirmationDialog(context: Context) =
+        ManualCleanupConfirmationDialog(context = context, onConfirm = ::onDeleteConfirmed)
 
     private fun Array<EpisodePlayingStatus>.mapToDiskSpaceViewsForEpisodes(
         episodes: List<Episode>,

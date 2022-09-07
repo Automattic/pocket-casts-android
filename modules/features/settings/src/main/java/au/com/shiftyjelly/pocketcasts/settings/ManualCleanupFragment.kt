@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ManualCleanupFragment private constructor() : BaseFragment() {
     companion object {
+        private const val CLEAN_UP_CONFIRMATION_DIALOG_TAG = "clean-up-confirmation-dialog"
         fun newInstance(): ManualCleanupFragment {
             return ManualCleanupFragment()
         }
@@ -38,5 +39,15 @@ class ManualCleanupFragment private constructor() : BaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.setup(::deleteButtonAction)
+    }
+
+    private fun deleteButtonAction() {
+        viewModel.cleanupConfirmationDialog(requireContext())
+            .show(parentFragmentManager, CLEAN_UP_CONFIRMATION_DIALOG_TAG)
     }
 }
