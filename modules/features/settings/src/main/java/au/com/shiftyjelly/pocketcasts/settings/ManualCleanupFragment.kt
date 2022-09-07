@@ -13,12 +13,10 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ManualCleanupFragment private constructor() : BaseFragment() {
+class ManualCleanupFragment : BaseFragment() {
     companion object {
         private const val CLEAN_UP_CONFIRMATION_DIALOG_TAG = "clean-up-confirmation-dialog"
-        fun newInstance(): ManualCleanupFragment {
-            return ManualCleanupFragment()
-        }
+        fun newInstance() = ManualCleanupFragment()
     }
 
     private val viewModel: ManualCleanupViewModel by viewModels()
