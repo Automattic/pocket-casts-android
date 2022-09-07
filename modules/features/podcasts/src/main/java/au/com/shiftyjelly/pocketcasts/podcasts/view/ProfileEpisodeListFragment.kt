@@ -14,6 +14,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -56,6 +58,12 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     companion object {
+        private const val SELECT_ALL_KEY = "select_all"
+        private const val OPTION_KEY = "option"
+        private const val AUTO_DOWNLOAD_SETTINGS = "auto_download_settings"
+        private const val STOP_ALL_DOWNLOADS = "stop_all_downloads"
+        private const val CLEAN_UP = "clean_up"
+
         fun newInstance(mode: Mode): ProfileEpisodeListFragment {
             val bundle = Bundle().apply {
                 putInt(ARG_MODE, mode.index)
@@ -73,6 +81,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     @Inject lateinit var settings: Settings
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
     private lateinit var imageLoader: PodcastImageLoader
@@ -111,7 +120,9 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     override fun onPause() {
         super.onPause()
         binding?.recyclerView?.adapter = null
-        multiSelectHelper.isMultiSelecting = false
+        if (multiSelectHelper.isMultiSelecting) {
+            multiSelectHelper.isMultiSelecting = false
+        }
     }
 
     override fun onResume() {
@@ -158,10 +169,17 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         binding?.lblEmptyTitle?.setText(emptyTitleId)
         binding?.lblEmptySummary?.setText(emptySummaryId)
 
-        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) {
-            binding?.multiSelectToolbar?.isVisible = it
-            binding?.toolbar?.isVisible = !it
+        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+            val wasMultiSelecting = binding?.multiSelectToolbar?.isVisible == true
+            binding?.multiSelectToolbar?.isVisible = isMultiSelecting
+            binding?.toolbar?.isVisible = !isMultiSelecting
             binding?.multiSelectToolbar?.setNavigationIcon(R.drawable.ic_arrow_back)
+
+            if (isMultiSelecting) {
+                trackMultiSelectEntered()
+            } else if (wasMultiSelecting) {
+                trackMultiSelectExited()
+            }
 
             adapter.notifyDataSetChanged()
         }
@@ -171,6 +189,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
                     adapter.notifyDataSetChanged()
+                    trackSelectAll(true)
                 }
             }
 
@@ -179,6 +198,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 if (episodes != null) {
                     episodes.forEach { multiSelectHelper.deselect(it) }
                     adapter.notifyDataSetChanged()
+                    trackSelectAll(false)
                 }
             }
 
@@ -188,6 +208,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     val startIndex = episodes.indexOf(episode)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(episodes.subList(0, startIndex + 1))
+                        trackSelectAllAbove()
                     }
 
                     adapter.notifyDataSetChanged()
@@ -200,6 +221,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                     val startIndex = episodes.indexOf(episode)
                     if (startIndex > -1) {
                         multiSelectHelper.selectAllInList(episodes.subList(startIndex, episodes.size))
+                        trackSelectAllBelow()
                     }
 
                     adapter.notifyDataSetChanged()
@@ -231,6 +253,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         return if (item.itemId == R.id.more_options) {
             val dialog = OptionsDialog()
             if (mode is Mode.Downloaded) {
+                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_BUTTON_TAPPED)
                 dialog.addTextOption(LR.string.profile_auto_download_settings, imageId = R.drawable.ic_settings_small, click = this::showAutodownloadSettings)
                 if (downloadManager.hasPendingOrRunningDownloads()) {
                     dialog.addTextOption(LR.string.settings_auto_download_stop_all, imageId = IR.drawable.ic_stop, click = this::stopAllDownloads)
@@ -249,15 +272,17 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     private fun showAutodownloadSettings() {
         val fragment = AutoDownloadSettingsFragment.newInstance(showToolbar = true)
         showFragment(fragment)
-
+        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to AUTO_DOWNLOAD_SETTINGS))
         (activity as AppCompatActivity).supportActionBar?.setTitle(LR.string.profile_auto_download_settings)
     }
 
     private fun stopAllDownloads() {
+        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to STOP_ALL_DOWNLOADS))
         downloadManager.stopAllDownloads()
     }
 
     private fun showCleanupSettings() {
+        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAN_UP))
         val fragment = ManualCleanupFragment.newInstance()
         showFragment(fragment)
     }
@@ -307,5 +332,45 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     override fun getBackstackCount(): Int {
         return super.getBackstackCount() + if (multiSelectHelper.isMultiSelecting) 1 else 0
+    }
+
+    private fun trackSelectAll(selectAll: Boolean) {
+        val analyticsEvent = when (mode) {
+            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_TAPPED
+            Mode.History, Mode.Starred -> null
+        }
+        analyticsEvent?.let { analyticsTracker.track(analyticsEvent, mapOf(SELECT_ALL_KEY to selectAll)) }
+    }
+
+    private fun trackSelectAllAbove() {
+        val analyticsEvent = when (mode) {
+            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_ABOVE_TAPPED
+            Mode.History, Mode.Starred -> null
+        }
+        analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
+    }
+
+    private fun trackSelectAllBelow() {
+        val analyticsEvent = when (mode) {
+            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_BELOW_TAPPED
+            Mode.History, Mode.Starred -> null
+        }
+        analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
+    }
+
+    private fun trackMultiSelectEntered() {
+        val analyticsEvent = when (mode) {
+            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_MULTI_SELECT_ENTERED
+            Mode.History, Mode.Starred -> null
+        }
+        analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
+    }
+
+    private fun trackMultiSelectExited() {
+        val analyticsEvent = when (mode) {
+            Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_MULTI_SELECT_EXITED
+            Mode.History, Mode.Starred -> null
+        }
+        analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
     }
 }

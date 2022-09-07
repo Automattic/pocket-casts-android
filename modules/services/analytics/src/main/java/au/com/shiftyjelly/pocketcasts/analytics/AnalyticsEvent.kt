@@ -105,4 +105,14 @@ enum class AnalyticsEvent(val key: String) {
     /* Stats View */
     STATS_SHOWN("stats_shown"),
     STATS_DISMISSED("stats_dismissed"),
+
+    /* Downloads View */
+    DOWNLOADS_SHOWN("downloads_shown"),
+    DOWNLOADS_OPTIONS_BUTTON_TAPPED("downloads_options_button_tapped"),
+    DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED("downloads_options_modal_option_tapped"),
+    DOWNLOADS_SELECT_ALL_TAPPED("downloads_select_all_tapped"),
+    DOWNLOADS_SELECT_ALL_ABOVE_TAPPED("downloads_select_all_above_tapped"),
+    DOWNLOADS_SELECT_ALL_BELOW_TAPPED("downloads_select_all_below_tapped"),
+    DOWNLOADS_MULTI_SELECT_ENTERED("downloads_multi_select_entered"),
+    DOWNLOADS_MULTI_SELECT_EXITED("downloads_multi_select_exited"),
 }

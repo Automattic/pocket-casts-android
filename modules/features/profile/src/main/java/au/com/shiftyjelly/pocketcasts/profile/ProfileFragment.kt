@@ -121,7 +121,10 @@ class ProfileFragment : BaseFragment() {
                     }
                     ProfileEpisodeListFragment::class.java -> {
                         val fragment = when (section.title) {
-                            LR.string.profile_navigation_downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
+                            LR.string.profile_navigation_downloads -> {
+                                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_SHOWN)
+                                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
+                            }
                             LR.string.profile_navigation_starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
                             LR.string.profile_navigation_listening_history -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
                             else -> throw IllegalStateException("Unknown row")
