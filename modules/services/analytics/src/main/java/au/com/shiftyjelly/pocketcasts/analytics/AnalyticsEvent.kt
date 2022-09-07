@@ -131,4 +131,16 @@ enum class AnalyticsEvent(val key: String) {
     LISTENING_HISTORY_MULTI_SELECT_ENTERED("listening_history_multi_select_entered"),
     LISTENING_HISTORY_MULTI_SELECT_EXITED("listening_history_multi_select_exited"),
     LISTENING_HISTORY_CLEARED("listening_history_cleared"),
+
+    /* Uploaded Files */
+    UPLOADED_FILES_SHOWN("uploaded_files_shown"),
+    UPLOADED_FILES_OPTIONS_BUTTON_TAPPED("uploaded_files_options_button_tapped"),
+    UPLOADED_FILES_OPTIONS_MODAL_OPTION_TAPPED("uploaded_files_options_modal_option_tapped"),
+    UPLOADED_FILES_MULTI_SELECT_ENTERED("uploaded_files_multi_select_entered"),
+    UPLOADED_FILES_SELECT_ALL_TAPPED("uploaded_files_select_all_tapped"),
+    UPLOADED_FILES_SELECT_ALL_ABOVE_TAPPED("uploaded_files_select_all_above_tapped"),
+    UPLOADED_FILES_SELECT_ALL_BELOW_TAPPED("uploaded_files_select_all_below_tapped"),
+    UPLOADED_FILES_MULTI_SELECT_EXITED("uploaded_files_multi_select_exited"),
+    UPLOADED_FILES_SORT_BY_CHANGED("uploaded_files_sort_by_changed"),
+    UPLOADED_FILES_PLUS_FAB_TAPPED("uploaded_files_plus_fab_tapped"),
 }

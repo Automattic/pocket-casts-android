@@ -13,6 +13,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -54,6 +56,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var multiSelectHelper: MultiSelectHelper
     @Inject lateinit var castManager: CastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var imageLoader: PodcastImageLoader
     lateinit var itemTouchHelper: EpisodeItemTouchHelper
@@ -169,14 +172,22 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         binding?.fab?.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_PLUS_FAB_TAPPED)
             val intent = AddFileActivity.newFileChooser(it.context)
             startActivity(intent)
         }
 
-        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) {
-            binding?.multiSelectToolbar?.isVisible = it
-            binding?.toolbar?.isVisible = !it
+        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+            val wasMultiSelecting = binding?.multiSelectToolbar?.isVisible ?: false
+            binding?.multiSelectToolbar?.isVisible = isMultiSelecting
+            binding?.toolbar?.isVisible = !isMultiSelecting
             binding?.multiSelectToolbar?.setNavigationIcon(IR.drawable.ic_arrow_back)
+
+            if (isMultiSelecting) {
+                analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_MULTI_SELECT_ENTERED)
+            } else if (wasMultiSelecting) {
+                analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_MULTI_SELECT_EXITED)
+            }
 
             adapter.notifyDataSetChanged()
         }
@@ -186,6 +197,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
                     adapter.notifyDataSetChanged()
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to true))
                 }
             }
 
@@ -194,6 +206,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 if (episodes != null) {
                     episodes.forEach { multiSelectHelper.deselect(it) }
                     adapter.notifyDataSetChanged()
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to false))
                 }
             }
 
@@ -206,6 +219,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     }
 
                     adapter.notifyDataSetChanged()
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SELECT_ALL_ABOVE_TAPPED)
                 }
             }
 
@@ -218,6 +232,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                     }
 
                     adapter.notifyDataSetChanged()
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SELECT_ALL_BELOW_TAPPED)
                 }
             }
         }
@@ -228,6 +243,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_options -> {
+                analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_OPTIONS_BUTTON_TAPPED)
                 showOptionsDialog()
                 true
             }
@@ -240,12 +256,14 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             .addTextOption(
                 titleId = LR.string.sort_by, imageId = IR.drawable.ic_sort,
                 click = {
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to SORT_BY))
                     showSortOptions()
                 }
             )
             .addTextOption(
                 titleId = LR.string.profile_cloud_settings, imageId = IR.drawable.ic_profile_settings,
                 click = {
+                    analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to FILE_SETTINGS))
                     showCloudSettings()
                 }
             )
@@ -262,17 +280,35 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             .setTitle(getString(LR.string.sort_by))
             .addCheckedOption(
                 titleId = LR.string.episode_sort_newest_to_oldest,
-                click = { viewModel.changeSort(Settings.CloudSortOrder.NEWEST_OLDEST) },
+                click = {
+                    viewModel.changeSort(Settings.CloudSortOrder.NEWEST_OLDEST)
+                    analyticsTracker.track(
+                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
+                        mapOf(SORT_BY to SortOrder.NEWEST_TO_OLDEST.analyticsValue)
+                    )
+                },
                 checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.NEWEST_OLDEST)
             )
             .addCheckedOption(
                 titleId = LR.string.episode_sort_oldest_to_newest,
-                click = { viewModel.changeSort(Settings.CloudSortOrder.OLDEST_NEWEST) },
+                click = {
+                    viewModel.changeSort(Settings.CloudSortOrder.OLDEST_NEWEST)
+                    analyticsTracker.track(
+                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
+                        mapOf(SORT_BY to SortOrder.OLDEST_TO_NEWEST.analyticsValue)
+                    )
+                },
                 checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.OLDEST_NEWEST)
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_sort_by_title,
-                click = { viewModel.changeSort(Settings.CloudSortOrder.A_TO_Z) },
+                click = {
+                    viewModel.changeSort(Settings.CloudSortOrder.A_TO_Z)
+                    analyticsTracker.track(
+                        AnalyticsEvent.UPLOADED_FILES_SORT_BY_CHANGED,
+                        mapOf(SORT_BY to SortOrder.TITLE_A_TO_Z.analyticsValue)
+                    )
+                },
                 checked = (viewModel.getSortOrder() == Settings.CloudSortOrder.A_TO_Z)
             )
         dialog.show(parentFragmentManager, "sort_options")
@@ -315,5 +351,18 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         } else {
             false
         }
+    }
+
+    enum class SortOrder(val analyticsValue: String) {
+        NEWEST_TO_OLDEST("newest_to_oldest"),
+        OLDEST_TO_NEWEST("oldest_to_newest"),
+        TITLE_A_TO_Z("title_a_to_z")
+    }
+
+    companion object {
+        private const val OPTION_KEY = "option"
+        private const val SELECT_ALL_KEY = "select_all"
+        private const val SORT_BY = "sort_by"
+        private const val FILE_SETTINGS = "file_settings"
     }
 }

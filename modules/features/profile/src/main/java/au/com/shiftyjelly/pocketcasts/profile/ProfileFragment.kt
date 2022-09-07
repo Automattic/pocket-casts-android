@@ -117,6 +117,7 @@ class ProfileFragment : BaseFragment() {
                         (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
                     }
                     CloudFilesFragment::class.java -> {
+                        analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SHOWN)
                         (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
                     }
                     ProfileEpisodeListFragment::class.java -> {
