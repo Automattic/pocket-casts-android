@@ -150,4 +150,12 @@ enum class AnalyticsEvent(val key: String) {
     USER_FILE_DETAIL_OPTION_TAPPED("user_file_detail_option_tapped"),
     USER_FILE_PLAY_PAUSE_BUTTON_TAPPED("user_file_play_pause_button_tapped"),
     USER_FILE_DELETED("user_file_deleted"),
+
+    /* Starred */
+    STARRED_SHOWN("starred_shown"),
+    STARRED_MULTI_SELECT_ENTERED("starred_multi_select_entered"),
+    STARRED_MULTI_SELECT_EXITED("starred_multi_select_exited"),
+    STARRED_SELECT_ALL_TAPPED("starred_select_all_tapped"),
+    STARRED_SELECT_ALL_ABOVE_TAPPED("starred_select_all_above_tapped"),
+    STARRED_SELECT_ALL_BELOW_TAPPED("starred_select_all_below_tapped"),
 }

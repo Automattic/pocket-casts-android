@@ -341,44 +341,44 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_TAPPED
             Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_TAPPED
-            Mode.Starred -> null
+            Mode.Starred -> AnalyticsEvent.STARRED_SELECT_ALL_TAPPED
         }
-        analyticsEvent?.let { analyticsTracker.track(analyticsEvent, mapOf(SELECT_ALL_KEY to selectAll)) }
+        analyticsTracker.track(analyticsEvent, mapOf(SELECT_ALL_KEY to selectAll))
     }
 
     private fun trackSelectAllAbove() {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_ABOVE_TAPPED
             Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_ABOVE_TAPPED
-            Mode.Starred -> null
+            Mode.Starred -> AnalyticsEvent.STARRED_SELECT_ALL_ABOVE_TAPPED
         }
-        analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
+        analyticsTracker.track(analyticsEvent)
     }
 
     private fun trackSelectAllBelow() {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_SELECT_ALL_BELOW_TAPPED
             Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_BELOW_TAPPED
-            Mode.Starred -> null
+            Mode.Starred -> AnalyticsEvent.STARRED_SELECT_ALL_BELOW_TAPPED
         }
-        analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
+        analyticsTracker.track(analyticsEvent)
     }
 
     private fun trackMultiSelectEntered() {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_MULTI_SELECT_ENTERED
             Mode.History -> AnalyticsEvent.LISTENING_HISTORY_MULTI_SELECT_ENTERED
-            Mode.Starred -> null
+            Mode.Starred -> AnalyticsEvent.STARRED_MULTI_SELECT_ENTERED
         }
-        analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
+        analyticsTracker.track(analyticsEvent)
     }
 
     private fun trackMultiSelectExited() {
         val analyticsEvent = when (mode) {
             Mode.Downloaded -> AnalyticsEvent.DOWNLOADS_MULTI_SELECT_EXITED
             Mode.History -> AnalyticsEvent.LISTENING_HISTORY_MULTI_SELECT_EXITED
-            Mode.Starred -> null
+            Mode.Starred -> AnalyticsEvent.STARRED_MULTI_SELECT_EXITED
         }
-        analyticsEvent?.let { analyticsTracker.track(analyticsEvent) }
+        analyticsTracker.track(analyticsEvent)
     }
 }

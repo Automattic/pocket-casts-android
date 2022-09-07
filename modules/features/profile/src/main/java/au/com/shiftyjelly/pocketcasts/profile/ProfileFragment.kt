@@ -126,7 +126,10 @@ class ProfileFragment : BaseFragment() {
                                 analyticsTracker.track(AnalyticsEvent.DOWNLOADS_SHOWN)
                                 ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
                             }
-                            LR.string.profile_navigation_starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
+                            LR.string.profile_navigation_starred -> {
+                                analyticsTracker.track(AnalyticsEvent.STARRED_SHOWN)
+                                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
+                            }
                             LR.string.profile_navigation_listening_history -> {
                                 analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_SHOWN)
                                 ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
