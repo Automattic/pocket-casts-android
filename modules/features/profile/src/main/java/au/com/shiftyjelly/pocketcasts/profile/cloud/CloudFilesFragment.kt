@@ -174,7 +174,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         binding?.fab?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_PLUS_FAB_TAPPED)
+            analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_ADD_FILE_TAPPED)
             val intent = AddFileActivity.newFileChooser(it.context)
             startActivity(intent)
         }
