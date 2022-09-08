@@ -178,4 +178,7 @@ enum class AnalyticsEvent(val key: String) {
     FOLDER_DELETED("folder_deleted"),
     FOLDER_CHOOSE_PODCASTS_SHOWN("folder_choose_podcasts_shown"),
     FOLDER_CHOOSE_PODCASTS_DISMISSED("folder_choose_podcasts_dismissed"),
+    FOLDER_CHOOSE_SHOWN("folder_choose_shown"),
+    FOLDER_CHOOSE_FOLDER_TAPPED("folder_choose_folder_tapped"),
+    FOLDER_PODCAST_MODAL_OPTION_TAPPED("folder_podcast_modal_option_tapped"),
 }

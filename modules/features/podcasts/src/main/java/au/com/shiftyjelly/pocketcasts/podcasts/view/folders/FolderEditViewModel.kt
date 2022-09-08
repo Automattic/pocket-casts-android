@@ -271,6 +271,7 @@ class FolderEditViewModel
         viewModelScope.launch {
             podcastManager.updateFolderUuid(folderUuid = folder.uuid, listOf(podcastUuid))
             folderUuid.value = Optional.of(folder.uuid)
+            analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_FOLDER_TAPPED)
         }
     }
 
