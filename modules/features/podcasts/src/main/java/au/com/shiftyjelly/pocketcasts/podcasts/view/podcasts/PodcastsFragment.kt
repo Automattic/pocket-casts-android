@@ -261,6 +261,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
             val onAddOrRemovePodcast = {
                 analyticsTracker.track(AnalyticsEvent.FOLDER_ADD_PODCASTS_BUTTON_TAPPED)
+                analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_PODCASTS_SHOWN)
                 val fragment = FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid)
                 fragment.show(parentFragmentManager, "add_podcasts_card")
             }

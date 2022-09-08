@@ -303,9 +303,16 @@ class FolderEditViewModel
         analyticsTracker.track(analyticsEvent, properties)
     }
 
+    fun trackDismiss() {
+        if (state.value.isEditFolder) {
+            analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_PODCASTS_DISMISSED, mapOf(CHANGED_PODCASTS_KEY to state.value.selectedCount))
+        }
+    }
+
     companion object {
         private const val SORT_ORDER_KEY = "sort_order"
         private const val NUMBER_OF_PODCASTS_KEY = "number_of_podcasts"
+        private const val CHANGED_PODCASTS_KEY = "changed_podcasts"
         const val COLOR_KEY = "color"
     }
 }
