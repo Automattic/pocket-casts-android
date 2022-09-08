@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastFolder
@@ -34,7 +36,8 @@ class FolderEditViewModel
 @Inject constructor(
     private val podcastManager: PodcastManager,
     private val folderManager: FolderManager,
-    private val settings: Settings
+    private val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel(), CoroutineScope {
 
     data class State(
@@ -164,8 +167,15 @@ class FolderEditViewModel
         selectedUuids.value = uuids.distinct()
     }
 
-    fun searchPodcasts(text: String) {
-        searchText.value = text
+    fun searchPodcasts(newValue: String) {
+        val oldValue = searchText.value
+        searchText.value = newValue
+        trackSearchIfNeeded(oldValue, newValue)
+    }
+
+    fun changeSortOrder(order: PodcastsSortType) {
+        settings.setSelectPodcastsSortType(order)
+        analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_PICKER_FILTER_CHANGED, mapOf(SORT_ORDER_KEY to order.analyticsValue))
     }
 
     fun changeFolderName(name: String) {
@@ -270,5 +280,27 @@ class FolderEditViewModel
         viewModelScope.launch {
             folderUuid.value = Optional.ofNullable(podcastManager.findPodcastByUuidSuspend(podcastUuid)?.folderUuid)
         }
+    }
+
+    private fun trackSearchIfNeeded(oldValue: String, newValue: String) {
+        if (oldValue.isEmpty() && newValue.isNotEmpty()) {
+            analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_PICKER_SEARCH_PERFORMED)
+        } else if (oldValue.isNotEmpty() && newValue.isEmpty()) {
+            analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_PICKER_SEARCH_CLEARED)
+        }
+    }
+
+    fun trackCreateFolderNavigation(analyticsEvent: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
+        if (!state.value.isCreateFolder) return
+        val properties = HashMap<String, Any>()
+        properties[NUMBER_OF_PODCASTS_KEY] = state.value.selectedCount
+        properties.putAll(props)
+        analyticsTracker.track(analyticsEvent, properties)
+    }
+
+    companion object {
+        private const val SORT_ORDER_KEY = "sort_order"
+        private const val NUMBER_OF_PODCASTS_KEY = "number_of_podcasts"
+        const val COLOR_KEY = "color"
     }
 }

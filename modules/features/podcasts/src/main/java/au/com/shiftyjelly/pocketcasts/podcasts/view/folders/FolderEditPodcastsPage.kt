@@ -70,7 +70,7 @@ fun FolderEditPodcastsPage(
             PageList(
                 onNextClick = onNextClick,
                 onSortClick = {
-                    SelectSortByDialog(settings).show(context = context, fragmentManager = fragmentManager)
+                    SelectSortByDialog(settings, viewModel::changeSortOrder).show(context = context, fragmentManager = fragmentManager)
                 },
                 state = state,
                 viewModel = viewModel,

@@ -51,6 +51,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     companion object {
         private const val LAST_ORIENTATION_NOT_SET = -1
+        private const val SOURCE_KEY = "source"
+        private const val PODCASTS_LIST = "podcasts_list"
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -257,6 +259,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     }
 
     private fun createFolder() {
+        analyticsTracker.track(AnalyticsEvent.FOLDER_CREATE_SHOWN, mapOf(SOURCE_KEY to PODCASTS_LIST))
         FolderCreateFragment().show(parentFragmentManager, "create_folder_card")
     }
 

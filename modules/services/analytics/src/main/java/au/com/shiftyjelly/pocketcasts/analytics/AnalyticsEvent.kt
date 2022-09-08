@@ -158,4 +158,13 @@ enum class AnalyticsEvent(val key: String) {
     STARRED_SELECT_ALL_TAPPED("starred_select_all_tapped"),
     STARRED_SELECT_ALL_ABOVE_TAPPED("starred_select_all_above_tapped"),
     STARRED_SELECT_ALL_BELOW_TAPPED("starred_select_all_below_tapped"),
+
+    /* Folder */
+    FOLDER_CREATE_SHOWN("folder_create_shown"),
+    FOLDER_PODCAST_PICKER_SEARCH_PERFORMED("folder_podcast_picker_search_performed"),
+    FOLDER_PODCAST_PICKER_SEARCH_CLEARED("folder_podcast_picker_search_cleared"),
+    FOLDER_PODCAST_PICKER_FILTER_CHANGED("folder_podcast_picker_filter_changed"),
+    FOLDER_CREATE_NAME_SHOWN("folder_create_name_shown"),
+    FOLDER_CREATE_COLOR_SHOWN("folder_create_color_shown"),
+    FOLDER_SAVED("folder_saved"),
 }
