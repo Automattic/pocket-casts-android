@@ -78,6 +78,9 @@ class FolderEditViewModel
     // folder color page
     val colorId = MutableStateFlow(0)
 
+    var isNameChanged: Boolean = false
+    var isColorIdChanged: Boolean = false
+
     init {
         viewModelScope.launch {
             combine(
@@ -191,6 +194,7 @@ class FolderEditViewModel
         viewModelScope.launch {
             folderManager.updateColor(folderUuid = folder.uuid, color = colorId.value)
         }
+        isColorIdChanged = true
     }
 
     fun saveFolderName(resources: Resources) {
@@ -203,6 +207,7 @@ class FolderEditViewModel
         viewModelScope.launch {
             folderManager.updateName(folderUuid = folder.uuid, name = name)
         }
+        isNameChanged = true
     }
 
     fun saveFolder(resources: Resources, onComplete: (folder: Folder) -> Unit) {

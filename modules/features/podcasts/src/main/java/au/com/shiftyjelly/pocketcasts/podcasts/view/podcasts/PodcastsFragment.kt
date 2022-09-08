@@ -255,6 +255,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
             val onEditFolder = {
                 analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to EDIT_FOLDER))
+                analyticsTracker.track(AnalyticsEvent.FOLDER_EDIT_SHOWN)
                 val fragment = FolderEditFragment.newInstance(folderUuid = folder.uuid)
                 fragment.show(parentFragmentManager, "edit_folder_card")
             }
