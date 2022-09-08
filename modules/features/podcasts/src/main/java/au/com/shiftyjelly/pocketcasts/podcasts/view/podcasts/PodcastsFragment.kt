@@ -53,6 +53,9 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         private const val LAST_ORIENTATION_NOT_SET = -1
         private const val SOURCE_KEY = "source"
         private const val PODCASTS_LIST = "podcasts_list"
+        private const val OPTION_KEY = "option"
+        private const val SORT_BY = "sort_by"
+        private const val EDIT_FOLDER = "edit_folder"
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -242,10 +245,14 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private fun openOptions() {
         if (viewModel.isFolderOpen()) {
             val folder = viewModel.folder ?: return
+            val onOpenSortOptions = {
+                analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to SORT_BY))
+            }
             val onSortTypeChanged = { sort: PodcastsSortType ->
                 viewModel.updateFolderSort(folder.uuid, sort)
             }
             val onEditFolder = {
+                analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to EDIT_FOLDER))
                 val fragment = FolderEditFragment.newInstance(folderUuid = folder.uuid)
                 fragment.show(parentFragmentManager, "edit_folder_card")
             }
@@ -254,7 +261,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 val fragment = FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid)
                 fragment.show(parentFragmentManager, "add_podcasts_card")
             }
-            folderOptionsDialog = FolderOptionsDialog(folder, onSortTypeChanged, onEditFolder, onAddOrRemovePodcast, this, settings).apply {
+            folderOptionsDialog = FolderOptionsDialog(folder, onOpenSortOptions, onSortTypeChanged, onEditFolder, onAddOrRemovePodcast, this, settings).apply {
                 show()
             }
         } else {

@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class FolderOptionsDialog(
     val folder: Folder,
+    val onOpenSortOptions: () -> Unit,
     val onSortTypeChanged: (PodcastsSortType) -> Unit,
     val onEditFolder: () -> Unit,
     val onAddOrRemovePodcast: () -> Unit,
@@ -31,7 +32,10 @@ class FolderOptionsDialog(
                 titleId = LR.string.podcasts_menu_sort_by,
                 imageId = IR.drawable.ic_sort,
                 valueId = folder.podcastsSortType.labelId,
-                click = { openSortOptions() }
+                click = {
+                    onOpenSortOptions()
+                    openSortOptions()
+                }
             )
             .addTextOption(
                 titleId = LR.string.edit_folder,
