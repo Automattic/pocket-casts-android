@@ -53,6 +53,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         private const val LAST_ORIENTATION_NOT_SET = -1
         private const val SOURCE_KEY = "source"
         private const val PODCASTS_LIST = "podcasts_list"
+        private const val SORT_ORDER_KEY = "sort_order"
         private const val OPTION_KEY = "option"
         private const val SORT_BY = "sort_by"
         private const val EDIT_FOLDER = "edit_folder"
@@ -249,6 +250,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to SORT_BY))
             }
             val onSortTypeChanged = { sort: PodcastsSortType ->
+                analyticsTracker.track(AnalyticsEvent.FOLDER_SORT_BY_CHANGED, mapOf(SORT_ORDER_KEY to sort.analyticsValue))
                 viewModel.updateFolderSort(folder.uuid, sort)
             }
             val onEditFolder = {

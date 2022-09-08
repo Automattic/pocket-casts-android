@@ -171,4 +171,5 @@ enum class AnalyticsEvent(val key: String) {
     FOLDER_OPTIONS_BUTTON_TAPPED("folder_options_button_tapped"),
     FOLDER_ADD_PODCASTS_BUTTON_TAPPED("folder_add_podcasts_button_tapped"),
     FOLDER_OPTIONS_MODAL_OPTION_TAPPED("folder_options_modal_option_tapped"),
+    FOLDER_SORT_BY_CHANGED("folder_sort_by_changed"),
 }
