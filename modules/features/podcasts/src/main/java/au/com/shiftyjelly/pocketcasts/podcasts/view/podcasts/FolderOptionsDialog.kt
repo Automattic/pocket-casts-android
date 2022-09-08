@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
-import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditPodcastsFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -15,6 +14,7 @@ class FolderOptionsDialog(
     val folder: Folder,
     val onSortTypeChanged: (PodcastsSortType) -> Unit,
     val onEditFolder: () -> Unit,
+    val onAddOrRemovePodcast: () -> Unit,
     val fragment: Fragment,
     val settings: Settings
 ) {
@@ -45,15 +45,11 @@ class FolderOptionsDialog(
                 titleId = LR.string.add_or_remove_podcasts,
                 imageId = R.drawable.ic_podcasts,
                 click = {
-                    addPodcasts(fragmentManager)
+                    onAddOrRemovePodcast()
                 }
             )
         dialog.show(fragmentManager, "podcasts_options_dialog")
         showDialog = dialog
-    }
-
-    private fun addPodcasts(fragmentManager: FragmentManager) {
-        FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid).show(fragmentManager, "add_podcasts_card")
     }
 
     private fun openSortOptions() {

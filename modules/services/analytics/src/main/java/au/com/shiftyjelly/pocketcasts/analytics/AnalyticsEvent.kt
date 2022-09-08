@@ -167,4 +167,7 @@ enum class AnalyticsEvent(val key: String) {
     FOLDER_CREATE_NAME_SHOWN("folder_create_name_shown"),
     FOLDER_CREATE_COLOR_SHOWN("folder_create_color_shown"),
     FOLDER_SAVED("folder_saved"),
+    FOLDER_SHOWN("folder_shown"),
+    FOLDER_OPTIONS_BUTTON_TAPPED("folder_options_button_tapped"),
+    FOLDER_ADD_PODCASTS_BUTTON_TAPPED("folder_add_podcasts_button_tapped"),
 }

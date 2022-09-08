@@ -85,9 +85,6 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
 
-    private val shouldTrackPodcastsListShown: Boolean
-        get() = !viewModel.isFragmentChangingConfigurations && (folderUuid == null)
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
@@ -170,8 +167,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
         }
 
-        if (shouldTrackPodcastsListShown) {
-            viewModel.trackPodcastsListShown()
+        if (!viewModel.isFragmentChangingConfigurations) {
+            folderUuid?.let { viewModel.trackFolderShown(it) } ?: viewModel.trackPodcastsListShown()
         }
 
         val toolbar = binding.toolbar
@@ -218,7 +215,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.more_options -> {
-                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_OPTIONS_BUTTON_TAPPED)
+                val event = folderUuid?.let { AnalyticsEvent.FOLDER_OPTIONS_BUTTON_TAPPED } ?: AnalyticsEvent.PODCASTS_LIST_OPTIONS_BUTTON_TAPPED
+                analyticsTracker.track(event)
                 openOptions()
                 true
             }
@@ -251,7 +249,12 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 val fragment = FolderEditFragment.newInstance(folderUuid = folder.uuid)
                 fragment.show(parentFragmentManager, "edit_folder_card")
             }
-            folderOptionsDialog = FolderOptionsDialog(folder, onSortTypeChanged, onEditFolder, this, settings).apply {
+            val onAddOrRemovePodcast = {
+                analyticsTracker.track(AnalyticsEvent.FOLDER_ADD_PODCASTS_BUTTON_TAPPED)
+                val fragment = FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid)
+                fragment.show(parentFragmentManager, "add_podcasts_card")
+            }
+            folderOptionsDialog = FolderOptionsDialog(folder, onSortTypeChanged, onEditFolder, onAddOrRemovePodcast, this, settings).apply {
                 show()
             }
         } else {
