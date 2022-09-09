@@ -220,9 +220,11 @@ class PodcastViewModel
         return episodes.size
     }
 
-    fun searchQueryUpdated(query: String) {
-        searchTerm = query
-        searchQueryRelay.accept(query)
+    fun searchQueryUpdated(newValue: String) {
+        val oldValue = searchQueryRelay.value ?: ""
+        searchTerm = newValue
+        searchQueryRelay.accept(newValue)
+        trackSearchIfNeeded(oldValue, newValue)
     }
 
     fun updateEpisodesSortType(episodesSortType: EpisodesSortType) {
@@ -379,6 +381,14 @@ class PodcastViewModel
             val errorMessage: String,
             val searchTerm: String
         ) : EpisodeState()
+    }
+
+    private fun trackSearchIfNeeded(oldValue: String, newValue: String) {
+        if (oldValue.isEmpty() && newValue.isNotEmpty()) {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SEARCH_PERFORMED)
+        } else if (oldValue.isNotEmpty() && newValue.isEmpty()) {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SEARCH_CLEARED)
+        }
     }
 
     companion object {

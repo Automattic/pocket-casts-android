@@ -135,6 +135,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let {
             AnalyticsHelper.podcastSubscribedFromList(it, podcastUuid)
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SUBSCRIBE_TAPPED)
         }
         if (featuredPodcast) AnalyticsHelper.subscribedToFeaturedPodcast()
 
@@ -149,6 +150,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 1 -> getString(LR.string.podcast_unsubscribe_downloaded_file_singular)
                 else -> getString(LR.string.podcast_unsubscribe_downloaded_file_plural, downloaded)
             }
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_UNSUBSCRIBE_TAPPED)
             val dialog = ConfirmationDialog().setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.unsubscribe)))
                 .setTitle(title)
                 .setSummary(getString(LR.string.podcast_unsubscribe_warning))
@@ -317,6 +319,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     private val onFoldersClicked: () -> Unit = {
         lifecycleScope.launch {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FOLDER_TAPPED)
             val folder = viewModel.getFolder()
             if (folder == null) {
                 analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_SHOWN)
@@ -357,6 +360,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     private val onSettingsClicked: () -> Unit = {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SETTINGS_TAPPED)
         (activity as FragmentHostListener).addFragment(PodcastSettingsFragment.newInstance(viewModel.podcastUuid))
         multiSelectHelper.isMultiSelecting = false
     }
@@ -400,7 +404,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
         adapter?.fromListUuid = fromListUuid
 
-        AnalyticsHelper.openedPodcast(podcastUuid)
+        if (savedInstanceState == null) {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN)
+            AnalyticsHelper.openedPodcast(podcastUuid)
+        }
     }
 
     override fun onPause() {
