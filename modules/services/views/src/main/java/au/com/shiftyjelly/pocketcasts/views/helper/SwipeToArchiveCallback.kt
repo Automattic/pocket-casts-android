@@ -107,6 +107,8 @@ class EpisodeItemTouchHelper(onLeftItem1: (episode: Playable, index: Int) -> Uni
         UP_NEXT_REMOVE("up_next_remove"),
         UP_NEXT_ADD_TOP("up_next_add_top"),
         UP_NEXT_ADD_BOTTOM("up_next_add_bottom"),
+        UP_NEXT_MOVE_TOP("up_next_move_top"),
+        UP_NEXT_MOVE_BOTTOM("up_next_move_bottom"),
         DELETE("delete"),
         UNARCHIVE("unarchive"),
         ARCHIVE("archive"),

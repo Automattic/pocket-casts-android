@@ -142,7 +142,7 @@ enum class AnalyticsEvent(val key: String) {
     UPLOADED_FILES_SELECT_ALL_BELOW_TAPPED("uploaded_files_select_all_below_tapped"),
     UPLOADED_FILES_MULTI_SELECT_EXITED("uploaded_files_multi_select_exited"),
     UPLOADED_FILES_SORT_BY_CHANGED("uploaded_files_sort_by_changed"),
-    UPLOADED_FILES_PLUS_FAB_TAPPED("uploaded_files_plus_fab_tapped"),
+    UPLOADED_FILES_ADD_FILE_TAPPED("uploaded_files_add_file_tapped"),
 
     /* User File Details View */
     USER_FILE_DETAIL_SHOWN("user_file_detail_shown"),

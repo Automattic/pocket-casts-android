@@ -219,9 +219,9 @@ class MainActivity :
             ) {
                 binding.playerBottomSheet.openPlayer()
             }
+        } else {
+            trackTabOpened(selectedTab, isInitial = true)
         }
-
-        trackTabOpened(selectedTab, isInitial = true)
         navigator.infoStream()
             .doOnNext {
                 updateStatusBar()

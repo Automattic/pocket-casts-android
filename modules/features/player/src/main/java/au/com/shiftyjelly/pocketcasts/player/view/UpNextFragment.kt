@@ -231,7 +231,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             episodeItemTouchHelper?.clearView(recyclerView, it)
         }
         playbackManager.playEpisodesNext(listOf(episode))
-        trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
+        trackSwipeAction(SwipeAction.UP_NEXT_MOVE_TOP)
     }
 
     fun moveToBottom(episode: Playable, position: Int) {
@@ -240,7 +240,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             episodeItemTouchHelper?.clearView(recyclerView, it)
         }
         playbackManager.playEpisodesLast(listOf(episode))
-        trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
+        trackSwipeAction(SwipeAction.UP_NEXT_MOVE_BOTTOM)
     }
 
     @Suppress("UNUSED_PARAMETER")
