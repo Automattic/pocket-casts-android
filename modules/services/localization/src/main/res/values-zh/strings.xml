@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-09 09:54:15+0000
+Translation-Revision-Date: 2022-08-23 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+	<string name="settings_storage_section_heading_mobile_data">移动数据</string>
+	<string name="settings_storage_section_heading_usage">使用情况</string>
+	<string name="settings_storage_downloaded_files">下载的文件</string>
+	<string name="settings_storage_downloaded_bytes">%d 字节</string>
+	<string name="plus_per_month">%s/月</string>
+	<string name="plus_day">日</string>
+	<string name="plus_month_year_price">%1$s/月或 %2$s/年</string>
+	<string name="plus_trial_then_slash_year">%1$s免费，之后 %2$s/年</string>
+	<string name="plus_trial_then_slash_month">%1$s免费，之后 %2$s/月</string>
+	<string name="plus_then_slash_year">之后 %s/年</string>
+	<string name="plus_then_slash_month">之后 %s/月</string>
+	<string name="plus_slash_year">%s/年</string>
+	<string name="plus_per_year">%s/年</string>
+	<string name="plus_trial_duration_free">%s免费！</string>
+	<string name="profile_start_free_trial">开始免费试用</string>
+	<string name="profile_per_year">每年</string>
+	<string name="profile_feature_try_trial_secondary_info">现在无需付款 - 可随时取消</string>
+	<string name="profile_feature_try_trial">免费试用 Pocket Casts Plus %s</string>
+	<string name="player_up_next_clear_episodes_plural">清除 %1$d 集 </string>
+	<string name="player_up_next_clear_queue_summary">是否确定要清除您的“接下来播放”队列？</string>
+	<string name="player_end_playback_clear_up_next">关闭并清除“接下来播放”</string>
 	<string name="player_open_full_size_player">启用以打开全尺寸播放器</string>
 	<string name="settings_downloads_clean_up">清理</string>
 	<string name="podcasts_share_failed_description">创建共享页面时出错。</string>
@@ -351,7 +372,6 @@ Language: zh_CN
 	<string name="settings_title_storage">存储和数据使用情况</string>
 	<string name="settings_title_playback">常规</string>
 	<string name="settings_title_notifications">通知</string>
-	<string name="settings_title_manage_downloads">管理下载</string>
 	<string name="settings_title_import_export">导入和导出 OPML</string>
 	<string name="settings_title_help">帮助和反馈</string>
 	<string name="settings_title_excluded_podcasts">不包括播客</string>
@@ -367,7 +387,6 @@ Language: zh_CN
 	<string name="settings_storage_move_podcasts">正在移动播客…</string>
 	<string name="settings_storage_move_message">这会将现有播客文件移动到此新位置。</string>
 	<string name="settings_storage_move">移动</string>
-	<string name="settings_storage_manage_downloads">管理下载的文件</string>
 	<string name="settings_storage_folder_write_failed">无法写入到此文件夹。</string>
 	<string name="settings_storage_folder_not_found">无法找到或创建文件夹。</string>
 	<string name="settings_storage_folder_change_failed">无法更改为自定义文件夹。</string>
@@ -515,7 +534,6 @@ Language: zh_CN
 	<string name="plus_renews_automatically_yearly">每年自动续订</string>
 	<string name="plus_best_value">最佳值</string>
 	<string name="plus_select_payment_frequency">选择付款频率</string>
-	<string name="plus_year_month_price">每年 %1$s/每月 %2$s</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">升级到 Pocket Casts Plus</string>
 	<string name="plus_trial_finished_locked">对 Pocket Casts Plus 功能的访问将被锁定</string>
 	<string name="plus_trial_finished_files_removed">上传到您账户的文件将在一周后删除</string>
@@ -525,8 +543,7 @@ Language: zh_CN
 	<string name="plus_themes_icons_body">选择您的真实颜色。 仅面向 Plus 俱乐部的专属图标和主题。</string>
 	<string name="plus_themes_icons">主题和图标</string>
 	<string name="plus_thanks_for_your_support_bang">感谢您的支持！</string>
-	<string name="plus_slash_month">%s /月</string>
-	<string name="plus_per_month">%s 每个月</string>
+	<string name="plus_slash_month">%s/月</string>
 	<string name="plus_lifetime_member">终身会员</string>
 	<string name="plus_learn_more_button">了解更多</string>
 	<string name="plus_learn_more_about_plus">了解有关 Pocket Casts Plus 的更多信息</string>
@@ -632,7 +649,6 @@ Language: zh_CN
 	<string name="profile_payment_failed_detail">似乎在处理您的付款时出现问题。 请重试。</string>
 	<string name="profile_payment_failed">付款失败</string>
 	<string name="profile_payment_cancelled">付款已取消</string>
-	<string name="profile_pay_now">立即支付</string>
 	<string name="profile_password_changed_successful">成功！</string>
 	<string name="profile_password_changed">密码已更改</string>
 	<string name="profile_password">密码</string>
@@ -760,7 +776,6 @@ Language: zh_CN
 	<string name="profile_account_created">账户已创建</string>
 	<string name="profile_access_ends">访问结束：%s</string>
 	<string name="profile_access_ended">访问已结束：%s</string>
-	<string name="profile_1_year_free">1 年免费</string>
 	<string name="profile">个人资料</string>
 	<string name="filters_warning_delete_summary">此操作无法撤消。</string>
 	<string name="filters_title_new_releases">新发布</string>
@@ -1017,7 +1032,6 @@ Language: zh_CN
 	<string name="player_up_next_empty_desc">您可以向右滑动剧集行或点按剧集卡上的图标，将剧集排队以供接下来播放。</string>
 	<string name="player_up_next_empty">“接下来播放”列表无内容</string>
 	<string name="player_up_next_clear_queue_button">清除“接下来播放”</string>
-	<string name="player_up_next_clear_queue_summary">清除“接下来播放”列表不能撤消</string>
 	<string name="player_up_next_clear_queue">清除队列</string>
 	<string name="player_trim_silence_detail">通过剪裁对话中的静音来缩短剧集的长度。</string>
 	<string name="player_time_saved_no_hour">恭喜！ 您节省了时间，并浏览了更多播客。</string>
@@ -1042,7 +1056,6 @@ Language: zh_CN
 	<string name="player_notification_skip_back">后退 %d 秒</string>
 	<string name="player_more_actions">更多操作</string>
 	<string name="player_full_screen">全屏</string>
-	<string name="player_end_playback_clear_up_next">结束播放并清除“接下来播放”</string>
 	<string name="player_effects_volume_boost">音量增强</string>
 	<string name="player_effects_voices_sound_louder">声音会更大</string>
 	<string name="player_effects_trim_silence">剪裁静音</string>

@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-09 09:54:15+0000
+Translation-Revision-Date: 2022-08-22 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+	<string name="settings_storage_section_heading_mobile_data">Dati dispositivi mobili</string>
+	<string name="settings_storage_section_heading_usage">Utilizzo</string>
+	<string name="settings_storage_downloaded_files">File scaricati</string>
+	<string name="settings_storage_downloaded_bytes">%d byte</string>
+	<string name="plus_per_month">%s al mese</string>
+	<string name="plus_day">giorno</string>
+	<string name="plus_month_year_price">%1$s al mese/%2$s all\'anno</string>
+	<string name="plus_trial_then_slash_year">%1$s gratuito poi %2$s/all\'anno</string>
+	<string name="plus_trial_then_slash_month">%1$s gratuito poi %2$s/al mese</string>
+	<string name="plus_then_slash_year">poi %s/all\'anno</string>
+	<string name="plus_then_slash_month">poi %s/al mese</string>
+	<string name="plus_slash_year">%s all\'anno</string>
+	<string name="plus_per_year">%s all\'anno</string>
+	<string name="plus_trial_duration_free">%s GRATUITO</string>
+	<string name="profile_start_free_trial">Inizia la prova gratuita</string>
+	<string name="profile_per_year">All\'anno</string>
+	<string name="profile_feature_try_trial_secondary_info">Nessun pagamento ora. Cancellazione in qualsiasi momento</string>
+	<string name="profile_feature_try_trial">Prova Pocket Casts Plus gratis per %s</string>
+	<string name="player_up_next_clear_episodes_plural">Cancella %1$d episodi</string>
+	<string name="player_up_next_clear_queue_summary">Desideri cancellare la tua coda Successivo?</string>
+	<string name="player_end_playback_clear_up_next">Chiudi e cancella Successivo</string>
 	<string name="player_open_full_size_player">Attivare per aprire il lettore a grandezza naturale</string>
 	<string name="settings_downloads_clean_up">Cancella</string>
 	<string name="podcasts_share_failed_description">Si è verificato un problema durante la creazione della tua pagina di condivisione.</string>
@@ -351,7 +372,6 @@ Language: it
 	<string name="settings_title_storage">Archiviazione e utilizzo dei dati</string>
 	<string name="settings_title_playback">Generale</string>
 	<string name="settings_title_notifications">Notifiche</string>
-	<string name="settings_title_manage_downloads">Gestisci i file scaricati</string>
 	<string name="settings_title_import_export">Importa ed esporta OPML</string>
 	<string name="settings_title_help">Supporto e feedback</string>
 	<string name="settings_title_excluded_podcasts">Podcast esclusi</string>
@@ -367,7 +387,6 @@ Language: it
 	<string name="settings_storage_move_podcasts">Spostamento dei podcast in corso...</string>
 	<string name="settings_storage_move_message">Questa opzione sposterà i file dei podcast esistenti in questa nuova posizione.</string>
 	<string name="settings_storage_move">Sposta</string>
-	<string name="settings_storage_manage_downloads">Gestisci i file scaricati</string>
 	<string name="settings_storage_folder_write_failed">Questa cartella non può essere scritta.</string>
 	<string name="settings_storage_folder_not_found">Questa cartella non può essere cercata o creata.</string>
 	<string name="settings_storage_folder_change_failed">Impossibile cambiare in cartella personalizzata.</string>
@@ -515,7 +534,6 @@ Language: it
 	<string name="plus_renews_automatically_yearly">Si rinnova automaticamente ogni anno</string>
 	<string name="plus_best_value">VALORE MIGLIORE</string>
 	<string name="plus_select_payment_frequency">Seleziona la frequenza di pagamento</string>
-	<string name="plus_year_month_price">%1$s all\'anno/%2$s al mese</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">Aggiorna a Pocket Casts Plus</string>
 	<string name="plus_trial_finished_locked">L\'accesso alle funzionalità di Pocket Casts Plus verrà bloccato</string>
 	<string name="plus_trial_finished_files_removed">I file caricati sul tuo account verranno rimossi dopo una settimana</string>
@@ -525,8 +543,7 @@ Language: it
 	<string name="plus_themes_icons_body">Mostra i tuoi reali colori. Icone e temi esclusivi solo per chi fa parte del club Plus.</string>
 	<string name="plus_themes_icons">Temi e icone</string>
 	<string name="plus_thanks_for_your_support_bang">Grazie per il supporto.</string>
-	<string name="plus_slash_month">%s al mese</string>
-	<string name="plus_per_month">%s al mese</string>
+	<string name="plus_slash_month">%s/al mese</string>
 	<string name="plus_lifetime_member">Membro a vita</string>
 	<string name="plus_learn_more_button">Scopri di più</string>
 	<string name="plus_learn_more_about_plus">Scopri di più su Pocket Casts Plus</string>
@@ -632,7 +649,6 @@ Language: it
 	<string name="profile_payment_failed_detail">Sembra che si sia verificato un problema durante l\'elaborazione del pagamento. Riprova.</string>
 	<string name="profile_payment_failed">Pagamento non riuscito</string>
 	<string name="profile_payment_cancelled">Pagamento annullato</string>
-	<string name="profile_pay_now">Paga ora</string>
 	<string name="profile_password_changed_successful">Operazione completata.</string>
 	<string name="profile_password_changed">Password modificata</string>
 	<string name="profile_password">Password</string>
@@ -760,7 +776,6 @@ Language: it
 	<string name="profile_account_created">Account creato</string>
 	<string name="profile_access_ends">L\'accesso termina: %s</string>
 	<string name="profile_access_ended">L\'accesso è terminato: %s</string>
-	<string name="profile_1_year_free">1 anno gratis</string>
 	<string name="profile">Profilo</string>
 	<string name="filters_warning_delete_summary">Questa operazione non può essere annullata.</string>
 	<string name="filters_title_new_releases">Nuovi episodi</string>
@@ -1017,7 +1032,6 @@ Language: it
 	<string name="player_up_next_empty_desc">Puoi mettere in coda gli episodi per la riproduzione scorrendo verso destra sulle righe degli episodi o toccando l\'icona sulla scheda di un episodio.</string>
 	<string name="player_up_next_empty">Lista Prossimo vuota</string>
 	<string name="player_up_next_clear_queue_button">Cancella Prossimo</string>
-	<string name="player_up_next_clear_queue_summary">La cancellazione dell\'elenco Prossimo non può essere annullata</string>
 	<string name="player_up_next_clear_queue">Cancella la coda</string>
 	<string name="player_trim_silence_detail">Riduce la durata di un episodio tagliando il silenzio durante le conversazioni.</string>
 	<string name="player_time_saved_no_hour">Congratulazioni! Stai risparmiando tempo e ascoltando più podcast.</string>
@@ -1042,7 +1056,6 @@ Language: it
 	<string name="player_notification_skip_back">Indietro di %d secondi</string>
 	<string name="player_more_actions">Altre azioni</string>
 	<string name="player_full_screen">Schermo intero</string>
-	<string name="player_end_playback_clear_up_next">Interrompi la riproduzione e cancella Prossimo</string>
 	<string name="player_effects_volume_boost">Aumenta il volume</string>
 	<string name="player_effects_voices_sound_louder">Volume più alto del solito</string>
 	<string name="player_effects_trim_silence">Taglia i silenzi</string>

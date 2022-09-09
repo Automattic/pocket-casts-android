@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-09 11:54:03+0000
+Translation-Revision-Date: 2022-08-23 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+	<string name="settings_storage_section_heading_mobile_data">Mobile Daten</string>
+	<string name="settings_storage_section_heading_usage">Nutzung</string>
+	<string name="settings_storage_downloaded_files">Heruntergeladene Dateien</string>
+	<string name="settings_storage_downloaded_bytes">%d Byte</string>
+	<string name="plus_per_month">%s pro Monat</string>
+	<string name="plus_day">Tag</string>
+	<string name="plus_month_year_price">%1$s pro Monat/%2$s pro Jahr</string>
+	<string name="plus_trial_then_slash_year">%1$s kostenlos, dann %2$s/Jahr</string>
+	<string name="plus_trial_then_slash_month">%1$s kostenlos, dann %2$s/Monat</string>
+	<string name="plus_then_slash_year">dann %s/Jahr</string>
+	<string name="plus_then_slash_month">dann %s/Monat</string>
+	<string name="plus_slash_year">%s/Jahr</string>
+	<string name="plus_per_year">%s pro Jahr</string>
+	<string name="plus_trial_duration_free">%s KOSTENLOS</string>
+	<string name="profile_start_free_trial">Gratis-Test starten</string>
+	<string name="profile_per_year">Pro Jahr</string>
+	<string name="profile_feature_try_trial_secondary_info">Jetzt keine Zahlungen – jederzeit kündbar</string>
+	<string name="profile_feature_try_trial">Teste Pocket Casts Plus kostenlos für %s</string>
+	<string name="player_up_next_clear_episodes_plural">%1$d Episoden löschen</string>
+	<string name="player_up_next_clear_queue_summary">Bist du sicher, dass du deine „Als Nächstes“-Warteschlange löschen möchtest?</string>
+	<string name="player_end_playback_clear_up_next">„Als Nächstes“ schließen und löschen</string>
 	<string name="player_open_full_size_player">Aktivieren, um Vollbild-Player zu öffnen</string>
 	<string name="settings_downloads_clean_up">Bereinigen</string>
 	<string name="podcasts_share_failed_description">Beim Erstellen deiner Teilen-Seite ist etwas schiefgelaufen.</string>
@@ -351,7 +372,6 @@ Language: de
 	<string name="settings_title_storage">Speicher und Datennutzung</string>
 	<string name="settings_title_playback">Allgemein</string>
 	<string name="settings_title_notifications">Benachrichtigungen</string>
-	<string name="settings_title_manage_downloads">Downloads verwalten</string>
 	<string name="settings_title_import_export">OPML-Import/Export</string>
 	<string name="settings_title_help">Hilfe &amp; Feedback</string>
 	<string name="settings_title_excluded_podcasts">Ausgeschlossene Podcasts</string>
@@ -367,7 +387,6 @@ Language: de
 	<string name="settings_storage_move_podcasts">Podcasts werden verschoben ...</string>
 	<string name="settings_storage_move_message">Dadurch werden bestehende Podcast-Dateien an diesen neuen Speicherort verschoben.</string>
 	<string name="settings_storage_move">Verschieben</string>
-	<string name="settings_storage_manage_downloads">Heruntergeladene Dateien verwalten</string>
 	<string name="settings_storage_folder_write_failed">In diesen Ordner kann nicht geschrieben werden.</string>
 	<string name="settings_storage_folder_not_found">Der Ordner kann nicht gefunden oder erstellt werden.</string>
 	<string name="settings_storage_folder_change_failed">Kann nicht in individuellen Ordner geändert werden.</string>
@@ -515,7 +534,6 @@ Language: de
 	<string name="plus_renews_automatically_yearly">Wird jedes Jahr automatisch verlängert</string>
 	<string name="plus_best_value">BESTES PREIS-LEISTUNGSVERHÄLTNIS</string>
 	<string name="plus_select_payment_frequency">Zahlungshäufigkeit auswählen</string>
-	<string name="plus_year_month_price">%1$s pro Jahr/%2$s pro Monat</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">Auf Pocket Casts Plus upgraden</string>
 	<string name="plus_trial_finished_locked">Der Zugriff auf Pocket Casts Plus-Funktionen wird gesperrt</string>
 	<string name="plus_trial_finished_files_removed">Dateien, die in dein Konto hochgeladen wurden, werden nach einer Woche gelöscht</string>
@@ -525,8 +543,7 @@ Language: de
 	<string name="plus_themes_icons_body">Bekenne Farbe mit den exklusiven Icons und Themes nur für Plus-Abonnenten.</string>
 	<string name="plus_themes_icons">Themes und Icons</string>
 	<string name="plus_thanks_for_your_support_bang">Danke für deine Unterstützung!</string>
-	<string name="plus_slash_month">%s /Monat</string>
-	<string name="plus_per_month">%s pro Monat</string>
+	<string name="plus_slash_month">%s/Monat</string>
 	<string name="plus_lifetime_member">Lebenslange Mitgliedschaft</string>
 	<string name="plus_learn_more_button">Weitere Informationen</string>
 	<string name="plus_learn_more_about_plus">Weitere Informationen zu Pocket Casts Plus</string>
@@ -632,7 +649,6 @@ Language: de
 	<string name="profile_payment_failed_detail">Bei der Bearbeitung deiner Zahlung ist anscheinend ein Fehler aufgetreten. Bitte versuch es noch einmal.</string>
 	<string name="profile_payment_failed">Zahlung fehlgeschlagen</string>
 	<string name="profile_payment_cancelled">Zahlung storniert</string>
-	<string name="profile_pay_now">Jetzt bezahlen</string>
 	<string name="profile_password_changed_successful">Erfolgreich!</string>
 	<string name="profile_password_changed">Passwort geändert</string>
 	<string name="profile_password">Passwort</string>
@@ -760,7 +776,6 @@ Language: de
 	<string name="profile_account_created">Konto erstellt</string>
 	<string name="profile_access_ends">Zugriff endet: %s</string>
 	<string name="profile_access_ended">Zugriff beendet: %s</string>
-	<string name="profile_1_year_free">1 Jahr kostenlos</string>
 	<string name="profile">Profil</string>
 	<string name="filters_warning_delete_summary">Dies kann nicht rückgängig gemacht werden.</string>
 	<string name="filters_title_new_releases">Neuerscheinungen</string>
@@ -1017,7 +1032,6 @@ Language: de
 	<string name="player_up_next_empty_desc">Du kannst eine Folge zur Warteschlange hinzufügen, indem du in der Folgenliste nach rechts wischst oder in einer Folgenkarte das Warteschlangen-Icon antippst.</string>
 	<string name="player_up_next_empty">Die Warteschlange ist leer.</string>
 	<string name="player_up_next_clear_queue_button">Warteschlange löschen</string>
-	<string name="player_up_next_clear_queue_summary">Das Löschen deiner Warteschlange kann nicht rückgängig gemacht werden.</string>
 	<string name="player_up_next_clear_queue">Warteschlange löschen</string>
 	<string name="player_trim_silence_detail">Reduziert die Länge einer Folge, indem Stille in Unterhaltungen gekürzt wird.</string>
 	<string name="player_time_saved_no_hour">Glückwunsch! Du sparst Zeit und schaffst mehr Podcasts.</string>
@@ -1042,7 +1056,6 @@ Language: de
 	<string name="player_notification_skip_back">%d Sek. zurück</string>
 	<string name="player_more_actions">Weitere Aktionen</string>
 	<string name="player_full_screen">Vollbild</string>
-	<string name="player_end_playback_clear_up_next">Wiedergabe beenden und Warteschlange löschen</string>
 	<string name="player_effects_volume_boost">Lautstärke-Booster</string>
 	<string name="player_effects_voices_sound_louder">Stimmen hören sich lauter an</string>
 	<string name="player_effects_trim_silence">Stille kürzen</string>

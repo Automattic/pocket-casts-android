@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-09 14:54:03+0000
+Translation-Revision-Date: 2022-08-23 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+	<string name="settings_storage_section_heading_mobile_data">Mobiele data</string>
+	<string name="settings_storage_section_heading_usage">Gebruik</string>
+	<string name="settings_storage_downloaded_files">Gedownloade bestanden</string>
+	<string name="settings_storage_downloaded_bytes">%d bytes</string>
+	<string name="plus_per_month">%s per maand</string>
+	<string name="plus_day">dag</string>
+	<string name="plus_month_year_price">%1$s per jaar/%2$s per maand</string>
+	<string name="plus_trial_then_slash_year">%1$s gratis, daarna %2$s per jaar</string>
+	<string name="plus_trial_then_slash_month">%1$s gratis, daarna %2$s per maand</string>
+	<string name="plus_then_slash_year">daarna %s per jaar</string>
+	<string name="plus_then_slash_month">daarna %s per maand</string>
+	<string name="plus_slash_year">%s per jaar</string>
+	<string name="plus_per_year">%s per jaar</string>
+	<string name="plus_trial_duration_free">%s GRATIS</string>
+	<string name="profile_start_free_trial">Gratis proefversie starten</string>
+	<string name="profile_per_year">Per jaar</string>
+	<string name="profile_feature_try_trial_secondary_info">Nu geen betalingen - Annuleer wanneer je wilt</string>
+	<string name="profile_feature_try_trial">Probeer Pocket Casts Plus gratis voor %s</string>
+	<string name="player_up_next_clear_episodes_plural">%1$d afleveringen wissen</string>
+	<string name="player_up_next_clear_queue_summary">Weet je zeker dat je je wachtrij Hierna wilt wissen?</string>
+	<string name="player_end_playback_clear_up_next">Sluit en wis Hierna</string>
 	<string name="player_open_full_size_player">Activeer om de speler op volledige grootte te openen</string>
 	<string name="settings_downloads_clean_up">Opschonen</string>
 	<string name="podcasts_share_failed_description">Er is iets verkeerd gegaan tijdens het aanmaken van je deelpagina.</string>
@@ -351,7 +372,6 @@ Language: nl
 	<string name="settings_title_storage">Gebruik van opslag en data</string>
 	<string name="settings_title_playback">Algemeen</string>
 	<string name="settings_title_notifications">Meldingen</string>
-	<string name="settings_title_manage_downloads">Downloads beheren</string>
 	<string name="settings_title_import_export">OPML importeren/exporteren</string>
 	<string name="settings_title_help">Hulp en feedback</string>
 	<string name="settings_title_excluded_podcasts">Uitgesloten podcasts</string>
@@ -367,7 +387,6 @@ Language: nl
 	<string name="settings_storage_move_podcasts">Podcasts verplaatsen...</string>
 	<string name="settings_storage_move_message">Hierdoor worden bestaande podcastbestanden verplaatst naar deze nieuwe locatie.</string>
 	<string name="settings_storage_move">Verplaats</string>
-	<string name="settings_storage_manage_downloads">Gedownloade bestanden beheren</string>
 	<string name="settings_storage_folder_write_failed">Er kan niet naar deze map geschreven worden.</string>
 	<string name="settings_storage_folder_not_found">De map kan niet gevonden of aangemaakt worden.</string>
 	<string name="settings_storage_folder_change_failed">Kan niet wijzigen naar aangepaste map.</string>
@@ -515,7 +534,6 @@ Language: nl
 	<string name="plus_renews_automatically_yearly">Automatisch jaarlijks verlengen</string>
 	<string name="plus_best_value">BESTE KOOP</string>
 	<string name="plus_select_payment_frequency">Selecteer betaalfrequentie</string>
-	<string name="plus_year_month_price">%1$s per jaar/%2$s per maand</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">Upgraden naar Pocket Casts Plus</string>
 	<string name="plus_trial_finished_locked">Toegang tot Pocket Casts Plus-functies worden vergrendeld</string>
 	<string name="plus_trial_finished_files_removed">Bestanden die worden geüpload naar uw account worden na een week verwijderd</string>
@@ -526,7 +544,6 @@ Language: nl
 	<string name="plus_themes_icons">Thema\'s en pictogrammen</string>
 	<string name="plus_thanks_for_your_support_bang">Bedankt voor je ondersteuning!</string>
 	<string name="plus_slash_month">%s / maand</string>
-	<string name="plus_per_month">%s per maand</string>
 	<string name="plus_lifetime_member">Levenslang lid</string>
 	<string name="plus_learn_more_button">Meer weten</string>
 	<string name="plus_learn_more_about_plus">Bekijk meer informatie over Pocket Casts Plus</string>
@@ -632,7 +649,6 @@ Language: nl
 	<string name="profile_payment_failed_detail">Het lijkt erop dat er een probleem is opgetreden bij het verwerken van je betaling. Probeer het nog eens.</string>
 	<string name="profile_payment_failed">Betaling mislukt.</string>
 	<string name="profile_payment_cancelled">Betaling geannuleerd</string>
-	<string name="profile_pay_now">Nu betalen</string>
 	<string name="profile_password_changed_successful">Gelukt!</string>
 	<string name="profile_password_changed">Wachtwoord veranderd</string>
 	<string name="profile_password">Wachtwoord</string>
@@ -760,7 +776,6 @@ Language: nl
 	<string name="profile_account_created">Account aangemaakt.</string>
 	<string name="profile_access_ends">Toegang eindigt: %s</string>
 	<string name="profile_access_ended">Toegang beëindigd: %s</string>
-	<string name="profile_1_year_free">1 jaar gratis</string>
 	<string name="profile">Profiel</string>
 	<string name="filters_warning_delete_summary">Deze actie kan niet ongedaan worden gemaakt.</string>
 	<string name="filters_title_new_releases">Nieuwe uitgaven</string>
@@ -1017,7 +1032,6 @@ Language: nl
 	<string name="player_up_next_empty_desc">U kunt afleveringen in de wachtrij zetten door naar rechts te swipen in afleveringrijen of door op het pictogram op een afleveringkaart te tikken.</string>
 	<string name="player_up_next_empty">Niets in Hierna</string>
 	<string name="player_up_next_clear_queue_button">Hierna wissen</string>
-	<string name="player_up_next_clear_queue_summary">Het wissen van je Hierna-lijst kan niet ongedaan gemaakt worden</string>
 	<string name="player_up_next_clear_queue">Wachtrij wissen</string>
 	<string name="player_trim_silence_detail">Vermindert de duur van een aflevering door stilte in gesprekken weg te filteren.</string>
 	<string name="player_time_saved_no_hour">Gefeliciteerd! Je bespaart tijd en kunt meer podcasts luisteren.</string>
@@ -1042,7 +1056,6 @@ Language: nl
 	<string name="player_notification_skip_back">%d seconden terugspoelen</string>
 	<string name="player_more_actions">Meer acties</string>
 	<string name="player_full_screen">Volledig scherm</string>
-	<string name="player_end_playback_clear_up_next">Afspelen beëindigen en Hierna wissen</string>
 	<string name="player_effects_volume_boost">Volumeboost</string>
 	<string name="player_effects_voices_sound_louder">Stemmen klinken luider</string>
 	<string name="player_effects_trim_silence">Stiltes wegfilteren</string>

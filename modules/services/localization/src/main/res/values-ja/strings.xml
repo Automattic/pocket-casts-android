@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-07-26 09:54:03+0000
+Translation-Revision-Date: 2022-08-25 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+	<string name="settings_storage_section_heading_mobile_data">モバイルデータ</string>
+	<string name="settings_storage_section_heading_usage">使用量</string>
+	<string name="settings_storage_downloaded_files">ダウンロード済みファイル</string>
+	<string name="settings_storage_downloaded_bytes">%dバイト</string>
+	<string name="plus_per_month">%s / 月</string>
+	<string name="plus_day">日</string>
+	<string name="plus_month_year_price">月額%1$s / 年額%2$s</string>
+	<string name="plus_trial_then_slash_year">%1$s 無料の後 %2$s / 年</string>
+	<string name="plus_trial_then_slash_month">%1$s 無料の後 %2$s / 月</string>
+	<string name="plus_then_slash_year">後 %s / 年</string>
+	<string name="plus_then_slash_month">後 %s/ 年</string>
+	<string name="plus_slash_year">後 %s / 年</string>
+	<string name="plus_per_year">%s / 年</string>
+	<string name="plus_trial_duration_free">%s無料</string>
+	<string name="profile_start_free_trial">無料お試しを開始する</string>
+	<string name="profile_per_year">/年</string>
+	<string name="profile_feature_try_trial_secondary_info">無料でお試ししていつでもキャンセル可能</string>
+	<string name="profile_feature_try_trial">%s で Pocket Casts Plus を無料でお試し</string>
+	<string name="player_up_next_clear_episodes_plural">%1$d件のエピソードをクリア</string>
+	<string name="player_up_next_clear_queue_summary">次のエピソード待機リストをクリアしてもよろしいですか ?</string>
+	<string name="player_end_playback_clear_up_next">閉じて次をクリア</string>
+	<string name="player_open_full_size_player">有効化してプレーヤーをフルサイズで開く</string>
 	<string name="settings_downloads_clean_up">クリーンアップ</string>
 	<string name="podcasts_share_failed_description">共有ページの作成中に問題が発生しました。</string>
 	<string name="podcasts_share_failed">共有に失敗</string>
@@ -350,7 +372,6 @@ Language: ja_JP
 	<string name="settings_title_storage">ストレージとデータ使用量</string>
 	<string name="settings_title_playback">全般</string>
 	<string name="settings_title_notifications">通知</string>
-	<string name="settings_title_manage_downloads">ダウンロードを管理</string>
 	<string name="settings_title_import_export">OPML をインポート / エクスポート</string>
 	<string name="settings_title_help">ヘルプ &amp; フィードバック</string>
 	<string name="settings_title_excluded_podcasts">除外されたポッドキャスト</string>
@@ -366,7 +387,6 @@ Language: ja_JP
 	<string name="settings_storage_move_podcasts">ポッドキャストを移動しています…</string>
 	<string name="settings_storage_move_message">既存のポッドキャストファイルがこちらの新しい場所に移動します。</string>
 	<string name="settings_storage_move">移動</string>
-	<string name="settings_storage_manage_downloads">ダウンロード済みファイルを管理</string>
 	<string name="settings_storage_folder_write_failed">このフォルダーには書き込めません。</string>
 	<string name="settings_storage_folder_not_found">フォルダーが見つからないか作成できません。</string>
 	<string name="settings_storage_folder_change_failed">カスタムフォルダーに変更できません。</string>
@@ -514,7 +534,6 @@ Language: ja_JP
 	<string name="plus_renews_automatically_yearly">毎年自動更新</string>
 	<string name="plus_best_value">最高の価値</string>
 	<string name="plus_select_payment_frequency">支払頻度を選択</string>
-	<string name="plus_year_month_price">年額%1$s / 月額%2$s</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">Pocket Casts Plus にアップグレード</string>
 	<string name="plus_trial_finished_locked">Pocket Casts Plus の機能が利用できなくなります</string>
 	<string name="plus_trial_finished_files_removed">アカウントにアップロードされたファイルは1週間後に削除されます</string>
@@ -525,7 +544,6 @@ Language: ja_JP
 	<string name="plus_themes_icons">テーマとアイコン</string>
 	<string name="plus_thanks_for_your_support_bang">ご支援いただきありがとうございます。</string>
 	<string name="plus_slash_month">%s / 月</string>
-	<string name="plus_per_month">%s / 月</string>
 	<string name="plus_lifetime_member">無期限メンバー</string>
 	<string name="plus_learn_more_button">もっと詳しく知る</string>
 	<string name="plus_learn_more_about_plus">Pocket Casts Plus の詳細</string>
@@ -631,7 +649,6 @@ Language: ja_JP
 	<string name="profile_payment_failed_detail">支払の処理で問題が発生したようです。 もう一度お試しください。</string>
 	<string name="profile_payment_failed">支払いに失敗しました</string>
 	<string name="profile_payment_cancelled">支払いをキャンセル済み</string>
-	<string name="profile_pay_now">今すぐ払う</string>
 	<string name="profile_password_changed_successful">成功しました !</string>
 	<string name="profile_password_changed">パスワードを変更済み</string>
 	<string name="profile_password">パスワード</string>
@@ -759,7 +776,6 @@ Language: ja_JP
 	<string name="profile_account_created">アカウントを作成済み</string>
 	<string name="profile_access_ends">アクセス権終了予定日: %s</string>
 	<string name="profile_access_ended">アクセス権終了日: %s</string>
-	<string name="profile_1_year_free">1年間無料</string>
 	<string name="profile">プロフィール</string>
 	<string name="filters_warning_delete_summary">この操作は元に戻すことができません。</string>
 	<string name="filters_title_new_releases">新規リリース</string>
@@ -1016,7 +1032,6 @@ Language: ja_JP
 	<string name="player_up_next_empty_desc">エピソード行を右にスワイプするか、エピソードカードのアイコンをタップすることで、次に再生するエピソードを待機リストに追加できます。</string>
 	<string name="player_up_next_empty">次のエピソードには何もありません</string>
 	<string name="player_up_next_clear_queue_button">次のエピソードをクリア</string>
-	<string name="player_up_next_clear_queue_summary">次のエピソードリストのクリアは元に戻すことができません</string>
 	<string name="player_up_next_clear_queue">待機リストをクリア</string>
 	<string name="player_trim_silence_detail">会話の間にある沈黙時間をカットしてエピソードを短縮します。</string>
 	<string name="player_time_saved_no_hour">おめでとうございます ! 時間を節約してより多くのポッドキャストを聴いています。</string>
@@ -1041,7 +1056,6 @@ Language: ja_JP
 	<string name="player_notification_skip_back">%d秒巻き戻し</string>
 	<string name="player_more_actions">その他の操作</string>
 	<string name="player_full_screen">フルスクリーン表示</string>
-	<string name="player_end_playback_clear_up_next">再生を終了して次のエピソードをクリア</string>
 	<string name="player_effects_volume_boost">ボリュームブースト</string>
 	<string name="player_effects_voices_sound_louder">音声のボリュームをアップ</string>
 	<string name="player_effects_trim_silence">無音時間をカット</string>
