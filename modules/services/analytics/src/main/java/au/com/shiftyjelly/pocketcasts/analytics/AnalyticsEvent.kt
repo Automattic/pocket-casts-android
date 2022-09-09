@@ -86,4 +86,10 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_FOLDER_TAPPED("podcasts_list_folder_tapped"),
     PODCASTS_LIST_OPTIONS_BUTTON_TAPPED("podcasts_list_options_button_tapped"),
     PODCASTS_LIST_REORDERED("podcasts_list_reordered"),
+
+    /* Tab bar items */
+    PODCAST_TAB_OPENED("podcast_tab_opened"),
+    FILTERS_TAB_OPENED("filters_tab_opened"),
+    DISCOVER_TAB_OPENED("discover_tab_opened"),
+    PROFILE_TAB_OPENED("profile_tab_opened"),
 }
