@@ -89,6 +89,7 @@ class PodcastAdapter(
     val settings: Settings,
     val theme: Theme,
     var fromListUuid: String?,
+    private val onHeaderSummaryToggled: (Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
     private val onEpisodesOptionsClicked: () -> Unit,
@@ -373,6 +374,7 @@ class PodcastAdapter(
         val expanded = binding.bottom.root.toggleVisibility()
         binding.top.chevron.isEnabled = expanded
         headerExpanded = expanded
+        onHeaderSummaryToggled(expanded)
     }
 
     private fun onWebsiteLinkClicked(context: Context) {

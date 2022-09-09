@@ -79,6 +79,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         const val ARG_LIST_UUID = "ARG_LIST_INDEX_UUID"
         const val ARG_FEATURED_PODCAST = "ARG_FEATURED_PODCAST"
         private const val OPTION_KEY = "option"
+        private const val IS_EXPANDED_KEY = "is_expanded"
         private const val REMOVE = "remove"
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
@@ -131,6 +132,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     override var statusBarColor: StatusBarColor = StatusBarColor.Custom(color = 0xFF1E1F1E.toInt(), isWhiteIcons = true)
+
+    private val onHeaderSummaryToggled: (expanded: Boolean) -> Unit = {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_SUMMARY, mapOf(IS_EXPANDED_KEY to it))
+    }
 
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let {
@@ -484,7 +489,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         }
 
         if (adapter == null) {
-            adapter = PodcastAdapter(downloadManager, playbackManager, upNextQueue, settings, theme, fromListUuid, onSubscribeClicked, onUnsubscribeClicked, onEpisodesOptionsClicked, onRowLongPress, onFoldersClicked, onNotificationsClicked, onSettingsClicked, playButtonListener, onRowClicked, onSearchQueryChanged, onSearchFocus, onShowArchivedClicked, multiSelectHelper, onArtworkLongClicked)
+            adapter = PodcastAdapter(downloadManager, playbackManager, upNextQueue, settings, theme, fromListUuid, onHeaderSummaryToggled, onSubscribeClicked, onUnsubscribeClicked, onEpisodesOptionsClicked, onRowLongPress, onFoldersClicked, onNotificationsClicked, onSettingsClicked, playButtonListener, onRowClicked, onSearchQueryChanged, onSearchFocus, onShowArchivedClicked, multiSelectHelper, onArtworkLongClicked)
         }
 
         binding.episodesRecyclerView.let {
