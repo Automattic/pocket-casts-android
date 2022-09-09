@@ -725,6 +725,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     private fun share() {
         val context = context ?: return
         viewModel.podcast.value?.let { podcast ->
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
             SharePodcastHelper(podcast, null, null, context).showShareDialogDirect()
         }
     }
