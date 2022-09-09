@@ -46,6 +46,7 @@ class PodcastsOptionsDialog(
                     click = {
                         settings.setPodcastsLayout(Settings.PodcastGridLayoutType.LARGE_ARTWORK.id)
                         trackTapOnModalOption(ModalOption.LAYOUT)
+                        trackLayoutChanged(Settings.PodcastGridLayoutType.LARGE_ARTWORK)
                     }
                 ),
                 ToggleButtonOption(
@@ -55,6 +56,7 @@ class PodcastsOptionsDialog(
                     click = {
                         settings.setPodcastsLayout(Settings.PodcastGridLayoutType.SMALL_ARTWORK.id)
                         trackTapOnModalOption(ModalOption.LAYOUT)
+                        trackLayoutChanged(Settings.PodcastGridLayoutType.SMALL_ARTWORK)
                     }
                 ),
                 ToggleButtonOption(
@@ -64,6 +66,7 @@ class PodcastsOptionsDialog(
                     click = {
                         settings.setPodcastsLayout(Settings.PodcastGridLayoutType.LIST_VIEW.id)
                         trackTapOnModalOption(ModalOption.LAYOUT)
+                        trackLayoutChanged(Settings.PodcastGridLayoutType.LIST_VIEW)
                     }
                 )
             )
@@ -103,7 +106,10 @@ class PodcastsOptionsDialog(
             dialog.addCheckedOption(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,
-                click = { settings.setPodcastsSortType(sortType = order, sync = true) }
+                click = {
+                    settings.setPodcastsSortType(sortType = order, sync = true)
+                    trackSortByChanged(order)
+                }
             )
         }
         fragmentManager?.let {
@@ -120,17 +126,29 @@ class PodcastsOptionsDialog(
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_off,
                 checked = badgeType == Settings.BadgeType.OFF,
-                click = { settings.setPodcastBadgeType(Settings.BadgeType.OFF) }
+                click = {
+                    val newBadgeType = Settings.BadgeType.OFF
+                    settings.setPodcastBadgeType(newBadgeType)
+                    trackBadgeChanged(newBadgeType)
+                }
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_all_unfinished,
                 checked = badgeType == Settings.BadgeType.ALL_UNFINISHED,
-                click = { settings.setPodcastBadgeType(Settings.BadgeType.ALL_UNFINISHED) }
+                click = {
+                    val newBadgeType = Settings.BadgeType.ALL_UNFINISHED
+                    settings.setPodcastBadgeType(newBadgeType)
+                    trackBadgeChanged(newBadgeType)
+                }
             )
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_only_latest_episode,
                 checked = badgeType == Settings.BadgeType.LATEST_EPISODE,
-                click = { settings.setPodcastBadgeType(Settings.BadgeType.LATEST_EPISODE) }
+                click = {
+                    val newBadgeType = Settings.BadgeType.LATEST_EPISODE
+                    settings.setPodcastBadgeType(newBadgeType)
+                    trackBadgeChanged(newBadgeType)
+                }
             )
         fragmentManager?.let {
             dialog.show(it, "podcasts_badges")
@@ -148,6 +166,18 @@ class PodcastsOptionsDialog(
         analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to option.analyticsValue))
     }
 
+    private fun trackSortByChanged(order: PodcastsSortType) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SORT_ORDER_CHANGED, mapOf(SORT_BY_KEY to order.analyticsValue))
+    }
+
+    private fun trackLayoutChanged(layoutType: Settings.PodcastGridLayoutType) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_LAYOUT_CHANGED, mapOf(LAYOUT_KEY to layoutType.analyticsValue))
+    }
+
+    private fun trackBadgeChanged(badgeType: Settings.BadgeType) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_BADGES_CHANGED, mapOf(TYPE_KEY to badgeType.analyticsValue))
+    }
+
     enum class ModalOption(val analyticsValue: String) {
         SORT_BY("sort_by"),
         LAYOUT("layout"),
@@ -157,5 +187,8 @@ class PodcastsOptionsDialog(
 
     companion object {
         private const val OPTION_KEY = "option"
+        private const val SORT_BY_KEY = "sort_by"
+        private const val LAYOUT_KEY = "layout"
+        private const val TYPE_KEY = "type"
     }
 }
