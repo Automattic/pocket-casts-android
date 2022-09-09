@@ -340,7 +340,6 @@ Language: en_GB
 	<string name="settings_title_storage">Storage &amp; data use</string>
 	<string name="settings_title_playback">General</string>
 	<string name="settings_title_notifications">Notifications</string>
-	<string name="settings_title_manage_downloads">Manage downloads</string>
 	<string name="settings_title_import_export">Import &amp; export OPML</string>
 	<string name="settings_title_help">Help &amp; feedback</string>
 	<string name="settings_title_excluded_podcasts">Excluded Podcasts</string>
@@ -356,7 +355,6 @@ Language: en_GB
 	<string name="settings_storage_move_podcasts">Moving podcasts…</string>
 	<string name="settings_storage_move_message">This will move existing podcast files to this new location.</string>
 	<string name="settings_storage_move">Move</string>
-	<string name="settings_storage_manage_downloads">Manage downloaded files</string>
 	<string name="settings_storage_folder_write_failed">This folder cannot be written to.</string>
 	<string name="settings_storage_folder_not_found">The folder cannot be found or created.</string>
 	<string name="settings_storage_folder_change_failed">Unable to change to custom folder.</string>
@@ -504,7 +502,6 @@ Language: en_GB
 	<string name="plus_renews_automatically_yearly">Renews automatically yearly</string>
 	<string name="plus_best_value">BEST VALUE</string>
 	<string name="plus_select_payment_frequency">Select Payment Frequency</string>
-	<string name="plus_year_month_price">%1$s per year / %2$s per month</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">Upgrade to Pocket Casts Plus</string>
 	<string name="plus_trial_finished_locked">Access to Pocket Casts Plus features will be locked</string>
 	<string name="plus_trial_finished_files_removed">Files uploaded to your account will be removed after a week</string>
@@ -514,8 +511,6 @@ Language: en_GB
 	<string name="plus_themes_icons_body">Show your true colours. Exclusive icons and themes for the plus club only.</string>
 	<string name="plus_themes_icons">Themes and Icons</string>
 	<string name="plus_thanks_for_your_support_bang">Thanks for your support!</string>
-	<string name="plus_per_month">%s / month</string>
-	<string name="plus_month_price">%s per month</string>
 	<string name="plus_lifetime_member">Lifetime Member</string>
 	<string name="plus_learn_more_button">Learn More</string>
 	<string name="plus_learn_more_about_plus">Learn more about Pocket Casts Plus</string>
@@ -621,7 +616,6 @@ Language: en_GB
 	<string name="profile_payment_failed_detail">It looks like there was a problem processing your payment. Please try again.</string>
 	<string name="profile_payment_failed">Payment Failed</string>
 	<string name="profile_payment_cancelled">Payment Cancelled</string>
-	<string name="profile_pay_now">Pay Now</string>
 	<string name="profile_password_changed_successful">Successful!</string>
 	<string name="profile_password_changed">Password Changed</string>
 	<string name="profile_password">Password</string>
@@ -749,7 +743,6 @@ Language: en_GB
 	<string name="profile_account_created">Account Created</string>
 	<string name="profile_access_ends">Access ends: %s</string>
 	<string name="profile_access_ended">Access ended: %s</string>
-	<string name="profile_1_year_free">1 Year Free</string>
 	<string name="profile">Profile</string>
 	<string name="filters_warning_delete_summary">This cannot be undone.</string>
 	<string name="filters_title_new_releases">New Releases</string>
@@ -1006,7 +999,6 @@ Language: en_GB
 	<string name="player_up_next_empty_desc">You can queue episodes to play next by swiping right on episode rows or tapping the icon on an episode card.</string>
 	<string name="player_up_next_empty">Nothing in Up Next</string>
 	<string name="player_up_next_clear_queue_button">Clear Up Next</string>
-	<string name="player_up_next_clear_queue_summary">Clearing your Up Next list cannot be undone</string>
 	<string name="player_up_next_clear_queue">Clear Queue</string>
 	<string name="player_trim_silence_detail">Reduces the length of an episode by trimming silence in conversations.</string>
 	<string name="player_time_saved_no_hour">Congrats! You\'re saving time and getting through more podcasts.</string>
@@ -1031,7 +1023,6 @@ Language: en_GB
 	<string name="player_notification_skip_back">Back %d secs</string>
 	<string name="player_more_actions">More actions</string>
 	<string name="player_full_screen">Full screen</string>
-	<string name="player_end_playback_clear_up_next">End playback &amp; clear Up Next</string>
 	<string name="player_effects_volume_boost">Volume Boost</string>
 	<string name="player_effects_voices_sound_louder">Voices sound louder</string>
 	<string name="player_effects_trim_silence">Trim Silence</string>
