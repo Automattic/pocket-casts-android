@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -48,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTouchCallback.ItemTouchHelperAdapter, Toolbar.OnMenuItemClickListener {
 
     companion object {
+        private const val LAST_ORIENTATION_NOT_SET = -1
         const val ARG_FOLDER_UUID = "ARG_FOLDER_UUID"
 
         fun newInstance(folderUuid: String): PodcastsFragment {
@@ -61,6 +64,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     @Inject lateinit var settings: Settings
     @Inject lateinit var castManager: CastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var podcastOptionsDialog: PodcastsOptionsDialog? = null
     private var folderOptionsDialog: FolderOptionsDialog? = null
@@ -72,12 +76,15 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     private val viewModel: PodcastsViewModel by viewModels()
     private val sharedViewModel: FolderCreateSharedViewModel by activityViewModels()
 
-    private var lastOrientationRefreshed = -1
+    private var lastOrientationRefreshed = LAST_ORIENTATION_NOT_SET
     private var lastWidthPx: Int = 0
     private var listState: Parcelable? = null
 
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
+
+    private val shouldTrackPodcastsListShown: Boolean
+        get() = !viewModel.isFragmentChangingConfigurations && (folderUuid == null)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
@@ -161,6 +168,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
         }
 
+        if (shouldTrackPodcastsListShown) {
+            viewModel.trackPodcastsListShown()
+        }
+
         val toolbar = binding.toolbar
         setupToolbarAndStatusBar(
             toolbar = toolbar,
@@ -205,6 +216,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.more_options -> {
+                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_OPTIONS_BUTTON_TAPPED)
                 openOptions()
                 true
             }
@@ -213,6 +225,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 true
             }
             R.id.create_folder -> {
+                analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_BUTTON_TAPPED)
                 createFolder()
                 true
             }
@@ -252,6 +265,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     override fun onPause() {
         super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
         podcastOptionsDialog?.dismiss()
         folderOptionsDialog?.dismiss()
     }
@@ -288,8 +302,8 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     private fun setupGridView(savedInstanceState: Parcelable? = listState) {
         val layoutManager = when (settings.getPodcastsLayout()) {
-            Settings.PODCAST_GRID_LAYOUT_LARGE_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
-            Settings.PODCAST_GRID_LAYOUT_SMALL_ARTWORK -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
+            Settings.PodcastGridLayoutType.LARGE_ARTWORK.id -> GridLayoutManager(activity, UiUtil.getGridColumnCount(false, context))
+            Settings.PodcastGridLayoutType.SMALL_ARTWORK.id -> GridLayoutManager(activity, UiUtil.getGridColumnCount(true, context))
             else -> LinearLayoutManager(activity, RecyclerView.VERTICAL, false)
         }
         val badgeType = settings.getPodcastBadgeType()
@@ -315,14 +329,17 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
     override fun onPodcastMoveFinished() {
         viewModel.commitMoves()
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_REORDERED)
     }
 
     override fun onPodcastClick(podcast: Podcast, view: View) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_PODCAST_TAPPED)
         val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
     override fun onFolderClick(folderUuid: String) {
+        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_TAPPED)
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }

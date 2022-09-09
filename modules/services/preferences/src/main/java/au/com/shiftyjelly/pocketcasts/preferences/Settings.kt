@@ -93,10 +93,6 @@ interface Settings {
         const val PREFERENCE_AUTO_PLAY_ON_EMPTY = "autoUpNextEmpty"
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
 
-        const val PODCAST_GRID_LAYOUT_LARGE_ARTWORK = 0
-        const val PODCAST_GRID_LAYOUT_SMALL_ARTWORK = 1
-        const val PODCAST_GRID_LAYOUT_LIST_VIEW = 2
-
         const val PREFERENCE_DISCOVERY_COUNTRY_CODE = "discovery_country_code"
         const val PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE = "popular_podcast_country_code"
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
@@ -127,10 +123,20 @@ interface Settings {
         const val LOG_TAG_AUTO = "PocketCastsAuto"
     }
 
-    enum class BadgeType(val labelId: Int) {
-        OFF(labelId = LR.string.podcasts_badges_off),
-        LATEST_EPISODE(labelId = LR.string.podcasts_badges_only_latest_episode),
-        ALL_UNFINISHED(labelId = LR.string.podcasts_badges_all_unfinished)
+    enum class BadgeType(val labelId: Int, val analyticsValue: String) {
+        OFF(labelId = LR.string.podcasts_badges_off, analyticsValue = "off"),
+        LATEST_EPISODE(labelId = LR.string.podcasts_badges_only_latest_episode, analyticsValue = "only_latest_episode"),
+        ALL_UNFINISHED(labelId = LR.string.podcasts_badges_all_unfinished, analyticsValue = "unfinished_episodes")
+    }
+
+    enum class PodcastGridLayoutType(val id: Int, val analyticsValue: String) {
+        LARGE_ARTWORK(id = 0, analyticsValue = "large_artwork"),
+        SMALL_ARTWORK(id = 1, analyticsValue = "small_artwork"),
+        LIST_VIEW(id = 2, analyticsValue = "list");
+        companion object {
+            fun fromLayoutId(id: Int) =
+                PodcastGridLayoutType.values().find { it.id == id } ?: LARGE_ARTWORK
+        }
     }
 
     enum class UpNextAction {

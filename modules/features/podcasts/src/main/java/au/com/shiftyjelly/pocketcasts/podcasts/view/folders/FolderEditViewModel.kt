@@ -45,7 +45,7 @@ class FolderEditViewModel
         val selectedUuids: List<String> = emptyList(),
         val searchText: String = "",
         val folder: Folder? = null,
-        val layout: Int = Settings.PODCAST_GRID_LAYOUT_LARGE_ARTWORK
+        val layout: Int = Settings.PodcastGridLayoutType.LARGE_ARTWORK.id
     ) {
         fun isSelected(podcast: Podcast): Boolean {
             return selectedUuids.contains(podcast.uuid)
@@ -249,7 +249,7 @@ class FolderEditViewModel
     }
 
     fun getGridImageWidthDp(layout: Int, context: Context): Int {
-        return UiUtil.getGridImageWidthPx(smallArtwork = layout == Settings.PODCAST_GRID_LAYOUT_SMALL_ARTWORK, context = context).pxToDp(context).toInt()
+        return UiUtil.getGridImageWidthPx(smallArtwork = layout == Settings.PodcastGridLayoutType.SMALL_ARTWORK.id, context = context).pxToDp(context).toInt()
     }
 
     fun movePodcastToFolder(podcastUuid: String, folder: Folder) {

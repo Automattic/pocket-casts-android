@@ -78,4 +78,12 @@ enum class AnalyticsEvent(val key: String) {
     /* Account Details */
     ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
     ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
+
+    /* Podcasts List */
+    PODCASTS_LIST_SHOWN("podcasts_list_shown"),
+    PODCASTS_LIST_FOLDER_BUTTON_TAPPED("podcasts_list_folder_button_tapped"),
+    PODCASTS_LIST_PODCAST_TAPPED("podcasts_list_podcast_tapped"),
+    PODCASTS_LIST_FOLDER_TAPPED("podcasts_list_folder_tapped"),
+    PODCASTS_LIST_OPTIONS_BUTTON_TAPPED("podcasts_list_options_button_tapped"),
+    PODCASTS_LIST_REORDERED("podcasts_list_reordered"),
 }
