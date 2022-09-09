@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-08 13:54:02+0000
+Translation-Revision-Date: 2022-08-23 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+	<string name="settings_storage_section_heading_mobile_data">Мобильные данные</string>
+	<string name="settings_storage_section_heading_usage">Использование</string>
+	<string name="settings_storage_downloaded_files">Скачанные файлы</string>
+	<string name="settings_storage_downloaded_bytes">%d байтов</string>
+	<string name="plus_per_month">%s за месяц</string>
+	<string name="plus_day">день</string>
+	<string name="plus_month_year_price">%1$s в месяц/%2$s в год</string>
+	<string name="plus_trial_then_slash_year">%1$s бесплатно, затем %2$s в год</string>
+	<string name="plus_trial_then_slash_month">%1$s бесплатно, затем %2$s в месяц</string>
+	<string name="plus_then_slash_year">затем %s в год</string>
+	<string name="plus_then_slash_month">затем %s в месяц</string>
+	<string name="plus_slash_year">%s в год</string>
+	<string name="plus_per_year">%s в год</string>
+	<string name="plus_trial_duration_free">%s БЕСПЛАТНО</string>
+	<string name="profile_start_free_trial">Запустить бесплатную пробную версию</string>
+	<string name="profile_per_year">В год</string>
+	<string name="profile_feature_try_trial_secondary_info">Пользуйтесь бесплатно или отмените в любой момент</string>
+	<string name="profile_feature_try_trial">Испытайте Pocket Casts Plus бесплатно в течение %s</string>
+	<string name="player_up_next_clear_episodes_plural">Удалить выпуски (%1$d)</string>
+	<string name="player_up_next_clear_queue_summary">Очистить очередь \"Следующие\"?</string>
+	<string name="player_end_playback_clear_up_next">Закрыть и очистить очередь</string>
 	<string name="player_open_full_size_player">Активируйте, чтобы открыть плеер в полном размере</string>
 	<string name="settings_downloads_clean_up">Очистить</string>
 	<string name="podcasts_share_failed_description">При создании общей страницы произошла ошибка.</string>
@@ -351,7 +372,6 @@ Language: ru
 	<string name="settings_title_storage">Использование хранилища и данных</string>
 	<string name="settings_title_playback">Общие</string>
 	<string name="settings_title_notifications">Уведомления</string>
-	<string name="settings_title_manage_downloads">Управлять скачиваниями</string>
 	<string name="settings_title_import_export">Импорт и экспорт OPML</string>
 	<string name="settings_title_help">Помощь и отзывы</string>
 	<string name="settings_title_excluded_podcasts">Исключенные подкасты</string>
@@ -367,7 +387,6 @@ Language: ru
 	<string name="settings_storage_move_podcasts">Переношу подкасты…</string>
 	<string name="settings_storage_move_message">Это приведёт к перемещению существующих файлов подкастов в указанное новое место.</string>
 	<string name="settings_storage_move">Переместить</string>
-	<string name="settings_storage_manage_downloads">Управление скачанными файлами</string>
 	<string name="settings_storage_folder_write_failed">Запись в эту папку невозможна.</string>
 	<string name="settings_storage_folder_not_found">Невозможно найти или создать папку.</string>
 	<string name="settings_storage_folder_change_failed">Не удаётся перейти в пользовательскую папку.</string>
@@ -515,7 +534,6 @@ Language: ru
 	<string name="plus_renews_automatically_yearly">Ежегодное автоматическое продление</string>
 	<string name="plus_best_value">ЛУЧШАЯ ЦЕНА</string>
 	<string name="plus_select_payment_frequency">Выбрать срок оплаты</string>
-	<string name="plus_year_month_price">%1$s в год/%2$s в месяц</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">Обновить до Pocket Casts Plus</string>
 	<string name="plus_trial_finished_locked">Доступ к функциям Pocket Casts Plus будет заблокирован</string>
 	<string name="plus_trial_finished_files_removed">Файлы, загруженные в вашу учётную запись, будут удалены через неделю</string>
@@ -526,7 +544,6 @@ Language: ru
 	<string name="plus_themes_icons">Темы и значки</string>
 	<string name="plus_thanks_for_your_support_bang">Спасибо за вашу поддержку!</string>
 	<string name="plus_slash_month">%s в месяц</string>
-	<string name="plus_per_month">%s за месяц</string>
 	<string name="plus_lifetime_member">Пожизненное членство</string>
 	<string name="plus_learn_more_button">Подробнее</string>
 	<string name="plus_learn_more_about_plus">Подробнее о Pocket Casts Plus</string>
@@ -632,7 +649,6 @@ Language: ru
 	<string name="profile_payment_failed_detail">Похоже, что при обработке вашего платежа возникла проблема. Повторите попытку.</string>
 	<string name="profile_payment_failed">Не удалось оплатить.</string>
 	<string name="profile_payment_cancelled">Оплата отменена</string>
-	<string name="profile_pay_now">Оплатить сейчас</string>
 	<string name="profile_password_changed_successful">Успешно!</string>
 	<string name="profile_password_changed">Пароль изменен</string>
 	<string name="profile_password">Пароль</string>
@@ -760,7 +776,6 @@ Language: ru
 	<string name="profile_account_created">Учетная запись создана</string>
 	<string name="profile_access_ends">Доступ прекращается: %s</string>
 	<string name="profile_access_ended">Доступ прекращён: %s</string>
-	<string name="profile_1_year_free">1 год бесплатно</string>
 	<string name="profile">Профиль</string>
 	<string name="filters_warning_delete_summary">Это действие нельзя отменить.</string>
 	<string name="filters_title_new_releases">Новые выпуски</string>
@@ -1017,7 +1032,6 @@ Language: ru
 	<string name="player_up_next_empty_desc">Вы можете поместить выпуски в очередь для последующего воспроизведения, проведя пальцем вправо по строкам выпусков или коснувшись значка на карточке выпуска.</string>
 	<string name="player_up_next_empty">Очередь пуста</string>
 	<string name="player_up_next_clear_queue_button">Очистить «Следующие»</string>
-	<string name="player_up_next_clear_queue_summary">Очистку списка «Следующие» отменить невозможно.</string>
 	<string name="player_up_next_clear_queue">Очистить очередь</string>
 	<string name="player_trim_silence_detail">Сокращает длину выпуска, вырезая паузы в разговорах.</string>
 	<string name="player_time_saved_no_hour">Поздравляем! Вы экономите время и успеваете прослушать больше подкастов.</string>
@@ -1042,7 +1056,6 @@ Language: ru
 	<string name="player_notification_skip_back">Назад на %d с.</string>
 	<string name="player_more_actions">Другие действия</string>
 	<string name="player_full_screen">Полноэкранный режим</string>
-	<string name="player_end_playback_clear_up_next">Завершить воспроизведение и очистить очередь «Следующие»</string>
 	<string name="player_effects_volume_boost">Усилитель звука</string>
 	<string name="player_effects_voices_sound_louder">Голоса звучат громче</string>
 	<string name="player_effects_trim_silence">Удалить паузы</string>
