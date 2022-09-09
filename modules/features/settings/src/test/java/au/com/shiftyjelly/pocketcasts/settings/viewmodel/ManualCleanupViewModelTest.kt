@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -14,7 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 import java.util.Date
@@ -23,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class ManualCleanupViewModelTest {
     private lateinit var episodeManager: EpisodeManager
     private lateinit var playbackManager: PlaybackManager
+    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private lateinit var viewModel: ManualCleanupViewModel
 
     private val episode: Episode = Episode(uuid = "1", publishedDate = Date())
@@ -36,9 +38,10 @@ class ManualCleanupViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         episodeManager = mock()
         playbackManager = mock()
+        analyticsTracker = mock()
         whenever(episodeManager.observeDownloadedEpisodes())
             .thenReturn(Flowable.generate { listOf(episodes) })
-        viewModel = ManualCleanupViewModel(episodeManager, playbackManager)
+        viewModel = ManualCleanupViewModel(episodeManager, playbackManager, analyticsTracker)
     }
 
     @Test
@@ -66,16 +69,16 @@ class ManualCleanupViewModelTest {
     }
 
     @Test
-    fun `given episodes selected, when delete button clicked, then episodes are deleted`() {
+    fun `given episodes selected, when delete button clicked, then delete action invoked`() {
         whenever(episodeManager.observeDownloadedEpisodes())
             .thenReturn(Flowable.generate { listOf(episode) })
+        val deleteButtonClickAction = mock<() -> Unit>()
+        viewModel.setup(deleteButtonClickAction)
         viewModel.onDiskSpaceCheckedChanged(isChecked = true, diskSpaceView = diskSpaceView)
 
         viewModel.onDeleteButtonClicked()
 
-        verifyBlocking(episodeManager, times(1)) {
-            deleteEpisodeFiles(episodes, playbackManager)
-        }
+        verify(deleteButtonClickAction).invoke()
     }
 
     @Test

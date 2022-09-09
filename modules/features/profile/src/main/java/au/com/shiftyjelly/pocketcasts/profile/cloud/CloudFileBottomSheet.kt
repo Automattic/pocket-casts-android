@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.profile.cloud
 
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -13,12 +14,18 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
+import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.DOWNLOAD
+import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.EDIT
+import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD
+import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD_UPGRADE_REQUIRED
 import au.com.shiftyjelly.pocketcasts.profile.databinding.BottomSheetCloudFileBinding
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
@@ -68,6 +75,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     @Inject lateinit var theme: Theme
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     var podcastImageLoader: PodcastImageLoader? = null
     private val viewModel: CloudBottomSheetViewModel by viewModels()
@@ -94,6 +102,11 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = BottomSheetCloudFileBinding.inflate(inflater, container, false)
         return binding?.root
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_DISMISSED)
     }
 
     override fun onDestroyView() {
@@ -231,19 +244,20 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                     when (episode.serverStatus) {
                         UserEpisodeServerStatus.LOCAL, UserEpisodeServerStatus.MISSING -> upload(episode, Network.isUnmeteredConnection(binding.layoutCloud.context))
                         UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> viewModel.cancelUpload(episode)
-                        UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) viewModel.removeEpisode(episode) else if (episode.isDownloading) cancelDownload(episode) else download(episode, Network.isUnmeteredConnection(binding.layoutCloud.context))
+                        UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) viewModel.removeEpisode(episode) else if (episode.isDownloading) viewModel.cancelDownload(episode) else download(episode, Network.isUnmeteredConnection(binding.layoutCloud.context))
                     }
 
                     dialog?.dismiss()
                 }
 
                 binding.layoutLockedCloud.setOnClickListener {
+                    viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
                     val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Files)
                     bottomSheet.show(parentFragmentManager, "upgrade_bottom_sheet")
                 }
 
                 binding.layoutDelete.setOnClickListener {
-                    val deleteState = viewModel.getDeleteState(episode)
+                    val deleteState = viewModel.getDeleteStateOnDeleteClick(episode)
                     val confirmationDialog = CloudDeleteHelper.getDeleteDialog(episode, deleteState, viewModel::deleteEpisode, resources)
                     confirmationDialog.show(parentFragmentManager, "delete_confirm")
                     dialog?.dismiss()
@@ -251,6 +265,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
                 binding.layoutEdit.setOnClickListener {
                     activity?.let { activity ->
+                        viewModel.trackOptionTapped(EDIT)
                         val intent = AddFileActivity.newEditInstance(activity, episode.uuid)
                         activity.startActivity(intent)
 
@@ -298,6 +313,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     fun download(episode: UserEpisode, isOnWifi: Boolean) {
+        viewModel.trackOptionTapped(DOWNLOAD)
         if (settings.warnOnMeteredNetwork() && !isOnWifi) {
             warningsHelper.downloadWarning(episodeUUID, "user episode sheet")
                 .show(parentFragmentManager, "download_warning")
@@ -306,16 +322,13 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    fun upload(episode: UserEpisode, isOnWifi: Boolean) {
+    private fun upload(episode: UserEpisode, isOnWifi: Boolean) {
+        viewModel.trackOptionTapped(UPLOAD)
         if (settings.warnOnMeteredNetwork() && !isOnWifi) {
             warningsHelper.uploadWarning(episodeUUID)
                 .show(parentFragmentManager, "upload_warning")
         } else {
             viewModel.uploadEpisode(episode)
         }
-    }
-
-    fun cancelDownload(episode: UserEpisode) {
-        downloadManager.removeEpisodeFromQueue(episode, "cloud bottom sheet")
     }
 }

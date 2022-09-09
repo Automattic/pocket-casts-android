@@ -95,4 +95,67 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Table Swipe Actions for Podcast episodes */
     EPISODE_SWIPE_ACTION_PERFORMED("episode_swipe_action_performed"),
+
+    /* Profile View */
+    PROFILE_SHOWN("profile_shown"),
+    PROFILE_ACCOUNT_BUTTON_TAPPED("profile_account_button_tapped"),
+    PROFILE_SETTINGS_BUTTON_TAPPED("profile_settings_button_tapped"),
+    PROFILE_REFRESH_BUTTON_TAPPED("profile_refresh_button_tapped"),
+
+    /* Stats View */
+    STATS_SHOWN("stats_shown"),
+    STATS_DISMISSED("stats_dismissed"),
+
+    /* Downloads View */
+    DOWNLOADS_SHOWN("downloads_shown"),
+    DOWNLOADS_OPTIONS_BUTTON_TAPPED("downloads_options_button_tapped"),
+    DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED("downloads_options_modal_option_tapped"),
+    DOWNLOADS_SELECT_ALL_TAPPED("downloads_select_all_tapped"),
+    DOWNLOADS_SELECT_ALL_ABOVE_TAPPED("downloads_select_all_above_tapped"),
+    DOWNLOADS_SELECT_ALL_BELOW_TAPPED("downloads_select_all_below_tapped"),
+    DOWNLOADS_MULTI_SELECT_ENTERED("downloads_multi_select_entered"),
+    DOWNLOADS_MULTI_SELECT_EXITED("downloads_multi_select_exited"),
+
+    /* Downloads Clean Up View */
+    DOWNLOADS_CLEAN_UP_SHOWN("downloads_clean_up_shown"),
+    DOWNLOADS_CLEAN_UP_BUTTON_TAPPED("downloads_clean_up_button_tapped"),
+    DOWNLOADS_CLEAN_UP_COMPLETED("downloads_clean_up_completed"),
+
+    /* Listening History */
+    LISTENING_HISTORY_SHOWN("listening_history_shown"),
+    LISTENING_HISTORY_OPTIONS_BUTTON_TAPPED("listening_history_options_button_tapped"),
+    LISTENING_HISTORY_OPTIONS_MODAL_OPTION_TAPPED("listening_history_options_modal_option_tapped"),
+    LISTENING_HISTORY_SELECT_ALL_TAPPED("listening_history_select_all_tapped"),
+    LISTENING_HISTORY_SELECT_ALL_ABOVE_TAPPED("listening_history_select_all_above_tapped"),
+    LISTENING_HISTORY_SELECT_ALL_BELOW_TAPPED("listening_history_select_all_below_tapped"),
+    LISTENING_HISTORY_MULTI_SELECT_ENTERED("listening_history_multi_select_entered"),
+    LISTENING_HISTORY_MULTI_SELECT_EXITED("listening_history_multi_select_exited"),
+    LISTENING_HISTORY_CLEARED("listening_history_cleared"),
+
+    /* Uploaded Files */
+    UPLOADED_FILES_SHOWN("uploaded_files_shown"),
+    UPLOADED_FILES_OPTIONS_BUTTON_TAPPED("uploaded_files_options_button_tapped"),
+    UPLOADED_FILES_OPTIONS_MODAL_OPTION_TAPPED("uploaded_files_options_modal_option_tapped"),
+    UPLOADED_FILES_MULTI_SELECT_ENTERED("uploaded_files_multi_select_entered"),
+    UPLOADED_FILES_SELECT_ALL_TAPPED("uploaded_files_select_all_tapped"),
+    UPLOADED_FILES_SELECT_ALL_ABOVE_TAPPED("uploaded_files_select_all_above_tapped"),
+    UPLOADED_FILES_SELECT_ALL_BELOW_TAPPED("uploaded_files_select_all_below_tapped"),
+    UPLOADED_FILES_MULTI_SELECT_EXITED("uploaded_files_multi_select_exited"),
+    UPLOADED_FILES_SORT_BY_CHANGED("uploaded_files_sort_by_changed"),
+    UPLOADED_FILES_ADD_FILE_TAPPED("uploaded_files_add_file_tapped"),
+
+    /* User File Details View */
+    USER_FILE_DETAIL_SHOWN("user_file_detail_shown"),
+    USER_FILE_DETAIL_DISMISSED("user_file_detail_dismissed"),
+    USER_FILE_DETAIL_OPTION_TAPPED("user_file_detail_option_tapped"),
+    USER_FILE_PLAY_PAUSE_BUTTON_TAPPED("user_file_play_pause_button_tapped"),
+    USER_FILE_DELETED("user_file_deleted"),
+
+    /* Starred */
+    STARRED_SHOWN("starred_shown"),
+    STARRED_MULTI_SELECT_ENTERED("starred_multi_select_entered"),
+    STARRED_MULTI_SELECT_EXITED("starred_multi_select_exited"),
+    STARRED_SELECT_ALL_TAPPED("starred_select_all_tapped"),
+    STARRED_SELECT_ALL_ABOVE_TAPPED("starred_select_all_above_tapped"),
+    STARRED_SELECT_ALL_BELOW_TAPPED("starred_select_all_below_tapped"),
 }
