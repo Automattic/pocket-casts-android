@@ -262,6 +262,15 @@ class PodcastsViewModel
         }
     }
 
+    fun trackFolderShown(folderUuid: String) {
+        launch {
+            val properties = HashMap<String, Any>()
+            properties[SORT_ORDER_KEY] = (folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST).analyticsValue
+            properties[NUMBER_OF_PODCASTS_KEY] = folderManager.findFolderPodcastsSorted(folderUuid).size
+            analyticsTracker.track(AnalyticsEvent.FOLDER_SHOWN, properties)
+        }
+    }
+
     companion object {
         private const val NUMBER_OF_FOLDERS_KEY = "number_of_folders"
         private const val NUMBER_OF_PODCASTS_KEY = "number_of_podcasts"

@@ -74,7 +74,7 @@ class FolderAdapter(
             FolderItem.Folder.viewTypeId -> {
                 val podcastsLayout = settings.getPodcastsLayout()
                 val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == Settings.PodcastGridLayoutType.SMALL_ARTWORK.id, context = context).pxToDp(parent.context).toInt()
-                FolderViewHolder(ComposeView(parent.context), theme, gridWidthDp, podcastsLayout, onFolderClick = { clickListener.onFolderClick(it.uuid) })
+                FolderViewHolder(ComposeView(parent.context), theme, gridWidthDp, podcastsLayout, onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) })
             }
             else -> throw Exception("Unknown view type $viewType")
         }
@@ -237,6 +237,6 @@ class FolderAdapter(
 
     interface ClickListener {
         fun onPodcastClick(podcast: Podcast, view: View)
-        fun onFolderClick(folderUuid: String)
+        fun onFolderClick(folderUuid: String, isUserInitiated: Boolean)
     }
 }

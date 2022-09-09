@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 /**
  * Sort order dialog used when picking podcasts from their collection. For example which podcasts are in a folder.
  */
-class SelectSortByDialog(val settings: Settings) {
+class SelectSortByDialog(val settings: Settings, val changeSortOrder: (PodcastsSortType) -> Unit) {
 
     private var optionsDialog: OptionsDialog? = null
 
@@ -25,7 +25,7 @@ class SelectSortByDialog(val settings: Settings) {
             dialog.addCheckedOption(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,
-                click = { settings.setSelectPodcastsSortType(order) }
+                click = { changeSortOrder(order) }
             )
         }
         dialog.show(fragmentManager, "select_podcasts_sort_dialog")
