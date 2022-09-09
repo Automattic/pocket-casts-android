@@ -186,6 +186,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_SHOWN("podcast_screen_shown"),
     PODCAST_SCREEN_FOLDER_TAPPED("podcast_screen_folder_tapped"),
     PODCAST_SCREEN_SETTINGS_TAPPED("podcast_screen_settings_tapped"),
+    PODCAST_SCREEN_NOTIFICATIONS_TAPPED("podcast_screen_notifications_tapped"),
     PODCAST_SCREEN_SUBSCRIBE_TAPPED("podcast_screen_subscribe_tapped"),
     PODCAST_SCREEN_UNSUBSCRIBE_TAPPED("podcast_screen_unsubscribe_tapped"),
     PODCAST_SCREEN_SEARCH_PERFORMED("podcast_screen_search_performed"),
