@@ -194,6 +194,7 @@ class PodcastViewModel
         launch {
             podcast.value?.let {
                 podcastManager.updateShowArchived(it, !it.showArchived)
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_ARCHIVED, mapOf(SHOW_ARCHIVED to !it.showArchived))
             }
         }
     }
@@ -394,6 +395,7 @@ class PodcastViewModel
     companion object {
         private const val ACTION_KEY = "action"
         private const val SOURCE_KEY = "source"
+        private const val SHOW_ARCHIVED = "show_archived"
     }
 }
 

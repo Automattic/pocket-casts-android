@@ -191,4 +191,5 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_SEARCH_PERFORMED("podcast_screen_search_performed"),
     PODCAST_SCREEN_SEARCH_CLEARED("podcast_screen_search_cleared"),
     PODCAST_SCREEN_OPTIONS_TAPPED("podcast_screen_options_tapped"),
+    PODCAST_SCREEN_TOGGLE_ARCHIVED("podcast_screen_toggle_archived"),
 }
