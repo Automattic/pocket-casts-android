@@ -167,7 +167,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
 
             if (inRootFolder && newFolderUuid != null) {
                 sharedViewModel.folderUuid = null
-                onFolderClick(newFolderUuid)
+                onFolderClick(newFolderUuid, isUserInitiated = false)
             }
         }
 
@@ -355,8 +355,10 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
-    override fun onFolderClick(folderUuid: String) {
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_TAPPED)
+    override fun onFolderClick(folderUuid: String, isUserInitiated: Boolean) {
+        if (isUserInitiated) {
+            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_FOLDER_TAPPED)
+        }
         val fragment = newInstance(folderUuid = folderUuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
