@@ -255,6 +255,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     private val onEpisodesOptionsClicked: () -> Unit = {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_OPTIONS_TAPPED)
         var optionsDialog = OptionsDialog()
             .addTextOption(
                 titleId = LR.string.podcast_sort_episodes,
