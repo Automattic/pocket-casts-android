@@ -92,4 +92,7 @@ enum class AnalyticsEvent(val key: String) {
     FILTERS_TAB_OPENED("filters_tab_opened"),
     DISCOVER_TAB_OPENED("discover_tab_opened"),
     PROFILE_TAB_OPENED("profile_tab_opened"),
+
+    /* Table Swipe Actions for Podcast episodes */
+    EPISODE_SWIPE_ACTION_PERFORMED("episode_swipe_action_performed"),
 }

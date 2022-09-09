@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -24,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -57,7 +61,8 @@ class PodcastViewModel
     private val settings: Settings,
     private val castManager: CastManager,
     private val downloadManager: DownloadManager,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -252,8 +257,10 @@ class PodcastViewModel
         launch {
             if (!episode.isArchived) {
                 episodeManager.archive(episode, playbackManager)
+                trackSwipeAction(SwipeAction.ARCHIVE)
             } else {
                 episodeManager.unarchive(episode)
+                trackSwipeAction(SwipeAction.UNARCHIVE)
             }
         }
     }
@@ -262,8 +269,10 @@ class PodcastViewModel
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
                 playbackManager.playNext(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
     }
@@ -272,8 +281,10 @@ class PodcastViewModel
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
                 playbackManager.playLast(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
     }
@@ -342,6 +353,16 @@ class PodcastViewModel
         }
     }
 
+    private fun trackSwipeAction(swipeAction: SwipeAction) {
+        analyticsTracker.track(
+            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
+            mapOf(
+                ACTION_KEY to swipeAction.analyticsValue,
+                SOURCE_KEY to SwipeSource.PODCAST_DETAILS.analyticsValue
+            )
+        )
+    }
+
     sealed class EpisodeState {
         data class Loaded(
             val episodes: List<Episode>,
@@ -358,6 +379,11 @@ class PodcastViewModel
             val errorMessage: String,
             val searchTerm: String
         ) : EpisodeState()
+    }
+
+    companion object {
+        private const val ACTION_KEY = "action"
+        private const val SOURCE_KEY = "source"
     }
 }
 

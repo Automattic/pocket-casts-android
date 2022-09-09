@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -12,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -34,10 +38,13 @@ class FilterEpisodeListViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
     val downloadManager: DownloadManager,
-    val settings: Settings
+    val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel(), CoroutineScope {
 
     companion object {
+        private const val ACTION_KEY = "action"
+        private const val SOURCE_KEY = "source"
         const val MAX_DOWNLOAD_ALL = Settings.MAX_DOWNLOAD
     }
 
@@ -91,8 +98,10 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             if (!episode.isArchived) {
                 episodeManager.archive(episode, playbackManager)
+                trackSwipeAction(SwipeAction.ARCHIVE)
             } else {
                 episodeManager.unarchive(episode)
+                trackSwipeAction(SwipeAction.UNARCHIVE)
             }
         }
     }
@@ -140,8 +149,10 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
                 playbackManager.playNext(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
     }
@@ -150,8 +161,10 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
                 playbackManager.playLast(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
     }
@@ -170,5 +183,15 @@ class FilterEpisodeListViewModel @Inject constructor(
         val episodes = episodesList.value ?: return 0
         val index = max(episodes.indexOf(episode), 0) // -1 on not found
         return min(episodes.count() - index, settings.getMaxUpNextEpisodes())
+    }
+
+    private fun trackSwipeAction(swipeAction: SwipeAction) {
+        analyticsTracker.track(
+            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
+            mapOf(
+                ACTION_KEY to swipeAction.analyticsValue,
+                SOURCE_KEY to SwipeSource.FILTERS.analyticsValue
+            )
+        )
     }
 }
