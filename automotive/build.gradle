@@ -9,11 +9,6 @@ android {
     defaultConfig {
         applicationId project.applicationId
         minSdkVersion 28
-        versionCode project.automotiveVersionCode
-        versionName project.versionName
-
-        buildConfigField 'int', 'VERSION_CODE', "${project.automotiveVersionCode}"
-        buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
     }
 
     buildTypes {

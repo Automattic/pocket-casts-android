@@ -9,11 +9,6 @@ android {
     defaultConfig {
         applicationId project.applicationId
         multiDexEnabled true
-        versionCode project.appVersionCode
-        versionName project.versionName
-
-        buildConfigField 'int', 'VERSION_CODE', "${project.appVersionCode}"
-        buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
     }
 
     sourceSets {

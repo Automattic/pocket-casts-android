@@ -13,13 +13,29 @@ static def loadPropertiesFromFile(inputFile) {
     return properties
 }
 
+// Unfortunately we currently need to rely on a property to separate the version code between app & automotive builds.
+// This is mainly because the library modules use the version code information from BuildConfig directly instead
+// of receiving from the clients.
+//
+// On the bright side, the difference between the app & automotive modules is a static number, so even if there is
+// an issue and the wrong version code information is used, it'd be easy to identify it.
+//
+// The long term solution is to move the version information out of the `base.gradle` and into the specific
+// app & automotive modules and pass this information to the modules that require it.
+def getVersionCode = {
+    def appVersionCode = versionProperties.getProperty("versionCode", null).toInteger()
+    if ((project.findProperty("IS_AUTOMOTIVE_BUILD") ?: false).toBoolean()) {
+        return appVersionCode + VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_AUTOMOTIVE
+    }
+    return appVersionCode
+}
+
 project.ext {
     // Application
     applicationId = 'au.com.shiftyjelly.pocketcasts'
 
     versionName = versionProperties.getProperty("versionName", null)
-    appVersionCode = versionProperties.getProperty("versionCode", null).toInteger()
-    automotiveVersionCode = appVersionCode + VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_AUTOMOTIVE
+    versionCode = getVersionCode()
 
     // Android
     minSdkVersion = 23

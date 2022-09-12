@@ -19,6 +19,11 @@ android {
     defaultConfig {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
+        versionCode project.versionCode
+        versionName project.versionName
+
+        buildConfigField 'int', 'VERSION_CODE', "${project.versionCode}"
+        buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.settingsEncryptSecret}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
 
