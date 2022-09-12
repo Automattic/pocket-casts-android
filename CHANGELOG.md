@@ -1,6 +1,9 @@
 7.23.0
 -----
 
+*   Bug Fixes:
+    *   Fix custom video file not opening in full-screen mode.
+        ([#304](https://github.com/Automattic/pocket-casts-android/pull/304)).
 
 7.22.0
 -----
