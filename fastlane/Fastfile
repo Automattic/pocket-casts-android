@@ -61,8 +61,8 @@ platform :android do
       new_version: new_version,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
-    setbranchprotection(repository:GHHELPER_REPO, branch: "release/#{new_version}")
-    setfrozentag(repository:GHHELPER_REPO, milestone: new_version)
+    setbranchprotection(repository:GH_REPOSITORY, branch: "release/#{new_version}")
+    setfrozentag(repository:GH_REPOSITORY, milestone: new_version)
   end
 
   lane :complete_code_freeze do | options |
@@ -134,10 +134,10 @@ platform :android do
     version = android_get_release_version()
 
     # Wrap up
-    removebranchprotection(repository:GHHELPER_REPO, branch: "release/#{version["name"]}")
-    setfrozentag(repository:GHHELPER_REPO, milestone: version["name"], freeze: false)
-    create_new_milestone(repository:GHHELPER_REPO, need_appstore_submission: true)
-    close_milestone(repository:GHHELPER_REPO, milestone: version["name"])
+    removebranchprotection(repository:GH_REPOSITORY, branch: "release/#{version["name"]}")
+    setfrozentag(repository:GH_REPOSITORY, milestone: version["name"], freeze: false)
+    create_new_milestone(repository:GH_REPOSITORY, need_appstore_submission: true)
+    close_milestone(repository:GH_REPOSITORY, milestone: version["name"])
 
     trigger_release_build(branch_to_build: "release/#{version["name"]}")
   end
