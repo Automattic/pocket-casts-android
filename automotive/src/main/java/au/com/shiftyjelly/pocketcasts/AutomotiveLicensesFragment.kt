@@ -15,8 +15,11 @@ import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
+import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
+import com.mikepenz.aboutlibraries.ui.compose.util.author
+import com.mikepenz.aboutlibraries.util.withContext
 
 class AutomotiveLicensesFragment : Fragment() {
 
@@ -42,6 +45,11 @@ class AutomotiveLicensesFragment : Fragment() {
                 contentColor = MaterialTheme.theme.colors.primaryText01
             ),
             itemContentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
+            librariesBlock = { context ->
+                val libs = Libs.Builder().withContext(context).build()
+                // without displaying the artifact id the libraries seem to appear twice
+                libs.copy(libs.libraries.distinctBy { "${it.name}##${it.author}" })
+            },
             onLibraryClick = { library ->
                 val website = library.website
                 val activity = activity

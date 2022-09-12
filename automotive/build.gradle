@@ -5,7 +5,6 @@ plugins {
     id 'com.mikepenz.aboutlibraries.plugin'
 }
 apply from: "../base.gradle"
-apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
     defaultConfig {

@@ -30,10 +30,9 @@ interface Settings {
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
 
         const val INFO_LEARN_MORE_URL = "https://www.pocketcasts.com/plus/"
-        const val SUPPORT_HOST = "support.pocketcasts.com"
-        const val INFO_TOS_URL = "https://$SUPPORT_HOST/article/terms-of-use-overview/"
-        const val INFO_PRIVACY_URL = "https://$SUPPORT_HOST/article/privacy-policy/"
-        const val INFO_CANCEL_URL = "https://$SUPPORT_HOST/article/subscription-info/"
+        const val INFO_TOS_URL = "https://support.pocketcasts.com/article/terms-of-use-overview/"
+        const val INFO_PRIVACY_URL = "https://support.pocketcasts.com/article/privacy-policy/"
+        const val INFO_CANCEL_URL = "https://support.pocketcasts.com/article/subscription-info/"
 
         const val USER_AGENT_POCKETCASTS_SERVER = "Pocket Casts/Android/" + BuildConfig.VERSION_NAME
 

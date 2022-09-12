@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 private val LocalColors = staticCompositionLocalOf { PocketCastsTheme(colors = ThemeLightColors, isLight = true) }
@@ -65,32 +65,28 @@ private fun SurfacedContent(
     }
 }
 
-private fun increaseFontSize(textStyle: TextStyle, times: Double): TextStyle {
-    return textStyle.copy(fontSize = textStyle.fontSize.times(times))
-}
-
 @Composable
 fun AutomotiveTheme(content: @Composable () -> Unit) {
     val theme = PocketCastsTheme(colors = ThemeDarkColors, isLight = false)
     val typography = MaterialTheme.typography
-    val fontIncrease = 1.5
+    // Increase the size of the fonts on Automotive to match the system
     CompositionLocalProvider(LocalColors provides theme) {
         MaterialTheme(
             colors = buildMaterialColors(colors = theme.colors, isLight = theme.isLight),
             typography = typography.copy(
-                h1 = increaseFontSize(typography.h1, fontIncrease),
-                h2 = increaseFontSize(typography.h2, fontIncrease),
-                h3 = increaseFontSize(typography.h3, fontIncrease),
-                h4 = increaseFontSize(typography.h4, fontIncrease),
-                h5 = increaseFontSize(typography.h5, fontIncrease),
-                h6 = increaseFontSize(typography.h6, fontIncrease),
-                body1 = increaseFontSize(typography.body1, fontIncrease),
-                body2 = increaseFontSize(typography.body2, fontIncrease),
-                subtitle1 = increaseFontSize(typography.subtitle1, fontIncrease),
-                subtitle2 = increaseFontSize(typography.subtitle2, fontIncrease),
-                button = increaseFontSize(typography.button, fontIncrease),
-                caption = increaseFontSize(typography.caption, fontIncrease),
-                overline = increaseFontSize(typography.overline, fontIncrease)
+                h1 = typography.h1.copy(fontSize = 144.sp),
+                h2 = typography.h2.copy(fontSize = 90.sp),
+                h3 = typography.h3.copy(fontSize = 72.sp),
+                h4 = typography.h4.copy(fontSize = 51.sp),
+                h5 = typography.h5.copy(fontSize = 36.sp),
+                h6 = typography.h6.copy(fontSize = 30.sp),
+                body1 = typography.body1.copy(fontSize = 24.sp),
+                body2 = typography.body2.copy(fontSize = 21.sp),
+                subtitle1 = typography.subtitle1.copy(fontSize = 24.sp),
+                subtitle2 = typography.subtitle2.copy(fontSize = 21.sp),
+                button = typography.button.copy(fontSize = 21.sp),
+                caption = typography.caption.copy(fontSize = 18.sp),
+                overline = typography.overline.copy(fontSize = 15.sp)
             ),
             content = content
         )
