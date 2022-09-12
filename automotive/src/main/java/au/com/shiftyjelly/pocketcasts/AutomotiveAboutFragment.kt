@@ -73,7 +73,7 @@ private fun AboutPage(onOpenLicenses: () -> Unit) {
             contentDescription = stringResource(R.string.settings_app_icon),
             modifier = Modifier
                 .padding(top = 56.dp)
-                .size(width = 314.dp, height = 188.dp)
+                .size(width = 220.dp, height = 132.dp)
         )
         Text(
             text = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString()),
@@ -109,7 +109,7 @@ private fun AboutPage(onOpenLicenses: () -> Unit) {
 }
 
 @Composable
-fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .clickable { onClick() }
@@ -127,6 +127,6 @@ fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier = Modif
 
 @Composable
 @Preview
-fun AboutPageRow() {
+private fun AboutPageRow() {
     AboutPage(onOpenLicenses = {})
 }
