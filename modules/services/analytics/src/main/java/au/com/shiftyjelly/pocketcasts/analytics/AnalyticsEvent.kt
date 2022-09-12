@@ -181,4 +181,18 @@ enum class AnalyticsEvent(val key: String) {
     FOLDER_CHOOSE_SHOWN("folder_choose_shown"),
     FOLDER_CHOOSE_FOLDER_TAPPED("folder_choose_folder_tapped"),
     FOLDER_PODCAST_MODAL_OPTION_TAPPED("folder_podcast_modal_option_tapped"),
+
+    /* Podcast screen */
+    PODCAST_SCREEN_SHOWN("podcast_screen_shown"),
+    PODCAST_SCREEN_FOLDER_TAPPED("podcast_screen_folder_tapped"),
+    PODCAST_SCREEN_SETTINGS_TAPPED("podcast_screen_settings_tapped"),
+    PODCAST_SCREEN_NOTIFICATIONS_TAPPED("podcast_screen_notifications_tapped"),
+    PODCAST_SCREEN_SUBSCRIBE_TAPPED("podcast_screen_subscribe_tapped"),
+    PODCAST_SCREEN_UNSUBSCRIBE_TAPPED("podcast_screen_unsubscribe_tapped"),
+    PODCAST_SCREEN_SEARCH_PERFORMED("podcast_screen_search_performed"),
+    PODCAST_SCREEN_SEARCH_CLEARED("podcast_screen_search_cleared"),
+    PODCAST_SCREEN_OPTIONS_TAPPED("podcast_screen_options_tapped"),
+    PODCAST_SCREEN_TOGGLE_ARCHIVED("podcast_screen_toggle_archived"),
+    PODCAST_SCREEN_TOGGLE_SUMMARY("podcast_screen_toggle_summary"),
+    PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
 }

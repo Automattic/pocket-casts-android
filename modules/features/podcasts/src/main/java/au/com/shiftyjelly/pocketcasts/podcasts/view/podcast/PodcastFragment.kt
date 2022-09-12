@@ -79,6 +79,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         const val ARG_LIST_UUID = "ARG_LIST_INDEX_UUID"
         const val ARG_FEATURED_PODCAST = "ARG_FEATURED_PODCAST"
         private const val OPTION_KEY = "option"
+        private const val IS_EXPANDED_KEY = "is_expanded"
         private const val REMOVE = "remove"
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
@@ -132,11 +133,16 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     override var statusBarColor: StatusBarColor = StatusBarColor.Custom(color = 0xFF1E1F1E.toInt(), isWhiteIcons = true)
 
+    private val onHeaderSummaryToggled: (expanded: Boolean) -> Unit = {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_SUMMARY, mapOf(IS_EXPANDED_KEY to it))
+    }
+
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let {
             AnalyticsHelper.podcastSubscribedFromList(it, podcastUuid)
         }
         if (featuredPodcast) AnalyticsHelper.subscribedToFeaturedPodcast()
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SUBSCRIBE_TAPPED)
 
         viewModel.subscribeToPodcast()
     }
@@ -149,6 +155,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 1 -> getString(LR.string.podcast_unsubscribe_downloaded_file_singular)
                 else -> getString(LR.string.podcast_unsubscribe_downloaded_file_plural, downloaded)
             }
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_UNSUBSCRIBE_TAPPED)
             val dialog = ConfirmationDialog().setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.unsubscribe)))
                 .setTitle(title)
                 .setSummary(getString(LR.string.podcast_unsubscribe_warning))
@@ -253,6 +260,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     private val onEpisodesOptionsClicked: () -> Unit = {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_OPTIONS_TAPPED)
         var optionsDialog = OptionsDialog()
             .addTextOption(
                 titleId = LR.string.podcast_sort_episodes,
@@ -317,6 +325,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     private val onFoldersClicked: () -> Unit = {
         lifecycleScope.launch {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_FOLDER_TAPPED)
             val folder = viewModel.getFolder()
             if (folder == null) {
                 analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_SHOWN)
@@ -357,6 +366,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     }
 
     private val onSettingsClicked: () -> Unit = {
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SETTINGS_TAPPED)
         (activity as FragmentHostListener).addFragment(PodcastSettingsFragment.newInstance(viewModel.podcastUuid))
         multiSelectHelper.isMultiSelecting = false
     }
@@ -400,7 +410,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
         adapter?.fromListUuid = fromListUuid
 
-        AnalyticsHelper.openedPodcast(podcastUuid)
+        if (savedInstanceState == null) {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN)
+            AnalyticsHelper.openedPodcast(podcastUuid)
+        }
     }
 
     override fun onPause() {
@@ -476,7 +489,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         }
 
         if (adapter == null) {
-            adapter = PodcastAdapter(downloadManager, playbackManager, upNextQueue, settings, theme, fromListUuid, onSubscribeClicked, onUnsubscribeClicked, onEpisodesOptionsClicked, onRowLongPress, onFoldersClicked, onNotificationsClicked, onSettingsClicked, playButtonListener, onRowClicked, onSearchQueryChanged, onSearchFocus, onShowArchivedClicked, multiSelectHelper, onArtworkLongClicked)
+            adapter = PodcastAdapter(downloadManager, playbackManager, upNextQueue, settings, theme, fromListUuid, onHeaderSummaryToggled, onSubscribeClicked, onUnsubscribeClicked, onEpisodesOptionsClicked, onRowLongPress, onFoldersClicked, onNotificationsClicked, onSettingsClicked, playButtonListener, onRowClicked, onSearchQueryChanged, onSearchFocus, onShowArchivedClicked, multiSelectHelper, onArtworkLongClicked)
         }
 
         binding.episodesRecyclerView.let {
@@ -712,6 +725,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     private fun share() {
         val context = context ?: return
         viewModel.podcast.value?.let { podcast ->
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
             SharePodcastHelper(podcast, null, null, context).showShareDialogDirect()
         }
     }
