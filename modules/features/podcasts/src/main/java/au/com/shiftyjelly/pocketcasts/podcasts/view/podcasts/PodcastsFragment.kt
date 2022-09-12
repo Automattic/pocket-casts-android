@@ -269,7 +269,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
                 show()
             }
         } else {
-            podcastOptionsDialog = PodcastsOptionsDialog(this, settings).apply {
+            podcastOptionsDialog = PodcastsOptionsDialog(this, settings, analyticsTracker).apply {
                 show()
             }
         }
