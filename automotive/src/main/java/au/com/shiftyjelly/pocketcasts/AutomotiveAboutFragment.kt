@@ -1,21 +1,17 @@
 package au.com.shiftyjelly.pocketcasts
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -33,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
@@ -41,12 +36,11 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.settings.about.openAcknowledgements
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
+import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -55,18 +49,18 @@ class AutomotiveAboutFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                AboutPage()
+                AboutPage(onOpenLicenses = { openLicenses() })
             }
         }
     }
 
-    private fun closeFragment() {
-        (activity as? FragmentHostListener)?.closeModal(this)
+    private fun openLicenses() {
+        (activity as? FragmentHostListener)?.addFragment(AutomotiveLicensesFragment())
     }
 }
 
 @Composable
-private fun AboutPage() {
+private fun AboutPage(onOpenLicenses: () -> Unit) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     AppTheme(Theme.ThemeType.DARK) {
@@ -100,16 +94,17 @@ private fun AboutPage() {
             )
             TextLinkButton(
                 text = stringResource(R.string.settings_about_terms_of_serivce),
-                onClick = { openUrl(Settings.INFO_TOS_URL, context) }
+                onClick = { context.startActivityViewUrl(Settings.INFO_TOS_URL) }
             )
             TextLinkButton(
                 text = stringResource(R.string.settings_about_privacy_policy),
-                onClick = { openUrl(Settings.INFO_PRIVACY_URL, context) }
+                onClick = { context.startActivityViewUrl(Settings.INFO_PRIVACY_URL) }
             )
             TextLinkButton(
                 text = stringResource(R.string.settings_about_acknowledgements),
-                onClick = { openAcknowledgements(context) }
+                onClick = { onOpenLicenses() }
             )
+            Spacer(Modifier.height(15.dp))
         }
     }
 }
@@ -132,40 +127,7 @@ fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier = Modif
 }
 
 @Composable
-private fun WebPage() {
-    val context = LocalContext.current
-    AndroidView(factory = {
-        WebView(context).apply {
-            webViewClient = object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                    val externalLink = request.url.host != Settings.SUPPORT_HOST
-                    if (externalLink) {
-                        openUrl(request.url.toString(), context)
-                        return true
-                    }
-                    return false
-                }
-            }
-            settings.minimumFontSize = 20
-            // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            //     settings.forceDark = WebSettings.FORCE_DARK_ON
-            // }
-
-            loadUrl("${Settings.INFO_PRIVACY_URL}?device=android")
-        }
-    })
-}
-
-private fun openUrl(url: String, context: Context) {
-    try {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-    } catch (e: Exception) {
-        Timber.i("Failed to open url $url")
-    }
-}
-
-@Composable
 @Preview
 fun AboutPageRow() {
-    AboutPage()
+    AboutPage(onOpenLicenses = {})
 }

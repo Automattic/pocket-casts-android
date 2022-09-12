@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.text.TextStyle
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 private val LocalColors = staticCompositionLocalOf { PocketCastsTheme(colors = ThemeLightColors, isLight = true) }
@@ -61,6 +62,38 @@ private fun SurfacedContent(
 ) {
     Surface(color = MaterialTheme.colors.background) {
         content()
+    }
+}
+
+private fun increaseFontSize(textStyle: TextStyle, times: Double): TextStyle {
+    return textStyle.copy(fontSize = textStyle.fontSize.times(times))
+}
+
+@Composable
+fun AutomotiveTheme(content: @Composable () -> Unit) {
+    val theme = PocketCastsTheme(colors = ThemeDarkColors, isLight = false)
+    val typography = MaterialTheme.typography
+    val fontIncrease = 1.5
+    CompositionLocalProvider(LocalColors provides theme) {
+        MaterialTheme(
+            colors = buildMaterialColors(colors = theme.colors, isLight = theme.isLight),
+            typography = typography.copy(
+                h1 = increaseFontSize(typography.h1, fontIncrease),
+                h2 = increaseFontSize(typography.h2, fontIncrease),
+                h3 = increaseFontSize(typography.h3, fontIncrease),
+                h4 = increaseFontSize(typography.h4, fontIncrease),
+                h5 = increaseFontSize(typography.h5, fontIncrease),
+                h6 = increaseFontSize(typography.h6, fontIncrease),
+                body1 = increaseFontSize(typography.body1, fontIncrease),
+                body2 = increaseFontSize(typography.body2, fontIncrease),
+                subtitle1 = increaseFontSize(typography.subtitle1, fontIncrease),
+                subtitle2 = increaseFontSize(typography.subtitle2, fontIncrease),
+                button = increaseFontSize(typography.button, fontIncrease),
+                caption = increaseFontSize(typography.caption, fontIncrease),
+                overline = increaseFontSize(typography.overline, fontIncrease)
+            ),
+            content = content
+        )
     }
 }
 
