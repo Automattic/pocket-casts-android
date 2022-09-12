@@ -1,14 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.ui.extensions
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import timber.log.Timber
 
 fun Context.getThemeColor(@AttrRes themeAttrId: Int): Int {
     val typedValue = TypedValue()
@@ -45,4 +48,12 @@ fun Context.getAttrTextStyleColor(themeAttrId: Int): Int {
     val textColor = typedArray.getColor(0, Color.RED) // Red so you can see when its broken
     typedArray.recycle()
     return textColor
+}
+
+fun Context.startActivityViewUrl(url: String) {
+    try {
+        this.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    } catch (e: Exception) {
+        Timber.i("Failed to open url $url")
+    }
 }

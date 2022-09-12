@@ -37,4 +37,9 @@
         android:title="@string/profile_refresh_now"
         android:summary=""
         android:persistent="false" />
+    <Preference
+        android:key="about"
+        android:title="@string/settings_title_about"
+        android:summary=""
+        android:persistent="false" />
 </PreferenceScreen>
