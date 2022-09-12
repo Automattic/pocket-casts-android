@@ -445,8 +445,8 @@ class MainActivity :
         viewModel.playbackState.observe(this) { state ->
             if (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) {
                 launch(Dispatchers.Default) {
-                    val episode = episodeManager.findByUuid(state.episodeUuid)
-                    if (episode?.isVideo == true && state.isPlaying) {
+                    val playable = episodeManager.findPlayableByUuid(state.episodeUuid)
+                    if (playable?.isVideo == true && state.isPlaying) {
                         launch(Dispatchers.Main) {
                             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                                 binding.playerBottomSheet.openPlayer()
