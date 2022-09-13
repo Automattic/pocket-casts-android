@@ -4,6 +4,8 @@
 *   Bug Fixes:
     *   Fix custom video file not opening in full-screen mode.
         ([#304](https://github.com/Automattic/pocket-casts-android/pull/304)).
+    *   Fix the discover artwork scaling issue.
+        ([#307](https://github.com/Automattic/pocket-casts-android/pull/307)).
 
 7.22.0
 -----
