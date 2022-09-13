@@ -153,8 +153,8 @@ project.ext {
             glide: "com.github.bumptech.glide:glide:$versionGlide",
             glideOkHttp: "com.github.bumptech.glide:okhttp3-integration:$versionGlide",
             glideCompile: "com.github.bumptech.glide:compiler:$versionGlide",
-            coil: "io.coil-kt:coil:2.2.0",
-            coilCompose: "io.coil-kt:coil-compose:2.2.0",
+            coil: "io.coil-kt:coil:2.2.1",
+            coilCompose: "io.coil-kt:coil-compose:2.2.1",
             // OkHttp (http client) - https://github.com/square/okhttp
             okHttp: "com.squareup.okhttp3:okhttp:4.9.3",
             okHttpLogging: "com.squareup.okhttp3:logging-interceptor:4.9.3",
