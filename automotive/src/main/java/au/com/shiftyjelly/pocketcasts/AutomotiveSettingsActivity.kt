@@ -33,6 +33,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     }
 
     override fun onSupportNavigateUp(): Boolean {
+        @Suppress("DEPRECATION")
         onBackPressed()
         return true
     }
@@ -50,6 +51,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
             return
         }
 
+        @Suppress("DEPRECATION")
         super.onBackPressed()
     }
 
