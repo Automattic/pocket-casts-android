@@ -1,3 +1,9 @@
+7.24.0
+-----
+
+*   Health:
+    *   Migrate app to Android 13 by targeting the SDK version 33.
+
 7.23.0
 -----
 
