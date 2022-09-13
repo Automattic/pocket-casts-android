@@ -78,7 +78,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             AppThemeWithBackground(theme.activeTheme) {
                 PlaybackSettings(
                     settings = settings,
-                    onBackClick = { activity?.onBackPressed() },
+                    onBackClick = { activity?.onBackPressedDispatcher?.onBackPressed() },
                 )
             }
         }

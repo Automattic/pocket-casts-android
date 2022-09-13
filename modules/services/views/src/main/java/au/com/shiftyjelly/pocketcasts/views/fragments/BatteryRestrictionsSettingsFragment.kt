@@ -100,7 +100,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
                     Page(
                         isUnrestricted = isUnrestricted,
                         navigationButton = navigationButton,
-                        onBackPressed = { activity?.onBackPressed() },
+                        onBackPressed = { activity?.onBackPressedDispatcher?.onBackPressed() },
                         onClick = { batteryRestrictions.promptToUpdateBatteryRestriction(context) },
                         openUrl = { url ->
                             startActivity(

@@ -61,7 +61,7 @@ class CreateFilterContainerFragment : BaseFragment() {
                         binding.toolbar.title = ""
                         binding.btnCreate.text = getString(LR.string.navigation_continue)
                         binding.btnCreate.isEnabled = !adapter.lockedToFirstPage
-                        binding.toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+                        binding.toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
                     }
                     1 -> {
                         binding.toolbar.title = getString(LR.string.filters_create_filter_details)

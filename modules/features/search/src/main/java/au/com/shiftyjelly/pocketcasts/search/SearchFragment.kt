@@ -101,11 +101,11 @@ class SearchFragment : BaseFragment() {
 
         val binding = binding ?: return
 
-        view.setOnClickListener { activity?.onBackPressed() }
+        view.setOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         binding.resultPanel.alpha = 0.0f
         binding.resultPanel.animate().setDuration(500L).alpha(1.0f).start()
 
-        binding.backButton.setOnClickListener { activity?.onBackPressed() }
+        binding.backButton.setOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
 
         // hack as Search View ignores text size
         val searchView = binding.searchView

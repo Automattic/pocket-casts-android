@@ -32,7 +32,7 @@ class ManualCleanupFragment : BaseFragment() {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     ManualCleanupPage(
                         viewModel = viewModel,
-                        onBackClick = { activity?.onBackPressed() },
+                        onBackClick = { activity?.onBackPressedDispatcher?.onBackPressed() },
                     )
                 }
             }

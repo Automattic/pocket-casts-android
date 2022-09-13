@@ -61,7 +61,7 @@ class SettingsFragment : BaseFragment() {
 
                             SettingsFragmentPage(
                                 signInState = signInState,
-                                onBackPressed = { activity?.onBackPressed() },
+                                onBackPressed = { activity?.onBackPressedDispatcher?.onBackPressed() },
                                 isDebug = BuildConfig.DEBUG,
                                 isUnrestrictedBattery = isUnrestrictedBattery,
                                 openFragment = { fragment ->

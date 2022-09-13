@@ -272,6 +272,6 @@ class AccountDetailsFragment : BaseFragment() {
     private fun performSignOut() {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "User requested to sign out")
         userManager.signOut(playbackManager, wasInitiatedByUser = true)
-        activity?.onBackPressed()
+        activity?.onBackPressedDispatcher?.onBackPressed()
     }
 }

@@ -110,7 +110,7 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
         if (binding.webview.canGoBack()) {
             binding.webview.goBack()
         } else {
-            super.onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 

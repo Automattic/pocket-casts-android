@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -179,7 +178,7 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         if (isCreate) {
             binding.toolbarLayout.isVisible = false
         } else {
-            binding.toolbar.setNavigationOnClickListener { (activity as AppCompatActivity).onBackPressed() }
+            binding.toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         }
 
         val layoutAutoDownload = binding.layoutAutoDownload

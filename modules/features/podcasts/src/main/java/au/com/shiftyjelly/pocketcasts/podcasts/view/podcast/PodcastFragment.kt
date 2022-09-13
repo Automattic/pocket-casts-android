@@ -163,7 +163,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 .setOnConfirm {
                     successCallback()
                     viewModel.unsubscribeFromPodcast()
-                    activity?.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 }
             dialog.show(parentFragmentManager, "unsubscribe")
         }
@@ -439,7 +439,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         if (shouldCloseOnReturn) {
             launch(Dispatchers.Main) {
                 // You can't call back during onresume
-                (activity as? AppCompatActivity)?.onBackPressed()
+                (activity as? AppCompatActivity)?.onBackPressedDispatcher?.onBackPressed()
             }
         }
 
@@ -476,7 +476,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding.toolbar.let {
             it.inflateMenu(R.menu.podcast_menu)
             it.setOnMenuItemClickListener(this)
-            it.setNavigationOnClickListener { activity?.onBackPressed() }
+            it.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
             val iconColor = it.context.getThemeColor(UR.attr.contrast_01)
             it.menu.setupChromeCastButton(context)
             it.menu.tintIcons(iconColor)

@@ -6,6 +6,7 @@ import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.MediaBrowserCompat
@@ -220,7 +221,12 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
             // If we have switched to casting we need to remove the notification
             if (isForegroundService && notification == null && playbackManager.isPlaybackRemote()) {
-                stopForeground(true)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                } else {
+                    @Suppress("DEPRECATION")
+                    stopForeground(true)
+                }
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground as player is remote")
             }
 
@@ -244,11 +250,15 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             startForeground(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
                             notificationManager.enteredForeground(notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
-                        } catch (e: ForegroundServiceStartNotAllowedException) {
-                            addBatteryWarnings()
+                        } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
-                            CrashlyticsHelper.recordException(e)
-                            AnalyticsHelper.foregroundServiceStartNotAllowedException()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                                e is ForegroundServiceStartNotAllowedException
+                            ) {
+                                addBatteryWarnings()
+                                CrashlyticsHelper.recordException(e)
+                                AnalyticsHelper.foregroundServiceStartNotAllowedException()
+                            }
                         }
                     } else {
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "can't startForeground as the notification is null")
@@ -275,7 +285,12 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state removing notification: $removeNotification")
                         }
 
-                        stopForeground(removeNotification)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            stopForeground(if (removeNotification) STOP_FOREGROUND_REMOVE else STOP_FOREGROUND_DETACH)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            stopForeground(removeNotification)
+                        }
                     }
 
                     if (state == PlaybackStateCompat.STATE_ERROR) {

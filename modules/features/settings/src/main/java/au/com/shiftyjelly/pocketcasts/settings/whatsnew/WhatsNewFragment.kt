@@ -83,7 +83,7 @@ class WhatsNewFragment : BaseFragment() {
     }
 
     private fun close() {
-        activity?.onBackPressed()
+        activity?.onBackPressedDispatcher?.onBackPressed()
     }
 }
 

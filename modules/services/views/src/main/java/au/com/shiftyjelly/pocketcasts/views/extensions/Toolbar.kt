@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.views.extensions
 import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
+import androidx.activity.ComponentActivity
 import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -49,7 +50,7 @@ fun Toolbar.setup(
     if (navigationIcon != None) {
         setNavigationOnClickListener {
             if (onNavigationClick == null) {
-                activity?.onBackPressed()
+                (activity as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed()
             } else {
                 onNavigationClick()
             }

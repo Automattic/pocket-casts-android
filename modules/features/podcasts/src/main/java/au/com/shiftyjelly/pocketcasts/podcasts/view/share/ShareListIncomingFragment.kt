@@ -82,7 +82,7 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
         val toolbar = binding.toolbar
-        toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+        toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         toolbar.navigationIcon = context.getThemeTintedDrawable(IR.drawable.ic_cancel, UR.attr.secondary_icon_01)
 
         viewModel.share.observe(viewLifecycleOwner) { share ->

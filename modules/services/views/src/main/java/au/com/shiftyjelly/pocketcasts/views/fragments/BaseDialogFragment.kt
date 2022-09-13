@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.views.fragments
 
-import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
+import androidx.activity.addCallback
 import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -64,16 +64,15 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         }
     }
 
-    protected fun addNavControllerToBackStack(loadNavController: () -> NavHostController?, initialRoute: String): Dialog {
-        return object : BottomSheetDialog(requireContext(), getTheme()) {
-            override fun onBackPressed() {
+    protected fun addNavControllerToBackStack(loadNavController: () -> NavHostController?, initialRoute: String) =
+        BottomSheetDialog(requireContext(), getTheme()).apply {
+            onBackPressedDispatcher.addCallback {
                 val navController = loadNavController()
                 if (navController == null || navController.currentDestination?.route == initialRoute) {
-                    super.onBackPressed()
+                    activity?.onBackPressedDispatcher?.onBackPressed()
                 } else {
                     navController.popBackStack()
                 }
             }
         }
-    }
 }

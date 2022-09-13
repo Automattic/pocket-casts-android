@@ -57,7 +57,7 @@ class DurationOptionsFragment : BaseFragment() {
         val binding = binding ?: return
 
         binding.lblTitle.text = getString(LR.string.filters_episode_duration)
-        binding.btnClose.setOnClickListener { activity?.onBackPressed() }
+        binding.btnClose.setOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
 
         val stepperLongerThan = binding.stepperLongerThan
         val formatter: (Int) -> String = {

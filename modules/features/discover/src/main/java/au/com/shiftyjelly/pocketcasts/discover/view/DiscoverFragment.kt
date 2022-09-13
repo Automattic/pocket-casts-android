@@ -157,7 +157,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     override fun onRegionSelected(region: DiscoverRegion) {
         viewModel.changeRegion(region, resources)
-        activity?.onBackPressed()
+        activity?.onBackPressedDispatcher?.onBackPressed()
         binding?.recyclerView?.scrollToPosition(0)
     }
 

@@ -29,9 +29,9 @@ class TrialFinishedFragment : BaseFragment() {
 
         val binding = binding ?: return
 
-        binding.btnDone.setOnClickListener { activity?.onBackPressed() }
+        binding.btnDone.setOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
         binding.btnUpgrade.setOnClickListener {
-            activity?.onBackPressed()
+            activity?.onBackPressedDispatcher?.onBackPressed()
             activity?.startActivity(AccountActivity.newUpgradeInstance(it.context))
         }
     }
