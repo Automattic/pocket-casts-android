@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-09 14:54:03+0000
+Translation-Revision-Date: 2022-08-23 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+	<string name="settings_storage_section_heading_mobile_data">Mobildata</string>
+	<string name="settings_storage_section_heading_usage">Användning</string>
+	<string name="settings_storage_downloaded_files">Nedladdade filer</string>
+	<string name="settings_storage_downloaded_bytes">%d byte</string>
+	<string name="plus_per_month">%s per månad</string>
+	<string name="plus_day">dag</string>
+	<string name="plus_month_year_price">%1$s per månad/%2$s per år</string>
+	<string name="plus_trial_then_slash_year">%1$s gratis, därefter %2$s/år</string>
+	<string name="plus_trial_then_slash_month">%1$s gratis, därefter %2$s/månad</string>
+	<string name="plus_then_slash_year">därefter %s/år</string>
+	<string name="plus_then_slash_month">därefter %s/månad</string>
+	<string name="plus_slash_year">%s/år</string>
+	<string name="plus_per_year">%s per år</string>
+	<string name="plus_trial_duration_free">%s GRATIS</string>
+	<string name="profile_start_free_trial">Starta kostnadsfri testperiod</string>
+	<string name="profile_per_year">Per år</string>
+	<string name="profile_feature_try_trial_secondary_info">Ingen betalning nu — Avbryt när som helst</string>
+	<string name="profile_feature_try_trial">Prova Pocket Casts Plus gratis i %s</string>
+	<string name="player_up_next_clear_episodes_plural">Rensa %1$d avsnitt</string>
+	<string name="player_up_next_clear_queue_summary">Är du säker på att du vill rensa din Nästa-kö?</string>
+	<string name="player_end_playback_clear_up_next">Stäng och rensa Nästa</string>
 	<string name="player_open_full_size_player">Aktivera för att öppna spelare i full storlek</string>
 	<string name="settings_downloads_clean_up">Rensa</string>
 	<string name="podcasts_share_failed_description">Något gick fel när din delningssida skulle skapas.</string>
@@ -351,7 +372,6 @@ Language: sv_SE
 	<string name="settings_title_storage">Lagrings- och dataanvändning</string>
 	<string name="settings_title_playback">Allmänt</string>
 	<string name="settings_title_notifications">Aviseringar</string>
-	<string name="settings_title_manage_downloads">Hantera nedladdningar</string>
 	<string name="settings_title_import_export">Importera och exportera OPML</string>
 	<string name="settings_title_help">Hjälp och feedback</string>
 	<string name="settings_title_excluded_podcasts">Exkluderade podcasts</string>
@@ -367,7 +387,6 @@ Language: sv_SE
 	<string name="settings_storage_move_podcasts">Flyttar podcasts …</string>
 	<string name="settings_storage_move_message">Detta kommer flytta befintliga podcastfiler till denna nya plats.</string>
 	<string name="settings_storage_move">Flytta</string>
-	<string name="settings_storage_manage_downloads">Hantera nedladdade filer</string>
 	<string name="settings_storage_folder_write_failed">Det går inte att skriva till den här mappen.</string>
 	<string name="settings_storage_folder_not_found">Det går inte att hitta eller skapa mappen.</string>
 	<string name="settings_storage_folder_change_failed">Det gick inte att ändra till anpassad mapp.</string>
@@ -515,7 +534,6 @@ Language: sv_SE
 	<string name="plus_renews_automatically_yearly">Förnyas automatiskt årligen</string>
 	<string name="plus_best_value">MEST PRISVÄRT</string>
 	<string name="plus_select_payment_frequency">Välj betalningsfrekvens</string>
-	<string name="plus_year_month_price">%1$s per år / %2$s per månad</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">Uppgradera till Pocket Casts Plus</string>
 	<string name="plus_trial_finished_locked">Åtkomst till Pocket Casts Plus-funktioner kommer att låsas</string>
 	<string name="plus_trial_finished_files_removed">Filer uppladdade till ditt konto kommer att tas bort efter en vecka</string>
@@ -525,8 +543,7 @@ Language: sv_SE
 	<string name="plus_themes_icons_body">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>
 	<string name="plus_themes_icons">Teman och ikoner</string>
 	<string name="plus_thanks_for_your_support_bang">Tack för ditt stöd!</string>
-	<string name="plus_slash_month">%s /månad</string>
-	<string name="plus_per_month">%s per månad</string>
+	<string name="plus_slash_month">%s/månad</string>
 	<string name="plus_lifetime_member">Livstidsmedlem</string>
 	<string name="plus_learn_more_button">Lär dig mer</string>
 	<string name="plus_learn_more_about_plus">Läs mer om Pocket Casts Plus</string>
@@ -632,7 +649,6 @@ Language: sv_SE
 	<string name="profile_payment_failed_detail">Det verkar som att det uppstod ett problem när din betalning behandlades. Försök igen.</string>
 	<string name="profile_payment_failed">Betalningen misslyckades</string>
 	<string name="profile_payment_cancelled">Betalningen har avbrutits</string>
-	<string name="profile_pay_now">Betala nu</string>
 	<string name="profile_password_changed_successful">Det lyckades!</string>
 	<string name="profile_password_changed">Lösenord ändrat</string>
 	<string name="profile_password">Lösenord</string>
@@ -760,7 +776,6 @@ Language: sv_SE
 	<string name="profile_account_created">Konto skapat.</string>
 	<string name="profile_access_ends">Åtkomst upphör: %s</string>
 	<string name="profile_access_ended">Åtkomst upphörde: %s</string>
-	<string name="profile_1_year_free">1 år gratis</string>
 	<string name="profile">Profil</string>
 	<string name="filters_warning_delete_summary">Det här går inte att ångra.</string>
 	<string name="filters_title_new_releases">Nya släpp</string>
@@ -1017,7 +1032,6 @@ Language: sv_SE
 	<string name="player_up_next_empty_desc">Du kan placera avsnitt i kö för uppspelning genom att svepa åt höger på avsnittsraden, eller genom att trycka på ikonen på ett avsnittskort.</string>
 	<string name="player_up_next_empty">Inget i Nästa</string>
 	<string name="player_up_next_clear_queue_button">Rensa Nästa</string>
-	<string name="player_up_next_clear_queue_summary">Rensning av din Nästa-lista går inte att ångra</string>
 	<string name="player_up_next_clear_queue">Rensa kö</string>
 	<string name="player_trim_silence_detail">Minskar längden på ett avsnitt genom att trimma tystnad i konversationer.</string>
 	<string name="player_time_saved_no_hour">Grattis! Du sparar tid och hinner gå igenom fler podcasts.</string>
@@ -1042,7 +1056,6 @@ Language: sv_SE
 	<string name="player_notification_skip_back">Bakåt %d sekunder</string>
 	<string name="player_more_actions">Fler åtgärder</string>
 	<string name="player_full_screen">Fullskärm</string>
-	<string name="player_end_playback_clear_up_next">Avsluta uppspelning och rensa Nästa</string>
 	<string name="player_effects_volume_boost">Volymökning</string>
 	<string name="player_effects_voices_sound_louder">Röster låter starkare</string>
 	<string name="player_effects_trim_silence">Trimma tystnad</string>
