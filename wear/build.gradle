@@ -1,0 +1,63 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+apply from: "../base.gradle"
+
+android {
+    defaultConfig {
+        minSdk 30
+        applicationId project.applicationId
+    }
+
+    if (canSignRelease) {
+        signingConfigs {
+            release {
+                storeFile = file(pocketcastsKeyStoreFile)
+                storePassword = pocketcastsKeyStorePassword
+                keyAlias = pocketcastsKeyStoreAlias
+                keyPassword = pocketcastsKeyStoreAliasPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            if (canSignRelease) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'com.google.android.gms:play-services-wearable:17.1.0'
+    implementation 'androidx.percentlayout:percentlayout:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation "androidx.compose.ui:ui:$versionCompose"
+    implementation "androidx.wear.compose:compose-material:$versionComposeWear"
+    implementation "androidx.wear.compose:compose-foundation:$versionComposeWear"
+    implementation "androidx.compose.ui:ui-tooling-preview:$versionCompose"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.activity:activity-compose:1.5.1'
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$versionCompose"
+    debugImplementation "androidx.compose.ui:ui-tooling:$versionCompose"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:$versionCompose"
+    wearApp project(":wear")
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:images')
+}
