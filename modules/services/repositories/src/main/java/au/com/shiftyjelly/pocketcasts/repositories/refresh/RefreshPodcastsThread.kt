@@ -133,10 +133,16 @@ class RefreshPodcastsThread(
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Refresh failed")
 
             if (e is SecurityException || e is UserNotLoggedInException) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because there was a security exception")
+                val exceptionType = when (e) {
+                    is SecurityException -> "SecurityException"
+                    is UserNotLoggedInException -> "UserNotLoggedInException"
+                    else -> "unexpected exception"
+                }
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because there was a $exceptionType")
+
                 val userManager = entryPoint.userManager()
                 val playbackManager = entryPoint.playbackManager()
-                userManager.signOut(playbackManager)
+                userManager.signOut(playbackManager, wasInitiatedByUser = false)
             } else {
                 refreshFailedOrCancelled(e.message ?: "Unknown error")
             }
@@ -165,7 +171,13 @@ class RefreshPodcastsThread(
                     processRefreshResponse(result)
                 }
 
-                override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
+                override fun onFailed(
+                    errorCode: Int,
+                    userMessage: String?,
+                    serverMessageId: String?,
+                    serverMessage: String?,
+                    throwable: Throwable?
+                ) {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as server call failed errorCode: $errorCode serverMessage: ${serverMessage ?: ""}")
                     if (throwable != null) {
                         LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "Server call failed")
@@ -253,7 +265,7 @@ class RefreshPodcastsThread(
 
             if (throwable is UserNotLoggedInException) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because server post failed to log in")
-                userManager.signOut(playbackManager)
+                userManager.signOut(playbackManager, wasInitiatedByUser = false)
             } else {
                 return RefreshState.Failed("Sync threw an error: ${throwable.message}")
             }

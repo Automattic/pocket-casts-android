@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateFrequenc
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
@@ -23,6 +25,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class CreateFrequencyFragment : BaseFragment() {
 
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var subscriptionManager: SubscriptionManager
     private var adapter: CreateFrequencyAdapter? = null
     private val viewModel: CreateAccountViewModel by activityViewModels()
@@ -79,6 +82,7 @@ class CreateFrequencyFragment : BaseFragment() {
         binding.btnNext.setOnClickListener {
             val subscription = viewModel.subscription.value
             if (subscription != null) {
+                analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED, mapOf(PRODUCT_KEY to subscription.productDetails.productId))
                 AnalyticsHelper.plusPlanChosen(
                     sku = subscription.productDetails.productId,
                     title = subscription.productDetails.title,
@@ -104,5 +108,9 @@ class CreateFrequencyFragment : BaseFragment() {
                 parentFragmentManager.popBackStack()
             }
         }
+    }
+
+    companion object {
+        private const val PRODUCT_KEY = "product"
     }
 }

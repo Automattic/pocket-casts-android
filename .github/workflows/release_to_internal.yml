@@ -1,11 +1,7 @@
 name: Release to Internal
 
-# Run when a pull request is merged
-on:
-  push:
-    branches:
-      - main
-      - 'release/*'
+# Run the deployment manually
+on: [workflow_dispatch]
 
 jobs:
   deployment:
@@ -52,7 +48,7 @@ jobs:
       - name: Assemble Release
         run: ./gradlew :app:bundleRelease --no-daemon
         env:
-          VERSION_CODE_START: 8135
+          VERSION_CODE_START: 8937
       - name: Sign Release
         uses: r0adkll/sign-android-release@v1
         id: sign_app
@@ -73,14 +69,14 @@ jobs:
           mappingFile: app/build/outputs/mapping/release/mapping.txt
       # Automotive
       - name: Assemble Automotive Release
-        run: ./gradlew assembleAutomotiveRelease bundleAutomotiveRelease --no-daemon
+        run: ./gradlew :automotive:assembleRelease :automotive:bundleRelease --no-daemon
         env:
           VERSION_CODE_START: 58135
       - name: Sign Automotive Bundle Release
         uses: r0adkll/sign-android-release@v1
         id: sign_automotive_bundle
         with:
-          releaseDirectory: automotive/build/outputs/bundle/automotiveRelease
+          releaseDirectory: automotive/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.SIGNING_ALIAS }}
           keyStorePassword: ${{ secrets.SIGNING_KEY_STORE_PASSWORD }}
@@ -89,7 +85,7 @@ jobs:
         uses: r0adkll/sign-android-release@v1
         id: sign_automotive_apk
         with:
-          releaseDirectory: automotive/build/outputs/apk/automotive/release
+          releaseDirectory: automotive/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.SIGNING_ALIAS }}
           keyStorePassword: ${{ secrets.SIGNING_KEY_STORE_PASSWORD }}
@@ -102,7 +98,7 @@ jobs:
           releaseFiles: ${{ steps.sign_automotive_apk.outputs.signedReleaseFile }}
           track: automotive:automotive_alpha
           status: completed
-          mappingFile: automotive/build/outputs/mapping/automotiveRelease/mapping.txt
+          mappingFile: automotive/build/outputs/mapping/release/mapping.txt
       - name: Upload Automotive Apk to Github
         uses: actions/upload-artifact@v3
         with:

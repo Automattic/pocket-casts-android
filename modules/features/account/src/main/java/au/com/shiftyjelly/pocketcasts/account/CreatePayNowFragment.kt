@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreatePaynowBi
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -34,7 +36,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class CreatePayNowFragment : BaseFragment() {
 
     @Inject lateinit var subscriptionManager: SubscriptionManager
-
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: CreateAccountViewModel by activityViewModels()
     private var binding: FragmentCreatePaynowBinding? = null
 
@@ -57,6 +59,7 @@ class CreatePayNowFragment : BaseFragment() {
             toolbar.navigationIcon = it.getTintedDrawable(IR.drawable.ic_close, closeColor)
         }
         toolbar.setNavigationOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.CONFIRM_PAYMENT_DISMISSED)
             requireActivity().finish()
         }
 
@@ -129,17 +132,24 @@ class CreatePayNowFragment : BaseFragment() {
             )
 
             binding?.btnSubmit?.setOnClickListener {
-                if (viewModel.createAccountState.value == CreateAccountState.AccountCreated ||
-                    viewModel.createAccountState.value == CreateAccountState.CurrentlyValid
+                val accountState = viewModel.createAccountState.value
+                if (accountState == CreateAccountState.AccountCreated ||
+                    accountState == CreateAccountState.CurrentlyValid ||
+                    (
+                        accountState is CreateAccountState.Failure &&
+                            accountState.errors.contains(CreateAccountError.CANCELLED_CREATE_SUB)
+                        )
                 ) {
 
                     binding?.txtError?.text = ""
+                    analyticsTracker.track(AnalyticsEvent.CONFIRM_PAYMENT_CONFIRM_BUTTON_TAPPED)
                     displayMainLayout(true, subscription = subscription)
                     viewModel.subscription.value?.let { subscription ->
                         viewModel.sendCreateSubscriptions()
                         subscriptionManager.launchBillingFlow(
                             requireActivity(),
-                            subscription.productDetails
+                            subscription.productDetails,
+                            subscription.offerToken
                         )
                     }
                 }

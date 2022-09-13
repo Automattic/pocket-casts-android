@@ -47,7 +47,7 @@ open class ServerManager @Inject constructor(
     }
 
     private fun tokenExtractionCallback(callback: ServerCallback<String>): PostCallback {
-        return object : PostCallback {
+        return object : PostCallback, ServerFailure by callback {
             override fun onSuccess(data: String?, response: ServerResponse) {
                 try {
                     if (data == null) {
@@ -60,10 +60,6 @@ open class ServerManager @Inject constructor(
                     Timber.e(e)
                     callback.dataReturned(null)
                 }
-            }
-
-            override fun onFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                callback.callFailed(errorCode, userMessage, userMessageId, serverMessage, throwable)
             }
         }
     }
@@ -80,10 +76,10 @@ open class ServerManager @Inject constructor(
                 if (token != null) {
                     callback.dataReturned(token)
                 } else {
-                    callback.callFailed(
+                    callback.onFailed(
                         errorCode = -1,
                         userMessage = "Unable to link Pocket Casts account with Sonos.",
-                        userMessageId = null,
+                        serverMessageId = null,
                         serverMessage = response.code().toString() + "Unable to link Pocket Casts account with Sonos.",
                         throwable = null
                     )
@@ -91,10 +87,10 @@ open class ServerManager @Inject constructor(
             }
 
             override fun onFailure(call: retrofit2.Call<ApiTokenResponse>, t: Throwable) {
-                callback.callFailed(
+                callback.onFailed(
                     errorCode = -1,
                     userMessage = "Unable to link Pocket Casts account with Sonos.",
-                    userMessageId = null,
+                    serverMessageId = null,
                     serverMessage = "Unable to link Pocket Casts account with Sonos. " + if (t.message == null) "" else t.message,
                     throwable = t
                 )
@@ -113,13 +109,9 @@ open class ServerManager @Inject constructor(
         }
         return postToMainServer(
             "/podcasts/search", Parameters("q", searchTerm), true,
-            object : PostCallback {
+            object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parsePodcastSearch(data = data, searchTerm = searchTerm))
-                }
-
-                override fun onFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                    callback.callFailed(errorCode, userMessage, userMessageId, serverMessage, throwable)
                 }
             }
         )
@@ -135,13 +127,9 @@ open class ServerManager @Inject constructor(
         val uuidsJoined = TextUtils.join(",", uuids)
         return postToMainServer(
             "/import/export_feed_urls", Parameters("uuids", uuidsJoined), true,
-            object : PostCallback {
+            object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseExportFeedUrls(data))
-                }
-
-                override fun onFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                    callback.callFailed(errorCode, userMessage, userMessageId, serverMessage, throwable)
                 }
             }
         )
@@ -150,13 +138,9 @@ open class ServerManager @Inject constructor(
     fun getSharedItemDetails(strippedUrl: String, callback: ServerCallback<Share>): Call? {
         return postToMainServer(
             strippedUrl, null, true,
-            object : PostCallback {
+            object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseShareItem(data))
-                }
-
-                override fun onFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                    callback.callFailed(errorCode, userMessage, userMessageId, serverMessage, throwable)
                 }
             }
         )
@@ -188,13 +172,9 @@ open class ServerManager @Inject constructor(
 
         return postToMainServer(
             "/user/update", parameters, false,
-            object : PostCallback {
+            object : PostCallback, ServerFailure by callback {
                 override fun onSuccess(data: String?, response: ServerResponse) {
                     callback.dataReturned(DataParser.parseRefreshPodcasts(data))
-                }
-
-                override fun onFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                    callback.callFailed(errorCode, userMessage, userMessageId, serverMessage, throwable)
                 }
             }
         )
@@ -202,16 +182,21 @@ open class ServerManager @Inject constructor(
 
     private fun <T> getRxServerCallback(emitter: SingleEmitter<T>): ServerCallback<T> {
         return object : ServerCallback<T> {
-            override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                if (emitter.isDisposed) return
-
-                emitter.onError(throwable ?: UnknownError())
-            }
 
             override fun dataReturned(result: T?) {
                 if (emitter.isDisposed) return
-
                 emitter.onSuccess(result!!)
+            }
+
+            override fun onFailed(
+                errorCode: Int,
+                userMessage: String?,
+                serverMessageId: String?,
+                serverMessage: String?,
+                throwable: Throwable?
+            ) {
+                if (emitter.isDisposed) return
+                emitter.onError(throwable ?: UnknownError())
             }
         }
     }
@@ -281,10 +266,22 @@ open class ServerManager @Inject constructor(
                     if (nextPollCount > 6) {
                         if (callbackOnUiThread) {
                             Handler(Looper.getMainLooper()).post {
-                                callback.onFailed(errorCode = -1, userMessage = response.message, userMessageId = null, serverMessage = responseDebug, throwable = null)
+                                callback.onFailed(
+                                    errorCode = -1,
+                                    userMessage = response.message,
+                                    serverMessageId = null,
+                                    serverMessage = responseDebug,
+                                    throwable = null
+                                )
                             }
                         } else {
-                            callback.onFailed(errorCode = -1, userMessage = response.message, userMessageId = null, serverMessage = responseDebug, throwable = null)
+                            callback.onFailed(
+                                errorCode = -1,
+                                userMessage = response.message,
+                                serverMessageId = null,
+                                serverMessage = responseDebug,
+                                throwable = null
+                            )
                         }
                     } else {
                         try {
@@ -309,7 +306,7 @@ open class ServerManager @Inject constructor(
                                 callback.onFailed(
                                     errorCode = serverResponse.errorCode,
                                     userMessage = if (serverResponse.message == null) NO_INTERNET_CONNECTION_MSG else serverResponse.message,
-                                    userMessageId = serverResponse.messageId,
+                                    serverMessageId = serverResponse.serverMessageId,
                                     serverMessage = responseDebug,
                                     throwable = null
                                 )
@@ -322,7 +319,7 @@ open class ServerManager @Inject constructor(
                             callback.onFailed(
                                 errorCode = serverResponse.errorCode,
                                 userMessage = if (serverResponse.message == null) NO_INTERNET_CONNECTION_MSG else serverResponse.message,
-                                userMessageId = serverResponse.messageId,
+                                serverMessageId = serverResponse.serverMessageId,
                                 serverMessage = responseDebug,
                                 throwable = null
                             )
@@ -336,10 +333,22 @@ open class ServerManager @Inject constructor(
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Response failed from ${call.request().url}.")
                 if (callbackOnUiThread) {
                     Handler(Looper.getMainLooper()).post {
-                        callback.onFailed(errorCode = -1, userMessage = NO_INTERNET_CONNECTION_MSG, userMessageId = null, serverMessage = e.message, throwable = e)
+                        callback.onFailed(
+                            errorCode = -1,
+                            userMessage = NO_INTERNET_CONNECTION_MSG,
+                            serverMessageId = null,
+                            serverMessage = e.message,
+                            throwable = e
+                        )
                     }
                 } else {
-                    callback.onFailed(errorCode = -1, userMessage = NO_INTERNET_CONNECTION_MSG, userMessageId = null, serverMessage = e.message, throwable = e)
+                    callback.onFailed(
+                        errorCode = -1,
+                        userMessage = NO_INTERNET_CONNECTION_MSG,
+                        serverMessageId = null,
+                        serverMessage = e.message,
+                        throwable = e
+                    )
                 }
             }
         }

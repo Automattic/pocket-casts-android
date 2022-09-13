@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentChangePwdBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangePasswordError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ChangePasswordState
@@ -145,6 +146,7 @@ class ChangePwdFragment : BaseFragment() {
                     doneViewModel.updateTitle(getString(LR.string.profile_password_changed))
                     doneViewModel.updateDetail(getString(LR.string.profile_password_changed_successful))
                     doneViewModel.updateImage(R.drawable.ic_password_changed)
+                    doneViewModel.trackShown(AccountUpdatedSource.CHANGE_PASSWORD)
 
                     val fragment = ChangeDoneFragment.newInstance(closeParent = true)
                     (activity as FragmentHostListener).addFragment(fragment)

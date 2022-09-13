@@ -286,11 +286,14 @@ class MediaSessionManager(
         val safeCharacterPodcastTitle = podcastTitle.replace("%", "pct")
         var nowPlayingBuilder = MediaMetadataCompat.Builder()
             .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, episode.uuid)
-            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, safeCharacterPodcastTitle)
             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, safeCharacterPodcastTitle)
             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, episode.durationMs.toLong())
             .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Podcast")
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, episode.title)
+
+        if (podcast != null && podcast.author.isNotEmpty()) {
+            nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, podcast.author)
+        }
 
         val nowPlaying = nowPlayingBuilder.build()
         Timber.i("MediaSession metadata. Episode: ${episode.uuid} ${episode.title} Duration: ${episode.durationMs.toLong()}")
