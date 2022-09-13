@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -184,7 +185,10 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbarColors = null
         )
 
-        toolbar.setNavigationOnClickListener { activity?.onBackPressedDispatcher?.onBackPressed() }
+        toolbar.setNavigationOnClickListener {
+            @Suppress("DEPRECATION")
+            (activity as AppCompatActivity).onBackPressed()
+        }
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
                 R.id.menu_delete -> {
@@ -228,7 +232,8 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         viewModel.playlistDeleted.observe(viewLifecycleOwner) { deleted ->
             if (deleted) {
-                activity?.onBackPressedDispatcher?.onBackPressed()
+                @Suppress("DEPRECATION")
+                activity?.onBackPressed()
             }
         }
 
@@ -509,7 +514,8 @@ class FilterEpisodeListFragment : BaseFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.filters_warning_delete_button)))
             .setOnConfirm {
                 viewModel.deletePlaylist()
-                activity?.onBackPressedDispatcher?.onBackPressed()
+                @Suppress("DEPRECATION")
+                activity?.onBackPressed()
             }
             .show(childFragmentManager, "confirm")
     }

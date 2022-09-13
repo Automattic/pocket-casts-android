@@ -32,7 +32,10 @@ class ManualCleanupFragment : BaseFragment() {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     ManualCleanupPage(
                         viewModel = viewModel,
-                        onBackClick = { activity?.onBackPressedDispatcher?.onBackPressed() },
+                        onBackClick = {
+                            @Suppress("DEPRECATION")
+                            activity?.onBackPressed()
+                        },
                     )
                 }
             }

@@ -119,7 +119,8 @@ class AccountActivity : AppCompatActivity() {
         }
 
         UiUtil.hideKeyboard(binding.root)
-        onBackPressedDispatcher.onBackPressed()
+        @Suppress("DEPRECATION")
+        super.onBackPressed()
     }
 
     private fun NavDestination.trackShown() {

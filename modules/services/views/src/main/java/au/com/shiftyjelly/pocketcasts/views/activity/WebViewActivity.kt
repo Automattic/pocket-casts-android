@@ -110,7 +110,8 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
         if (binding.webview.canGoBack()) {
             binding.webview.goBack()
         } else {
-            onBackPressedDispatcher.onBackPressed()
+            @Suppress("DEPRECATION")
+            super.onBackPressed()
         }
     }
 
