@@ -10,7 +10,8 @@
         ([#284](https://github.com/Automattic/pocket-casts-android/pull/284)).
 
 
-### 7.21.1
+7.21.1
+-----
 
 *   Bug Fixes:
     *   Fix Chromecast not taking over playback after connection.
@@ -18,7 +19,8 @@
     *   Fix the discover artwork scaling issue.
         ([#308](https://github.com/Automattic/pocket-casts-android/pull/308)).
 
-### 7.21.0
+7.21.0
+-----
 
 *   Bug Fixes:    
     *   Fix the mini player's play icon showing the wrong icon.
@@ -42,27 +44,31 @@
     *   Fix episode row buffering state.
         ([#53](https://github.com/Automattic/pocket-casts-android/issues/53)).
 
-### 7.20.3
+7.20.3
+-----
 
 *   Bug Fixes:
     *   Fixes folder mapping at the time of folders full sync.
         ([#214](https://github.com/Automattic/pocket-casts-android/pull/214)).
 
-### 7.20.2
+7.20.2
+-----
 
 *   Bug Fixes:    
     *   Fix OPML import.
     *   Fix podcasts and folders rearrange crash.
         ([#200](https://github.com/Automattic/pocket-casts-android/issues/200)).
 
-### 7.20.1
+7.20.1
+-----
 
 *   New Features:
     *   Add localizations for English (UK), Arabic, and Norwegian.
 *   Bug Fixes:
     *   Fix an issue where the podcasts order was being changed after migrating to the latest version.
 
-### 7.20.0
+7.20.0
+-----
 
 *   New Features:
     *   Folders!
@@ -125,7 +131,8 @@
     *   Improve manage downloads screen
         ([#117](https://github.com/Automattic/pocket-casts-android/pull/117)).
 
-### 7.19.2 (2022-02-11)
+7.19.2 (2022-02-11)
+-----
 
 *   New Features:
     *   Add support for episode lists in the discover section.
