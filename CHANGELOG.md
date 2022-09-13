@@ -1,5 +1,13 @@
 # Release notes
 
+### 7.21.1
+
+*   Bug Fixes:
+    *   Fix Chromecast not taking over playback after connection.
+        ([#308](https://github.com/Automattic/pocket-casts-android/pull/308)).
+    *   Fix the discover artwork scaling issue.
+        ([#308](https://github.com/Automattic/pocket-casts-android/pull/308)).
+
 ### 7.21.0
 
 *   Bug Fixes:    
