@@ -13,6 +13,11 @@ USER_ENV_FILE_PATH = File.join(Dir.home, ENV_FILE_NAME)
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 APP_PACKAGE_NAME = 'au.com.shiftyjelly.pocketcasts'
 GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
+ORIGINALS_METADATA_DIR_PATH = File.join(PROJECT_ROOT_FOLDER, 'metadata')
+RELEASE_NOTES_SOURCE_PATH = File.join(PROJECT_ROOT_FOLDER, 'CHANGELOG.md')
+EXTRACTED_RELEASE_NOTES_PATH = File.join(ORIGINALS_METADATA_DIR_PATH, 'release_notes.txt')
+PLAY_STORE_TRACK_BETA = "beta"
+PLAY_STORE_TRACK_PRODUCTION = "production"
 
 ########################################################################
 # Environment
@@ -41,24 +46,62 @@ before_all do |lane|
 end
 
 platform :android do
-  # - Builds the app for external beta distribution
-  # - Uploads the builds to 'beta' channel in Play Store (but does not release it)
+  lane :code_freeze do | options |
+    android_codefreeze_prechecks(options)
+
+    android_bump_version_release()
+    new_version = android_get_app_version()
+
+    extract_release_notes_for_version(
+      version: new_version,
+      release_notes_file_path: RELEASE_NOTES_SOURCE_PATH,
+      extracted_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH
+    )
+    android_update_release_notes(
+      new_version: new_version,
+      release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
+    )
+    setbranchprotection(repository:GHHELPER_REPO, branch: "release/#{new_version}")
+    setfrozentag(repository:GHHELPER_REPO, milestone: new_version)
+  end
+
+  lane :complete_code_freeze do | options |
+    android_completecodefreeze_prechecks(options)
+
+    new_version = android_get_app_version()
+    trigger_release_build(branch_to_build: "release/#{new_version}")
+  end
+
+  # @param [String] branch_to_build (default: current git branch) The branch to build
+  lane :trigger_release_build do | options |
+    buildkite_trigger_build(
+      buildkite_organization: 'automattic',
+      buildkite_pipeline: 'pocket-casts-android',
+      branch: options[:branch_to_build] || git_branch,
+      pipeline_file: 'release-builds.yml'
+    )
+  end
+
+  # - Uses the current version to decide if this is a beta or production build
+  # - Builds the apps for external distribution
+  # - Uploads the builds to 'beta' or 'production' Play Store channel (but does not release it)
   # - Creates draft Github release
   #
   # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
   # @option [Boolean] skip_prechecks (default: false) If true, skips android_build_preflight
   # @option [Boolean] create_gh_release (default: false) If true, creates a draft GitHub release
   #
-  desc "Builds and uploads a new beta build to Google Play (without releasing it)"
-  lane :build_and_upload_beta do | options |
-    android_build_prechecks(skip_confirm: options[:skip_confirm], alpha: false, beta: true, final: false) unless (options[:skip_prechecks])
+  desc "Builds and uploads a new build to Google Play (without releasing it)"
+  lane :build_and_upload_to_play_store do | options |
+    version = android_get_release_version()
+    is_beta = is_beta_version(version)
+    android_build_prechecks(skip_confirm: options[:skip_confirm], alpha: false, beta: is_beta, final: !is_beta) unless (options[:skip_prechecks])
     android_build_preflight() unless options[:skip_prechecks]
 
-    version = android_get_release_version()
     release_assets = []
 
     APPS.each do |app|
-        build_bundle(app: app, version: version)
+        build_bundle(app: app)
 
         aab_artifact_path = aab_artifact_path(app, version)
         UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
@@ -66,7 +109,7 @@ platform :android do
         upload_to_play_store(
           package_name: APP_PACKAGE_NAME,
           aab: aab_artifact_path,
-          track: 'beta',
+          track: is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION,
           release_status: 'draft',
           skip_upload_apk: true,
           skip_upload_metadata: true,
@@ -79,19 +122,35 @@ platform :android do
         release_assets << aab_artifact_path
     end
 
-    create_gh_release(version: version, prerelease: true, release_assets: release_assets.compact) if options[:create_release]
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_release]
   end
 
-  # Builds an app bundle
-  desc "Builds an app bundle"
+  lane :finalize_release do | options |
+    android_finalize_prechecks(options)
+    configure_apply(force: is_ci)
+
+    android_bump_version_final_release()
+
+    version = android_get_release_version()
+
+    # Wrap up
+    removebranchprotection(repository:GHHELPER_REPO, branch: "release/#{version["name"]}")
+    setfrozentag(repository:GHHELPER_REPO, milestone: version["name"], freeze: false)
+    create_new_milestone(repository:GHHELPER_REPO, need_appstore_submission: true)
+    close_milestone(repository:GHHELPER_REPO, milestone: version["name"])
+
+    trigger_release_build(branch_to_build: "release/#{version["name"]}")
+  end
+
+  # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
+  # @param [String] app The Android app to build (i.e 'app' or 'automotive')
+  desc "Builds and bundles the given app"
   lane :build_bundle do | options |
-    # Create the file names
     version = options[:version]
     app = options[:app]
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = "artifacts/"
 
-    # Build
     gradle(task: "clean")
     UI.message("Running lint...")
     gradle(task: ":#{app}:preBundleLint")
@@ -164,9 +223,13 @@ platform :android do
   end
 
   def firebase_secret(name:)
-     UI.user_error!('Unable to locale Firebase Secrets File – did you run `bundle exec fastlane run configure_apply`?') unless File.file? GOOGLE_FIREBASE_SECRETS_PATH
-     key_file_secrets = JSON.parse(File.read(GOOGLE_FIREBASE_SECRETS_PATH))
-     UI.user_error!("Unable to find key `#{name}` in #{GOOGLE_FIREBASE_SECRETS_PATH}") if key_file_secrets[name].nil?
-     key_file_secrets[name]
-   end
+    UI.user_error!('Unable to locale Firebase Secrets File – did you run `bundle exec fastlane run configure_apply`?') unless File.file? GOOGLE_FIREBASE_SECRETS_PATH
+    key_file_secrets = JSON.parse(File.read(GOOGLE_FIREBASE_SECRETS_PATH))
+    UI.user_error!("Unable to find key `#{name}` in #{GOOGLE_FIREBASE_SECRETS_PATH}") if key_file_secrets[name].nil?
+    key_file_secrets[name]
+  end
+
+  def is_beta_version(version)
+    version['name'].include? "-rc-"
+  end
 end
