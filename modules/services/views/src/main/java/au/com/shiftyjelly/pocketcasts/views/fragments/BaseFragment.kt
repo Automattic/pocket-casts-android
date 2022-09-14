@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -42,11 +41,6 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         }
         view.isClickable = true
         view.isFocusable = true
-    }
-
-    override fun onResume() {
-        super.onResume()
-        CrashlyticsHelper.logLastFragment(this)
     }
 
     @Suppress("DEPRECATION")

@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts
 import android.app.Application
 import android.os.Environment
 import android.os.StrictMode
-import androidx.core.os.ConfigurationCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -25,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
@@ -33,11 +31,10 @@ import coil.Coil
 import coil.ImageLoader
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -90,7 +87,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
 
         super.onCreate()
 
-        setupCrashlytics()
+        setupSentry()
         setupLogging()
         setupAnalytics()
         setupApp()
@@ -102,20 +99,17 @@ class PocketcastsApplication : Application(), Configuration.Provider {
         AnalyticsTracker.refreshMetadata()
     }
 
-    private fun setupCrashlytics() {
+    private fun setupSentry() {
         Thread.getDefaultUncaughtExceptionHandler()?.let {
             Thread.setDefaultUncaughtExceptionHandler(LogBufferUncaughtExceptionHandler(it))
         }
 
-        // Setup the Firebase, the Crashlytics documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
+        SentryAndroid.init(this) { options ->
+            options.dsn = settings.getSentryDsn()
+        }
+
+        // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
         FirebaseApp.initializeApp(this)
-
-        val crashlytics = Firebase.crashlytics
-        crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
-
-        // Add the user's locale
-        val locales = ConfigurationCompat.getLocales(resources.configuration)
-        crashlytics.setCustomKey(CrashlyticsHelper.KEY_LOCALE, if (locales.isEmpty) "" else locales[0].toString())
     }
 
     override fun getWorkManagerConfiguration(): Configuration {

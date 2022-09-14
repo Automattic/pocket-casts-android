@@ -21,6 +21,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
+import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -46,6 +47,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
+        setupSentry()
         setupLogging()
         setupAutomotiveDefaults()
         setupApp()
@@ -93,6 +95,12 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         }
         if (!settings.contains(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY)) {
             settings.setBooleanForKey(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, true)
+        }
+    }
+
+    private fun setupSentry() {
+        SentryAndroid.init(this) { options ->
+            options.dsn = settings.getSentryDsn()
         }
     }
 
