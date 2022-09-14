@@ -57,8 +57,11 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$versionCompose"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$versionCompose"
     wearApp project(":wear")
+
+    implementation project(':modules:services:compose')
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')
+    implementation project(':modules:services:ui')
     implementation project(':modules:services:utils')
     implementation project(':modules:services:images')
     implementation project(':modules:features:profile')

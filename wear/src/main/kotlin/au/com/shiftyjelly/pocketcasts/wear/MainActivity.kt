@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
@@ -17,19 +18,26 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject lateinit var theme: Theme
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WearApp()
+            // TODO add lines for radioactive theme
+            WearApp(theme.activeTheme)
         }
     }
 }
 
 @Composable
-fun WearApp() {
-    WearAppTheme {
+fun WearApp(themeType: Theme.ThemeType) {
+    WearAppTheme(themeType) {
 
         val navController = rememberSwipeDismissableNavController()
         SwipeDismissableNavHost(
@@ -50,5 +58,5 @@ fun WearApp() {
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    WearApp()
+    WearApp(Theme.ThemeType.LIGHT)
 }

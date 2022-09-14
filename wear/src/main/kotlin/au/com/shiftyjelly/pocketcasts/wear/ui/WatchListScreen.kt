@@ -16,13 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Chip
@@ -31,6 +31,10 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.Text
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
+import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.profile.R as PR
@@ -172,7 +176,7 @@ private fun UpNextChip(navController: NavHostController?, numInUpNext: Int) {
                     .padding(vertical = 8.dp)
                     .aspectRatio(1f)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.theme.colors.primaryIcon02Active)
             ) {
                 val num = if (numInUpNext < 10) numInUpNext.toString() else "9+"
                 Text(
@@ -186,6 +190,10 @@ private fun UpNextChip(navController: NavHostController?, numInUpNext: Int) {
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
-private fun WatchListPreview() {
-    WatchListScreen(navController = null)
+private fun WatchListPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    WearAppTheme(themeType) {
+        WatchListScreen(navController = null)
+    }
 }
