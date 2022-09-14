@@ -250,6 +250,8 @@ interface Settings {
 
     fun getGitHash(): String?
 
+    fun getSentryDsn(): String
+
     fun isScreenReaderOn(): Boolean
 
     fun getSkipForwardInSecs(): Int
