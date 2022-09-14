@@ -16,8 +16,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -90,7 +90,7 @@ class AccountDetailsViewModel
     private fun deleteAccountError(throwable: Throwable) {
         deleteAccountState.postValue(DeleteAccountState.Failure(message = null))
         Timber.e(throwable)
-        CrashlyticsHelper.recordException("Delete account failed", throwable)
+        SentryHelper.recordException("Delete account failed", throwable)
     }
 
     fun clearDeleteAccountState() {

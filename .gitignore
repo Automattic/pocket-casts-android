@@ -55,3 +55,6 @@ firebase.secrets.json
 
 # ripgrep ignore file
 .rgignore
+
+# Sentry
+sentry.properties

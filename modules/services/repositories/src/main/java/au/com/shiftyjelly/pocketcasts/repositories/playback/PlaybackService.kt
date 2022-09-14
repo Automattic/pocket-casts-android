@@ -37,9 +37,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -247,7 +247,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                         } catch (e: ForegroundServiceStartNotAllowedException) {
                             addBatteryWarnings()
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
-                            CrashlyticsHelper.recordException(e)
+                            SentryHelper.recordException(e)
                             AnalyticsHelper.foregroundServiceStartNotAllowedException()
                         }
                     } else {
