@@ -1,30 +1,110 @@
 default_platform(:android)
+fastlane_require 'dotenv'
 
 unless FastlaneCore::Helper.bundler?
   UI.user_error!('Please run fastlane via `bundle exec`')
 end
 
-before_all do |lane|
-  # Ensure we use the latest version of the toolkit
-  check_for_toolkit_updates unless is_ci || ENV['FASTLANE_SKIP_TOOLKIT_UPDATE_CHECK']
-end
-
 ########################################################################
 # Constants
 ########################################################################
+ENV_FILE_NAME = '.pocketcastsandroid-env.default'
+USER_ENV_FILE_PATH = File.join(Dir.home, ENV_FILE_NAME)
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
+APP_PACKAGE_NAME = 'au.com.shiftyjelly.pocketcasts'
 GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
 
+########################################################################
+# Environment
+########################################################################
+Dotenv.load(USER_ENV_FILE_PATH)
+ENV["PROJECT_NAME"] = "pocket-casts-android"
+ENV["PROJECT_ROOT_FOLDER"] = "./"
+ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
+GH_REPOSITORY = "automattic/pocket-casts-android"
+# TODO: Disable building/uploading automative artifacts until we get everything working
+#APPS = ["app", "automotive"]
+APPS = ["app"]
+
+UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
+
+before_all do |lane|
+  # Ensure we use the latest version of the toolkit
+  check_for_toolkit_updates unless is_ci || ENV['FASTLANE_SKIP_TOOLKIT_UPDATE_CHECK']
+
+  # Check that the env files exist
+  # rubocop:disable Style/IfUnlessModifier
+  unless is_ci || File.file?(USER_ENV_FILE_PATH)
+    example_path = File.join(PROJECT_ROOT_FOLDER, 'fastlane/env/user.env-example')
+    UI.user_error! "#{ENV_FILE_NAME} not found: Please copy '#{example_path}' to '#{USER_ENV_FILE_PATH}' and fill in the values."
+  end
+end
+
 platform :android do
-  #####################################################################################
-  # build_and_instrumented_test
-  # -----------------------------------------------------------------------------------
-  # Run instrumented tests in Google Firebase Test Lab
-  # -----------------------------------------------------------------------------------
-  # Usage:
-  # bundle exec fastlane build_and_instrumented_test
+  # - Builds the app for external beta distribution
+  # - Uploads the builds to 'beta' channel in Play Store (but does not release it)
+  # - Creates draft Github release
   #
-  #####################################################################################
+  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
+  # @option [Boolean] skip_prechecks (default: false) If true, skips android_build_preflight
+  # @option [Boolean] create_gh_release (default: false) If true, creates a draft GitHub release
+  #
+  desc "Builds and uploads a new beta build to Google Play (without releasing it)"
+  lane :build_and_upload_beta do | options |
+    android_build_prechecks(skip_confirm: options[:skip_confirm], alpha: false, beta: true, final: false) unless (options[:skip_prechecks])
+    android_build_preflight() unless options[:skip_prechecks]
+
+    version = android_get_release_version()
+    release_assets = []
+
+    APPS.each do |app|
+        build_bundle(app: app, version: version)
+
+        aab_artifact_path = aab_artifact_path(app, version)
+        UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
+
+        upload_to_play_store(
+          package_name: APP_PACKAGE_NAME,
+          aab: aab_artifact_path,
+          track: 'beta',
+          release_status: 'draft',
+          skip_upload_apk: true,
+          skip_upload_metadata: true,
+          skip_upload_changelogs: true,
+          skip_upload_images: true,
+          skip_upload_screenshots: true,
+          json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+        )
+
+        release_assets << aab_artifact_path
+    end
+
+    create_gh_release(version: version, prerelease: true, release_assets: release_assets.compact) if options[:create_release]
+  end
+
+  # Builds an app bundle
+  desc "Builds an app bundle"
+  lane :build_bundle do | options |
+    # Create the file names
+    version = options[:version]
+    app = options[:app]
+    aab_artifact_path = aab_artifact_path(app, version)
+    build_dir = "artifacts/"
+
+    # Build
+    gradle(task: "clean")
+    UI.message("Running lint...")
+    gradle(task: ":#{app}:preBundleLint")
+    UI.message("Building #{version["name"]} / #{version["code"]} - #{aab_artifact_path}...")
+    gradle(task: ":#{app}:bundle", build_type: "Release")
+
+    Dir.chdir("..") do
+      sh("mkdir -p #{build_dir} && cp -v #{bundle_output_path(app)} #{aab_artifact_path}")
+      UI.message("Bundle ready: #{aab_artifact_path}")
+    end
+  end
+
+  # Run instrumented tests in Google Firebase Test Lab
   desc "Build the application and instrumented tests, then run the tests in Firebase Test Lab"
   lane :build_and_instrumented_test do | options |
     gradle(tasks: ['assembleDebug', 'assembleDebugAndroidTest'])
@@ -45,6 +125,42 @@ platform :android do
       apk_path: File.join(apk_dir, 'debug', 'app-debug.apk'),
       results_output_dir: File.join(PROJECT_ROOT_FOLDER, 'build', 'instrumented-tests')
      )
+  end
+
+  #####################################################################################
+  # Private lanes
+  #####################################################################################
+
+  # Creates a new GitHub Release for the given version
+  #
+  # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
+  # @param [Bool] prerelease If true, the GitHub Release will have the prerelease flag
+  #
+  private_lane :create_gh_release do | options |
+    version = options[:version]
+    prerelease = options[:prerelease] || false
+    release_assets = options[:release_assets]
+
+    create_release(
+      repository: GH_REPOSITORY,
+      version: version["name"],
+      release_notes_file_path: nil,
+      prerelease: prerelease,
+      release_assets: release_assets.join(',')
+    )
+  end
+
+  #####################################################################################
+  # Utils
+  #####################################################################################
+  def aab_artifact_path(app, version)
+    File.join(PROJECT_ROOT_FOLDER, 'artifacts', "#{app}-#{version["name"]}.aab")
+  end
+
+  def bundle_output_path(app)
+    output_dir = "#{app}/build/outputs/bundle"
+    # TODO: Ideally we won't need this type of separation which is caused by the extra 'automotive` flavor
+    app == "app" ? "#{output_dir}/release/app-release.aab" : "#{output_dir}/automotiveRelease/automotive-automotive-release.aab"
   end
 
   def firebase_secret(name:)

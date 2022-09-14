@@ -28,10 +28,10 @@ android {
     if (canSignRelease) {
         signingConfigs {
             release {
-                storeFile = file(pocketcastsKeyStoreFile)
-                storePassword = pocketcastsKeyStorePassword
-                keyAlias = pocketcastsKeyStoreAlias
-                keyPassword = pocketcastsKeyStoreAliasPassword
+                storeFile = releaseStoreFile
+                storePassword = getSecretProperty("signingKeyStorePassword", null)
+                keyAlias = getSecretProperty("signingKeyAlias", null)
+                keyPassword = getSecretProperty("signingKeyPassword", null)
             }
         }
     }
@@ -113,3 +113,7 @@ task useGoogleServicesDebugFile {
     }
 }
 preBuild.dependsOn(useGoogleServicesDebugFile)
+
+tasks.register("preBundleLint") {
+    dependsOn(tasks.named("lintRelease"))
+}

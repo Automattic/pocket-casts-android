@@ -14,7 +14,8 @@ def SERVER_SHORT_URL_PROD = "\"https://pca.st\""
 def WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
 
 ext {
-    canSignRelease = project.hasProperty('pocketcastsKeyStoreFile')
+    releaseStoreFile = file("$rootDir/${getSecretProperty("signingKeyStoreFile", null)}")
+    canSignRelease = releaseStoreFile.exists()
 }
 
 android {
@@ -23,8 +24,9 @@ android {
     defaultConfig {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
-        versionCode project.versionCode
-        versionName project.versionName
+        versionCode getVersionProperty("versionCode").toInteger()
+        versionName getVersionProperty("versionName")
+        // TODO: Use versionCode & versionName from version.properties
         buildConfigField 'int', 'VERSION_CODE', "${project.versionCode}"
         buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
 
