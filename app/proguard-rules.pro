@@ -56,12 +56,9 @@
 # dagger 2
 -dontwarn com.google.errorprone.annotations.*
 
-# crashlytics
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception
--keep class com.crashlytics.** { *; }
--dontwarn com.crashlytics.**
 -keep class com.google.android.gms.measurement.** { *; }
 -dontwarn com.google.android.gms.measurement.**
 
@@ -128,7 +125,6 @@
 # clean up notes
 -dontnote io.reactivex.**
 -dontnote com.facebook.stetho.**
--dontnote com.crashlytics.**
 -dontnote com.afollestad.materialdialogs.internal.**
 -dontnote com.astuetz.**
 -dontnote com.google.android.gms.**

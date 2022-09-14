@@ -153,7 +153,6 @@ dependencies {
     implementation androidLibs.constraintLayout
     implementation androidLibs.cast
     implementation platform(androidLibs.firebaseBom)
-    implementation androidLibs.firebaseCrashlytics
     implementation androidLibs.firebaseAnalytics
     implementation androidLibs.firebaseConfig
     implementation androidLibs.liveDataReactiveStreams
@@ -216,6 +215,10 @@ dependencies {
     implementation libs.hiltAndroid
     implementation libs.hiltWorkManager
     implementation libs.accompanistFlowLayout
+    implementation platform(libs.sentryBom)
+    implementation libs.sentry
+    implementation libs.sentryFragment
+    implementation libs.sentryTimber
 
     kapt libs.moshiKotlinCompile
     kapt libs.glideCompile

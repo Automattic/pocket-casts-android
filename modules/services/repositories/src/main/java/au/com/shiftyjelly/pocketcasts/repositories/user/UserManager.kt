@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -61,7 +61,7 @@ class UserManagerImpl @Inject constructor(
 
                 (settings.isLoggedInObservable as? BehaviorRelay<Boolean>)?.accept(settings.isLoggedIn())
             } catch (t: Throwable) {
-                CrashlyticsHelper.recordException("Account monitoring crash.", t)
+                SentryHelper.recordException("Account monitoring crash.", t)
             }
         }
 
