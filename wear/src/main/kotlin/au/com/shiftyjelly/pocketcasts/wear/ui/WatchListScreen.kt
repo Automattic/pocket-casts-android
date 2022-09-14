@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -174,14 +173,14 @@ private fun UpNextChip(navController: NavHostController?, numInUpNext: Int) {
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
-                    .aspectRatio(1f)
                     .clip(CircleShape)
                     .background(MaterialTheme.theme.colors.primaryIcon02Active)
             ) {
-                val num = if (numInUpNext < 10) numInUpNext.toString() else "9+"
+                val num = if (numInUpNext < 100) numInUpNext.toString() else "99+"
                 Text(
                     text = num,
                     textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 6.dp)
                 )
             }
         }
