@@ -22,19 +22,27 @@ static def loadPropertiesFromFile(inputFile) {
 //
 // The long term solution is to move the version information out of the `base.gradle` and into the specific
 // app & automotive modules and pass this information to the modules that require it.
+def isAutomotiveBuild = project.findProperty("IS_AUTOMOTIVE_BUILD") ?: false
 def getVersionCode = {
     def appVersionCode = versionProperties.getProperty("versionCode", null).toInteger()
-    if ((project.findProperty("IS_AUTOMOTIVE_BUILD") ?: false).toBoolean()) {
+    if (isAutomotiveBuild) {
         return appVersionCode + VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_AUTOMOTIVE
     }
     return appVersionCode
+}
+def getVersionName = {
+    def versionName = versionProperties.getProperty("versionName", null)
+    if (isAutomotiveBuild) {
+        return "${versionName}a"
+    }
+    return versionName
 }
 
 project.ext {
     // Application
     applicationId = 'au.com.shiftyjelly.pocketcasts'
 
-    versionName = versionProperties.getProperty("versionName", null)
+    versionName = getVersionName()
     versionCode = getVersionCode()
 
     // Android
