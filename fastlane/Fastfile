@@ -122,7 +122,7 @@ platform :android do
         release_assets << aab_artifact_path
     end
 
-    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_release]
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
   end
 
   lane :finalize_release do | options |
