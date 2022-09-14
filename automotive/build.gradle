@@ -35,7 +35,7 @@ android {
         release {
             manifestPlaceholders = [
                     gitHash: "",
-                    sentryDsn: project.properties['pocketcastsSentryDsn'] ?: ""
+                    sentryDsn: project.pocketcastsSentryDsn
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

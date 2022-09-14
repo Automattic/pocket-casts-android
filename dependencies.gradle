@@ -62,6 +62,7 @@ project.ext {
     // Secrets
     settingsEncryptSecret = secretProperties.getProperty("pocketcastsSettingsEncryptSecret", "")
     sharingServerSecret = secretProperties.getProperty("pocketcastsSharingServerSecret", "")
+    pocketcastsSentryDsn = secretProperties.getProperty("pocketcastsSentryDsn", "")
 
     // Library versions
     versionBillingClient = '5.0.0'
