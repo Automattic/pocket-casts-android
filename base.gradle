@@ -28,8 +28,8 @@ android {
         buildConfigField 'int', 'VERSION_CODE', "${project.versionCode}"
         buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
 
-        buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.properties["pocketcastsSettingsEncryptSecret"] ?: ""}\""
-        buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.properties["pocketcastsSharingServerSecret"] ?: ""}\""
+        buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${getSecretProperty("pocketcastsSettingsEncryptSecret", "")}\""
+        buildConfigField "String", "SHARING_SERVER_SECRET", "\"${getSecretProperty("pocketcastsSharingServerSecret", "")}\""
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")

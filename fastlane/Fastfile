@@ -1,0 +1,56 @@
+default_platform(:android)
+
+unless FastlaneCore::Helper.bundler?
+  UI.user_error!('Please run fastlane via `bundle exec`')
+end
+
+before_all do |lane|
+  # Ensure we use the latest version of the toolkit
+  check_for_toolkit_updates unless is_ci || ENV['FASTLANE_SKIP_TOOLKIT_UPDATE_CHECK']
+end
+
+########################################################################
+# Constants
+########################################################################
+PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
+GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
+
+platform :android do
+  #####################################################################################
+  # build_and_instrumented_test
+  # -----------------------------------------------------------------------------------
+  # Run instrumented tests in Google Firebase Test Lab
+  # -----------------------------------------------------------------------------------
+  # Usage:
+  # bundle exec fastlane build_and_instrumented_test
+  #
+  #####################################################################################
+  desc "Build the application and instrumented tests, then run the tests in Firebase Test Lab"
+  lane :build_and_instrumented_test do | options |
+    gradle(tasks: ['assembleDebug', 'assembleDebugAndroidTest'])
+
+    # Run the instrumented tests in Firebase Test Lab
+    firebase_login(
+      key_file: GOOGLE_FIREBASE_SECRETS_PATH
+    )
+
+    apk_dir = File.join(PROJECT_ROOT_FOLDER, 'app', 'build', 'outputs', 'apk')
+
+    android_firebase_test(
+      project_id: firebase_secret(name: 'project_id'),
+      key_file: GOOGLE_FIREBASE_SECRETS_PATH,
+      model: 'Nexus5',
+      version: 23,
+      test_apk_path: File.join(apk_dir, 'androidTest', 'debug', 'app-debug-androidTest.apk'),
+      apk_path: File.join(apk_dir, 'debug', 'app-debug.apk'),
+      results_output_dir: File.join(PROJECT_ROOT_FOLDER, 'build', 'instrumented-tests')
+     )
+  end
+
+  def firebase_secret(name:)
+     UI.user_error!('Unable to locale Firebase Secrets File – did you run `bundle exec fastlane run configure_apply`?') unless File.file? GOOGLE_FIREBASE_SECRETS_PATH
+     key_file_secrets = JSON.parse(File.read(GOOGLE_FIREBASE_SECRETS_PATH))
+     UI.user_error!("Unable to find key `#{name}` in #{GOOGLE_FIREBASE_SECRETS_PATH}") if key_file_secrets[name].nil?
+     key_file_secrets[name]
+   end
+end
