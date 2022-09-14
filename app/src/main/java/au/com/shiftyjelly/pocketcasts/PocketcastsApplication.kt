@@ -6,6 +6,8 @@ import android.os.StrictMode
 import androidx.core.os.ConfigurationCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -50,6 +52,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 class PocketcastsApplication : Application(), Configuration.Provider {
 
+    @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
     @Inject lateinit var statsManager: StatsManager
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var episodeManager: EpisodeManager
@@ -65,6 +68,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var appIcon: AppIcon
     @Inject lateinit var coilImageLoader: ImageLoader
     @Inject lateinit var userManager: UserManager
+    @Inject lateinit var tracker: TracksAnalyticsTracker
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -88,7 +92,14 @@ class PocketcastsApplication : Application(), Configuration.Provider {
 
         setupCrashlytics()
         setupLogging()
+        setupAnalytics()
         setupApp()
+    }
+
+    private fun setupAnalytics() {
+        AnalyticsTracker.registerTracker(tracker)
+        AnalyticsTracker.init(settings)
+        AnalyticsTracker.refreshMetadata()
     }
 
     private fun setupCrashlytics() {
@@ -124,6 +135,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
 
             AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@PocketcastsApplication))
             notificationHelper.setupNotificationChannels()
+            appLifecycleObserver.setup()
 
             Coil.setImageLoader(coilImageLoader)
 

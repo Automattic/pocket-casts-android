@@ -10,6 +10,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.runBlocking
@@ -34,7 +35,7 @@ class PocketCastsAccountAuthenticator(val context: Context, private val accountA
         if (authToken.isNullOrEmpty() && account != null) {
             runBlocking {
                 Timber.d("Signing in to get a new token")
-                val authResult = accountAuth.signInWithEmailAndPassword(account.name, accountManager.getPassword(account))
+                val authResult = accountAuth.signInWithEmailAndPassword(account.name, accountManager.getPassword(account), SignInSource.AccountAuthenticator)
                 if (authResult is AccountAuth.AuthResult.Success) {
                     Timber.d("Token refresh success")
                     authToken = authResult.result

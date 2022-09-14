@@ -254,4 +254,6 @@ class FolderManagerImpl @Inject constructor(
             return itemsSorted
         }
     }
+
+    override fun countFolders() = folderDao.count()
 }

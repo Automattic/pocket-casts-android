@@ -9,12 +9,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 
 @Composable
-fun RowTextButton(text: String, modifier: Modifier = Modifier, secondaryText: String? = null, onClick: () -> Unit) {
+fun RowTextButton(text: String, modifier: Modifier = Modifier, secondaryText: String? = null, onClick: () -> Unit, fontSize: TextUnit = 17.sp) {
     Row(
         modifier = modifier
             .clickable { onClick() }
@@ -24,13 +25,13 @@ fun RowTextButton(text: String, modifier: Modifier = Modifier, secondaryText: St
     ) {
         Text(
             text = text,
-            fontSize = 17.sp,
+            fontSize = fontSize,
             color = MaterialTheme.theme.colors.primaryText01
         )
         if (secondaryText != null) {
             Text(
                 text = secondaryText,
-                fontSize = 17.sp,
+                fontSize = fontSize,
                 color = MaterialTheme.theme.colors.primaryText02
             )
         }

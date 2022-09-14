@@ -45,6 +45,7 @@ buildscript {
 }
 
 plugins {
+    id 'com.mikepenz.aboutlibraries.plugin' version '10.4.0' apply false
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'com.diffplug.spotless' version '6.2.2'
 }
@@ -81,6 +82,13 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "https://a8c-libs.s3.amazonaws.com/android"
+            content {
+                includeGroup "com.automattic"
+                includeGroup "com.automattic.tracks"
+            }
+        }
     }
 }
 

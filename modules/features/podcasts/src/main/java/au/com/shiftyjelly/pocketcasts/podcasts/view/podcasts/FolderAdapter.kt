@@ -73,8 +73,8 @@ class FolderAdapter(
             }
             FolderItem.Folder.viewTypeId -> {
                 val podcastsLayout = settings.getPodcastsLayout()
-                val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == Settings.PODCAST_GRID_LAYOUT_SMALL_ARTWORK, context = context).pxToDp(parent.context).toInt()
-                FolderViewHolder(ComposeView(parent.context), theme, gridWidthDp, podcastsLayout, onFolderClick = { clickListener.onFolderClick(it.uuid) })
+                val gridWidthDp = UiUtil.getGridImageWidthPx(smallArtwork = podcastsLayout == Settings.PodcastGridLayoutType.SMALL_ARTWORK.id, context = context).pxToDp(parent.context).toInt()
+                FolderViewHolder(ComposeView(parent.context), theme, gridWidthDp, podcastsLayout, onFolderClick = { clickListener.onFolderClick(it.uuid, isUserInitiated = true) })
             }
             else -> throw Exception("Unknown view type $viewType")
         }
@@ -160,7 +160,7 @@ class FolderAdapter(
         val unplayedBackground: ImageView? = view.findViewById(R.id.unplayed_background)
         val countTextMarginSmall: Int = 2.dpToPx(view.resources.displayMetrics)
         val countTextMarginLarge: Int = 4.dpToPx(view.resources.displayMetrics)
-        val isListLayout: Boolean = layout == Settings.PODCAST_GRID_LAYOUT_LIST_VIEW
+        val isListLayout: Boolean = layout == Settings.PodcastGridLayoutType.LIST_VIEW.id
 
         fun bind(podcast: Podcast, badgeType: Settings.BadgeType, podcastUuidToBadge: Map<String, Int>, clickListener: ClickListener) {
             button.setOnClickListener { clickListener.onPodcastClick(podcast, itemView) }
@@ -237,6 +237,6 @@ class FolderAdapter(
 
     interface ClickListener {
         fun onPodcastClick(podcast: Podcast, view: View)
-        fun onFolderClick(folderUuid: String)
+        fun onFolderClick(folderUuid: String, isUserInitiated: Boolean)
     }
 }

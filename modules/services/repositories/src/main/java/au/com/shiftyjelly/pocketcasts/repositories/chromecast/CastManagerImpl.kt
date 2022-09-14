@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chromecast
 
 import android.content.Context
+import androidx.core.content.ContextCompat
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.Session
@@ -23,7 +24,14 @@ class CastManagerImpl @Inject constructor(@ApplicationContext private val contex
     override val isConnectedObservable = BehaviorRelay.create<Boolean>().apply { accept(false) }
 
     init {
-        getSessionManager()?.addSessionManagerListener(sessionManagerListener)
+        try {
+            val executor = ContextCompat.getMainExecutor(context)
+            CastContext.getSharedInstance(context, executor)
+                .addOnFailureListener { e -> LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to init CastContext shared instance ${e.message}") }
+                .addOnSuccessListener { castContext -> castContext.sessionManager.addSessionManagerListener(sessionManagerListener) }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to setup Chromecast.")
+        }
     }
 
     override suspend fun isAvailable(): Boolean {

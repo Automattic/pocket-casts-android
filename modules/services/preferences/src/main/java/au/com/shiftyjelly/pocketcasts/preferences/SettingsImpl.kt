@@ -55,6 +55,7 @@ class SettingsImpl @Inject constructor(
     companion object {
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
+        private const val SEND_USAGE_STATS_KEY = "SendUsageStatsKey"
     }
 
     private var languageCode: String? = null
@@ -1029,11 +1030,11 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getPodcastsLayout(): Int {
-        return getInt("PODCAST_GRID_LAYOUT", Settings.PODCAST_GRID_LAYOUT_LARGE_ARTWORK)
+        return getInt("PODCAST_GRID_LAYOUT", Settings.PodcastGridLayoutType.LARGE_ARTWORK.id)
     }
 
     override fun isPodcastsLayoutListView(): Boolean {
-        return getPodcastsLayout() == Settings.PODCAST_GRID_LAYOUT_LIST_VIEW
+        return getPodcastsLayout() == Settings.PodcastGridLayoutType.LIST_VIEW.id
     }
 
     override fun getAutoArchiveExcludedPodcasts(): List<String> {
@@ -1347,4 +1348,11 @@ class SettingsImpl @Inject constructor(
 
     override fun getTimesToShowBatteryWarning(): Int =
         getInt(SHOWN_BATTERY_WARNING_KEY, 4)
+
+    override fun setSendUsageStats(value: Boolean) {
+        setBoolean(SEND_USAGE_STATS_KEY, value)
+    }
+
+    override fun getSendUsageStats(): Boolean =
+        getBoolean(SEND_USAGE_STATS_KEY, true)
 }

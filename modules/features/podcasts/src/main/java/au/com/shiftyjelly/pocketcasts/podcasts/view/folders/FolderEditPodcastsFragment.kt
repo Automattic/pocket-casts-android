@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -57,5 +58,10 @@ class FolderEditPodcastsFragment : BaseDialogFragment() {
                 }
             }
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        viewModel.trackDismiss()
+        super.onDismiss(dialog)
     }
 }

@@ -8,14 +8,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateTosBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class CreateTOSFragment : BaseFragment() {
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: CreateAccountViewModel by activityViewModels()
     private var binding: FragmentCreateTosBinding? = null
@@ -37,6 +41,7 @@ class CreateTOSFragment : BaseFragment() {
 
         binding.btnAgree.setOnClickListener {
             viewModel.updateTermsOfUse(true)
+            analyticsTracker.track(AnalyticsEvent.TERMS_OF_USE_ACCEPTED)
 
             if (viewModel.upgradeMode.value == true) {
                 viewModel.updateStateTotAccountCreated()
@@ -48,6 +53,7 @@ class CreateTOSFragment : BaseFragment() {
 
         binding.btnDisagree.setOnClickListener {
             viewModel.updateTermsOfUse(false)
+            analyticsTracker.track(AnalyticsEvent.TERMS_OF_USE_REJECTED)
             requireActivity().finish()
         }
 

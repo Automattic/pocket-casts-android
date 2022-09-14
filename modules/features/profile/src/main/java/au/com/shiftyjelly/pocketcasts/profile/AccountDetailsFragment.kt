@@ -17,6 +17,8 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -56,6 +58,7 @@ class AccountDetailsFragment : BaseFragment() {
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: AccountDetailsViewModel by viewModels()
     private var binding: FragmentAccountDetailsBinding? = null
@@ -149,8 +152,7 @@ class AccountDetailsFragment : BaseFragment() {
         viewModel.marketingOptInState.observe(viewLifecycleOwner) { marketingOptIn ->
             binding.swtNewsletter?.isChecked = marketingOptIn
             binding.swtNewsletter?.setOnCheckedChangeListener { _, isChecked ->
-                settings.setMarketingOptIn(isChecked)
-                settings.setMarketingOptInNeedsSync(true)
+                viewModel.updateNewsletter(isChecked)
             }
         }
 
@@ -183,10 +185,12 @@ class AccountDetailsFragment : BaseFragment() {
         }
 
         binding.btnPrivacyPolicy?.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY)
             context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_PRIVACY_URL)))
         }
 
         binding.btnTermsOfUse?.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_SHOW_TOS)
             context?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Settings.INFO_TOS_URL)))
         }
     }
@@ -267,7 +271,7 @@ class AccountDetailsFragment : BaseFragment() {
 
     private fun performSignOut() {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "User requested to sign out")
-        userManager.signOut(playbackManager)
+        userManager.signOut(playbackManager, wasInitiatedByUser = true)
         activity?.onBackPressed()
     }
 }
