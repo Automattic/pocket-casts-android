@@ -341,7 +341,6 @@ Language: ar
 	<string name="settings_title_storage">التخزين واستخدام البيانات</string>
 	<string name="settings_title_playback">عام</string>
 	<string name="settings_title_notifications">التنبيهات</string>
-	<string name="settings_title_manage_downloads">إدارة التنزيلات</string>
 	<string name="settings_title_import_export">استيراد وتصدير OPML</string>
 	<string name="settings_title_help">المساعدة والملاحظات</string>
 	<string name="settings_title_excluded_podcasts">البث الصوتي المُستبعد</string>
@@ -357,7 +356,6 @@ Language: ar
 	<string name="settings_storage_move_podcasts">جارٍ نقل البث الصوتي...</string>
 	<string name="settings_storage_move_message">سيقوم هذا بنقل ملفات البث الصوتي إلى هذا الموقع الجديد.</string>
 	<string name="settings_storage_move">نقل</string>
-	<string name="settings_storage_manage_downloads">إدارة الملفات التي تم تنزيلها</string>
 	<string name="settings_storage_folder_write_failed">يتعذر الكتابة على هذا المجلد.</string>
 	<string name="settings_storage_folder_not_found">يتعذر العثور على المجلد أو إنشاؤه.</string>
 	<string name="settings_storage_folder_change_failed">يتعذر التغيير إلى مجلد مخصص.</string>
@@ -505,7 +503,6 @@ Language: ar
 	<string name="plus_renews_automatically_yearly">يتم التجديد سنويًا تلقائيًا</string>
 	<string name="plus_best_value">أفضل قيمة</string>
 	<string name="plus_select_payment_frequency">تحديد وتيرة الدفع</string>
-	<string name="plus_year_month_price">⁦%1$s⁩ في السنة / ⁦%2$s⁩ في الشهر</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">الترقية إلى Pocket Casts Plus</string>
 	<string name="plus_trial_finished_locked">سيتم قفل الوصول إلى ميزات Pocket Casts Plus</string>
 	<string name="plus_trial_finished_files_removed">ستتم إزالة الملفات التي تم رفعها إلى حسابك بعد أسبوع</string>
@@ -515,8 +512,6 @@ Language: ar
 	<string name="plus_themes_icons_body">أظهر معدنك الحقيقي. أيقونات وقوالب حصرية لنادي plus فقط.</string>
 	<string name="plus_themes_icons">القوالب والأيقونات</string>
 	<string name="plus_thanks_for_your_support_bang">شكرًا لك على دعمك!</string>
-	<string name="plus_per_month">%s / شهريًا</string>
-	<string name="plus_month_price">%s في الشهر</string>
 	<string name="plus_lifetime_member">عضو مدى الحياة</string>
 	<string name="plus_learn_more_button">أعرف أكثر</string>
 	<string name="plus_learn_more_about_plus">معرفة المزيد حول Pocket Casts Plus</string>
@@ -622,7 +617,6 @@ Language: ar
 	<string name="profile_payment_failed_detail">يبدو أنه كانت مشكلة في معالجة عملية الدفع الخاصة بك. الرجاء المحاولة مرة أخرى.</string>
 	<string name="profile_payment_failed">فشلت عملية الدفع</string>
 	<string name="profile_payment_cancelled">تم إلغاء عملية الدفع</string>
-	<string name="profile_pay_now">الدفع الآن</string>
 	<string name="profile_password_changed_successful">تم بنجاح!</string>
 	<string name="profile_password_changed">تم تغيير كلمة المرور</string>
 	<string name="profile_password">كلمة المرور</string>
@@ -750,7 +744,6 @@ Language: ar
 	<string name="profile_account_created">تم إنشاء حساب</string>
 	<string name="profile_access_ends">ينتهي الوصول: %s</string>
 	<string name="profile_access_ended">انتهى الوصول: %s</string>
-	<string name="profile_1_year_free">عام واحد مجانًا</string>
 	<string name="profile">الملف الشخصي</string>
 	<string name="filters_warning_delete_summary">يتعذر التراجع عن هذه العملية.</string>
 	<string name="filters_title_new_releases">إصدارات جديدة</string>
@@ -1007,7 +1000,6 @@ Language: ar
 	<string name="player_up_next_empty_desc">يمكنك إدراج الحلقات في قائمة الانتظار لتشغيلها بعد ذلك عن طريق التمرير إلى اليمين في صفوف الحلقة أو النقر على الأيقونة الموجودة على بطاقة الحلقة.</string>
 	<string name="player_up_next_empty">لا يوجد شيء في التالي</string>
 	<string name="player_up_next_clear_queue_button">مسح التالي</string>
-	<string name="player_up_next_clear_queue_summary">يتعذر التراجع عن مسح قائمتك التالية</string>
 	<string name="player_up_next_clear_queue">مسح قائمة الانتظار</string>
 	<string name="player_trim_silence_detail">يقلل طول الحلقة عن طريق إزالة السكوت في المحادثات.</string>
 	<string name="player_time_saved_no_hour">تهانينا! إنك توفِّر الوقت وتحصل على مزيد من البث الصوتي.</string>
@@ -1032,7 +1024,6 @@ Language: ar
 	<string name="player_notification_skip_back">الرجوع %d من الثواني</string>
 	<string name="player_more_actions">المزيد من الإجراءات</string>
 	<string name="player_full_screen">وضع ملء الشاشة</string>
-	<string name="player_end_playback_clear_up_next">نهاية التشغيل ومسح التالي</string>
 	<string name="player_effects_volume_boost">تعزيز الصوت</string>
 	<string name="player_effects_voices_sound_louder">تبدو الأصوات أعلى</string>
 	<string name="player_effects_trim_silence">إزالة السكوت</string>

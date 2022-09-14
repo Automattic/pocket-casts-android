@@ -3,6 +3,10 @@ package au.com.shiftyjelly.pocketcasts.account
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -24,17 +28,42 @@ class AccountAuth @Inject constructor(
     private val settings: Settings,
     private val serverManager: ServerManager,
     private val podcastManager: PodcastManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext private val context: Context
 ) {
 
-    suspend fun signInWithEmailAndPassword(email: String, password: String): AuthResult {
+    companion object {
+        private const val KEY_SIGN_IN_SOURCE = "sign_in_source"
+        private const val KEY_ERROR_CODE = "error_code"
+    }
+
+    suspend fun signInWithEmailAndPassword(
+        email: String,
+        password: String,
+        signInSource: SignInSource
+    ): AuthResult {
         return withContext(Dispatchers.IO) {
             val authResult = loginToSyncServer(email, password)
             if (authResult is AuthResult.Success) {
                 val token = authResult.result
                 signInSuccessful(email, password, token)
             }
+            trackSignIn(authResult, signInSource)
             authResult
+        }
+    }
+
+    private fun trackSignIn(authResult: AuthResult, signInSource: SignInSource) {
+        val properties = mapOf(KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
+        when (authResult) {
+            is AuthResult.Success -> {
+                analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
+            }
+            is AuthResult.Failed -> {
+                val errorCodeValue = authResult.serverMessageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+                val errorProperties = properties.plus(KEY_ERROR_CODE to errorCodeValue)
+                analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, errorProperties)
+            }
         }
     }
 
@@ -56,11 +85,27 @@ class AccountAuth @Inject constructor(
                 object : ServerCallback<String> {
                     override fun dataReturned(result: String?) {
                         continuation.resume(AuthResult.Success(result))
+                        analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
                     }
 
-                    override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                        val message = userMessageId?.let { getResourceString(userMessageId) } ?: userMessage ?: getResourceString(LR.string.error_login_failed)
-                        continuation.resume(AuthResult.Failed(message = message, field = InputField.GENERAL))
+                    override fun onFailed(
+                        errorCode: Int,
+                        userMessage: String?,
+                        serverMessageId: String?,
+                        serverMessage: String?,
+                        throwable: Throwable?
+                    ) {
+                        val message = LocaliseHelper.serverMessageIdToMessage(serverMessageId, ::getResourceString)
+                            ?: userMessage
+                            ?: getResourceString(LR.string.error_login_failed)
+                        continuation.resume(
+                            AuthResult.Failed(
+                                message = message,
+                                serverMessageId = serverMessageId
+                            )
+                        )
+                        val errorCodeValue = serverMessageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+                        analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED, mapOf(KEY_ERROR_CODE to errorCodeValue))
                     }
                 }
             )
@@ -76,9 +121,22 @@ class AccountAuth @Inject constructor(
                         continuation.resume(AuthResult.Success(result))
                     }
 
-                    override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                        val message = userMessageId?.let { getResourceString(userMessageId) } ?: userMessage ?: getResourceString(LR.string.error_login_failed)
-                        continuation.resume(AuthResult.Failed(message = message, field = InputField.GENERAL))
+                    override fun onFailed(
+                        errorCode: Int,
+                        userMessage: String?,
+                        serverMessageId: String?,
+                        serverMessage: String?,
+                        throwable: Throwable?
+                    ) {
+                        val message = LocaliseHelper.serverMessageIdToMessage(serverMessageId, ::getResourceString)
+                            ?: userMessage
+                            ?: getResourceString(LR.string.error_login_failed)
+                        continuation.resume(
+                            AuthResult.Failed(
+                                message = message,
+                                serverMessageId = serverMessageId
+                            )
+                        )
                     }
                 }
             )
@@ -91,11 +149,25 @@ class AccountAuth @Inject constructor(
             object : ServerCallback<String> {
                 override fun dataReturned(result: String?) {
                     complete(AuthResult.Success(result))
+                    analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_RESET)
                 }
 
-                override fun callFailed(errorCode: Int, userMessage: String?, userMessageId: Int?, serverMessage: String?, throwable: Throwable?) {
-                    val message = userMessageId?.let { getResourceString(userMessageId) } ?: userMessage ?: getResourceString(LR.string.profile_reset_password_failed)
-                    complete(AuthResult.Failed(message, InputField.GENERAL))
+                override fun onFailed(
+                    errorCode: Int,
+                    userMessage: String?,
+                    serverMessageId: String?,
+                    serverMessage: String?,
+                    throwable: Throwable?
+                ) {
+                    val message = LocaliseHelper.serverMessageIdToMessage(serverMessageId, ::getResourceString)
+                        ?: userMessage
+                        ?: getResourceString(LR.string.profile_reset_password_failed)
+                    complete(
+                        AuthResult.Failed(
+                            message = message,
+                            serverMessageId = serverMessageId
+                        )
+                    )
                 }
             }
         )
@@ -126,19 +198,13 @@ class AccountAuth @Inject constructor(
         return context.resources.getString(stringId)
     }
 
-    enum class InputField {
-        EMAIL,
-        PASSWORD,
-        GENERAL
-    }
-
     sealed class AuthResult {
         data class Success(val result: String?) : AuthResult()
-        data class Failed(val message: String, val field: InputField) : AuthResult() {
-            val isPasswordError: Boolean = field == InputField.PASSWORD
-        }
-
-        val isSuccess: Boolean
-            get() = this is Success
+        data class Failed(val message: String, val serverMessageId: String?) : AuthResult()
     }
+}
+
+enum class SignInSource(val analyticsValue: String) {
+    AccountAuthenticator("account_manager"),
+    SignInViewModel("sign_in_view_model"),
 }

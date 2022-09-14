@@ -341,7 +341,6 @@ Language: nb_NO
 	<string name="settings_title_storage">Lagring og databruk</string>
 	<string name="settings_title_playback">Generelt</string>
 	<string name="settings_title_notifications">Varslinger</string>
-	<string name="settings_title_manage_downloads">Administrer nedlastinger</string>
 	<string name="settings_title_import_export">Importer og eksporter OPML</string>
 	<string name="settings_title_help">Hjelp og tilbakemeldinger</string>
 	<string name="settings_title_excluded_podcasts">Utelatte podcaster</string>
@@ -357,7 +356,6 @@ Language: nb_NO
 	<string name="settings_storage_move_podcasts">Flytter podcaster …</string>
 	<string name="settings_storage_move_message">Dette vil flytte eksisterende podcast-filer til den nye plasseringen.</string>
 	<string name="settings_storage_move">Flytt</string>
-	<string name="settings_storage_manage_downloads">Administrer nedlastede filer</string>
 	<string name="settings_storage_folder_write_failed">Denne mappen kan ikke skrives til.</string>
 	<string name="settings_storage_folder_not_found">Finner ikke mappen, eller den kan ikke opprettes.</string>
 	<string name="settings_storage_folder_change_failed">Kan ikke bytte til egendefinert mappe.</string>
@@ -505,7 +503,6 @@ Language: nb_NO
 	<string name="plus_renews_automatically_yearly">Fornyes automatisk per år</string>
 	<string name="plus_best_value">BESTE VERDI</string>
 	<string name="plus_select_payment_frequency">Velg betalingshyppighet</string>
-	<string name="plus_year_month_price">%1$s per år / %2$s per måned</string>
 	<string name="plus_upgrade_to_pocket_casts_plus">Oppgrader til Pocket Casts Plus</string>
 	<string name="plus_trial_finished_locked">Tilgang til Pocket Casts Plus-funksjoner blir sperret</string>
 	<string name="plus_trial_finished_files_removed">Filer lastet opp til kontoen din blir fjernet etter en uke</string>
@@ -515,8 +512,6 @@ Language: nb_NO
 	<string name="plus_themes_icons_body">Vis ditt sanne jeg. Eksklusive ikoner og temaer kun for Plus-klubben.</string>
 	<string name="plus_themes_icons">Temaer og ikoner</string>
 	<string name="plus_thanks_for_your_support_bang">Takk for støtten!</string>
-	<string name="plus_per_month">%s / måned</string>
-	<string name="plus_month_price">%s per måned</string>
 	<string name="plus_lifetime_member">Livstidsmedlem</string>
 	<string name="plus_learn_more_button">Finn ut mer</string>
 	<string name="plus_learn_more_about_plus">Finn ut mer om Pocket Casts Plus</string>
@@ -622,7 +617,6 @@ Language: nb_NO
 	<string name="profile_payment_failed_detail">Det virker som det oppstod et problem under behandling av betalingen. Prøv på nytt.</string>
 	<string name="profile_payment_failed">Betaling mislyktes</string>
 	<string name="profile_payment_cancelled">Betaling kansellert</string>
-	<string name="profile_pay_now">Betal nå</string>
 	<string name="profile_password_changed_successful">Vellykket!</string>
 	<string name="profile_password_changed">Passord endret</string>
 	<string name="profile_password">Passord</string>
@@ -750,7 +744,6 @@ Language: nb_NO
 	<string name="profile_account_created">Konto opprettet</string>
 	<string name="profile_access_ends">Tilgang avsluttes: %s</string>
 	<string name="profile_access_ended">Tilgang avsluttet: %s</string>
-	<string name="profile_1_year_free">1 år gratis</string>
 	<string name="profile">Profil</string>
 	<string name="filters_warning_delete_summary">Dette kan ikke angres.</string>
 	<string name="filters_title_new_releases">Nye utgivelser</string>
@@ -1007,7 +1000,6 @@ Language: nb_NO
 	<string name="player_up_next_empty_desc">Du kan sette episoder i kø for avspilling ved å sveipe til høyre på episoderader eller ved å trykke på ikonet på et episodekort.</string>
 	<string name="player_up_next_empty">Ingenting i Neste</string>
 	<string name="player_up_next_clear_queue_button">Tøm Neste</string>
-	<string name="player_up_next_clear_queue_summary">Tømming av Neste-listen kan ikke angres</string>
 	<string name="player_up_next_clear_queue">Tøm kø</string>
 	<string name="player_trim_silence_detail">Reduserer lengden på en episode ved å kutte bort stillhet i samtaler.</string>
 	<string name="player_time_saved_no_hour">Gratulerer! Du sparer tid og kan gå gjennom flere podcaster.</string>
@@ -1032,7 +1024,6 @@ Language: nb_NO
 	<string name="player_notification_skip_back">Tilbake %d sekunder</string>
 	<string name="player_more_actions">Flere handlinger</string>
 	<string name="player_full_screen">Full skjerm</string>
-	<string name="player_end_playback_clear_up_next">Avslutt avspilling og tøm Neste</string>
 	<string name="player_effects_volume_boost">Volumøkning</string>
 	<string name="player_effects_voices_sound_louder">Stemmer blir høyere</string>
 	<string name="player_effects_trim_silence">Kutt av stillhet</string>

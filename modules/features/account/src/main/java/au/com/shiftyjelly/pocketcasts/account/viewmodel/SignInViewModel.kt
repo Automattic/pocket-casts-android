@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -56,16 +57,17 @@ class SignInViewModel
     }
 
     fun signIn() {
-        val emailString = email.value ?: ""
-        val pwdString = password.value ?: ""
-        if (emailString.isEmpty() || pwdString.isEmpty()) {
+        val emailString = email.value
+        val pwdString = password.value
+        if (emailString.isNullOrEmpty() || pwdString.isNullOrEmpty()) {
             return
         }
         signInState.postValue(SignInState.Loading)
 
         subscriptionManager.clearCachedStatus()
         viewModelScope.launch {
-            when (val result = auth.signInWithEmailAndPassword(emailString, pwdString)) {
+            val result = auth.signInWithEmailAndPassword(emailString, pwdString, SignInSource.SignInViewModel)
+            when (result) {
                 is AccountAuth.AuthResult.Success -> {
                     signInState.postValue(SignInState.Success)
                 }

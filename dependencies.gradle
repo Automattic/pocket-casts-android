@@ -26,7 +26,7 @@ project.ext {
     applicationId = 'au.com.shiftyjelly.pocketcasts'
 
     versionCode = getVersionCode()
-    versionName = '7.21.0' + getVersionNameSuffix()
+    versionName = '7.22.0' + getVersionNameSuffix()
 
     // Android
     minSdkVersion = 23
@@ -53,6 +53,9 @@ project.ext {
     versionRoom = '2.4.3'
     versionTest = '1.4.0'
     versionWork = '2.7.1'
+
+    // Automattic library versions
+    versionTracks = '2.2.0'
 
     androidLibs = [
             appCompat: "androidx.appcompat:appcompat:1.5.0",
@@ -184,7 +187,9 @@ project.ext {
             mockWebServer: "com.squareup.okhttp3:mockwebserver:4.9.3",
             barista: "com.adevinta.android:barista:4.2.0",
             // Accompanist - https://google.github.io/accompanist/
-            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1"
+            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1",
+            //Automattic Tracks
+            automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks"
     ]
 
 }

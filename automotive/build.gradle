@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-parcelize'
+    id 'com.mikepenz.aboutlibraries.plugin'
 }
 apply from: "../base.gradle"
 
@@ -9,6 +10,11 @@ android {
     defaultConfig {
         applicationId project.applicationId
         minSdkVersion 28
+    }
+
+    buildFeatures {
+        viewBinding true
+        compose true
     }
 
     if (canSignRelease) {
@@ -45,15 +51,6 @@ android {
 
         }
     }
-
-    flavorDimensions "automotive"
-    productFlavors {
-        automotive {
-            dimension "automotive"
-            buildConfigField "String", "SYNC_USERNAME", "null"
-            buildConfigField "String", "SYNC_PASSWORD", "null"
-        }
-    }
 }
 
 dependencies {
@@ -64,6 +61,8 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'com.mikepenz:aboutlibraries-core:10.4.0'
+    implementation 'com.mikepenz:aboutlibraries-compose:10.4.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -74,6 +73,7 @@ dependencies {
     implementation project(':modules:services:model')
     implementation project(':modules:services:ui')
     implementation project(':modules:services:views')
+    implementation project(':modules:services:compose')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:servers')
     implementation project(':modules:features:profile')

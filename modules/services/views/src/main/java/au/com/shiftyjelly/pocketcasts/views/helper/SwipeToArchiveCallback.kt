@@ -102,6 +102,27 @@ class EpisodeItemTouchHelper(onLeftItem1: (episode: Playable, index: Int) -> Uni
         mDy = 0f
         mRecoverAnimations.clear()
     }
+
+    enum class SwipeAction(val analyticsValue: String) {
+        UP_NEXT_REMOVE("up_next_remove"),
+        UP_NEXT_ADD_TOP("up_next_add_top"),
+        UP_NEXT_ADD_BOTTOM("up_next_add_bottom"),
+        UP_NEXT_MOVE_TOP("up_next_move_top"),
+        UP_NEXT_MOVE_BOTTOM("up_next_move_bottom"),
+        DELETE("delete"),
+        UNARCHIVE("unarchive"),
+        ARCHIVE("archive"),
+    }
+
+    enum class SwipeSource(val analyticsValue: String) {
+        PODCAST_DETAILS("podcast_details"),
+        FILTERS("filters"),
+        DOWNLOADS("downloads"),
+        LISTENING_HISTORY("listening_history"),
+        STARRED("starred"),
+        FILES("files"),
+        UP_NEXT("up_next"),
+    }
 }
 
 private abstract class SwipeToArchiveCallback() : MultiSwipeHelper.SimpleCallback(0, ItemTouchHelper.LEFT.or(ItemTouchHelper.RIGHT)) {

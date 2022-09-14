@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -29,7 +31,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-open class SyncServerManager @Inject constructor(@SyncServerRetrofit retrofit: Retrofit, val settings: Settings, @SyncServerCache val cache: Cache) {
+open class SyncServerManager @Inject constructor(
+    @SyncServerRetrofit retrofit: Retrofit,
+    val settings: Settings,
+    @SyncServerCache val cache: Cache,
+    private val analyticsTracker: AnalyticsTrackerWrapper
+) {
 
     val server = retrofit.create(SyncServer::class.java)
 
@@ -49,19 +56,30 @@ open class SyncServerManager @Inject constructor(@SyncServerRetrofit retrofit: R
                 "mobile"
             )
             server.emailChange(addBearer(token), request)
+        }.doOnSuccess {
+            if (it.success == true) {
+                analyticsTracker.track(AnalyticsEvent.USER_EMAIL_UPDATED)
+            }
         }
     }
 
-    fun deleteAccount(): Single<UserChangeResponse> {
-        return getCacheTokenOrLogin { token ->
+    fun deleteAccount(): Single<UserChangeResponse> =
+        getCacheTokenOrLogin { token ->
             server.deleteAccount(addBearer(token))
+        }.doOnSuccess {
+            if (it.success == true) {
+                analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_DELETED)
+            }
         }
-    }
 
     fun pwdChange(pwdNew: String, pwdOld: String): Single<PwdChangeResponse> {
         return getCacheTokenOrLogin { token ->
             val request = PwdChangeRequest(pwdNew, pwdOld, "mobile")
             server.pwdChange(addBearer(token), request)
+        }.doOnSuccess {
+            if (it.success == true) {
+                analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_UPDATED)
+            }
         }
     }
 

@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDays
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralMonths
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYears
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
 
@@ -14,7 +15,6 @@ sealed interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
 }
 
 sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
-    val pricingPhase: ProductDetails.PricingPhase
     val formattedPrice: String
         get() = pricingPhase.formattedPrice
     val perPeriod: Int
@@ -26,13 +26,27 @@ sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
 }
 
 sealed interface SubscriptionPricingPhase {
+    val pricingPhase: ProductDetails.PricingPhase
     val periodRes: Int
     fun periodValue(res: Resources): String
+    fun phaseType(): Type = pricingPhase.subscriptionPricingPhaseType
+
+    enum class Type { TRIAL, RECURRING, UNKNOWN }
+
+    private val ProductDetails.PricingPhase.subscriptionPricingPhaseType: Type
+        get() = when (recurrenceMode) {
+            ProductDetails.RecurrenceMode.FINITE_RECURRING -> Type.TRIAL
+            ProductDetails.RecurrenceMode.INFINITE_RECURRING -> Type.RECURRING
+            else -> {
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Unable to determine SubscriptionPricingPhase.Type")
+                Type.UNKNOWN
+            }
+        }
 
     class Years(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period
-    ) : RecurringSubscriptionPricingPhase {
+    ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_year
         override val perPeriod = R.string.profile_per_year
@@ -55,7 +69,7 @@ sealed interface SubscriptionPricingPhase {
     class Months(
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period
-    ) : RecurringSubscriptionPricingPhase {
+    ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_month
         override val perPeriod = R.string.profile_per_month
@@ -75,10 +89,17 @@ sealed interface SubscriptionPricingPhase {
             res.getString(R.string.plus_then_slash_month, pricingPhase.formattedPrice)
     }
 
-    class Days(private val period: Period) : TrialSubscriptionPricingPhase {
-
+    class Days(
+        override val pricingPhase: ProductDetails.PricingPhase,
+        private val period: Period
+    ) : TrialSubscriptionPricingPhase {
         override val periodRes = R.string.plus_day
-
         override fun periodValue(res: Resources): String = res.getStringPluralDays(period.days)
+
+        init {
+            if (phaseType() != Type.TRIAL) {
+                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "Got a phase type of ${phaseType()} for a Days phase, which only extends TrialSubscriptionPricingPhase")
+            }
+        }
     }
 }

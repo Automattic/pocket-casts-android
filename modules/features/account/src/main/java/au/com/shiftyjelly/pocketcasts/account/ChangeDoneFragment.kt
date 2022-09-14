@@ -88,4 +88,9 @@ class ChangeDoneFragment : BaseFragment() {
         binding.txtDoneSecondary.isVisible = true
         binding.btnDone.isVisible = true
     }
+
+    override fun onBackPressed(): Boolean {
+        viewModel.trackDismissed()
+        return super.onBackPressed()
+    }
 }

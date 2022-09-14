@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(val settings: Settings, val podcastManager: PodcastManager, val statsManager: StatsManager, val userManager: UserManager) : ViewModel() {
-
+    var isFragmentChangingConfigurations: Boolean = false
     val podcastCount: LiveData<Int> = LiveDataReactiveStreams.fromPublisher(podcastManager.observeCountSubscribed())
     val daysListenedCount: MutableLiveData<Long> = MutableLiveData()
     val daysSavedCount: MutableLiveData<Long> = MutableLiveData()

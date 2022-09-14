@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.UpgradeAccountViewModel
@@ -18,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,17 +36,20 @@ class PlusUpgradeFragment : BaseDialogFragment() {
         object Unknown : UpgradePage(promotionId = "UNKNOWN", promotionName = "Unknown", featureBlocked = false)
 
         companion object {
-            fun fromString(value: String): UpgradePage {
-                return when (value) {
-                    Folders.promotionId -> Folders
-                    else -> Unknown
-                }
+            fun fromString(value: String) = when (value) {
+                Profile.promotionId -> Profile
+                Files.promotionId -> Files
+                Folders.promotionId -> Folders
+                Themes.promotionId -> Themes
+                Icons.promotionId -> Icons
+                else -> Unknown
             }
         }
     }
 
     companion object {
         private const val EXTRA_START_PAGE = "extra_start_page"
+        private const val SOURCE_KEY = "source"
 
         fun newInstance(upgradePage: UpgradePage): PlusUpgradeFragment {
             return PlusUpgradeFragment().apply {
@@ -53,11 +59,14 @@ class PlusUpgradeFragment : BaseDialogFragment() {
     }
 
     @Inject lateinit var settings: Settings
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: UpgradeAccountViewModel by viewModels()
 
     private val upgradePage: UpgradePage
         get() = UpgradePage.fromString(arguments?.getString(EXTRA_START_PAGE) ?: "")
+    private val promotionSource: String
+        get() = upgradePage.promotionId.lowercase(Locale.ENGLISH)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
@@ -78,7 +87,7 @@ class PlusUpgradeFragment : BaseDialogFragment() {
 
     override fun onResume() {
         super.onResume()
-
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, mapOf(SOURCE_KEY to promotionSource))
         AnalyticsHelper.plusUpgradeViewed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
     }
 
@@ -88,6 +97,7 @@ class PlusUpgradeFragment : BaseDialogFragment() {
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, mapOf(SOURCE_KEY to promotionSource))
         AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
     }
 
@@ -101,12 +111,13 @@ class PlusUpgradeFragment : BaseDialogFragment() {
             intent.data = Uri.parse(Settings.INTENT_LINK_UPGRADE)
             startActivity(intent)
         }
-
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, mapOf(SOURCE_KEY to promotionSource))
         AnalyticsHelper.plusUpgradeConfirmed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
         dismiss()
     }
 
     private fun closeUpgrade() {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, mapOf(SOURCE_KEY to promotionSource))
         AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
         dismiss()
     }

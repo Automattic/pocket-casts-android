@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -12,8 +14,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditViewModel.Companion.COLOR_KEY
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +49,10 @@ class FolderCreateFragment : BaseDialogFragment() {
                         composable(NavRoutes.podcasts) {
                             FolderEditPodcastsPage(
                                 onCloseClick = { dismiss() },
-                                onNextClick = { navController.navigate(NavRoutes.name) },
+                                onNextClick = {
+                                    viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_CREATE_NAME_SHOWN)
+                                    navController.navigate(NavRoutes.name)
+                                },
                                 viewModel = viewModel,
                                 settings = settings,
                                 fragmentManager = parentFragmentManager
@@ -52,16 +61,22 @@ class FolderCreateFragment : BaseDialogFragment() {
                         composable(NavRoutes.name) {
                             FolderEditNamePage(
                                 onBackClick = { navController.popBackStack() },
-                                onNextClick = { navController.navigate(NavRoutes.color) },
+                                onNextClick = {
+                                    viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_CREATE_COLOR_SHOWN)
+                                    navController.navigate(NavRoutes.color)
+                                },
                                 viewModel = viewModel
                             )
                         }
                         composable(NavRoutes.color) {
+                            val colors = MaterialTheme.theme.colors
                             FolderEditColorPage(
                                 onBackClick = { navController.popBackStack() },
                                 onSaveClick = {
                                     viewModel.saveFolder(resources = resources) { folder ->
                                         sharedViewModel.folderUuid = folder.uuid
+                                        val colorHex = ColorUtils.colorIntToHexString(colors.getFolderColor(folder.color).toArgb())
+                                        viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_SAVED, mapOf(COLOR_KEY to colorHex))
                                         AnalyticsHelper.folderCreated()
                                         dismiss()
                                     }

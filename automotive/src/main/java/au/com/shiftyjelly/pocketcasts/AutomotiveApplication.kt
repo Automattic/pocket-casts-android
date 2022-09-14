@@ -68,13 +68,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
                 downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
-
-                if (!settings.isLoggedIn() && BuildConfig.SYNC_USERNAME != null) {
-                    val authResult = accountAuth.signInWithEmailAndPassword(BuildConfig.SYNC_USERNAME, BuildConfig.SYNC_PASSWORD)
-                    Log.i(Settings.LOG_TAG_AUTO, "$authResult")
-                } else {
-                    RefreshPodcastsTask.runNow(this@AutomotiveApplication)
-                }
+                RefreshPodcastsTask.runNow(this@AutomotiveApplication)
             }
         }
 
