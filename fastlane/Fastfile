@@ -153,7 +153,7 @@ platform :android do
 
     gradle(task: "clean")
     UI.message("Running lint...")
-    gradle(task: ":#{app}:preBundleLint")
+    gradle(task: ":#{app}:lintRelease")
     UI.message("Building #{version["name"]} / #{version["code"]} - #{aab_artifact_path}...")
     gradle(
         task: ":#{app}:bundle",
@@ -223,9 +223,7 @@ platform :android do
   end
 
   def bundle_output_path(app)
-    output_dir = "#{app}/build/outputs/bundle"
-    # TODO: Ideally we won't need this type of separation which is caused by the extra 'automotive` flavor
-    app == APPS_APP ? "#{output_dir}/release/app-release.aab" : "#{output_dir}/automotiveRelease/automotive-automotive-release.aab"
+    "#{app}/build/outputs/bundle/release/#{app}-release.aab"
   end
 
   def firebase_secret(name:)
