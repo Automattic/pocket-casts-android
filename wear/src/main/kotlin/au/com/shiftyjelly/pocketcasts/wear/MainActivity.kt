@@ -50,11 +50,9 @@ fun WearApp(themeType: Theme.ThemeType) {
             composable(NowPlayingScreen.route) { NowPlayingScreen() }
             composable(UpNextScreen.route) { UpNextScreen() }
             composable(PodcastsScreen.route) {
-                PodcastsScreen(
-                    onNavigateToPodcast = { podcastUuid ->
-                        navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                    }
-                )
+                PodcastsScreen { podcastUuid ->
+                    navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+                }
             }
             composable(
                 route = PodcastScreen.route,
