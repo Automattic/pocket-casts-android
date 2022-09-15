@@ -176,6 +176,7 @@ project.ext {
             hiltDaggerCompiler: "com.google.dagger:hilt-compiler:$versionHilt",
             hiltCompiler: "androidx.hilt:hilt-compiler:1.0.0",
             hiltWorkManager: "androidx.hilt:hilt-work:1.0.0",
+            hiltNavigationCompose: "androidx.hilt:hilt-navigation-compose:1.0.0",
             // Lottie
             lottie: "com.airbnb.android:lottie:5.2.0",
             // JUnit

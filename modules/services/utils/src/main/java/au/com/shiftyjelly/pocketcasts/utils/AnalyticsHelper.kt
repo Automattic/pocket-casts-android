@@ -8,7 +8,7 @@ import com.google.firebase.analytics.FirebaseAnalytics.Param
 import timber.log.Timber
 
 object AnalyticsHelper {
-    private lateinit var firebaseAnalytics: FirebaseAnalytics
+    private var firebaseAnalytics: FirebaseAnalytics? = null
     fun setup(analytics: FirebaseAnalytics) {
         firebaseAnalytics = analytics
     }
@@ -258,7 +258,7 @@ object AnalyticsHelper {
     }
 
     private fun logEvent(name: String, bundle: Bundle? = Bundle()) {
-        firebaseAnalytics.logEvent(name, bundle)
+        firebaseAnalytics?.logEvent(name, bundle)
 
         Timber.d("Analytic event $name $bundle")
     }

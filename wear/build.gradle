@@ -45,6 +45,7 @@ dependencies {
     implementation androidLibs.composeActivity
     implementation androidLibs.composeUi
     implementation androidLibs.composeUiToolingPreview
+    implementation libs.hiltNavigationCompose
 
     // Compose for Wear OS Dependencies
     implementation androidLibs.wearComposeMaterial
@@ -59,5 +60,7 @@ dependencies {
     implementation project(':modules:services:ui')
     implementation project(':modules:services:utils')
     implementation project(':modules:services:images')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:model')
     implementation project(':modules:features:profile')
 }
