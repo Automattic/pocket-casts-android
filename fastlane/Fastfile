@@ -16,6 +16,8 @@ GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files'
 ORIGINALS_METADATA_DIR_PATH = File.join(PROJECT_ROOT_FOLDER, 'metadata')
 RELEASE_NOTES_SOURCE_PATH = File.join(PROJECT_ROOT_FOLDER, 'CHANGELOG.md')
 EXTRACTED_RELEASE_NOTES_PATH = File.join(ORIGINALS_METADATA_DIR_PATH, 'release_notes.txt')
+PLAY_STORE_TRACK_AUTOMOTIVE_BETA = "automotive:beta"
+PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION = "automotive:production"
 PLAY_STORE_TRACK_BETA = "beta"
 PLAY_STORE_TRACK_PRODUCTION = "production"
 
@@ -106,10 +108,16 @@ platform :android do
         aab_artifact_path = aab_artifact_path(app, version)
         UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
 
+        track = if (app == APPS_AUTOMOTIVE)
+            is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
+        else
+            is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
+        end
+
         upload_to_play_store(
           package_name: APP_PACKAGE_NAME,
           aab: aab_artifact_path,
-          track: is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION,
+          track: track,
           release_status: 'draft',
           skip_upload_apk: true,
           skip_upload_metadata: true,
