@@ -30,7 +30,7 @@ project.ext {
 
     // Android
     minSdkVersion = 23
-    minSdkVersionWear = 23
+    minSdkVersionWear = 26
     targetSdkVersion = 31
     compileSdkVersion = 32
     testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
@@ -126,6 +126,8 @@ project.ext {
             composeNavigation: "androidx.navigation:navigation-compose:$versionNavigation",
             composeRx: "androidx.compose.runtime:runtime-rxjava2:$versionCompose",
             composeViewModel: "androidx.lifecycle:lifecycle-viewmodel-compose:$versionLifecycle",
+            wearComposeMaterial: "androidx.wear.compose:compose-material:$versionComposeWear",
+            wearComposeFoundation: "androidx.wear.compose:compose-foundation:$versionComposeWear",
             guava: 'com.google.guava:guava:27.1-android' // Required to fix conflict between versions in exoplayer and workmanager
     ]
 
