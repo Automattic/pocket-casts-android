@@ -3,60 +3,60 @@ package au.com.shiftyjelly.pocketcasts.wear
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.Text
+import androidx.wear.compose.navigation.SwipeDismissableNavHost
+import androidx.wear.compose.navigation.composable
+import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.wear.ui.DownloadsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.NowPlayingScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.PodcastsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject lateinit var theme: Theme
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
-            WearApp()
+            // TODO add lines for radioactive theme
+            WearApp(theme.activeTheme)
         }
     }
 }
 
 @Composable
-fun WearApp() {
-    WearAppTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background)
-                .selectableGroup(),
-            verticalArrangement = Arrangement.Center
+fun WearApp(themeType: Theme.ThemeType) {
+    WearAppTheme(themeType) {
+
+        val navController = rememberSwipeDismissableNavController()
+        SwipeDismissableNavHost(
+            navController = navController,
+            startDestination = WatchListScreen.route
         ) {
-            Greeting()
+            composable(WatchListScreen.route) { WatchListScreen(navController) }
+            composable(NowPlayingScreen.route) { NowPlayingScreen() }
+            composable(UpNextScreen.route) { UpNextScreen() }
+            composable(PodcastsScreen.route) { PodcastsScreen() }
+            composable(FiltersScreen.route) { FiltersScreen() }
+            composable(DownloadsScreen.route) { DownloadsScreen() }
+            composable(FilesScreen.route) { FilesScreen() }
         }
     }
-}
-
-@Composable
-fun Greeting() {
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colors.primary,
-        text = stringResource(LR.string.app_name)
-    )
 }
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    WearApp()
+    WearApp(Theme.ThemeType.LIGHT)
 }

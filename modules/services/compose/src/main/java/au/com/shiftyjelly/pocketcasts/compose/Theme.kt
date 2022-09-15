@@ -10,7 +10,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
-private val LocalColors = staticCompositionLocalOf { PocketCastsTheme(colors = ThemeLightColors, isLight = true) }
+val LocalColors = staticCompositionLocalOf { PocketCastsTheme(colors = ThemeLightColors, isLight = true) }
 
 /**
  * This theme should be used to support light/dark colors if the composable root of the view tree
@@ -32,7 +32,21 @@ fun AppTheme(
     themeType: Theme.ThemeType,
     content: @Composable () -> Unit
 ) {
-    val colors = when (themeType) {
+    val colors = themeTypeToColors(themeType)
+    val isLight = !themeType.darkTheme
+    val theme = PocketCastsTheme(colors = colors, isLight = isLight)
+
+    CompositionLocalProvider(LocalColors provides theme) {
+        MaterialTheme(
+            colors = buildMaterialColors(colors, isLight),
+            content = content
+        )
+    }
+}
+
+@Composable
+fun themeTypeToColors(themeType: Theme.ThemeType) =
+    when (themeType) {
         Theme.ThemeType.LIGHT -> ThemeLightColors
         Theme.ThemeType.DARK -> ThemeDarkColors
         Theme.ThemeType.EXTRA_DARK -> ThemeExtraDarkColors
@@ -44,17 +58,6 @@ fun AppTheme(
         Theme.ThemeType.LIGHT_CONTRAST -> ThemeLightContrastColors
         Theme.ThemeType.DARK_CONTRAST -> ThemeDarkContrastColors
     }
-
-    val isLight = !themeType.darkTheme
-    val theme = PocketCastsTheme(colors = colors, isLight = isLight)
-
-    CompositionLocalProvider(LocalColors provides theme) {
-        MaterialTheme(
-            colors = buildMaterialColors(colors, isLight),
-            content = content
-        )
-    }
-}
 
 @Composable
 private fun SurfacedContent(
