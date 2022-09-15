@@ -30,9 +30,6 @@ buildscript {
         classpath 'com.google.android.gms:oss-licenses-plugin:0.10.5'
         // Hilt dependency injection
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
-
-        // Configure plugin: https://github.com/Automattic/configure/
-        classpath 'com.automattic.android:configure:0.6.2'
     }
 
     // Force proguard to the new version to fix "proguard.ParseException: Use of generics not allowed for java type at '<1>_<2>_<3>JsonAdapter' in line 31 of file '/Users/philip/.gradle/caches/transforms-2/files-2.1/d5ca2d039e1d32e9ba6bfd6a67df5151/META-INF/proguard/moshi.pro'"
@@ -53,7 +50,6 @@ plugins {
 apply plugin: 'base'
 apply from: rootProject.file('dependencies.gradle')
 apply from: 'scripts/git-hooks/install.gradle'
-apply plugin: 'com.automattic.android.configure'
 
 apply plugin: 'com.diffplug.spotless'
 spotless {
