@@ -54,6 +54,7 @@ project.ext {
     versionRoom = '2.4.3'
     versionTest = '1.4.0'
     versionWork = '2.7.1'
+    versionHorologist = '0.1.11'
 
     // Automattic library versions
     versionTracks = '2.2.0'
@@ -129,6 +130,9 @@ project.ext {
             wearComposeMaterial: "androidx.wear.compose:compose-material:$versionComposeWear",
             wearComposeFoundation: "androidx.wear.compose:compose-foundation:$versionComposeWear",
             wearComposeNavigation:  "androidx.wear.compose:compose-navigation:$versionComposeWear",
+            horologistMedia: "com.google.android.horologist:horologist-media:$versionHorologist",
+            horologistMediaUi: "com.google.android.horologist:horologist-media-ui:$versionHorologist",
+            horologistMediaData: "com.google.android.horologist:horologist-media-data:$versionHorologist",
             guava: 'com.google.guava:guava:27.1-android' // Required to fix conflict between versions in exoplayer and workmanager
     ]
 
