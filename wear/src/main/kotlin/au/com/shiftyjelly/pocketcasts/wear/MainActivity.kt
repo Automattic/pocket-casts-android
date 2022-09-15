@@ -69,9 +69,12 @@ fun WearApp(themeType: Theme.ThemeType) {
                 route = PodcastsScreen.route,
                 scrollStateBuilder = { ScalingLazyListState() }
             ) {
-                PodcastsScreen { podcastUuid ->
-                    navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                }
+                PodcastsScreen(
+                    listState = it.scrollableState,
+                    onNavigateToPodcast = { podcastUuid ->
+                        navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+                    }
+                )
             }
 
             wearNavComposable(
