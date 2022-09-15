@@ -1,11 +1,16 @@
 {
   "project_name": "pocketcasts-android",
   "branch": "trunk",
-  "pinned_hash": "c024212f9013f282a2945df5749f406368c4546d",
+  "pinned_hash": "edeb13e77b282067bb6b867ea24af8fa9bca4e85",
   "files_to_copy": [
     {
       "file": "android/pocket-casts/secret.properties",
       "destination": "secret.properties",
+      "encrypt": true
+    },
+    {
+      "file": "android/pocket-casts/sentry.properties",
+      "destination": "sentry.properties",
       "encrypt": true
     },
     {

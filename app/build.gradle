@@ -50,10 +50,10 @@ android {
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher",
                     gitHash: "",
-                    sentryDsn: project.properties['pocketcastsSentryDsn'] ?: ""
+                    sentryDsn: project.pocketcastsSentryDsn
             ]
 
-            if (!project.properties['pocketcastsSentryDsn']) {
+            if (!project.pocketcastsSentryDsn) {
                 println "WARNING: Sentry DSN gradle property 'pocketcastsSentryDsn' not found. Crash reporting won't work without this."
             }
 
