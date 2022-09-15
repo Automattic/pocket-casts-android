@@ -1,26 +1,27 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui.podcasts
+package au.com.shiftyjelly.pocketcasts.wear.ui.podcast
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
-import au.com.shiftyjelly.pocketcasts.models.to.FolderItem.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PodcastsViewModel @Inject constructor(
+class PodcastViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val podcastManager: PodcastManager
 ) : ViewModel() {
 
+    private val podcastUuid: String = savedStateHandle[PodcastScreen.argument] ?: ""
+
     data class UiState(
-        val folder: Folder? = null,
-        val items: List<FolderItem> = emptyList(),
-        val isSignedInAsPlus: Boolean = false
+        val podcast: Podcast? = null
     )
 
     var uiState by mutableStateOf(UiState())
@@ -28,8 +29,8 @@ class PodcastsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val podcasts = podcastManager.findPodcastsOrderByTitle().map { FolderItem.Podcast(it) }
-            uiState = UiState(folder = null, items = podcasts, isSignedInAsPlus = false)
+            val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
+            uiState = UiState(podcast = podcast)
         }
     }
 }

@@ -57,9 +57,8 @@ fun WearApp(themeType: Theme.ThemeType) {
             composable(
                 route = PodcastScreen.route,
                 arguments = listOf(navArgument(PodcastScreen.argument) { type = NavType.StringType })
-            ) { backStackEntry ->
-                val podcastUuid = backStackEntry.arguments?.getString(PodcastScreen.argument) ?: ""
-                PodcastScreen(podcastUuid)
+            ) {
+                PodcastScreen()
             }
             composable(FiltersScreen.route) { FiltersScreen() }
             composable(DownloadsScreen.route) { DownloadsScreen() }
