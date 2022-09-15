@@ -13,25 +13,19 @@ def SERVER_LIST_HOST_PROD = "\"lists.pocketcasts.com\""
 def SERVER_SHORT_URL_PROD = "\"https://pca.st\""
 def WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
 
-ext {
-    releaseStoreFile = file("$rootDir/${getSecretProperty("signingKeyStoreFile", null)}")
-    canSignRelease = releaseStoreFile.exists()
-}
-
 android {
     compileSdkVersion project.compileSdkVersion
 
     defaultConfig {
         minSdkVersion project.minSdkVersion
         targetSdkVersion project.targetSdkVersion
-        versionCode getVersionProperty("versionCode").toInteger()
-        versionName getVersionProperty("versionName")
-        // TODO: Use versionCode & versionName from version.properties
+        versionCode project.versionCode
+        versionName project.versionName
+
         buildConfigField 'int', 'VERSION_CODE', "${project.versionCode}"
         buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
-
-        buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${getSecretProperty("pocketcastsSettingsEncryptSecret", "")}\""
-        buildConfigField "String", "SHARING_SERVER_SECRET", "\"${getSecretProperty("pocketcastsSharingServerSecret", "")}\""
+        buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.settingsEncryptSecret}\""
+        buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
@@ -76,6 +70,17 @@ android {
         exclude 'META-INF/licenses/ASM'
         // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
         exclude '**/attach_hotspot_windows.dll'
+    }
+
+    if (canSignRelease) {
+        signingConfigs {
+            release {
+                storeFile = project.storeFile
+                storePassword = project.storePassword
+                keyAlias = project.keyAlias
+                keyPassword = project.keyPassword
+            }
+        }
     }
 
     buildTypes {
@@ -126,6 +131,11 @@ android {
             buildConfigField "String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD
             buildConfigField "String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD
             buildConfigField "String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD
+
+            if (canSignRelease) {
+                signingConfig signingConfigs.release
+            }
+
         }
     }
 

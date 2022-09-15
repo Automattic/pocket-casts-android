@@ -18,17 +18,6 @@ android {
         compose true
     }
 
-    if (canSignRelease) {
-        signingConfigs {
-            release {
-                storeFile = releaseStoreFile
-                storePassword = getSecretProperty("signingKeyStorePassword", null)
-                keyAlias = getSecretProperty("signingKeyAlias", null)
-                keyPassword = getSecretProperty("signingKeyPassword", null)
-            }
-        }
-    }
-
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
@@ -50,11 +39,6 @@ android {
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            if (canSignRelease) {
-                signingConfig signingConfigs.release
-            }
-
         }
     }
 }

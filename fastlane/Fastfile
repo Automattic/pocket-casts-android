@@ -27,9 +27,9 @@ ENV["PROJECT_NAME"] = "pocket-casts-android"
 ENV["PROJECT_ROOT_FOLDER"] = "./"
 ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
 GH_REPOSITORY = "automattic/pocket-casts-android"
-# TODO: Disable building/uploading automative artifacts until we get everything working
-#APPS = ["app", "automotive"]
-APPS = ["app"]
+APPS_APP = "app"
+APPS_AUTOMOTIVE = "automotive"
+APPS = [APPS_APP, APPS_AUTOMOTIVE]
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
 
@@ -61,8 +61,8 @@ platform :android do
       new_version: new_version,
       release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
     )
-    setbranchprotection(repository:GHHELPER_REPO, branch: "release/#{new_version}")
-    setfrozentag(repository:GHHELPER_REPO, milestone: new_version)
+    setbranchprotection(repository:GH_REPOSITORY, branch: "release/#{new_version}")
+    setfrozentag(repository:GH_REPOSITORY, milestone: new_version)
   end
 
   lane :complete_code_freeze do | options |
@@ -101,7 +101,7 @@ platform :android do
     release_assets = []
 
     APPS.each do |app|
-        build_bundle(app: app)
+        build_bundle(app: app, version: version)
 
         aab_artifact_path = aab_artifact_path(app, version)
         UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
@@ -122,7 +122,7 @@ platform :android do
         release_assets << aab_artifact_path
     end
 
-    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_release]
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
   end
 
   lane :finalize_release do | options |
@@ -134,10 +134,10 @@ platform :android do
     version = android_get_release_version()
 
     # Wrap up
-    removebranchprotection(repository:GHHELPER_REPO, branch: "release/#{version["name"]}")
-    setfrozentag(repository:GHHELPER_REPO, milestone: version["name"], freeze: false)
-    create_new_milestone(repository:GHHELPER_REPO, need_appstore_submission: true)
-    close_milestone(repository:GHHELPER_REPO, milestone: version["name"])
+    removebranchprotection(repository:GH_REPOSITORY, branch: "release/#{version["name"]}")
+    setfrozentag(repository:GH_REPOSITORY, milestone: version["name"], freeze: false)
+    create_new_milestone(repository:GH_REPOSITORY, need_appstore_submission: true)
+    close_milestone(repository:GH_REPOSITORY, milestone: version["name"])
 
     trigger_release_build(branch_to_build: "release/#{version["name"]}")
   end
@@ -155,7 +155,13 @@ platform :android do
     UI.message("Running lint...")
     gradle(task: ":#{app}:preBundleLint")
     UI.message("Building #{version["name"]} / #{version["code"]} - #{aab_artifact_path}...")
-    gradle(task: ":#{app}:bundle", build_type: "Release")
+    gradle(
+        task: ":#{app}:bundle",
+        build_type: "Release",
+        properties: {
+            "IS_AUTOMOTIVE_BUILD" => app == APPS_AUTOMOTIVE
+        }
+    )
 
     Dir.chdir("..") do
       sh("mkdir -p #{build_dir} && cp -v #{bundle_output_path(app)} #{aab_artifact_path}")
@@ -219,7 +225,7 @@ platform :android do
   def bundle_output_path(app)
     output_dir = "#{app}/build/outputs/bundle"
     # TODO: Ideally we won't need this type of separation which is caused by the extra 'automotive` flavor
-    app == "app" ? "#{output_dir}/release/app-release.aab" : "#{output_dir}/automotiveRelease/automotive-automotive-release.aab"
+    app == APPS_APP ? "#{output_dir}/release/app-release.aab" : "#{output_dir}/automotiveRelease/automotive-automotive-release.aab"
   end
 
   def firebase_secret(name:)
