@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
+import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.profile.R as PR
@@ -146,12 +147,10 @@ private fun UpNextChip(navController: NavHostController?, numInUpNext: Int) {
         colors = ChipDefaults.chipColors(),
         modifier = Modifier.fillMaxWidth()
     ) {
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxHeight()
         ) {
-
             Box(
                 modifier = Modifier.wrapContentSize(align = Alignment.Center),
                 content = {

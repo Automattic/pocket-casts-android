@@ -1,24 +1,25 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui
+package au.com.shiftyjelly.pocketcasts.wear.ui.podcast
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object PodcastsScreen {
-    const val route = "podcasts_screen"
+object PodcastScreen {
+    const val argument = "podcastUuid"
+    const val route = "podcast/{$argument}"
+
+    fun navigateRoute(podcastUuid: String) = "podcast/$podcastUuid"
 }
 
 @Composable
-fun PodcastsScreen() {
+fun PodcastScreen(podcastUuid: String, modifier: Modifier = Modifier) {
     Text(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         color = MaterialTheme.colors.primary,
-        text = stringResource(LR.string.podcasts)
+        text = podcastUuid
     )
 }
