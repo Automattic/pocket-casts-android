@@ -128,6 +128,7 @@ project.ext {
             composeViewModel: "androidx.lifecycle:lifecycle-viewmodel-compose:$versionLifecycle",
             wearComposeMaterial: "androidx.wear.compose:compose-material:$versionComposeWear",
             wearComposeFoundation: "androidx.wear.compose:compose-foundation:$versionComposeWear",
+            wearComposeNavigation:  "androidx.wear.compose:compose-navigation:$versionComposeWear",
             guava: 'com.google.guava:guava:27.1-android' // Required to fix conflict between versions in exoplayer and workmanager
     ]
 

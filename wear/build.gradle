@@ -49,6 +49,7 @@ dependencies {
     // Compose for Wear OS Dependencies
     implementation androidLibs.wearComposeMaterial
     implementation androidLibs.wearComposeFoundation
+    implementation androidLibs.wearComposeNavigation
 
     wearApp project(":wear")
 
