@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+apply from: "../base.gradle"
+
+android {
+    defaultConfig {
+        minSdk project.minSdkVersionWear
+        applicationId project.applicationId
+    }
+
+    if (canSignRelease) {
+        signingConfigs {
+            release {
+                storeFile = file(pocketcastsKeyStoreFile)
+                storePassword = pocketcastsKeyStorePassword
+                keyAlias = pocketcastsKeyStoreAlias
+                keyPassword = pocketcastsKeyStoreAliasPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            if (canSignRelease) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+}
+
+dependencies {
+    // General Compose dependencies
+    implementation androidLibs.composeActivity
+    implementation androidLibs.composeUi
+    implementation androidLibs.composeUiToolingPreview
+
+    // Compose for Wear OS Dependencies
+    implementation androidLibs.wearComposeMaterial
+    implementation androidLibs.wearComposeFoundation
+
+    wearApp project(":wear")
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:images')
+}
