@@ -1,3 +1,10 @@
+7.24
+-----
+
+*   Bug Fixes:
+    *   Fix Mini Player long press mark as played button.
+        ([#330](https://github.com/Automattic/pocket-casts-android/pull/330)).
+
 7.23.0
 -----
 
