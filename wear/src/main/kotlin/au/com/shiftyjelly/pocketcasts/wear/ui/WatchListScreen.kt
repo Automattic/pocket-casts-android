@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
@@ -35,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.profile.R as PR
@@ -44,7 +48,11 @@ object WatchListScreen {
 }
 
 @Composable
-fun WatchListScreen(navigateToRoute: (String) -> Unit, scrollState: ScalingLazyListState) {
+fun WatchListScreen(
+    navigateToRoute: (String) -> Unit,
+    scrollState: ScalingLazyListState,
+    viewModel: WatchListViewModel = hiltViewModel()
+) {
     ScalingLazyColumn(
         state = scrollState,
         modifier = Modifier.fillMaxWidth(),
@@ -57,6 +65,29 @@ fun WatchListScreen(navigateToRoute: (String) -> Unit, scrollState: ScalingLazyL
                 color = MaterialTheme.colors.primary,
                 text = stringResource(LR.string.app_name)
             )
+        }
+
+        item {
+            val signInState by viewModel.signInState.subscribeAsState(null)
+            Timber.e("TEST123, isSignedIn: ${signInState?.isSignedIn}")
+            Timber.e("TEST123, signInState: $signInState")
+            when (signInState?.isSignedIn) {
+                true -> {
+                    WatchListChip(
+                        titleRes = LR.string.sign_out,
+                        iconRes = IR.drawable.ic_signout,
+                        onClick = viewModel::signOut,
+                    )
+                }
+                false -> {
+                    WatchListChip(
+                        titleRes = LR.string.sign_in,
+                        iconRes = IR.drawable.ic_profile,
+                        onClick = { navigateToRoute(authenticationSubGraph) },
+                    )
+                }
+                null -> { /* Do nothing */ }
+            }
         }
 
         item {

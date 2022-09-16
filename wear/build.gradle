@@ -23,6 +23,22 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+
+            def gitLongVersion = "git -C ${rootDir} describe --tags --long --dirty".execute().text.trim()
+            def (gitTag, versionBuild, gitHash, gitDirty) = gitLongVersion.tokenize('-')
+
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher_radioactive",
+                    gitHash: gitHash + (gitDirty ? ("-" + gitDirty) : "")
+            ]
+        }
+
+        debugProd {
+            initWith debug
+        }
+
         release {
             minifyEnabled true
             shrinkResources true
@@ -64,5 +80,7 @@ dependencies {
     implementation project(':modules:services:images')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:model')
+    implementation project(':modules:features:account')
     implementation project(':modules:features:profile')
+    implementation project(':modules:features:podcasts')
 }

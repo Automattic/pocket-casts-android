@@ -38,6 +38,7 @@ fun FormField(
     placeholder: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
     onNext: () -> Unit = {},
     singleLine: Boolean = true,
     imeAction: ImeAction = ImeAction.Done
@@ -56,6 +57,7 @@ fun FormField(
         keyboardOptions = KeyboardOptions(imeAction = imeAction, capitalization = KeyboardCapitalization.Sentences),
         keyboardActions = KeyboardActions(onAny = { onNext() }),
         singleLine = singleLine,
+        label = label,
         modifier = modifier
             .fillMaxWidth()
             .onPreviewKeyEvent {

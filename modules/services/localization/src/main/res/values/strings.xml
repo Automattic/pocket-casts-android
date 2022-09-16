@@ -1364,4 +1364,8 @@
     <string name="server_files_storage_limit_exceeded">You have exceeded the storage limit for your account.</string>
     <string name="server_files_title_required">Title is required.</string>
 
+    <!-- Wear -->
+
+    <string name="wear_enter_email">Enter your account email</string>
+
 </resources>
