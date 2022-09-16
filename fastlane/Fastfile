@@ -27,7 +27,8 @@ PLAY_STORE_TRACK_PRODUCTION = "production"
 Dotenv.load(USER_ENV_FILE_PATH)
 ENV["PROJECT_NAME"] = "pocket-casts-android"
 ENV["PROJECT_ROOT_FOLDER"] = "./"
-ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
+# TODO: Update this to `main` when we are ready to merge it the changes to `main`
+ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main-with-buildkite-release-cycle'
 GH_REPOSITORY = "automattic/pocket-casts-android"
 APPS_APP = "app"
 APPS_AUTOMOTIVE = "automotive"
