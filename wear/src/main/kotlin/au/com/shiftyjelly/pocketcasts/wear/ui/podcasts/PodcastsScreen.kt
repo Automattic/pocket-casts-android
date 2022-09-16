@@ -10,6 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.ScalingLazyColumn
+import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.items
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -23,12 +24,14 @@ object PodcastsScreen {
 fun PodcastsScreen(
     modifier: Modifier = Modifier,
     viewModel: PodcastsViewModel = hiltViewModel(),
+    listState: ScalingLazyListState,
     onNavigateToPodcast: (String) -> Unit
 ) {
     val uiState = viewModel.uiState
 
     ScalingLazyColumn(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        state = listState,
     ) {
         items(uiState.items) { item ->
             if (item is FolderItem.Podcast) {

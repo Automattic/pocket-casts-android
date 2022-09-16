@@ -67,6 +67,8 @@ dependencies {
 
     wearApp project(":wear")
 
+    implementation androidLibs.horologistComposeLayout
+
     implementation project(':modules:services:compose')
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')

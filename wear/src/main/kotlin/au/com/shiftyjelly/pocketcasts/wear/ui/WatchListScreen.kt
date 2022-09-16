@@ -23,12 +23,12 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.ScalingLazyColumn
+import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -45,10 +45,12 @@ object WatchListScreen {
 }
 
 @Composable
-fun WatchListScreen(navController: NavHostController?) {
+fun WatchListScreen(navigateToRoute: (String) -> Unit, scrollState: ScalingLazyListState) {
     ScalingLazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        state = scrollState,
+        modifier = Modifier.fillMaxWidth(),
     ) {
+
         item {
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -63,13 +65,13 @@ fun WatchListScreen(navController: NavHostController?) {
                 titleRes = LR.string.player_tab_playing_wide,
                 iconRes = IR.drawable.ic_play_all,
                 secondaryLabel = "A Really Long Podcast Name", // TODO
-                onClick = { navController?.navigate(NowPlayingScreen.route) },
+                onClick = { navigateToRoute(NowPlayingScreen.route) },
             )
         }
 
         item {
             UpNextChip(
-                navController = navController,
+                navigateToRoute = navigateToRoute,
                 numInUpNext = 100
             )
         }
@@ -78,7 +80,7 @@ fun WatchListScreen(navController: NavHostController?) {
             WatchListChip(
                 titleRes = LR.string.podcasts,
                 iconRes = IR.drawable.ic_podcasts,
-                onClick = { navController?.navigate(PodcastsScreen.route) }
+                onClick = { navigateToRoute(PodcastsScreen.route) }
             )
         }
 
@@ -86,7 +88,7 @@ fun WatchListScreen(navController: NavHostController?) {
             WatchListChip(
                 titleRes = LR.string.filters,
                 iconRes = IR.drawable.ic_filters,
-                onClick = { navController?.navigate(FiltersScreen.route) }
+                onClick = { navigateToRoute(FiltersScreen.route) }
             )
         }
 
@@ -94,7 +96,7 @@ fun WatchListScreen(navController: NavHostController?) {
             WatchListChip(
                 titleRes = LR.string.downloads,
                 iconRes = IR.drawable.ic_download,
-                onClick = { navController?.navigate(DownloadsScreen.route) }
+                onClick = { navigateToRoute(DownloadsScreen.route) }
             )
         }
 
@@ -102,7 +104,7 @@ fun WatchListScreen(navController: NavHostController?) {
             WatchListChip(
                 titleRes = LR.string.profile_navigation_files,
                 iconRes = PR.drawable.ic_file,
-                onClick = { navController?.navigate(FilesScreen.route) }
+                onClick = { navigateToRoute(FilesScreen.route) }
             )
         }
     }
@@ -141,10 +143,10 @@ private fun WatchListChip(
 }
 
 @Composable
-private fun UpNextChip(navController: NavHostController?, numInUpNext: Int) {
+private fun UpNextChip(navigateToRoute: (String) -> Unit, numInUpNext: Int) {
     val title = stringResource(LR.string.up_next)
     Chip(
-        onClick = { navController?.navigate(UpNextScreen.route) },
+        onClick = { navigateToRoute(UpNextScreen.route) },
         colors = ChipDefaults.chipColors(),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -193,6 +195,9 @@ private fun WatchListPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     WearAppTheme(themeType) {
-        WatchListScreen(navController = null)
+        WatchListScreen(
+            navigateToRoute = {},
+            scrollState = ScalingLazyListState()
+        )
     }
 }

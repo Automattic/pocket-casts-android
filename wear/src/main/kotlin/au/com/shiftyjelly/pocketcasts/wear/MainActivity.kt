@@ -8,8 +8,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.wear.compose.navigation.SwipeDismissableNavHost
-import androidx.wear.compose.navigation.composable
+import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
@@ -21,6 +20,10 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
+import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
+import com.google.android.horologist.compose.navscaffold.WearNavScaffold
+import com.google.android.horologist.compose.navscaffold.scalingLazyColumnComposable
+import com.google.android.horologist.compose.navscaffold.wearNavComposable
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -42,28 +45,48 @@ class MainActivity : ComponentActivity() {
 fun WearApp(themeType: Theme.ThemeType) {
     WearAppTheme(themeType) {
         val navController = rememberSwipeDismissableNavController()
-        SwipeDismissableNavHost(
+
+        WearNavScaffold(
             navController = navController,
             startDestination = WatchListScreen.route
         ) {
-            composable(WatchListScreen.route) { WatchListScreen(navController) }
-            composable(NowPlayingScreen.route) { NowPlayingScreen() }
-            composable(UpNextScreen.route) { UpNextScreen() }
-            composable(PodcastsScreen.route) {
-                PodcastsScreen { podcastUuid ->
-                    navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                }
+
+            scalingLazyColumnComposable(
+                route = WatchListScreen.route,
+                scrollStateBuilder = { ScalingLazyListState() }
+            ) {
+                WatchListScreen(navController::navigate, it.scrollableState)
             }
-            composable(
+
+            wearNavComposable(NowPlayingScreen.route) { _, viewModel ->
+                viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+                NowPlayingScreen()
+            }
+
+            wearNavComposable(UpNextScreen.route) { _, _ -> UpNextScreen() }
+
+            scalingLazyColumnComposable(
+                route = PodcastsScreen.route,
+                scrollStateBuilder = { ScalingLazyListState() }
+            ) {
+                PodcastsScreen(
+                    listState = it.scrollableState,
+                    onNavigateToPodcast = { podcastUuid ->
+                        navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+                    }
+                )
+            }
+
+            wearNavComposable(
                 route = PodcastScreen.route,
                 arguments = listOf(navArgument(PodcastScreen.argument) { type = NavType.StringType })
-            ) { backStackEntry ->
-                val podcastUuid = backStackEntry.arguments?.getString(PodcastScreen.argument) ?: ""
-                PodcastScreen(podcastUuid)
+            ) { _, _ ->
+                PodcastScreen()
             }
-            composable(FiltersScreen.route) { FiltersScreen() }
-            composable(DownloadsScreen.route) { DownloadsScreen() }
-            composable(FilesScreen.route) { FilesScreen() }
+
+            wearNavComposable(FiltersScreen.route) { _, _ -> FiltersScreen() }
+            wearNavComposable(DownloadsScreen.route) { _, _ -> DownloadsScreen() }
+            wearNavComposable(FilesScreen.route) { _, _ -> FilesScreen() }
         }
     }
 }
