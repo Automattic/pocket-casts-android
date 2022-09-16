@@ -12,7 +12,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -24,6 +23,8 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
@@ -69,13 +70,12 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
-import au.com.shiftyjelly.pocketcasts.ui.MainActivity.Companion.PROMOCODE_REQUEST_CODE
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -123,6 +123,7 @@ class MainActivity :
     CoroutineScope {
 
     companion object {
+        private const val INITIAL_KEY = "initial"
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -141,6 +142,7 @@ class MainActivity :
     @Inject lateinit var subscriptionManager: SubscriptionManager
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
     @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -217,14 +219,16 @@ class MainActivity :
             ) {
                 binding.playerBottomSheet.openPlayer()
             }
+        } else {
+            trackTabOpened(selectedTab, isInitial = true)
         }
-
         navigator.infoStream()
             .doOnNext {
                 updateStatusBar()
                 if (it is NavigatorAction.TabSwitched) {
                     val currentTab = navigator.currentTab()
                     if (settings.selectedTab() != currentTab) {
+                        trackTabOpened(currentTab)
                         when (currentTab) {
                             VR.id.navigation_podcasts -> AnalyticsHelper.navigatedToPodcasts()
                             VR.id.navigation_filters -> AnalyticsHelper.navigatedToFilters()
@@ -441,8 +445,8 @@ class MainActivity :
         viewModel.playbackState.observe(this) { state ->
             if (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) {
                 launch(Dispatchers.Default) {
-                    val episode = episodeManager.findByUuid(state.episodeUuid)
-                    if (episode?.isVideo == true && state.isPlaying) {
+                    val playable = episodeManager.findPlayableByUuid(state.episodeUuid)
+                    if (playable?.isVideo == true && state.isPlaying) {
                         launch(Dispatchers.Main) {
                             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                                 binding.playerBottomSheet.openPlayer()
@@ -904,7 +908,7 @@ class MainActivity :
             }
         } catch (e: Exception) {
             Timber.e(e)
-            CrashlyticsHelper.recordException(e)
+            SentryHelper.recordException(e)
         }
     }
 
@@ -1074,5 +1078,19 @@ class MainActivity :
     @Suppress("UNCHECKED_CAST")
     private fun getBottomSheetBehavior(): LockableBottomSheetBehavior<View> {
         return (BottomSheetBehavior.from(binding.frameBottomSheet) as LockableBottomSheetBehavior<View>)
+    }
+
+    private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
+        val event: AnalyticsEvent? = when (tab) {
+            VR.id.navigation_podcasts -> AnalyticsEvent.PODCAST_TAB_OPENED
+            VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
+            VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
+            VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED
+            else -> {
+                Timber.e("Can't open invalid tab")
+                null
+            }
+        }
+        event?.let { analyticsTracker.track(event, mapOf(INITIAL_KEY to isInitial)) }
     }
 }

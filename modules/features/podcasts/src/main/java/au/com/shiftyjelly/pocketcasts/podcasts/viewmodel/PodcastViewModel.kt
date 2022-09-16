@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -24,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -57,7 +61,8 @@ class PodcastViewModel
     private val settings: Settings,
     private val castManager: CastManager,
     private val downloadManager: DownloadManager,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -189,6 +194,7 @@ class PodcastViewModel
         launch {
             podcast.value?.let {
                 podcastManager.updateShowArchived(it, !it.showArchived)
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_ARCHIVED, mapOf(SHOW_ARCHIVED to !it.showArchived))
             }
         }
     }
@@ -215,9 +221,11 @@ class PodcastViewModel
         return episodes.size
     }
 
-    fun searchQueryUpdated(query: String) {
-        searchTerm = query
-        searchQueryRelay.accept(query)
+    fun searchQueryUpdated(newValue: String) {
+        val oldValue = searchQueryRelay.value ?: ""
+        searchTerm = newValue
+        searchQueryRelay.accept(newValue)
+        trackSearchIfNeeded(oldValue, newValue)
     }
 
     fun updateEpisodesSortType(episodesSortType: EpisodesSortType) {
@@ -239,6 +247,7 @@ class PodcastViewModel
     fun toggleNotifications(context: Context) {
         val podcast = podcast.value ?: return
         val showNotifications = !podcast.isShowNotifications
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, mapOf(ENABLED_KEY to showNotifications))
         Toast.makeText(context, if (showNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
         launch {
             podcastManager.updateShowNotifications(podcast, showNotifications)
@@ -252,8 +261,10 @@ class PodcastViewModel
         launch {
             if (!episode.isArchived) {
                 episodeManager.archive(episode, playbackManager)
+                trackSwipeAction(SwipeAction.ARCHIVE)
             } else {
                 episodeManager.unarchive(episode)
+                trackSwipeAction(SwipeAction.UNARCHIVE)
             }
         }
     }
@@ -262,8 +273,10 @@ class PodcastViewModel
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
                 playbackManager.playNext(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
     }
@@ -272,8 +285,10 @@ class PodcastViewModel
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
                 playbackManager.playLast(episode)
+                trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
     }
@@ -342,6 +357,16 @@ class PodcastViewModel
         }
     }
 
+    private fun trackSwipeAction(swipeAction: SwipeAction) {
+        analyticsTracker.track(
+            AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
+            mapOf(
+                ACTION_KEY to swipeAction.analyticsValue,
+                SOURCE_KEY to SwipeSource.PODCAST_DETAILS.analyticsValue
+            )
+        )
+    }
+
     sealed class EpisodeState {
         data class Loaded(
             val episodes: List<Episode>,
@@ -358,6 +383,21 @@ class PodcastViewModel
             val errorMessage: String,
             val searchTerm: String
         ) : EpisodeState()
+    }
+
+    private fun trackSearchIfNeeded(oldValue: String, newValue: String) {
+        if (oldValue.isEmpty() && newValue.isNotEmpty()) {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SEARCH_PERFORMED)
+        } else if (oldValue.isNotEmpty() && newValue.isEmpty()) {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SEARCH_CLEARED)
+        }
+    }
+
+    companion object {
+        private const val ACTION_KEY = "action"
+        private const val SOURCE_KEY = "source"
+        private const val ENABLED_KEY = "enabled"
+        private const val SHOW_ARCHIVED = "show_archived"
     }
 }
 

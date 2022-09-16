@@ -17,7 +17,7 @@ class FolderEditViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        viewModel = FolderEditViewModel(mock(), mock(), mock())
+        viewModel = FolderEditViewModel(mock(), mock(), mock(), mock())
     }
 
     @Test

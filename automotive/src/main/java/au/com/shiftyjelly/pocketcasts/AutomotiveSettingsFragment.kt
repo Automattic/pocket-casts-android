@@ -8,10 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveDataReactiveStreams
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
+import au.com.shiftyjelly.pocketcasts.databinding.FragmentAutomotiveSettingsBinding
 import au.com.shiftyjelly.pocketcasts.profile.AccountDetailsFragment
-import au.com.shiftyjelly.pocketcasts.profile.UserView
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -19,14 +18,17 @@ import javax.inject.Inject
 class AutomotiveSettingsFragment : Fragment() {
     @Inject lateinit var userManager: UserManager
 
+    private lateinit var binding: FragmentAutomotiveSettingsBinding
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_automotive_settings, container, false)
+        binding = FragmentAutomotiveSettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userView = view.findViewById<UserView>(R.id.userView)
+        val userView = binding.userView
 
         LiveDataReactiveStreams.fromPublisher(userManager.getSignInState()).observe(viewLifecycleOwner) { signInState ->
             val loggedIn = signInState.isSignedIn
@@ -40,7 +42,7 @@ class AutomotiveSettingsFragment : Fragment() {
             userView.setOnClickListener {
                 if (loggedIn) {
                     val fragment = AccountDetailsFragment.newInstance()
-                    (activity as? FragmentHostListener)?.addFragment(fragment)
+                    (activity as? AutomotiveSettingsActivity)?.addFragment(fragment)
                 } else {
                     signIn()
                 }

@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
@@ -42,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -56,6 +59,7 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileViewModel by viewModels()
     private var binding: FragmentProfileBinding? = null
@@ -82,12 +86,18 @@ class ProfileFragment : BaseFragment() {
         viewModel.clearFailedRefresh()
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.isFragmentChangingConfigurations = activity?.isChangingConfigurations ?: false
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
 
         binding.btnSettings.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
             (activity as FragmentHostListener).addFragment(SettingsFragment())
         }
 
@@ -101,16 +111,34 @@ class ProfileFragment : BaseFragment() {
         recyclerView.addItemDecoration(divider)
         recyclerView.adapter = SettingsAdapter(sections) { section ->
             section.fragment?.let { fragmentClass ->
-                if (fragmentClass == ProfileEpisodeListFragment::class.java) {
-                    val fragment = when (section.title) {
-                        LR.string.profile_navigation_downloads -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
-                        LR.string.profile_navigation_starred -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
-                        LR.string.profile_navigation_listening_history -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
-                        else -> throw IllegalStateException("Unknown row")
+                when (fragmentClass) {
+                    StatsFragment::class.java -> {
+                        analyticsTracker.track(AnalyticsEvent.STATS_SHOWN)
+                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
                     }
-                    (activity as? FragmentHostListener)?.addFragment(fragment)
-                } else {
-                    (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                    CloudFilesFragment::class.java -> {
+                        analyticsTracker.track(AnalyticsEvent.UPLOADED_FILES_SHOWN)
+                        (activity as? FragmentHostListener)?.addFragment(fragmentClass.newInstance())
+                    }
+                    ProfileEpisodeListFragment::class.java -> {
+                        val fragment = when (section.title) {
+                            LR.string.profile_navigation_downloads -> {
+                                analyticsTracker.track(AnalyticsEvent.DOWNLOADS_SHOWN)
+                                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded)
+                            }
+                            LR.string.profile_navigation_starred -> {
+                                analyticsTracker.track(AnalyticsEvent.STARRED_SHOWN)
+                                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Starred)
+                            }
+                            LR.string.profile_navigation_listening_history -> {
+                                analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_SHOWN)
+                                ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
+                            }
+                            else -> throw IllegalStateException("Unknown row")
+                        }
+                        (activity as? FragmentHostListener)?.addFragment(fragment)
+                    }
+                    else -> Timber.e("Profile section is invalid")
                 }
             }
 
@@ -152,6 +180,7 @@ class ProfileFragment : BaseFragment() {
         }
 
         binding.userView.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
             if (viewModel.isSignedIn) {
                 val fragment = AccountDetailsFragment.newInstance()
                 (activity as FragmentHostListener).addFragment(fragment)
@@ -164,6 +193,7 @@ class ProfileFragment : BaseFragment() {
         binding.btnRefresh.setOnClickListener {
             updateRefreshUI(RefreshState.Refreshing)
             podcastManager.refreshPodcasts("profile")
+            analyticsTracker.track(AnalyticsEvent.PROFILE_REFRESH_BUTTON_TAPPED)
         }
 
         val upgradeLayout = binding.upgradeLayout
@@ -179,6 +209,10 @@ class ProfileFragment : BaseFragment() {
 
         viewModel.refreshObservable.observe(viewLifecycleOwner) { state ->
             updateRefreshUI(state)
+        }
+
+        if (!viewModel.isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.PROFILE_SHOWN)
         }
     }
 

@@ -113,6 +113,15 @@ class SettingsImpl @Inject constructor(
         }
     }
 
+    override fun getSentryDsn(): String {
+        return try {
+            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+            applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.sentryDsn", "")
+        } catch (e: NameNotFoundException) {
+            ""
+        }
+    }
+
     private fun setupFirebaseConfig(): FirebaseRemoteConfig {
         return FirebaseRemoteConfig.getInstance().apply {
             val config = FirebaseRemoteConfigSettings.Builder()
@@ -1030,11 +1039,11 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getPodcastsLayout(): Int {
-        return getInt("PODCAST_GRID_LAYOUT", Settings.PODCAST_GRID_LAYOUT_LARGE_ARTWORK)
+        return getInt("PODCAST_GRID_LAYOUT", Settings.PodcastGridLayoutType.LARGE_ARTWORK.id)
     }
 
     override fun isPodcastsLayoutListView(): Boolean {
-        return getPodcastsLayout() == Settings.PODCAST_GRID_LAYOUT_LIST_VIEW
+        return getPodcastsLayout() == Settings.PodcastGridLayoutType.LIST_VIEW.id
     }
 
     override fun getAutoArchiveExcludedPodcasts(): List<String> {

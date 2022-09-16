@@ -24,10 +24,14 @@ class CastManagerImpl @Inject constructor(@ApplicationContext private val contex
     override val isConnectedObservable = BehaviorRelay.create<Boolean>().apply { accept(false) }
 
     init {
-        val executor = ContextCompat.getMainExecutor(context)
-        CastContext.getSharedInstance(context, executor)
-            .addOnFailureListener { e -> LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to init CastContext shared instance ${e.message}") }
-            .addOnSuccessListener { castContext -> castContext.sessionManager.addSessionManagerListener(sessionManagerListener) }
+        try {
+            val executor = ContextCompat.getMainExecutor(context)
+            CastContext.getSharedInstance(context, executor)
+                .addOnFailureListener { e -> LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Failed to init CastContext shared instance ${e.message}") }
+                .addOnSuccessListener { castContext -> castContext.sessionManager.addSessionManagerListener(sessionManagerListener) }
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to setup Chromecast.")
+        }
     }
 
     override suspend fun isAvailable(): Boolean {

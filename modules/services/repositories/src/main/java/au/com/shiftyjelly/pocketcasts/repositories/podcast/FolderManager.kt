@@ -31,4 +31,5 @@ interface FolderManager {
     suspend fun updateSortPosition(folderItems: List<FolderItem>)
     fun findFoldersToSync(): List<Folder>
     fun markAllSynced()
+    fun countFolders(): Int
 }

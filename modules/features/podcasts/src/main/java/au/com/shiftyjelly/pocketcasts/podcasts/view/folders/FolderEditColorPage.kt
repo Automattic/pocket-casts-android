@@ -124,7 +124,7 @@ private fun FolderEditColorForm(
 private fun FolderPreview(layout: Int, name: String, colorId: Int, gridImageWidthDp: Int, podcastUuids: List<String>, modifier: Modifier = Modifier) {
     val backgroundColor = MaterialTheme.theme.colors.getFolderColor(colorId)
     when (layout) {
-        Settings.PODCAST_GRID_LAYOUT_LIST_VIEW -> {
+        Settings.PodcastGridLayoutType.LIST_VIEW.id -> {
             FolderListRow(
                 color = backgroundColor,
                 name = name,

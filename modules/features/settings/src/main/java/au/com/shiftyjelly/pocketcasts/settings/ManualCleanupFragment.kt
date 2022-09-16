@@ -13,11 +13,10 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ManualCleanupFragment private constructor() : BaseFragment() {
+class ManualCleanupFragment : BaseFragment() {
     companion object {
-        fun newInstance(): ManualCleanupFragment {
-            return ManualCleanupFragment()
-        }
+        private const val CLEAN_UP_CONFIRMATION_DIALOG_TAG = "clean-up-confirmation-dialog"
+        fun newInstance() = ManualCleanupFragment()
     }
 
     private val viewModel: ManualCleanupViewModel by viewModels()
@@ -38,5 +37,20 @@ class ManualCleanupFragment private constructor() : BaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.setup(::deleteButtonAction)
+    }
+
+    private fun deleteButtonAction() {
+        viewModel.cleanupConfirmationDialog(requireContext())
+            .show(parentFragmentManager, CLEAN_UP_CONFIRMATION_DIALOG_TAG)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 }

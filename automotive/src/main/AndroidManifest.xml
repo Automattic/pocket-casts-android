@@ -75,13 +75,12 @@
                 tools:node="remove" />
         </provider>
 
-        <!-- Disable crashlytics and manually start it -->
-        <meta-data
-            android:name="firebase_crashlytics_collection_enabled"
-            android:value="false" />
         <meta-data
             android:name="pocketcasts_automotive"
             android:value="true" />
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="${sentryDsn}" />
     </application>
 
 </manifest>

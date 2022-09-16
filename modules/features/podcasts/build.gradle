@@ -11,6 +11,7 @@ dependencies {
     implementation project(':modules:services:servers')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:model')
+    implementation project(':modules:services:analytics')
     implementation project(':modules:features:search')
     implementation project(':modules:features:settings')
     implementation project(':modules:features:account')

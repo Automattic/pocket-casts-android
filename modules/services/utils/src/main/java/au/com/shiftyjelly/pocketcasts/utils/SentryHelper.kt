@@ -1,29 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
-import com.google.firebase.crashlytics.FirebaseCrashlytics
+import io.sentry.Sentry
 import java.io.IOException
 import java.util.concurrent.CancellationException
 import javax.net.ssl.SSLException
 
-object CrashlyticsHelper {
-
-    const val KEY_LAST_ACTIVITY = "last_activity"
-    const val KEY_LAST_FRAGMENT = "last_fragment"
-    const val KEY_LOCALE = "locale"
-
-    fun logLastActivity(logObject: Any) {
-        FirebaseCrashlytics.getInstance().setCustomKey(KEY_LAST_ACTIVITY, logObject.javaClass.name)
-    }
-
-    fun logLastFragment(logObject: Any) {
-        FirebaseCrashlytics.getInstance().setCustomKey(KEY_LAST_FRAGMENT, logObject.javaClass.name)
-    }
+object SentryHelper {
 
     fun recordException(throwable: Throwable) {
         if (shouldIgnoreExceptions(throwable)) {
             return
         }
-        FirebaseCrashlytics.getInstance().recordException(throwable)
+        Sentry.captureException(throwable)
     }
 
     fun recordException(message: String, throwable: Throwable) {
