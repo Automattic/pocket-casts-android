@@ -27,7 +27,8 @@ PLAY_STORE_TRACK_PRODUCTION = "production"
 Dotenv.load(USER_ENV_FILE_PATH)
 ENV["PROJECT_NAME"] = "pocket-casts-android"
 ENV["PROJECT_ROOT_FOLDER"] = "./"
-ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
+# TODO: Update this to `main` when we are ready to merge it the changes to `main`
+ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main-with-buildkite-release-cycle'
 GH_REPOSITORY = "automattic/pocket-casts-android"
 APPS_APP = "app"
 APPS_AUTOMOTIVE = "automotive"
@@ -70,6 +71,34 @@ platform :android do
   lane :complete_code_freeze do | options |
     android_completecodefreeze_prechecks(options)
 
+    new_version = android_get_app_version()
+    trigger_release_build(branch_to_build: "release/#{new_version}")
+  end
+
+  lane :new_beta_release do | options |
+    android_betabuild_prechecks(options)
+    android_bump_version_beta()
+    new_version = android_get_app_version()
+    trigger_release_build(branch_to_build: "release/#{new_version}")
+  end
+
+  # Sets the stage to start working on a hotfix
+  #
+  # - Cuts a new `release/x.y.z` branch from the tag from the latest (`x.y`) version
+  # - Bumps the app version numbers appropriately
+  #
+  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
+  # @option [String] version_name (required) The version name to use for the hotfix (`"x.y.z"`)
+  # @option [String] version_code (required) The version code to use for the hotfix (`"x.y.z"`)
+  #
+  # Note that the version_code needs to be higher than any of the existing version_codes in Play Store
+  lane :new_hotfix_release do |options|
+    hotfix_version = options[:version_name] || UI.input('Version number for the new hotfix?')
+    previous_tag = android_hotfix_prechecks(version_name: hotfix_version, skip_confirm: options[:skip_confirm])
+    android_bump_version_hotfix(previous_version_name: previous_tag, version_name: hotfix_version, version_code: options[:version_code])
+  end
+
+  lane :finalize_hotfix_release do |options|
     new_version = android_get_app_version()
     trigger_release_build(branch_to_build: "release/#{new_version}")
   end
