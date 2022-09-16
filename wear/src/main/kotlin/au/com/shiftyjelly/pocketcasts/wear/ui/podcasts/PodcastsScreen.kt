@@ -45,7 +45,7 @@ fun PodcastsScreen(
 private fun PodcastChip(podcast: FolderItem.Podcast, onClick: (String) -> Unit, modifier: Modifier = Modifier) {
     Chip(
         onClick = { onClick(podcast.uuid) },
-        colors = ChipDefaults.chipColors(),
+        colors = ChipDefaults.secondaryChipColors(),
         label = {
             Text(podcast.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
         },

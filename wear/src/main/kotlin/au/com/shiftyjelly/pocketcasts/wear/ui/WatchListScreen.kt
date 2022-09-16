@@ -119,7 +119,9 @@ private fun WatchListChip(
     val title = stringResource(titleRes)
     Chip(
         onClick = onClick,
-        colors = ChipDefaults.chipColors(),
+        colors = ChipDefaults.secondaryChipColors(
+            secondaryContentColor = MaterialTheme.theme.colors.primaryText02
+        ),
         label = {
             Text(title)
         },
@@ -146,7 +148,7 @@ private fun UpNextChip(navigateToRoute: (String) -> Unit, numInUpNext: Int) {
     val title = stringResource(LR.string.up_next)
     Chip(
         onClick = { navigateToRoute(UpNextScreen.route) },
-        colors = ChipDefaults.chipColors(),
+        colors = ChipDefaults.secondaryChipColors(),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -181,6 +183,7 @@ private fun UpNextChip(navigateToRoute: (String) -> Unit, numInUpNext: Int) {
                 Text(
                     text = num,
                     textAlign = TextAlign.Center,
+                    color = MaterialTheme.theme.colors.primaryUi01,
                     modifier = Modifier.padding(horizontal = 6.dp)
                 )
             }
