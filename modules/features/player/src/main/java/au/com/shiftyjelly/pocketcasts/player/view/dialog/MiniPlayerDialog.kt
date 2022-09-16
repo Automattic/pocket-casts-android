@@ -46,6 +46,6 @@ class MiniPlayerDialog(
 
     private fun markAsPlayed() {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
-        episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+        episodeManager.markAsPlayedAsync(episode, playbackManager, podcastManager)
     }
 }
