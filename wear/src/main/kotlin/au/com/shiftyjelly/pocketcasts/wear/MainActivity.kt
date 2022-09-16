@@ -64,7 +64,12 @@ fun WearApp(themeType: Theme.ThemeType) {
                 NowPlayingScreen()
             }
 
-            wearNavComposable(UpNextScreen.route) { _, _ -> UpNextScreen() }
+            scalingLazyColumnComposable(
+                route = UpNextScreen.route,
+                scrollStateBuilder = { ScalingLazyListState() }
+            ) {
+                UpNextScreen(listState = it.scrollableState)
+            }
 
             scalingLazyColumnComposable(
                 route = PodcastsScreen.route,
