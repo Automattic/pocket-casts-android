@@ -32,17 +32,17 @@ fun WearAppTheme(
 
 private fun buildWearMaterialColors(colors: ThemeColors): Colors {
     return Colors(
-        primary = colors.primaryInteractive01,
-        primaryVariant = colors.primaryInteractive01,
-        secondary = colors.primaryInteractive01,
-        secondaryVariant = colors.primaryInteractive01,
+        primary = colors.primaryText01,
+        primaryVariant = colors.primaryText01,
+        secondary = colors.primaryText02,
+        secondaryVariant = colors.primaryText02,
         background = colors.primaryUi04,
         surface = colors.primaryUi01,
         error = colors.support05,
         onPrimary = colors.primaryInteractive02,
         onSecondary = colors.primaryInteractive02,
         onBackground = colors.secondaryIcon01,
-        onSurface = colors.primaryInteractive01,
+        onSurface = colors.primaryText01,
         onError = colors.secondaryIcon01,
     )
 }
