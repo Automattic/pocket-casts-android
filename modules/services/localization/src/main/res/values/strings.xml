@@ -1366,6 +1366,6 @@
 
     <!-- Wear -->
 
-    <string name="wear_enter_email">Enter your account email</string>
-
+    <string name="wear_hide_password">Hide password</string>
+    <string name="wear_show_password">Show password</string>
 </resources>

@@ -60,6 +60,7 @@ dependencies {
     // General Compose dependencies
     implementation androidLibs.composeActivity
     implementation androidLibs.composeUi
+    implementation androidLibs.composeMaterialIconsExtended
     implementation androidLibs.composeUiToolingPreview
     implementation libs.hiltNavigationCompose
 

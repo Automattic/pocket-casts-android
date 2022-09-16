@@ -121,6 +121,7 @@ project.ext {
             composeUiTooling: "androidx.compose.ui:ui-tooling:$versionCompose",
             composeUiToolingPreview: "androidx.compose.ui:ui-tooling-preview:$versionCompose",
             composeMaterial: "androidx.compose.material:material:$versionCompose",
+            composeMaterialIconsExtended: "androidx.compose.material:material-icons-extended:$versionCompose",
             composeAnimation: "androidx.compose.animation:animation:$versionCompose",
             composeLiveData: "androidx.compose.runtime:runtime-livedata:$versionCompose",
             composeNavigation: "androidx.navigation:navigation-compose:$versionNavigation",

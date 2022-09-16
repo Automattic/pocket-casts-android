@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.profile.R as PR
@@ -69,8 +68,6 @@ fun WatchListScreen(
 
         item {
             val signInState by viewModel.signInState.subscribeAsState(null)
-            Timber.e("TEST123, isSignedIn: ${signInState?.isSignedIn}")
-            Timber.e("TEST123, signInState: $signInState")
             when (signInState?.isSignedIn) {
                 true -> {
                     WatchListChip(
