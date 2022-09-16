@@ -34,6 +34,7 @@ import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
@@ -50,8 +51,13 @@ object WatchListScreen {
 fun WatchListScreen(
     navigateToRoute: (String) -> Unit,
     scrollState: ScalingLazyListState,
-    viewModel: WatchListViewModel = hiltViewModel()
+    viewModel: WatchListViewModel = hiltViewModel(),
+    upNextViewModel: UpNextViewModel = hiltViewModel(),
 ) {
+
+    val signInState by viewModel.signInState.subscribeAsState(null)
+    val upNextState by upNextViewModel.upNextQueue.subscribeAsState(null)
+
     ScalingLazyColumn(
         state = scrollState,
         modifier = Modifier.fillMaxWidth(),
@@ -67,7 +73,6 @@ fun WatchListScreen(
         }
 
         item {
-            val signInState by viewModel.signInState.subscribeAsState(null)
             when (signInState?.isSignedIn) {
                 true -> {
                     WatchListChip(
@@ -97,9 +102,10 @@ fun WatchListScreen(
         }
 
         item {
+            val num = (upNextState as? UpNextQueue.State.Loaded)?.queue?.size ?: 0
             UpNextChip(
                 navigateToRoute = navigateToRoute,
-                numInUpNext = 100
+                numInUpNext = num
             )
         }
 
@@ -200,20 +206,23 @@ private fun UpNextChip(navigateToRoute: (String) -> Unit, numInUpNext: Int) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.theme.colors.primaryIcon02Active)
-            ) {
-                val num = if (numInUpNext < 100) numInUpNext.toString() else "99+"
-                Text(
-                    text = num,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryUi01,
-                    modifier = Modifier.padding(horizontal = 6.dp)
-                )
+            // Only show number in queue if queue isn't empty
+            if (numInUpNext != 0) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.theme.colors.primaryIcon02Active)
+                ) {
+                    val num = if (numInUpNext < 100) numInUpNext.toString() else "99+"
+                    Text(
+                        text = num,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.theme.colors.primaryUi01,
+                        modifier = Modifier.padding(horizontal = 6.dp)
+                    )
+                }
             }
         }
     }
