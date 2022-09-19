@@ -45,6 +45,9 @@ android {
         freeCompilerArgs += "-opt-in=com.google.android.horologist.media.ui.ExperimentalHorologistMediaUiApi"
         freeCompilerArgs += "-opt-in=com.google.android.horologist.media.data.ExperimentalHorologistMediaDataApi"
         freeCompilerArgs += "-opt-in=com.google.android.horologist.composables.ExperimentalHorologistComposablesApi"
+        freeCompilerArgs += "-opt-in=com.google.android.horologist.media3.ExperimentalHorologistMedia3BackendApi"
+        freeCompilerArgs += "-opt-in=com.google.android.horologist.networks.ExperimentalHorologistNetworksApi"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
 }
 
@@ -64,6 +67,11 @@ dependencies {
     implementation androidLibs.horologistMedia
     implementation androidLibs.horologistMediaUi
     implementation androidLibs.horologistMediaData
+    implementation androidLibs.horologistMedia3Backend
+    implementation androidLibs.horologistAudioUi
+    implementation androidLibs.horologistNetworkAwarness
+
+    implementation androidLibs.media3DatasourceOkhttp
 
     wearApp project(":wear")
 

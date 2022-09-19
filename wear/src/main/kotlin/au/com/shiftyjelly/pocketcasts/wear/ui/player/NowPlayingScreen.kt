@@ -25,8 +25,8 @@ fun NowPlayingScreen(
     ) {
         PlayerScreen(
             playerViewModel = viewModel,
-            mediaDisplay = {
-                AnimatedPlayerScreenMediaDisplay()
+            mediaDisplay = { playerUiState ->
+                AnimatedPlayerScreenMediaDisplay(playerUiState)
             },
             controlButtons = {
                 PlayerScreenPodcastControlButtons(viewModel, it)
