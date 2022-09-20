@@ -66,9 +66,11 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
     protected fun addNavControllerToBackStack(loadNavController: () -> NavHostController?, initialRoute: String): Dialog {
         return object : BottomSheetDialog(requireContext(), getTheme()) {
+            @Deprecated("Deprecated in Java")
             override fun onBackPressed() {
                 val navController = loadNavController()
                 if (navController == null || navController.currentDestination?.route == initialRoute) {
+                    @Suppress("DEPRECATION")
                     super.onBackPressed()
                 } else {
                     navController.popBackStack()

@@ -2,8 +2,10 @@
 -----
 
 *   Bug Fixes:
-    *   Fix Mini Player long press mark as played button.
+    * Fix Mini Player long press mark as played button.
         ([#330](https://github.com/Automattic/pocket-casts-android/pull/330)).
+*   Health:
+    *   Migrate app to Android 13 by targeting the SDK version 33.
 
 7.23.0
 -----

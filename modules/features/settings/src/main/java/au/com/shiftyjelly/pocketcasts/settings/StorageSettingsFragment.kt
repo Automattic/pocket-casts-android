@@ -40,7 +40,10 @@ class StorageSettingsFragment : BaseFragment() {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     StorageSettingsPage(
                         viewModel = viewModel,
-                        onBackPressed = { activity?.onBackPressed() },
+                        onBackPressed = {
+                            @Suppress("DEPRECATION")
+                            activity?.onBackPressed()
+                        },
                         onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance()) }
                     )
                 }

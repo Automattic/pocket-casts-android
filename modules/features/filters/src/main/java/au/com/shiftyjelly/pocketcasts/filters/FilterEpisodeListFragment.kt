@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.filters
 import android.animation.LayoutTransition
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -95,7 +96,12 @@ class FilterEpisodeListFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        listSavedState = savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
+        listSavedState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER, Parcelable::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
+        }
         showingFilterOptionsBeforeModal = arguments?.getBoolean(ARG_FILTER_IS_NEW) ?: false
 
         AnalyticsHelper.openedFilter()
@@ -179,7 +185,10 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbarColors = null
         )
 
-        toolbar.setNavigationOnClickListener { (activity as AppCompatActivity).onBackPressed() }
+        toolbar.setNavigationOnClickListener {
+            @Suppress("DEPRECATION")
+            (activity as AppCompatActivity).onBackPressed()
+        }
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
                 R.id.menu_delete -> {
@@ -223,6 +232,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         viewModel.playlistDeleted.observe(viewLifecycleOwner) { deleted ->
             if (deleted) {
+                @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
         }
@@ -504,6 +514,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.filters_warning_delete_button)))
             .setOnConfirm {
                 viewModel.deletePlaylist()
+                @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
             .show(childFragmentManager, "confirm")
