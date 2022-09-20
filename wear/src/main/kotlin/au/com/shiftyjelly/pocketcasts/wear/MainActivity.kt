@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
@@ -63,7 +64,12 @@ fun WearApp(themeType: Theme.ThemeType) {
                 NowPlayingScreen()
             }
 
-            wearNavComposable(UpNextScreen.route) { _, _ -> UpNextScreen() }
+            scalingLazyColumnComposable(
+                route = UpNextScreen.route,
+                scrollStateBuilder = { ScalingLazyListState() }
+            ) {
+                UpNextScreen(listState = it.scrollableState)
+            }
 
             scalingLazyColumnComposable(
                 route = PodcastsScreen.route,
@@ -87,6 +93,8 @@ fun WearApp(themeType: Theme.ThemeType) {
             wearNavComposable(FiltersScreen.route) { _, _ -> FiltersScreen() }
             wearNavComposable(DownloadsScreen.route) { _, _ -> DownloadsScreen() }
             wearNavComposable(FilesScreen.route) { _, _ -> FilesScreen() }
+
+            authenticationGraph(navController)
         }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -38,9 +39,12 @@ fun FormField(
     placeholder: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     onNext: () -> Unit = {},
     singleLine: Boolean = true,
-    imeAction: ImeAction = ImeAction.Done
+    imeAction: ImeAction = ImeAction.Done,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
 ) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
@@ -51,11 +55,14 @@ fun FormField(
             placeholderColor = MaterialTheme.theme.colors.primaryText02,
             unfocusedBorderColor = MaterialTheme.theme.colors.primaryField03
         ),
+        visualTransformation = visualTransformation,
         placeholder = { Text(placeholder) },
         shape = RoundedCornerShape(6.dp),
         keyboardOptions = KeyboardOptions(imeAction = imeAction, capitalization = KeyboardCapitalization.Sentences),
         keyboardActions = KeyboardActions(onAny = { onNext() }),
         singleLine = singleLine,
+        label = label,
+        trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
             .onPreviewKeyEvent {

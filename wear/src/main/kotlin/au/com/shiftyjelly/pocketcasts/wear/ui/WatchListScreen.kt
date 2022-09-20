@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
@@ -31,6 +34,7 @@ import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
@@ -45,7 +49,16 @@ object WatchListScreen {
 }
 
 @Composable
-fun WatchListScreen(navigateToRoute: (String) -> Unit, scrollState: ScalingLazyListState) {
+fun WatchListScreen(
+    navigateToRoute: (String) -> Unit,
+    scrollState: ScalingLazyListState,
+    viewModel: WatchListViewModel = hiltViewModel(),
+    upNextViewModel: UpNextViewModel = hiltViewModel(),
+) {
+
+    val signInState by viewModel.signInState.subscribeAsState(null)
+    val upNextState by upNextViewModel.upNextQueue.subscribeAsState(null)
+
     ScalingLazyColumn(
         state = scrollState,
         modifier = Modifier.fillMaxWidth(),
@@ -61,6 +74,26 @@ fun WatchListScreen(navigateToRoute: (String) -> Unit, scrollState: ScalingLazyL
         }
 
         item {
+            when (signInState?.isSignedIn) {
+                true -> {
+                    WatchListChip(
+                        titleRes = LR.string.sign_out,
+                        iconRes = IR.drawable.ic_signout,
+                        onClick = viewModel::signOut,
+                    )
+                }
+                false -> {
+                    WatchListChip(
+                        titleRes = LR.string.sign_in,
+                        iconRes = IR.drawable.ic_profile,
+                        onClick = { navigateToRoute(authenticationSubGraph) },
+                    )
+                }
+                null -> { /* Do nothing */ }
+            }
+        }
+
+        item {
             WatchListChip(
                 titleRes = LR.string.player_tab_playing_wide,
                 iconRes = IR.drawable.ic_play_all,
@@ -70,9 +103,10 @@ fun WatchListScreen(navigateToRoute: (String) -> Unit, scrollState: ScalingLazyL
         }
 
         item {
+            val num = (upNextState as? UpNextQueue.State.Loaded)?.queue?.size ?: 0
             UpNextChip(
                 navigateToRoute = navigateToRoute,
-                numInUpNext = 100
+                numInUpNext = num
             )
         }
 
@@ -173,20 +207,23 @@ private fun UpNextChip(navigateToRoute: (String) -> Unit, numInUpNext: Int) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.theme.colors.primaryIcon02Active)
-            ) {
-                val num = if (numInUpNext < 100) numInUpNext.toString() else "99+"
-                Text(
-                    text = num,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryUi01,
-                    modifier = Modifier.padding(horizontal = 6.dp)
-                )
+            // Only show number in queue if queue isn't empty
+            if (numInUpNext != 0) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.theme.colors.primaryIcon02Active)
+                ) {
+                    val num = if (numInUpNext < 100) numInUpNext.toString() else "99+"
+                    Text(
+                        text = num,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.theme.colors.primaryUi01,
+                        modifier = Modifier.padding(horizontal = 6.dp)
+                    )
+                }
             }
         }
     }
