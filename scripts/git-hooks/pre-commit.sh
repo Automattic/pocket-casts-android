@@ -22,6 +22,13 @@ fi
 # gitleaks
 ##################
 
+# Use sentry.properties file as a proxy for determining if the contributor has
+# access to secrets and should run gitleaks before committing
+if [ ! -f "sentry.properties" ]; then
+  echo "Skipping gitleaks check..."
+  exit $RESULT
+fi
+
 if ! command -v gitleaks &> /dev/null
 then
   echo ""
