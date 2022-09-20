@@ -1,5 +1,10 @@
 #!/bin/sh
 
+
+##################
+# Spotless
+##################
+
 echo "Running Spotless..."
 ./gradlew spotlessCheck
 RESULT=$?
@@ -11,6 +16,26 @@ if [ $RESULT -ne 0 ]; then
   ./gradlew spotlessApply > /dev/null
 
   echo "Recommended changes from spotless have been applied."
+fi
+
+##################
+# gitleaks
+##################
+
+if ! command -v gitleaks &> /dev/null
+then
+  echo ""
+  echo "Error: gitleaks script not found, please install it (https://github.com/zricethezav/gitleaks)"
+  exit 1
+fi
+
+gitleaks protect -v --staged
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+  echo ""
+  echo "Warning: gitleaks has detected sensitive information in your changes. Aborting commit."
+  exit 1
 fi
 
 exit $RESULT
