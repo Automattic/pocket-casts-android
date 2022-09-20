@@ -38,9 +38,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -256,7 +256,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                                 e is ForegroundServiceStartNotAllowedException
                             ) {
                                 addBatteryWarnings()
-                                CrashlyticsHelper.recordException(e)
+                                SentryHelper.recordException(e)
                                 AnalyticsHelper.foregroundServiceStartNotAllowedException()
                             }
                         }

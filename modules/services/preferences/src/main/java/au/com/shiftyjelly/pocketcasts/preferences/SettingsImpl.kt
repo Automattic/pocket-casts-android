@@ -118,6 +118,15 @@ class SettingsImpl @Inject constructor(
         }
     }
 
+    override fun getSentryDsn(): String {
+        return try {
+            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+            applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.sentryDsn", "")
+        } catch (e: NameNotFoundException) {
+            ""
+        }
+    }
+
     private fun setupFirebaseConfig(): FirebaseRemoteConfig {
         return FirebaseRemoteConfig.getInstance().apply {
             val config = FirebaseRemoteConfigSettings.Builder()

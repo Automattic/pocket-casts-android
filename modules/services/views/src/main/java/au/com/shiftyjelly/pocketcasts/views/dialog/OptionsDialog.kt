@@ -85,8 +85,8 @@ class OptionsDialog : BottomSheetDialogFragment() {
         var closeAndClick: (() -> Unit)? = null
         if (click != null) {
             closeAndClick = {
-                dismiss()
                 click.invoke()
+                dismiss()
             }
         }
 

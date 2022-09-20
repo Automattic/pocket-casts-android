@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-parcelize'
+    id 'io.sentry.android.gradle'
+    id 'com.mikepenz.aboutlibraries.plugin'
 }
 apply from: "../base.gradle"
 
@@ -9,6 +11,11 @@ android {
     defaultConfig {
         applicationId project.applicationId
         minSdkVersion 28
+    }
+
+    buildFeatures {
+        viewBinding true
+        compose true
     }
 
     if (canSignRelease) {
@@ -25,6 +32,10 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
+
+            manifestPlaceholders = [
+                    sentryDsn: ""
+            ]
         }
 
         debugProd {
@@ -34,7 +45,8 @@ android {
 
         release {
             manifestPlaceholders = [
-                    gitHash: ""
+                    gitHash: "",
+                    sentryDsn: project.properties['pocketcastsSentryDsn'] ?: ""
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -55,6 +67,8 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'com.mikepenz:aboutlibraries-core:10.4.0'
+    implementation 'com.mikepenz:aboutlibraries-compose:10.4.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -65,6 +79,7 @@ dependencies {
     implementation project(':modules:services:model')
     implementation project(':modules:services:ui')
     implementation project(':modules:services:views')
+    implementation project(':modules:services:compose')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:servers')
     implementation project(':modules:features:profile')
@@ -75,7 +90,6 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
 
 task useGoogleServicesDebugFile {
     description 'Copies the debug google-services.json file if file is missing.'

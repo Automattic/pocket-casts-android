@@ -1,6 +1,9 @@
-7.24.0
+7.24
 -----
 
+*   Bug Fixes:
+    * Fix Mini Player long press mark as played button.
+        ([#330](https://github.com/Automattic/pocket-casts-android/pull/330)).
 *   Health:
     *   Migrate app to Android 13 by targeting the SDK version 33.
 
@@ -17,9 +20,18 @@
 *   Bug Fixes:
     *   Fix playing on Chromecast always shows buffering.
         ([#254](https://github.com/Automattic/pocket-casts-android/pull/254)).
-    *   Fix Chromecast not taking over playback after connection.
     *   Fix Plus subscription confirm button not always working.
         ([#284](https://github.com/Automattic/pocket-casts-android/pull/284)).
+
+
+7.21.1
+-----
+
+*   Bug Fixes:
+    *   Fix Chromecast not taking over playback after connection.
+        ([#308](https://github.com/Automattic/pocket-casts-android/pull/308)).
+    *   Fix the discover artwork scaling issue.
+        ([#308](https://github.com/Automattic/pocket-casts-android/pull/308)).
 
 7.21.0
 -----

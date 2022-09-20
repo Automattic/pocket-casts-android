@@ -72,7 +72,6 @@ project.ext {
             desugarJdk: "com.android.tools:desugar_jdk_libs:1.1.5",
             // Firebase BoM (Bill of Materials enables you to manage all your Firebase library versions by specifying only one version)
             firebaseBom: "com.google.firebase:firebase-bom:30.3.2",
-            firebaseCrashlytics: "com.google.firebase:firebase-crashlytics-ktx",
             firebaseAnalytics: "com.google.firebase:firebase-analytics-ktx",
             firebaseConfig: "com.google.firebase:firebase-config-ktx",
             constraintLayout: "androidx.constraintlayout:constraintlayout:2.1.4",
@@ -156,8 +155,8 @@ project.ext {
             glide: "com.github.bumptech.glide:glide:$versionGlide",
             glideOkHttp: "com.github.bumptech.glide:okhttp3-integration:$versionGlide",
             glideCompile: "com.github.bumptech.glide:compiler:$versionGlide",
-            coil: "io.coil-kt:coil:2.2.0",
-            coilCompose: "io.coil-kt:coil-compose:2.2.0",
+            coil: "io.coil-kt:coil:2.2.1",
+            coilCompose: "io.coil-kt:coil-compose:2.2.1",
             // OkHttp (http client) - https://github.com/square/okhttp
             okHttp: "com.squareup.okhttp3:okhttp:4.9.3",
             okHttpLogging: "com.squareup.okhttp3:logging-interceptor:4.9.3",
@@ -188,8 +187,13 @@ project.ext {
             barista: "com.adevinta.android:barista:4.2.0",
             // Accompanist - https://google.github.io/accompanist/
             accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1",
-            //Automattic Tracks
-            automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks"
+            // Automattic Tracks
+            automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks",
+            // Sentry
+            sentryBom: 'io.sentry:sentry-bom:6.4.1',
+            sentry: 'io.sentry:sentry-android',
+            sentryFragment: 'io.sentry:sentry-android-fragment',
+            sentryTimber: 'io.sentry:sentry-android-timber'
     ]
 
 }

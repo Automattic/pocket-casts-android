@@ -527,6 +527,10 @@
         <!-- Samsung Carmode -->
         <meta-data android:name="com.sec.android.automotive.drivelink.notification.SmallIcon" android:resource="@drawable/notification"/>
 
+        <!-- Disable Sentry exception tracking so we can turn it on based on the user preference -->
+        <meta-data android:name="io.sentry.auto-init" android:value="false" />
+        <!-- Pass in the Sentry DSN -->
+        <meta-data android:name="au.com.shiftyjelly.pocketcasts.sentryDsn" android:value="${sentryDsn}"/>
     </application>
 
 </manifest>
