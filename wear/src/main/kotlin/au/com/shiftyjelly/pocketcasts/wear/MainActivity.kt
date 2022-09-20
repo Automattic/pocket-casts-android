@@ -15,9 +15,9 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
