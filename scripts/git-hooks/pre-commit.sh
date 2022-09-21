@@ -16,6 +16,7 @@ if [ $RESULT -ne 0 ]; then
   ./gradlew spotlessApply > /dev/null
 
   echo "Recommended changes from spotless have been applied."
+  exit $RESULT
 fi
 
 ##################
