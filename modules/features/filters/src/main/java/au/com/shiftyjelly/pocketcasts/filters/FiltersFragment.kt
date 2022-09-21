@@ -48,6 +48,11 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
         return binding?.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
+
     override fun onDestroyView() {
         binding?.recyclerView?.adapter = null
         super.onDestroyView()
@@ -96,7 +101,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
         val itemTouchHelper = ItemTouchHelper(touchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        openSavedFilter()
+        checkForSavedFilter()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -112,18 +117,22 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     override fun setUserVisibleHint(visible: Boolean) {
         super.setUserVisibleHint(visible)
         if (visible && isAdded) {
-            openSavedFilter()
+            checkForSavedFilter()
         }
     }
 
-    private fun openSavedFilter() {
-        if (settings.selectedFilter() != null && lastFilterUuidShown != settings.selectedFilter()) {
+    private fun checkForSavedFilter() {
+        val shouldOpenSavedFilter = settings.selectedFilter() != null && lastFilterUuidShown != settings.selectedFilter()
+        if (shouldOpenSavedFilter) {
             runBlocking {
                 val playlistUUID = settings.selectedFilter() ?: return@runBlocking
                 lastFilterUuidShown = playlistUUID
                 val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) } ?: return@runBlocking
                 openPlaylist(playlist, isNewFilter = false)
             }
+        } else {
+            // Not showing a specific filter, so track showing of the filter list
+            viewModel.trackFilterListShown()
         }
     }
 

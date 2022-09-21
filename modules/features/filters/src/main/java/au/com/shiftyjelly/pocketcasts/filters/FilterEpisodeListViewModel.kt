@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,6 +48,9 @@ class FilterEpisodeListViewModel @Inject constructor(
         private const val SOURCE_KEY = "source"
         const val MAX_DOWNLOAD_ALL = Settings.MAX_DOWNLOAD
     }
+
+    var isFragmentChangingConfigurations: Boolean = false
+        private set
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -193,5 +197,14 @@ class FilterEpisodeListViewModel @Inject constructor(
                 SOURCE_KEY to SwipeSource.FILTERS.analyticsValue
             )
         )
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
+
+    fun trackFilterShown() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
+        AnalyticsHelper.openedFilter()
     }
 }

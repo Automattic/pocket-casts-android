@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.filters
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -16,7 +18,20 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
-class FiltersFragmentViewModel @Inject constructor(val playlistManager: PlaylistManager, episodeManager: EpisodeManager, playbackManager: PlaybackManager) : ViewModel(), CoroutineScope {
+class FiltersFragmentViewModel @Inject constructor(
+    val playlistManager: PlaylistManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    episodeManager: EpisodeManager,
+    playbackManager: PlaybackManager
+) : ViewModel(), CoroutineScope {
+
+    companion object {
+        private const val FILTER_COUNT_KEY = "filter_count"
+    }
+
+    var isFragmentChangingConfigurations: Boolean = false
+        private set
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -51,5 +66,16 @@ class FiltersFragmentViewModel @Inject constructor(val playlistManager: Playlist
         }
 
         runBlocking(Dispatchers.Default) { playlistManager.updateAll(playlists) }
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
+
+    fun trackFilterListShown() {
+        val properties = filters.value?.size?.let { filterCount ->
+            mapOf(FILTER_COUNT_KEY to filterCount)
+        } ?: emptyMap()
+        analyticsTracker.track(AnalyticsEvent.FILTER_LIST_SHOWN, properties)
     }
 }

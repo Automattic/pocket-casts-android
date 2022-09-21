@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -102,8 +101,6 @@ class FilterEpisodeListFragment : BaseFragment() {
             savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
         }
         showingFilterOptionsBeforeModal = arguments?.getBoolean(ARG_FILTER_IS_NEW) ?: false
-
-        AnalyticsHelper.openedFilter()
     }
 
     override fun onAttach(context: Context) {
@@ -123,6 +120,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     override fun onPause() {
         super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
 
         val binding = binding ?: return
         binding.toolbar.menu.close()
@@ -162,6 +160,10 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        if (!viewModel.isFragmentChangingConfigurations) {
+            viewModel.trackFilterShown()
+        }
+
         binding = FragmentFilterBinding.inflate(inflater, container, false)
         return binding?.root
     }
