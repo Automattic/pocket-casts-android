@@ -594,7 +594,7 @@ class SettingsImpl @Inject constructor(
 
         return withContext(Dispatchers.IO) {
             try {
-                val token = manager.blockingGetAuthToken(account, AccountConstants.TOKEN_TYPE, false)
+                val token = manager.blockingGetAuthToken(account, AccountConstants.TOKEN_TYPE, true)
                     // Token failed to refresh
                     ?: throw SecurityException("Token could not be refreshed")
                 token
