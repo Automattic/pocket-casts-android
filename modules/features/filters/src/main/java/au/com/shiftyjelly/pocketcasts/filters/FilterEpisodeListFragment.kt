@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -185,10 +184,6 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbarColors = null
         )
 
-        toolbar.setNavigationOnClickListener {
-            @Suppress("DEPRECATION")
-            (activity as AppCompatActivity).onBackPressed()
-        }
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
                 R.id.menu_delete -> {
