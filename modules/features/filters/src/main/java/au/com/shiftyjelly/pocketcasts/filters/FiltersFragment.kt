@@ -132,7 +132,9 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
             }
         } else {
             // Not showing a specific filter, so track showing of the filter list
-            viewModel.trackFilterListShown()
+            if (!viewModel.isFragmentChangingConfigurations) {
+                viewModel.trackFilterListShown()
+            }
         }
     }
 
