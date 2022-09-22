@@ -227,6 +227,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         viewModel.playlistDeleted.observe(viewLifecycleOwner) { deleted ->
             if (deleted) {
+                clearSelectedFilter()
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
@@ -509,6 +510,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.filters_warning_delete_button)))
             .setOnConfirm {
                 viewModel.deletePlaylist()
+                clearSelectedFilter()
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
@@ -578,12 +580,20 @@ class FilterEpisodeListFragment : BaseFragment() {
             multiSelectHelper.isMultiSelecting = false
             true
         } else {
+            clearSelectedFilter()
             super.onBackPressed()
         }
     }
 
     override fun getBackstackCount(): Int {
         return super.getBackstackCount() + if (multiSelectHelper.isMultiSelecting) 1 else 0
+    }
+
+    private fun clearSelectedFilter() {
+        // Only clear the selected filter if the currently displayed filter is the selected filter
+        if (settings.selectedFilter() == viewModel.playlist.value?.uuid) {
+            settings.setSelectedFilter(null)
+        }
     }
 }
 
