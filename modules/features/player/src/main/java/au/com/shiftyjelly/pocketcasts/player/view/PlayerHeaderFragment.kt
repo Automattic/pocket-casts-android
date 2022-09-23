@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
@@ -72,6 +73,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     lateinit var imageLoader: PodcastImageLoaderThemed
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: AdapterPlayerHeaderBinding? = null
+    private val playbackSource = PlaybackSource.PLAYER
 
     var skippedFirstTouch: Boolean = false
 
@@ -98,10 +100,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         binding.skipBack.setOnClickListener {
             onSkipBack()
+            playbackManager.playbackSource = playbackSource
             (it as LottieAnimationView).playAnimation()
         }
         binding.skipForward.setOnClickListener {
             onSkipForward()
+            playbackManager.playbackSource = playbackSource
             (it as LottieAnimationView).playAnimation()
         }
         binding.skipForward.setOnLongClickListener {
@@ -451,6 +455,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onPlayClicked() {
+        playbackManager.playbackSource = playbackSource
         if (playbackManager.isPlaying()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
             playbackManager.pause()
