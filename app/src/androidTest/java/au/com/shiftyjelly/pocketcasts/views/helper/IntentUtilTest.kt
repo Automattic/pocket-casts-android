@@ -26,11 +26,11 @@ class IntentUtilTest {
     @Test
     fun testSubscribeUrlWithParams() {
         val intent = Intent(Intent.ACTION_VIEW)
-        val url = "pktc://subscribe/theincomparable.memberfulcontent.com/rss/6618?auth=snZc3xsAd3GCMVvY6ZSfymsQ"
+        val url = "pktc://subscribe/mypodcast.memberfulcontent.com/rss/6618?someKey=someValue"
         intent.data = Uri.parse(url)
 
         val parsed = IntentUtil.getPodloveUrl(intent)
-        assertEquals("http://theincomparable.memberfulcontent.com/rss/6618?auth=snZc3xsAd3GCMVvY6ZSfymsQ", parsed)
+        assertEquals("http://mypodcast.memberfulcontent.com/rss/6618?someKey=someValue", parsed)
     }
 
     @Test
@@ -46,11 +46,11 @@ class IntentUtilTest {
     @Test
     fun testSubscribeUrlWithParamsHttps() {
         val intent = Intent(Intent.ACTION_VIEW)
-        val url = "pktc://subscribehttps/theincomparable.memberfulcontent.com/rss/6618?auth=snZc3xsAd3GCMVvY6ZSfymsQ"
+        val url = "pktc://subscribehttps/mypodcast.memberfulcontent.com/rss/6618?someKey=someValue"
         intent.data = Uri.parse(url)
 
         val parsed = IntentUtil.getPodloveUrl(intent)
-        assertEquals("https://theincomparable.memberfulcontent.com/rss/6618?auth=snZc3xsAd3GCMVvY6ZSfymsQ", parsed)
+        assertEquals("https://mypodcast.memberfulcontent.com/rss/6618?someKey=someValue", parsed)
     }
 
     @Test
