@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -161,10 +162,12 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: Episode) {
+        playbackManager.playbackSource = PlaybackSource.DISCOVER
         playbackManager.playNow(episode, forceStream = true)
     }
 
     fun stopPlayback() {
+        playbackManager.playbackSource = PlaybackSource.DISCOVER
         playbackManager.stopAsync()
     }
 }
