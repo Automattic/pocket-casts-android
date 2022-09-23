@@ -30,6 +30,8 @@ class PlayButtonListener @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
+    override var playbackSource = PlaybackManager.PlaybackSource.UNKNOWN
+
     override fun onPlayClicked(episodeUuid: String) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "In app play button pushed for $episodeUuid")
         launch {
@@ -54,10 +56,12 @@ class PlayButtonListener @Inject constructor(
     private fun play(episode: Playable, force: Boolean = true) {
         playbackManager.playNow(episode, force)
         warningsHelper.showBatteryWarningSnackbarIfAppropriate()
+        playbackManager.playbackSource = playbackSource
     }
 
     override fun onPauseClicked() {
         playbackManager.pause()
+        playbackManager.playbackSource = playbackSource
     }
 
     override fun onPlayedClicked(episodeUuid: String) {
