@@ -4,6 +4,11 @@
 *   Bug Fixes:
     *   Fix Mini Player long press mark as played button.
         ([#330](https://github.com/Automattic/pocket-casts-android/pull/330)).
+    *   Fix Filters tab not always displaying the list of filters when it should.
+        ([#342](https://github.com/Automattic/pocket-casts-android/pull/342)).
+*   Health:
+    *   Migrate app to Android 13 by targeting the SDK version 33.
+        ([#312](https://github.com/Automattic/pocket-casts-android/pull/312)).
 
 7.23.0
 -----

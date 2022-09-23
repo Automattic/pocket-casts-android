@@ -106,7 +106,12 @@ class SettingsImpl @Inject constructor(
 
     override fun getGitHash(): String? {
         try {
-            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+            val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getApplicationInfo(context.packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+            }
             return applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.gitHash")
         } catch (e: NameNotFoundException) {
             return null
@@ -115,7 +120,12 @@ class SettingsImpl @Inject constructor(
 
     override fun getSentryDsn(): String {
         return try {
-            val applicationInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+            val applicationInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getApplicationInfo(context.packageName, PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+            }
             applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.sentryDsn", "")
         } catch (e: NameNotFoundException) {
             ""

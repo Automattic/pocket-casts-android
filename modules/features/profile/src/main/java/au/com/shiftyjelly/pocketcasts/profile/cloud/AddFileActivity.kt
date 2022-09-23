@@ -8,6 +8,7 @@ import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.MediaStore
@@ -227,7 +228,14 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
             }
 
             dataUri = when (intent?.action) {
-                Intent.ACTION_SEND -> intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
+                Intent.ACTION_SEND -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
+                    }
+                }
                 Intent.ACTION_VIEW -> intent.data
                 else -> null
             }

@@ -29,8 +29,12 @@ class TrialFinishedFragment : BaseFragment() {
 
         val binding = binding ?: return
 
-        binding.btnDone.setOnClickListener { activity?.onBackPressed() }
+        binding.btnDone.setOnClickListener {
+            @Suppress("DEPRECATION")
+            activity?.onBackPressed()
+        }
         binding.btnUpgrade.setOnClickListener {
+            @Suppress("DEPRECATION")
             activity?.onBackPressed()
             activity?.startActivity(AccountActivity.newUpgradeInstance(it.context))
         }

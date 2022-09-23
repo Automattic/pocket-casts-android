@@ -1087,7 +1087,7 @@ class MainActivity :
 
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
         val event: AnalyticsEvent? = when (tab) {
-            VR.id.navigation_podcasts -> AnalyticsEvent.PODCAST_TAB_OPENED
+            VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
             VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
             VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
             VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED

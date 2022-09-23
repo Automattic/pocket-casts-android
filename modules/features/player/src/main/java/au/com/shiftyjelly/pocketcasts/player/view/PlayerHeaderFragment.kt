@@ -262,22 +262,16 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val swipeGesture = GestureDetectorCompat(
             context,
             object : GestureDetector.OnGestureListener {
-                override fun onShowPress(e: MotionEvent?) {
-                }
 
-                override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                    return false
-                }
+                override fun onShowPress(e: MotionEvent) {}
 
-                override fun onDown(e: MotionEvent?): Boolean {
-                    return true
-                }
+                override fun onSingleTapUp(e: MotionEvent) = false
 
-                override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-                    return false
-                }
+                override fun onDown(e: MotionEvent) = true
 
-                override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+                override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float) = false
+
+                override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
                     val upNextBottomSheetBehavior = (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior
                         ?: return false
                     if (!skippedFirstTouch) {
@@ -302,8 +296,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     return upNextBottomSheetBehavior.peekHeight != 0
                 }
 
-                override fun onLongPress(e: MotionEvent?) {
-                }
+                override fun onLongPress(e: MotionEvent) {}
             }
         )
 

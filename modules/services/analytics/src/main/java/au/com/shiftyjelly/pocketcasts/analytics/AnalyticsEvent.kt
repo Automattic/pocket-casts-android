@@ -92,7 +92,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_BADGES_CHANGED("podcasts_list_badges_changed"),
 
     /* Tab bar items */
-    PODCAST_TAB_OPENED("podcast_tab_opened"),
+    PODCASTS_TAB_OPENED("podcasts_tab_opened"),
     FILTERS_TAB_OPENED("filters_tab_opened"),
     DISCOVER_TAB_OPENED("discover_tab_opened"),
     PROFILE_TAB_OPENED("profile_tab_opened"),
