@@ -15,8 +15,8 @@ If you're just looking to install Pocket Casts Android, you can find it on [Goog
 
 To build, install, and test the project from the command line:
 
-    $ ./gradlew :app:assembleDebug              # assemble the debug .apk
-    $ ./gradlew :app:installDebug               # install the debug .apk to a connected device
+    $ ./gradlew :app:assembleDebugProd          # assemble the debug .apk
+    $ ./gradlew :app:installDebugProd           # install the debug .apk to a connected device
     $ ./gradlew :app:testDebugUnitTest          # assemble, install and run unit tests
     $ ./gradlew :app:connectedDebugAndroidTest  # assemble, install and run Android tests
 
