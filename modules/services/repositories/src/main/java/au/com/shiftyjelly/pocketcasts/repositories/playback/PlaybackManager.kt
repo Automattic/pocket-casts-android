@@ -11,6 +11,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveDataReactiveStreams
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -95,7 +97,8 @@ open class PlaybackManager @Inject constructor(
     val upNextQueue: UpNextQueue,
     private val syncServerManager: SyncServerManager,
     private val notificationHelper: NotificationHelper,
-    private val userEpisodeManager: UserEpisodeManager
+    private val userEpisodeManager: UserEpisodeManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -104,6 +107,7 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
+        private const val KEY_SOURCE = "source"
     }
 
     override val coroutineContext: CoroutineContext
@@ -150,6 +154,7 @@ open class PlaybackManager @Inject constructor(
     var sleepAfterEpisode: Boolean = false
 
     var player: Player? = null
+    var playbackSource = PlaybackSource.UNKNOWN
 
     val mediaSession: MediaSessionCompat
         get() = mediaSessionManager.mediaSession
@@ -459,6 +464,7 @@ open class PlaybackManager @Inject constructor(
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
+            trackPlayback(AnalyticsEvent.PAUSE, playbackSource)
         } else {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = true))
@@ -599,6 +605,7 @@ open class PlaybackManager @Inject constructor(
                 onCompletion(episode.uuid)
             }
         }
+        trackPlayback(AnalyticsEvent.SKIP_FORWARD, playbackSource)
     }
 
     fun skipBackward() {
@@ -614,6 +621,7 @@ open class PlaybackManager @Inject constructor(
             val newPositionMs = Math.max(currentTimeMs - jumpAmountMs, 0)
             seekToTimeMsInternal(newPositionMs)
         }
+        trackPlayback(AnalyticsEvent.SKIP_BACK, playbackSource)
     }
 
     fun skipToNextChapter() {
@@ -1554,6 +1562,7 @@ open class PlaybackManager @Inject constructor(
         )
 
         player?.play(currentTimeMs)
+        trackPlayback(AnalyticsEvent.PLAY, playbackSource)
     }
 
     private suspend fun addPodcastStartFromSettings(episode: Episode, podcast: Podcast?, isPlaying: Boolean) {
@@ -1827,5 +1836,24 @@ open class PlaybackManager @Inject constructor(
             )
             playbackStateRelay.accept(playbackState)
         }
+    }
+
+    private fun trackPlayback(event: AnalyticsEvent, playbackSource: PlaybackSource) {
+        analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
+    }
+
+    enum class PlaybackSource(val analyticsValue: String) {
+        PODCAST_SCREEN("podcast_screen"),
+        FILTERS("filters"),
+        DISCOVER("discover"),
+        DOWNLOADS("downloads"),
+        FILES("files"),
+        STARRED("starred"),
+        LISTENING_HISTORY("listening_history"),
+        MINIPLAYER("miniplayer"),
+        PLAYER("player"),
+        NOTIFICATION("notification"),
+        FULL_SCREEN_VIDEO("full_screen_video"),
+        UNKNOWN("unknown"),
     }
 }
