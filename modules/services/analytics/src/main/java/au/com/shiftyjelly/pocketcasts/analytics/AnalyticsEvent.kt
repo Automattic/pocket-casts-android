@@ -203,4 +203,5 @@ enum class AnalyticsEvent(val key: String) {
     /* Filters screen */
     FILTER_LIST_SHOWN("filter_list_shown"),
     FILTER_SHOWN("filter_shown"),
+    FILTER_DELETED("filter_deleted"),
 }

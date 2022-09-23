@@ -91,6 +91,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) }?.let { playlist ->
                 playlistManager.delete(playlist)
+                analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
             }
         }
     }
