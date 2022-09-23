@@ -1850,6 +1850,7 @@ open class PlaybackManager @Inject constructor(
         FILES("files"),
         STARRED("starred"),
         LISTENING_HISTORY("listening_history"),
+        EPISODE_DETAILS("episode_details"),
         MINIPLAYER("miniplayer"),
         PLAYER("player"),
         NOTIFICATION("notification"),
