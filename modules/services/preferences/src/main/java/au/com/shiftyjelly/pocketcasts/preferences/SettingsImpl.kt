@@ -598,7 +598,6 @@ class SettingsImpl @Inject constructor(
         getSyncTokenSuspend()
     }
 
-    @Suppress("DEPRECATION")
     override suspend fun getSyncTokenSuspend(): String? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
@@ -618,7 +617,12 @@ class SettingsImpl @Inject constructor(
                 // Token failed to refresh
                 if (token == null) {
                     if (bundle.containsKey(AccountManager.KEY_INTENT)) {
-                        val intent = bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
+                        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            bundle.getParcelable(AccountManager.KEY_INTENT, Intent::class.java)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
+                        }
                         intent?.let { showSignInErrorNotification(it) }
                     }
                     throw SecurityException("Token could not be refreshed")
