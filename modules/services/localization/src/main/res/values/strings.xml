@@ -61,7 +61,8 @@
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
     <string name="star_episode">Star episode</string>
-    <string name="token_refresh_error">There was a problem. Please sign back into Pocket Casts.</string>
+    <string name="token_refresh_sign_in_error_title">"You\'ve been signed out!</string>
+    <string name="token_refresh_sign_in_error_description">Please sign in into your Pocket Casts account again.</string>
     <string name="unstar">Unstar</string>
     <string name="unstar_episode">Unstar episode</string>
     <string name="starred">Starred</string>
