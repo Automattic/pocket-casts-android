@@ -129,12 +129,14 @@ interface Settings {
         NOTIFICATION_CHANNEL_ID_EPISODE("episode"),
         NOTIFICATION_CHANNEL_ID_PLAYBACK_ERROR("playbackError"),
         NOTIFICATION_CHANNEL_ID_PODCAST("podcastImport"),
+        NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR("signInError"),
     }
 
     enum class NotificationId(val value: Int) {
         OPML(21483646),
         PLAYING(21483647),
         DOWNLOADING(21483648),
+        SIGN_IN_ERROR(21483649),
     }
 
     enum class BadgeType(val labelId: Int, val analyticsValue: String) {

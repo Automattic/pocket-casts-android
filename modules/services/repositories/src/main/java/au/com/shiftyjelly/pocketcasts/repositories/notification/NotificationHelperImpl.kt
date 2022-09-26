@@ -70,6 +70,14 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(podcastImportChannel)
 
+        val signInErrorChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR.id, "Sign-in Error", NotificationManager.IMPORTANCE_HIGH).apply {
+            description = "Shows when signed out in background and cannot auto re sign-in"
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(signInErrorChannel)
+
         notificationManager.createNotificationChannels(channelList)
     }
 
