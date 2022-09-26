@@ -61,6 +61,7 @@
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
     <string name="star_episode">Star episode</string>
+    <string name="token_refresh_error">There was a problem. Please sign back into Pocket Casts.</string>
     <string name="unstar">Unstar</string>
     <string name="unstar_episode">Unstar episode</string>
     <string name="starred">Starred</string>

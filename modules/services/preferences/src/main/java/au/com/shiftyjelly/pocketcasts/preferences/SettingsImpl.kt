@@ -10,6 +10,7 @@ import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
 import android.util.Base64
+import android.widget.Toast
 import androidx.core.content.edit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -44,6 +45,7 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
 import kotlin.math.max
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class SettingsImpl @Inject constructor(
     @PublicSharedPreferences private val sharedPreferences: SharedPreferences,
@@ -595,9 +597,16 @@ class SettingsImpl @Inject constructor(
         return withContext(Dispatchers.IO) {
             try {
                 val token = manager.blockingGetAuthToken(account, AccountConstants.TOKEN_TYPE, true)
-                    // Token failed to refresh
-                    ?: throw SecurityException("Token could not be refreshed")
-                token
+                // Token failed to refresh
+                if (token == null) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, LR.string.token_refresh_error, Toast.LENGTH_LONG)
+                            .show()
+                    }
+                    throw SecurityException("Token could not be refreshed")
+                } else {
+                    token
+                }
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not get token")
                 throw e // Rethrow the exception so it carries on
