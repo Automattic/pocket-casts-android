@@ -9,6 +9,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
@@ -36,6 +38,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     @Inject lateinit var settings: Settings
     @Inject lateinit var staticServerManager: StaticServerManagerImpl
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: DiscoverViewModel by viewModels()
     private var adapter: DiscoverAdapter? = null
@@ -55,10 +58,12 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val listId = list.listUuid
         if (listId != null) {
             AnalyticsHelper.listShowAllTapped(listId)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED, mapOf("list_id" to listId))
         }
         if (list is DiscoverCategory) {
             viewModel.currentRegionCode?.let {
                 AnalyticsHelper.openedCategory(list.id, it)
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_CATEGORY_SHOWN, mapOf(NAME_KEY to list.name, REGION_KEY to it, ID_KEY to list.id))
             }
         }
 
@@ -169,5 +174,11 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         if (visible) {
             AnalyticsHelper.navigatedToDiscover()
         }
+    }
+
+    companion object {
+        private const val ID_KEY = "id"
+        private const val NAME_KEY = "name"
+        private const val REGION_KEY = "region"
     }
 }

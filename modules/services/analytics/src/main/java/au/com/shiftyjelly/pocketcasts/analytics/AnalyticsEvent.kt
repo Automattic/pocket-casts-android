@@ -205,4 +205,8 @@ enum class AnalyticsEvent(val key: String) {
     PAUSE("pause"),
     SKIP_BACK("skip_back"),
     SKIP_FORWARD("skip_forward"),
+
+    /* Discover */
+    DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
+    DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
 }
