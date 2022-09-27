@@ -68,6 +68,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MAX_ROWS_SMALL_LIST = 20
+private const val CURRENT_PAGE = "current_page"
+private const val TOTAL_PAGES = "total_pages"
 const val LIST_ID_KEY = "list_id"
 const val PODCAST_UUID_KEY = "podcast_uuid"
 const val EPISODE_UUID_KEY = "episode_uuid"
@@ -175,6 +177,7 @@ internal class DiscoverAdapter(
             snapHelper.attachToRecyclerView(recyclerView)
             snapHelper.onSnapPositionChanged = { position ->
                 binding.pageIndicatorView.position = position
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED, mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount))
             }
 
             recyclerView?.adapter = adapter
