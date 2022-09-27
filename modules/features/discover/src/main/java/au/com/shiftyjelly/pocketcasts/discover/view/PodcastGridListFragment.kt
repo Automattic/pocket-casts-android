@@ -94,7 +94,10 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     }
 
     val onPodcastSubscribe: (String) -> Unit = { podcastUuid ->
-        listUuid?.let { AnalyticsHelper.podcastSubscribedFromList(it, podcastUuid) }
+        listUuid?.let {
+            AnalyticsHelper.podcastSubscribedFromList(it, podcastUuid)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
+        }
         podcastManager.subscribeToPodcast(podcastUuid, sync = true)
     }
 

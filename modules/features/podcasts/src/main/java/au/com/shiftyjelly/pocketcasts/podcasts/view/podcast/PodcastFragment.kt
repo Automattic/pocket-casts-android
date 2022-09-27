@@ -142,6 +142,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let {
             AnalyticsHelper.podcastSubscribedFromList(it, podcastUuid)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
         }
         if (featuredPodcast) {
             AnalyticsHelper.subscribedToFeaturedPodcast()

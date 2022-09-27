@@ -66,7 +66,10 @@ internal class LargeListRowAdapter(
             holder.btnSubscribe.isClickable = true
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
-                fromListId?.let { AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid) }
+                fromListId?.let {
+                    AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid)
+                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcast.uuid))
+                }
                 onPodcastSubscribe(podcast, fromListId)
             }
             holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = podcast.isSubscribed, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)

@@ -80,7 +80,10 @@ internal class SmallListRowAdapter(
                     onPodcastClicked(podcast, fromListId)
                 }
                 podcastRow.onSubscribeClicked = {
-                    fromListId?.let { AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid) }
+                    fromListId?.let {
+                        AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid)
+                        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcast.uuid))
+                    }
                     onPodcastSubscribe(podcast, fromListId)
                 }
             } else {
