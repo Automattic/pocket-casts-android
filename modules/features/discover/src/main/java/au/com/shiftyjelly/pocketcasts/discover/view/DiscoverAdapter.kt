@@ -381,6 +381,7 @@ internal class DiscoverAdapter(
                             btnSubscribe.setOnClickListener {
                                 btnSubscribe.updateSubscribeButtonIcon(true)
                                 listener.onPodcastSubscribe(podcast = podcast, listUuid = row.listUuid)
+                                row.listUuid?.let { listUuid -> trackDiscoverListPodcastSubscribed(listUuid, podcast.uuid) }
                             }
 
                             imageLoader.loadSmallImage(podcast.uuid).into(holder.binding.imgPodcast)
@@ -564,6 +565,11 @@ internal class DiscoverAdapter(
     private fun trackDiscoverListPodcastTapped(listUuid: String, podcastUuid: String) {
         AnalyticsHelper.podcastTappedFromList(listUuid, podcastUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
+    }
+
+    private fun trackDiscoverListPodcastSubscribed(listUuid: String, podcastUuid: String) {
+        AnalyticsHelper.podcastSubscribedFromList(listUuid, podcastUuid)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
     }
 }
 

@@ -52,8 +52,8 @@ class TracksAnalyticsTracker @Inject constructor(
         if (tracksClient == null) return
 
         val eventKey = event.key
-        val user = anonID ?: generateNewAnonID()
-        val userType = TracksClient.NosaraUserType.ANON
+//        val user = anonID ?: generateNewAnonID()
+//        val userType = TracksClient.NosaraUserType.ANON
 
         /* Create the merged JSON Object of properties.
         Properties defined by the user have precedence over the default ones pre-defined at "event level" */
@@ -67,7 +67,7 @@ class TracksAnalyticsTracker @Inject constructor(
             }
         }
 
-        tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
+//        tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
         if (propertiesToJSON.length() > 0) {
             Timber.i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
         } else {
