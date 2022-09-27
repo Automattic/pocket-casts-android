@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -30,7 +32,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
     }
 }
 
-internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit), val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit)) : ListAdapter<Any, CarouselItemViewHolder>(differ) {
+internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit), val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit), private val analyticsTracker: AnalyticsTrackerWrapper) : ListAdapter<Any, CarouselItemViewHolder>(differ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CarouselItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_carousel, parent, false)
         return CarouselItemViewHolder(theme, view)
@@ -45,15 +47,21 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                 onPodcastClicked(podcast, null) // no analytics for carousel
 
                 AnalyticsHelper.openedFeaturedPodcast()
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED, mapOf(PODCAST_UUID_KEY to podcast.uuid))
             }
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true)
                 onPodcastSubscribe(podcast, null) // no analytics for carousel
 
                 AnalyticsHelper.subscribedToFeaturedPodcast()
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcast.uuid))
             }
         } else {
             holder.podcast = null
         }
+    }
+
+    companion object {
+        private const val PODCAST_UUID_KEY = "podcast_uuid"
     }
 }

@@ -81,6 +81,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         const val ARG_FEATURED_PODCAST = "ARG_FEATURED_PODCAST"
         private const val OPTION_KEY = "option"
         private const val IS_EXPANDED_KEY = "is_expanded"
+        private const val PODCAST_UUID_KEY = "podcast_uuid"
         private const val REMOVE = "remove"
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
@@ -142,7 +143,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         fromListUuid?.let {
             AnalyticsHelper.podcastSubscribedFromList(it, podcastUuid)
         }
-        if (featuredPodcast) AnalyticsHelper.subscribedToFeaturedPodcast()
+        if (featuredPodcast) {
+            AnalyticsHelper.subscribedToFeaturedPodcast()
+            viewModel.podcast.value?.uuid?.let { podcastUuid ->
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
+            }
+        }
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SUBSCRIBE_TAPPED)
 
         viewModel.subscribeToPodcast()
