@@ -62,7 +62,7 @@
     <string name="star">Star</string>
     <string name="star_episode">Star episode</string>
     <string name="token_refresh_sign_in_error_title">Sign In Error</string>
-    <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out of Pocket Casts. Tap here to sign back in.</string>
+    <string name="token_refresh_sign_in_error_description">There was a problem and you\'ve been signed out. Tap here to sign back in.</string>
     <string name="unstar">Unstar</string>
     <string name="unstar_episode">Unstar episode</string>
     <string name="starred">Starred</string>
