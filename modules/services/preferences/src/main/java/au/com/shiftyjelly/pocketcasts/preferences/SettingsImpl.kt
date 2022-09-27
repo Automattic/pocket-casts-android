@@ -616,15 +616,13 @@ class SettingsImpl @Inject constructor(
                 val token = bundle.getString(AccountManager.KEY_AUTHTOKEN)
                 // Token failed to refresh
                 if (token == null) {
-                    if (bundle.containsKey(AccountManager.KEY_INTENT)) {
-                        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            bundle.getParcelable(AccountManager.KEY_INTENT, Intent::class.java)
-                        } else {
-                            @Suppress("DEPRECATION")
-                            bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
-                        }
-                        intent?.let { showSignInErrorNotification(it) }
+                    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        bundle.getParcelable(AccountManager.KEY_INTENT, Intent::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
                     }
+                    intent?.let { showSignInErrorNotification(it) }
                     throw SecurityException("Token could not be refreshed")
                 } else {
                     token
