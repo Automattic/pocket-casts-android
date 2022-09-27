@@ -68,7 +68,7 @@ internal class LargeListRowAdapter(
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
                 fromListId?.let {
                     AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid)
-                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcast.uuid))
+                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
                 }
                 onPodcastSubscribe(podcast, fromListId)
             }
