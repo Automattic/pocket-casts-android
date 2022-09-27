@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentRegionSelectBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowRegionBinding
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -17,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import coil.load
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_REGION_LIST = "regionlist"
@@ -29,6 +32,7 @@ class RegionSelectFragment : BaseFragment() {
     }
 
     companion object {
+        private const val REGION_KEY = "region"
         fun newInstance(regionList: List<DiscoverRegion>, selectedRegion: DiscoverRegion): RegionSelectFragment {
             val regionArrayList: ArrayList<DiscoverRegion> = ArrayList()
             regionArrayList.addAll(regionList)
@@ -55,6 +59,7 @@ class RegionSelectFragment : BaseFragment() {
     var listener: Listener? = null
 
     private var binding: FragmentRegionSelectBinding? = null
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentRegionSelectBinding.inflate(inflater, container, false)
@@ -76,6 +81,7 @@ class RegionSelectFragment : BaseFragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         val adapter = RegionAdapter(regionList.sortedBy { it.name }) {
             listener?.onRegionSelected(it)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_REGION_CHANGED, mapOf(REGION_KEY to it.code))
         }
         adapter.selectedRegionCode = arguments?.getString(ARG_SELECTED_REGION)
 
