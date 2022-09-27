@@ -210,6 +210,7 @@ internal class DiscoverAdapter(
             snapHelper.attachToRecyclerView(recyclerView)
             snapHelper.onSnapPositionChanged = { position ->
                 binding.pageIndicatorView.position = position
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_SMALL_LIST_PAGE_CHANGED, mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount))
             }
 
             recyclerView?.adapter = adapter
