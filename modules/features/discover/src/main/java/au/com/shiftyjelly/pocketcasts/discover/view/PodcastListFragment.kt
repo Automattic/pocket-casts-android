@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastListFragmentBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
@@ -33,12 +35,14 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class PodcastListFragment : PodcastGridListFragment() {
 
     companion object {
+        private const val LIST_ID_KEY = "list_id"
         fun newInstance(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): PodcastListFragment {
             return PodcastListFragment().apply {
                 arguments = newInstanceBundle(
@@ -63,6 +67,7 @@ class PodcastListFragment : PodcastGridListFragment() {
     }
 
     lateinit var adapter: ListAdapter<Any, RecyclerView.ViewHolder>
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var analyticsImpressionSent = false
     private var binding: PodcastListFragmentBinding? = null
@@ -113,6 +118,7 @@ class PodcastListFragment : PodcastGridListFragment() {
             return
         }
         AnalyticsHelper.listImpression(impressionId)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to impressionId))
         analyticsImpressionSent = true
     }
 

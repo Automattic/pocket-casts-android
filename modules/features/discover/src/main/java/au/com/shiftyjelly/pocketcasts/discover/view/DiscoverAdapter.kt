@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
@@ -66,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MAX_ROWS_SMALL_LIST = 20
+private const val LIST_ID_KEY = "list_id"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
@@ -74,7 +77,8 @@ internal class DiscoverAdapter(
     val staticServerManager: StaticServerManagerImpl,
     val listener: Listener,
     val theme: Theme,
-    val loadPodcastList: (String) -> Flowable<PodcastList>
+    val loadPodcastList: (String) -> Flowable<PodcastList>,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
         fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?)
@@ -155,7 +159,7 @@ internal class DiscoverAdapter(
     }
 
     inner class CarouselListViewHolder(var binding: RowCarouselListBinding) : NetworkLoadableViewHolder(binding.root) {
-        val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe)
+        val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         private val linearLayoutManager =
             LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
@@ -300,7 +304,7 @@ internal class DiscoverAdapter(
                             holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
                         }
                     )
-                    row.listUuid?.let { AnalyticsHelper.listImpression(it) }
+                    row.listUuid?.let { trackListImpression(it) }
                 }
                 is CarouselListViewHolder -> {
                     val featuredLimit = 5
@@ -342,7 +346,7 @@ internal class DiscoverAdapter(
                             holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
                         }
                     )
-                    row.listUuid?.let { AnalyticsHelper.listImpression(it) }
+                    row.listUuid?.let { trackListImpression(it) }
                 }
                 is CategoriesViewHolder -> {
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
@@ -390,7 +394,7 @@ internal class DiscoverAdapter(
                                 lblSponsored.text = context.getString(LR.string.discover_row_fresh_pick)
                             }
 
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
 
                             val textSize = if ((podcastTitle ?: "").length < 15) 18f else 15f
                             holder.binding.lblTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
@@ -456,7 +460,7 @@ internal class DiscoverAdapter(
                                 listener.onEpisodeClicked(episode = episode, listUuid = row.listUuid)
                             }
                             onRestoreInstanceState(holder)
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
                         }
                     )
                 }
@@ -504,7 +508,7 @@ internal class DiscoverAdapter(
 
                             onRestoreInstanceState(holder)
 
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
                         }
                     )
                 }
@@ -539,6 +543,11 @@ internal class DiscoverAdapter(
                 savedState[holder.itemId] = holder.onSaveInstanceState()
             }
         }
+    }
+
+    private fun trackListImpression(listUuid: String) {
+        AnalyticsHelper.listImpression(listUuid)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))
     }
 }
 

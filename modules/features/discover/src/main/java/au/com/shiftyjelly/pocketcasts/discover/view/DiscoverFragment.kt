@@ -118,7 +118,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val recyclerView = binding?.recyclerView ?: return
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         if (adapter == null) {
-            adapter = DiscoverAdapter(viewModel.repository, staticServerManager, this, theme, viewModel::loadPodcastList)
+            adapter = DiscoverAdapter(viewModel.repository, staticServerManager, this, theme, viewModel::loadPodcastList, analyticsTracker)
         }
         recyclerView.adapter = adapter
         recyclerView.itemAnimator = null
