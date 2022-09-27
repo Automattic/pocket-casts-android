@@ -22,6 +22,20 @@ interface NetworkLoadableList {
     val curated: Boolean
 
     fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): NetworkLoadableList
+
+    fun inferredId(source: String?) = source?.let {
+        when {
+            it.lowercase().contains(TRENDING) -> TRENDING
+            it.lowercase().contains(POPULAR) -> POPULAR
+            else -> NONE
+        }
+    } ?: NONE
+
+    companion object {
+        private const val TRENDING = "trending"
+        private const val POPULAR = "popular"
+        private const val NONE = "none"
+    }
 }
 
 @JsonClass(generateAdapter = true)

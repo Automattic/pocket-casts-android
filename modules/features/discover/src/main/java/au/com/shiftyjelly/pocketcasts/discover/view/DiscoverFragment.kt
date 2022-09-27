@@ -58,7 +58,9 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val listId = list.listUuid
         if (listId != null) {
             AnalyticsHelper.listShowAllTapped(listId)
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED, mapOf("list_id" to listId))
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to listId))
+        } else {
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to transformedList.inferredId(transformedList.source)))
         }
         if (list is DiscoverCategory) {
             viewModel.currentRegionCode?.let {
