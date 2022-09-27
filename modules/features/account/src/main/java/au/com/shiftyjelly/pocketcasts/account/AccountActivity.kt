@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account
 
+import android.accounts.AccountAuthenticatorResponse
+import android.accounts.AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -48,7 +50,15 @@ class AccountActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
 
-            if (isNewUpgradeInstance(intent)) {
+            val accountAuthenticatorResponse = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE)
+            }
+            if (accountAuthenticatorResponse != null) {
+                graph.setStartDestination(R.id.signInFragment)
+            } else if (isNewUpgradeInstance(intent)) {
                 viewModel.clearReadyForUpgrade()
                 graph.setStartDestination(R.id.createFrequencyFragment)
             } else if (isPromoCodeInstance(intent)) {

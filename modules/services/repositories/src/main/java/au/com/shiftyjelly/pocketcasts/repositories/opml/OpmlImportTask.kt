@@ -14,6 +14,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.ImportOpmlResponse
@@ -197,13 +198,13 @@ class OpmlImportTask @AssistedInject constructor(
      * Keep the job in the foreground with a notification
      */
     private fun createForegroundInfo(progress: Int, total: Int): ForegroundInfo {
-        return ForegroundInfo(NotificationHelper.NOTIFICATION_ID_OPML, buildNotification(progress, total))
+        return ForegroundInfo(Settings.NotificationId.OPML.value, buildNotification(progress, total))
     }
 
     private fun updateNotification(initialDatabaseCount: Int, podcastCount: Int) {
         val databaseCount = podcastManager.countPodcasts()
         val progress = (databaseCount - initialDatabaseCount).coerceIn(0, podcastCount)
-        notificationManager.notify(NotificationHelper.NOTIFICATION_ID_OPML, buildNotification(progress, podcastCount))
+        notificationManager.notify(Settings.NotificationId.OPML.value, buildNotification(progress, podcastCount))
     }
 
     private fun buildNotification(progress: Int, total: Int): Notification {

@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.DownloadEpisodeTask
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateEpisodeTask
@@ -472,7 +473,7 @@ class DownloadManagerImpl @Inject constructor(
             var firstUuid: String
             synchronized(downloadingQueue) {
                 if (downloadingQueue.isEmpty()) {
-                    notificationManager.cancel(NotificationHelper.NOTIFICATION_ID_DOWNLOADING)
+                    notificationManager.cancel(NotificationId.DOWNLOADING.value)
                     return@launch
                 }
 
@@ -516,7 +517,7 @@ class DownloadManagerImpl @Inject constructor(
             notificationBuilder.setProgress(max.toInt(), progress.toInt(), false)
 
             if (System.currentTimeMillis() - lastReportedNotificationTime > MIN_TIME_BETWEEN_UPDATE_REPORTS) {
-                notificationManager.notify(NotificationHelper.NOTIFICATION_ID_DOWNLOADING, notificationBuilder.build())
+                notificationManager.notify(NotificationId.DOWNLOADING.value, notificationBuilder.build())
                 lastReportedNotificationTime = System.currentTimeMillis()
             }
         }
