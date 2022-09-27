@@ -14,6 +14,7 @@ import androidx.core.view.marginLeft
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -113,7 +114,7 @@ class EpisodeViewHolder(
                 listOf(EpisodeItemTouchHelper.IconWithBackground(IR.drawable.ic_archive, binding.episodeRow.context.getThemeColor(UR.attr.support_06)))
         }
 
-    fun setup(episode: Episode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable) {
+    fun setup(episode: Episode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable, analyticsTracker: AnalyticsTrackerWrapper) {
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
 
@@ -127,6 +128,7 @@ class EpisodeViewHolder(
         }
         binding.episode = episode
         binding.playButton.listener = playButtonListener
+        binding.playButton.analyticsTracker = analyticsTracker
 
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
         val iconColor = context.getThemeColor(UR.attr.primary_icon_02)
@@ -288,5 +290,6 @@ class EpisodeViewHolder(
     fun clearObservers() {
         disposable?.dispose()
         binding.playButton.listener = null
+        binding.playButton.analyticsTracker = null
     }
 }

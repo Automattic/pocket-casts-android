@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.marginLeft
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -52,7 +53,8 @@ class UserEpisodeViewHolder(
     val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     val playbackStateUpdates: Observable<PlaybackState>,
     val upNextChangesObservable: Observable<UpNextQueue.State>,
-    val imageLoader: PodcastImageLoader? = null
+    val imageLoader: PodcastImageLoader? = null,
+    val analyticsTracker: AnalyticsTrackerWrapper
 ) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
@@ -123,6 +125,7 @@ class UserEpisodeViewHolder(
         binding.tintColor = tintColor
         binding.publishedDate = dateFormatter.format(episode.publishedDate, context.resources)
         binding.playButton.listener = playButtonListener
+        binding.playButton.analyticsTracker = analyticsTracker
         binding.executePendingBindings()
 
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
@@ -245,6 +248,7 @@ class UserEpisodeViewHolder(
 
         disposables.clear()
         binding.playButton.listener = null
+        binding.playButton.analyticsTracker = null
         uploadConsumer.accept(0.0f)
     }
 }

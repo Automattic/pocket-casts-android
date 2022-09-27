@@ -433,6 +433,7 @@ internal class DiscoverAdapter(
 
                                 row.listUuid?.let { listUuid ->
                                     AnalyticsHelper.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
+                                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid))
                                 }
                                 binding.btnPlay.setIconResource(if (!episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
                                 if (episode.isPlaying) {

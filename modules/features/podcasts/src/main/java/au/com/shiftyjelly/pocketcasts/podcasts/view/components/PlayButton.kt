@@ -7,6 +7,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.annotation.ColorInt
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -26,6 +28,7 @@ class PlayButton @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     var listener: OnClickListener? = null
+    var analyticsTracker: AnalyticsTrackerWrapper? = null
 
     private var buttonType: PlayButtonType = PlayButtonType.PLAY
     private var episodeUuid: String? = null
@@ -47,6 +50,8 @@ class PlayButton @JvmOverloads constructor(
     }
 
     companion object {
+        private const val LIST_ID_KEY = "list_id"
+        private const val PODCAST_UUID_KEY = "podcast_uuid"
         fun calculateButtonType(episode: Playable, streamByDefault: Boolean): PlayButtonType {
             return when {
                 episode.lastPlaybackFailed() -> PlayButtonType.PLAYBACK_FAILED
@@ -79,6 +84,7 @@ class PlayButton @JvmOverloads constructor(
                 val currentPodcastUuid = podcastUuid
                 if (currentFromListUuid != null && currentPodcastUuid != null) {
                     AnalyticsHelper.podcastEpisodePlayedFromList(currentFromListUuid, currentPodcastUuid)
+                    analyticsTracker?.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to currentFromListUuid, PODCAST_UUID_KEY to currentPodcastUuid))
                 }
                 listener?. onPlayClicked(episodeUuid)
                 UiUtil.hideKeyboard(this)

@@ -65,7 +65,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     private val viewModel: CloudFilesViewModel by viewModels()
     private var binding: FragmentCloudFilesBinding? = null
 
-    val adapter by lazy { EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager) }
+    val adapter by lazy { EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager, analyticsTracker) }
 
     private val onRowClick = { episode: Playable ->
         analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_SHOWN)
