@@ -41,6 +41,7 @@ class PodcastListFragment : PodcastGridListFragment() {
 
     companion object {
         private const val LIST_ID_KEY = "list_id"
+        private const val NONE = "none"
         fun newInstance(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): PodcastListFragment {
             return PodcastListFragment().apply {
                 arguments = newInstanceBundle(
@@ -136,6 +137,7 @@ class PodcastListFragment : PodcastGridListFragment() {
             binding.linkLayout.visibility = View.VISIBLE
             binding.lblLinkTitle.text = linkTitle
             binding.linkLayout.setOnClickListener {
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED, mapOf(LIST_ID_KEY to (listUuid ?: NONE)))
                 WebViewActivity.show(context, linkTitle, linkUrl)
             }
         }

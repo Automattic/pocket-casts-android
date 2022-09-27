@@ -220,4 +220,5 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_FEATURED_PAGE_CHANGED("discover_featured_page_changed"),
     DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
     DISCOVER_REGION_CHANGED("discover_region_changed"),
+    DISCOVER_COLLECTION_LINK_TAPPED("discover_collection_link_tapped"),
 }
