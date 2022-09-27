@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastListFragmentBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
@@ -35,7 +34,6 @@ import coil.load
 import coil.transform.CircleCropTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -61,13 +59,13 @@ class PodcastListFragment : PodcastGridListFragment() {
 
     private val onPromotionClick: (DiscoverPromotion) -> Unit = { promotion ->
         AnalyticsHelper.podcastTappedFromList(promotion.promotionUuid, promotion.podcastUuid)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to promotion.promotionUuid, PODCAST_UUID_KEY to promotion.podcastUuid))
 
         val fragment = PodcastFragment.newInstance(podcastUuid = promotion.podcastUuid, fromListUuid = promotion.promotionUuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
     lateinit var adapter: ListAdapter<Any, RecyclerView.ViewHolder>
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var analyticsImpressionSent = false
     private var binding: PodcastListFragmentBinding? = null

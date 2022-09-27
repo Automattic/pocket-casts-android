@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.DISCOVER_PODCAST_DIFF_CALLBACK
@@ -19,7 +21,11 @@ import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-internal class LargeListRowAdapter(val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit), val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit)) : ListAdapter<Any, LargeListRowAdapter.LargeListItemViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
+internal class LargeListRowAdapter(
+    val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
+    val onPodcastSubscribe: ((DiscoverPodcast, String?) -> Unit),
+    private val analyticsTracker: AnalyticsTrackerWrapper
+) : ListAdapter<Any, LargeListRowAdapter.LargeListItemViewHolder>(DISCOVER_PODCAST_DIFF_CALLBACK) {
     var fromListId: String? = null
 
     class LargeListItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -51,7 +57,10 @@ internal class LargeListRowAdapter(val onPodcastClicked: ((DiscoverPodcast, Stri
             holder.lblSubtitle.text = podcast.author
             holder.itemView.isClickable = true
             holder.itemView.setOnClickListener {
-                fromListId?.let { AnalyticsHelper.podcastTappedFromList(it, podcast.uuid) }
+                fromListId?.let {
+                    AnalyticsHelper.podcastTappedFromList(it, podcast.uuid)
+                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
+                }
                 onPodcastClicked(podcast, fromListId)
             }
             holder.btnSubscribe.isClickable = true

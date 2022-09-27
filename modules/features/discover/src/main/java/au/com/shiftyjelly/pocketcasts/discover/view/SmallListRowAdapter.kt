@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemSmallListBinding
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
@@ -28,7 +30,11 @@ private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
     }
 }
 
-internal class SmallListRowAdapter(val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit), val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit) : ListAdapter<List<Any>, SmallListRowAdapter.SmallListViewHolder>(SmallListDiffer) {
+internal class SmallListRowAdapter(
+    val onPodcastClicked: ((DiscoverPodcast, String?) -> Unit),
+    val onPodcastSubscribe: (DiscoverPodcast, String?) -> Unit,
+    val analyticsTracker: AnalyticsTrackerWrapper
+) : ListAdapter<List<Any>, SmallListRowAdapter.SmallListViewHolder>(SmallListDiffer) {
     class SmallListViewHolder(val binding: ItemSmallListBinding) : RecyclerView.ViewHolder(binding.root) {
 
         companion object {
@@ -67,7 +73,10 @@ internal class SmallListRowAdapter(val onPodcastClicked: ((DiscoverPodcast, Stri
                 podcastRow.podcast = podcast
                 podcastRow.isClickable = true
                 podcastRow.setOnClickListener {
-                    fromListId?.let { AnalyticsHelper.podcastTappedFromList(it, podcast.uuid) }
+                    fromListId?.let {
+                        AnalyticsHelper.podcastTappedFromList(it, podcast.uuid)
+                        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
+                    }
                     onPodcastClicked(podcast, fromListId)
                 }
                 podcastRow.onSubscribeClicked = {

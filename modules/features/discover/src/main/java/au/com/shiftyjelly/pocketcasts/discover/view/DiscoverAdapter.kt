@@ -68,7 +68,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MAX_ROWS_SMALL_LIST = 20
-private const val LIST_ID_KEY = "list_id"
+const val LIST_ID_KEY = "list_id"
+const val PODCAST_UUID_KEY = "podcast_uuid"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
@@ -142,7 +143,7 @@ internal class DiscoverAdapter(
     }
 
     inner class LargeListViewHolder(val binding: RowPodcastLargeListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = LargeListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe)
+        val adapter = LargeListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
         override val showAllButton: TextView
             get() = binding.btnShowAll
 
@@ -188,7 +189,7 @@ internal class DiscoverAdapter(
     }
 
     inner class SmallListViewHolder(val binding: RowPodcastSmallListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = SmallListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe)
+        val adapter = SmallListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         override val showAllButton: TextView
             get() = binding.btnShowAll
@@ -380,7 +381,7 @@ internal class DiscoverAdapter(
                             imageLoader.loadSmallImage(podcast.uuid).into(holder.binding.imgPodcast)
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
-                                    AnalyticsHelper.podcastTappedFromList(listUuid, podcast.uuid)
+                                    trackDiscoverListPodcastTapped(listUuid, podcast.uuid)
                                     listener.onPodcastClicked(podcast, row.listUuid)
                                 }
                             }
@@ -548,6 +549,11 @@ internal class DiscoverAdapter(
     private fun trackListImpression(listUuid: String) {
         AnalyticsHelper.listImpression(listUuid)
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))
+    }
+
+    private fun trackDiscoverListPodcastTapped(listUuid: String, podcastUuid: String) {
+        AnalyticsHelper.podcastTappedFromList(listUuid, podcastUuid)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
     }
 }
 

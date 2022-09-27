@@ -212,4 +212,5 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
     DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
     DISCOVER_LIST_IMPRESSION("discover_list_impression"),
+    DISCOVER_LIST_PODCAST_TAPPED("discover_list_podcast_tapped"),
 }

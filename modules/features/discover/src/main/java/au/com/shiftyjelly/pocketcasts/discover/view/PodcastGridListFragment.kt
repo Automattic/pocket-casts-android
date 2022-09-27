@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
@@ -26,6 +28,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
 
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var settings: Settings
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     companion object {
         internal const val ARG_LIST_UUID = "listUuid"
@@ -82,7 +85,10 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     protected val viewModel: PodcastListViewModel by viewModels()
 
     val onPodcastClicked: (DiscoverPodcast) -> Unit = { podcast ->
-        listUuid?.let { AnalyticsHelper.podcastTappedFromList(it, podcast.uuid) }
+        listUuid?.let {
+            AnalyticsHelper.podcastTappedFromList(it, podcast.uuid)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
+        }
         val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
