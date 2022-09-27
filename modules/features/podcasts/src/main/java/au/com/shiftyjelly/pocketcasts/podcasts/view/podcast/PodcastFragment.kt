@@ -82,6 +82,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         private const val OPTION_KEY = "option"
         private const val IS_EXPANDED_KEY = "is_expanded"
         private const val PODCAST_UUID_KEY = "podcast_uuid"
+        private const val LIST_ID_KEY = "list_id"
+        private const val EPISODE_UUID_KEY = "episode_uuid"
         private const val REMOVE = "remove"
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
@@ -200,6 +202,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     private val onRowClicked: (Episode) -> Unit = { episode ->
         fromListUuid?.let { listUuid ->
             AnalyticsHelper.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
+                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid)
+            )
         }
         val episodeCard = EpisodeFragment.newInstance(episode, overridePodcastLink = true, fromListUuid = fromListUuid)
         episodeCard.show(parentFragmentManager, "episode_card")

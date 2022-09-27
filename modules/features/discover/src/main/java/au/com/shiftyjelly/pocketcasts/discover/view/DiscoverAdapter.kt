@@ -70,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 private const val MAX_ROWS_SMALL_LIST = 20
 const val LIST_ID_KEY = "list_id"
 const val PODCAST_UUID_KEY = "podcast_uuid"
+const val EPISODE_UUID_KEY = "episode_uuid"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
@@ -457,6 +458,10 @@ internal class DiscoverAdapter(
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
                                     AnalyticsHelper.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
+                                        mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid)
+                                    )
                                 }
                                 listener.onEpisodeClicked(episode = episode, listUuid = row.listUuid)
                             }

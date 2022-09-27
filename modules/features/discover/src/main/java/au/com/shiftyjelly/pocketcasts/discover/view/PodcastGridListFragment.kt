@@ -104,6 +104,10 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     val onEpisodeClick: (DiscoverEpisode) -> Unit = { episode ->
         listUuid?.let { listUuid ->
             AnalyticsHelper.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
+                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid)
+            )
         }
         val fragment = EpisodeFragment.newInstance(episodeUuid = episode.uuid, podcastUuid = episode.podcast_uuid, fromListUuid = listUuid)
         fragment.show(parentFragmentManager, "episode_card")
