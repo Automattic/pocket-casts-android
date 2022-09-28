@@ -212,7 +212,7 @@ private fun ImportAndExportOpmlRow(onClick: () -> Unit) {
 private fun PrivacyRow(onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_privacy),
-        icon = null, // TODO get a designer to create this
+        icon = GradientIconData(SR.drawable.whatsnew_privacy),
         modifier = rowModifier(onClick)
     )
 }
