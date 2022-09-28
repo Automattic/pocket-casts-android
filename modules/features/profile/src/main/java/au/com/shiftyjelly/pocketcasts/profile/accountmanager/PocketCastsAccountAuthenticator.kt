@@ -38,7 +38,7 @@ class PocketCastsAccountAuthenticator(val context: Context, private val accountA
                 val authResult = accountAuth.signInWithEmailAndPassword(account.name, accountManager.getPassword(account), SignInSource.AccountAuthenticator)
                 if (authResult is AccountAuth.AuthResult.Success) {
                     Timber.d("Token refresh success")
-                    authToken = authResult.result
+                    authToken = authResult.token
                 } else if (authResult is AccountAuth.AuthResult.Failed) {
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not get new token, ${authResult.message}")
                 }

@@ -45,7 +45,7 @@ class AccountAuth @Inject constructor(
         return withContext(Dispatchers.IO) {
             val authResult = loginToSyncServer(email, password)
             if (authResult is AuthResult.Success) {
-                val token = authResult.result
+                val token = authResult.token
                 signInSuccessful(email, password, token)
             }
             trackSignIn(authResult, signInSource)
@@ -71,7 +71,7 @@ class AccountAuth @Inject constructor(
         return withContext(Dispatchers.IO) {
             val authResult = registerWithSyncServer(email, password)
             if (authResult is AuthResult.Success) {
-                val token = authResult.result
+                val token = authResult.token
                 signInSuccessful(email, password, token)
             }
             authResult
@@ -148,7 +148,7 @@ class AccountAuth @Inject constructor(
             email,
             object : ServerCallback<String> {
                 override fun dataReturned(result: String?) {
-                    complete(AuthResult.Success(result))
+                    complete(AuthResult.Success(token = null, jsonData = result))
                     analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_RESET)
                 }
 
@@ -199,7 +199,7 @@ class AccountAuth @Inject constructor(
     }
 
     sealed class AuthResult {
-        data class Success(val result: String?) : AuthResult()
+        data class Success(val token: String?, val uuid: String? = null, val jsonData: String? = null) : AuthResult()
         data class Failed(val message: String, val serverMessageId: String?) : AuthResult()
     }
 }
