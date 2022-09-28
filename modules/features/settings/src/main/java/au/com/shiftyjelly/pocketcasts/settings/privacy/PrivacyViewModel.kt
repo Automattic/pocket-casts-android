@@ -15,8 +15,6 @@ class PrivacyViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed class UiState {
-        object Loading : UiState()
-        object Error : UiState()
         data class Loaded(
             val analytics: Boolean,
             val crashReports: Boolean,
@@ -24,15 +22,13 @@ class PrivacyViewModel @Inject constructor(
         ) : UiState()
     }
 
-    private val mutableUiState = MutableStateFlow<UiState>(UiState.Loaded(analytics = true, crashReports = false, linkAccount = false))
+    private val mutableUiState = MutableStateFlow<UiState>(UiState.Loaded(analytics = settings.getSendUsageStats(), crashReports = false, linkAccount = false))
     val uiState: StateFlow<UiState> = mutableUiState.asStateFlow()
-
-    init {
-        // settings.privacyAnalyticsFlow
-    }
 
     fun updateAnalyticsSetting(on: Boolean) {
         Timber.i("on: $on")
+        settings.setSendUsageStats(on)
+        mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(analytics = on)
     }
 
     fun updateCrashReportsSetting(on: Boolean) {
