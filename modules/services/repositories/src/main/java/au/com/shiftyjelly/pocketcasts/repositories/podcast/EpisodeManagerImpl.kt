@@ -489,6 +489,12 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override fun markAsPlayedAsync(episode: Playable?, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+        launch {
+            markAsPlayed(episode, playbackManager, podcastManager)
+        }
+    }
+
     override fun markAsPlayed(episode: Playable?, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
         if (episode == null) {
             return

@@ -3,13 +3,13 @@ package au.com.shiftyjelly.pocketcasts.filters
 import android.animation.LayoutTransition
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -95,7 +95,12 @@ class FilterEpisodeListFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        listSavedState = savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
+        listSavedState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER, Parcelable::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
+        }
         showingFilterOptionsBeforeModal = arguments?.getBoolean(ARG_FILTER_IS_NEW) ?: false
 
         AnalyticsHelper.openedFilter()
@@ -179,7 +184,6 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbarColors = null
         )
 
-        toolbar.setNavigationOnClickListener { (activity as AppCompatActivity).onBackPressed() }
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
                 R.id.menu_delete -> {
@@ -223,6 +227,8 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         viewModel.playlistDeleted.observe(viewLifecycleOwner) { deleted ->
             if (deleted) {
+                clearSelectedFilter()
+                @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
         }
@@ -504,6 +510,8 @@ class FilterEpisodeListFragment : BaseFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.filters_warning_delete_button)))
             .setOnConfirm {
                 viewModel.deletePlaylist()
+                clearSelectedFilter()
+                @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
             .show(childFragmentManager, "confirm")
@@ -572,12 +580,20 @@ class FilterEpisodeListFragment : BaseFragment() {
             multiSelectHelper.isMultiSelecting = false
             true
         } else {
+            clearSelectedFilter()
             super.onBackPressed()
         }
     }
 
     override fun getBackstackCount(): Int {
         return super.getBackstackCount() + if (multiSelectHelper.isMultiSelecting) 1 else 0
+    }
+
+    private fun clearSelectedFilter() {
+        // Only clear the selected filter if the currently displayed filter is the selected filter
+        if (settings.selectedFilter() == viewModel.playlist.value?.uuid) {
+            settings.setSelectedFilter(null)
+        }
     }
 }
 

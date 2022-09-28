@@ -8,18 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class NotificationHelperImpl @Inject constructor(@ApplicationContext private val context: Context) : NotificationHelper {
-
-    companion object {
-        private const val PLAYBACK_CHANNEL_ID = "playback"
-        private const val DOWNLOAD_CHANNEL_ID = "download"
-        private const val EPISODE_NOTIFICATION_CHANNEL_ID = "episode"
-        private const val PLAYBACK_ERROR_CHANNEL_ID = "playbackError"
-        private const val PODCAST_IMPORT_CHANNEL_ID = "podcastImport"
-    }
 
     private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
 
@@ -35,7 +28,7 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
 
         val channelList = ArrayList<NotificationChannel>()
         // set up playback channel
-        val playbackChannel = NotificationChannel(PLAYBACK_CHANNEL_ID, "Playback", NotificationManager.IMPORTANCE_LOW).apply {
+        val playbackChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PLAYBACK.id, "Playback", NotificationManager.IMPORTANCE_LOW).apply {
             description = "Shows while Pocket Casts is playing audio"
             setShowBadge(false)
             enableVibration(false)
@@ -44,7 +37,7 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         channelList.add(playbackChannel)
 
         // set up download channel
-        val downloadChannel = NotificationChannel(DOWNLOAD_CHANNEL_ID, "Downloads", NotificationManager.IMPORTANCE_LOW).apply {
+        val downloadChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DOWNLOAD.id, "Downloads", NotificationManager.IMPORTANCE_LOW).apply {
             description = "Shows while Pocket Casts is downloading episodes"
             setShowBadge(false)
             enableVibration(false)
@@ -53,7 +46,7 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         channelList.add(downloadChannel)
 
         // set up new episode channel
-        val episodeChannel = NotificationChannel(EPISODE_NOTIFICATION_CHANNEL_ID, "New Episodes", NotificationManager.IMPORTANCE_DEFAULT).apply {
+        val episodeChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_EPISODE.id, "New Episodes", NotificationManager.IMPORTANCE_DEFAULT).apply {
             description = "Shows when a new episode comes out"
             setShowBadge(true)
             enableVibration(false)
@@ -61,7 +54,7 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(episodeChannel)
 
-        val playbackErrorChannel = NotificationChannel(PLAYBACK_ERROR_CHANNEL_ID, "Playback Errors", NotificationManager.IMPORTANCE_HIGH).apply {
+        val playbackErrorChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PLAYBACK_ERROR.id, "Playback Errors", NotificationManager.IMPORTANCE_HIGH).apply {
             description = "Errors during playback"
             setShowBadge(false)
             enableVibration(true)
@@ -69,7 +62,7 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(playbackErrorChannel)
 
-        val podcastImportChannel = NotificationChannel(PODCAST_IMPORT_CHANNEL_ID, "Podcast Import", NotificationManager.IMPORTANCE_LOW).apply {
+        val podcastImportChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PODCAST.id, "Podcast Import", NotificationManager.IMPORTANCE_LOW).apply {
             description = "Import podcast collections"
             setShowBadge(false)
             enableVibration(false)
@@ -77,27 +70,35 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
         }
         channelList.add(podcastImportChannel)
 
+        val signInErrorChannel = NotificationChannel(Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR.id, "Sign-in Error", NotificationManager.IMPORTANCE_HIGH).apply {
+            description = "Shows when signed out in background and cannot auto re sign-in"
+            setShowBadge(false)
+            enableVibration(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        }
+        channelList.add(signInErrorChannel)
+
         notificationManager.createNotificationChannels(channelList)
     }
 
     override fun downloadChannelBuilder(): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, DOWNLOAD_CHANNEL_ID)
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_DOWNLOAD.id)
     }
 
     override fun playbackChannelBuilder(): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, PLAYBACK_CHANNEL_ID)
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PLAYBACK.id)
     }
 
     override fun episodeNotificationChannelBuilder(): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, EPISODE_NOTIFICATION_CHANNEL_ID)
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_EPISODE.id)
     }
 
     override fun playbackErrorChannelBuilder(): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, PLAYBACK_ERROR_CHANNEL_ID).setPriority(NotificationCompat.PRIORITY_MAX)
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PLAYBACK_ERROR.id).setPriority(NotificationCompat.PRIORITY_MAX)
     }
 
     override fun podcastImportChannelBuilder(): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, PODCAST_IMPORT_CHANNEL_ID)
+        return NotificationCompat.Builder(context, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_PODCAST.id)
     }
 
     /**
@@ -108,7 +109,7 @@ class NotificationHelperImpl @Inject constructor(@ApplicationContext private val
 
         val intent = Intent(android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
         intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, activity.packageName)
-        intent.putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, EPISODE_NOTIFICATION_CHANNEL_ID)
+        intent.putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_EPISODE.id)
         activity.startActivity(intent)
     }
 }

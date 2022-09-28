@@ -1,8 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.account
 
+import android.accounts.AccountAuthenticatorResponse
+import android.accounts.AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -46,7 +50,15 @@ class AccountActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
 
-            if (isNewUpgradeInstance(intent)) {
+            val accountAuthenticatorResponse = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE)
+            }
+            if (accountAuthenticatorResponse != null) {
+                graph.setStartDestination(R.id.signInFragment)
+            } else if (isNewUpgradeInstance(intent)) {
                 viewModel.clearReadyForUpgrade()
                 graph.setStartDestination(R.id.createFrequencyFragment)
             } else if (isPromoCodeInstance(intent)) {
@@ -54,7 +66,14 @@ class AccountActivity : AppCompatActivity() {
                 arguments.putString(PromoCodeFragment.ARG_PROMO_CODE, intent.getStringExtra(PROMO_CODE_VALUE))
             } else if (isSignInInstance(intent)) {
                 graph.setStartDestination(R.id.signInFragment)
-                arguments.putParcelable(SignInFragment.EXTRA_SUCCESS_INTENT, intent.getParcelableExtra(SUCCESS_INTENT))
+
+                val successIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra(SUCCESS_INTENT, Parcelable::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(SUCCESS_INTENT)
+                }
+                arguments.putParcelable(SignInFragment.EXTRA_SUCCESS_INTENT, successIntent)
             } else {
                 if (isNewAutoSelectPlusInstance(intent)) {
                     viewModel.defaultSubscriptionType = SubscriptionType.PLUS
@@ -110,6 +129,7 @@ class AccountActivity : AppCompatActivity() {
         }
 
         UiUtil.hideKeyboard(binding.root)
+        @Suppress("DEPRECATION")
         super.onBackPressed()
     }
 

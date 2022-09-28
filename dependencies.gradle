@@ -48,8 +48,8 @@ project.ext {
     // Android
     minSdkVersion = 23
     minSdkVersionWear = 23
-    targetSdkVersion = 31
-    compileSdkVersion = 32
+    targetSdkVersion = 33
+    compileSdkVersion = 33
     testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
 
     // App Signing

@@ -71,7 +71,10 @@ class StatsFragment : BaseFragment() {
                 val state: StatsViewModel.State by viewModel.state.collectAsState()
                 StatsPage(
                     state = state,
-                    onBackClick = { activity?.onBackPressed() },
+                    onBackClick = {
+                        @Suppress("DEPRECATION")
+                        activity?.onBackPressed()
+                    },
                     onRetryClick = { viewModel.loadStats() }
                 )
             }

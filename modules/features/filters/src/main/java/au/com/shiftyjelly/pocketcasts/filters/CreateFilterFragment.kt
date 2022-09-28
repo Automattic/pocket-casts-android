@@ -179,7 +179,10 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         if (isCreate) {
             binding.toolbarLayout.isVisible = false
         } else {
-            binding.toolbar.setNavigationOnClickListener { (activity as AppCompatActivity).onBackPressed() }
+            binding.toolbar.setNavigationOnClickListener {
+                @Suppress("DEPRECATION")
+                (activity as AppCompatActivity).onBackPressed()
+            }
         }
 
         val layoutAutoDownload = binding.layoutAutoDownload

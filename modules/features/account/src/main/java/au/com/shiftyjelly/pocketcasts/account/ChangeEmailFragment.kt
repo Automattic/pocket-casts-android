@@ -135,7 +135,10 @@ class ChangeEmailFragment : BaseFragment() {
                     doneViewModel.trackShown(AccountUpdatedSource.CHANGE_EMAIL)
 
                     val activity = requireActivity()
+
+                    @Suppress("DEPRECATION")
                     activity.onBackPressed() // done fragment needs to back to profile page
+
                     val fragment = ChangeDoneFragment.newInstance()
                     (activity as FragmentHostListener).addFragment(fragment)
                 }

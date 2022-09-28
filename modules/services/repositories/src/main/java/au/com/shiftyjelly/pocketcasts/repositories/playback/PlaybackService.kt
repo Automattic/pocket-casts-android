@@ -6,6 +6,7 @@ import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.MediaBrowserCompat
@@ -220,14 +221,19 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
             // If we have switched to casting we need to remove the notification
             if (isForegroundService && notification == null && playbackManager.isPlaybackRemote()) {
-                stopForeground(true)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                } else {
+                    @Suppress("DEPRECATION")
+                    stopForeground(true)
+                }
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground as player is remote")
             }
 
             // If we are already showing a notification, update it no matter the state.
-            if (notification != null && notificationHelper.isShowing(NotificationHelper.NOTIFICATION_ID_PLAYING)) {
+            if (notification != null && notificationHelper.isShowing(Settings.NotificationId.PLAYING.value)) {
                 Timber.d("Updating playback notification")
-                notificationManager.notify(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                notificationManager.notify(Settings.NotificationId.PLAYING.value, notification)
                 if (isForegroundService && (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING)) {
                     // Nothing else to do
                     return
@@ -241,14 +247,18 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 PlaybackStateCompat.STATE_PLAYING -> {
                     if (notification != null) {
                         try {
-                            startForeground(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                            startForeground(Settings.NotificationId.PLAYING.value, notification)
                             notificationManager.enteredForeground(notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
-                        } catch (e: ForegroundServiceStartNotAllowedException) {
-                            addBatteryWarnings()
+                        } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
-                            SentryHelper.recordException(e)
-                            AnalyticsHelper.foregroundServiceStartNotAllowedException()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                                e is ForegroundServiceStartNotAllowedException
+                            ) {
+                                addBatteryWarnings()
+                                SentryHelper.recordException(e)
+                                AnalyticsHelper.foregroundServiceStartNotAllowedException()
+                            }
                         }
                     } else {
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "can't startForeground as the notification is null")
@@ -269,13 +279,18 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                         }
 
                         if (notification != null && state == PlaybackStateCompat.STATE_PAUSED && isForegroundService) {
-                            notificationManager.notify(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                            notificationManager.notify(Settings.NotificationId.PLAYING.value, notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state (update notification)")
                         } else {
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state removing notification: $removeNotification")
                         }
 
-                        stopForeground(removeNotification)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            stopForeground(if (removeNotification) STOP_FOREGROUND_REMOVE else STOP_FOREGROUND_DETACH)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            stopForeground(removeNotification)
+                        }
                     }
 
                     if (state == PlaybackStateCompat.STATE_ERROR) {
