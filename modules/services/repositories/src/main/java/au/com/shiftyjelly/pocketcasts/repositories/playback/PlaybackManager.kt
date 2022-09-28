@@ -464,7 +464,7 @@ open class PlaybackManager @Inject constructor(
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
-            trackPlayback(AnalyticsEvent.PAUSE, playbackSource)
+            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE, playbackSource)
         } else {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = true))
@@ -605,7 +605,7 @@ open class PlaybackManager @Inject constructor(
                 onCompletion(episode.uuid)
             }
         }
-        trackPlayback(AnalyticsEvent.SKIP_FORWARD, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, playbackSource)
     }
 
     fun skipBackward() {
@@ -621,7 +621,7 @@ open class PlaybackManager @Inject constructor(
             val newPositionMs = Math.max(currentTimeMs - jumpAmountMs, 0)
             seekToTimeMsInternal(newPositionMs)
         }
-        trackPlayback(AnalyticsEvent.SKIP_BACK, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK, playbackSource)
     }
 
     fun skipToNextChapter() {
@@ -1562,7 +1562,7 @@ open class PlaybackManager @Inject constructor(
         )
 
         player?.play(currentTimeMs)
-        trackPlayback(AnalyticsEvent.PLAY, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, playbackSource)
     }
 
     private suspend fun addPodcastStartFromSettings(episode: Episode, podcast: Podcast?, isPlaying: Boolean) {
