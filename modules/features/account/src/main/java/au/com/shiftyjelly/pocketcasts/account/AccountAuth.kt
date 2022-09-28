@@ -46,7 +46,8 @@ class AccountAuth @Inject constructor(
             val authResult = loginToSyncServer(email, password)
             if (authResult is AuthResult.Success) {
                 val token = authResult.token
-                signInSuccessful(email, password, token)
+                val uuid = authResult.uuid
+                signInSuccessful(email, password, token, uuid)
             }
             trackSignIn(authResult, signInSource)
             authResult
@@ -72,7 +73,8 @@ class AccountAuth @Inject constructor(
             val authResult = registerWithSyncServer(email, password)
             if (authResult is AuthResult.Success) {
                 val token = authResult.token
-                signInSuccessful(email, password, token)
+                val uuid = authResult.uuid
+                signInSuccessful(email, password, token, uuid)
             }
             authResult
         }
@@ -82,9 +84,9 @@ class AccountAuth @Inject constructor(
         return suspendCoroutine { continuation ->
             serverManager.registerWithSyncServer(
                 email, password,
-                object : ServerCallback<String> {
-                    override fun dataReturned(result: String?) {
-                        continuation.resume(AuthResult.Success(result))
+                object : ServerCallback<Pair<String, String>> {
+                    override fun dataReturned(result: Pair<String, String>?) {
+                        continuation.resume(AuthResult.Success(token = result?.first, uuid = result?.second))
                         analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
                     }
 
@@ -116,9 +118,9 @@ class AccountAuth @Inject constructor(
         return suspendCoroutine { continuation ->
             serverManager.loginToSyncServer(
                 email, password,
-                object : ServerCallback<String> {
-                    override fun dataReturned(result: String?) {
-                        continuation.resume(AuthResult.Success(result))
+                object : ServerCallback<Pair<String, String>> {
+                    override fun dataReturned(result: Pair<String, String>?) {
+                        continuation.resume(AuthResult.Success(token = result?.first, uuid = result?.second))
                     }
 
                     override fun onFailed(
@@ -173,7 +175,7 @@ class AccountAuth @Inject constructor(
         )
     }
 
-    private suspend fun signInSuccessful(email: String, password: String, token: String?) {
+    private suspend fun signInSuccessful(email: String, password: String, token: String?, uuid: String?) {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully to $email")
         // Store details in android account manager
         if (token != null && token.isNotEmpty()) {
@@ -182,6 +184,7 @@ class AccountAuth @Inject constructor(
             val accountManager = AccountManager.get(context)
             accountManager.addAccountExplicitly(account, password, null)
             accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, token)
+            accountManager.setUserData(account, AccountConstants.UUID, uuid)
 
             settings.setUsedAccountManager(true)
         } else {

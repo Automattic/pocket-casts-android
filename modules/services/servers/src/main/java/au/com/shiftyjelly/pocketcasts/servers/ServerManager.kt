@@ -38,15 +38,15 @@ open class ServerManager @Inject constructor(
         private const val NO_INTERNET_CONNECTION_MSG = "Check your connection and try again."
     }
 
-    fun registerWithSyncServer(email: String, password: String, callback: ServerCallback<String>): Call? {
+    fun registerWithSyncServer(email: String, password: String, callback: ServerCallback<Pair<String, String>>): Call? {
         return postToSyncServer("/security/register", email, password, null, true, tokenExtractionCallback(callback))
     }
 
-    fun loginToSyncServer(email: String, password: String, callback: ServerCallback<String>): Call? {
+    fun loginToSyncServer(email: String, password: String, callback: ServerCallback<Pair<String, String>>): Call? {
         return postToSyncServer("/security/login", email, password, null, true, tokenExtractionCallback(callback))
     }
 
-    private fun tokenExtractionCallback(callback: ServerCallback<String>): PostCallback {
+    private fun tokenExtractionCallback(callback: ServerCallback<Pair<String, String>>): PostCallback {
         return object : PostCallback, ServerFailure by callback {
             override fun onSuccess(data: String?, response: ServerResponse) {
                 try {
@@ -55,7 +55,8 @@ open class ServerManager @Inject constructor(
                     }
                     val jsonData = JSONObject(data)
                     val token = jsonData.getString("token")
-                    callback.dataReturned(token)
+                    val uuid = jsonData.getString("uuid")
+                    callback.dataReturned(Pair(token, uuid))
                 } catch (e: JSONException) {
                     Timber.e(e)
                     callback.dataReturned(null)
