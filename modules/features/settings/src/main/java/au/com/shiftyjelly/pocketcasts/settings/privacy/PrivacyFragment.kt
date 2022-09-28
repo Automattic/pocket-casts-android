@@ -22,6 +22,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
@@ -33,42 +35,55 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class PrivacyFragment : BaseFragment() {
 
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val viewModel: PrivacyViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = ComposeView(requireContext()).apply {
-        setContent {
-            AppThemeWithBackground(theme.activeTheme) {
-                val state: PrivacyViewModel.UiState by viewModel.uiState.collectAsState()
-                PrivacySettings(
-                    state = state,
-                    onAnalyticsClick = {
-                        viewModel.updateAnalyticsSetting(it)
-                    },
-                    onCrashReportsClick = {
-                        viewModel.updateCrashReportsSetting(it)
-                    },
-                    onLinkAccountClick = {
-                        viewModel.updateLinkAccountSetting(it)
-                    },
-                    onPrivacyPolicyClick = {
-                        context.startActivityViewUrl(Settings.INFO_PRIVACY_URL)
-                    },
-                    onBackClick = {
-                        @Suppress("DEPRECATION")
-                        activity?.onBackPressed()
-                    }
-                )
+    ): View {
+        if (!viewModel.isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.PRIVACY_SETTINGS_SHOWN)
+        }
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppThemeWithBackground(theme.activeTheme) {
+                    val state: PrivacyViewModel.UiState by viewModel.uiState.collectAsState()
+                    PrivacySettings(
+                        state = state,
+                        onAnalyticsClick = {
+                            viewModel.updateAnalyticsSetting(it)
+                        },
+                        onCrashReportsClick = {
+                            viewModel.updateCrashReportsSetting(it)
+                        },
+                        onLinkAccountClick = {
+                            viewModel.updateLinkAccountSetting(it)
+                        },
+                        onPrivacyPolicyClick = {
+                            analyticsTracker.track(AnalyticsEvent.SETTINGS_SHOW_PRIVACY_POLICY)
+                            context.startActivityViewUrl(Settings.INFO_PRIVACY_URL)
+                        },
+                        onBackClick = {
+                            @Suppress("DEPRECATION")
+                            activity?.onBackPressed()
+                        }
+                    )
+                }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.isFragmentChangingConfigurations = activity?.isChangingConfigurations ?: false
     }
 
     @Composable

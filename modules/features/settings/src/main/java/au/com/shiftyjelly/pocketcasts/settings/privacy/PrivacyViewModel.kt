@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.settings.privacy
 
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,9 +13,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PrivacyViewModel @Inject constructor(
-    val settings: Settings
+    private val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
+    var isFragmentChangingConfigurations: Boolean = false
     sealed class UiState {
         data class Loaded(
             val analytics: Boolean,
@@ -29,6 +33,8 @@ class PrivacyViewModel @Inject constructor(
         Timber.i("on: $on")
         settings.setSendUsageStats(on)
         mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(analytics = on)
+        val optInAnalytics = if (on) AnalyticsEvent.ANALYTICS_OPT_IN else AnalyticsEvent.ANALYTICS_OPT_OUT
+        analyticsTracker.track(optInAnalytics)
     }
 
     fun updateCrashReportsSetting(on: Boolean) {
