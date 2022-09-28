@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -26,7 +27,10 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.text.LinkText
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -55,6 +59,9 @@ class PrivacyFragment : BaseFragment() {
                     onLinkAccountClick = {
                         viewModel.updateLinkAccountSetting(it)
                     },
+                    onPrivacyPolicyClick = {
+                        context.startActivityViewUrl(Settings.INFO_PRIVACY_URL)
+                    },
                     onBackClick = {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
@@ -70,6 +77,7 @@ class PrivacyFragment : BaseFragment() {
         onAnalyticsClick: (Boolean) -> Unit,
         onCrashReportsClick: (Boolean) -> Unit,
         onLinkAccountClick: (Boolean) -> Unit,
+        onPrivacyPolicyClick: () -> Unit,
         onBackClick: () -> Unit,
         modifier: Modifier = Modifier
     ) {
@@ -124,6 +132,11 @@ class PrivacyFragment : BaseFragment() {
                             indent = false
                         )
                     }
+                    LinkText(
+                        text = stringResource(LR.string.profile_privacy_policy_read),
+                        textAlign = TextAlign.Start,
+                        onClick = onPrivacyPolicyClick
+                    )
                 }
             }
         }

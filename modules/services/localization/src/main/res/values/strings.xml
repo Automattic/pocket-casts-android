@@ -763,6 +763,7 @@
     <string name="profile_plus_thankyou">The Pocket Casts Web Player is now part of Pocket Casts Plus. As a thank you for your support, we&#x2019;ve upgraded your account to Pocket Casts Plus for %s.</string>
     <string name="profile_pocket_casts_newsletter">Pocket Casts newsletter</string>
     <string name="profile_privacy_policy">Privacy policy</string>
+    <string name="profile_privacy_policy_read">Read privacy policy</string>
     <string name="profile_privacy_policy_title">Privacy policy</string>
     <string name="profile_promo_create_account" translatable="false">@string/create_account</string>
     <string name="profile_promo_create_pocket_casts_account">Create a Pocket Casts Account</string>
