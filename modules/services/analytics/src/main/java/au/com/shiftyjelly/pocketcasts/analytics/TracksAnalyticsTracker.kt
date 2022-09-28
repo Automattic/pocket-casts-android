@@ -51,7 +51,6 @@ class TracksAnalyticsTracker @Inject constructor(
         }
 
     override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-        super.track(event, properties)
         if (tracksClient == null) return
 
         val eventKey = event.key
@@ -85,6 +84,7 @@ class TracksAnalyticsTracker @Inject constructor(
         val uuid = accountManager.getUserData(accountManager.pocketCastsAccount(), AccountConstants.UUID)
         if (!uuid.isNullOrEmpty()) {
             userId = uuid
+            // Re-unify the user
             if (anonID != null) {
                 tracksClient?.trackAliasUser(userId, anonID, TracksClient.NosaraUserType.POCKETCASTS)
                 clearAnonID()
