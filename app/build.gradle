@@ -28,17 +28,6 @@ android {
         abortOnError false
     }
 
-    if (canSignRelease) {
-        signingConfigs {
-            release {
-                storeFile = file(pocketcastsKeyStoreFile)
-                storePassword = pocketcastsKeyStorePassword
-                keyAlias = pocketcastsKeyStoreAlias
-                keyPassword = pocketcastsKeyStoreAliasPassword
-            }
-        }
-    }
-
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
@@ -61,10 +50,10 @@ android {
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher",
                     gitHash: "",
-                    sentryDsn: project.properties['pocketcastsSentryDsn'] ?: ""
+                    sentryDsn: project.pocketcastsSentryDsn
             ]
 
-            if (!project.properties['pocketcastsSentryDsn']) {
+            if (!project.pocketcastsSentryDsn) {
                 println "WARNING: Sentry DSN gradle property 'pocketcastsSentryDsn' not found. Crash reporting won't work without this."
             }
 
@@ -73,10 +62,6 @@ android {
             }
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            if (canSignRelease) {
-                signingConfig signingConfigs.release
-            }
         }
     }
 }
