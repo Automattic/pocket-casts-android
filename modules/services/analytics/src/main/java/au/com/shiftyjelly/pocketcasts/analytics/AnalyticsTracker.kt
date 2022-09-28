@@ -16,11 +16,11 @@ object AnalyticsTracker {
                 }
             }
         }
+        get() = settings.getSendUsageStats()
 
     fun init(settings: Settings) {
         this.settings = settings
         trackers.forEach { it.clearAllData() }
-        sendUsageStats = settings.getSendUsageStats()
     }
 
     fun registerTracker(tracker: Tracker?) {

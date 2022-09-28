@@ -31,10 +31,14 @@ class PrivacyViewModel @Inject constructor(
 
     fun updateAnalyticsSetting(on: Boolean) {
         Timber.i("on: $on")
-        settings.setSendUsageStats(on)
+        if (on) {
+            settings.setSendUsageStats(true)
+            analyticsTracker.track(AnalyticsEvent.ANALYTICS_OPT_IN)
+        } else {
+            analyticsTracker.track(AnalyticsEvent.ANALYTICS_OPT_OUT)
+            settings.setSendUsageStats(false)
+        }
         mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(analytics = on)
-        val optInAnalytics = if (on) AnalyticsEvent.ANALYTICS_OPT_IN else AnalyticsEvent.ANALYTICS_OPT_OUT
-        analyticsTracker.track(optInAnalytics)
     }
 
     fun updateCrashReportsSetting(on: Boolean) {
