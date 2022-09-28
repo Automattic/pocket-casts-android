@@ -16,6 +16,7 @@ abstract class Tracker(
     /* The date the last event was tracked, used to determine when to regenerate the anonID */
     private var lastEventDate: Date? = null
     private val anonIDInactivityTimeout: Long = 30.minutes()
+    var userId: String? = null
 
     @CallSuper
     open fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
@@ -23,21 +24,15 @@ abstract class Tracker(
         /* Update the last event date so we can monitor the anonID timeout */
         lastEventDate = Date()
     }
-
-    @CallSuper
-    open fun refreshMetadata() {
-        if (anonID == null) {
-            generateNewAnonID()
-        }
-    }
+    abstract fun refreshMetadata()
 
     abstract fun flush()
     open fun clearAllData() {
-        // Reset the anon ID here
         clearAnonID()
+        userId = null
     }
 
-    private fun clearAnonID() {
+    fun clearAnonID() {
         anonymousID = null
         if (preferences.contains(anonIdPrefKey)) {
             val editor = preferences.edit()

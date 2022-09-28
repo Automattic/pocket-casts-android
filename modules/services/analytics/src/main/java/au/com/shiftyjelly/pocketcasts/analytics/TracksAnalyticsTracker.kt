@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
+import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.preferences.pocketCastsAccount
 import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -13,7 +16,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class TracksAnalyticsTracker @Inject constructor(
-    @ApplicationContext appContext: Context,
+    @ApplicationContext private val appContext: Context,
     @PublicSharedPreferences preferences: SharedPreferences,
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
@@ -52,8 +55,10 @@ class TracksAnalyticsTracker @Inject constructor(
         if (tracksClient == null) return
 
         val eventKey = event.key
-        val user = anonID ?: generateNewAnonID()
-        val userType = TracksClient.NosaraUserType.ANON
+        val user = userId ?: anonID ?: generateNewAnonID()
+        val userType = userId?.let {
+            TracksClient.NosaraUserType.POCKETCASTS
+        } ?: TracksClient.NosaraUserType.ANON
 
         /* Create the merged JSON Object of properties.
         Properties defined by the user have precedence over the default ones pre-defined at "event level" */
@@ -72,6 +77,23 @@ class TracksAnalyticsTracker @Inject constructor(
             Timber.i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
         } else {
             Timber.i("\uD83D\uDD35 Tracked: $eventKey")
+        }
+    }
+
+    override fun refreshMetadata() {
+        val accountManager = AccountManager.get(appContext)
+        val uuid = accountManager.getUserData(accountManager.pocketCastsAccount(), AccountConstants.UUID)
+        if (!uuid.isNullOrEmpty()) {
+            userId = uuid
+            if (anonID != null) {
+                tracksClient?.trackAliasUser(userId, anonID, TracksClient.NosaraUserType.POCKETCASTS)
+                clearAnonID()
+            }
+        } else {
+            userId = null
+            if (anonID == null) {
+                generateNewAnonID()
+            }
         }
     }
 
