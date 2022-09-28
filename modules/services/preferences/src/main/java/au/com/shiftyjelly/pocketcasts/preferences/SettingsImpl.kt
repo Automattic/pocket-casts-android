@@ -66,6 +66,8 @@ class SettingsImpl @Inject constructor(
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
         private const val SEND_USAGE_STATS_KEY = "SendUsageStatsKey"
+        private const val SEND_CRASH_REPORTS_KEY = "SendCrashReportsKey"
+        private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
     }
 
     private var languageCode: String? = null
@@ -1419,4 +1421,18 @@ class SettingsImpl @Inject constructor(
 
     override fun getSendUsageStats(): Boolean =
         getBoolean(SEND_USAGE_STATS_KEY, true)
+
+    override fun setSendCrashReports(value: Boolean) {
+        setBoolean(SEND_CRASH_REPORTS_KEY, value)
+    }
+
+    override fun getSendCrashReports(): Boolean =
+        getBoolean(SEND_CRASH_REPORTS_KEY, true)
+
+    override fun setLinkCrashReportsToUser(value: Boolean) {
+        setBoolean(LINK_CRASH_REPORTS_TO_USER_KEY, value)
+    }
+
+    override fun getLinkCrashReportsToUser(): Boolean =
+        getBoolean(LINK_CRASH_REPORTS_TO_USER_KEY, false)
 }

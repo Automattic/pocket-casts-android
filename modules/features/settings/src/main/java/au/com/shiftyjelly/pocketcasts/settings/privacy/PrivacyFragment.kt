@@ -62,7 +62,7 @@ class PrivacyFragment : BaseFragment() {
                             viewModel.updateAnalyticsSetting(it)
                         },
                         onCrashReportsClick = {
-                            viewModel.updateCrashReportsSetting(it)
+                            viewModel.updateCrashReportsSetting(context, it)
                         },
                         onLinkAccountClick = {
                             viewModel.updateLinkAccountSetting(it)
@@ -135,7 +135,7 @@ class PrivacyFragment : BaseFragment() {
                         ) { onCrashReportsClick(!state.crashReports) },
                         indent = false
                     )
-                    if (state.crashReports) {
+                    if (state.shouldShowLinkUserSetting()) {
                         SettingRow(
                             primaryText = stringResource(LR.string.settings_privacy_crash_link),
                             secondaryText = stringResource(LR.string.settings_privacy_crash_link_summary),

@@ -540,4 +540,10 @@ interface Settings {
 
     fun setSendUsageStats(value: Boolean)
     fun getSendUsageStats(): Boolean
+
+    fun setSendCrashReports(value: Boolean)
+    fun getSendCrashReports(): Boolean
+
+    fun setLinkCrashReportsToUser(value: Boolean)
+    fun getLinkCrashReportsToUser(): Boolean
 }

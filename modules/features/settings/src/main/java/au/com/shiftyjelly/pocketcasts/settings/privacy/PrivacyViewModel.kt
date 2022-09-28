@@ -1,10 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.settings.privacy
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.sentry.Sentry
+import io.sentry.android.core.SentryAndroid
+import io.sentry.protocol.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,15 +26,26 @@ class PrivacyViewModel @Inject constructor(
         data class Loaded(
             val analytics: Boolean,
             val crashReports: Boolean,
-            val linkAccount: Boolean
-        ) : UiState()
+            val linkAccount: Boolean,
+            private val getUserEmail: () -> String?
+        ) : UiState() {
+            fun shouldShowLinkUserSetting() = crashReports && getUserEmail() != null
+        }
     }
 
-    private val mutableUiState = MutableStateFlow<UiState>(UiState.Loaded(analytics = settings.getSendUsageStats(), crashReports = false, linkAccount = false))
+    private val mutableUiState = MutableStateFlow<UiState>(
+        UiState.Loaded(
+            analytics = settings.getSendUsageStats(),
+            crashReports = settings.getSendCrashReports(),
+            linkAccount = settings.getLinkCrashReportsToUser(),
+            getUserEmail = { getUserEmail() }
+        )
+    )
     val uiState: StateFlow<UiState> = mutableUiState.asStateFlow()
 
     fun updateAnalyticsSetting(on: Boolean) {
         Timber.i("on: $on")
+
         if (on) {
             settings.setSendUsageStats(true)
             analyticsTracker.track(AnalyticsEvent.ANALYTICS_OPT_IN)
@@ -41,11 +56,27 @@ class PrivacyViewModel @Inject constructor(
         mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(analytics = on)
     }
 
-    fun updateCrashReportsSetting(on: Boolean) {
+    fun updateCrashReportsSetting(context: Context, on: Boolean) {
         Timber.i("on: $on")
+
+        if (on) {
+            SentryAndroid.init(context) { it.dsn = settings.getSentryDsn() }
+        } else {
+            SentryAndroid.init(context) { it.dsn = "" }
+        }
+        settings.setSendCrashReports(on)
+        mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(crashReports = on)
     }
 
     fun updateLinkAccountSetting(on: Boolean) {
         Timber.i("on: $on")
+
+        val user = if (on) User().apply { email = getUserEmail() } else null
+        Sentry.setUser(user)
+
+        settings.setLinkCrashReportsToUser(on)
+        mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(linkAccount = on)
     }
+
+    private fun getUserEmail() = settings.getSyncEmail()
 }

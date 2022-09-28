@@ -105,7 +105,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
         }
 
         SentryAndroid.init(this) { options ->
-            options.dsn = settings.getSentryDsn()
+            options.dsn = if (settings.getSendCrashReports()) settings.getSentryDsn() else ""
         }
 
         // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
