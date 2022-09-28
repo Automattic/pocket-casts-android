@@ -150,7 +150,8 @@ class PrivacyFragment : BaseFragment() {
                     LinkText(
                         text = stringResource(LR.string.profile_privacy_policy_read),
                         textAlign = TextAlign.Start,
-                        onClick = onPrivacyPolicyClick
+                        onClick = onPrivacyPolicyClick,
+                        modifier = Modifier.padding(16.dp)
                     )
                 }
             }
