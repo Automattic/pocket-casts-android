@@ -72,10 +72,8 @@ class FiltersFragmentViewModel @Inject constructor(
         isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
-    fun trackFilterListShown() {
-        val properties = filters.value?.size?.let { filterCount ->
-            mapOf(FILTER_COUNT_KEY to filterCount)
-        } ?: emptyMap()
+    fun trackFilterListShown(filterCount: Int) {
+        val properties = mapOf(FILTER_COUNT_KEY to filterCount)
         analyticsTracker.track(AnalyticsEvent.FILTER_LIST_SHOWN, properties)
     }
 }

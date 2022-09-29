@@ -34,6 +34,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     @Inject lateinit var castManager: CastManager
 
     private val viewModel: FiltersFragmentViewModel by viewModels()
+    private var trackFilterListShown = false
     var filterCount: Int? = null
     var lastFilterUuidShown: String? = null
     var previousLastFilter: Playlist? = null
@@ -87,6 +88,11 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
             }
 
             this.filterCount = it.size
+            if (trackFilterListShown) {
+                viewModel.trackFilterListShown(it.size)
+                trackFilterListShown = false
+            }
+
             previousLastFilter = it.lastOrNull()
             viewModel.adapterState = it.toMutableList()
             adapter.submitList(it)
@@ -130,10 +136,14 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
                 val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) } ?: return@runBlocking
                 openPlaylist(playlist, isNewFilter = false)
             }
-        } else {
-            // Not showing a specific filter, so track showing of the filter list
-            if (!viewModel.isFragmentChangingConfigurations) {
-                viewModel.trackFilterListShown()
+        } else if (!viewModel.isFragmentChangingConfigurations) {
+            // Not showing a specific filter, so track showing of the filter list if not just a configuration change
+            filterCount.let {
+                if (it != null) {
+                    viewModel.trackFilterListShown(it)
+                } else {
+                    trackFilterListShown = true
+                }
             }
         }
     }
