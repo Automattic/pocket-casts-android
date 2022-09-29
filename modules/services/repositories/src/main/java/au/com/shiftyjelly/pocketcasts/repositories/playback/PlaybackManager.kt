@@ -481,6 +481,7 @@ open class PlaybackManager @Inject constructor(
 
     fun stopAsync() {
         launch {
+            trackPlayback(AnalyticsEvent.PLAYBACK_STOP)
             stop()
         }
     }
@@ -1850,6 +1851,7 @@ open class PlaybackManager @Inject constructor(
         PODCAST_SCREEN("podcast_screen"),
         FILTERS("filters"),
         DISCOVER("discover"),
+        DISCOVER_PODCAST_LIST("discover_podcast_list"),
         DOWNLOADS("downloads"),
         FILES("files"),
         STARRED("starred"),

@@ -205,4 +205,5 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_PAUSE("playback_pause"),
     PLAYBACK_SKIP_BACK("playback_skip_back"),
     PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
+    PLAYBACK_STOP("playback_stop"),
 }
