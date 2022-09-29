@@ -99,13 +99,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.viewModel = PlayerViewModel.PlayerHeader()
 
         binding.skipBack.setOnClickListener {
-            onSkipBack()
             playbackManager.playbackSource = playbackSource
+            onSkipBack()
             (it as LottieAnimationView).playAnimation()
         }
         binding.skipForward.setOnClickListener {
-            onSkipForward()
             playbackManager.playbackSource = playbackSource
+            onSkipForward()
             (it as LottieAnimationView).playAnimation()
         }
         binding.skipForward.setOnLongClickListener {
@@ -448,9 +448,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onPlayClicked() {
-        playbackManager.playbackSource = playbackSource
         if (playbackManager.isPlaying()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
+            playbackManager.playbackSource = playbackSource
             playbackManager.pause()
         } else {
             if (playbackManager.shouldWarnAboutPlayback()) {
@@ -459,6 +459,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     playbackManager.getCurrentEpisode()?.let { episode ->
                         launch(Dispatchers.Main) {
                             if (episode.isDownloaded) {
+                                playbackManager.playbackSource = playbackSource
                                 viewModel.play()
                                 warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
                             } else {
@@ -469,6 +470,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     }
                 }
             } else {
+                playbackManager.playbackSource = playbackSource
                 viewModel.play()
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
             }
