@@ -58,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -125,6 +126,7 @@ class MainActivity :
 
     companion object {
         private const val INITIAL_KEY = "initial"
+        private const val SOURCE_KEY = "source"
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -431,11 +433,16 @@ class MainActivity :
     }
 
     override fun onUpNextClicked() {
-        showBottomSheet(UpNextFragment())
+        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.MINI_PLAYER.analyticsValue))
+        showUpNextFragment()
     }
 
     override fun onMiniPlayerLongClick() {
         MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager, analyticsTracker).show(this)
+    }
+
+    private fun showUpNextFragment() {
+        showBottomSheet(UpNextFragment())
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -579,8 +586,9 @@ class MainActivity :
         // Handle up next shortcut
         if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {
             intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
+            analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.UP_NEXT_SHORTCUT.analyticsValue))
             binding.playerBottomSheet.openPlayer()
-            onUpNextClicked()
+            showUpNextFragment()
         }
     }
 

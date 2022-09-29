@@ -17,12 +17,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -42,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 @AndroidEntryPoint
 class PlayerContainerFragment : BaseFragment(), HasBackstack {
     @Inject lateinit var settings: Settings
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var upNextBottomSheetBehavior: BottomSheetBehavior<View>
 
@@ -139,7 +143,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             binding.upNextButton.setImageDrawable(upNextDrawable)
             binding.countText.text = if (upNextCount == 0) "" else upNextCount.toString()
 
-            binding.upNextButton.setOnClickListener { openUpNext() }
+            binding.upNextButton.setOnClickListener {
+                analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue))
+                openUpNext()
+            }
 
             view.setBackgroundColor(it.podcastHeader.backgroundColor)
         }
@@ -196,6 +203,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         } else {
             false
         }
+    }
+
+    companion object {
+        private const val SOURCE_KEY = "source"
     }
 }
 
