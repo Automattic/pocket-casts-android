@@ -34,7 +34,7 @@ class PrivacyViewModel @Inject constructor(
 
     private val mutableUiState = MutableStateFlow<UiState>(
         UiState.Loaded(
-            analytics = settings.getSendUsageStats(),
+            analytics = analyticsTracker.getSendUsageStats(),
             crashReports = settings.getSendCrashReports(),
             linkAccount = settings.getLinkCrashReportsToUser(),
             getUserEmail = { getUserEmail() }
@@ -44,11 +44,11 @@ class PrivacyViewModel @Inject constructor(
 
     fun updateAnalyticsSetting(on: Boolean) {
         if (on) {
-            settings.setSendUsageStats(true)
+            analyticsTracker.setSendUsageStats(true)
             analyticsTracker.track(AnalyticsEvent.ANALYTICS_OPT_IN)
         } else {
             analyticsTracker.track(AnalyticsEvent.ANALYTICS_OPT_OUT)
-            settings.setSendUsageStats(false)
+            analyticsTracker.setSendUsageStats(false)
         }
         mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(analytics = on)
     }

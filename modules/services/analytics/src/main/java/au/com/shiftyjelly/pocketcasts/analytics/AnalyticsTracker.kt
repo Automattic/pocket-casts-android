@@ -6,18 +6,6 @@ object AnalyticsTracker {
     private val trackers: MutableList<Tracker> = mutableListOf()
     private lateinit var settings: Settings
 
-    var sendUsageStats: Boolean = true
-        set(value) {
-            if (value != field) {
-                field = value
-                settings.setSendUsageStats(sendUsageStats)
-                if (!field) {
-                    trackers.forEach { it.clearAllData() }
-                }
-            }
-        }
-        get() = settings.getSendUsageStats()
-
     fun init(settings: Settings) {
         this.settings = settings
         trackers.forEach { it.clearAllData() }
@@ -28,7 +16,7 @@ object AnalyticsTracker {
     }
 
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
-        if (sendUsageStats) {
+        if (getSendUsageStats()) {
             trackers.forEach { it.track(event, properties) }
         }
     }
@@ -44,4 +32,15 @@ object AnalyticsTracker {
     fun clearAllData() {
         trackers.forEach { it.clearAllData() }
     }
+
+    fun setSendUsageStats(send: Boolean) {
+        if (send != getSendUsageStats()) {
+            settings.setSendUsageStats(send)
+            if (!send) {
+                trackers.forEach { it.clearAllData() }
+            }
+        }
+    }
+
+    fun getSendUsageStats() = settings.getSendUsageStats()
 }

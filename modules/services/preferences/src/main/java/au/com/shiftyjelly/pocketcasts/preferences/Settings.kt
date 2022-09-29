@@ -538,6 +538,8 @@ interface Settings {
     fun setTimesToShowBatteryWarning(value: Int)
     fun getTimesToShowBatteryWarning(): Int
 
+    // Only the AnalyticsTracker object should update or retrieve SendUsageState directly. Everything else
+    // should update/access this setting through the AnalyticsTracker.
     fun setSendUsageStats(value: Boolean)
     fun getSendUsageStats(): Boolean
 
