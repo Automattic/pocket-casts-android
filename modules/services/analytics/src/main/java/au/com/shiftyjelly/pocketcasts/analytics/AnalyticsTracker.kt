@@ -28,10 +28,7 @@ object AnalyticsTracker {
     }
 
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
-        // TODO only sending usage stats for debug builds while this feature is in development. Once we're
-        // ready to release this, we should reverse this and default to _only_ sending usage stats when
-        // it is _not_ a debug build (or do more checks when setting the `sendUsageStats` variable).
-        if (sendUsageStats && BuildConfig.DEBUG) {
+        if (sendUsageStats) {
             trackers.forEach { it.track(event, properties) }
         }
     }
