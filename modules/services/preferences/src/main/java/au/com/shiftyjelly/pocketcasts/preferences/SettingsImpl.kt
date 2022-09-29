@@ -584,6 +584,12 @@ class SettingsImpl @Inject constructor(
         return manager.getPassword(account)
     }
 
+    override fun getSyncUuid(): String? {
+        val manager = AccountManager.get(context)
+        val account = manager.pocketCastsAccount() ?: return null
+        return manager.getUserData(account, AccountConstants.UUID)
+    }
+
     private fun peekToken(): String? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null

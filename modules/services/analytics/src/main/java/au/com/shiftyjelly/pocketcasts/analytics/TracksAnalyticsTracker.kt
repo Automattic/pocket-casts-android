@@ -1,13 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import android.accounts.AccountManager
 import android.content.Context
 import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
-import au.com.shiftyjelly.pocketcasts.preferences.pocketCastsAccount
 import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -80,9 +77,7 @@ class TracksAnalyticsTracker @Inject constructor(
     }
 
     override fun refreshMetadata() {
-        val accountManager = AccountManager.get(appContext)
-        val uuid = accountManager.pocketCastsAccount()
-            ?.let { accountManager.getUserData(it, AccountConstants.UUID) }
+        val uuid = settings.getSyncUuid()
         if (!uuid.isNullOrEmpty()) {
             userId = uuid
             // Re-unify the user

@@ -350,6 +350,7 @@ interface Settings {
     fun clearEmailAndPassword()
     fun getSyncEmail(): String?
     fun getSyncPassword(): String?
+    fun getSyncUuid(): String?
     fun getSyncRefreshToken(): String?
     fun getSyncToken(): String?
     suspend fun getSyncTokenSuspend(): String?
