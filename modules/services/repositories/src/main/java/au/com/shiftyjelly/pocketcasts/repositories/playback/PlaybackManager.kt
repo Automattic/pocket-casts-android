@@ -464,7 +464,7 @@ open class PlaybackManager @Inject constructor(
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
-            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE, playbackSource)
+            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE)
         } else {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = true))
@@ -605,7 +605,7 @@ open class PlaybackManager @Inject constructor(
                 onCompletion(episode.uuid)
             }
         }
-        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD)
     }
 
     fun skipBackward() {
@@ -621,7 +621,7 @@ open class PlaybackManager @Inject constructor(
             val newPositionMs = Math.max(currentTimeMs - jumpAmountMs, 0)
             seekToTimeMsInternal(newPositionMs)
         }
-        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK)
     }
 
     fun skipToNextChapter() {
@@ -1562,7 +1562,7 @@ open class PlaybackManager @Inject constructor(
         )
 
         player?.play(currentTimeMs)
-        trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_PLAY)
     }
 
     private suspend fun addPodcastStartFromSettings(episode: Episode, podcast: Podcast?, isPlaying: Boolean) {
@@ -1838,8 +1838,12 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private fun trackPlayback(event: AnalyticsEvent, playbackSource: PlaybackSource) {
+    private fun trackPlayback(event: AnalyticsEvent) {
+        if (playbackSource == PlaybackSource.UNKNOWN) {
+            Timber.w("Found unknown playback source.")
+        }
         analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
+        playbackSource = PlaybackSource.UNKNOWN
     }
 
     enum class PlaybackSource(val analyticsValue: String) {
