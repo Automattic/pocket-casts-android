@@ -12,7 +12,6 @@ import io.sentry.protocol.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,8 +43,6 @@ class PrivacyViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = mutableUiState.asStateFlow()
 
     fun updateAnalyticsSetting(on: Boolean) {
-        Timber.i("on: $on")
-
         if (on) {
             settings.setSendUsageStats(true)
             analyticsTracker.track(AnalyticsEvent.ANALYTICS_OPT_IN)
@@ -57,8 +54,6 @@ class PrivacyViewModel @Inject constructor(
     }
 
     fun updateCrashReportsSetting(context: Context, on: Boolean) {
-        Timber.i("on: $on")
-
         if (on) {
             SentryAndroid.init(context) { it.dsn = settings.getSentryDsn() }
         } else {
@@ -69,8 +64,6 @@ class PrivacyViewModel @Inject constructor(
     }
 
     fun updateLinkAccountSetting(on: Boolean) {
-        Timber.i("on: $on")
-
         val user = if (on) User().apply { email = getUserEmail() } else null
         Sentry.setUser(user)
 
