@@ -238,4 +238,16 @@ enum class AnalyticsEvent(val key: String) {
     MINI_PLAYER_LONG_PRESS_MENU_SHOWN("mini_player_long_press_menu_shown"),
     MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED("mini_player_long_press_menu_option_tapped"),
     MINI_PLAYER_LONG_PRESS_MENU_DISMISSED("mini_player_long_press_menu_dismissed"),
+
+    /* Up Next */
+    UP_NEXT_SHOWN("up_next_shown"),
+    UP_NEXT_QUEUE_CLEARED("up_next_queue_cleared"),
+    UP_NEXT_NOW_PLAYING_TAPPED("up_next_now_playing_tapped"),
+    UP_NEXT_QUEUE_EPISODE_TAPPED("up_next_queue_episode_tapped"),
+    UP_NEXT_QUEUE_EPISODE_LONG_PRESSED("up_next_queue_episode_long_pressed"),
+    UP_NEXT_MULTI_SELECT_ENTERED("up_next_multi_select_entered"),
+    UP_NEXT_SELECT_ALL_BUTTON_TAPPED("up_next_select_all_button_tapped"),
+    UP_NEXT_MULTI_SELECT_EXITED("up_next_multi_select_exited"),
+    UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
+    UP_NEXT_DISMISSED("up_next_dismissed"),
 }
