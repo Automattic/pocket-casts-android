@@ -81,7 +81,8 @@ class TracksAnalyticsTracker @Inject constructor(
 
     override fun refreshMetadata() {
         val accountManager = AccountManager.get(appContext)
-        val uuid = accountManager.getUserData(accountManager.pocketCastsAccount(), AccountConstants.UUID)
+        val uuid = accountManager.pocketCastsAccount()
+            ?.let { accountManager.getUserData(it, AccountConstants.UUID) }
         if (!uuid.isNullOrEmpty()) {
             userId = uuid
             // Re-unify the user
