@@ -18,17 +18,6 @@ android {
         compose true
     }
 
-    if (canSignRelease) {
-        signingConfigs {
-            release {
-                storeFile = file(pocketcastsKeyStoreFile)
-                storePassword = pocketcastsKeyStorePassword
-                keyAlias = pocketcastsKeyStoreAlias
-                keyPassword = pocketcastsKeyStoreAliasPassword
-            }
-        }
-    }
-
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
@@ -46,15 +35,10 @@ android {
         release {
             manifestPlaceholders = [
                     gitHash: "",
-                    sentryDsn: project.properties['pocketcastsSentryDsn'] ?: ""
+                    sentryDsn: project.pocketcastsSentryDsn
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            if (canSignRelease) {
-                signingConfig signingConfigs.release
-            }
-
         }
     }
 }

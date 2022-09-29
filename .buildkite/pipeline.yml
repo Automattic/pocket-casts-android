@@ -1,0 +1,32 @@
+# Nodes with values to reuse in the pipeline.
+common_params:
+  # Common plugin settings to use with the `plugins` key.
+  - &common_plugins
+    - automattic/bash-cache#2.7.0
+
+steps:
+  - label: 'Unit tests'
+    command: |
+      echo "--- 🧪 Testing"
+      ./gradlew testDebugUnitTest
+    plugins: *common_plugins
+
+  - label: 'Lint'
+    command: |
+      echo "--- 🧹 Linting"
+      ./gradlew lintDebug
+    plugins: *common_plugins
+    artifact_paths:
+      - "**/build/reports/lint-results*.*"
+
+  - label: "Instrumented tests"
+    command: |
+      echo "--- :rubygems: Setting up Gems"
+      install_gems
+      echo "--- :closed_lock_with_key: Installing Secrets"
+      bundle exec fastlane run configure_apply
+      echo "--- 🧪 Testing"
+      bundle exec fastlane build_and_instrumented_test
+    plugins: *common_plugins
+    artifact_paths:
+      - "**/build/instrumented-tests/**/*"
