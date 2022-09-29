@@ -84,7 +84,7 @@ project.ext {
     versionWork = '2.7.1'
 
     // Automattic library versions
-    versionTracks = '145-721f55480d26b9d05acb2aa600e99e4f97f5e302'
+    versionTracks = '145-4e0107195396042b275e6618bbc74a4fef59e73e'
 
     androidLibs = [
             appCompat: "androidx.appcompat:appcompat:1.5.0",
