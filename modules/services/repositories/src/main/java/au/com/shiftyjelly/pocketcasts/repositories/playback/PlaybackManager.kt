@@ -464,7 +464,7 @@ open class PlaybackManager @Inject constructor(
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
-            trackPlayback(AnalyticsEvent.PAUSE, playbackSource)
+            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE)
         } else {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = true))
@@ -481,6 +481,7 @@ open class PlaybackManager @Inject constructor(
 
     fun stopAsync() {
         launch {
+            trackPlayback(AnalyticsEvent.PLAYBACK_STOP)
             stop()
         }
     }
@@ -605,7 +606,7 @@ open class PlaybackManager @Inject constructor(
                 onCompletion(episode.uuid)
             }
         }
-        trackPlayback(AnalyticsEvent.SKIP_FORWARD, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD)
     }
 
     fun skipBackward() {
@@ -621,7 +622,7 @@ open class PlaybackManager @Inject constructor(
             val newPositionMs = Math.max(currentTimeMs - jumpAmountMs, 0)
             seekToTimeMsInternal(newPositionMs)
         }
-        trackPlayback(AnalyticsEvent.SKIP_BACK, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK)
     }
 
     fun skipToNextChapter() {
@@ -1562,7 +1563,7 @@ open class PlaybackManager @Inject constructor(
         )
 
         player?.play(currentTimeMs)
-        trackPlayback(AnalyticsEvent.PLAY, playbackSource)
+        trackPlayback(AnalyticsEvent.PLAYBACK_PLAY)
     }
 
     private suspend fun addPodcastStartFromSettings(episode: Episode, podcast: Podcast?, isPlaying: Boolean) {
@@ -1838,14 +1839,19 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private fun trackPlayback(event: AnalyticsEvent, playbackSource: PlaybackSource) {
+    private fun trackPlayback(event: AnalyticsEvent) {
+        if (playbackSource == PlaybackSource.UNKNOWN) {
+            Timber.w("Found unknown playback source.")
+        }
         analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
+        playbackSource = PlaybackSource.UNKNOWN
     }
 
     enum class PlaybackSource(val analyticsValue: String) {
         PODCAST_SCREEN("podcast_screen"),
         FILTERS("filters"),
         DISCOVER("discover"),
+        DISCOVER_PODCAST_LIST("discover_podcast_list"),
         DOWNLOADS("downloads"),
         FILES("files"),
         STARRED("starred"),
@@ -1855,7 +1861,7 @@ open class PlaybackManager @Inject constructor(
         PLAYER("player"),
         NOTIFICATION("notification"),
         FULL_SCREEN_VIDEO("full_screen_video"),
-        MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"), // for media
+        MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
         UNKNOWN("unknown"),
     }
 }

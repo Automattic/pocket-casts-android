@@ -14,11 +14,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.download.ResponseValidationResult
 import au.com.shiftyjelly.pocketcasts.repositories.download.toData
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
@@ -185,7 +185,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         val notification = downloadManager.getNotificationBuilder()
             .build()
 
-        return ForegroundInfo(NotificationHelper.NOTIFICATION_ID_DOWNLOADING, notification)
+        return ForegroundInfo(NotificationId.DOWNLOADING.value, notification)
     }
 
     private fun markAsRetry(e: Exception? = null) {

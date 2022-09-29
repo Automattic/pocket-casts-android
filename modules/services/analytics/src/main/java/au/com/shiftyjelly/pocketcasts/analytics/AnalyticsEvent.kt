@@ -201,10 +201,11 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
 
     /* Playback */
-    PLAY("play"),
-    PAUSE("pause"),
-    SKIP_BACK("skip_back"),
-    SKIP_FORWARD("skip_forward"),
+    PLAYBACK_PLAY("playback_play"),
+    PLAYBACK_PAUSE("playback_pause"),
+    PLAYBACK_SKIP_BACK("playback_skip_back"),
+    PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
+    PLAYBACK_STOP("playback_stop"),
 
     /* Discover */
     DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
