@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -45,7 +44,6 @@ class WarningsHelper @Inject constructor(
     ): ConfirmationDialog {
         return streamingWarningDialog(onConfirm = {
             GlobalScope.launch {
-                playbackManager.playbackSource = PlaybackSource.STREAMING_WARNING_DIALOG
                 playbackManager.playNow(episode, true)
                 showBatteryWarningSnackbarIfAppropriate(snackbarParentView)
             }
