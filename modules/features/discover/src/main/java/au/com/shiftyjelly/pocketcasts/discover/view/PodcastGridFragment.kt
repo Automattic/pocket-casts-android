@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
-import android.graphics.Color
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,13 +16,9 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
-import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import coil.load
-import coil.transform.CircleCropTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
@@ -73,52 +66,18 @@ class PodcastGridFragment : PodcastGridListFragment() {
                             } else {
                                 binding.headerLayout.visibility = View.VISIBLE
 
-                                binding.toolbar.title = it.subtitle
-                                binding.toolbar.menu.findItem(R.id.share_list)?.isVisible = curated
-
-                                binding.lblSubtitle.text = it.subtitle?.uppercase()
-                                binding.lblTitle.text = it.title
-                                binding.lblBody.text = it.description
-
-                                it.webLinkTitle?.let { linkTitle ->
-                                    it.webLinkUrl?.let { linkUrl ->
-                                        binding.linkLayout.visibility = View.VISIBLE
-                                        binding.lblLinkTitle.text = linkTitle
-                                        binding.linkLayout.setOnClickListener {
-                                            WebViewActivity.show(context, linkTitle, linkUrl)
-                                        }
-                                    }
-                                }
-
-                                val colorMatrix = ColorMatrix().apply { setSaturation(0.0f) }
-                                binding.imgPodcast.colorFilter = ColorMatrixColorFilter(colorMatrix)
-
-                                context?.let { context ->
-                                    it.collageImages?.let { images ->
-                                        if (images.isNotEmpty()) {
-                                            val backgroundUrl = images[0].imageUrl
-                                            binding.imgPodcast.load(backgroundUrl) {
-                                                transformations(ThemedImageTintTransformation(context))
-                                            }
-                                        }
-                                    }
-
-                                    it.tintColors?.let { tintColors ->
-                                        val tintColor: Int
-                                        try {
-                                            tintColor = if (theme.isDarkTheme) Color.parseColor(tintColors.darkTintColor) else Color.parseColor(tintColors.lightTintColor)
-                                            binding.lblSubtitle.setTextColor(tintColor)
-                                            binding.imgTint.setBackgroundColor(tintColor)
-                                        } catch (e: Exception) {
-                                        }
-                                    }
-
-                                    it.collectionImageUrl?.let { url ->
-                                        binding.highlightImage.load(url) {
-                                            transformations(ThemedImageTintTransformation(context), CircleCropTransformation())
-                                        }
-                                    }
-                                }
+                                updateCollectionHeaderView(
+                                    listFeed = it,
+                                    headshotImageView = binding.highlightImage,
+                                    headerImageView = binding.imgPodcast,
+                                    tintImageView = binding.imgTint,
+                                    titleTextView = binding.lblTitle,
+                                    subTitleTextView = binding.lblSubtitle,
+                                    bodyTextView = binding.lblBody,
+                                    linkView = binding.linkLayout,
+                                    linkTextView = binding.lblLinkTitle,
+                                    toolbar = binding.toolbar
+                                )
                             }
                         }
 
