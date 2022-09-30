@@ -5,6 +5,8 @@ import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -38,6 +40,7 @@ import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -66,6 +69,9 @@ class PocketcastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var coilImageLoader: ImageLoader
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var tracker: TracksAnalyticsTracker
+    @Inject lateinit var auth: AccountAuth
+
+    private val applicationScope = MainScope()
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -96,7 +102,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
     private fun setupAnalytics() {
         AnalyticsTracker.registerTracker(tracker)
         AnalyticsTracker.init(settings)
-        AnalyticsTracker.refreshMetadata()
+        retrieveUserIdIfNeededAndRefreshMetadata()
     }
 
     private fun setupSentry() {
@@ -204,6 +210,21 @@ class PocketcastsApplication : Application(), Configuration.Provider {
         userManager.beginMonitoringAccountManager(playbackManager)
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
+    }
+
+    private fun retrieveUserIdIfNeededAndRefreshMetadata() {
+        val email = settings.getSyncEmail()
+        val password = settings.getSyncPassword()
+        val uuid = settings.getSyncUuid()
+        if (!email.isNullOrEmpty() && !password.isNullOrEmpty() && uuid.isNullOrEmpty()) {
+            Timber.e("Missing User ID - Retrieving from the server")
+            applicationScope.launch(Dispatchers.IO) {
+                auth.signInWithEmailAndPassword(email, password, SignInSource.PocketCastsApplication)
+                AnalyticsTracker.refreshMetadata()
+            }
+        } else {
+            AnalyticsTracker.refreshMetadata()
+        }
     }
 
     @Suppress("DEPRECATION")
