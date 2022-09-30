@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokenedOkHttpClient
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -38,15 +39,15 @@ open class ServerManager @Inject constructor(
         private const val NO_INTERNET_CONNECTION_MSG = "Check your connection and try again."
     }
 
-    fun registerWithSyncServer(email: String, password: String, callback: ServerCallback<String>): Call? {
-        return postToSyncServer("/security/register", email, password, null, true, tokenExtractionCallback(callback))
+    fun registerWithSyncServer(email: String, password: String, callback: ServerCallback<AuthResultModel>): Call? {
+        return postToSyncServer("/security/register", email, password, null, true, authResultExtractionCallback(callback))
     }
 
-    fun loginToSyncServer(email: String, password: String, callback: ServerCallback<String>): Call? {
-        return postToSyncServer("/security/login", email, password, null, true, tokenExtractionCallback(callback))
+    fun loginToSyncServer(email: String, password: String, callback: ServerCallback<AuthResultModel>): Call? {
+        return postToSyncServer("/security/login", email, password, null, true, authResultExtractionCallback(callback))
     }
 
-    private fun tokenExtractionCallback(callback: ServerCallback<String>): PostCallback {
+    private fun authResultExtractionCallback(callback: ServerCallback<AuthResultModel>): PostCallback {
         return object : PostCallback, ServerFailure by callback {
             override fun onSuccess(data: String?, response: ServerResponse) {
                 try {
@@ -55,7 +56,8 @@ open class ServerManager @Inject constructor(
                     }
                     val jsonData = JSONObject(data)
                     val token = jsonData.getString("token")
-                    callback.dataReturned(token)
+                    val uuid = jsonData.getString("uuid")
+                    callback.dataReturned(AuthResultModel(token = token, uuid = uuid))
                 } catch (e: JSONException) {
                     Timber.e(e)
                     callback.dataReturned(null)

@@ -13,7 +13,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class TracksAnalyticsTracker @Inject constructor(
-    @ApplicationContext appContext: Context,
+    @ApplicationContext private val appContext: Context,
     @PublicSharedPreferences preferences: SharedPreferences,
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
@@ -48,12 +48,13 @@ class TracksAnalyticsTracker @Inject constructor(
         }
 
     override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-        super.track(event, properties)
         if (tracksClient == null) return
 
         val eventKey = event.key
-        val user = anonID ?: generateNewAnonID()
-        val userType = TracksClient.NosaraUserType.ANON
+        val user = userId ?: anonID ?: generateNewAnonID()
+        val userType = userId?.let {
+            TracksClient.NosaraUserType.POCKETCASTS
+        } ?: TracksClient.NosaraUserType.ANON
 
         /* Create the merged JSON Object of properties.
         Properties defined by the user have precedence over the default ones pre-defined at "event level" */
@@ -72,6 +73,23 @@ class TracksAnalyticsTracker @Inject constructor(
             Timber.i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
         } else {
             Timber.i("\uD83D\uDD35 Tracked: $eventKey")
+        }
+    }
+
+    override fun refreshMetadata() {
+        val uuid = settings.getSyncUuid()
+        if (!uuid.isNullOrEmpty()) {
+            userId = uuid
+            // Re-unify the user
+            if (anonID != null) {
+                tracksClient?.trackAliasUser(userId, anonID, TracksClient.NosaraUserType.POCKETCASTS)
+                clearAnonID()
+            }
+        } else {
+            userId = null
+            if (anonID == null) {
+                generateNewAnonID()
+            }
         }
     }
 
