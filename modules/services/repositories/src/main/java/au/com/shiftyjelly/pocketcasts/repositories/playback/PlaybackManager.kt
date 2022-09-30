@@ -1178,7 +1178,7 @@ open class PlaybackManager @Inject constructor(
 
     override fun onFocusRequestFailed() {
         LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Could not get audio focus, stopping")
-        stopAsync(isAudioFocusFailed = false)
+        stopAsync(isAudioFocusFailed = true)
     }
 
     override fun onAudioBecomingNoisy() {
