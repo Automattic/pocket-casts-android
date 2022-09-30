@@ -54,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -685,6 +686,7 @@ class MainActivity :
     }
 
     override fun onPlayClicked() {
+        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         if (playbackManager.shouldWarnAboutPlayback()) {
             launch {
                 // show the stream warning if the episode isn't downloaded
@@ -707,14 +709,17 @@ class MainActivity :
     }
 
     override fun onPauseClicked() {
+        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         playbackManager.pause()
     }
 
     override fun onSkipBackwardClicked() {
+        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         playbackManager.skipBackward()
     }
 
     override fun onSkipForwardClicked() {
+        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         playbackManager.skipForward()
     }
 

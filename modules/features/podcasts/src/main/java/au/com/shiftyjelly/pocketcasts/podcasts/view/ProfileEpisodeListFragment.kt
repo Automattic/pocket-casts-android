@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
@@ -116,6 +117,12 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         imageLoader = PodcastImageLoaderThemed(context).apply {
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
+
+        playButtonListener.playbackSource = when (mode) {
+            Mode.Downloaded -> PlaybackSource.DOWNLOADS
+            Mode.Starred -> PlaybackSource.STARRED
+            Mode.History -> PlaybackSource.LISTENING_HISTORY
+        }
     }
 
     override fun onPause() {

@@ -424,6 +424,7 @@ internal class DiscoverAdapter(
                             binding.publishedDate.text = episode.published?.toLocalizedFormatPattern(pattern = "d MMM")
                             binding.btnPlay.setIconResource(if (episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
                             binding.btnPlay.setOnClickListener {
+
                                 row.listUuid?.let { listUuid ->
                                     AnalyticsHelper.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
                                 }
