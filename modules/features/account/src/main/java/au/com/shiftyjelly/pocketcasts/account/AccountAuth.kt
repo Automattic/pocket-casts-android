@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -45,9 +46,7 @@ class AccountAuth @Inject constructor(
         return withContext(Dispatchers.IO) {
             val authResult = loginToSyncServer(email, password)
             if (authResult is AuthResult.Success) {
-                val token = authResult.token
-                val uuid = authResult.uuid
-                signInSuccessful(email, password, token, uuid)
+                signInSuccessful(email, password, authResult.result)
             }
             trackSignIn(authResult, signInSource)
             authResult
@@ -72,9 +71,7 @@ class AccountAuth @Inject constructor(
         return withContext(Dispatchers.IO) {
             val authResult = registerWithSyncServer(email, password)
             if (authResult is AuthResult.Success) {
-                val token = authResult.token
-                val uuid = authResult.uuid
-                signInSuccessful(email, password, token, uuid)
+                signInSuccessful(email, password, authResult.result)
             }
             authResult
         }
@@ -84,9 +81,9 @@ class AccountAuth @Inject constructor(
         return suspendCoroutine { continuation ->
             serverManager.registerWithSyncServer(
                 email, password,
-                object : ServerCallback<Pair<String, String>> {
-                    override fun dataReturned(result: Pair<String, String>?) {
-                        continuation.resume(AuthResult.Success(token = result?.first, uuid = result?.second))
+                object : ServerCallback<AuthResultModel> {
+                    override fun dataReturned(result: AuthResultModel?) {
+                        continuation.resume(AuthResult.Success(result))
                         analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
                     }
 
@@ -118,9 +115,9 @@ class AccountAuth @Inject constructor(
         return suspendCoroutine { continuation ->
             serverManager.loginToSyncServer(
                 email, password,
-                object : ServerCallback<Pair<String, String>> {
-                    override fun dataReturned(result: Pair<String, String>?) {
-                        continuation.resume(AuthResult.Success(token = result?.first, uuid = result?.second))
+                object : ServerCallback<AuthResultModel> {
+                    override fun dataReturned(result: AuthResultModel?) {
+                        continuation.resume(AuthResult.Success(result))
                     }
 
                     override fun onFailed(
@@ -150,7 +147,7 @@ class AccountAuth @Inject constructor(
             email,
             object : ServerCallback<String> {
                 override fun dataReturned(result: String?) {
-                    complete(AuthResult.Success(token = null, jsonData = result))
+                    complete(AuthResult.Success(null))
                     analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_RESET)
                 }
 
@@ -175,16 +172,16 @@ class AccountAuth @Inject constructor(
         )
     }
 
-    private suspend fun signInSuccessful(email: String, password: String, token: String?, uuid: String?) {
+    private suspend fun signInSuccessful(email: String, password: String, authResult: AuthResultModel?) {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully to $email")
         // Store details in android account manager
-        if (token != null && token.isNotEmpty()) {
+        if (authResult?.token != null && authResult.token?.isNotEmpty() == true) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Saving $email to account manager")
             val account = Account(email, AccountConstants.ACCOUNT_TYPE)
             val accountManager = AccountManager.get(context)
             accountManager.addAccountExplicitly(account, password, null)
-            accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, token)
-            accountManager.setUserData(account, AccountConstants.UUID, uuid)
+            accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, authResult.token)
+            accountManager.setUserData(account, AccountConstants.UUID, authResult.uuid)
 
             settings.setUsedAccountManager(true)
         } else {
@@ -202,7 +199,7 @@ class AccountAuth @Inject constructor(
     }
 
     sealed class AuthResult {
-        data class Success(val token: String?, val uuid: String? = null, val jsonData: String? = null) : AuthResult()
+        data class Success(val result: AuthResultModel?) : AuthResult()
         data class Failed(val message: String, val serverMessageId: String?) : AuthResult()
     }
 }
