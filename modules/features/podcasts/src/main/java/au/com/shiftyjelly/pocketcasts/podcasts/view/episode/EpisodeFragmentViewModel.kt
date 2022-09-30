@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -239,6 +240,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         fromListUuid: String? = null
     ): Boolean {
         episode?.let { episode ->
+            playbackManager.playbackSource = PlaybackSource.EPISODE_DETAILS
             if (isPlaying.value == true) {
                 playbackManager.pause()
                 return false

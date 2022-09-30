@@ -199,4 +199,11 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_TOGGLE_ARCHIVED("podcast_screen_toggle_archived"),
     PODCAST_SCREEN_TOGGLE_SUMMARY("podcast_screen_toggle_summary"),
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
+
+    /* Playback */
+    PLAYBACK_PLAY("playback_play"),
+    PLAYBACK_PAUSE("playback_pause"),
+    PLAYBACK_SKIP_BACK("playback_skip_back"),
+    PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
+    PLAYBACK_STOP("playback_stop"),
 }

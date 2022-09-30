@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -389,6 +390,7 @@ class MediaSessionManager(
                     @Suppress("DEPRECATION")
                     mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
                 } ?: return false
+                playbackManager.playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
