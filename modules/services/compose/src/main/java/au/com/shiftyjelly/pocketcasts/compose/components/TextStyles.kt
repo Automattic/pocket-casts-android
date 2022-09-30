@@ -153,7 +153,7 @@ fun TextP50(
         text = text,
         color = color ?: MaterialTheme.theme.colors.primaryText01,
         fontSize = 14.sp,
-        lineHeight = 16.sp,
+        lineHeight = 20.sp,
         maxLines = maxLines ?: Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis,
         style = style ?: LocalTextStyle.current,

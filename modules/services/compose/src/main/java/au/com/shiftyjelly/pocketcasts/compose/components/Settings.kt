@@ -3,13 +3,13 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Checkbox
@@ -50,7 +50,7 @@ fun SettingSection(
     heading: String? = null,
     content: @Composable () -> Unit = {}
 ) {
-    Column(modifier = modifier.background(MaterialTheme.theme.colors.primaryUi02)) {
+    Column(modifier = modifier) {
         Column(
             modifier = Modifier.padding(
                 top = verticalPadding,
@@ -116,6 +116,7 @@ fun SettingRow(
     icon: GradientIconData? = null,
     @DrawableRes primaryTextEndDrawable: Int? = null,
     toggle: SettingRowToggle = SettingRowToggle.None,
+    indent: Boolean = true,
     additionalContent: @Composable () -> Unit = {},
 ) {
     Row(
@@ -130,7 +131,7 @@ fun SettingRow(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.width(startPadding)
+            modifier = Modifier.width(if (indent || icon != null) startPadding else 16.dp)
         ) {
             GradientIcon(icon)
         }
@@ -156,6 +157,7 @@ fun SettingRow(
             }
 
             if (secondaryText != null) {
+                Spacer(Modifier.height(4.dp))
                 Crossfade(targetState = secondaryText) { text ->
                     TextP50(
                         text = text,

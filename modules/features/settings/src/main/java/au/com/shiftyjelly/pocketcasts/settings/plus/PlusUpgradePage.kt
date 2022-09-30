@@ -166,7 +166,8 @@ private fun PlusInformation(
         LinkText(
             text = stringResource(LR.string.plus_learn_more_about_plus),
             textAlign = TextAlign.Center,
-            onClick = onLearnMoreClick
+            onClick = onLearnMoreClick,
+            modifier = modifier.padding(8.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
         if (productState?.price != null) {
