@@ -1864,6 +1864,7 @@ open class PlaybackManager @Inject constructor(
         NOTIFICATION("notification"),
         FULL_SCREEN_VIDEO("full_screen_video"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
+        STREAMING_WARNING_DIALOG("streaming_warning_dialog"),
         UNKNOWN("unknown"),
     }
 }
