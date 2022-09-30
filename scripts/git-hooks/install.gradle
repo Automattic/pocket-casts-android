@@ -1,3 +1,23 @@
+import org.gradle.internal.logging.text.StyledTextOutputFactory;
+import static org.gradle.internal.logging.text.StyledTextOutput.Style;
+
+task gitleaksWarning {
+    doLast{
+        def result = exec {
+            ignoreExitValue = true
+            executable "bash" args "-l", "-c", "command -v gitleaks"
+        }
+        def hasGitleaks = result.getExitValue() == 0
+        if (!hasGitleaks) {
+            def out = services.get(StyledTextOutputFactory).create("blah")
+            out.withStyle(Style.Failure).println "\n\nGITLEAKS NOT FOUND"
+            println "If gitleaks (https://gitleaks.io/) is installed, it will run in the pre-commit hook to ensure no secrets are committed to this public repository."
+            out.withStyle(Style.FailureHeader).println "If you are an employee of Automattic, you must install gitleaks."
+            println "If you are an open source contributor, you can ignore this message."
+        }
+    }
+}
+
 task copyGitHooks(type: Copy) {
     description 'Copies the git hooks from scripts/git-hooks to the .git folder.'
     from("${rootDir}/scripts/git-hooks/") {
@@ -13,7 +33,7 @@ task installGitHooks(type: Exec) {
     workingDir rootDir
     commandLine 'chmod'
     args '-R', '+x', '.git/hooks/'
-    dependsOn copyGitHooks
+    dependsOn copyGitHooks, gitleaksWarning
     doLast {
         logger.info('Git hook installed successfully.')
     }
