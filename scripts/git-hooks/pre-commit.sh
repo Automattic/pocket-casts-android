@@ -23,17 +23,19 @@ fi
 # gitleaks
 ##################
 
-# Check if gitleaks is installed
+# Exit early if gitleaks is not installed
 if ! [ -x "$(command -v gitleaks)" ]; then
-  echo "Skipping gitleaks check..."
-  exit $RESULT
-fi
 
-if ! command -v gitleaks &> /dev/null
-then
-  echo ""
-  echo "Error: gitleaks script not found, please install it (https://github.com/zricethezav/gitleaks)"
-  exit 1
+  # Check if user has access to secrets
+  if [ -e "$HOME/.mobile-secrets/" ]; then
+    RED='\033[0;31m'
+    NO_COLOR='\033[0m'
+    printf "\n${RED}ERROR: You have access to PocketCasts secrets, so you must install gitleaks.${NO_COLOR}\n"
+    exit 1
+  else
+    echo "Gitleaks not installed. Skipping gitleaks check..."
+    exit 0
+  fi
 fi
 
 gitleaks protect -v --staged
@@ -42,7 +44,7 @@ RESULT=$?
 if [ $RESULT -ne 0 ]; then
   echo ""
   echo "Warning: gitleaks has detected sensitive information in your changes. Aborting commit."
-  exit 1
+  exit $RESULT
 fi
 
 exit $RESULT
