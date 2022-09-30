@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-23 14:54:03+0000
+Translation-Revision-Date: 2022-09-16 09:55:47+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+	<string name="settings_downloads_clean_up_summary">¿Seguro que quieres eliminar estos archivos descargados?</string>
 	<string name="settings_storage_section_heading_mobile_data">Datos móviles</string>
 	<string name="settings_storage_section_heading_usage">Uso</string>
 	<string name="settings_storage_downloaded_files">Archivos descargados</string>
@@ -1036,7 +1037,7 @@ Language: es
 	<string name="player_trim_silence_detail">Reduce la duración de un episodio al recortar el silencio en las conversaciones.</string>
 	<string name="player_time_saved_no_hour">¡Enhorabuena! Estás ahorrando tiempo y terminando más podcasts.</string>
 	<string name="player_time_saved_detail">En total, has ahorrado %s con esta función.</string>
-	<string name="player_tab_playing_wide">Se está reproduciendo ahora</string>
+	<string name="player_tab_playing_wide">Reproduciendo</string>
 	<string name="player_tab_playing">En reproducción</string>
 	<string name="player_tab_notes">Notas</string>
 	<string name="player_sleep_when_episode_ends">Poner en reposo cuando se termine el episodio</string>

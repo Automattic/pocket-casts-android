@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-23 14:54:03+0000
+Translation-Revision-Date: 2022-09-13 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+	<string name="settings_downloads_clean_up_summary">Weet je zeker dat je deze gedownloade bestanden wilt verwijderen?</string>
 	<string name="settings_storage_section_heading_mobile_data">Mobiele data</string>
 	<string name="settings_storage_section_heading_usage">Gebruik</string>
 	<string name="settings_storage_downloaded_files">Gedownloade bestanden</string>
