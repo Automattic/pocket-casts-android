@@ -212,4 +212,9 @@ enum class AnalyticsEvent(val key: String) {
     ANALYTICS_OPT_IN("analytics_opt_in"),
     ANALYTICS_OPT_OUT("analytics_opt_out"),
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
+
+    /* Filters screen */
+    FILTER_LIST_SHOWN("filter_list_shown"),
+    FILTER_SHOWN("filter_shown"),
+    FILTER_DELETED("filter_deleted"),
 }
