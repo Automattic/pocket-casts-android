@@ -763,6 +763,7 @@
     <string name="profile_plus_thankyou">The Pocket Casts Web Player is now part of Pocket Casts Plus. As a thank you for your support, we&#x2019;ve upgraded your account to Pocket Casts Plus for %s.</string>
     <string name="profile_pocket_casts_newsletter">Pocket Casts newsletter</string>
     <string name="profile_privacy_policy">Privacy policy</string>
+    <string name="profile_privacy_policy_read">Read privacy policy</string>
     <string name="profile_privacy_policy_title">Privacy policy</string>
     <string name="profile_promo_create_account" translatable="false">@string/create_account</string>
     <string name="profile_promo_create_pocket_casts_account">Create a Pocket Casts Account</string>
@@ -1096,6 +1097,7 @@
     <string name="settings_title_excluded_podcasts">Excluded Podcasts</string>
     <string name="settings_title_help">Help &amp; feedback</string>
     <string name="settings_title_import_export">Import &amp; export OPML</string>
+    <string name="settings_title_privacy">Privacy</string>
     <string name="settings_title_manage_downloads" translatable="false">@string/settings_storage_downloaded_files</string>
     <string name="settings_title_notifications">Notifications</string>
     <string name="settings_title_playback">General</string>
@@ -1231,6 +1233,13 @@
     <string name="settings_about_privacy_policy">Privacy policy</string>
     <string name="settings_about_acknowledgements">Acknowledgements</string>
     <string name="settings_about_website">Website</string>
+    <string name="settings_privacy_summary">Allowing us to collect analytics and crash reports helps us build a better app. We understand if you would prefer not to share this information.</string>
+    <string name="settings_privacy_analytics">Analytics</string>
+    <string name="settings_privacy_analytics_summary">Allow us to collect analytics.</string>
+    <string name="settings_privacy_crash">Crash reports</string>
+    <string name="settings_privacy_crash_summary">Allow us to collect crash reports.</string>
+    <string name="settings_privacy_crash_link">Link your account to crashes</string>
+    <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
 
     <string name="whats_new_folders_title_7_20" translatable="false">@string/folders</string>
     <string name="whats_new_folders_7_20">If you love podcasts half as much as we do, you probably have a lot of them. If you\'re a Pocket Casts Plus subscriber, you can now sort these into folders and file them into neat groups.\n\nThanks to your support, your Home Screen has never looked better!</string>

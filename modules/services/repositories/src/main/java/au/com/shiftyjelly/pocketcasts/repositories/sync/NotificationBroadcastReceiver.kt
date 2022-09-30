@@ -60,6 +60,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
             return
         }
 
+        playbackManager.playbackSource = PlaybackManager.PlaybackSource.NOTIFICATION
         // remove the notification
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationTag = bundle.getString(INTENT_EXTRA_NOTIFICATION_TAG, null)

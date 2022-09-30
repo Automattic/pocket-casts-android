@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
@@ -60,6 +61,7 @@ class PlayButton @JvmOverloads constructor(
     }
 
     interface OnClickListener {
+        var playbackSource: PlaybackManager.PlaybackSource
         fun onPlayClicked(episodeUuid: String)
         fun onPauseClicked()
         fun onPlayNext(episodeUuid: String)
