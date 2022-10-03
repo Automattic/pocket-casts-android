@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -48,6 +49,9 @@ class FilterEpisodeListViewModel @Inject constructor(
         const val MAX_DOWNLOAD_ALL = Settings.MAX_DOWNLOAD
     }
 
+    var isFragmentChangingConfigurations: Boolean = false
+        private set
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -87,6 +91,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) }?.let { playlist ->
                 playlistManager.delete(playlist)
+                analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
             }
         }
     }
@@ -193,5 +198,14 @@ class FilterEpisodeListViewModel @Inject constructor(
                 SOURCE_KEY to SwipeSource.FILTERS.analyticsValue
             )
         )
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
+
+    fun trackFilterShown() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
+        FirebaseAnalyticsTracker.openedFilter()
     }
 }

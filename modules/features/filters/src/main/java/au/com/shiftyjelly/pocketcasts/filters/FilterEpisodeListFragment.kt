@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -30,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getStringForDuration
@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -103,8 +102,6 @@ class FilterEpisodeListFragment : BaseFragment() {
             savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
         }
         showingFilterOptionsBeforeModal = arguments?.getBoolean(ARG_FILTER_IS_NEW) ?: false
-
-        AnalyticsHelper.openedFilter()
     }
 
     override fun onAttach(context: Context) {
@@ -114,6 +111,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
 
+        playButtonListener.playbackSource = PlaybackSource.FILTERS
         adapter = EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, this::onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager)
     }
 
@@ -124,6 +122,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     override fun onPause() {
         super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
 
         val binding = binding ?: return
         binding.toolbar.menu.close()
@@ -163,6 +162,10 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        if (!viewModel.isFragmentChangingConfigurations) {
+            viewModel.trackFilterShown()
+        }
+
         binding = FragmentFilterBinding.inflate(inflater, container, false)
         return binding?.root
     }
@@ -185,10 +188,6 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbarColors = null
         )
 
-        toolbar.setNavigationOnClickListener {
-            @Suppress("DEPRECATION")
-            (activity as AppCompatActivity).onBackPressed()
-        }
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
                 R.id.menu_delete -> {
@@ -232,6 +231,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         viewModel.playlistDeleted.observe(viewLifecycleOwner) { deleted ->
             if (deleted) {
+                clearSelectedFilter()
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
@@ -514,6 +514,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.filters_warning_delete_button)))
             .setOnConfirm {
                 viewModel.deletePlaylist()
+                clearSelectedFilter()
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
@@ -583,12 +584,20 @@ class FilterEpisodeListFragment : BaseFragment() {
             multiSelectHelper.isMultiSelecting = false
             true
         } else {
+            clearSelectedFilter()
             super.onBackPressed()
         }
     }
 
     override fun getBackstackCount(): Int {
         return super.getBackstackCount() + if (multiSelectHelper.isMultiSelecting) 1 else 0
+    }
+
+    private fun clearSelectedFilter() {
+        // Only clear the selected filter if the currently displayed filter is the selected filter
+        if (settings.selectedFilter() == viewModel.playlist.value?.uuid) {
+            settings.setSelectedFilter(null)
+        }
     }
 }
 

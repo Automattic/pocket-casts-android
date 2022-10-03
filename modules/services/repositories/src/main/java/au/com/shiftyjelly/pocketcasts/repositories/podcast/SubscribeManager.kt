@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -15,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
@@ -75,7 +75,7 @@ class SubscribeManager @Inject constructor(
     fun subscribeOnQueue(podcastUuid: String, sync: Boolean = false) {
         // We only want to track subscriptions on this device, not ones from sync.
         // Sync doesn't go through this method
-        AnalyticsHelper.subscribedToPodcast()
+        FirebaseAnalyticsTracker.subscribedToPodcast()
 
         if (uuidsInQueue.contains(podcastUuid)) {
             return

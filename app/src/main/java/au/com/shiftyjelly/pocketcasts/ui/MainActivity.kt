@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
@@ -54,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -74,7 +76,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
@@ -230,10 +231,10 @@ class MainActivity :
                     if (settings.selectedTab() != currentTab) {
                         trackTabOpened(currentTab)
                         when (currentTab) {
-                            VR.id.navigation_podcasts -> AnalyticsHelper.navigatedToPodcasts()
-                            VR.id.navigation_filters -> AnalyticsHelper.navigatedToFilters()
-                            VR.id.navigation_discover -> AnalyticsHelper.navigatedToDiscover()
-                            VR.id.navigation_profile -> AnalyticsHelper.navigatedToProfile()
+                            VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
+                            VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
+                            VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
+                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -267,7 +268,7 @@ class MainActivity :
         super.onResume()
 
         if (settings.selectedTab() == VR.id.navigation_discover) {
-            AnalyticsHelper.navigatedToDiscover()
+            FirebaseAnalyticsTracker.navigatedToDiscover()
         }
 
         refreshApp()
@@ -602,7 +603,7 @@ class MainActivity :
         updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
         UiUtil.hideKeyboard(binding.root)
 
-        AnalyticsHelper.nowPlayingOpen()
+        FirebaseAnalyticsTracker.nowPlayingOpen()
 
         viewModel.isPlayerOpen = true
     }
@@ -685,6 +686,7 @@ class MainActivity :
     }
 
     override fun onPlayClicked() {
+        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         if (playbackManager.shouldWarnAboutPlayback()) {
             launch {
                 // show the stream warning if the episode isn't downloaded
@@ -707,14 +709,17 @@ class MainActivity :
     }
 
     override fun onPauseClicked() {
+        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         playbackManager.pause()
     }
 
     override fun onSkipBackwardClicked() {
+        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         playbackManager.skipBackward()
     }
 
     override fun onSkipForwardClicked() {
+        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         playbackManager.skipForward()
     }
 
@@ -1082,7 +1087,7 @@ class MainActivity :
 
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
         val event: AnalyticsEvent? = when (tab) {
-            VR.id.navigation_podcasts -> AnalyticsEvent.PODCAST_TAB_OPENED
+            VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
             VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
             VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
             VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED

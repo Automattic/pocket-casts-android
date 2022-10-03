@@ -92,7 +92,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_BADGES_CHANGED("podcasts_list_badges_changed"),
 
     /* Tab bar items */
-    PODCAST_TAB_OPENED("podcast_tab_opened"),
+    PODCASTS_TAB_OPENED("podcasts_tab_opened"),
     FILTERS_TAB_OPENED("filters_tab_opened"),
     DISCOVER_TAB_OPENED("discover_tab_opened"),
     PROFILE_TAB_OPENED("profile_tab_opened"),
@@ -199,4 +199,22 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_TOGGLE_ARCHIVED("podcast_screen_toggle_archived"),
     PODCAST_SCREEN_TOGGLE_SUMMARY("podcast_screen_toggle_summary"),
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
+
+    /* Playback */
+    PLAYBACK_PLAY("playback_play"),
+    PLAYBACK_PAUSE("playback_pause"),
+    PLAYBACK_SKIP_BACK("playback_skip_back"),
+    PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
+    PLAYBACK_STOP("playback_stop"),
+
+    /* Privacy */
+    PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
+    ANALYTICS_OPT_IN("analytics_opt_in"),
+    ANALYTICS_OPT_OUT("analytics_opt_out"),
+    SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
+
+    /* Filters screen */
+    FILTER_LIST_SHOWN("filter_list_shown"),
+    FILTER_SHOWN("filter_shown"),
+    FILTER_DELETED("filter_deleted"),
 }

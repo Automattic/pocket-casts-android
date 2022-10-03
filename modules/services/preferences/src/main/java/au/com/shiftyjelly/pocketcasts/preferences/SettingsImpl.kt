@@ -1,15 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.accounts.AccountManager
+import android.accounts.AccountManagerFuture
 import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.util.Base64
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -19,6 +25,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationChannel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isScreenReaderOn
@@ -44,6 +52,8 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
 import kotlin.math.max
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class SettingsImpl @Inject constructor(
     @PublicSharedPreferences private val sharedPreferences: SharedPreferences,
@@ -56,6 +66,8 @@ class SettingsImpl @Inject constructor(
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
         private const val SEND_USAGE_STATS_KEY = "SendUsageStatsKey"
+        private const val SEND_CRASH_REPORTS_KEY = "SendCrashReportsKey"
+        private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
     }
 
     private var languageCode: String? = null
@@ -574,6 +586,12 @@ class SettingsImpl @Inject constructor(
         return manager.getPassword(account)
     }
 
+    override fun getSyncUuid(): String? {
+        val manager = AccountManager.get(context)
+        val account = manager.pocketCastsAccount() ?: return null
+        return manager.getUserData(account, AccountConstants.UUID)
+    }
+
     private fun peekToken(): String? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
@@ -594,16 +612,51 @@ class SettingsImpl @Inject constructor(
 
         return withContext(Dispatchers.IO) {
             try {
-                val token = manager.blockingGetAuthToken(account, AccountConstants.TOKEN_TYPE, false)
-                    // Token failed to refresh
-                    ?: throw SecurityException("Token could not be refreshed")
-                token
+                val resultFuture: AccountManagerFuture<Bundle> = manager.getAuthToken(
+                    account,
+                    AccountConstants.TOKEN_TYPE,
+                    Bundle(),
+                    false,
+                    null,
+                    null
+                )
+                val bundle: Bundle = resultFuture.result // This call will block until the result is available.
+                val token = bundle.getString(AccountManager.KEY_AUTHTOKEN)
+                // Token failed to refresh
+                if (token == null) {
+                    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        bundle.getParcelable(AccountManager.KEY_INTENT, Intent::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
+                    }
+                    intent?.let { showSignInErrorNotification(it) }
+                    throw SecurityException("Token could not be refreshed")
+                } else {
+                    token
+                }
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not get token")
                 throw e // Rethrow the exception so it carries on
             }
         }
     }
+
+    private fun showSignInErrorNotification(intent: Intent) {
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
+        val notification = NotificationCompat.Builder(context, NotificationChannel.NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR.id)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setContentTitle(context.getString(LR.string.token_refresh_sign_in_error_title))
+            .setContentText(context.getString(LR.string.token_refresh_sign_in_error_description))
+            .setAutoCancel(true)
+            .setSmallIcon(IR.drawable.ic_failedwarning)
+            .setOnlyAlertOnce(true)
+            .setContentIntent(pendingIntent)
+            .build()
+        NotificationManagerCompat.from(context)
+            .notify(NotificationId.SIGN_IN_ERROR.value, notification)
+    }
+
     override fun invalidateToken() {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return
@@ -1374,4 +1427,18 @@ class SettingsImpl @Inject constructor(
 
     override fun getSendUsageStats(): Boolean =
         getBoolean(SEND_USAGE_STATS_KEY, true)
+
+    override fun setSendCrashReports(value: Boolean) {
+        setBoolean(SEND_CRASH_REPORTS_KEY, value)
+    }
+
+    override fun getSendCrashReports(): Boolean =
+        getBoolean(SEND_CRASH_REPORTS_KEY, true)
+
+    override fun setLinkCrashReportsToUser(value: Boolean) {
+        setBoolean(LINK_CRASH_REPORTS_TO_USER_KEY, value)
+    }
+
+    override fun getLinkCrashReportsToUser(): Boolean =
+        getBoolean(LINK_CRASH_REPORTS_TO_USER_KEY, false)
 }

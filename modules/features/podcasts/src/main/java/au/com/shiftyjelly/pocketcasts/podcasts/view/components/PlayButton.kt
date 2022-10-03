@@ -7,12 +7,13 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.annotation.ColorInt
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
 import au.com.shiftyjelly.pocketcasts.views.extensions.inflate
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -60,6 +61,7 @@ class PlayButton @JvmOverloads constructor(
     }
 
     interface OnClickListener {
+        var playbackSource: PlaybackManager.PlaybackSource
         fun onPlayClicked(episodeUuid: String)
         fun onPauseClicked()
         fun onPlayNext(episodeUuid: String)
@@ -76,7 +78,7 @@ class PlayButton @JvmOverloads constructor(
                 val currentFromListUuid = fromListUuid
                 val currentPodcastUuid = podcastUuid
                 if (currentFromListUuid != null && currentPodcastUuid != null) {
-                    AnalyticsHelper.podcastEpisodePlayedFromList(currentFromListUuid, currentPodcastUuid)
+                    FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(currentFromListUuid, currentPodcastUuid)
                 }
                 listener?. onPlayClicked(episodeUuid)
                 UiUtil.hideKeyboard(this)
@@ -90,7 +92,7 @@ class PlayButton @JvmOverloads constructor(
     }
 
     private fun onLongClick() {
-        AnalyticsHelper.longPressedEpisodeButton()
+        FirebaseAnalyticsTracker.longPressedEpisodeButton()
         val popup = PopupMenu(context, this)
         this.setOnTouchListener(popup.dragToOpenListener)
         popup.inflate(R.menu.play_button)

@@ -7,11 +7,13 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -19,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.servers.CachedServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -239,12 +240,13 @@ class EpisodeFragmentViewModel @Inject constructor(
         fromListUuid: String? = null
     ): Boolean {
         episode?.let { episode ->
+            playbackManager.playbackSource = PlaybackSource.EPISODE_DETAILS
             if (isPlaying.value == true) {
                 playbackManager.pause()
                 return false
             } else {
                 fromListUuid?.let {
-                    AnalyticsHelper.podcastEpisodePlayedFromList(it, episode.podcastUuid)
+                    FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
                 }
                 playbackManager.playNow(episode, force)
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate()

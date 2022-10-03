@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account
 
+import android.accounts.AccountAuthenticatorResponse
+import android.accounts.AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -18,8 +20,8 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,7 +50,15 @@ class AccountActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
 
-            if (isNewUpgradeInstance(intent)) {
+            val accountAuthenticatorResponse = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE)
+            }
+            if (accountAuthenticatorResponse != null) {
+                graph.setStartDestination(R.id.signInFragment)
+            } else if (isNewUpgradeInstance(intent)) {
                 viewModel.clearReadyForUpgrade()
                 graph.setStartDestination(R.id.createFrequencyFragment)
             } else if (isPromoCodeInstance(intent)) {
@@ -115,7 +125,7 @@ class AccountActivity : AppCompatActivity() {
             return
         }
         if (currentFragment?.id == R.id.accountFragment) {
-            AnalyticsHelper.closeAccountMissingClicked()
+            FirebaseAnalyticsTracker.closeAccountMissingClicked()
         }
 
         UiUtil.hideKeyboard(binding.root)

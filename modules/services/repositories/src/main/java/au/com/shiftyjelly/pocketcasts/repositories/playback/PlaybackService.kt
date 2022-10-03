@@ -16,6 +16,7 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -37,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
@@ -231,9 +231,9 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             }
 
             // If we are already showing a notification, update it no matter the state.
-            if (notification != null && notificationHelper.isShowing(NotificationHelper.NOTIFICATION_ID_PLAYING)) {
+            if (notification != null && notificationHelper.isShowing(Settings.NotificationId.PLAYING.value)) {
                 Timber.d("Updating playback notification")
-                notificationManager.notify(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                notificationManager.notify(Settings.NotificationId.PLAYING.value, notification)
                 if (isForegroundService && (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING)) {
                     // Nothing else to do
                     return
@@ -247,7 +247,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 PlaybackStateCompat.STATE_PLAYING -> {
                     if (notification != null) {
                         try {
-                            startForeground(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                            startForeground(Settings.NotificationId.PLAYING.value, notification)
                             notificationManager.enteredForeground(notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
                         } catch (e: Exception) {
@@ -257,7 +257,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             ) {
                                 addBatteryWarnings()
                                 SentryHelper.recordException(e)
-                                AnalyticsHelper.foregroundServiceStartNotAllowedException()
+                                FirebaseAnalyticsTracker.foregroundServiceStartNotAllowedException()
                             }
                         }
                     } else {
@@ -279,7 +279,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                         }
 
                         if (notification != null && state == PlaybackStateCompat.STATE_PAUSED && isForegroundService) {
-                            notificationManager.notify(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                            notificationManager.notify(Settings.NotificationId.PLAYING.value, notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state (update notification)")
                         } else {
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state removing notification: $removeNotification")

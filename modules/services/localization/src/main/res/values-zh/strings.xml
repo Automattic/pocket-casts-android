@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-08-23 09:54:03+0000
+Translation-Revision-Date: 2022-09-14 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+	<string name="settings_downloads_clean_up_summary">是否确定要删除下载的这些文件？</string>
 	<string name="settings_storage_section_heading_mobile_data">移动数据</string>
 	<string name="settings_storage_section_heading_usage">使用情况</string>
 	<string name="settings_storage_downloaded_files">下载的文件</string>

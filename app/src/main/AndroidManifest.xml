@@ -27,7 +27,7 @@
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
 
     <application
-            android:name=".PocketcastsApplication"
+            android:name=".PocketCastsApplication"
             android:hardwareAccelerated="true"
             android:icon="${appIcon}"
             android:label="@string/app_name"
