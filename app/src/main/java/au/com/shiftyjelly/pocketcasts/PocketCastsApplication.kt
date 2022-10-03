@@ -143,7 +143,10 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
-            FirebaseAnalyticsTracker.setup(FirebaseAnalytics.getInstance(this@PocketCastsApplication))
+            FirebaseAnalyticsTracker.setup(
+                analytics = FirebaseAnalytics.getInstance(this@PocketCastsApplication),
+                settings = settings
+            )
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
 

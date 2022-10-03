@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.FirebaseAnalytics.Event
 import com.google.firebase.analytics.FirebaseAnalytics.Param
@@ -9,8 +10,10 @@ import timber.log.Timber
 
 object FirebaseAnalyticsTracker {
     private lateinit var firebaseAnalytics: FirebaseAnalytics
-    fun setup(analytics: FirebaseAnalytics) {
+    private lateinit var settings: Settings
+    fun setup(analytics: FirebaseAnalytics, settings: Settings) {
         firebaseAnalytics = analytics
+        this.settings = settings
     }
 
     fun openedFeaturedPodcast() {
@@ -262,8 +265,10 @@ object FirebaseAnalyticsTracker {
     }
 
     private fun logEvent(name: String, bundle: Bundle? = Bundle()) {
-        firebaseAnalytics.logEvent(name, bundle)
+        if (settings.getSendUsageStats()) {
+            firebaseAnalytics.logEvent(name, bundle)
 
-        Timber.d("Analytic event $name $bundle")
+            Timber.d("Analytic event $name $bundle")
+        }
     }
 }

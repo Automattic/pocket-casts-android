@@ -65,7 +65,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         Log.i(Settings.LOG_TAG_AUTO, "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
 
         runBlocking {
-            FirebaseAnalyticsTracker.setup(FirebaseAnalytics.getInstance(this@AutomotiveApplication))
+            FirebaseAnalyticsTracker.setup(FirebaseAnalytics.getInstance(this@AutomotiveApplication), settings)
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
