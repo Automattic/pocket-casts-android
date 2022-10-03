@@ -44,13 +44,13 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
             holder.itemView.setOnClickListener {
                 onPodcastClicked(podcast, null) // no analytics for carousel
 
-                au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.openedFeaturedPodcast()
+                AnalyticsHelper.openedFeaturedPodcast()
             }
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true)
                 onPodcastSubscribe(podcast, null) // no analytics for carousel
 
-                au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.subscribedToFeaturedPodcast()
+                AnalyticsHelper.subscribedToFeaturedPodcast()
             }
         } else {
             holder.podcast = null

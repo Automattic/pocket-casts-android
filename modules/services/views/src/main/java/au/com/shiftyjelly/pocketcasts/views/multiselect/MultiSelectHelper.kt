@@ -93,7 +93,7 @@ class MultiSelectHelper @Inject constructor(
             isMultiSelecting = !isMultiSelecting
             select(episode)
 
-            au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.enteredMultiSelect()
+            AnalyticsHelper.enteredMultiSelect()
         } else {
             OptionsDialog()
                 .addTextOption(titleId = LR.string.select_all_above, click = { selectAllAbove(episode) }, imageId = IR.drawable.ic_selectall_up)

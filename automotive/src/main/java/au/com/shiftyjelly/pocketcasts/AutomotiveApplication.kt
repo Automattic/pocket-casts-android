@@ -65,7 +65,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         Log.i(Settings.LOG_TAG_AUTO, "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
 
         runBlocking {
-            au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@AutomotiveApplication))
+            AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@AutomotiveApplication))
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
