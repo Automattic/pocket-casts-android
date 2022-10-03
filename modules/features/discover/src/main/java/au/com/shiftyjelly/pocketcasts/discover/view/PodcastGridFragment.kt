@@ -12,8 +12,10 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastGridFragmentBinding
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
@@ -32,6 +34,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class PodcastGridFragment : PodcastGridListFragment() {
     companion object {
+        private const val NONE = "none"
         fun newInstance(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): PodcastGridFragment {
             return PodcastGridFragment().apply {
                 arguments = newInstanceBundle(
@@ -85,6 +88,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
                                         binding.linkLayout.visibility = View.VISIBLE
                                         binding.lblLinkTitle.text = linkTitle
                                         binding.linkLayout.setOnClickListener {
+                                            analyticsTracker.track(AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED, mapOf(LIST_ID_KEY to (listUuid ?: NONE)))
                                             WebViewActivity.show(context, linkTitle, linkUrl)
                                         }
                                     }
