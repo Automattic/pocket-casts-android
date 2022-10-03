@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -49,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -140,9 +140,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let {
-            AnalyticsHelper.podcastSubscribedFromList(it, podcastUuid)
+            FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
         }
-        if (featuredPodcast) AnalyticsHelper.subscribedToFeaturedPodcast()
+        if (featuredPodcast) FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SUBSCRIBE_TAPPED)
 
         viewModel.subscribeToPodcast()
@@ -192,7 +192,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     private val onRowClicked: (Episode) -> Unit = { episode ->
         fromListUuid?.let { listUuid ->
-            AnalyticsHelper.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
+            FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
         }
         val episodeCard = EpisodeFragment.newInstance(episode, overridePodcastLink = true, fromListUuid = fromListUuid)
         episodeCard.show(parentFragmentManager, "episode_card")
@@ -415,7 +415,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
         if (savedInstanceState == null) {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN)
-            AnalyticsHelper.openedPodcast(podcastUuid)
+            FirebaseAnalyticsTracker.openedPodcast(podcastUuid)
         }
     }
 

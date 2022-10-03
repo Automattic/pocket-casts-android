@@ -8,6 +8,7 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -25,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
@@ -143,7 +143,10 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
-            AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@PocketCastsApplication))
+            FirebaseAnalyticsTracker.setup(
+                analytics = FirebaseAnalytics.getInstance(this@PocketCastsApplication),
+                settings = settings
+            )
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
 

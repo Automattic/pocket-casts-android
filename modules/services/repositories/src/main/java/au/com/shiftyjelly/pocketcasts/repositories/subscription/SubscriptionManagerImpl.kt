@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 
 import android.app.Activity
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -16,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
@@ -246,7 +246,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
                     updateFreeTrialEligible(false)
-                    AnalyticsHelper.plusPurchased()
+                    FirebaseAnalyticsTracker.plusPurchased()
                 } catch (e: Exception) {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
                     purchaseEvents.accept(PurchaseEvent.Failure(e.message ?: "Unknown error", null))
