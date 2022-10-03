@@ -11,8 +11,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.UpgradeAccountViewModel
@@ -88,7 +88,7 @@ class PlusUpgradeFragment : BaseDialogFragment() {
     override fun onResume() {
         super.onResume()
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, mapOf(SOURCE_KEY to promotionSource))
-        AnalyticsHelper.plusUpgradeViewed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
+        FirebaseAnalyticsTracker.plusUpgradeViewed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
     }
 
     private fun openLearnMore() {
@@ -98,7 +98,7 @@ class PlusUpgradeFragment : BaseDialogFragment() {
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, mapOf(SOURCE_KEY to promotionSource))
-        AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
+        FirebaseAnalyticsTracker.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
     }
 
     private fun acceptUpgrade() {
@@ -112,13 +112,13 @@ class PlusUpgradeFragment : BaseDialogFragment() {
             startActivity(intent)
         }
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, mapOf(SOURCE_KEY to promotionSource))
-        AnalyticsHelper.plusUpgradeConfirmed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
+        FirebaseAnalyticsTracker.plusUpgradeConfirmed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
         dismiss()
     }
 
     private fun closeUpgrade() {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, mapOf(SOURCE_KEY to promotionSource))
-        AnalyticsHelper.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
+        FirebaseAnalyticsTracker.plusUpgradeClosed(promotionId = upgradePage.promotionId, promotionName = upgradePage.promotionName)
         dismiss()
     }
 }

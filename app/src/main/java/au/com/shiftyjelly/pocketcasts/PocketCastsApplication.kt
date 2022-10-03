@@ -7,8 +7,8 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -143,7 +143,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
-            AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@PocketCastsApplication))
+            FirebaseAnalyticsTracker.setup(FirebaseAnalytics.getInstance(this@PocketCastsApplication))
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
 

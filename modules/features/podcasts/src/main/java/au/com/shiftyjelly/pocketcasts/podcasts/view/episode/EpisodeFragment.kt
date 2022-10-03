@@ -25,7 +25,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -158,7 +158,7 @@ class EpisodeFragment : BaseDialogFragment() {
 
         episodeUUID?.let { episodeUuid ->
             podcastUuid?.let { podcastUuid ->
-                AnalyticsHelper.openedEpisode(podcastUuid, episodeUuid)
+                FirebaseAnalyticsTracker.openedEpisode(podcastUuid, episodeUuid)
             }
         }
     }

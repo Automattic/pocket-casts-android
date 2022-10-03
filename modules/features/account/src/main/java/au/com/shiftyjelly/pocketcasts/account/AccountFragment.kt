@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentAccountBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -82,13 +82,13 @@ class AccountFragment : BaseFragment() {
 
         binding.btnClose?.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED)
-            AnalyticsHelper.closeAccountMissingClicked()
+            FirebaseAnalyticsTracker.closeAccountMissingClicked()
             activity?.finish()
         }
 
         binding.btnCreate.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(BUTTON to CREATE_ACCOUNT))
-            AnalyticsHelper.createAccountClicked()
+            FirebaseAnalyticsTracker.createAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 if (Util.isCarUiMode(view.context) || accountViewModel.supporterInstance) { // We can't sign up to plus on cars so skip that step
                     view.findNavController().navigate(R.id.action_accountFragment_to_createEmailFragment)
@@ -100,7 +100,7 @@ class AccountFragment : BaseFragment() {
 
         binding.btnSignIn.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(BUTTON to SIGN_IN))
-            AnalyticsHelper.signInAccountClicked()
+            FirebaseAnalyticsTracker.signInAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 view.findNavController().navigate(R.id.action_accountFragment_to_signInFragment)
             }

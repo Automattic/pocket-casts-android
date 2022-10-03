@@ -13,8 +13,8 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -83,7 +83,7 @@ class CreateFrequencyFragment : BaseFragment() {
             val subscription = viewModel.subscription.value
             if (subscription != null) {
                 analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED, mapOf(PRODUCT_KEY to subscription.productDetails.productId))
-                AnalyticsHelper.plusPlanChosen(
+                FirebaseAnalyticsTracker.plusPlanChosen(
                     sku = subscription.productDetails.productId,
                     title = subscription.productDetails.title,
                     price = subscription.recurringPricingPhase.pricingPhase.priceAmountMicros * 1_000_000.0,

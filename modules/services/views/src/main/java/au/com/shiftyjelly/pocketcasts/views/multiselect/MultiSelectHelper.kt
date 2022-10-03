@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -93,7 +93,7 @@ class MultiSelectHelper @Inject constructor(
             isMultiSelecting = !isMultiSelecting
             select(episode)
 
-            AnalyticsHelper.enteredMultiSelect()
+            FirebaseAnalyticsTracker.enteredMultiSelect()
         } else {
             OptionsDialog()
                 .addTextOption(titleId = LR.string.select_all_above, click = { selectAllAbove(episode) }, imageId = IR.drawable.ic_selectall_up)

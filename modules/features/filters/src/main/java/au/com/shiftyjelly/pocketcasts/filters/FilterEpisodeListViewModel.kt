@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -206,6 +206,6 @@ class FilterEpisodeListViewModel @Inject constructor(
 
     fun trackFilterShown() {
         analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
-        AnalyticsHelper.openedFilter()
+        FirebaseAnalyticsTracker.openedFilter()
     }
 }

@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
@@ -54,11 +54,11 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val transformedList = viewModel.transformNetworkLoadableList(list, resources) // Replace any [regionCode] etc references
         val listId = list.listUuid
         if (listId != null) {
-            au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.listShowAllTapped(listId)
+            FirebaseAnalyticsTracker.listShowAllTapped(listId)
         }
         if (list is DiscoverCategory) {
             viewModel.currentRegionCode?.let {
-                au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.openedCategory(list.id, it)
+                FirebaseAnalyticsTracker.openedCategory(list.id, it)
             }
         }
 
@@ -167,7 +167,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     override fun setUserVisibleHint(visible: Boolean) {
         super.setUserVisibleHint(visible)
         if (visible) {
-            au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.navigatedToDiscover()
+            FirebaseAnalyticsTracker.navigatedToDiscover()
         }
     }
 }

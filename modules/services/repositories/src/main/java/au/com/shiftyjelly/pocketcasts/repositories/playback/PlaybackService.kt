@@ -16,7 +16,7 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -257,7 +257,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             ) {
                                 addBatteryWarnings()
                                 SentryHelper.recordException(e)
-                                AnalyticsHelper.foregroundServiceStartNotAllowedException()
+                                FirebaseAnalyticsTracker.foregroundServiceStartNotAllowedException()
                             }
                         }
                     } else {

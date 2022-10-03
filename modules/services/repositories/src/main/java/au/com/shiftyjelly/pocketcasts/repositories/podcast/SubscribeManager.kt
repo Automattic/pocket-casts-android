@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -75,7 +75,7 @@ class SubscribeManager @Inject constructor(
     fun subscribeOnQueue(podcastUuid: String, sync: Boolean = false) {
         // We only want to track subscriptions on this device, not ones from sync.
         // Sync doesn't go through this method
-        AnalyticsHelper.subscribedToPodcast()
+        FirebaseAnalyticsTracker.subscribedToPodcast()
 
         if (uuidsInQueue.contains(podcastUuid)) {
             return

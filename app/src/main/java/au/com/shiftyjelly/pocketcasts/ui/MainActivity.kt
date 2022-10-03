@@ -24,8 +24,8 @@ import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
@@ -231,10 +231,10 @@ class MainActivity :
                     if (settings.selectedTab() != currentTab) {
                         trackTabOpened(currentTab)
                         when (currentTab) {
-                            VR.id.navigation_podcasts -> AnalyticsHelper.navigatedToPodcasts()
-                            VR.id.navigation_filters -> AnalyticsHelper.navigatedToFilters()
-                            VR.id.navigation_discover -> AnalyticsHelper.navigatedToDiscover()
-                            VR.id.navigation_profile -> AnalyticsHelper.navigatedToProfile()
+                            VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
+                            VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
+                            VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
+                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -268,7 +268,7 @@ class MainActivity :
         super.onResume()
 
         if (settings.selectedTab() == VR.id.navigation_discover) {
-            AnalyticsHelper.navigatedToDiscover()
+            FirebaseAnalyticsTracker.navigatedToDiscover()
         }
 
         refreshApp()
@@ -603,7 +603,7 @@ class MainActivity :
         updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
         UiUtil.hideKeyboard(binding.root)
 
-        AnalyticsHelper.nowPlayingOpen()
+        FirebaseAnalyticsTracker.nowPlayingOpen()
 
         viewModel.isPlayerOpen = true
     }

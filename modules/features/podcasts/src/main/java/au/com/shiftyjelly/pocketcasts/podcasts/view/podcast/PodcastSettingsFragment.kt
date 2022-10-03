@@ -11,7 +11,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -209,7 +209,7 @@ class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, Filt
                     launch {
                         podcastManager.updateRefreshAvailable(podcastUuid = podcastUuid, refreshAvailable = false)
                         val success = podcastManager.refreshPodcastFeed(podcastUuid = podcastUuid)
-                        AnalyticsHelper.podcastFeedRefreshed()
+                        FirebaseAnalyticsTracker.podcastFeedRefreshed()
                         showFeedUpdateQueued(success = success)
                     }
                 }

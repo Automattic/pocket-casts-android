@@ -18,8 +18,8 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -238,7 +238,7 @@ class AccountDetailsFragment : BaseFragment() {
         when (state) {
             is DeleteAccountState.Success -> {
                 viewModel.clearDeleteAccountState()
-                AnalyticsHelper.accountDeleted()
+                FirebaseAnalyticsTracker.accountDeleted()
                 performSignOut()
             }
             is DeleteAccountState.Failure -> {

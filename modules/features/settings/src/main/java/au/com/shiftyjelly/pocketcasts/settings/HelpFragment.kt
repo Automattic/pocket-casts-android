@@ -18,7 +18,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
@@ -62,7 +62,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
         )
         toolbar.setOnMenuItemClickListener(this)
 
-        AnalyticsHelper.userGuideOpened()
+        FirebaseAnalyticsTracker.userGuideOpened()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -185,7 +185,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
             }
         }
 
-        AnalyticsHelper.userGuideEmailFeedback()
+        FirebaseAnalyticsTracker.userGuideEmailFeedback()
     }
 
     private fun sendSupportEmail() {
@@ -200,6 +200,6 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
             }
         }
 
-        AnalyticsHelper.userGuideEmailSupport()
+        FirebaseAnalyticsTracker.userGuideEmailSupport()
     }
 }

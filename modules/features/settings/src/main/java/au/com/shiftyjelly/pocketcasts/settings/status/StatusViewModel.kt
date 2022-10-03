@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.ServiceStatusChecker.Check.Internet
 import au.com.shiftyjelly.pocketcasts.settings.status.ServiceStatusChecker.Check.Urls
@@ -120,7 +120,7 @@ class StatusViewModel @Inject constructor(
             }
         }
 
-        AnalyticsHelper.statusReportSent()
+        FirebaseAnalyticsTracker.statusReportSent()
     }
 
     private fun updateServicesUi(running: Boolean) {

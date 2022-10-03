@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.DISCOVER_PODCAST_DIFF_CALLBACK
@@ -51,13 +51,13 @@ internal class LargeListRowAdapter(val onPodcastClicked: ((DiscoverPodcast, Stri
             holder.lblSubtitle.text = podcast.author
             holder.itemView.isClickable = true
             holder.itemView.setOnClickListener {
-                fromListId?.let { au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastTappedFromList(it, podcast.uuid) }
+                fromListId?.let { FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid) }
                 onPodcastClicked(podcast, fromListId)
             }
             holder.btnSubscribe.isClickable = true
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
-                fromListId?.let { au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid) }
+                fromListId?.let { FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcast.uuid) }
                 onPodcastSubscribe(podcast, fromListId)
             }
             holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = podcast.isSubscribed, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)

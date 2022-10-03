@@ -17,7 +17,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
@@ -86,7 +86,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
                     upNextFragment.startTour()
 
-                    AnalyticsHelper.openedUpNext()
+                    FirebaseAnalyticsTracker.openedUpNext()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     updateUpNextVisibility(false)
 
@@ -114,8 +114,8 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 when (position) {
-                    1 -> AnalyticsHelper.openedPlayerNotes()
-                    2 -> AnalyticsHelper.openedPlayerChapters()
+                    1 -> FirebaseAnalyticsTracker.openedPlayerNotes()
+                    2 -> FirebaseAnalyticsTracker.openedPlayerChapters()
                 }
             }
         })

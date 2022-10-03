@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemSmallListBinding
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 
@@ -67,11 +67,11 @@ internal class SmallListRowAdapter(val onPodcastClicked: ((DiscoverPodcast, Stri
                 podcastRow.podcast = podcast
                 podcastRow.isClickable = true
                 podcastRow.setOnClickListener {
-                    fromListId?.let { au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastTappedFromList(it, podcast.uuid) }
+                    fromListId?.let { FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid) }
                     onPodcastClicked(podcast, fromListId)
                 }
                 podcastRow.onSubscribeClicked = {
-                    fromListId?.let { au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid) }
+                    fromListId?.let { FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcast.uuid) }
                     onPodcastSubscribe(podcast, fromListId)
                 }
             } else {

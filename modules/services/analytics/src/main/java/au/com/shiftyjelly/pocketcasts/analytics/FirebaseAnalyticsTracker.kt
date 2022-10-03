@@ -7,7 +7,7 @@ import com.google.firebase.analytics.FirebaseAnalytics.Event
 import com.google.firebase.analytics.FirebaseAnalytics.Param
 import timber.log.Timber
 
-object AnalyticsHelper {
+object FirebaseAnalyticsTracker {
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     fun setup(analytics: FirebaseAnalytics) {
         firebaseAnalytics = analytics

@@ -15,7 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderEditViewModel.Companion.COLOR_KEY
@@ -77,7 +77,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                                         sharedViewModel.folderUuid = folder.uuid
                                         val colorHex = ColorUtils.colorIntToHexString(colors.getFolderColor(folder.color).toArgb())
                                         viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_SAVED, mapOf(COLOR_KEY to colorHex))
-                                        AnalyticsHelper.folderCreated()
+                                        FirebaseAnalyticsTracker.folderCreated()
                                         dismiss()
                                     }
                                 },
