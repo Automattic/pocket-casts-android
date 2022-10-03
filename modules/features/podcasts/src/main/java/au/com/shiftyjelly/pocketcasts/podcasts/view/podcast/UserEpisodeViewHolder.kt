@@ -125,7 +125,6 @@ class UserEpisodeViewHolder(
         binding.tintColor = tintColor
         binding.publishedDate = dateFormatter.format(episode.publishedDate, context.resources)
         binding.playButton.listener = playButtonListener
-        binding.playButton.analyticsTracker = analyticsTracker
         binding.executePendingBindings()
 
         val captionColor = context.getThemeColor(UR.attr.primary_text_02)
@@ -248,7 +247,6 @@ class UserEpisodeViewHolder(
 
         disposables.clear()
         binding.playButton.listener = null
-        binding.playButton.analyticsTracker = null
         uploadConsumer.accept(0.0f)
     }
 }

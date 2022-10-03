@@ -83,7 +83,7 @@ class EpisodeListAdapter(
         val episode = getItem(position) as Episode
 
         val tintColor = this.tintColor ?: holder.itemView.context.getThemeColor(UR.attr.primary_icon_01)
-        holder.setup(episode, fromListUuid, tintColor, playButtonListener, settings.streamingMode(), settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables, analyticsTracker)
+        holder.setup(episode, fromListUuid, tintColor, playButtonListener, settings.streamingMode(), settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables)
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
                 holder.binding.checkbox.isChecked = multiSelectHelper.toggle(episode)

@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -104,8 +103,7 @@ class PodcastAdapter(
     private val onSearchFocus: () -> Unit,
     private val onShowArchivedClicked: () -> Unit,
     private val multiSelectHelper: MultiSelectHelper,
-    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -224,7 +222,7 @@ class PodcastAdapter(
 
     private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, position: Int, fromListUuid: String?) {
         val episode = getItem(position) as? Episode ?: return
-        holder.setup(episode, fromListUuid, ThemeColor.podcastIcon02(theme.activeTheme, tintColor), playButtonListener, settings.streamingMode() || castConnected, settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables, analyticsTracker)
+        holder.setup(episode, fromListUuid, ThemeColor.podcastIcon02(theme.activeTheme, tintColor), playButtonListener, settings.streamingMode() || castConnected, settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables)
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
                 holder.binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
