@@ -52,7 +52,7 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @HiltAndroidApp
-class PocketcastsApplication : Application(), Configuration.Provider {
+class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
     @Inject lateinit var statsManager: StatsManager
@@ -143,7 +143,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
-            AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@PocketcastsApplication))
+            AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@PocketCastsApplication))
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
 
@@ -164,16 +164,16 @@ class PocketcastsApplication : Application(), Configuration.Provider {
                 if (storageChoice == null) {
                     // the user doesn't have a storage choice, give them one
                     val storageOptions = StorageOptions()
-                    val locationsAvailable = storageOptions.getFolderLocations(this@PocketcastsApplication)
+                    val locationsAvailable = storageOptions.getFolderLocations(this@PocketCastsApplication)
                     if (locationsAvailable.size > 0) {
                         val folder = locationsAvailable[0]
                         settings.setStorageChoice(folder.filePath, folder.label)
                     } else {
-                        val location = this@PocketcastsApplication.filesDir
+                        val location = this@PocketCastsApplication.filesDir
                         settings.setStorageCustomFolder(location.absolutePath)
                     }
                 } else if (storageChoice.equals(Settings.LEGACY_STORAGE_ON_PHONE, ignoreCase = true)) {
-                    val location = this@PocketcastsApplication.filesDir
+                    val location = this@PocketCastsApplication.filesDir
                     settings.setStorageCustomFolder(location.absolutePath)
                 } else if (storageChoice.equals(Settings.LEGACY_STORAGE_ON_SD_CARD, ignoreCase = true)) {
                     val location = findExternalStorageDirectory()
@@ -201,7 +201,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
-                VersionMigrationsJob.run(podcastManager = podcastManager, settings = settings, context = this@PocketcastsApplication)
+                VersionMigrationsJob.run(podcastManager = podcastManager, settings = settings, context = this@PocketCastsApplication)
 
                 // check that we have .nomedia files in existing folders
                 fileStorage.checkNoMediaDirs()
@@ -209,7 +209,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
                 // init the stats engine
                 statsManager.initStatsEngine()
 
-                subscriptionManager.connectToGooglePlay(this@PocketcastsApplication)
+                subscriptionManager.connectToGooglePlay(this@PocketCastsApplication)
             }
         }
 
