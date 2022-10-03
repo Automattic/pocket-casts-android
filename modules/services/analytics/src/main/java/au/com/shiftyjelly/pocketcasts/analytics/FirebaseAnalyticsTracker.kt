@@ -265,7 +265,7 @@ object FirebaseAnalyticsTracker {
     }
 
     private fun logEvent(name: String, bundle: Bundle? = Bundle()) {
-        if (settings.getSendUsageStats()) {
+        if (settings.getSendUsageStats() || !BuildConfig.FIREBASE_ANALYTICS_OPT_OUT_ENABLED) {
             firebaseAnalytics.logEvent(name, bundle)
 
             Timber.d("Analytic event $name $bundle")

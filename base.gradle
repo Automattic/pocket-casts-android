@@ -26,6 +26,7 @@ android {
         buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.settingsEncryptSecret}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
+        buildConfigField "boolean", "FIREBASE_ANALYTICS_OPT_OUT_ENABLED", "false"
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
