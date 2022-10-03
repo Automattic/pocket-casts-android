@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastListFragmentBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
@@ -21,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -48,7 +48,7 @@ class PodcastListFragment : PodcastGridListFragment() {
     }
 
     private val onPromotionClick: (DiscoverPromotion) -> Unit = { promotion ->
-        AnalyticsHelper.podcastTappedFromList(promotion.promotionUuid, promotion.podcastUuid)
+        au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastTappedFromList(promotion.promotionUuid, promotion.podcastUuid)
 
         val fragment = PodcastFragment.newInstance(podcastUuid = promotion.podcastUuid, fromListUuid = promotion.promotionUuid)
         (activity as FragmentHostListener).addFragment(fragment)
@@ -104,7 +104,7 @@ class PodcastListFragment : PodcastGridListFragment() {
         if (analyticsImpressionSent || impressionId == null) {
             return
         }
-        AnalyticsHelper.listImpression(impressionId)
+        au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.listImpression(impressionId)
         analyticsImpressionSent = true
     }
 

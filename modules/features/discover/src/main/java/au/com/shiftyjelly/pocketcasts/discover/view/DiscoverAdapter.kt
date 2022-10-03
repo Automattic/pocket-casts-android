@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
@@ -43,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
@@ -300,7 +300,7 @@ internal class DiscoverAdapter(
                             holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
                         }
                     )
-                    row.listUuid?.let { AnalyticsHelper.listImpression(it) }
+                    row.listUuid?.let { au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.listImpression(it) }
                 }
                 is CarouselListViewHolder -> {
                     val featuredLimit = 5
@@ -342,7 +342,7 @@ internal class DiscoverAdapter(
                             holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
                         }
                     )
-                    row.listUuid?.let { AnalyticsHelper.listImpression(it) }
+                    row.listUuid?.let { au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.listImpression(it) }
                 }
                 is CategoriesViewHolder -> {
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
@@ -376,7 +376,7 @@ internal class DiscoverAdapter(
                             imageLoader.loadSmallImage(podcast.uuid).into(holder.binding.imgPodcast)
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
-                                    AnalyticsHelper.podcastTappedFromList(listUuid, podcast.uuid)
+                                    au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastTappedFromList(listUuid, podcast.uuid)
                                     listener.onPodcastClicked(podcast, row.listUuid)
                                 }
                             }
@@ -390,7 +390,7 @@ internal class DiscoverAdapter(
                                 lblSponsored.text = context.getString(LR.string.discover_row_fresh_pick)
                             }
 
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.listImpression(listUuid) }
 
                             val textSize = if ((podcastTitle ?: "").length < 15) 18f else 15f
                             holder.binding.lblTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
@@ -426,7 +426,7 @@ internal class DiscoverAdapter(
                             binding.btnPlay.setOnClickListener {
 
                                 row.listUuid?.let { listUuid ->
-                                    AnalyticsHelper.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
+                                    au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
                                 }
                                 binding.btnPlay.setIconResource(if (!episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
                                 if (episode.isPlaying) {
@@ -451,12 +451,12 @@ internal class DiscoverAdapter(
                             }
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
-                                    AnalyticsHelper.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
+                                    au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
                                 }
                                 listener.onEpisodeClicked(episode = episode, listUuid = row.listUuid)
                             }
                             onRestoreInstanceState(holder)
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.listImpression(listUuid) }
                         }
                     )
                 }
@@ -504,7 +504,7 @@ internal class DiscoverAdapter(
 
                             onRestoreInstanceState(holder)
 
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.listImpression(listUuid) }
                         }
                     )
                 }

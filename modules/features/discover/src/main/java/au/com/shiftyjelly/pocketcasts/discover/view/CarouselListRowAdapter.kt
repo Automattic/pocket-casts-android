@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 
 private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
@@ -44,13 +44,13 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
             holder.itemView.setOnClickListener {
                 onPodcastClicked(podcast, null) // no analytics for carousel
 
-                AnalyticsHelper.openedFeaturedPodcast()
+                au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.openedFeaturedPodcast()
             }
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true)
                 onPodcastSubscribe(podcast, null) // no analytics for carousel
 
-                AnalyticsHelper.subscribedToFeaturedPodcast()
+                au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.subscribedToFeaturedPodcast()
             }
         } else {
             holder.podcast = null

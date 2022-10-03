@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemSmallListBinding
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 
 private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
     override fun areItemsTheSame(oldItem: List<Any>, newItem: List<Any>): Boolean {
@@ -67,11 +67,11 @@ internal class SmallListRowAdapter(val onPodcastClicked: ((DiscoverPodcast, Stri
                 podcastRow.podcast = podcast
                 podcastRow.isClickable = true
                 podcastRow.setOnClickListener {
-                    fromListId?.let { AnalyticsHelper.podcastTappedFromList(it, podcast.uuid) }
+                    fromListId?.let { au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastTappedFromList(it, podcast.uuid) }
                     onPodcastClicked(podcast, fromListId)
                 }
                 podcastRow.onSubscribeClicked = {
-                    fromListId?.let { AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid) }
+                    fromListId?.let { au.com.shiftyjelly.pocketcasts.analytics.AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid) }
                     onPodcastSubscribe(podcast, fromListId)
                 }
             } else {

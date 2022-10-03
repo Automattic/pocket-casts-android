@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.utils
+package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
