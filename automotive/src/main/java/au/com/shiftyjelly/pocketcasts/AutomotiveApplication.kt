@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -49,6 +50,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
 
         setupSentry()
         setupLogging()
+        setupAnalytics()
         setupAutomotiveDefaults()
         setupApp()
     }
@@ -109,5 +111,9 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         // if (BuildConfig.DEBUG) {
         Timber.plant(TimberDebugTree())
         // }
+    }
+
+    private fun setupAnalytics() {
+        AnalyticsTracker.init(settings)
     }
 }
