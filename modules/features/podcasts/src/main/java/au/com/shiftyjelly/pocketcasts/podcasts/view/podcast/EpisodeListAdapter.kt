@@ -8,7 +8,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -47,7 +46,6 @@ class EpisodeListAdapter(
     val imageLoader: PodcastImageLoader,
     val multiSelectHelper: MultiSelectHelper,
     val fragmentManager: FragmentManager,
-    val analyticsTracker: AnalyticsTrackerWrapper,
     val fromListUuid: String? = null,
 ) : ListAdapter<Playable, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
@@ -67,7 +65,7 @@ class EpisodeListAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.adapter_episode -> EpisodeViewHolder(AdapterEpisodeBinding.inflate(inflater, parent, false), EpisodeViewHolder.ViewMode.Artwork, downloadManager.progressUpdateRelay, playbackManager.playbackStateRelay, upNextQueue.changesObservable, imageLoader)
-            R.layout.adapter_user_episode -> UserEpisodeViewHolder(AdapterUserEpisodeBinding.inflate(inflater, parent, false), UserEpisodeViewHolder.ViewMode.Artwork, downloadManager.progressUpdateRelay, playbackManager.playbackStateRelay, upNextQueue.changesObservable, imageLoader, analyticsTracker)
+            R.layout.adapter_user_episode -> UserEpisodeViewHolder(AdapterUserEpisodeBinding.inflate(inflater, parent, false), UserEpisodeViewHolder.ViewMode.Artwork, downloadManager.progressUpdateRelay, playbackManager.playbackStateRelay, upNextQueue.changesObservable, imageLoader)
             else -> throw IllegalStateException("Unknown playable type")
         }
     }
