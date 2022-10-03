@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 import javax.inject.Inject
 
 class AnalyticsTrackerWrapper @Inject constructor() {
+
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         AnalyticsTracker.track(event, properties)
     }
@@ -18,4 +19,10 @@ class AnalyticsTrackerWrapper @Inject constructor() {
     fun clearAllData() {
         AnalyticsTracker.clearAllData()
     }
+
+    fun setSendUsageStats(send: Boolean) {
+        AnalyticsTracker.setSendUsageStats(send)
+    }
+
+    fun getSendUsageStats() = AnalyticsTracker.getSendUsageStats()
 }

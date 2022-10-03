@@ -34,6 +34,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     @Inject lateinit var castManager: CastManager
 
     private val viewModel: FiltersFragmentViewModel by viewModels()
+    private var trackFilterListShown = false
     var filterCount: Int? = null
     var lastFilterUuidShown: String? = null
     var previousLastFilter: Playlist? = null
@@ -46,6 +47,11 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentFiltersBinding.inflate(inflater, container, false)
         return binding?.root
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     override fun onDestroyView() {
@@ -82,6 +88,11 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
             }
 
             this.filterCount = it.size
+            if (trackFilterListShown) {
+                viewModel.trackFilterListShown(it.size)
+                trackFilterListShown = false
+            }
+
             previousLastFilter = it.lastOrNull()
             viewModel.adapterState = it.toMutableList()
             adapter.submitList(it)
@@ -96,7 +107,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
         val itemTouchHelper = ItemTouchHelper(touchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        openSavedFilter()
+        checkForSavedFilter()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -112,17 +123,27 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     override fun setUserVisibleHint(visible: Boolean) {
         super.setUserVisibleHint(visible)
         if (visible && isAdded) {
-            openSavedFilter()
+            checkForSavedFilter()
         }
     }
 
-    private fun openSavedFilter() {
-        if (settings.selectedFilter() != null && lastFilterUuidShown != settings.selectedFilter()) {
+    private fun checkForSavedFilter() {
+        val shouldOpenSavedFilter = settings.selectedFilter() != null && lastFilterUuidShown != settings.selectedFilter()
+        if (shouldOpenSavedFilter) {
             runBlocking {
                 val playlistUUID = settings.selectedFilter() ?: return@runBlocking
                 lastFilterUuidShown = playlistUUID
                 val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) } ?: return@runBlocking
                 openPlaylist(playlist, isNewFilter = false)
+            }
+        } else if (!viewModel.isFragmentChangingConfigurations) {
+            // Not showing a specific filter, so track showing of the filter list if not just a configuration change
+            filterCount.let {
+                if (it != null) {
+                    viewModel.trackFilterListShown(it)
+                } else {
+                    trackFilterListShown = true
+                }
             }
         }
     }

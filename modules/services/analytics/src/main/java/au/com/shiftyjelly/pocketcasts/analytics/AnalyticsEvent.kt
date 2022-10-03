@@ -207,6 +207,17 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
     PLAYBACK_STOP("playback_stop"),
 
+    /* Privacy */
+    PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
+    ANALYTICS_OPT_IN("analytics_opt_in"),
+    ANALYTICS_OPT_OUT("analytics_opt_out"),
+    SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
+
+    /* Filters screen */
+    FILTER_LIST_SHOWN("filter_list_shown"),
+    FILTER_SHOWN("filter_shown"),
+    FILTER_DELETED("filter_deleted"),
+
     /* Discover */
     DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
     DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),

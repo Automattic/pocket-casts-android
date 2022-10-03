@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -22,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.about.AboutFragment
+import au.com.shiftyjelly.pocketcasts.settings.privacy.PrivacyFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -46,6 +48,7 @@ fun SettingsFragmentPage(
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
+                .background(MaterialTheme.theme.colors.primaryUi02)
                 .padding(vertical = 8.dp)
         ) {
             if (isDebug) {
@@ -72,6 +75,7 @@ fun SettingsFragmentPage(
             AutoAddToUpNextRow(onClick = { openFragment(AutoAddSettingsFragment()) })
             HelpAndFeedbackRow(onClick = { openFragment(HelpFragment()) })
             ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
+            PrivacyRow(onClick = { openFragment(PrivacyFragment()) })
             AboutRow(onClick = { openFragment(AboutFragment()) })
         }
     }
@@ -200,6 +204,15 @@ private fun ImportAndExportOpmlRow(onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_import_export),
         icon = GradientIconData(SR.drawable.settings_import_export),
+        modifier = rowModifier(onClick)
+    )
+}
+
+@Composable
+private fun PrivacyRow(onClick: () -> Unit) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_title_privacy),
+        icon = GradientIconData(SR.drawable.whatsnew_privacy),
         modifier = rowModifier(onClick)
     )
 }

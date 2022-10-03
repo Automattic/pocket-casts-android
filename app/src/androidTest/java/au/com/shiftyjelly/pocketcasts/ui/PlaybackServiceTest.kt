@@ -7,7 +7,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ServiceTestRule
-import au.com.shiftyjelly.pocketcasts.PocketcastsApplication
+import au.com.shiftyjelly.pocketcasts.PocketCastsApplication
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
@@ -37,7 +37,7 @@ class PlaybackServiceTest {
     @Test
     @Throws(TimeoutException::class)
     fun testPlaybackServiceEntersAndExitsForeground() {
-        val application = ApplicationProvider.getApplicationContext<PocketcastsApplication>()
+        val application = ApplicationProvider.getApplicationContext<PocketCastsApplication>()
         val testScheduler = SchedulerProvider.testScheduler
 
         // Create the service Intent.

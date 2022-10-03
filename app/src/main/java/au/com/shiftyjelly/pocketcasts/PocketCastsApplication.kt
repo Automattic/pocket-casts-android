@@ -5,6 +5,8 @@ import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -34,10 +36,13 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
+import io.sentry.protocol.User
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -47,7 +52,7 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @HiltAndroidApp
-class PocketcastsApplication : Application(), Configuration.Provider {
+class PocketCastsApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
     @Inject lateinit var statsManager: StatsManager
@@ -66,6 +71,9 @@ class PocketcastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var coilImageLoader: ImageLoader
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var tracker: TracksAnalyticsTracker
+    @Inject lateinit var auth: AccountAuth
+
+    private val applicationScope = MainScope()
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -96,7 +104,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
     private fun setupAnalytics() {
         AnalyticsTracker.registerTracker(tracker)
         AnalyticsTracker.init(settings)
-        AnalyticsTracker.refreshMetadata()
+        retrieveUserIdIfNeededAndRefreshMetadata()
     }
 
     private fun setupSentry() {
@@ -105,7 +113,15 @@ class PocketcastsApplication : Application(), Configuration.Provider {
         }
 
         SentryAndroid.init(this) { options ->
-            options.dsn = settings.getSentryDsn()
+            options.dsn = if (settings.getSendCrashReports()) settings.getSentryDsn() else ""
+        }
+
+        // Link email to Sentry crash reports only if the user has opted in
+        if (settings.getLinkCrashReportsToUser()) {
+            settings.getSyncEmail()?.let { syncEmail ->
+                val user = User().apply { email = syncEmail }
+                Sentry.setUser(user)
+            }
         }
 
         // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
@@ -127,7 +143,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
         runBlocking {
             appIcon.enableSelectedAlias(appIcon.activeAppIcon)
 
-            AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@PocketcastsApplication))
+            AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@PocketCastsApplication))
             notificationHelper.setupNotificationChannels()
             appLifecycleObserver.setup()
 
@@ -148,16 +164,16 @@ class PocketcastsApplication : Application(), Configuration.Provider {
                 if (storageChoice == null) {
                     // the user doesn't have a storage choice, give them one
                     val storageOptions = StorageOptions()
-                    val locationsAvailable = storageOptions.getFolderLocations(this@PocketcastsApplication)
+                    val locationsAvailable = storageOptions.getFolderLocations(this@PocketCastsApplication)
                     if (locationsAvailable.size > 0) {
                         val folder = locationsAvailable[0]
                         settings.setStorageChoice(folder.filePath, folder.label)
                     } else {
-                        val location = this@PocketcastsApplication.filesDir
+                        val location = this@PocketCastsApplication.filesDir
                         settings.setStorageCustomFolder(location.absolutePath)
                     }
                 } else if (storageChoice.equals(Settings.LEGACY_STORAGE_ON_PHONE, ignoreCase = true)) {
-                    val location = this@PocketcastsApplication.filesDir
+                    val location = this@PocketCastsApplication.filesDir
                     settings.setStorageCustomFolder(location.absolutePath)
                 } else if (storageChoice.equals(Settings.LEGACY_STORAGE_ON_SD_CARD, ignoreCase = true)) {
                     val location = findExternalStorageDirectory()
@@ -185,7 +201,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
-                VersionMigrationsJob.run(podcastManager = podcastManager, settings = settings, context = this@PocketcastsApplication)
+                VersionMigrationsJob.run(podcastManager = podcastManager, settings = settings, context = this@PocketCastsApplication)
 
                 // check that we have .nomedia files in existing folders
                 fileStorage.checkNoMediaDirs()
@@ -193,7 +209,7 @@ class PocketcastsApplication : Application(), Configuration.Provider {
                 // init the stats engine
                 statsManager.initStatsEngine()
 
-                subscriptionManager.connectToGooglePlay(this@PocketcastsApplication)
+                subscriptionManager.connectToGooglePlay(this@PocketCastsApplication)
             }
         }
 
@@ -204,6 +220,21 @@ class PocketcastsApplication : Application(), Configuration.Provider {
         userManager.beginMonitoringAccountManager(playbackManager)
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
+    }
+
+    private fun retrieveUserIdIfNeededAndRefreshMetadata() {
+        val email = settings.getSyncEmail()
+        val password = settings.getSyncPassword()
+        val uuid = settings.getSyncUuid()
+        if (!email.isNullOrEmpty() && !password.isNullOrEmpty() && uuid.isNullOrEmpty()) {
+            Timber.e("Missing User ID - Retrieving from the server")
+            applicationScope.launch(Dispatchers.IO) {
+                auth.signInWithEmailAndPassword(email, password, SignInSource.PocketCastsApplication)
+                AnalyticsTracker.refreshMetadata()
+            }
+        } else {
+            AnalyticsTracker.refreshMetadata()
+        }
     }
 
     @Suppress("DEPRECATION")

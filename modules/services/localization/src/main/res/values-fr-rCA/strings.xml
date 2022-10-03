@@ -6,6 +6,7 @@ Generator: GlotPress/2.4.0-alpha
 Language: fr_CA
 -->
 <resources>
+	<string name="settings_downloads_clean_up_summary">Voulez-vous vraiment supprimer ces fichiers téléchargés ?</string>
 	<string name="settings_storage_section_heading_mobile_data">Données mobiles</string>
 	<string name="settings_storage_section_heading_usage">Utilisation</string>
 	<string name="settings_storage_downloaded_files">Fichiers téléchargés</string>

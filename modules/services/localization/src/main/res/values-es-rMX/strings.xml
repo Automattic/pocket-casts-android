@@ -6,6 +6,7 @@ Generator: GlotPress/2.4.0-alpha
 Language: es_MX
 -->
 <resources>
+	<string name="settings_downloads_clean_up_summary">¿Seguro que quieres eliminar estos archivos descargados?</string>
 	<string name="settings_storage_section_heading_mobile_data">Datos móviles</string>
 	<string name="settings_storage_section_heading_usage">Uso</string>
 	<string name="settings_storage_downloaded_files">Archivos descargados</string>
