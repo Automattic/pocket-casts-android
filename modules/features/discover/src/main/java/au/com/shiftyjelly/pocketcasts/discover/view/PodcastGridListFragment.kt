@@ -58,6 +58,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
         internal const val ARG_BACKGROUND_COLOR = "backgroundColor"
         internal const val ARG_TAGLINE = "tagline"
         internal const val ARG_CURATED = "curated"
+        internal const val NONE = "none"
 
         fun newInstanceBundle(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): Bundle {
             return Bundle().apply {
@@ -180,6 +181,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             linkView.visibility = View.VISIBLE
             linkTextView.text = linkTitle
             linkView.setOnClickListener {
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED, mapOf(LIST_ID_KEY to (listUuid ?: NONE)))
                 WebViewActivity.show(context, linkTitle, linkUrl)
             }
         }
