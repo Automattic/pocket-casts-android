@@ -182,5 +182,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         private const val ID_KEY = "id"
         private const val NAME_KEY = "name"
         private const val REGION_KEY = "region"
+        const val LIST_ID_KEY = "list_id"
+        const val PODCAST_UUID_KEY = "podcast_uuid"
+        const val EPISODE_UUID_KEY = "episode_uuid"
     }
 }

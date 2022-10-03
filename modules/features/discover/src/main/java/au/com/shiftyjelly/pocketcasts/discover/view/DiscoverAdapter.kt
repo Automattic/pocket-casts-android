@@ -26,6 +26,9 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBi
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -70,9 +73,6 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 private const val MAX_ROWS_SMALL_LIST = 20
 private const val CURRENT_PAGE = "current_page"
 private const val TOTAL_PAGES = "total_pages"
-const val LIST_ID_KEY = "list_id"
-const val PODCAST_UUID_KEY = "podcast_uuid"
-const val EPISODE_UUID_KEY = "episode_uuid"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
