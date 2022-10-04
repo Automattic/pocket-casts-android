@@ -433,16 +433,16 @@ class MainActivity :
     }
 
     override fun onUpNextClicked() {
-        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.MINI_PLAYER.analyticsValue))
-        showUpNextFragment()
+        showUpNextFragment(UpNextSource.MINI_PLAYER)
     }
 
     override fun onMiniPlayerLongClick() {
         MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager, analyticsTracker).show(this)
     }
 
-    private fun showUpNextFragment() {
-        showBottomSheet(UpNextFragment())
+    private fun showUpNextFragment(source: UpNextSource) {
+        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
+        showBottomSheet(UpNextFragment.newInstance(source = source))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -586,9 +586,8 @@ class MainActivity :
         // Handle up next shortcut
         if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {
             intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
-            analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.UP_NEXT_SHORTCUT.analyticsValue))
             binding.playerBottomSheet.openPlayer()
-            showUpNextFragment()
+            showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
         }
     }
 

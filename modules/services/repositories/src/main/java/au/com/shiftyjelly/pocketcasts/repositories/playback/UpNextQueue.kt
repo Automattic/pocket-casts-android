@@ -78,6 +78,11 @@ enum class UpNextSource(val analyticsValue: String) {
     MINI_PLAYER("mini_player"),
     PLAYER("player"),
     UP_NEXT_SHORTCUT("up_next_shortcut"),
+    UNKNOWN("unknown");
+
+    companion object {
+        fun fromString(string: String) = UpNextSource.values().find { it.analyticsValue == string } ?: UNKNOWN
+    }
 }
 
 fun Observable<UpNextQueue.State>.containsUuid(uuid: String): Observable<Boolean> {

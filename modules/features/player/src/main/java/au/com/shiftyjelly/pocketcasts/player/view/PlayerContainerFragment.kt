@@ -68,7 +68,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
         adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
 
-        val upNextFragment = UpNextFragment.newInstance(embedded = true)
+        val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.PLAYER)
         childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment).commitAllowingStateLoss()
 
         val binding = binding ?: return

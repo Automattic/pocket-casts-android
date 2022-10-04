@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentUpnextBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -52,12 +53,13 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemTouchHelperAdapter {
     companion object {
         private const val ARG_EMBEDDED = "embedded"
+        private const val ARG_SOURCE = "source"
         private const val ACTION_KEY = "action"
         private const val SOURCE_KEY = "source"
 
-        fun newInstance(embedded: Boolean = false): UpNextFragment {
+        fun newInstance(embedded: Boolean = false, source: UpNextSource): UpNextFragment {
             val fragment = UpNextFragment()
-            fragment.arguments = bundleOf(ARG_EMBEDDED to embedded)
+            fragment.arguments = bundleOf(ARG_EMBEDDED to embedded, ARG_SOURCE to source.analyticsValue)
             return fragment
         }
     }
@@ -86,6 +88,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     val isEmbedded: Boolean
         get() = arguments?.getBoolean(ARG_EMBEDDED) ?: false
 
+    val upNextSource: UpNextSource
+        get() = arguments?.getString(ARG_SOURCE)?.let { UpNextSource.fromString(it) } ?: UpNextSource.UNKNOWN
+
     val overrideTheme: Theme.ThemeType
         get() = if (Theme.isDark(context)) theme.activeTheme else Theme.ThemeType.DARK
 
@@ -110,7 +115,16 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val imageLoader = PodcastImageLoaderThemed(context)
-        adapter = UpNextAdapter(context, imageLoader, episodeManager, this, multiSelectHelper, childFragmentManager)
+        adapter = UpNextAdapter(
+            context = context,
+            imageLoader = imageLoader,
+            episodeManager = episodeManager,
+            listener = this,
+            multiSelectHelper = multiSelectHelper,
+            fragmentManager = childFragmentManager,
+            analyticsTracker = analyticsTracker,
+            upNextSource = upNextSource
+        )
         adapter.theme = overrideTheme
 
         if (!isEmbedded) {
