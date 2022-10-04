@@ -1,6 +1,9 @@
 7.25
 -----
 
+*   Bug Fixes:
+    *   Allow Discover feed collection titles to wrap
+        ([#335](https://github.com/Automattic/pocket-casts-android/pull/335)).
 
 7.24
 -----
