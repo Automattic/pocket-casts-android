@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.DISCOVER_PODCAST_DIFF_CALLBACK
@@ -20,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 internal class LargeListRowAdapter(
@@ -60,7 +60,7 @@ internal class LargeListRowAdapter(
             holder.itemView.isClickable = true
             holder.itemView.setOnClickListener {
                 fromListId?.let {
-                    AnalyticsHelper.podcastTappedFromList(it, podcast.uuid)
+                    FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
                 }
                 onPodcastClicked(podcast, fromListId)
@@ -69,7 +69,7 @@ internal class LargeListRowAdapter(
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true, colorSubscribed = UR.attr.contrast_01, colorUnsubscribed = UR.attr.contrast_01)
                 fromListId?.let {
-                    AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid)
+                    FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcast.uuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
                 }
                 onPodcastSubscribe(podcast, fromListId)

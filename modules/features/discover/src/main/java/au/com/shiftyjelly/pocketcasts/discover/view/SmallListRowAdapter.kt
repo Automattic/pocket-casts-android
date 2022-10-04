@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemSmallListBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 
 private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
     override fun areItemsTheSame(oldItem: List<Any>, newItem: List<Any>): Boolean {
@@ -76,14 +76,14 @@ internal class SmallListRowAdapter(
                 podcastRow.isClickable = true
                 podcastRow.setOnClickListener {
                     fromListId?.let {
-                        AnalyticsHelper.podcastTappedFromList(it, podcast.uuid)
+                        FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
                         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
                     }
                     onPodcastClicked(podcast, fromListId)
                 }
                 podcastRow.onSubscribeClicked = {
                     fromListId?.let {
-                        AnalyticsHelper.podcastSubscribedFromList(it, podcast.uuid)
+                        FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcast.uuid)
                         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
                     }
                     onPodcastSubscribe(podcast, fromListId)
