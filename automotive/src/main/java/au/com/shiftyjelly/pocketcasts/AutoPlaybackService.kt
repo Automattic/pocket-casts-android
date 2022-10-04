@@ -76,18 +76,13 @@ class AutoPlaybackService : PlaybackService() {
     }
 
     override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>) {
-        if (parentId == MEDIA_ID_ROOT) {
-            Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Loading section sync $parentId")
-            result.sendResult(loadRootChildren())
-            return
-        }
-
         result.detach()
         Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Loading section $parentId")
         launch(Dispatchers.IO) {
             Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Running in background $parentId")
             try {
                 val items: List<MediaBrowserCompat.MediaItem> = when (parentId) {
+                    MEDIA_ID_ROOT -> loadRootChildren()
                     PODCASTS_ROOT -> loadPodcastsChildren()
                     FILTERS_ROOT -> loadFiltersRoot()
                     DISCOVER_ROOT -> loadDiscoverRoot()
@@ -110,9 +105,7 @@ class AutoPlaybackService : PlaybackService() {
         }
     }
 
-    override fun loadRootChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
-        val rootItems = ArrayList<MediaBrowserCompat.MediaItem>()
-
+    override suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
         // podcasts
         val podcastsDescription = MediaDescriptionCompat.Builder()
             .setTitle(getString(LR.string.podcasts))
@@ -120,19 +113,18 @@ class AutoPlaybackService : PlaybackService() {
             .setIconUri(AutoConverter.getBitmapUri(IR.drawable.auto_tab_podcasts, this))
             .build()
         val podcastItem = MediaBrowserCompat.MediaItem(podcastsDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
-        rootItems.add(podcastItem)
 
         // filters
-        val extras = Bundle()
-        extras.putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
-        val mediaDescription = MediaDescriptionCompat.Builder()
+        val extras = Bundle().apply {
+            putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
+        }
+        val filtersDescription = MediaDescriptionCompat.Builder()
             .setTitle(getString(LR.string.episode_filters))
             .setMediaId(FILTERS_ROOT)
             .setIconUri(AutoConverter.getBitmapUri(IR.drawable.auto_tab_filter, this))
             .setExtras(extras)
             .build()
-        val playlistItem = MediaBrowserCompat.MediaItem(mediaDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
-        rootItems.add(playlistItem)
+        val filtersItem = MediaBrowserCompat.MediaItem(filtersDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
 
         // discover
         val discoverDescription = MediaDescriptionCompat.Builder()
@@ -141,9 +133,13 @@ class AutoPlaybackService : PlaybackService() {
             .setIconUri(AutoConverter.getBitmapUri(IR.drawable.auto_tab_discover, this))
             .build()
         val discoverItem = MediaBrowserCompat.MediaItem(discoverDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
-        rootItems.add(discoverItem)
 
-        return rootItems
+        // show the user's podcast collection first if they are subscribed any
+        return if (podcastManager.countSubscribed() > 0) {
+            listOf(podcastItem, filtersItem, discoverItem)
+        } else {
+            listOf(discoverItem, podcastItem, filtersItem)
+        }
     }
 
     fun loadFiltersRoot(): List<MediaBrowserCompat.MediaItem> {

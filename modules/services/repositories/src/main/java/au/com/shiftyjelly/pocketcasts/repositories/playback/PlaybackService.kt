@@ -440,7 +440,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         return arrayListOf(AutoConverter.convertEpisodeToMediaItem(this, upNext, parentPodcast))
     }
 
-    open fun loadRootChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
+    open suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
         val rootItems = ArrayList<MediaBrowserCompat.MediaItem>()
 
         // podcasts
