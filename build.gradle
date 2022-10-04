@@ -20,10 +20,9 @@ buildscript {
     // Gradle Plugins
     dependencies {
         // Android - https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:7.2.2'
-
+        classpath 'com.android.tools.build:gradle:7.3.0'
         // Google Services - https://developers.google.com/android/guides/google-services-plugin
-        classpath "com.google.gms:google-services:4.3.13"
+        classpath "com.google.gms:google-services:4.3.14"
         // Kotlin
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // Open source licenses plugin
