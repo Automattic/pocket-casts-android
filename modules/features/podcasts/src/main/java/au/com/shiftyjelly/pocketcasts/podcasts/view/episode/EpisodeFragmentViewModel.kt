@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -47,7 +49,8 @@ class EpisodeFragmentViewModel @Inject constructor(
     val downloadManager: DownloadManager,
     val serverManager: ServerManager,
     val playbackManager: PlaybackManager,
-    val settings: Settings
+    val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -247,6 +250,7 @@ class EpisodeFragmentViewModel @Inject constructor(
             } else {
                 fromListUuid?.let {
                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
+                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
                 }
                 playbackManager.playNow(episode, force)
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate()
@@ -261,6 +265,11 @@ class EpisodeFragmentViewModel @Inject constructor(
         episode?.let { episode ->
             episodeManager.toggleStarEpisodeAsync(episode)
         }
+    }
+
+    companion object {
+        private const val LIST_ID_KEY = "list_id"
+        private const val PODCAST_ID_KEY = "podcast_id"
     }
 }
 

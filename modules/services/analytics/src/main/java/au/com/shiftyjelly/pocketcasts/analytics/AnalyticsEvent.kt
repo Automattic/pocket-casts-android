@@ -217,4 +217,20 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_LIST_SHOWN("filter_list_shown"),
     FILTER_SHOWN("filter_shown"),
     FILTER_DELETED("filter_deleted"),
+
+    /* Discover */
+    DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
+    DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),
+    DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
+    DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
+    DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
+    DISCOVER_LIST_IMPRESSION("discover_list_impression"),
+    DISCOVER_LIST_EPISODE_TAPPED("discover_list_episode_tapped"),
+    DISCOVER_LIST_EPISODE_PLAY("discover_list_episode_play"),
+    DISCOVER_LIST_PODCAST_TAPPED("discover_list_podcast_tapped"),
+    DISCOVER_LIST_PODCAST_SUBSCRIBED("discover_list_podcast_subscribed"),
+    DISCOVER_FEATURED_PAGE_CHANGED("discover_featured_page_changed"),
+    DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
+    DISCOVER_REGION_CHANGED("discover_region_changed"),
+    DISCOVER_COLLECTION_LINK_TAPPED("discover_collection_link_tapped"),
 }

@@ -11,8 +11,13 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewModel
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
@@ -25,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
@@ -41,6 +47,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
 
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var settings: Settings
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     companion object {
         internal const val ARG_LIST_UUID = "listUuid"
@@ -52,17 +59,21 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
         internal const val ARG_BACKGROUND_COLOR = "backgroundColor"
         internal const val ARG_TAGLINE = "tagline"
         internal const val ARG_CURATED = "curated"
+        internal const val ARG_INFERRED_ID = "inferredId"
 
-        fun newInstanceBundle(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): Bundle {
+        fun newInstanceBundle(
+            networkLoadableList: NetworkLoadableList,
+        ): Bundle {
             return Bundle().apply {
-                putString(ARG_LIST_UUID, listUuid)
-                putString(ARG_TITLE, title)
-                putString(ARG_SOURCE_URL, sourceUrl)
-                putString(ARG_LIST_TYPE, listType.stringValue)
-                putString(ARG_DISPLAY_STYLE, displayStyle.stringValue)
-                putString(ARG_EXPANDED_STYLE, expandedStyle.stringValue)
-                putString(ARG_TAGLINE, tagline)
-                putBoolean(ARG_CURATED, curated)
+                putString(ARG_LIST_UUID, networkLoadableList.listUuid)
+                putString(ARG_INFERRED_ID, networkLoadableList.inferredId())
+                putString(ARG_TITLE, networkLoadableList.title)
+                putString(ARG_SOURCE_URL, networkLoadableList.source)
+                putString(ARG_LIST_TYPE, networkLoadableList.type.stringValue)
+                putString(ARG_DISPLAY_STYLE, networkLoadableList.displayStyle.stringValue)
+                putString(ARG_EXPANDED_STYLE, networkLoadableList.expandedStyle.stringValue)
+                putString(ARG_TAGLINE, networkLoadableList.expandedTopItemLabel)
+                putBoolean(ARG_CURATED, networkLoadableList.curated)
             }
         }
     }
@@ -85,6 +96,9 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     val listUuid: String?
         get() = arguments?.getString(ARG_LIST_UUID)
 
+    private val inferredId: String
+        get() = arguments?.getString(ARG_INFERRED_ID) ?: NetworkLoadableList.Companion.NONE
+
     val sourceUrl: String?
         get() = arguments?.getString(ARG_SOURCE_URL)
 
@@ -97,19 +111,29 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     protected val viewModel: PodcastListViewModel by viewModels()
 
     val onPodcastClicked: (DiscoverPodcast) -> Unit = { podcast ->
-        listUuid?.let { FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid) }
+        listUuid?.let {
+            FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
+        }
         val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid)
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
     val onPodcastSubscribe: (String) -> Unit = { podcastUuid ->
-        listUuid?.let { FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid) }
+        listUuid?.let {
+            FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
+        }
         podcastManager.subscribeToPodcast(podcastUuid, sync = true)
     }
 
     val onEpisodeClick: (DiscoverEpisode) -> Unit = { episode ->
         listUuid?.let { listUuid ->
             FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
+                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid)
+            )
         }
         val fragment = EpisodeFragment.newInstance(episodeUuid = episode.uuid, podcastUuid = episode.podcast_uuid, fromListUuid = listUuid)
         fragment.show(parentFragmentManager, "episode_card")
@@ -164,6 +188,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             linkView.visibility = View.VISIBLE
             linkTextView.text = linkTitle
             linkView.setOnClickListener {
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED, mapOf(LIST_ID_KEY to inferredId))
                 WebViewActivity.show(context, linkTitle, linkUrl)
             }
         }

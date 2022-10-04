@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastListFragmentBinding
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -21,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,24 +34,18 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class PodcastListFragment : PodcastGridListFragment() {
 
     companion object {
-        fun newInstance(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): PodcastListFragment {
+        private const val LIST_ID_KEY = "list_id"
+
+        fun newInstance(networkLoadableList: NetworkLoadableList): PodcastListFragment {
             return PodcastListFragment().apply {
-                arguments = newInstanceBundle(
-                    listUuid = listUuid,
-                    title = title,
-                    sourceUrl = sourceUrl,
-                    listType = listType,
-                    displayStyle = displayStyle,
-                    expandedStyle = expandedStyle,
-                    tagline = tagline,
-                    curated = curated
-                )
+                arguments = newInstanceBundle(networkLoadableList)
             }
         }
     }
 
     private val onPromotionClick: (DiscoverPromotion) -> Unit = { promotion ->
         FirebaseAnalyticsTracker.podcastTappedFromList(promotion.promotionUuid, promotion.podcastUuid)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to promotion.promotionUuid, PODCAST_UUID_KEY to promotion.podcastUuid))
 
         val fragment = PodcastFragment.newInstance(podcastUuid = promotion.podcastUuid, fromListUuid = promotion.promotionUuid)
         (activity as FragmentHostListener).addFragment(fragment)
@@ -105,6 +102,7 @@ class PodcastListFragment : PodcastGridListFragment() {
             return
         }
         FirebaseAnalyticsTracker.listImpression(impressionId)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to impressionId))
         analyticsImpressionSent = true
     }
 
