@@ -23,13 +23,12 @@ interface NetworkLoadableList {
 
     fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): NetworkLoadableList
 
-    fun inferredId(source: String?) = source?.let {
-        when {
-            it.lowercase().contains(TRENDING) -> TRENDING
-            it.lowercase().contains(POPULAR) -> POPULAR
-            else -> NONE
-        }
-    } ?: NONE
+    fun inferredId() = when {
+        listUuid != null -> listUuid as String
+        source.lowercase().contains(TRENDING) -> TRENDING
+        source.lowercase().contains(POPULAR) -> POPULAR
+        else -> NONE
+    }
 
     companion object {
         private const val TRENDING = "trending"
