@@ -13,9 +13,8 @@ import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastGridFragmentBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
-import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
-import au.com.shiftyjelly.pocketcasts.servers.model.ListType
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -25,18 +24,9 @@ import timber.log.Timber
 @AndroidEntryPoint
 class PodcastGridFragment : PodcastGridListFragment() {
     companion object {
-        fun newInstance(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): PodcastGridFragment {
+        fun newInstance(networkLoadableList: NetworkLoadableList): PodcastGridFragment {
             return PodcastGridFragment().apply {
-                arguments = newInstanceBundle(
-                    listUuid = listUuid,
-                    title = title,
-                    sourceUrl = sourceUrl,
-                    listType = listType,
-                    displayStyle = displayStyle,
-                    expandedStyle = expandedStyle,
-                    tagline = tagline,
-                    curated = curated
-                )
+                arguments = newInstanceBundle(networkLoadableList)
             }
         }
     }

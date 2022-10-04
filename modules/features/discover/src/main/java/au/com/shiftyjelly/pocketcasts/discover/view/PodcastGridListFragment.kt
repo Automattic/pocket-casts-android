@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
@@ -58,18 +59,21 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
         internal const val ARG_BACKGROUND_COLOR = "backgroundColor"
         internal const val ARG_TAGLINE = "tagline"
         internal const val ARG_CURATED = "curated"
-        internal const val NONE = "none"
+        internal const val ARG_INFERRED_ID = "inferredId"
 
-        fun newInstanceBundle(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): Bundle {
+        fun newInstanceBundle(
+            networkLoadableList: NetworkLoadableList,
+        ): Bundle {
             return Bundle().apply {
-                putString(ARG_LIST_UUID, listUuid)
-                putString(ARG_TITLE, title)
-                putString(ARG_SOURCE_URL, sourceUrl)
-                putString(ARG_LIST_TYPE, listType.stringValue)
-                putString(ARG_DISPLAY_STYLE, displayStyle.stringValue)
-                putString(ARG_EXPANDED_STYLE, expandedStyle.stringValue)
-                putString(ARG_TAGLINE, tagline)
-                putBoolean(ARG_CURATED, curated)
+                putString(ARG_LIST_UUID, networkLoadableList.listUuid)
+                putString(ARG_INFERRED_ID, networkLoadableList.inferredId())
+                putString(ARG_TITLE, networkLoadableList.title)
+                putString(ARG_SOURCE_URL, networkLoadableList.source)
+                putString(ARG_LIST_TYPE, networkLoadableList.type.stringValue)
+                putString(ARG_DISPLAY_STYLE, networkLoadableList.displayStyle.stringValue)
+                putString(ARG_EXPANDED_STYLE, networkLoadableList.expandedStyle.stringValue)
+                putString(ARG_TAGLINE, networkLoadableList.expandedTopItemLabel)
+                putBoolean(ARG_CURATED, networkLoadableList.curated)
             }
         }
     }
@@ -91,6 +95,9 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
 
     val listUuid: String?
         get() = arguments?.getString(ARG_LIST_UUID)
+
+    private val inferredId: String
+        get() = arguments?.getString(ARG_INFERRED_ID) ?: NetworkLoadableList.Companion.NONE
 
     val sourceUrl: String?
         get() = arguments?.getString(ARG_SOURCE_URL)
@@ -181,7 +188,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             linkView.visibility = View.VISIBLE
             linkTextView.text = linkTitle
             linkView.setOnClickListener {
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED, mapOf(LIST_ID_KEY to (listUuid ?: NONE)))
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED, mapOf(LIST_ID_KEY to inferredId))
                 WebViewActivity.show(context, linkTitle, linkUrl)
             }
         }

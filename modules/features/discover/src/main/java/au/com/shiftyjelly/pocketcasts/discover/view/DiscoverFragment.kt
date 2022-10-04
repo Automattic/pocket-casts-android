@@ -70,10 +70,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         }
 
         if (list.expandedStyle is ExpandedStyle.GridList) {
-            val fragment = PodcastGridFragment.newInstance(listId, transformedList.title, transformedList.source, transformedList.type, transformedList.displayStyle, transformedList.expandedStyle, transformedList.expandedTopItemLabel, transformedList.curated)
+            val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         } else {
-            val fragment = PodcastListFragment.newInstance(listId, transformedList.title, transformedList.source, transformedList.type, transformedList.displayStyle, transformedList.expandedStyle, transformedList.expandedTopItemLabel, transformedList.curated)
+            val fragment = PodcastListFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         }
     }

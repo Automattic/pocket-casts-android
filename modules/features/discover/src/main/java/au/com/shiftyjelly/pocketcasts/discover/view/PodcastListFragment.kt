@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListFeed
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
@@ -34,18 +35,10 @@ class PodcastListFragment : PodcastGridListFragment() {
 
     companion object {
         private const val LIST_ID_KEY = "list_id"
-        fun newInstance(listUuid: String?, title: String, sourceUrl: String, listType: ListType, displayStyle: DisplayStyle, expandedStyle: ExpandedStyle, tagline: String? = null, curated: Boolean = false): PodcastListFragment {
+
+        fun newInstance(networkLoadableList: NetworkLoadableList): PodcastListFragment {
             return PodcastListFragment().apply {
-                arguments = newInstanceBundle(
-                    listUuid = listUuid,
-                    title = title,
-                    sourceUrl = sourceUrl,
-                    listType = listType,
-                    displayStyle = displayStyle,
-                    expandedStyle = expandedStyle,
-                    tagline = tagline,
-                    curated = curated
-                )
+                arguments = newInstanceBundle(networkLoadableList)
             }
         }
     }
