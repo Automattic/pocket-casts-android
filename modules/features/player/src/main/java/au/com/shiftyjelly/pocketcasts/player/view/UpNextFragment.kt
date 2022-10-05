@@ -123,7 +123,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             analyticsTracker = analyticsTracker,
-            upNextSource = upNextSource
+            upNextSource = upNextSource,
+            settings = settings
         )
         adapter.theme = overrideTheme
 

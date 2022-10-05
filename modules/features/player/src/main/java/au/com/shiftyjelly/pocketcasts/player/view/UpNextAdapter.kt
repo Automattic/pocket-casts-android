@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
@@ -41,8 +42,9 @@ class UpNextAdapter(
     val listener: UpNextListener,
     val multiSelectHelper: MultiSelectHelper,
     val fragmentManager: FragmentManager,
-    val analyticsTracker: AnalyticsTrackerWrapper,
-    val upNextSource: UpNextSource
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val upNextSource: UpNextSource,
+    private val settings: Settings
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
 
@@ -95,6 +97,8 @@ class UpNextAdapter(
                 holder.binding.checkbox.isChecked = multiSelectHelper.toggle(item)
             } else {
                 val podcastUuid = (item as? Episode)?.podcastUuid
+                val playOnTap = settings.getTapOnUpNextShouldPlay()
+                analyticsTracker.track(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(SOURCE_KEY to upNextSource, WILL_PLAY_KEY to playOnTap))
                 listener.onEpisodeActionsClick(episodeUuid = item.uuid, podcastUuid = podcastUuid)
             }
         }
@@ -103,6 +107,8 @@ class UpNextAdapter(
                 multiSelectHelper.defaultLongPress(episode = item, fragmentManager = fragmentManager)
             } else {
                 val podcastUuid = (item as? Episode)?.podcastUuid
+                val playOnLongPress = !settings.getTapOnUpNextShouldPlay()
+                analyticsTracker.track(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(SOURCE_KEY to upNextSource, WILL_PLAY_KEY to playOnLongPress))
                 listener.onEpisodeActionsLongPress(episodeUuid = item.uuid, podcastUuid = podcastUuid)
             }
             true
@@ -170,6 +176,7 @@ class UpNextAdapter(
 
     companion object {
         private const val SOURCE_KEY = "source"
+        private const val WILL_PLAY_KEY = "will_play"
     }
 }
 
