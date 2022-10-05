@@ -52,6 +52,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.math.abs
@@ -74,8 +75,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: AdapterPlayerHeaderBinding? = null
     private val playbackSource = PlaybackSource.PLAYER
-
-    var skippedFirstTouch: Boolean = false
+    private var skippedFirstTouch: Boolean = false
+    private var hasReceivedOnTouchDown = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
@@ -261,15 +262,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val context = context ?: return
         val swipeGesture = GestureDetectorCompat(
             context,
-            object : GestureDetector.OnGestureListener {
-
-                override fun onShowPress(e: MotionEvent) {}
-
-                override fun onSingleTapUp(e: MotionEvent) = false
+            object : GestureDetector.SimpleOnGestureListener() {
 
                 override fun onDown(e: MotionEvent) = true
-
-                override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float) = false
 
                 override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
                     val upNextBottomSheetBehavior = (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior
@@ -282,7 +277,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         return false
                     }
 
-                    if ((upNextBottomSheetBehavior.peekHeight == 0 && distanceY < 0) || abs(distanceY) > UPNEXT_OUTLIER_THRESHOLD) { // Dragging down when we are at the bottom already or random large outlier
+                    // Bottom sheet is already at the bottom
+                    if (upNextBottomSheetBehavior.peekHeight == 0 && distanceY < 0) {
+                        return false
+                    }
+
+                    // Filtering out large deltas to avoid jumps in scrolling
+                    if (abs(distanceY) > UPNEXT_OUTLIER_THRESHOLD) {
                         return false
                     }
 
@@ -295,8 +296,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
                     return upNextBottomSheetBehavior.peekHeight != 0
                 }
-
-                override fun onLongPress(e: MotionEvent) {}
             }
         )
 
@@ -305,29 +304,46 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 return@setOnTouchListener false
             }
 
-            val action = event.actionMasked
-            if (action == MotionEvent.ACTION_UP) {
-                skippedFirstTouch = false
+            when (event.actionMasked) {
 
-                val playerContainerFragment = parentFragment as? PlayerContainerFragment
-                val upNextBottomSheetBehavior = playerContainerFragment?.upNextBottomSheetBehavior
-                if (upNextBottomSheetBehavior != null) {
-                    val peekHeight = upNextBottomSheetBehavior.peekHeight
-                    val cutOff = Resources.getSystem().displayMetrics.heightPixels * UPNEXT_HEIGHT_OPEN_THRESHOLD
-                    if (peekHeight > cutOff) {
-                        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    } else {
-                        upNextBottomSheetBehavior.setPeekHeight(0, true)
-                        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                MotionEvent.ACTION_DOWN -> {
+                    hasReceivedOnTouchDown = true
+                }
 
-                        if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
-                            (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(false)
+                MotionEvent.ACTION_UP -> {
+                    skippedFirstTouch = false
+
+                    val playerContainerFragment = parentFragment as? PlayerContainerFragment
+                    val upNextBottomSheetBehavior =
+                        playerContainerFragment?.upNextBottomSheetBehavior
+                    if (upNextBottomSheetBehavior != null) {
+                        val peekHeight = upNextBottomSheetBehavior.peekHeight
+                        val cutOff =
+                            Resources.getSystem().displayMetrics.heightPixels * UPNEXT_HEIGHT_OPEN_THRESHOLD
+                        if (peekHeight > cutOff) {
+                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        } else {
+                            upNextBottomSheetBehavior.setPeekHeight(0, true)
+                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+                            if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
+                                (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(
+                                    false
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            swipeGesture.onTouchEvent(event)
+            // Only pass events to swipeGesture if a down event has been received to avoid
+            // this crash: https://github.com/Automattic/pocket-casts-android/issues/370
+            if (hasReceivedOnTouchDown) {
+                swipeGesture.onTouchEvent(event)
+            } else {
+                Timber.w("Not passing touch event to swipe gesture handler")
+                false
+            }
         }
     }
 
