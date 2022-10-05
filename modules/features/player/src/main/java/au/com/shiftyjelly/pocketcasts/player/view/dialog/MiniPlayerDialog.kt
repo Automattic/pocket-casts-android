@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -57,8 +58,14 @@ class MiniPlayerDialog(
     }
 
     private fun endPlaybackAndClearUpNext(context: Context) {
-        ClearUpNextDialog(removeNowPlaying = true, playbackManager = playbackManager, context = context)
-            .showOrClear(fragmentManager)
+        val dialog = ClearUpNextDialog(
+            source = UpNextSource.MINI_PLAYER,
+            removeNowPlaying = true,
+            playbackManager = playbackManager,
+            analyticsTracker = analyticsTracker,
+            context = context
+        )
+        dialog.showOrClear(fragmentManager)
     }
 
     private fun markAsPlayed() {

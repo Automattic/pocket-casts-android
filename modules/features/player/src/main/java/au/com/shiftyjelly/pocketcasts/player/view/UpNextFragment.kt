@@ -303,7 +303,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     override fun onClearUpNext() {
-        playerViewModel.clearUpNext(requireContext()).showOrClear(parentFragmentManager)
+        playerViewModel.clearUpNext(context = requireContext(), upNextSource = upNextSource)
+            .showOrClear(parentFragmentManager)
     }
 
     override fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder) {
