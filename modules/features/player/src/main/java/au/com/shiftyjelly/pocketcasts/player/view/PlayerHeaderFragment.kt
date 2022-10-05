@@ -61,7 +61,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UPNEXT_DRAG_DISTANCE_MULTIPLIER = 1.85f // Open up next at a different rate than we are dragging
 private const val UPNEXT_HEIGHT_OPEN_THRESHOLD = 0.15f // We only have an open threshold because we only control swipe up, swipe down is the standard bottom sheet behaviour
-private const val UPNEXT_OUTLIER_THRESHOLD = 150.0f // Sometimes we get a random large delta, it seems better to filter them out or else you get random jumps
+private const val UPNEXT_OUTLIER_THRESHOLD = 400.0f // Sometimes we get a random large delta, it seems better to filter them out or else you get random jumps
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
