@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentResetPasswordBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ResetPasswordError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ResetPasswordState
@@ -86,7 +87,7 @@ class ResetPasswordFragment : BaseFragment() {
                             getString(LR.string.profile_reset_password_check_email),
                             onComplete = {
                                 if (isAdded) {
-                                    parentFragmentManager.popBackStack()
+                                    view.findNavController().popBackStack()
                                 }
                             }
                         )
