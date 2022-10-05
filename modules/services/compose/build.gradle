@@ -2,6 +2,13 @@ apply from: "../../modules.gradle"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
+android {
+    namespace 'au.com.shiftyjelly.pocketcasts.compose'
+    buildFeatures {
+        compose true
+    }
+}
+
 dependencies {
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')
@@ -10,10 +17,4 @@ dependencies {
     implementation project(':modules:services:images')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:model')
-}
-
-android {
-    buildFeatures {
-        compose true
-    }
 }
