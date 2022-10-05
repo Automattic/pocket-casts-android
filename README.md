@@ -5,7 +5,7 @@
 
 <p align="center">
     <a href="https://buildkite.com/automattic/pocket-casts-android"><img src="https://badge.buildkite.com/dc67ef3537ad6cf097ff193b28063347418205a341d55f9940.svg?branch=main" /></a>
-    <a href="https://github.com/Automattic/pocket-casts-android/blob/main/LICENSE.md"><img src="https://img.shields.io/badge/license-MPL-black" /></a>
+    <a href="https://github.com/Automattic/pocket-casts-android/blob/main/LICENSE.md"><img src="https://img.shields.io/badge/license-MPL-blue" /></a>
 </p>
 
 <p align="center">
