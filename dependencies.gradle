@@ -54,9 +54,21 @@ project.ext {
 
     // App Signing
     storeFile = file("$rootDir/${secretProperties.getProperty("signingKeyStoreFile", null)}")
-    storePassword = secretProperties.getProperty("signingKeyStorePassword", null)
-    keyAlias = secretProperties.getProperty("signingKeyAlias", null)
-    keyPassword = secretProperties.getProperty("signingKeyPassword", null)
+    if (storeFile.exists()) {
+        // Use secret properties
+        storePassword = secretProperties.getProperty("signingKeyStorePassword", null)
+        keyAlias = secretProperties.getProperty("signingKeyAlias", null)
+        keyPassword = secretProperties.getProperty("signingKeyPassword", null)
+    } else {
+        // Check local gradle properties
+        def keystoreFilePropertyKey = "pocketcastsKeyStoreFile"
+        if (project.hasProperty(keystoreFilePropertyKey)) {
+            storeFile = file(project.getProperty(keystoreFilePropertyKey))
+            storePassword = project.getProperty("pocketcastsKeyStorePassword")
+            keyAlias = project.getProperty("pocketcastsKeyStoreAlias")
+            keyPassword = project.getProperty("pocketcastsKeyStoreAliasPassword")
+        }
+    }
     canSignRelease = storeFile.exists()
 
     // Secrets
