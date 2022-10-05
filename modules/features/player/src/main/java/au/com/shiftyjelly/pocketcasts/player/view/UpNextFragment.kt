@@ -44,6 +44,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.abs
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -57,6 +58,12 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         private const val ACTION_KEY = "action"
         private const val SOURCE_KEY = "source"
         private const val SELECT_ALL_KEY = "select_all"
+        private const val DIRECTION_KEY = "direction"
+        private const val SLOTS_KEY = "slots"
+        private const val IS_NEXT_KEY = "is_next"
+        private const val DOWN = "down"
+        private const val UP = "up"
+        private const val UP_NEXT_ADAPTER_POSITION = 2
 
         fun newInstance(embedded: Boolean = false, source: UpNextSource): UpNextFragment {
             val fragment = UpNextFragment()
@@ -74,6 +81,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     lateinit var adapter: UpNextAdapter
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private var userRearrangingFrom: Int? = null
+    private var userDraggingStart: Int? = null
     private var playingEpisodeAtStartOfDrag: String? = null
 
     private var realBinding: FragmentUpnextBinding? = null
@@ -304,6 +312,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
         itemTouchHelper.startDrag(viewHolder)
         viewHolder.setIsRecyclable(false)
+        userDraggingStart = viewHolder.bindingAdapterPosition
 
         // Clear out any open swipes on drag
         val firstPosition = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
@@ -356,7 +365,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         }
     }
 
-    override fun onUpNextItemTouchHelperFinished() {
+    override fun onUpNextItemTouchHelperFinished(position: Int) {
         if (playingEpisodeAtStartOfDrag == playbackManager.upNextQueue.currentEpisode?.uuid) {
             playerViewModel.changeUpNextEpisodes(upNextEpisodes.subList(1, upNextEpisodes.size).filterIsInstance<Playable>())
         } else {
@@ -366,7 +375,21 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             }
         }
 
+        userDraggingStart?.let { dragStartPosition ->
+            if (position != userDraggingStart) {
+                trackUpNextEvent(
+                    AnalyticsEvent.UP_NEXT_QUEUE_REORDERED,
+                    mapOf(
+                        SLOTS_KEY to abs(position.minus(dragStartPosition)),
+                        DIRECTION_KEY to if (position > dragStartPosition) DOWN else UP,
+                        IS_NEXT_KEY to (position == UP_NEXT_ADAPTER_POSITION),
+                    )
+                )
+            }
+        }
+
         userRearrangingFrom = null
+        userDraggingStart = null
         playingEpisodeAtStartOfDrag = null
     }
 
