@@ -233,4 +233,9 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
     DISCOVER_REGION_CHANGED("discover_region_changed"),
     DISCOVER_COLLECTION_LINK_TAPPED("discover_collection_link_tapped"),
+
+    /* Mini Player */
+    MINI_PLAYER_LONG_PRESS_MENU_SHOWN("mini_player_long_press_menu_shown"),
+    MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED("mini_player_long_press_menu_option_tapped"),
+    MINI_PLAYER_LONG_PRESS_MENU_DISMISSED("mini_player_long_press_menu_dismissed"),
 }

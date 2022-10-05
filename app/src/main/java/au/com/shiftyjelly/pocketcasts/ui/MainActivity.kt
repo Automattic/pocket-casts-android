@@ -435,7 +435,7 @@ class MainActivity :
     }
 
     override fun onMiniPlayerLongClick() {
-        MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager).show(this)
+        MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager, analyticsTracker).show(this)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
