@@ -164,7 +164,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun openUpNext() {
-        val upNextFragment = UpNextFragment()
+        val upNextFragment = UpNextFragment.newInstance(source = UpNextSource.PLAYER)
         (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
     }
 
