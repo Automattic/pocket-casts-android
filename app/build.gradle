@@ -66,6 +66,10 @@ android {
     }
 }
 
+sentry {
+    includeProguardMapping = file("$rootDir/sentry.properties").exists()
+}
+
 dependencies {
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')
