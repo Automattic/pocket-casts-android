@@ -56,6 +56,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         private const val ARG_SOURCE = "source"
         private const val ACTION_KEY = "action"
         private const val SOURCE_KEY = "source"
+        private const val SELECT_ALL_KEY = "select_all"
 
         fun newInstance(embedded: Boolean = false, source: UpNextSource): UpNextFragment {
             val fragment = UpNextFragment()
@@ -155,6 +156,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.menu_select -> {
+                    trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_ENTERED)
                     multiSelectHelper.isMultiSelecting = true
                     true
                 }
@@ -193,17 +195,24 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) {
             multiSelectToolbar.isVisible = it
             toolbar.isVisible = !it
+
+            if (toolbar.isVisible) {
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_EXITED)
+            }
+
             multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)
 
             adapter.notifyDataSetChanged()
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener {
             override fun multiSelectSelectAll() {
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to true))
                 upNextPlayables.forEach { multiSelectHelper.select(it) }
                 adapter.notifyDataSetChanged()
             }
 
             override fun multiSelectSelectNone() {
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to false))
                 upNextPlayables.forEach { multiSelectHelper.deselect(it) }
                 adapter.notifyDataSetChanged()
             }
@@ -237,7 +246,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     override fun onPause() {
         super.onPause()
-        multiSelectHelper.isMultiSelecting = false
+        if (multiSelectHelper.isMultiSelecting) {
+            multiSelectHelper.isMultiSelecting = false
+        }
     }
 
     fun moveToTop(episode: Playable, position: Int) {
@@ -371,6 +382,13 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 SOURCE_KEY to SwipeSource.UP_NEXT.analyticsValue
             )
         )
+    }
+
+    private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
+        val properties = HashMap<String, Any>()
+        properties[SOURCE_KEY] = upNextSource.analyticsValue
+        properties.putAll(props)
+        analyticsTracker.track(event, properties)
     }
 }
 
