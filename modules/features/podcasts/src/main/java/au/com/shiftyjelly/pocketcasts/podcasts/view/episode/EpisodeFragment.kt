@@ -490,10 +490,6 @@ class EpisodeFragment : BaseDialogFragment() {
                             return true
                         }
                     }
-                    // turn off text selection in the web view
-                    setOnLongClickListener { true }
-                    isLongClickable = false
-                    isHapticFeedbackEnabled = false
                 }
                 binding?.webViewShowNotes?.addView(webView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             } catch (e: Exception) {
