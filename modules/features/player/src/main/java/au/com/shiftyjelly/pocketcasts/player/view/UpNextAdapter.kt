@@ -98,7 +98,7 @@ class UpNextAdapter(
             } else {
                 val podcastUuid = (item as? Episode)?.podcastUuid
                 val playOnTap = settings.getTapOnUpNextShouldPlay()
-                analyticsTracker.track(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(SOURCE_KEY to upNextSource, WILL_PLAY_KEY to playOnTap))
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(WILL_PLAY_KEY to playOnTap))
                 listener.onEpisodeActionsClick(episodeUuid = item.uuid, podcastUuid = podcastUuid)
             }
         }
@@ -108,7 +108,7 @@ class UpNextAdapter(
             } else {
                 val podcastUuid = (item as? Episode)?.podcastUuid
                 val playOnLongPress = !settings.getTapOnUpNextShouldPlay()
-                analyticsTracker.track(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(SOURCE_KEY to upNextSource, WILL_PLAY_KEY to playOnLongPress))
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(WILL_PLAY_KEY to playOnLongPress))
                 listener.onEpisodeActionsLongPress(episodeUuid = item.uuid, podcastUuid = podcastUuid)
             }
             true
@@ -146,7 +146,7 @@ class UpNextAdapter(
 
         init {
             binding.root.setOnClickListener {
-                analyticsTracker.track(AnalyticsEvent.UP_NEXT_NOW_PLAYING_TAPPED, mapOf(SOURCE_KEY to upNextSource))
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_NOW_PLAYING_TAPPED)
                 listener.onNowPlayingClick()
             }
         }
@@ -172,6 +172,13 @@ class UpNextAdapter(
 
             binding.playingAnimation.isVisible = isPlaying
         }
+    }
+
+    private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
+        val properties = HashMap<String, Any>()
+        properties[SOURCE_KEY] = upNextSource.analyticsValue
+        properties.putAll(props)
+        analyticsTracker.track(event, properties)
     }
 
     companion object {
