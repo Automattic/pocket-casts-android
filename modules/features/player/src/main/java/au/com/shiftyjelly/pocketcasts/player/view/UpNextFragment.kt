@@ -205,7 +205,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             multiSelectToolbar.isVisible = isMultiSelecting
             toolbar.isVisible = !isMultiSelecting
 
-            if (!isEmbedded) {
+            /* Track only if not embedded. If it is an embedded fragment, then track only when in expanded state */
+            if (!isEmbedded || isEmbeddedExpanded()) {
                 if (isMultiSelecting) {
                     trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_ENTERED)
                 } else if (wasMultiSelecting) {
@@ -305,6 +306,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
+
+    private fun isEmbeddedExpanded() =
+        isEmbedded && (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
 
     override fun onClearUpNext() {
         playerViewModel.clearUpNext(context = requireContext(), upNextSource = upNextSource)
