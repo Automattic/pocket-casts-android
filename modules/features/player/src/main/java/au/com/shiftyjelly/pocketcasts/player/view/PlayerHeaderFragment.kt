@@ -167,7 +167,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.castButton.setAlwaysVisible(true)
         binding.castButton.updateColor(ThemeColor.playerContrast03(theme.activeTheme))
 
-        setupUpNextDrag(view)
+        setupUpNextDrag(view, binding.topView)
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
@@ -258,7 +258,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-    private fun setupUpNextDrag(view: View) {
+    private fun setupUpNextDrag(view: View, topView: View?) {
         val context = context ?: return
         val swipeGesture = GestureDetectorCompat(
             context,
@@ -298,6 +298,18 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 }
             }
         )
+
+        @Suppress("ClickableViewAccessibility")
+        topView?.setOnTouchListener { _, event ->
+            // Check for down events from the top view because sometimes they don't make it to
+            // the NestedScrollView's OnTouchListener and the first event we pass to our
+            // swipe gesture handler must be a down event
+            if (!hasReceivedOnTouchDown && event.actionMasked == MotionEvent.ACTION_DOWN) {
+                swipeGesture.onTouchEvent(event)
+                hasReceivedOnTouchDown = true
+            }
+            false
+        }
 
         view.setOnTouchListener { _, event ->
             if ((activity as? FragmentHostListener)?.getPlayerBottomSheetState() != BottomSheetBehavior.STATE_EXPANDED) {
