@@ -2,8 +2,10 @@
 -----
 
 *   Bug Fixes:
-    *   Allow Discover feed collection titles to wrap
+    *   Allow Discover feed collection titles to wrap.
         ([#335](https://github.com/Automattic/pocket-casts-android/pull/335)).
+    *   Allow select text in show notes from episode details view.
+        ([#372](https://github.com/Automattic/pocket-casts-android/pull/372)).
 
 7.24
 -----
