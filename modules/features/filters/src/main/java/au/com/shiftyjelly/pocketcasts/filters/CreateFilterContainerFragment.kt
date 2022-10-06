@@ -101,7 +101,7 @@ class CreateFilterContainerFragment : BaseFragment() {
                     binding.btnCreate.isEnabled = it.isNotEmpty()
                 }
             }
-            viewModel.colorId.observe(viewLifecycleOwner) {
+            viewModel.colorIndex.observe(viewLifecycleOwner) {
                 val colorResId = Playlist.themeColors.getOrNull(it) ?: UR.attr.filter_01
                 val tintColor = view.context.getThemeColor(colorResId)
                 val stateList = ColorStateList(
@@ -122,7 +122,7 @@ class CreateFilterContainerFragment : BaseFragment() {
     }
 
     private fun updateToolbarColors() {
-        val colorResId = Playlist.themeColors.getOrNull(viewModel.colorId.value ?: 0) ?: UR.attr.filter_01
+        val colorResId = Playlist.themeColors.getOrNull(viewModel.colorIndex.value ?: 0) ?: UR.attr.filter_01
         val tintColor = view?.context?.getThemeColor(colorResId) ?: return
         val iconRes = if (binding.viewPager.currentItem == 0) IR.drawable.ic_close else IR.drawable.ic_arrow_back
         val backIcon = context?.getTintedDrawable(iconRes, ThemeColor.filterIcon01(theme.activeTheme, tintColor))

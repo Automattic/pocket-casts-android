@@ -10,6 +10,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedI
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -28,6 +31,7 @@ class CreateFilterViewModel @Inject constructor(val playlistManager: PlaylistMan
         get() = Dispatchers.Default
 
     private var hasBeenInitialised = false
+    var isAutoDownloadSwitchInitialized = false
     lateinit var playlist: LiveData<Playlist>
     val lockedToFirstPage = MutableLiveData<Boolean>(true)
 
@@ -36,31 +40,68 @@ class CreateFilterViewModel @Inject constructor(val playlistManager: PlaylistMan
 
     val filterName = MutableLiveData("")
     var iconId: Int = 0
-    var colorId = MutableLiveData(0)
+    var colorIndex = MutableLiveData(0)
+
+    var userChangedFilterName = false
+    var userChangedIcon = false
+    var userChangedColor = false
 
     fun saveNewFilterDetails() {
-        val colorId = colorId.value ?: return
+        val colorIndex = colorIndex.value ?: return
         launch {
-            saveFilter(iconId, colorId)
+            saveFilter(
+                iconIndex = iconId,
+                colorIndex = colorIndex,
+                isCreatingNewFilter = true
+            )
             withContext(Dispatchers.Main) {
                 reset()
             }
         }
     }
 
-    suspend fun saveFilter(iconId: Int, colorId: Int) = withContext(Dispatchers.Default) {
+    suspend fun saveFilter(
+        iconIndex: Int,
+        colorIndex: Int,
+        isCreatingNewFilter: Boolean
+    ) = withContext(Dispatchers.Default) {
         val playlist = playlist.value ?: return@withContext
         playlist.title = filterName.value ?: ""
-        playlist.iconId = Playlist.calculateCombinedIconId(colorId, iconId)
+        playlist.iconId = Playlist.calculateCombinedIconId(colorIndex, iconIndex)
         playlist.draft = false
-        playlistManager.update(playlist)
+
+        // If in filter creation flow a filter is not being updated by the user,
+        // there are no user updated playlist properties
+        val userPlaylistUpdate = if (!isCreatingNewFilter) {
+            val properties = listOfNotNull(
+                if (userChangedFilterName) PlaylistProperty.FilterName else null,
+                if (userChangedIcon) PlaylistProperty.Icon else null,
+                if (userChangedColor) PlaylistProperty.Color else null,
+            )
+            if (properties.isNotEmpty()) {
+                UserPlaylistUpdate(properties, PlaylistUpdateSource.FILTER_OPTIONS)
+            } else null
+        } else null
+
+        // Reset the property flags after they have been read when the update is sent to the PlaylistManager
+        userChangedFilterName = false
+        userChangedIcon = false
+        userChangedColor = false
+
+        playlistManager.update(playlist, userPlaylistUpdate)
     }
 
     fun updateAutodownload(autoDownload: Boolean) {
         launch {
             playlist.value?.let { playlist ->
                 playlist.autoDownload = autoDownload
-                playlistManager.update(playlist)
+                val userPlaylistUpdate = if (isAutoDownloadSwitchInitialized) {
+                    UserPlaylistUpdate(
+                        listOf(PlaylistProperty.AutoDownload),
+                        PlaylistUpdateSource.FILTER_EPISODE_LIST
+                    )
+                } else null
+                playlistManager.update(playlist, userPlaylistUpdate)
             }
         }
     }
@@ -88,14 +129,19 @@ class CreateFilterViewModel @Inject constructor(val playlistManager: PlaylistMan
         launch {
             val playlist = playlist.value ?: return@launch
             playlist.autodownloadLimit = limit
-            playlistManager.update(playlist)
+
+            val userPlaylistUpdate = UserPlaylistUpdate(
+                listOf(PlaylistProperty.AutoDownloadLimit),
+                PlaylistUpdateSource.FILTER_OPTIONS
+            )
+            playlistManager.update(playlist, userPlaylistUpdate)
         }
     }
 
     fun reset() {
         filterName.value = ""
         iconId = 0
-        colorId.value = 0
+        colorIndex.value = 0
         hasBeenInitialised = false
         lockedToFirstPage.value = true
     }
@@ -108,13 +154,34 @@ class CreateFilterViewModel @Inject constructor(val playlistManager: PlaylistMan
         }
     }
 
-    fun starredChipTapped() {
+    fun starredChipTapped(isCreatingFilter: Boolean) {
         lockedToFirstPage.value = false
         launch {
             playlist.value?.let { playlist ->
                 playlist.starred = !playlist.starred
-                playlistManager.update(playlist)
+
+                // Only indicate user is updating the starred property if this is not
+                // the filter creation flow
+                val userPlaylistUpdate = if (!isCreatingFilter) {
+                    UserPlaylistUpdate(
+                        listOf(PlaylistProperty.Starred),
+                        PlaylistUpdateSource.FILTER_EPISODE_LIST
+                    )
+                } else null
+                playlistManager.update(playlist, userPlaylistUpdate)
             }
         }
+    }
+
+    fun userChangedFilterName() {
+        userChangedFilterName = true
+    }
+
+    fun userChangedIcon() {
+        userChangedIcon = true
+    }
+
+    fun userChangedColor() {
+        userChangedColor = true
     }
 }
