@@ -52,6 +52,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.math.abs
@@ -61,7 +62,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UPNEXT_DRAG_DISTANCE_MULTIPLIER = 1.85f // Open up next at a different rate than we are dragging
 private const val UPNEXT_HEIGHT_OPEN_THRESHOLD = 0.15f // We only have an open threshold because we only control swipe up, swipe down is the standard bottom sheet behaviour
-private const val UPNEXT_OUTLIER_THRESHOLD = 150.0f // Sometimes we get a random large delta, it seems better to filter them out or else you get random jumps
+private const val UPNEXT_OUTLIER_THRESHOLD = 400.0f // Sometimes we get a random large delta, it seems better to filter them out or else you get random jumps
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
@@ -74,8 +75,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: AdapterPlayerHeaderBinding? = null
     private val playbackSource = PlaybackSource.PLAYER
-
-    var skippedFirstTouch: Boolean = false
+    private var skippedFirstTouch: Boolean = false
+    private var hasReceivedOnTouchDown = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
@@ -166,7 +167,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.castButton.setAlwaysVisible(true)
         binding.castButton.updateColor(ThemeColor.playerContrast03(theme.activeTheme))
 
-        setupUpNextDrag(view)
+        setupUpNextDrag(view, binding.topView)
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
@@ -257,19 +258,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-    private fun setupUpNextDrag(view: View) {
+    private fun setupUpNextDrag(view: View, topView: View?) {
         val context = context ?: return
         val swipeGesture = GestureDetectorCompat(
             context,
-            object : GestureDetector.OnGestureListener {
-
-                override fun onShowPress(e: MotionEvent) {}
-
-                override fun onSingleTapUp(e: MotionEvent) = false
+            object : GestureDetector.SimpleOnGestureListener() {
 
                 override fun onDown(e: MotionEvent) = true
-
-                override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float) = false
 
                 override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
                     val upNextBottomSheetBehavior = (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior
@@ -282,7 +277,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         return false
                     }
 
-                    if ((upNextBottomSheetBehavior.peekHeight == 0 && distanceY < 0) || abs(distanceY) > UPNEXT_OUTLIER_THRESHOLD) { // Dragging down when we are at the bottom already or random large outlier
+                    // Bottom sheet is already at the bottom
+                    if (upNextBottomSheetBehavior.peekHeight == 0 && distanceY < 0) {
+                        return false
+                    }
+
+                    // Filtering out large deltas to avoid jumps in scrolling
+                    if (abs(distanceY) > UPNEXT_OUTLIER_THRESHOLD) {
                         return false
                     }
 
@@ -295,39 +296,66 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
                     return upNextBottomSheetBehavior.peekHeight != 0
                 }
-
-                override fun onLongPress(e: MotionEvent) {}
             }
         )
+
+        @Suppress("ClickableViewAccessibility")
+        topView?.setOnTouchListener { _, event ->
+            // Check for down events from the top view because sometimes they don't make it to
+            // the NestedScrollView's OnTouchListener and the first event we pass to our
+            // swipe gesture handler must be a down event
+            if (!hasReceivedOnTouchDown && event.actionMasked == MotionEvent.ACTION_DOWN) {
+                swipeGesture.onTouchEvent(event)
+                hasReceivedOnTouchDown = true
+            }
+            false
+        }
 
         view.setOnTouchListener { _, event ->
             if ((activity as? FragmentHostListener)?.getPlayerBottomSheetState() != BottomSheetBehavior.STATE_EXPANDED) {
                 return@setOnTouchListener false
             }
 
-            val action = event.actionMasked
-            if (action == MotionEvent.ACTION_UP) {
-                skippedFirstTouch = false
+            when (event.actionMasked) {
 
-                val playerContainerFragment = parentFragment as? PlayerContainerFragment
-                val upNextBottomSheetBehavior = playerContainerFragment?.upNextBottomSheetBehavior
-                if (upNextBottomSheetBehavior != null) {
-                    val peekHeight = upNextBottomSheetBehavior.peekHeight
-                    val cutOff = Resources.getSystem().displayMetrics.heightPixels * UPNEXT_HEIGHT_OPEN_THRESHOLD
-                    if (peekHeight > cutOff) {
-                        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    } else {
-                        upNextBottomSheetBehavior.setPeekHeight(0, true)
-                        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                MotionEvent.ACTION_DOWN -> {
+                    hasReceivedOnTouchDown = true
+                }
 
-                        if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
-                            (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(false)
+                MotionEvent.ACTION_UP -> {
+                    skippedFirstTouch = false
+
+                    val playerContainerFragment = parentFragment as? PlayerContainerFragment
+                    val upNextBottomSheetBehavior =
+                        playerContainerFragment?.upNextBottomSheetBehavior
+                    if (upNextBottomSheetBehavior != null) {
+                        val peekHeight = upNextBottomSheetBehavior.peekHeight
+                        val cutOff =
+                            Resources.getSystem().displayMetrics.heightPixels * UPNEXT_HEIGHT_OPEN_THRESHOLD
+                        if (peekHeight > cutOff) {
+                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        } else {
+                            upNextBottomSheetBehavior.setPeekHeight(0, true)
+                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+                            if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
+                                (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(
+                                    false
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            swipeGesture.onTouchEvent(event)
+            // Only pass events to swipeGesture if a down event has been received to avoid
+            // this crash: https://github.com/Automattic/pocket-casts-android/issues/370
+            if (hasReceivedOnTouchDown) {
+                swipeGesture.onTouchEvent(event)
+            } else {
+                Timber.w("Not passing touch event to swipe gesture handler")
+                false
+            }
         }
     }
 
