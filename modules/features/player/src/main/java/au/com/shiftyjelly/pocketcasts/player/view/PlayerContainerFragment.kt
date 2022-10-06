@@ -68,7 +68,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
         adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
 
-        val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.PLAYER)
+        val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.NOW_PLAYING)
         childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment).commitAllowingStateLoss()
 
         val binding = binding ?: return
@@ -80,6 +80,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
                     upNextBottomSheetBehavior.setPeekHeight(0, false)
                     updateUpNextVisibility(true)
 
@@ -92,6 +93,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
                     FirebaseAnalyticsTracker.openedUpNext()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
                     updateUpNextVisibility(false)
 
                     (activity as? FragmentHostListener)?.updateSystemColors()
