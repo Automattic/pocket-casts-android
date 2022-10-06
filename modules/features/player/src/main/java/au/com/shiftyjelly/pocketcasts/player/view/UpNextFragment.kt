@@ -156,7 +156,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
         toolbar.setTitle(LR.string.up_next)
         toolbar.setNavigationOnClickListener {
-            trackUpNextEvent(AnalyticsEvent.UP_NEXT_DISMISSED)
             close()
         }
         toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(overrideTheme))

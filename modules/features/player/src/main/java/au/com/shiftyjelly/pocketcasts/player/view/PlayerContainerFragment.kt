@@ -93,7 +93,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
                     FirebaseAnalyticsTracker.openedUpNext()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
                     updateUpNextVisibility(false)
 
                     (activity as? FragmentHostListener)?.updateSystemColors()

@@ -529,6 +529,7 @@ class MainActivity :
 
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
                         supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                             removeBottomSheetFragment(it)
                         }
