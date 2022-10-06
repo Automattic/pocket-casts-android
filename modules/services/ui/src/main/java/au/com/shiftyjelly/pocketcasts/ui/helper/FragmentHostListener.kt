@@ -26,4 +26,5 @@ interface FragmentHostListener {
     fun lockPlayerBottomSheet(locked: Boolean)
     fun updateSystemColors()
     fun overrideNextRefreshTimer()
+    fun isUpNextShowing(): Boolean
 }

@@ -165,7 +165,6 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.menu_select -> {
-                    trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_ENTERED)
                     multiSelectHelper.isMultiSelecting = true
                     true
                 }
@@ -201,12 +200,17 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
 
         val multiSelectToolbar = view.findViewById<MultiSelectToolbar>(R.id.multiSelectToolbar)
-        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) {
-            multiSelectToolbar.isVisible = it
-            toolbar.isVisible = !it
+        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+            val wasMultiSelecting = multiSelectToolbar.isVisible
+            multiSelectToolbar.isVisible = isMultiSelecting
+            toolbar.isVisible = !isMultiSelecting
 
-            if (toolbar.isVisible) {
-                trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_EXITED)
+            if (!isEmbedded) {
+                if (isMultiSelecting) {
+                    trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_ENTERED)
+                } else if (wasMultiSelecting) {
+                    trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_EXITED)
+                }
             }
 
             multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)

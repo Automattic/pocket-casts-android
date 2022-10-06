@@ -654,6 +654,8 @@ class MainActivity :
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
 
+    override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
+
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name
         supportFragmentManager.findFragmentByTag(tag)?.let {
