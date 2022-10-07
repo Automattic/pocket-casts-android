@@ -250,4 +250,9 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_MULTI_SELECT_EXITED("up_next_multi_select_exited"),
     UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
     UP_NEXT_DISMISSED("up_next_dismissed"),
+
+    /* Player - Sleep Timer */
+    PLAYER_SLEEP_TIMER_ENABLED("player_sleep_timer_enabled"),
+    PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
+    PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
 }
