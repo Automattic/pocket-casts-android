@@ -135,13 +135,13 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun changeSort(sortOrder: Int) {
+    fun changeSort(sortOrder: Playlist.SortOrder) {
         launch {
             playlist.value?.let { playlist ->
-                playlist.sortId = sortOrder
+                playlist.sortId = sortOrder.value
 
                 val userPlaylistUpdate = UserPlaylistUpdate(
-                    listOf(PlaylistProperty.Sort),
+                    listOf(PlaylistProperty.Sort(sortOrder)),
                     PlaylistUpdateSource.FILTER_EPISODE_LIST
                 )
                 playlistManager.update(playlist, userPlaylistUpdate)

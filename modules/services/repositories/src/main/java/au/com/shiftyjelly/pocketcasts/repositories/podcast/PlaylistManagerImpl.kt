@@ -46,6 +46,7 @@ class PlaylistManagerImpl @Inject constructor(
         const val LIMIT_KEY = "limit"
         const val GROUP_KEY = "group"
         const val SOURCE_KEY = "source"
+        const val SORT_ORDER_KEY = "sort_order"
     }
 
     private val playlistDao = appDatabase.playlistDao()
@@ -149,7 +150,7 @@ class PlaylistManagerImpl @Inject constructor(
     override fun findEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<Episode> {
         val where = buildPlaylistWhere(playlist, playbackManager)
         val orderBy = getPlaylistOrderByString(playlist)
-        val limit = if (playlist.sortId == Playlist.PLAYLIST_SORT_LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
+        val limit = if (playlist.sortOrder() == Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
         return episodeManager.findEpisodesWhere("$where ORDER BY $orderBy LIMIT $limit")
     }
 
@@ -160,7 +161,7 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     override fun observeEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<Episode>> {
-        val limitCount = if (playlist.sortId == Playlist.PLAYLIST_SORT_LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
+        val limitCount = if (playlist.sortOrder() == Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
         val queryAfterWhere = getPlaylistQuery(playlist, limit = limitCount, playbackManager = playbackManager)
         return episodeManager.observeEpisodesWhere(queryAfterWhere)
     }
@@ -170,16 +171,28 @@ class PlaylistManagerImpl @Inject constructor(
         return episodeManager.observeEpisodesWhere(queryAfterWhere)
     }
 
-    private fun getPlaylistOrderByString(playlist: Playlist): String? {
-        if (playlist.sortId == Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST || playlist.sortId == Playlist.PLAYLIST_SORT_OLDEST_TO_NEWEST) {
-            return "published_date " + (if (playlist.sortId == Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST) "DESC" else "ASC") +
-                ", added_date " + if (playlist.sortId == Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST) "DESC" else "ASC"
-        } else if (playlist.sortId == Playlist.PLAYLIST_SORT_SHORTEST_TO_LONGEST || playlist.sortId == Playlist.PLAYLIST_SORT_LONGEST_TO_SHORTEST) {
-            return "duration " + (if (playlist.sortId == Playlist.PLAYLIST_SORT_SHORTEST_TO_LONGEST) "ASC" else "DESC") + ", added_date DESC"
-        } else if (playlist.sortId == Playlist.PLAYLIST_SORT_LAST_DOWNLOAD_ATTEMPT_DATE) {
-            return "last_download_attempt_date DESC, published_date DESC"
+    private fun getPlaylistOrderByString(playlist: Playlist): String? = when (playlist.sortOrder()) {
+
+        Playlist.SortOrder.NEWEST_TO_OLDEST,
+        Playlist.SortOrder.OLDEST_TO_NEWEST -> {
+            "published_date " +
+                (if (playlist.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST) "DESC" else "ASC") +
+                ", added_date " +
+                if (playlist.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST) "DESC" else "ASC"
         }
-        return null
+
+        Playlist.SortOrder.SHORTEST_TO_LONGEST,
+        Playlist.SortOrder.LONGEST_TO_SHORTEST -> {
+            "duration " +
+                (if (playlist.sortOrder() == Playlist.SortOrder.SHORTEST_TO_LONGEST) "ASC" else "DESC") +
+                ", added_date DESC"
+        }
+
+        Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE -> {
+            "last_download_attempt_date DESC, published_date DESC"
+        }
+
+        else -> null
     }
 
     override fun create(playlist: Playlist): Long {
@@ -191,7 +204,7 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     /**
-     * A null UserPlayListUpdate parameter indicates that the user did not initiate this update
+     * A null userPlayListUpdate parameter indicates that  the user did not initiate this update
      */
     override fun update(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?) {
         playlistDao.update(playlist)
@@ -357,10 +370,21 @@ class PlaylistManagerImpl @Inject constructor(
                         analyticsTracker.track(AnalyticsEvent.FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED, properties)
                     }
 
+                    is PlaylistProperty.Sort -> {
+                        val sortOrderString = when (playlistProperty.sortOrder) {
+                            Playlist.SortOrder.NEWEST_TO_OLDEST -> "newest_to_oldest"
+                            Playlist.SortOrder.OLDEST_TO_NEWEST -> "oldest_to_newest"
+                            Playlist.SortOrder.SHORTEST_TO_LONGEST -> "shortest_to_longest"
+                            Playlist.SortOrder.LONGEST_TO_SHORTEST -> "longest_to_shortest"
+                            Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE -> "last_download_attempt_date"
+                        }
+                        val properties = mapOf(SORT_ORDER_KEY to sortOrderString)
+                        analyticsTracker.track(AnalyticsEvent.FILTER_SORT_BY_CHANGED, properties)
+                    }
+
                     PlaylistProperty.Color,
                     PlaylistProperty.FilterName,
-                    PlaylistProperty.Icon,
-                    PlaylistProperty.Sort -> { /* Do nothing. These are handled by other events. */ }
+                    PlaylistProperty.Icon -> { /* Do nothing. These are handled by the filter_edit_dismissed event. */ }
                 }
             }
         }
@@ -570,7 +594,7 @@ class PlaylistManagerImpl @Inject constructor(
             audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL,
             allPodcasts = true,
             autoDownload = false,
-            sortId = Playlist.PLAYLIST_SORT_LAST_DOWNLOAD_ATTEMPT_DATE
+            sortId = Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE.value
         )
     }
 
