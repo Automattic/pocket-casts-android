@@ -120,8 +120,14 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 when (position) {
-                    1 -> FirebaseAnalyticsTracker.openedPlayerNotes()
-                    2 -> FirebaseAnalyticsTracker.openedPlayerChapters()
+                    1 -> {
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to SHOW_NOTES))
+                        FirebaseAnalyticsTracker.openedPlayerNotes()
+                    }
+                    2 -> {
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to CHAPTERS))
+                        FirebaseAnalyticsTracker.openedPlayerChapters()
+                    }
                 }
             }
         })
@@ -209,6 +215,9 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
     companion object {
         private const val SOURCE_KEY = "source"
+        private const val TAB_KEY = "tab"
+        private const val SHOW_NOTES = "show_notes"
+        private const val CHAPTERS = "chapters"
     }
 }
 
