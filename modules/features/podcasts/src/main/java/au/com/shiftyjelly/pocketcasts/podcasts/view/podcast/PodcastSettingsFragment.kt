@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColors
+import au.com.shiftyjelly.pocketcasts.views.fragments.BasePreferenceFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
@@ -48,7 +49,7 @@ import au.com.shiftyjelly.pocketcasts.settings.R as SR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, FilterSelectFragment.Listener, HasBackstack {
+class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, FilterSelectFragment.Listener, HasBackstack {
     @Inject lateinit var theme: Theme
     @Inject lateinit var podcastManager: PodcastManager
 
@@ -120,6 +121,7 @@ class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, Filt
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        showLoading()
 
         view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
         view.isClickable = true
@@ -172,6 +174,8 @@ class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, Filt
             preferenceFilters?.icon = context.getTintedDrawable(IR.drawable.ic_filters, colors.iconColor)
 
             preferenceUnsubscribe?.isVisible = podcast.isSubscribed
+
+            hideLoading()
         }
 
         viewModel.includedFilters.observe(viewLifecycleOwner) {
