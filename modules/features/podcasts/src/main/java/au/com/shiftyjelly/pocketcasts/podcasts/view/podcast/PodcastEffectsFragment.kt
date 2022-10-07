@@ -9,10 +9,12 @@ import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlaybackSpeedPreference
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastEffectsViewModel
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastEffectsViewModel.Companion.ENABLED_KEY
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -116,6 +118,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         }
 
         preferenceTrimSilence?.setOnPreferenceChangeListener { _, newValue ->
+            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(ENABLED_KEY to newValue))
             viewModel.updateTrimSilence(if (newValue as? Boolean == true) TrimMode.LOW else TrimMode.OFF)
             true
         }
@@ -127,6 +130,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         }
 
         preferenceBoostVolume?.setOnPreferenceChangeListener { _, newValue ->
+            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED, mapOf(ENABLED_KEY to newValue))
             viewModel.updateBoostVolume(newValue as Boolean)
             true
         }
@@ -146,5 +150,10 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         preferencePlaybackSpeed?.icon = context.getTintedDrawable(R.drawable.ic_speed, tintColor)
         preferenceTrimSilence?.icon = context.getTintedDrawable(R.drawable.ic_silence, tintColor)
         preferenceBoostVolume?.icon = context.getTintedDrawable(R.drawable.ic_volumeboost, tintColor)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.trackSpeedChangeIfNeeded()
     }
 }
