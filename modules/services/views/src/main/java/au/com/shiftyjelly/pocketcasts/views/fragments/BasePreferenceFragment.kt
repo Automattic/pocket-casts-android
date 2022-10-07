@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.preference.PreferenceFragmentCompat
-import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 
 abstract class BasePreferenceFragment : PreferenceFragmentCompat() {
@@ -24,17 +23,6 @@ abstract class BasePreferenceFragment : PreferenceFragmentCompat() {
         progressBar = createProgressBar()
         root.addView(progressBar)
         return root
-    }
-
-    override fun onCreateRecyclerView(
-        inflater: LayoutInflater,
-        parent: ViewGroup,
-        savedInstanceState: Bundle?
-    ): RecyclerView {
-        return super.onCreateRecyclerView(inflater, parent, savedInstanceState).apply {
-            // itemAnimator = null
-            // layoutAnimation = null
-        }
     }
 
     fun showLoading() {
