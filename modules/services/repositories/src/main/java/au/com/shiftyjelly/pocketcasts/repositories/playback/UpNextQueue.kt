@@ -74,6 +74,18 @@ interface UpNextQueue {
     }
 }
 
+enum class UpNextSource(val analyticsValue: String) {
+    MINI_PLAYER("mini_player"),
+    PLAYER("player"),
+    NOW_PLAYING("now_playing"),
+    UP_NEXT_SHORTCUT("up_next_shortcut"),
+    UNKNOWN("unknown");
+
+    companion object {
+        fun fromString(string: String) = UpNextSource.values().find { it.analyticsValue == string } ?: UNKNOWN
+    }
+}
+
 fun Observable<UpNextQueue.State>.containsUuid(uuid: String): Observable<Boolean> {
     return this.switchMap { state ->
         if (state is UpNextQueue.State.Loaded) {

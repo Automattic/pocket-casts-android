@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -19,9 +21,11 @@ import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -30,7 +34,18 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class UpNextAdapter(context: Context, val imageLoader: PodcastImageLoader, val episodeManager: EpisodeManager, val listener: UpNextListener, val multiSelectHelper: MultiSelectHelper, val fragmentManager: FragmentManager) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
+class UpNextAdapter(
+    context: Context,
+    val
+    imageLoader: PodcastImageLoader,
+    val episodeManager: EpisodeManager,
+    val listener: UpNextListener,
+    val multiSelectHelper: MultiSelectHelper,
+    val fragmentManager: FragmentManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val upNextSource: UpNextSource,
+    private val settings: Settings
+) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
 
     var isPlaying: Boolean = false
@@ -82,6 +97,8 @@ class UpNextAdapter(context: Context, val imageLoader: PodcastImageLoader, val e
                 holder.binding.checkbox.isChecked = multiSelectHelper.toggle(item)
             } else {
                 val podcastUuid = (item as? Episode)?.podcastUuid
+                val playOnTap = settings.getTapOnUpNextShouldPlay()
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(WILL_PLAY_KEY to playOnTap))
                 listener.onEpisodeActionsClick(episodeUuid = item.uuid, podcastUuid = podcastUuid)
             }
         }
@@ -90,6 +107,8 @@ class UpNextAdapter(context: Context, val imageLoader: PodcastImageLoader, val e
                 multiSelectHelper.defaultLongPress(episode = item, fragmentManager = fragmentManager)
             } else {
                 val podcastUuid = (item as? Episode)?.podcastUuid
+                val playOnLongPress = !settings.getTapOnUpNextShouldPlay()
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(WILL_PLAY_KEY to playOnLongPress))
                 listener.onEpisodeActionsLongPress(episodeUuid = item.uuid, podcastUuid = podcastUuid)
             }
             true
@@ -126,7 +145,10 @@ class UpNextAdapter(context: Context, val imageLoader: PodcastImageLoader, val e
         var loadedUuid: String? = null
 
         init {
-            binding.root.setOnClickListener { listener.onNowPlayingClick() }
+            binding.root.setOnClickListener {
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_NOW_PLAYING_TAPPED)
+                listener.onNowPlayingClick()
+            }
         }
 
         fun bind(playingState: UpNextPlaying) {
@@ -150,6 +172,18 @@ class UpNextAdapter(context: Context, val imageLoader: PodcastImageLoader, val e
 
             binding.playingAnimation.isVisible = isPlaying
         }
+    }
+
+    private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
+        val properties = HashMap<String, Any>()
+        properties[SOURCE_KEY] = upNextSource.analyticsValue
+        properties.putAll(props)
+        analyticsTracker.track(event, properties)
+    }
+
+    companion object {
+        private const val SOURCE_KEY = "source"
+        private const val WILL_PLAY_KEY = "will_play"
     }
 }
 
