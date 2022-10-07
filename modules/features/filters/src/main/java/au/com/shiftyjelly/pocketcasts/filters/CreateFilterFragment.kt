@@ -237,6 +237,11 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         }
     }
 
+    override fun onBackPressed(): Boolean {
+        viewModel.onBackPressed(isCreate)
+        return super.onBackPressed()
+    }
+
     private fun setupIconViews() {
         val context = context ?: return
         val binding = binding ?: return
