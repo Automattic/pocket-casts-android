@@ -1864,6 +1864,8 @@ open class PlaybackManager @Inject constructor(
         NOTIFICATION("notification"),
         FULL_SCREEN_VIDEO("full_screen_video"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
+        PLAYER_PLAYBACK_EFFECTS("player_playback_effects"),
+        PODCAST_SETTINGS("podcast_settings"),
         UNKNOWN("unknown"),
     }
 }
