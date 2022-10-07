@@ -11,7 +11,6 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -42,7 +41,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     @Inject lateinit var stats: StatsManager
     @Inject lateinit var settings: Settings
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var playbackManager: PlaybackManager
 
     override val statusBarColor: StatusBarColor? = null
 
@@ -198,7 +197,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         val podcast = binding.podcast ?: return
 
         if (buttonView.id == binding.switchTrim.id) {
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(ENABLED_KEY to isChecked))
+            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
             if (effects.trimMode == TrimMode.OFF && isChecked) {
                 effects.trimMode = TrimMode.LOW
                 this.binding?.trimToggleGroup?.check(R.id.trimLow)
@@ -209,7 +208,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
             updateTrimState()
         } else if (buttonView.id == binding.switchVolume.id) {
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED, mapOf(ENABLED_KEY to isChecked))
+            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
             effects.isVolumeBoosted = isChecked
             viewModel.saveEffects(effects, podcast)
         }
@@ -225,7 +224,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             val newTrimMode = TrimMode.values()[index + 1]
             if (effects.trimMode != newTrimMode) {
                 effects.trimMode = newTrimMode
-                trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(AMOUNT_KEY to newTrimMode.analyticsVale))
+                trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(PlaybackManager.AMOUNT_KEY to newTrimMode.analyticsVale))
                 viewModel.saveEffects(effects, podcast)
             }
         }
@@ -252,22 +251,12 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     private fun trackSpeedChangeIfNeeded() {
         if (isSpeedChanged) {
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(SPEED_KEY to finalSpeed))
+            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to finalSpeed))
             isSpeedChanged = false
         }
     }
 
     private fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
-        val properties = HashMap<String, Any>()
-        properties[SOURCE_KEY] = PlaybackManager.PlaybackSource.PLAYER_PLAYBACK_EFFECTS.analyticsValue
-        properties.putAll(props)
-        analyticsTracker.track(event, properties)
-    }
-
-    companion object {
-        private const val SOURCE_KEY = "source"
-        private const val SPEED_KEY = "speed"
-        private const val AMOUNT_KEY = "amount"
-        const val ENABLED_KEY = "enabled"
+        playbackManager.trackPlaybackEffectsEvent(event, props, PlaybackManager.PlaybackSource.PLAYER_PLAYBACK_EFFECTS)
     }
 }

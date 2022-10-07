@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.clipToRange
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -57,7 +56,7 @@ class PodcastEffectsViewModel
         val podcast = this.podcast.value ?: return
         launch {
             podcastManager.updateTrimMode(podcast, trimMode)
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(AMOUNT_KEY to trimMode.analyticsVale))
+            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(PlaybackManager.AMOUNT_KEY to trimMode.analyticsVale))
             if (shouldUpdatePlaybackManager()) {
                 playbackManager.updatePlayerEffects(podcast.playbackEffects)
             }
@@ -109,22 +108,12 @@ class PodcastEffectsViewModel
 
     fun trackSpeedChangeIfNeeded() {
         if (isSpeedChanged) {
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(SPEED_KEY to finalSpeed))
+            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to finalSpeed))
             isSpeedChanged = false
         }
     }
 
     fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
-        val properties = HashMap<String, Any>()
-        properties[SOURCE_KEY] = PlaybackSource.PODCAST_SETTINGS.analyticsValue
-        properties.putAll(props)
-        analyticsTracker.track(event, properties)
-    }
-
-    companion object {
-        private const val SOURCE_KEY = "source"
-        private const val SPEED_KEY = "speed"
-        private const val AMOUNT_KEY = "amount"
-        const val ENABLED_KEY = "enabled"
+        playbackManager.trackPlaybackEffectsEvent(event, props, PlaybackManager.PlaybackSource.PODCAST_SETTINGS)
     }
 }

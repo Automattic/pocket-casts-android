@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlaybackSpeedPreference
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastEffectsViewModel
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastEffectsViewModel.Companion.ENABLED_KEY
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -118,7 +118,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         }
 
         preferenceTrimSilence?.setOnPreferenceChangeListener { _, newValue ->
-            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(ENABLED_KEY to newValue))
+            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to newValue))
             viewModel.updateTrimSilence(if (newValue as? Boolean == true) TrimMode.LOW else TrimMode.OFF)
             true
         }
@@ -130,7 +130,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
         }
 
         preferenceBoostVolume?.setOnPreferenceChangeListener { _, newValue ->
-            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED, mapOf(ENABLED_KEY to newValue))
+            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to newValue))
             viewModel.updateBoostVolume(newValue as Boolean)
             true
         }
