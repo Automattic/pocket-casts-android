@@ -6,9 +6,9 @@ sealed interface FilterUpdatedEvent {
 
 sealed class PlaylistProperty {
 
-    object AutoDownload : PlaylistProperty()
+    data class AutoDownload(val enabled: Boolean) : PlaylistProperty()
 
-    object AutoDownloadLimit : PlaylistProperty()
+    data class AutoDownloadLimit(val limit: Int) : PlaylistProperty()
 
     object Color : PlaylistProperty()
 

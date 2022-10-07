@@ -248,7 +248,7 @@ class AutoDownloadSettingsFragment :
 
                 val userPlaylistUpdate = if (userChanged) {
                     UserPlaylistUpdate(
-                        listOf(PlaylistProperty.AutoDownload),
+                        listOf(PlaylistProperty.AutoDownload(autoDownloadStatus)),
                         PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS
                     )
                 } else null
