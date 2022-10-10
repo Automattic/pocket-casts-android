@@ -15,6 +15,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -136,7 +139,12 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             playlist.value?.let { playlist ->
                 playlist.sortId = sortOrder
-                playlistManager.update(playlist)
+
+                val userPlaylistUpdate = UserPlaylistUpdate(
+                    listOf(PlaylistProperty.Sort),
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST
+                )
+                playlistManager.update(playlist, userPlaylistUpdate)
             }
         }
     }
@@ -145,7 +153,12 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             playlist.value?.let { playlist ->
                 playlist.starred = !playlist.starred
-                playlistManager.update(playlist)
+
+                val userPlaylistUpdate = UserPlaylistUpdate(
+                    listOf(PlaylistProperty.Starred),
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST
+                )
+                playlistManager.update(playlist, userPlaylistUpdate)
             }
         }
     }

@@ -20,7 +20,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
@@ -239,9 +242,17 @@ class AutoDownloadSettingsFragment :
     override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {
         lifecycleScope.launch(Dispatchers.Default) {
             playlistManager.findAll().forEach {
-                val autodownloadStatus = newSelection.contains(it.uuid)
-                it.autoDownload = autodownloadStatus
-                playlistManager.update(it)
+                val autoDownloadStatus = newSelection.contains(it.uuid)
+                val userChanged = autoDownloadStatus != it.autoDownload
+                it.autoDownload = autoDownloadStatus
+
+                val userPlaylistUpdate = if (userChanged) {
+                    UserPlaylistUpdate(
+                        listOf(PlaylistProperty.AutoDownload),
+                        PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS
+                    )
+                } else null
+                playlistManager.update(it, userPlaylistUpdate)
             }
             launch(Dispatchers.Main) { updateFiltersSelectedSummary() }
         }

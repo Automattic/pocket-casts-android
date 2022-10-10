@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
 import android.os.Build
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -34,6 +36,7 @@ private const val CREATED_DEFAULT_PLAYLISTS = "createdDefaultPlaylists"
 class PlaylistManagerImpl @Inject constructor(
     private val settings: Settings,
     private val downloadManager: DownloadManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase
 ) : PlaylistManager, CoroutineScope {
@@ -180,8 +183,12 @@ class PlaylistManagerImpl @Inject constructor(
         return id
     }
 
-    override fun update(playlist: Playlist) {
+    /**
+     * A null UserPlayListUpdate parameter indicates that the user did not initiate this update
+     */
+    override fun update(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?) {
         playlistDao.update(playlist)
+        sendPlaylistUpdateAnalytics(playlist, userPlaylistUpdate)
     }
 
     override fun updateAll(playlists: List<Playlist>) {
@@ -225,7 +232,10 @@ class PlaylistManagerImpl @Inject constructor(
         if (loggedIn) {
             playlist.deleted = true
             markAsNotSynced(playlist)
-            update(playlist)
+
+            // user initiated filter deletion, not update of any playlist properties, so this
+            // is not a user initiated update
+            update(playlist, userPlaylistUpdate = null)
         }
 
         if (!loggedIn) {
@@ -307,6 +317,35 @@ class PlaylistManagerImpl @Inject constructor(
 
     override fun findPlaylistsToSync(): List<Playlist> {
         return playlistDao.findNotSynced()
+    }
+
+    private fun sendPlaylistUpdateAnalytics(
+        playlist: Playlist,
+        userPlaylistUpdate: UserPlaylistUpdate?
+    ) {
+        // Don't send a filter updated event if the playlist is being created or if
+        // the user did not initiate the update
+        if (!playlist.draft && userPlaylistUpdate != null) {
+            userPlaylistUpdate.properties.map { playlistProperty ->
+                when (playlistProperty) {
+
+                    is FilterUpdatedEvent -> {
+                        val properties = mapOf(
+                            "group" to playlistProperty.groupValue,
+                            "source" to userPlaylistUpdate.source.analyticsValue
+                        )
+                        analyticsTracker.track(AnalyticsEvent.FILTER_UPDATED, properties)
+                    }
+
+                    PlaylistProperty.AutoDownload,
+                    PlaylistProperty.AutoDownloadLimit,
+                    PlaylistProperty.Color,
+                    PlaylistProperty.FilterName,
+                    PlaylistProperty.Icon,
+                    PlaylistProperty.Sort -> { /* Do nothing. These are handled by other events. */ }
+                }
+            }
+        }
     }
 
     /**

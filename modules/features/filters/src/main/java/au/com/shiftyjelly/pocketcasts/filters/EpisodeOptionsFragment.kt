@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FilterOptionsFragmentBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -45,6 +48,7 @@ class EpisodeOptionsFragment : BaseFragment(), CoroutineScope {
 
     var playlist: Playlist? = null
     private var binding: FilterOptionsFragmentBinding? = null
+    private var userChanged = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FilterOptionsFragmentBinding.inflate(inflater, container, false)
@@ -75,9 +79,18 @@ class EpisodeOptionsFragment : BaseFragment(), CoroutineScope {
             } ?: return@launch
             this@EpisodeOptionsFragment.playlist = playlist
 
-            val unplayedOption = FilterOption(LR.string.unplayed, playlist.unplayed, { v, _ -> playlist.unplayed = v })
-            val inProgressOption = FilterOption(LR.string.in_progress, playlist.partiallyPlayed, { v, _ -> playlist.partiallyPlayed = v })
-            val playedOption = FilterOption(LR.string.played, playlist.finished, { v, _ -> playlist.finished = v })
+            val unplayedOption = FilterOption(LR.string.unplayed, playlist.unplayed, { v, _ ->
+                playlist.unplayed = v
+                userChanged = true
+            })
+            val inProgressOption = FilterOption(LR.string.in_progress, playlist.partiallyPlayed, { v, _ ->
+                playlist.partiallyPlayed = v
+                userChanged = true
+            })
+            val playedOption = FilterOption(LR.string.played, playlist.finished, { v, _ ->
+                playlist.finished = v
+                userChanged = true
+            })
 
             val color = playlist.getColor(context)
             val filterTintColor = ThemeColor.filterInteractive01(theme.activeTheme, color)
@@ -97,7 +110,15 @@ class EpisodeOptionsFragment : BaseFragment(), CoroutineScope {
             playlist?.let { playlist ->
                 launch(Dispatchers.Default) {
                     playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
-                    playlistManager.update(playlist)
+
+                    val userPlaylistUpdate = if (userChanged) {
+                        UserPlaylistUpdate(
+                            listOf(PlaylistProperty.EpisodeStatus),
+                            PlaylistUpdateSource.FILTER_EPISODE_LIST
+                        )
+                    } else null
+                    playlistManager.update(playlist, userPlaylistUpdate)
+
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@EpisodeOptionsFragment) }
                 }
             }
