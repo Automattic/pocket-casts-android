@@ -49,8 +49,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private lateinit var imageLoader: PodcastImageLoaderThemed
     private var binding: FragmentEffectsBinding? = null
     private val trimToggleGroupButtonIds = arrayOf(R.id.trimLow, R.id.trimMedium, R.id.trimHigh)
-    private var isSpeedChanged = false
-    private var finalSpeed: Double = 1.0
+    private var updatedSpeed: Double? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -158,11 +157,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private fun changePlaybackSpeed(effects: PlaybackEffects, podcast: Podcast, amount: Double) {
         val binding = binding ?: return
 
-        isSpeedChanged = true
         // val speed = (amount.clipToRange(0.5, 3.0) * 10.0).toInt() / 10.0
         val speed = round(amount.clipToRange(0.5, 3.0) * 10.0) / 10.0
         effects.playbackSpeed = speed
-        finalSpeed = speed
+        updatedSpeed = speed
         binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
@@ -250,10 +248,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     }
 
     private fun trackSpeedChangeIfNeeded() {
-        if (isSpeedChanged) {
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to finalSpeed))
-            isSpeedChanged = false
-        }
+        updatedSpeed?.let { trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to it)) }
     }
 
     private fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {

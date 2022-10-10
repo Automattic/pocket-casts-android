@@ -31,8 +31,7 @@ class PodcastEffectsViewModel
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private var isSpeedChanged: Boolean = false
-    private var finalSpeed: Double = 1.0
+    private var updatedSpeed: Double? = null
     lateinit var podcast: LiveData<Podcast>
 
     fun loadPodcast(uuid: String) {
@@ -89,9 +88,9 @@ class PodcastEffectsViewModel
         val podcast = this.podcast.value ?: return
         val clippedToRangeSpeed = speed.clipToRange(0.5, 3.0)
         // to stop the issue 1.2000000000000002
-        finalSpeed = round(clippedToRangeSpeed * 10.0) / 10.0
-        podcastManager.updatePlaybackSpeed(podcast, finalSpeed)
-        isSpeedChanged = true
+        val roundedSpeed = round(clippedToRangeSpeed * 10.0) / 10.0
+        podcastManager.updatePlaybackSpeed(podcast, roundedSpeed)
+        updatedSpeed = roundedSpeed
         if (shouldUpdatePlaybackManager()) {
             playbackManager.updatePlayerEffects(podcast.playbackEffects)
         }
@@ -105,10 +104,7 @@ class PodcastEffectsViewModel
     }
 
     fun trackSpeedChangeIfNeeded() {
-        if (isSpeedChanged) {
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to finalSpeed))
-            isSpeedChanged = false
-        }
+        updatedSpeed?.let { trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to it)) }
     }
 
     fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
