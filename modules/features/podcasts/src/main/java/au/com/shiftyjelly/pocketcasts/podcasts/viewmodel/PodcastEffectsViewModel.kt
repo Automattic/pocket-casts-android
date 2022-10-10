@@ -53,7 +53,6 @@ class PodcastEffectsViewModel
         val podcast = this.podcast.value ?: return
         launch {
             podcastManager.updateTrimMode(podcast, trimMode)
-            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(PlaybackManager.AMOUNT_KEY to trimMode.analyticsVale))
             if (shouldUpdatePlaybackManager()) {
                 playbackManager.updatePlayerEffects(podcast.playbackEffects)
             }

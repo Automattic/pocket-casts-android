@@ -125,7 +125,9 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
 
         preferenceTrimMode?.setOnPreferenceChangeListener { preference, newValue ->
             val index = (preference as ListPreference).findIndexOfValue(newValue as String)
-            viewModel.updateTrimSilence(TrimMode.values()[index + 1])
+            val trimMode = TrimMode.values()[index + 1]
+            viewModel.trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(PlaybackManager.AMOUNT_KEY to trimMode.analyticsVale))
+            viewModel.updateTrimSilence(trimMode)
             true
         }
 
