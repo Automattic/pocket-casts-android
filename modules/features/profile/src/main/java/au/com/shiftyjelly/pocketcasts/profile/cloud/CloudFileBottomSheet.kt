@@ -22,10 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
-import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.DOWNLOAD
-import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.EDIT
-import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD
-import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD_UPGRADE_REQUIRED
+import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.profile.databinding.BottomSheetCloudFileBinding
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
@@ -251,7 +248,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 binding.layoutLockedCloud.setOnClickListener {
-                    viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
+                    viewModel.trackOptionTapped(AnalyticsProp.Value.UPLOAD_UPGRADE_REQUIRED)
                     val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Files)
                     bottomSheet.show(parentFragmentManager, "upgrade_bottom_sheet")
                 }
@@ -265,7 +262,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
                 binding.layoutEdit.setOnClickListener {
                     activity?.let { activity ->
-                        viewModel.trackOptionTapped(EDIT)
+                        viewModel.trackOptionTapped(AnalyticsProp.Value.EDIT)
                         val intent = AddFileActivity.newEditInstance(activity, episode.uuid)
                         activity.startActivity(intent)
 
@@ -313,7 +310,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     fun download(episode: UserEpisode, isOnWifi: Boolean) {
-        viewModel.trackOptionTapped(DOWNLOAD)
+        viewModel.trackOptionTapped(AnalyticsProp.Value.DOWNLOAD)
         if (settings.warnOnMeteredNetwork() && !isOnWifi) {
             warningsHelper.downloadWarning(episodeUUID, "user episode sheet")
                 .show(parentFragmentManager, "download_warning")
@@ -323,7 +320,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun upload(episode: UserEpisode, isOnWifi: Boolean) {
-        viewModel.trackOptionTapped(UPLOAD)
+        viewModel.trackOptionTapped(AnalyticsProp.Value.UPLOAD)
         if (settings.warnOnMeteredNetwork() && !isOnWifi) {
             warningsHelper.uploadWarning(episodeUUID)
                 .show(parentFragmentManager, "upload_warning")

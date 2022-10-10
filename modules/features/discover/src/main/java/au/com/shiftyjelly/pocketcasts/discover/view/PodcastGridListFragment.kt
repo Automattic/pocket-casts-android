@@ -12,12 +12,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewModel
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
@@ -113,7 +111,13 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     val onPodcastClicked: (DiscoverPodcast) -> Unit = { podcast ->
         listUuid?.let {
             FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
+                mapOf(
+                    DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(it),
+                    DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(podcast.uuid)
+                )
+            )
         }
         val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid)
         (activity as FragmentHostListener).addFragment(fragment)
@@ -122,7 +126,13 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
     val onPodcastSubscribe: (String) -> Unit = { podcastUuid ->
         listUuid?.let {
             FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
+                mapOf(
+                    DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(it),
+                    DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(podcastUuid)
+                )
+            )
         }
         podcastManager.subscribeToPodcast(podcastUuid, sync = true)
     }
@@ -132,7 +142,11 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid)
+                mapOf(
+                    DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(listUuid),
+                    DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(episode.podcast_uuid),
+                    DiscoverFragment.Companion.AnalyticsPropKey.EPISODE_UUID to AnalyticsPropValue(episode.uuid)
+                )
             )
         }
         val fragment = EpisodeFragment.newInstance(episodeUuid = episode.uuid, podcastUuid = episode.podcast_uuid, fromListUuid = listUuid)
@@ -188,7 +202,10 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             linkView.visibility = View.VISIBLE
             linkTextView.text = linkTitle
             linkView.setOnClickListener {
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED, mapOf(LIST_ID_KEY to inferredId))
+                analyticsTracker.track(
+                    AnalyticsEvent.DISCOVER_COLLECTION_LINK_TAPPED,
+                    mapOf(DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(inferredId))
+                )
                 WebViewActivity.show(context, linkTitle, linkUrl)
             }
         }

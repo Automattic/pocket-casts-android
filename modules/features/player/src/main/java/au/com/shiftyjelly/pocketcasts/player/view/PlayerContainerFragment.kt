@@ -80,7 +80,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
+                    analyticsTracker.track(
+                        AnalyticsEvent.UP_NEXT_SHOWN,
+                        mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue)
+                    )
                     upNextBottomSheetBehavior.setPeekHeight(0, false)
                     updateUpNextVisibility(true)
 
@@ -146,7 +149,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             binding.countText.text = if (upNextCount == 0) "" else upNextCount.toString()
 
             binding.upNextButton.setOnClickListener {
-                analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue))
+                analyticsTracker.track(
+                    AnalyticsEvent.UP_NEXT_SHOWN,
+                    mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue)
+                )
                 openUpNext()
             }
 

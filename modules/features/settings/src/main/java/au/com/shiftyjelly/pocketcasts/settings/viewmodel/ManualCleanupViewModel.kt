@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -178,15 +179,15 @@ class ManualCleanupViewModel
         }
 
     private fun trackCleanupCompleted() {
-        val properties = HashMap<String, Boolean>()
+        val properties = HashMap<String, AnalyticsPropValue>()
         state.value.diskSpaceViews.forEach {
             when (it.title) {
-                LR.string.unplayed -> properties[UNPLAYED_KEY] = it.isChecked
-                LR.string.played -> properties[PLAYED_KEY] = it.isChecked
-                LR.string.in_progress -> properties[IN_PROGRESS_KEY] = it.isChecked
+                LR.string.unplayed -> properties[UNPLAYED_KEY] = AnalyticsPropValue(it.isChecked)
+                LR.string.played -> properties[PLAYED_KEY] = AnalyticsPropValue(it.isChecked)
+                LR.string.in_progress -> properties[IN_PROGRESS_KEY] = AnalyticsPropValue(it.isChecked)
             }
         }
-        properties[INCLUDE_STARRED_KEY] = switchState.value ?: false
+        properties[INCLUDE_STARRED_KEY] = AnalyticsPropValue(switchState.value ?: false)
         analyticsTracker.track(AnalyticsEvent.DOWNLOADS_CLEAN_UP_COMPLETED, properties)
     }
 

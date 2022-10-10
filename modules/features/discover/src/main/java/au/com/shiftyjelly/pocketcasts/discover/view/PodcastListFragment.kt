@@ -11,10 +11,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastListFragmentBinding
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -45,7 +45,13 @@ class PodcastListFragment : PodcastGridListFragment() {
 
     private val onPromotionClick: (DiscoverPromotion) -> Unit = { promotion ->
         FirebaseAnalyticsTracker.podcastTappedFromList(promotion.promotionUuid, promotion.podcastUuid)
-        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to promotion.promotionUuid, PODCAST_UUID_KEY to promotion.podcastUuid))
+        analyticsTracker.track(
+            AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
+            mapOf(
+                LIST_ID_KEY to AnalyticsPropValue(promotion.promotionUuid),
+                DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(promotion.podcastUuid)
+            )
+        )
 
         val fragment = PodcastFragment.newInstance(podcastUuid = promotion.podcastUuid, fromListUuid = promotion.promotionUuid)
         (activity as FragmentHostListener).addFragment(fragment)
@@ -102,7 +108,10 @@ class PodcastListFragment : PodcastGridListFragment() {
             return
         }
         FirebaseAnalyticsTracker.listImpression(impressionId)
-        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to impressionId))
+        analyticsTracker.track(
+            AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
+            mapOf(LIST_ID_KEY to AnalyticsPropValue(impressionId))
+        )
         analyticsImpressionSent = true
     }
 

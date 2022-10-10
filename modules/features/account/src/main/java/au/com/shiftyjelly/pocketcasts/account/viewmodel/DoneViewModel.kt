@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity.AccountUpdatedSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -30,7 +31,10 @@ class DoneViewModel @Inject constructor(
     }
 
     fun trackShown(source: AccountUpdatedSource) {
-        analyticsTracker.track(AnalyticsEvent.ACCOUNT_UPDATED_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
+        analyticsTracker.track(
+            AnalyticsEvent.ACCOUNT_UPDATED_SHOWN,
+            mapOf(SOURCE_KEY to AnalyticsPropValue(source.analyticsValue))
+        )
     }
 
     fun trackDismissed() {

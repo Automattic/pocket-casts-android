@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -65,11 +66,13 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         private const val UP = "up"
         private const val UP_NEXT_ADAPTER_POSITION = 2
 
-        fun newInstance(embedded: Boolean = false, source: UpNextSource): UpNextFragment {
-            val fragment = UpNextFragment()
-            fragment.arguments = bundleOf(ARG_EMBEDDED to embedded, ARG_SOURCE to source.analyticsValue)
-            return fragment
-        }
+        fun newInstance(embedded: Boolean = false, source: UpNextSource): UpNextFragment =
+            UpNextFragment().apply {
+                arguments = bundleOf(
+                    ARG_EMBEDDED to embedded,
+                    ARG_SOURCE to source.analyticsString
+                )
+            }
     }
 
     @Inject lateinit var settings: Settings
@@ -219,13 +222,13 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener {
             override fun multiSelectSelectAll() {
-                trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to true))
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to AnalyticsPropValue(true)))
                 upNextPlayables.forEach { multiSelectHelper.select(it) }
                 adapter.notifyDataSetChanged()
             }
 
             override fun multiSelectSelectNone() {
-                trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to false))
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to AnalyticsPropValue(false)))
                 upNextPlayables.forEach { multiSelectHelper.deselect(it) }
                 adapter.notifyDataSetChanged()
             }
@@ -388,9 +391,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 trackUpNextEvent(
                     AnalyticsEvent.UP_NEXT_QUEUE_REORDERED,
                     mapOf(
-                        SLOTS_KEY to abs(position.minus(dragStartPosition)),
-                        DIRECTION_KEY to if (position > dragStartPosition) DOWN else UP,
-                        IS_NEXT_KEY to (position == UP_NEXT_ADAPTER_POSITION),
+                        SLOTS_KEY to AnalyticsPropValue(abs(position.minus(dragStartPosition))),
+                        DIRECTION_KEY to AnalyticsPropValue(if (position > dragStartPosition) DOWN else UP),
+                        IS_NEXT_KEY to AnalyticsPropValue(position == UP_NEXT_ADAPTER_POSITION),
                     )
                 )
             }
@@ -416,9 +419,8 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         )
     }
 
-    private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
-        val properties = HashMap<String, Any>()
-        properties[SOURCE_KEY] = upNextSource.analyticsValue
+    private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, AnalyticsPropValue> = emptyMap()) {
+        val properties = mutableMapOf(SOURCE_KEY to upNextSource.analyticsValue)
         properties.putAll(props)
         analyticsTracker.track(event, properties)
     }

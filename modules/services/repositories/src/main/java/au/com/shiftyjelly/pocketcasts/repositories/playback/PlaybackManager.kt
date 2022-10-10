@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveDataReactiveStreams
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
@@ -1849,7 +1850,7 @@ open class PlaybackManager @Inject constructor(
         playbackSource = PlaybackSource.UNKNOWN
     }
 
-    enum class PlaybackSource(val analyticsValue: String) {
+    enum class PlaybackSource(valueString: String) {
         PODCAST_SCREEN("podcast_screen"),
         FILTERS("filters"),
         DISCOVER("discover"),
@@ -1864,6 +1865,8 @@ open class PlaybackManager @Inject constructor(
         NOTIFICATION("notification"),
         FULL_SCREEN_VIDEO("full_screen_video"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
-        UNKNOWN("unknown"),
+        UNKNOWN("unknown");
+
+        val analyticsValue = AnalyticsPropValue(valueString)
     }
 }

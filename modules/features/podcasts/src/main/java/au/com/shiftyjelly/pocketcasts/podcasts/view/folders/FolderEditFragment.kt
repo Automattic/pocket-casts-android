@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -84,8 +85,8 @@ class FolderEditFragment : BaseDialogFragment() {
         analyticsTracker.track(
             AnalyticsEvent.FOLDER_EDIT_DISMISSED,
             mapOf(
-                DID_CHANGE_NAME_KEY to viewModel.isNameChanged,
-                DID_CHANGE_COLOR_KEY to viewModel.isColorIdChanged
+                DID_CHANGE_NAME_KEY to AnalyticsPropValue(viewModel.isNameChanged),
+                DID_CHANGE_COLOR_KEY to AnalyticsPropValue(viewModel.isColorIdChanged)
             )
         )
         super.onDismiss(dialog)

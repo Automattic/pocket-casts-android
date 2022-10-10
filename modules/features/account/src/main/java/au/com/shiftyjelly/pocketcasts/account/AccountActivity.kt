@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -149,7 +150,7 @@ class AccountActivity : AppCompatActivity() {
         val properties = when (id) {
             R.id.createPayNowFragment -> {
                 val subscription = viewModel.subscription.value
-                subscription?.let { mapOf(PRODUCT_KEY to it.productDetails.productId) }
+                subscription?.let { mapOf(PRODUCT_KEY to AnalyticsPropValue(it.productDetails.productId)) }
             }
             R.id.createDoneFragment -> {
                 val source = when (viewModel.createAccountState.value) {
@@ -157,7 +158,7 @@ class AccountActivity : AppCompatActivity() {
                     CreateAccountState.SubscriptionCreated -> AccountUpdatedSource.CONFIRM_PAYMENT.analyticsValue
                     else -> null
                 }
-                source?.let { mapOf(SOURCE_KEY to source) }
+                source?.let { mapOf(SOURCE_KEY to AnalyticsPropValue(source)) }
             }
             else -> null
         } ?: emptyMap()

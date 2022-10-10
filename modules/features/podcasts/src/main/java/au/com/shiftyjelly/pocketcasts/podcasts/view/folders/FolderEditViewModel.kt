@@ -5,7 +5,9 @@ import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.analyticsValue
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastFolder
@@ -178,7 +180,10 @@ class FolderEditViewModel
 
     fun changeSortOrder(order: PodcastsSortType) {
         settings.setSelectPodcastsSortType(order)
-        analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_PICKER_FILTER_CHANGED, mapOf(SORT_ORDER_KEY to order.analyticsValue))
+        analyticsTracker.track(
+            AnalyticsEvent.FOLDER_PODCAST_PICKER_FILTER_CHANGED,
+            mapOf(SORT_ORDER_KEY to order.analyticsValue)
+        )
     }
 
     fun changeFolderName(name: String) {
@@ -296,17 +301,19 @@ class FolderEditViewModel
         }
     }
 
-    fun trackCreateFolderNavigation(analyticsEvent: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
+    fun trackCreateFolderNavigation(analyticsEvent: AnalyticsEvent, props: Map<String, AnalyticsPropValue> = emptyMap()) {
         if (!state.value.isCreateFolder) return
-        val properties = HashMap<String, Any>()
-        properties[NUMBER_OF_PODCASTS_KEY] = state.value.selectedCount
+        val properties = mutableMapOf(NUMBER_OF_PODCASTS_KEY to AnalyticsPropValue(state.value.selectedCount))
         properties.putAll(props)
         analyticsTracker.track(analyticsEvent, properties)
     }
 
     fun trackDismiss() {
         if (state.value.isEditFolder) {
-            analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_PODCASTS_DISMISSED, mapOf(CHANGED_PODCASTS_KEY to state.value.selectedCount))
+            analyticsTracker.track(
+                AnalyticsEvent.FOLDER_CHOOSE_PODCASTS_DISMISSED,
+                mapOf(CHANGED_PODCASTS_KEY to AnalyticsPropValue(state.value.selectedCount))
+            )
         }
     }
 

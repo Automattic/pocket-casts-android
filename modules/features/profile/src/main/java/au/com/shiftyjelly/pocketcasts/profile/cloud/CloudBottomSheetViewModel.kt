@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
@@ -50,7 +51,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun getDeleteStateOnDeleteClick(episode: UserEpisode): DeleteState {
-        trackOptionTapped(DELETE)
+        trackOptionTapped(AnalyticsProp.Value.DELETE)
         return CloudDeleteHelper.getDeleteState(episode)
     }
 
@@ -65,17 +66,17 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun removeEpisode(episode: UserEpisode) {
         userEpisodeManager.removeFromCloud(episode)
-        trackOptionTapped(DELETE_FROM_CLOUD)
+        trackOptionTapped(AnalyticsProp.Value.DELETE_FROM_CLOUD)
     }
 
     fun cancelUpload(episode: UserEpisode) {
         userEpisodeManager.cancelUpload(episode)
-        trackOptionTapped(CANCEL_UPLOAD)
+        trackOptionTapped(AnalyticsProp.Value.CANCEL_UPLOAD)
     }
 
     fun cancelDownload(episode: UserEpisode) {
         downloadManager.removeEpisodeFromQueue(episode, "cloud bottom sheet")
-        trackOptionTapped(CANCEL_DOWNLOAD)
+        trackOptionTapped(AnalyticsProp.Value.CANCEL_DOWNLOAD)
     }
 
     fun download(episode: UserEpisode) {
@@ -86,14 +87,14 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun removeFromUpNext(episode: UserEpisode) {
         playbackManager.removeEpisode(episode)
-        trackOptionTapped(UP_NEXT_DELETE)
+        trackOptionTapped(AnalyticsProp.Value.UP_NEXT_DELETE)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun playNext(episode: UserEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
             playbackManager.playNext(episode)
-            trackOptionTapped(UP_NEXT_ADD_TOP)
+            trackOptionTapped(AnalyticsProp.Value.UP_NEXT_ADD_TOP)
         }
     }
 
@@ -101,55 +102,71 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun playLast(episode: UserEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
             playbackManager.playLast(episode)
-            trackOptionTapped(UP_NEXT_ADD_BOTTOM)
+            trackOptionTapped(AnalyticsProp.Value.UP_NEXT_ADD_BOTTOM)
         }
     }
 
     fun markAsPlayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
             episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
-            trackOptionTapped(MARK_PLAYED)
+            trackOptionTapped(AnalyticsProp.Value.MARK_PLAYED)
         }
     }
 
     fun markAsUnplayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
             episodeManager.markAsNotPlayed(episode)
-            trackOptionTapped(MARK_UNPLAYED)
+            trackOptionTapped(AnalyticsProp.Value.MARK_UNPLAYED)
         }
     }
 
     fun playNow(episode: UserEpisode, forceStream: Boolean) {
         playbackManager.playNow(episode, forceStream)
-        analyticsTracker.track(AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED, mapOf(OPTION_KEY to PLAY))
+        analyticsTracker.track(
+            AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.PLAY)
+        )
     }
 
     fun pause() {
         playbackManager.pause()
-        analyticsTracker.track(AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED, mapOf(OPTION_KEY to PAUSE))
+        analyticsTracker.track(
+            AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.PAUSE)
+        )
     }
 
-    fun trackOptionTapped(option: String) {
-        analyticsTracker.track(AnalyticsEvent.USER_FILE_DETAIL_OPTION_TAPPED, mapOf(OPTION_KEY to option))
+    fun trackOptionTapped(option: AnalyticsPropValue) {
+        analyticsTracker.track(
+            AnalyticsEvent.USER_FILE_DETAIL_OPTION_TAPPED,
+            mapOf(AnalyticsProp.Key.OPTION to option)
+        )
     }
 
     companion object {
-        private const val OPTION_KEY = "option"
-        private const val UP_NEXT_DELETE = "up_next_delete"
-        private const val UP_NEXT_ADD_TOP = "up_next_add_top"
-        private const val UP_NEXT_ADD_BOTTOM = "up_next_add_bottom"
-        private const val MARK_PLAYED = "mark_played"
-        private const val MARK_UNPLAYED = "mark_unplayed"
-        private const val DELETE = "delete"
-        private const val CANCEL_UPLOAD = "cancel_upload"
-        private const val CANCEL_DOWNLOAD = "cancel_download"
-        private const val DELETE_FROM_CLOUD = "delete_from_cloud"
-        private const val PLAY = "play"
-        private const val PAUSE = "pause"
-        const val EDIT = "edit"
-        const val UPLOAD = "upload"
-        const val DOWNLOAD = "download"
-        const val UPLOAD_UPGRADE_REQUIRED = "upload_upgrade_required"
+        object AnalyticsProp {
+            object Key {
+                const val OPTION = "option"
+            }
+            object Value {
+                val PLAY = AnalyticsPropValue("play")
+                val PAUSE = AnalyticsPropValue("pause")
+                val DELETE = AnalyticsPropValue("delete")
+                val CANCEL_UPLOAD = AnalyticsPropValue("cancel_upload")
+                val MARK_UNPLAYED = AnalyticsPropValue("mark_unplayed")
+                val UP_NEXT_DELETE = AnalyticsPropValue("up_next_delete")
+                val UP_NEXT_ADD_TOP = AnalyticsPropValue("up_next_add_top")
+                val UP_NEXT_ADD_BOTTOM = AnalyticsPropValue("up_next_add_bottom")
+                val MARK_PLAYED = AnalyticsPropValue("mark_played")
+                val CANCEL_DOWNLOAD = AnalyticsPropValue("cancel_download")
+                val DELETE_FROM_CLOUD = AnalyticsPropValue("delete_from_cloud")
+
+                val EDIT = AnalyticsPropValue("edit")
+                val UPLOAD = AnalyticsPropValue("upload")
+                val DOWNLOAD = AnalyticsPropValue("download")
+                val UPLOAD_UPGRADE_REQUIRED = AnalyticsPropValue("upload_upgrade_required")
+            }
+        }
     }
 }
 

@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -250,7 +251,13 @@ class EpisodeFragmentViewModel @Inject constructor(
             } else {
                 fromListUuid?.let {
                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
-                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
+                    analyticsTracker.track(
+                        AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY,
+                        mapOf(
+                            LIST_ID_KEY to AnalyticsPropValue(it),
+                            PODCAST_ID_KEY to AnalyticsPropValue(episode.podcastUuid)
+                        )
+                    )
                 }
                 playbackManager.playNow(episode, force)
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate()

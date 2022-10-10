@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.annotation.ColorInt
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -87,7 +88,13 @@ class PlayButton @JvmOverloads constructor(
                 val currentPodcastUuid = podcastUuid
                 if (currentFromListUuid != null && currentPodcastUuid != null) {
                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(currentFromListUuid, currentPodcastUuid)
-                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to currentFromListUuid, PODCAST_UUID_KEY to currentPodcastUuid))
+                    analyticsTracker.track(
+                        AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY,
+                        mapOf(
+                            LIST_ID_KEY to AnalyticsPropValue(currentFromListUuid),
+                            PODCAST_UUID_KEY to AnalyticsPropValue(currentPodcastUuid)
+                        )
+                    )
                 }
                 listener?. onPlayClicked(episodeUuid)
                 UiUtil.hideKeyboard(this)

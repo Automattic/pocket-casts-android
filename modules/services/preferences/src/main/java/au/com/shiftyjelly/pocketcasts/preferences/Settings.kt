@@ -139,16 +139,17 @@ interface Settings {
         SIGN_IN_ERROR(21483649),
     }
 
-    enum class BadgeType(val labelId: Int, val analyticsValue: String) {
-        OFF(labelId = LR.string.podcasts_badges_off, analyticsValue = "off"),
-        LATEST_EPISODE(labelId = LR.string.podcasts_badges_only_latest_episode, analyticsValue = "only_latest_episode"),
-        ALL_UNFINISHED(labelId = LR.string.podcasts_badges_all_unfinished, analyticsValue = "unfinished_episodes")
+    enum class BadgeType(val labelId: Int, val analyticsString: String) {
+        OFF(labelId = LR.string.podcasts_badges_off, analyticsString = "off"),
+        LATEST_EPISODE(labelId = LR.string.podcasts_badges_only_latest_episode, analyticsString = "only_latest_episode"),
+        ALL_UNFINISHED(labelId = LR.string.podcasts_badges_all_unfinished, analyticsString = "unfinished_episodes");
     }
 
-    enum class PodcastGridLayoutType(val id: Int, val analyticsValue: String) {
-        LARGE_ARTWORK(id = 0, analyticsValue = "large_artwork"),
-        SMALL_ARTWORK(id = 1, analyticsValue = "small_artwork"),
-        LIST_VIEW(id = 2, analyticsValue = "list");
+    enum class PodcastGridLayoutType(val id: Int, val analyticsString: String) {
+        LARGE_ARTWORK(id = 0, analyticsString = "large_artwork"),
+        SMALL_ARTWORK(id = 1, analyticsString = "small_artwork"),
+        LIST_VIEW(id = 2, analyticsString = "list");
+
         companion object {
             fun fromLayoutId(id: Int) =
                 PodcastGridLayoutType.values().find { it.id == id } ?: LARGE_ARTWORK

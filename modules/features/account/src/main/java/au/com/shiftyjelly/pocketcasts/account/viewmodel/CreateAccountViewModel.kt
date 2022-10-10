@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -17,7 +18,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,11 +42,13 @@ class CreateAccountViewModel
     @Inject lateinit var subscriptionManager: SubscriptionManager
 
     companion object {
-        private const val PRODUCT_KEY = "product"
-        private const val IS_FREE_TRIAL_KEY = "is_free_trial"
-        private const val ERROR_CODE_KEY = "error_code"
-        private const val SOURCE_KEY = "source"
-        private const val ENABLED_KEY = "enabled"
+        private object AnalyticsPropKey {
+            const val PRODUCT = "product"
+            const val IS_FREE_TRIAL = "is_free_trial"
+            const val ERROR_CODE = "error_code"
+            const val SOURCE = "source"
+            const val ENABLED = "enabled"
+        }
     }
 
     fun loadSubs() {
@@ -132,7 +134,10 @@ class CreateAccountViewModel
     fun updateNewsletter(isChecked: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
-            mapOf(SOURCE_KEY to NewsletterSource.ACCOUNT_UPDATED.analyticsValue, ENABLED_KEY to isChecked)
+            mapOf(
+                AnalyticsPropKey.SOURCE to NewsletterSource.ACCOUNT_UPDATED.analyticsValue,
+                AnalyticsPropKey.ENABLED to AnalyticsPropValue(isChecked)
+            )
         )
         newsletter.value = isChecked
         newsletter.value?.let {
@@ -237,24 +242,27 @@ class CreateAccountViewModel
         val isFreeTrial = subscription.value is Subscription.WithTrial
 
         val analyticsProperties = mapOf(
-            PRODUCT_KEY to shortProductId,
-            IS_FREE_TRIAL_KEY to isFreeTrial
+            AnalyticsPropKey.PRODUCT to AnalyticsPropValue(shortProductId),
+            AnalyticsPropKey.IS_FREE_TRIAL to AnalyticsPropValue(isFreeTrial)
         )
 
         when (purchaseEvent) {
 
-            is PurchaseEvent.Success -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
+            is PurchaseEvent.Success -> analyticsTracker.track(
+                AnalyticsEvent.PURCHASE_SUCCESSFUL,
+                analyticsProperties
+            )
 
             is PurchaseEvent.Cancelled -> analyticsTracker.track(
                 AnalyticsEvent.PURCHASE_CANCELLED,
-                analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode)
+                analyticsProperties.plus(AnalyticsPropKey.ERROR_CODE to AnalyticsPropValue(purchaseEvent.responseCode))
             )
 
             is PurchaseEvent.Failure -> {
 
                 // Exclude error_code property if we do not have a responseCode
                 val properties = purchaseEvent.responseCode?.let {
-                    analyticsProperties.plus(ERROR_CODE_KEY to it)
+                    analyticsProperties.plus(AnalyticsPropKey.ERROR_CODE to AnalyticsPropValue(it))
                 } ?: analyticsProperties
 
                 analyticsTracker.track(AnalyticsEvent.PURCHASE_FAILED, properties)
@@ -272,9 +280,11 @@ class CreateAccountViewModel
     }
 }
 
-enum class NewsletterSource(val analyticsValue: String) {
+enum class NewsletterSource(analyticsString: String) {
     ACCOUNT_UPDATED("account_updated"),
-    PROFILE("profile")
+    PROFILE("profile");
+
+    val analyticsValue = AnalyticsPropValue(analyticsString)
 }
 
 enum class SubscriptionType(val value: String, val trackingLabel: String) {

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -59,12 +60,18 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     companion object {
-        private const val SELECT_ALL_KEY = "select_all"
-        private const val OPTION_KEY = "option"
-        private const val AUTO_DOWNLOAD_SETTINGS = "auto_download_settings"
-        private const val STOP_ALL_DOWNLOADS = "stop_all_downloads"
-        private const val CLEAN_UP = "clean_up"
-        private const val CLEAR_HISTORY = "clear_history"
+        private object AnalyticsProp {
+            object Key {
+                const val SELECT_ALL = "select_all"
+                const val OPTION = "option"
+            }
+            object Value {
+                val AUTO_DOWNLOAD_SETTINGS = AnalyticsPropValue("auto_download_settings")
+                val STOP_ALL_DOWNLOADS = AnalyticsPropValue("stop_all_downloads")
+                val CLEAN_UP = AnalyticsPropValue("clean_up")
+                val CLEAR_HISTORY = AnalyticsPropValue("clear_history")
+            }
+        }
 
         fun newInstance(mode: Mode): ProfileEpisodeListFragment {
             val bundle = Bundle().apply {
@@ -283,23 +290,35 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     private fun showAutodownloadSettings() {
         val fragment = AutoDownloadSettingsFragment.newInstance(showToolbar = true)
         showFragment(fragment)
-        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to AUTO_DOWNLOAD_SETTINGS))
+        analyticsTracker.track(
+            AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED,
+            mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.AUTO_DOWNLOAD_SETTINGS)
+        )
         (activity as AppCompatActivity).supportActionBar?.setTitle(LR.string.profile_auto_download_settings)
     }
 
     private fun stopAllDownloads() {
-        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to STOP_ALL_DOWNLOADS))
+        analyticsTracker.track(
+            AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED,
+            mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.STOP_ALL_DOWNLOADS)
+        )
         downloadManager.stopAllDownloads()
     }
 
     private fun showCleanupSettings() {
-        analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAN_UP))
+        analyticsTracker.track(
+            AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED,
+            mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.CLEAN_UP)
+        )
         val fragment = ManualCleanupFragment.newInstance()
         showFragment(fragment)
     }
 
     private fun clearListeningHistory() {
-        analyticsTracker.track(AnalyticsEvent.LISTENING_HISTORY_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CLEAR_HISTORY))
+        analyticsTracker.track(
+            AnalyticsEvent.LISTENING_HISTORY_OPTIONS_MODAL_OPTION_TAPPED,
+            mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.CLEAR_HISTORY)
+        )
         val dialog = ConfirmationDialog()
             .setIconId(R.drawable.ic_history)
             .setTitle(resources.getString(LR.string.profile_clear_listening_history_title))
@@ -352,7 +371,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             Mode.History -> AnalyticsEvent.LISTENING_HISTORY_SELECT_ALL_TAPPED
             Mode.Starred -> AnalyticsEvent.STARRED_SELECT_ALL_TAPPED
         }
-        analyticsTracker.track(analyticsEvent, mapOf(SELECT_ALL_KEY to selectAll))
+        analyticsTracker.track(analyticsEvent, mapOf(AnalyticsProp.Key.SELECT_ALL to AnalyticsPropValue(selectAll)))
     }
 
     private fun trackSelectAllAbove() {

@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.dialog
 import android.content.Context
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -34,7 +35,10 @@ class MiniPlayerDialog(
                 imageId = IR.drawable.ic_markasplayed,
                 click = {
                     isOptionClicked = true
-                    analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to MARK_PLAYED))
+                    analyticsTracker.track(
+                        AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED,
+                        mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.MARK_PLAYED)
+                    )
                     markAsPlayed()
                 }
             )
@@ -45,7 +49,10 @@ class MiniPlayerDialog(
                 imageColor = dangerColor,
                 click = {
                     isOptionClicked = true
-                    analyticsTracker.track(AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED, mapOf(OPTION_KEY to CLOSE_AND_CLEAR_UP_NEXT))
+                    analyticsTracker.track(
+                        AnalyticsEvent.MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED,
+                        mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.CLOSE_AND_CLEAR_UP_NEXT)
+                    )
                     endPlaybackAndClearUpNext(context)
                 }
             )
@@ -74,8 +81,14 @@ class MiniPlayerDialog(
     }
 
     companion object {
-        private const val OPTION_KEY = "option"
-        private const val MARK_PLAYED = "mark_played"
-        private const val CLOSE_AND_CLEAR_UP_NEXT = "close_and_clear_up_next"
+        private object AnalyticsProp {
+            object Key {
+                const val OPTION = "option"
+            }
+            object Value {
+                val MARK_PLAYED = AnalyticsPropValue("mark_played")
+                val CLOSE_AND_CLEAR_UP_NEXT = AnalyticsPropValue("close_and_clear_up_next")
+            }
+        }
     }
 }

@@ -4,7 +4,9 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.analyticsValue
 import au.com.shiftyjelly.pocketcasts.compose.buttons.ToggleButtonOption
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -178,11 +180,13 @@ class PodcastsOptionsDialog(
         analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_BADGES_CHANGED, mapOf(TYPE_KEY to badgeType.analyticsValue))
     }
 
-    enum class ModalOption(val analyticsValue: String) {
+    enum class ModalOption(analyticsString: String) {
         SORT_BY("sort_by"),
         LAYOUT("layout"),
         BADGE("badge"),
-        SHARE("share"),
+        SHARE("share");
+
+        val analyticsValue = AnalyticsPropValue(analyticsString)
     }
 
     companion object {

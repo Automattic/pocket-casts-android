@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.analyticsValue
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -252,22 +254,29 @@ class PodcastsViewModel
 
     fun trackPodcastsListShown() {
         launch {
-            val properties = HashMap<String, Any>()
-            properties[NUMBER_OF_FOLDERS_KEY] = folderManager.countFolders()
-            properties[NUMBER_OF_PODCASTS_KEY] = podcastManager.countSubscribed()
-            properties[BADGE_TYPE_KEY] = settings.getPodcastBadgeType().analyticsValue
-            properties[LAYOUT_KEY] = PodcastGridLayoutType.fromLayoutId(settings.getPodcastsLayout()).analyticsValue
-            properties[SORT_ORDER_KEY] = settings.getPodcastsSortType().analyticsValue
-            analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_SHOWN, properties)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCASTS_LIST_SHOWN,
+                mapOf(
+                    NUMBER_OF_FOLDERS_KEY to AnalyticsPropValue(folderManager.countFolders()),
+                    NUMBER_OF_PODCASTS_KEY to AnalyticsPropValue(podcastManager.countSubscribed()),
+                    BADGE_TYPE_KEY to settings.getPodcastBadgeType().analyticsValue,
+                    LAYOUT_KEY to PodcastGridLayoutType.fromLayoutId(settings.getPodcastsLayout()).analyticsValue,
+                    SORT_ORDER_KEY to settings.getPodcastsSortType().analyticsValue
+                )
+            )
         }
     }
 
     fun trackFolderShown(folderUuid: String) {
         launch {
-            val properties = HashMap<String, Any>()
-            properties[SORT_ORDER_KEY] = (folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST).analyticsValue
-            properties[NUMBER_OF_PODCASTS_KEY] = folderManager.findFolderPodcastsSorted(folderUuid).size
-            analyticsTracker.track(AnalyticsEvent.FOLDER_SHOWN, properties)
+            val sortType = folderManager.findByUuid(folderUuid)?.podcastsSortType ?: PodcastsSortType.DATE_ADDED_OLDEST_TO_NEWEST
+            analyticsTracker.track(
+                AnalyticsEvent.FOLDER_SHOWN,
+                mapOf(
+                    SORT_ORDER_KEY to sortType.analyticsValue,
+                    NUMBER_OF_PODCASTS_KEY to AnalyticsPropValue(folderManager.findFolderPodcastsSorted(folderUuid).size)
+                )
+            )
         }
     }
 

@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentAccountBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -31,9 +32,9 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class AccountFragment : BaseFragment() {
     companion object {
-        private const val BUTTON = "button"
-        private const val SIGN_IN = "sign_in"
-        private const val CREATE_ACCOUNT = "create_account"
+        private const val KEY_BUTTON = "button"
+        private val VALUE_SIGN_IN = AnalyticsPropValue("sign_in")
+        private val KEY_CREATE_ACCOUNT = AnalyticsPropValue("create_account")
         fun newInstance() = AccountFragment()
     }
 
@@ -87,7 +88,7 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnCreate.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(BUTTON to CREATE_ACCOUNT))
+            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(KEY_BUTTON to KEY_CREATE_ACCOUNT))
             FirebaseAnalyticsTracker.createAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 if (Util.isCarUiMode(view.context) || accountViewModel.supporterInstance) { // We can't sign up to plus on cars so skip that step
@@ -99,7 +100,7 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnSignIn.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(BUTTON to SIGN_IN))
+            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(KEY_BUTTON to VALUE_SIGN_IN))
             FirebaseAnalyticsTracker.signInAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 view.findNavController().navigate(R.id.action_accountFragment_to_signInFragment)

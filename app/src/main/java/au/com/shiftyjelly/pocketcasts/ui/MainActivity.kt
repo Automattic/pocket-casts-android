@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
@@ -441,7 +442,10 @@ class MainActivity :
     }
 
     private fun showUpNextFragment(source: UpNextSource) {
-        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
+        analyticsTracker.track(
+            AnalyticsEvent.UP_NEXT_SHOWN,
+            mapOf(SOURCE_KEY to source.analyticsValue)
+        )
         showBottomSheet(UpNextFragment.newInstance(source = source))
     }
 
@@ -1106,6 +1110,6 @@ class MainActivity :
                 null
             }
         }
-        event?.let { analyticsTracker.track(event, mapOf(INITIAL_KEY to isInitial)) }
+        event?.let { analyticsTracker.track(event, mapOf(INITIAL_KEY to AnalyticsPropValue(isInitial))) }
     }
 }

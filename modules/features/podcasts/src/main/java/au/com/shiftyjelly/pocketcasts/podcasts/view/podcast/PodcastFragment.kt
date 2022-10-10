@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
@@ -79,14 +80,21 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         const val ARG_PODCAST_UUID = "ARG_PODCAST_UUID"
         const val ARG_LIST_UUID = "ARG_LIST_INDEX_UUID"
         const val ARG_FEATURED_PODCAST = "ARG_FEATURED_PODCAST"
-        private const val OPTION_KEY = "option"
-        private const val IS_EXPANDED_KEY = "is_expanded"
-        private const val PODCAST_UUID_KEY = "podcast_uuid"
-        private const val LIST_ID_KEY = "list_id"
-        private const val EPISODE_UUID_KEY = "episode_uuid"
-        private const val REMOVE = "remove"
-        private const val CHANGE = "change"
-        private const val GO_TO = "go_to"
+
+        private object AnalyticsProp {
+            object Key {
+                const val OPTION = "option"
+                const val IS_EXPANDED = "is_expanded"
+                const val PODCAST_UUID = "podcast_uuid"
+                const val LIST_ID = "list_id"
+                const val EPISODE_UUID = "episode_uuid"
+            }
+            object Value {
+                val REMOVE = AnalyticsPropValue("remove")
+                val CHANGE = AnalyticsPropValue("change")
+                val GO_TO = AnalyticsPropValue("go_to")
+            }
+        }
 
         fun newInstance(podcastUuid: String, fromListUuid: String? = null, featuredPodcast: Boolean = false): PodcastFragment {
             return PodcastFragment().apply {
@@ -138,18 +146,30 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     override var statusBarColor: StatusBarColor = StatusBarColor.Custom(color = 0xFF1E1F1E.toInt(), isWhiteIcons = true)
 
     private val onHeaderSummaryToggled: (expanded: Boolean) -> Unit = {
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_SUMMARY, mapOf(IS_EXPANDED_KEY to it))
+        analyticsTracker.track(
+            AnalyticsEvent.PODCAST_SCREEN_TOGGLE_SUMMARY,
+            mapOf(AnalyticsProp.Key.IS_EXPANDED to AnalyticsPropValue(it))
+        )
     }
 
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let {
             FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
+                mapOf(
+                    AnalyticsProp.Key.LIST_ID to AnalyticsPropValue(it),
+                    AnalyticsProp.Key.PODCAST_UUID to AnalyticsPropValue(podcastUuid)
+                )
+            )
         }
         if (featuredPodcast) {
             FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
             viewModel.podcast.value?.uuid?.let { podcastUuid ->
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
+                analyticsTracker.track(
+                    AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED,
+                    mapOf(AnalyticsProp.Key.PODCAST_UUID to AnalyticsPropValue(podcastUuid))
+                )
             }
         }
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SUBSCRIBE_TAPPED)
@@ -204,7 +224,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid)
+                mapOf(
+                    AnalyticsProp.Key.LIST_ID to AnalyticsPropValue(listUuid),
+                    AnalyticsProp.Key.PODCAST_UUID to AnalyticsPropValue(episode.podcastUuid),
+                    AnalyticsProp.Key.EPISODE_UUID to AnalyticsPropValue(episode.uuid)
+                )
             )
         }
         val episodeCard = EpisodeFragment.newInstance(episode, overridePodcastLink = true, fromListUuid = fromListUuid)
@@ -354,17 +378,26 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             val dialog = PodcastFolderOptionsDialog(
                 folder = folder,
                 onRemoveFolder = {
-                    analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to REMOVE))
+                    analyticsTracker.track(
+                        AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED,
+                        mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.REMOVE)
+                    )
                     viewModel.removeFromFolder()
                 },
                 onChangeFolder = {
-                    analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to CHANGE))
+                    analyticsTracker.track(
+                        AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED,
+                        mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.CHANGE)
+                    )
                     FolderChooserFragment
                         .newInstance(viewModel.podcastUuid)
                         .show(parentFragmentManager, "folder_chooser_fragment")
                 },
                 onOpenFolder = {
-                    analyticsTracker.track(AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to GO_TO))
+                    analyticsTracker.track(
+                        AnalyticsEvent.FOLDER_PODCAST_MODAL_OPTION_TAPPED,
+                        mapOf(AnalyticsProp.Key.OPTION to AnalyticsProp.Value.GO_TO)
+                    )
                     val fragment = PodcastsFragment.newInstance(folderUuid = folder.uuid)
                     (activity as FragmentHostListener).addFragment(fragment)
                 },

@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -210,11 +211,11 @@ class CreateFilterViewModel @Inject constructor(
     fun onBackPressed(isCreatingFilter: Boolean) {
         if (!isCreatingFilter) {
             val properties = mapOf(
-                AnalyticsPropKey.DID_CHANGE_AUTO_DOWNLOAD to userChangedAutoDownload.changedSinceScreenLoad,
-                AnalyticsPropKey.DID_CHANGE_AUTO_DOWNLOAD_EPISODE_COUNT to userChangedAutoDownloadEpisodeCount.changedSinceScreenLoad,
-                AnalyticsPropKey.DID_CHANGE_ICON to userChangedIcon.changedSinceScreenLoad,
-                AnalyticsPropKey.DID_CHANGE_NAME to userChangedFilterName.changedSinceScreenLoad,
-                AnalyticsPropKey.DID_CHANGE_COLOR to userChangedColor.changedSinceScreenLoad
+                AnalyticsPropKey.DID_CHANGE_AUTO_DOWNLOAD to userChangedAutoDownload.changedSinceScreenLoadProp(),
+                AnalyticsPropKey.DID_CHANGE_AUTO_DOWNLOAD_EPISODE_COUNT to userChangedAutoDownloadEpisodeCount.changedSinceScreenLoadProp(),
+                AnalyticsPropKey.DID_CHANGE_ICON to userChangedIcon.changedSinceScreenLoadProp(),
+                AnalyticsPropKey.DID_CHANGE_NAME to userChangedFilterName.changedSinceScreenLoadProp(),
+                AnalyticsPropKey.DID_CHANGE_COLOR to userChangedColor.changedSinceScreenLoadProp()
             )
 
             userChangedAutoDownload.changedSinceScreenLoad = false
@@ -231,6 +232,7 @@ class CreateFilterViewModel @Inject constructor(
         var changedSinceScreenLoad: Boolean = false,
         var changedSinceFilterUpdated: Boolean = false
     ) {
+        fun changedSinceScreenLoadProp() = AnalyticsPropValue(changedSinceScreenLoad)
         fun recordUserChange() {
             changedSinceScreenLoad = true
             changedSinceFilterUpdated = true

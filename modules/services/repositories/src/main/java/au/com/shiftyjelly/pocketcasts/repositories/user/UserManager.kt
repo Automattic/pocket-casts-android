@@ -4,6 +4,7 @@ import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -108,7 +109,10 @@ class UserManagerImpl @Inject constructor(
 
         settings.setMarketingOptIn(false)
         settings.setMarketingOptInNeedsSync(false)
-        analyticsTracker.track(AnalyticsEvent.USER_SIGNED_OUT, mapOf(KEY_USER_INITIATED to wasInitiatedByUser))
+        analyticsTracker.track(
+            AnalyticsEvent.USER_SIGNED_OUT,
+            mapOf(KEY_USER_INITIATED to AnalyticsPropValue(wasInitiatedByUser))
+        )
         analyticsTracker.flush()
         analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()

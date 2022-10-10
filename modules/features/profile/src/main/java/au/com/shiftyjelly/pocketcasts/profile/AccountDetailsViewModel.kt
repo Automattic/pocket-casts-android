@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -100,7 +101,10 @@ class AccountDetailsViewModel
     fun updateNewsletter(isChecked: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
-            mapOf(SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue, ENABLED_KEY to isChecked)
+            mapOf(
+                SOURCE_KEY to NewsletterSource.PROFILE.analyticsValue,
+                ENABLED_KEY to AnalyticsPropValue(isChecked)
+            )
         )
         settings.setMarketingOptIn(isChecked)
         settings.setMarketingOptInNeedsSync(true)

@@ -6,11 +6,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemSmallListBinding
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 
 private val SmallListDiffer = object : DiffUtil.ItemCallback<List<Any>>() {
@@ -77,14 +76,26 @@ internal class SmallListRowAdapter(
                 podcastRow.setOnClickListener {
                     fromListId?.let {
                         FirebaseAnalyticsTracker.podcastTappedFromList(it, podcast.uuid)
-                        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
+                        analyticsTracker.track(
+                            AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
+                            mapOf(
+                                DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(it),
+                                DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(podcast.uuid)
+                            )
+                        )
                     }
                     onPodcastClicked(podcast, fromListId)
                 }
                 podcastRow.onSubscribeClicked = {
                     fromListId?.let {
                         FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcast.uuid)
-                        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcast.uuid))
+                        analyticsTracker.track(
+                            AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
+                            mapOf(
+                                DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(it),
+                                DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(podcast.uuid)
+                            )
+                        )
                     }
                     onPodcastSubscribe(podcast, fromListId)
                 }

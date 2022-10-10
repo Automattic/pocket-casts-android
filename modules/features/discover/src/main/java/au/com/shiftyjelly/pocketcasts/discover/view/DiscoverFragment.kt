@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
@@ -58,14 +59,27 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val listId = list.listUuid
         if (listId != null) {
             FirebaseAnalyticsTracker.listShowAllTapped(listId)
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to listId))
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED,
+                mapOf(AnalyticsPropKey.LIST_ID to AnalyticsPropValue(listId))
+            )
         } else {
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to transformedList.inferredId()))
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED,
+                mapOf(AnalyticsPropKey.LIST_ID to AnalyticsPropValue(transformedList.inferredId()))
+            )
         }
         if (list is DiscoverCategory) {
             viewModel.currentRegionCode?.let {
                 FirebaseAnalyticsTracker.openedCategory(list.id, it)
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_CATEGORY_SHOWN, mapOf(NAME_KEY to list.name, REGION_KEY to it, ID_KEY to list.id))
+                analyticsTracker.track(
+                    AnalyticsEvent.DISCOVER_CATEGORY_SHOWN,
+                    mapOf(
+                        AnalyticsPropKey.NAME to AnalyticsPropValue(list.name),
+                        AnalyticsPropKey.REGION to AnalyticsPropValue(it),
+                        AnalyticsPropKey.ID to AnalyticsPropValue(list.id)
+                    )
+                )
             }
         }
 
@@ -179,11 +193,13 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     companion object {
-        private const val ID_KEY = "id"
-        private const val NAME_KEY = "name"
-        private const val REGION_KEY = "region"
-        const val LIST_ID_KEY = "list_id"
-        const val PODCAST_UUID_KEY = "podcast_uuid"
-        const val EPISODE_UUID_KEY = "episode_uuid"
+        object AnalyticsPropKey {
+            const val ID = "id"
+            const val NAME = "name"
+            const val REGION = "region"
+            const val LIST_ID = "list_id"
+            const val PODCAST_UUID = "podcast_uuid"
+            const val EPISODE_UUID = "episode_uuid"
+        }
     }
 }

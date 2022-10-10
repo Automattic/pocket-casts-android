@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -74,15 +75,19 @@ interface UpNextQueue {
     }
 }
 
-enum class UpNextSource(val analyticsValue: String) {
+enum class UpNextSource(val analyticsString: String) {
     MINI_PLAYER("mini_player"),
     PLAYER("player"),
     NOW_PLAYING("now_playing"),
     UP_NEXT_SHORTCUT("up_next_shortcut"),
     UNKNOWN("unknown");
 
+    val analyticsValue = AnalyticsPropValue(analyticsString)
+
     companion object {
-        fun fromString(string: String) = UpNextSource.values().find { it.analyticsValue == string } ?: UNKNOWN
+        fun fromString(string: String) = UpNextSource.values().find {
+            it.analyticsValue.propValue == string
+        } ?: UNKNOWN
     }
 }
 

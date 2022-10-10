@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentRegionSelectBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowRegionBinding
@@ -81,7 +82,10 @@ class RegionSelectFragment : BaseFragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         val adapter = RegionAdapter(regionList.sortedBy { it.name }) {
             listener?.onRegionSelected(it)
-            analyticsTracker.track(AnalyticsEvent.DISCOVER_REGION_CHANGED, mapOf(REGION_KEY to it.code))
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_REGION_CHANGED,
+                mapOf(REGION_KEY to AnalyticsPropValue(it.code))
+            )
         }
         adapter.selectedRegionCode = arguments?.getString(ARG_SELECTED_REGION)
 

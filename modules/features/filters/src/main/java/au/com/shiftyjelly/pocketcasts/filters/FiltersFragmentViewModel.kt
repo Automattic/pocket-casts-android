@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -73,7 +74,9 @@ class FiltersFragmentViewModel @Inject constructor(
     }
 
     fun trackFilterListShown(filterCount: Int) {
-        val properties = mapOf(FILTER_COUNT_KEY to filterCount)
-        analyticsTracker.track(AnalyticsEvent.FILTER_LIST_SHOWN, properties)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_LIST_SHOWN,
+            mapOf(FILTER_COUNT_KEY to AnalyticsPropValue(filterCount))
+        )
     }
 }

@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -103,7 +104,7 @@ class EpisodeItemTouchHelper(onLeftItem1: (episode: Playable, index: Int) -> Uni
         mRecoverAnimations.clear()
     }
 
-    enum class SwipeAction(val analyticsValue: String) {
+    enum class SwipeAction(value: String) {
         UP_NEXT_REMOVE("up_next_remove"),
         UP_NEXT_ADD_TOP("up_next_add_top"),
         UP_NEXT_ADD_BOTTOM("up_next_add_bottom"),
@@ -111,17 +112,21 @@ class EpisodeItemTouchHelper(onLeftItem1: (episode: Playable, index: Int) -> Uni
         UP_NEXT_MOVE_BOTTOM("up_next_move_bottom"),
         DELETE("delete"),
         UNARCHIVE("unarchive"),
-        ARCHIVE("archive"),
+        ARCHIVE("archive");
+
+        val analyticsValue = AnalyticsPropValue(value)
     }
 
-    enum class SwipeSource(val analyticsValue: String) {
+    enum class SwipeSource(value: String) {
         PODCAST_DETAILS("podcast_details"),
         FILTERS("filters"),
         DOWNLOADS("downloads"),
         LISTENING_HISTORY("listening_history"),
         STARRED("starred"),
         FILES("files"),
-        UP_NEXT("up_next"),
+        UP_NEXT("up_next");
+
+        val analyticsValue = AnalyticsPropValue(value)
     }
 }
 

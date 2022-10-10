@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -194,7 +195,10 @@ class PodcastViewModel
         launch {
             podcast.value?.let {
                 podcastManager.updateShowArchived(it, !it.showArchived)
-                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_ARCHIVED, mapOf(SHOW_ARCHIVED to !it.showArchived))
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SCREEN_TOGGLE_ARCHIVED,
+                    mapOf(SHOW_ARCHIVED to AnalyticsPropValue(!it.showArchived))
+                )
             }
         }
     }
@@ -247,7 +251,10 @@ class PodcastViewModel
     fun toggleNotifications(context: Context) {
         val podcast = podcast.value ?: return
         val showNotifications = !podcast.isShowNotifications
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, mapOf(ENABLED_KEY to showNotifications))
+        analyticsTracker.track(
+            AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED,
+            mapOf(ENABLED_KEY to AnalyticsPropValue(showNotifications))
+        )
         Toast.makeText(context, if (showNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
         launch {
             podcastManager.updateShowNotifications(podcast, showNotifications)

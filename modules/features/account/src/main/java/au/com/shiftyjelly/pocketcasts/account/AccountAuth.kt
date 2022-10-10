@@ -4,6 +4,7 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
@@ -61,7 +62,7 @@ class AccountAuth @Inject constructor(
             }
             is AuthResult.Failed -> {
                 val errorCodeValue = authResult.serverMessageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-                val errorProperties = properties.plus(KEY_ERROR_CODE to errorCodeValue)
+                val errorProperties = properties.plus(KEY_ERROR_CODE to AnalyticsPropValue(errorCodeValue))
                 analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, errorProperties)
             }
         }
@@ -104,7 +105,8 @@ class AccountAuth @Inject constructor(
                             )
                         )
                         val errorCodeValue = serverMessageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-                        analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED, mapOf(KEY_ERROR_CODE to errorCodeValue))
+                        val properties = mapOf(KEY_ERROR_CODE to AnalyticsPropValue(errorCodeValue))
+                        analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED, properties)
                     }
                 }
             )
@@ -204,8 +206,10 @@ class AccountAuth @Inject constructor(
     }
 }
 
-enum class SignInSource(val analyticsValue: String) {
+enum class SignInSource(analyticsString: String) {
     AccountAuthenticator("account_manager"),
     SignInViewModel("sign_in_view_model"),
-    PocketCastsApplication("pocketcasts_application"),
+    PocketCastsApplication("pocketcasts_application");
+
+    val analyticsValue = AnalyticsPropValue(analyticsString)
 }

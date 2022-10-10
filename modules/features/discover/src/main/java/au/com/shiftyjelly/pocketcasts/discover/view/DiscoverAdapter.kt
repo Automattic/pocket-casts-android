@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsPropValue
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
@@ -27,9 +28,6 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBi
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
-import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -177,7 +175,13 @@ internal class DiscoverAdapter(
             snapHelper.attachToRecyclerView(recyclerView)
             snapHelper.onSnapPositionChanged = { position ->
                 binding.pageIndicatorView.position = position
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED, mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount))
+                analyticsTracker.track(
+                    AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED,
+                    mapOf(
+                        CURRENT_PAGE to AnalyticsPropValue(position),
+                        TOTAL_PAGES to AnalyticsPropValue(adapter.itemCount)
+                    )
+                )
             }
 
             recyclerView?.adapter = adapter
@@ -214,7 +218,11 @@ internal class DiscoverAdapter(
                 row?.let {
                     analyticsTracker.track(
                         AnalyticsEvent.DISCOVER_SMALL_LIST_PAGE_CHANGED,
-                        mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId())
+                        mapOf(
+                            CURRENT_PAGE to AnalyticsPropValue(position),
+                            TOTAL_PAGES to AnalyticsPropValue(adapter.itemCount),
+                            DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(it.inferredId())
+                        )
                     )
                 }
             }
@@ -444,7 +452,13 @@ internal class DiscoverAdapter(
 
                                 row.listUuid?.let { listUuid ->
                                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
-                                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid))
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY,
+                                        mapOf(
+                                            DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(listUuid),
+                                            DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(episode.podcast_uuid)
+                                        )
+                                    )
                                 }
                                 binding.btnPlay.setIconResource(if (!episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
                                 if (episode.isPlaying) {
@@ -472,7 +486,11 @@ internal class DiscoverAdapter(
                                     FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
                                     analyticsTracker.track(
                                         AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
-                                        mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid)
+                                        mapOf(
+                                            DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(listUuid),
+                                            DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(episode.podcast_uuid),
+                                            DiscoverFragment.Companion.AnalyticsPropKey.EPISODE_UUID to AnalyticsPropValue(episode.uuid)
+                                        )
                                     )
                                 }
                                 listener.onEpisodeClicked(episode = episode, listUuid = row.listUuid)
@@ -565,17 +583,32 @@ internal class DiscoverAdapter(
 
     private fun trackListImpression(listUuid: String) {
         FirebaseAnalyticsTracker.listImpression(listUuid)
-        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))
+        analyticsTracker.track(
+            AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
+            mapOf(DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(listUuid))
+        )
     }
 
     private fun trackDiscoverListPodcastTapped(listUuid: String, podcastUuid: String) {
         FirebaseAnalyticsTracker.podcastTappedFromList(listUuid, podcastUuid)
-        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
+        analyticsTracker.track(
+            AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
+            mapOf(
+                DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(listUuid),
+                DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(podcastUuid)
+            )
+        )
     }
 
     private fun trackDiscoverListPodcastSubscribed(listUuid: String, podcastUuid: String) {
         FirebaseAnalyticsTracker.podcastSubscribedFromList(listUuid, podcastUuid)
-        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
+        analyticsTracker.track(
+            AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
+            mapOf(
+                DiscoverFragment.Companion.AnalyticsPropKey.LIST_ID to AnalyticsPropValue(listUuid),
+                DiscoverFragment.Companion.AnalyticsPropKey.PODCAST_UUID to AnalyticsPropValue(podcastUuid)
+            )
+        )
     }
 }
 

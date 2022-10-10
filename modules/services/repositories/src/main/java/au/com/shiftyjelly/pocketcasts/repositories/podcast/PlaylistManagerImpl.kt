@@ -350,36 +350,37 @@ class PlaylistManagerImpl @Inject constructor(
                 when (playlistProperty) {
 
                     is FilterUpdatedEvent -> {
-                        val properties = mapOf(
-                            GROUP_KEY to playlistProperty.groupValue,
-                            SOURCE_KEY to userPlaylistUpdate.source.analyticsValue
+                        analyticsTracker.track(
+                            AnalyticsEvent.FILTER_UPDATED,
+                            mapOf(
+                                GROUP_KEY to playlistProperty.groupValue,
+                                SOURCE_KEY to userPlaylistUpdate.source.analyticsValue
+                            )
                         )
-                        analyticsTracker.track(AnalyticsEvent.FILTER_UPDATED, properties)
                     }
 
                     is PlaylistProperty.AutoDownload -> {
-                        val properties = mapOf(
-                            SOURCE_KEY to userPlaylistUpdate.source.analyticsValue,
-                            ENABLED_KEY to playlistProperty.enabled
+                        analyticsTracker.track(
+                            AnalyticsEvent.FILTER_AUTO_DOWNLOAD_UPDATED,
+                            mapOf(
+                                SOURCE_KEY to userPlaylistUpdate.source.analyticsValue,
+                                ENABLED_KEY to playlistProperty.enabledValue
+                            )
                         )
-                        analyticsTracker.track(AnalyticsEvent.FILTER_AUTO_DOWNLOAD_UPDATED, properties)
                     }
 
                     is PlaylistProperty.AutoDownloadLimit -> {
-                        val properties = mapOf(LIMIT_KEY to playlistProperty.limit)
-                        analyticsTracker.track(AnalyticsEvent.FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED, properties)
+                        analyticsTracker.track(
+                            AnalyticsEvent.FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED,
+                            mapOf(LIMIT_KEY to playlistProperty.limitValue)
+                        )
                     }
 
                     is PlaylistProperty.Sort -> {
-                        val sortOrderString = when (playlistProperty.sortOrder) {
-                            Playlist.SortOrder.NEWEST_TO_OLDEST -> "newest_to_oldest"
-                            Playlist.SortOrder.OLDEST_TO_NEWEST -> "oldest_to_newest"
-                            Playlist.SortOrder.SHORTEST_TO_LONGEST -> "shortest_to_longest"
-                            Playlist.SortOrder.LONGEST_TO_SHORTEST -> "longest_to_shortest"
-                            Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE -> "last_download_attempt_date"
-                        }
-                        val properties = mapOf(SORT_ORDER_KEY to sortOrderString)
-                        analyticsTracker.track(AnalyticsEvent.FILTER_SORT_BY_CHANGED, properties)
+                        analyticsTracker.track(
+                            AnalyticsEvent.FILTER_SORT_BY_CHANGED,
+                            mapOf(SORT_ORDER_KEY to playlistProperty.sortOrderValue)
+                        )
                     }
 
                     PlaylistProperty.Color,

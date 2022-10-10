@@ -15,9 +15,10 @@ object AnalyticsTracker {
         tracker?.let { trackers.add(tracker) }
     }
 
-    fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
+    fun track(event: AnalyticsEvent, properties: Map<String, AnalyticsPropValue> = emptyMap()) {
         if (getSendUsageStats()) {
-            trackers.forEach { it.track(event, properties) }
+            val convertedProps = properties.mapValues { it.value.propValue }
+            trackers.forEach { it.track(event, convertedProps) }
         }
     }
 
