@@ -120,6 +120,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
                 viewModel.seekToMs(progress, seekComplete)
+                playbackManager.trackPlaybackSeek(progress, PlaybackSource.PLAYER)
             }
 
             override fun onSeekPositionChanging(progress: Int) {}

@@ -548,6 +548,7 @@ class MediaSessionManager(
             seeking = true
             launch {
                 playbackManager.seekToTimeMs(pos.toInt())
+                playbackManager.trackPlaybackSeek(pos.toInt(), PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
             }
         }
     }

@@ -206,6 +206,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SKIP_BACK("playback_skip_back"),
     PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
     PLAYBACK_STOP("playback_stop"),
+    PLAYBACK_SEEK("playback_seek"),
 
     /* Privacy */
     PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
