@@ -234,7 +234,10 @@ project.ext {
             sentryBom: 'io.sentry:sentry-bom:6.4.2',
             sentry: 'io.sentry:sentry-android',
             sentryFragment: 'io.sentry:sentry-android-fragment',
-            sentryTimber: 'io.sentry:sentry-android-timber'
+            sentryTimber: 'io.sentry:sentry-android-timber',
+            // AboutLibraries - https://github.com/mikepenz/AboutLibraries
+            aboutLibrariesCore: 'com.mikepenz:aboutlibraries-core:10.5.0',
+            aboutLibrariesCompose: 'com.mikepenz:aboutlibraries-compose:10.5.0'
     ]
 
 }

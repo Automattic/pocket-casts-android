@@ -524,7 +524,13 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         } else {
             val podcastFound = podcastManager.findPodcastByUuidSuspend(parentId) ?: podcastManager.findOrDownloadPodcastRx(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
-                val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast).filterNot { it.isFinished || it.isArchived }.take(EPISODE_LIMIT).toMutableList()
+
+                val showPlayed = settings.getAutoShowPlayed()
+                val episodes = episodeManager
+                    .findEpisodesByPodcastOrdered(podcast)
+                    .filterNot { !showPlayed && (it.isFinished || it.isArchived) }
+                    .take(EPISODE_LIMIT)
+                    .toMutableList()
                 if (!podcast.isSubscribed) {
                     episodes.sortBy { it.episodeType !is Episode.EpisodeType.Trailer } // Bring trailers to the top
                 }

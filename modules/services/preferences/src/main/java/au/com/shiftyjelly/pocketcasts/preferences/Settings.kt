@@ -92,6 +92,7 @@ interface Settings {
 
         const val PREFERENCE_AUTO_PLAY_ON_EMPTY = "autoUpNextEmpty"
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
+        const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
         const val PREFERENCE_DISCOVERY_COUNTRY_CODE = "discovery_country_code"
         const val PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE = "popular_podcast_country_code"
@@ -514,6 +515,7 @@ interface Settings {
     fun setTrialFinishedSeen(seen: Boolean)
     fun getTrialFinishedSeen(): Boolean
     fun getAutoSubscribeToPlayed(): Boolean
+    fun getAutoShowPlayed(): Boolean
     fun getAutoPlayNextEpisodeOnEmpty(): Boolean
     fun defaultShowArchived(): Boolean
     fun setDefaultShowArchived(value: Boolean)
