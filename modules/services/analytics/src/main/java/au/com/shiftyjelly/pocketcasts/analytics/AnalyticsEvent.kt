@@ -219,6 +219,7 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_DELETED("filter_deleted"),
     FILTER_LIST_SHOWN("filter_list_shown"),
     FILTER_SHOWN("filter_shown"),
+    FILTER_SORT_BY_CHANGED("filter_sort_by_changed"),
     FILTER_UPDATED("filter_updated"),
 
     /* Discover */
