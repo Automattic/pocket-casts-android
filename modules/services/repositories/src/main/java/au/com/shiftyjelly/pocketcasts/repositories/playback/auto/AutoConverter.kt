@@ -7,8 +7,16 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.MediaDescriptionCompat.EXTRA_DOWNLOAD_STATUS
+import android.support.v4.media.MediaDescriptionCompat.STATUS_DOWNLOADED
+import android.support.v4.media.MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
 import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.core.os.bundleOf
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_NOT_PLAYED
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocaliseFilters
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -58,16 +66,6 @@ object AutoConverter {
 
     private const val THUMBNAIL_IMAGE_SIZE = 200
     private const val FULL_IMAGE_SIZE = 800
-
-    // bundle extras giving Android Auto more info about an episode
-    private const val EXTRA_IS_EXPLICIT = "android.media.IS_EXPLICIT"
-    private const val EXTRA_IS_DOWNLOADED = "android.media.extra.DOWNLOAD_STATUS"
-
-    // Playback Status, being one of the 3 constants below it
-    private const val EXTRA_PLAY_COMPLETION_STATE = "android.media.extra.PLAYBACK_STATUS"
-    private const val EXTRA_PLAY_STATE_VALUE_UNPLAYED = 0
-    private const val EXTRA_PLAY_STATE_VALUE_PARTIAL = 1
-    private const val EXTRA_PLAY_STATE_VALUE_COMPLETED = 2
 
     fun convertEpisodeToMediaItem(context: Context, episode: Playable, parentPodcast: Podcast, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
         val localUri = getBitmapUriForPodcast(parentPodcast, context)
@@ -205,19 +203,17 @@ object AutoConverter {
     }
 
     private fun extrasForEpisode(episode: Playable): Bundle {
-        val extras = Bundle(2)
-        extras.putLong(EXTRA_IS_DOWNLOADED, (if (episode.isDownloaded) 1 else 0).toLong())
+        val downloadStatus = if (episode.isDownloaded) STATUS_DOWNLOADED else STATUS_NOT_DOWNLOADED
 
-        val playbackStatus = episode.playingStatus
-        var androidAutoPlaybackStatus = EXTRA_PLAY_STATE_VALUE_UNPLAYED
-        if (playbackStatus == EpisodePlayingStatus.IN_PROGRESS) {
-            androidAutoPlaybackStatus = EXTRA_PLAY_STATE_VALUE_PARTIAL
-        } else if (playbackStatus == EpisodePlayingStatus.COMPLETED) {
-            androidAutoPlaybackStatus = EXTRA_PLAY_STATE_VALUE_COMPLETED
+        val completionStatus = when (episode.playingStatus) {
+            EpisodePlayingStatus.NOT_PLAYED -> DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_NOT_PLAYED
+            EpisodePlayingStatus.IN_PROGRESS -> DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED
+            EpisodePlayingStatus.COMPLETED -> DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_FULLY_PLAYED
         }
 
-        extras.putInt(EXTRA_PLAY_COMPLETION_STATE, androidAutoPlaybackStatus)
-
-        return extras
+        return bundleOf(
+            EXTRA_DOWNLOAD_STATUS to downloadStatus,
+            DESCRIPTION_EXTRAS_KEY_COMPLETION_STATUS to completionStatus
+        )
     }
 }
