@@ -97,7 +97,7 @@ class CreateFilterViewModel @Inject constructor(val playlistManager: PlaylistMan
                 playlist.autoDownload = autoDownload
                 val userPlaylistUpdate = if (isAutoDownloadSwitchInitialized) {
                     UserPlaylistUpdate(
-                        listOf(PlaylistProperty.AutoDownload),
+                        listOf(PlaylistProperty.AutoDownload(autoDownload)),
                         PlaylistUpdateSource.FILTER_EPISODE_LIST
                     )
                 } else null
@@ -131,7 +131,7 @@ class CreateFilterViewModel @Inject constructor(val playlistManager: PlaylistMan
             playlist.autodownloadLimit = limit
 
             val userPlaylistUpdate = UserPlaylistUpdate(
-                listOf(PlaylistProperty.AutoDownloadLimit),
+                listOf(PlaylistProperty.AutoDownloadLimit(limit)),
                 PlaylistUpdateSource.FILTER_OPTIONS
             )
             playlistManager.update(playlist, userPlaylistUpdate)

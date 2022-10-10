@@ -214,9 +214,11 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
 
     /* Filters screen */
+    FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED("filter_auto_download_limit_updated"),
+    FILTER_AUTO_DOWNLOAD_UPDATED("filter_auto_download_updated"),
+    FILTER_DELETED("filter_deleted"),
     FILTER_LIST_SHOWN("filter_list_shown"),
     FILTER_SHOWN("filter_shown"),
-    FILTER_DELETED("filter_deleted"),
     FILTER_UPDATED("filter_updated"),
 
     /* Discover */

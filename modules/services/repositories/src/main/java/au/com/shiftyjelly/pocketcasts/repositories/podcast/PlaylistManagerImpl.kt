@@ -41,6 +41,13 @@ class PlaylistManagerImpl @Inject constructor(
     appDatabase: AppDatabase
 ) : PlaylistManager, CoroutineScope {
 
+    companion object {
+        const val ENABLED_KEY = "enabled"
+        const val LIMIT_KEY = "limit"
+        const val GROUP_KEY = "group"
+        const val SOURCE_KEY = "source"
+    }
+
     private val playlistDao = appDatabase.playlistDao()
 
     init {
@@ -331,14 +338,25 @@ class PlaylistManagerImpl @Inject constructor(
 
                     is FilterUpdatedEvent -> {
                         val properties = mapOf(
-                            "group" to playlistProperty.groupValue,
-                            "source" to userPlaylistUpdate.source.analyticsValue
+                            GROUP_KEY to playlistProperty.groupValue,
+                            SOURCE_KEY to userPlaylistUpdate.source.analyticsValue
                         )
                         analyticsTracker.track(AnalyticsEvent.FILTER_UPDATED, properties)
                     }
 
-                    PlaylistProperty.AutoDownload,
-                    PlaylistProperty.AutoDownloadLimit,
+                    is PlaylistProperty.AutoDownload -> {
+                        val properties = mapOf(
+                            SOURCE_KEY to userPlaylistUpdate.source.analyticsValue,
+                            ENABLED_KEY to playlistProperty.enabled
+                        )
+                        analyticsTracker.track(AnalyticsEvent.FILTER_AUTO_DOWNLOAD_UPDATED, properties)
+                    }
+
+                    is PlaylistProperty.AutoDownloadLimit -> {
+                        val properties = mapOf(LIMIT_KEY to playlistProperty.limit)
+                        analyticsTracker.track(AnalyticsEvent.FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED, properties)
+                    }
+
                     PlaylistProperty.Color,
                     PlaylistProperty.FilterName,
                     PlaylistProperty.Icon,
