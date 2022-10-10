@@ -120,6 +120,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 when (position) {
+                    0 -> {
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to NOW_PLAYING))
+                        FirebaseAnalyticsTracker.nowPlayingOpen()
+                    }
                     1 -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to SHOW_NOTES))
                         FirebaseAnalyticsTracker.openedPlayerNotes()
@@ -127,6 +131,9 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                     2 -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to CHAPTERS))
                         FirebaseAnalyticsTracker.openedPlayerChapters()
+                    }
+                    else -> {
+                        Timber.e("Invalid tab selected")
                     }
                 }
             }
@@ -216,6 +223,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     companion object {
         private const val SOURCE_KEY = "source"
         private const val TAB_KEY = "tab"
+        private const val NOW_PLAYING = "now_playing"
         private const val SHOW_NOTES = "show_notes"
         private const val CHAPTERS = "chapters"
     }
