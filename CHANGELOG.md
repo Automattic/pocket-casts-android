@@ -6,6 +6,8 @@
         ([#335](https://github.com/Automattic/pocket-casts-android/pull/335)).
     *   Allow select text in show notes from episode details view.
         ([#372](https://github.com/Automattic/pocket-casts-android/pull/372)).
+    *   Added Automotive OS setting to show played episodes.
+        ([#389](https://github.com/Automattic/pocket-casts-android/pull/389)).
 
 7.24
 -----
