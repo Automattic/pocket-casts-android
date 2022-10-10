@@ -107,7 +107,10 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
-        private const val KEY_SOURCE = "source"
+        private const val SOURCE_KEY = "source"
+        const val SPEED_KEY = "speed"
+        const val AMOUNT_KEY = "amount"
+        const val ENABLED_KEY = "enabled"
     }
 
     override val coroutineContext: CoroutineContext
@@ -1845,8 +1848,19 @@ open class PlaybackManager @Inject constructor(
         if (playbackSource == PlaybackSource.UNKNOWN) {
             Timber.w("Found unknown playback source.")
         }
-        analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
+        analyticsTracker.track(event, mapOf(SOURCE_KEY to playbackSource.analyticsValue))
         playbackSource = PlaybackSource.UNKNOWN
+    }
+
+    fun trackPlaybackEffectsEvent(
+        event: AnalyticsEvent,
+        props: Map<String, Any> = emptyMap(),
+        playbackSource: PlaybackSource
+    ) {
+        val properties = HashMap<String, Any>()
+        properties[SOURCE_KEY] = playbackSource.analyticsValue
+        properties.putAll(props)
+        analyticsTracker.track(event, properties)
     }
 
     enum class PlaybackSource(val analyticsValue: String) {
@@ -1864,6 +1878,8 @@ open class PlaybackManager @Inject constructor(
         NOTIFICATION("notification"),
         FULL_SCREEN_VIDEO("full_screen_video"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
+        PLAYER_PLAYBACK_EFFECTS("player_playback_effects"),
+        PODCAST_SETTINGS("podcast_settings"),
         UNKNOWN("unknown"),
     }
 }
