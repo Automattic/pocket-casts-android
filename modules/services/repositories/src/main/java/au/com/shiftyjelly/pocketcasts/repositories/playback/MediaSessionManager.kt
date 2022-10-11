@@ -633,9 +633,10 @@ class MediaSessionManager(
 
         Timber.i("performPlayFromSearch query: $query")
 
+        val playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION
         launch {
             if (query.startsWith("up next")) {
-                playbackManager.playQueue()
+                playbackManager.playQueue(playbackSource = playbackSource)
                 return@launch
             }
 
@@ -652,7 +653,7 @@ class MediaSessionManager(
                 val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitle(option)
                 if (matchingPodcast != null) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played podcast from search %s.", option)
-                    playPodcast(matchingPodcast)
+                    playPodcast(podcast = matchingPodcast, playbackSource = playbackSource)
                     return@launch
                 }
             }
@@ -660,7 +661,7 @@ class MediaSessionManager(
             for (option in options) {
                 val matchingEpisode = episodeManager.findFirstBySearchQuery(option) ?: continue
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played episode from search %s.", option)
-                playbackManager.playNow(matchingEpisode)
+                playbackManager.playNow(episode = matchingEpisode, playbackSource = playbackSource)
                 return@launch
             }
 
@@ -710,9 +711,9 @@ class MediaSessionManager(
         playbackManager.playEpisodes(episodes = episodes, playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION)
     }
 
-    private suspend fun playPodcast(podcast: Podcast) {
+    private suspend fun playPodcast(podcast: Podcast, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         val latestEpisode = withContext(Dispatchers.Default) { episodeManager.findLatestUnfinishedEpisodeByPodcast(podcast) } ?: return
-        playbackManager.playNow(latestEpisode)
+        playbackManager.playNow(episode = latestEpisode, playbackSource = playbackSource)
     }
 
     // there's an issue on Samsung phones that if you don't say you support ACTION_SKIP_TO_PREVIOUS and ACTION_SKIP_TO_NEXT then the skip buttons on the lock screen are disabled.
