@@ -1850,9 +1850,6 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private fun PlaybackSource.skipTracking() =
-        this in listOf(PlaybackSource.AUTO_PLAY, PlaybackSource.AUTO_PAUSE)
-
     enum class PlaybackSource(val analyticsValue: String) {
         PODCAST_SCREEN("podcast_screen"),
         FILTERS("filters"),
@@ -1874,6 +1871,8 @@ open class PlaybackManager @Inject constructor(
         CHROMECAST("chromecast"),
         AUTO_PLAY("auto_play"),
         AUTO_PAUSE("auto_pause"),
-        UNKNOWN("unknown"),
+        UNKNOWN("unknown");
+
+        fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
     }
 }
