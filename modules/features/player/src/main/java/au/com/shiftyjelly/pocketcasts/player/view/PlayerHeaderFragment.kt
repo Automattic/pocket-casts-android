@@ -486,7 +486,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 viewModel.play()
                                 warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
                             } else {
-                                warningsHelper.streamingWarningDialog(episode, snackbarParentView = view)
+                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, playbackSource = PlaybackSource.PLAYER)
                                     .show(parentFragmentManager, "streaming dialog")
                             }
                         }

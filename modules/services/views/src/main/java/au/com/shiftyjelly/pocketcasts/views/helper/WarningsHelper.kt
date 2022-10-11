@@ -40,11 +40,12 @@ class WarningsHelper @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     fun streamingWarningDialog(
         episode: Playable,
-        snackbarParentView: View? = null
+        snackbarParentView: View? = null,
+        playbackSource: PlaybackManager.PlaybackSource
     ): ConfirmationDialog {
         return streamingWarningDialog(onConfirm = {
             GlobalScope.launch {
-                playbackManager.playNow(episode, true)
+                playbackManager.playNow(episode = episode, forceStream = true, playbackSource = playbackSource)
                 showBatteryWarningSnackbarIfAppropriate(snackbarParentView)
             }
         })

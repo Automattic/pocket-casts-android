@@ -42,7 +42,7 @@ class PlayButtonListener @Inject constructor(
                         if (episode.isDownloaded) {
                             play(episode)
                         } else if (activity is AppCompatActivity) {
-                            warningsHelper.streamingWarningDialog(episode)
+                            warningsHelper.streamingWarningDialog(episode = episode, playbackSource = playbackSource)
                                 .show(activity.supportFragmentManager, "streaming dialog")
                         }
                     }

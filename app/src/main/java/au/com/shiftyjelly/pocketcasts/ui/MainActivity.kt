@@ -695,7 +695,7 @@ class MainActivity :
                             playbackManager.playQueue(PlaybackSource.MINIPLAYER)
                             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                         } else {
-                            warningsHelper.streamingWarningDialog(episode)
+                            warningsHelper.streamingWarningDialog(episode = episode, playbackSource = PlaybackSource.MINIPLAYER)
                                 .show(supportFragmentManager, "streaming dialog")
                         }
                     }
