@@ -442,7 +442,7 @@ class MediaSessionManager(
                 playPauseTimer = null
 
                 logEvent("skip forwards from headset hook")
-                playbackManager.skipForward()
+                playbackManager.skipForward(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
             }
         }
 
@@ -480,7 +480,7 @@ class MediaSessionManager(
             logEvent("stop")
             launch {
                 // note: the stop event is called from cars when they only want to pause, this is less destructive and doesn't cause issues if they try to play again
-                playbackManager.pause()
+                playbackManager.pause(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
             }
         }
 
@@ -512,7 +512,7 @@ class MediaSessionManager(
                 val autoMediaId = AutoMediaId.fromMediaId(mediaId)
                 val playableId = autoMediaId.playableId
                 episodeManager.findPlayableByUuid(playableId)?.let { episode ->
-                    playbackManager.playNow(episode)
+                    playbackManager.playNow(episode, playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
 
                     playbackManager.lastLoadedFromPodcastOrPlaylistUuid = autoMediaId.sourceId
                 }
@@ -537,7 +537,7 @@ class MediaSessionManager(
             if (state is UpNextQueue.State.Loaded) {
                 state.queue.find { it.adapterId == id }?.let { episode ->
                     logEvent("play from skip to queue item")
-                    playbackManager.playNow(episode)
+                    playbackManager.playNow(episode, playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
                 }
             }
         }
