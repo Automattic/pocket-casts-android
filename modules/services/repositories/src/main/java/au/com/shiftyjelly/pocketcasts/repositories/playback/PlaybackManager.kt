@@ -1864,6 +1864,7 @@ open class PlaybackManager @Inject constructor(
         PLAYER("player"),
         NOTIFICATION("notification"),
         FULL_SCREEN_VIDEO("full_screen_video"),
+        UP_NEXT("up_next"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
         CHROMECAST("chromecast"),
         AUTO_PLAY("auto_play"),

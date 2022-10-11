@@ -371,10 +371,10 @@ class PlayerViewModel @Inject constructor(
         playbackManager.playQueue(playbackSource = PlaybackSource.PLAYER)
     }
 
-    fun playEpisode(uuid: String) {
+    fun playEpisode(uuid: String, playbackSource: PlaybackManager.PlaybackSource = PlaybackManager.PlaybackSource.UNKNOWN) {
         launch {
             val episode = episodeManager.findPlayableByUuid(uuid) ?: return@launch
-            playbackManager.playNow(episode)
+            playbackManager.playNow(episode = episode, playbackSource = playbackSource)
         }
     }
 

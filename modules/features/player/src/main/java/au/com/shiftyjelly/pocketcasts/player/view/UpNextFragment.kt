@@ -288,7 +288,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {
         if (settings.getTapOnUpNextShouldPlay()) {
-            playerViewModel.playEpisode(episodeUuid)
+            playerViewModel.playEpisode(uuid = episodeUuid, playbackSource = PlaybackManager.PlaybackSource.UP_NEXT)
         } else {
             (activity as? FragmentHostListener)?.openEpisodeDialog(episodeUuid, podcastUuid, forceDark = true)
         }
@@ -298,7 +298,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         if (settings.getTapOnUpNextShouldPlay()) {
             (activity as? FragmentHostListener)?.openEpisodeDialog(episodeUuid, podcastUuid, forceDark = true)
         } else {
-            playerViewModel.playEpisode(episodeUuid)
+            playerViewModel.playEpisode(uuid = episodeUuid, playbackSource = PlaybackManager.PlaybackSource.UP_NEXT)
         }
     }
 
