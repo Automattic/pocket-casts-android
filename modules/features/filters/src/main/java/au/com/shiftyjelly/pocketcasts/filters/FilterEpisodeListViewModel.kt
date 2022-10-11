@@ -118,7 +118,7 @@ class FilterEpisodeListViewModel @Inject constructor(
             if (startIndex > -1) {
                 playbackManager.upNextQueue.removeAll()
                 val count = min(episodes.size - startIndex, settings.getMaxUpNextEpisodes())
-                playbackManager.playEpisodes(episodes.subList(startIndex, startIndex + count))
+                playbackManager.playEpisodes(episodes = episodes.subList(startIndex, startIndex + count), playbackSource = PlaybackManager.PlaybackSource.FILTERS)
             }
         }
     }

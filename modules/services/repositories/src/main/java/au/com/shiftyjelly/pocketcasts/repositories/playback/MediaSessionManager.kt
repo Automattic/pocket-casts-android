@@ -707,7 +707,7 @@ class MediaSessionManager(
             return
         }
 
-        playbackManager.playEpisodes(episodes)
+        playbackManager.playEpisodes(episodes = episodes, playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION)
     }
 
     private suspend fun playPodcast(podcast: Podcast) {

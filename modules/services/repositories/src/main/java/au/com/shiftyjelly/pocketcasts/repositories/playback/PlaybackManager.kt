@@ -399,14 +399,14 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun playEpisodes(episodes: List<Playable>) {
+    fun playEpisodes(episodes: List<Playable>, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         if (episodes.isEmpty()) {
             return
         }
 
         launch {
             val topEpisode = episodes.first()
-            playNowSync(topEpisode)
+            playNowSync(episode = topEpisode, playbackSource = playbackSource)
             if (episodes.size > 1) {
                 upNextQueue.clearAndPlayAll(episodes.slice(1 until min(episodes.size, settings.getMaxUpNextEpisodes())), downloadManager)
             }
@@ -1866,6 +1866,7 @@ open class PlaybackManager @Inject constructor(
         FULL_SCREEN_VIDEO("full_screen_video"),
         UP_NEXT("up_next"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
+        MEDIA_BUTTON_BROADCAST_SEARCH_ACTION("media_button_broadcast_search_action"),
         CHROMECAST("chromecast"),
         AUTO_PLAY("auto_play"),
         UNKNOWN("unknown"),
