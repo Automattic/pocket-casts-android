@@ -132,7 +132,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playLast(episode)
                 if (playNext) {
-                    playbackManager.playNextInQueue()
+                    playbackManager.playNextInQueue(playbackSource = PlaybackManager.PlaybackSource.NOTIFICATION)
                 }
             }
         }

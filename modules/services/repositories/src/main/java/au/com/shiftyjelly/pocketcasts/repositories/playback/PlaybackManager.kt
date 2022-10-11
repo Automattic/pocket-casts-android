@@ -578,10 +578,10 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun playNextInQueue() {
+    fun playNextInQueue(playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         launch {
             upNextQueue.queueEpisodes.getOrNull(0)?.let {
-                playNowSync(it)
+                playNowSync(episode = it, playbackSource = playbackSource)
             }
         }
     }

@@ -399,7 +399,7 @@ class PlayerViewModel @Inject constructor(
         }
         if (playbackManager.upNextQueue.queueEpisodes.isNotEmpty()) {
             optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.next_episode) {
-                playbackManager.playNextInQueue()
+                playbackManager.playNextInQueue(playbackSource = PlaybackManager.PlaybackSource.PLAYER)
             }
         }
 
