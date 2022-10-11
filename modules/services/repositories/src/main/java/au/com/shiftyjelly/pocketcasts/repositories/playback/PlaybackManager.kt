@@ -206,7 +206,7 @@ open class PlaybackManager @Inject constructor(
         withContext(Dispatchers.Default) {
             upNextQueue.playNext(autoPlayEpisode, downloadManager) {
                 launch {
-                    loadCurrentEpisode(autoPlay)
+                    loadCurrentEpisode(play = autoPlay, playbackSource = PlaybackSource.AUTO_PLAY)
                 }
             }
         }
@@ -999,7 +999,7 @@ open class PlaybackManager @Inject constructor(
                 shutdown()
             }
         } else {
-            loadCurrentEpisode(autoPlay)
+            loadCurrentEpisode(play = autoPlay, playbackSource = PlaybackSource.AUTO_PLAY)
         }
     }
 
@@ -1845,7 +1845,9 @@ open class PlaybackManager @Inject constructor(
         if (playbackSource == PlaybackSource.UNKNOWN) {
             Timber.w("Found unknown playback source.")
         }
-        analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
+        if (playbackSource != PlaybackSource.AUTO_PLAY) {
+            analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
+        }
     }
 
     enum class PlaybackSource(val analyticsValue: String) {
@@ -1863,6 +1865,7 @@ open class PlaybackManager @Inject constructor(
         NOTIFICATION("notification"),
         FULL_SCREEN_VIDEO("full_screen_video"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
+        AUTO_PLAY("auto_play"),
         UNKNOWN("unknown"),
     }
 }
