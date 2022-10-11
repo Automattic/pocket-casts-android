@@ -753,7 +753,7 @@ open class PlaybackManager @Inject constructor(
         upNextQueue.currentEpisode ?: return
         launch {
             if (isPlayerSwitchRequired()) {
-                loadCurrentEpisode(true)
+                loadCurrentEpisode(true, playbackSource = PlaybackSource.CHROMECAST)
             }
         }
     }
@@ -766,7 +766,7 @@ open class PlaybackManager @Inject constructor(
             stop()
 
             if (isPlayerSwitchRequired()) {
-                loadCurrentEpisode(false)
+                loadCurrentEpisode(false, playbackSource = PlaybackSource.CHROMECAST)
             }
         }
     }
@@ -1865,6 +1865,7 @@ open class PlaybackManager @Inject constructor(
         NOTIFICATION("notification"),
         FULL_SCREEN_VIDEO("full_screen_video"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
+        CHROMECAST("chromecast"),
         AUTO_PLAY("auto_play"),
         UNKNOWN("unknown"),
     }
