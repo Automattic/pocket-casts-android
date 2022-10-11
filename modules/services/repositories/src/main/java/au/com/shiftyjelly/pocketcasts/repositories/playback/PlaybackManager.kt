@@ -711,7 +711,7 @@ open class PlaybackManager @Inject constructor(
                 upNextQueue.removeEpisode(episodeToRemove)
 
                 if (isCurrentEpisode) {
-                    loadCurrentEpisode(isPlaying)
+                    loadCurrentEpisode(play = isPlaying, playbackSource = PlaybackSource.AUTO_PLAY)
                 }
             }
         }
