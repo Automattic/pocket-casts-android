@@ -243,16 +243,15 @@ class EpisodeFragmentViewModel @Inject constructor(
         fromListUuid: String? = null
     ): Boolean {
         episode?.let { episode ->
-            playbackManager.playbackSource = PlaybackSource.EPISODE_DETAILS
             if (isPlaying.value == true) {
-                playbackManager.pause()
+                playbackManager.pause(playbackSource = PlaybackSource.EPISODE_DETAILS)
                 return false
             } else {
                 fromListUuid?.let {
                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
                 }
-                playbackManager.playNow(episode, force)
+                playbackManager.playNow(episode, forceStream = force, playbackSource = PlaybackSource.EPISODE_DETAILS)
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                 return true
             }

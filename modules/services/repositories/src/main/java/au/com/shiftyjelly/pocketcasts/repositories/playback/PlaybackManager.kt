@@ -154,7 +154,6 @@ open class PlaybackManager @Inject constructor(
     var sleepAfterEpisode: Boolean = false
 
     var player: Player? = null
-    var playbackSource = PlaybackSource.UNKNOWN
 
     val mediaSession: MediaSessionCompat
         get() = mediaSessionManager.mediaSession
@@ -320,30 +319,30 @@ open class PlaybackManager @Inject constructor(
         return playbackStateRelay.blockingFirst().playbackSpeed
     }
 
-    fun playPause() {
+    fun playPause(playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         if (isPlaying()) {
-            pause()
+            pause(playbackSource = playbackSource)
         } else {
-            playQueue()
+            playQueue(playbackSource)
         }
     }
 
-    fun playQueue() {
+    fun playQueue(playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         launch {
             if (upNextQueue.currentEpisode != null) {
-                loadEpisodeWhenRequired()
+                loadEpisodeWhenRequired(playbackSource)
             }
         }
     }
 
-    fun playNow(episode: Playable, forceStream: Boolean = false) {
+    fun playNow(episode: Playable, forceStream: Boolean = false, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         launch {
             forcePlayerSwitch = true
-            playNowSync(episode, forceStream)
+            playNowSync(episode = episode, forceStream = forceStream, playbackSource = playbackSource)
         }
     }
 
-    private suspend fun playNowSync(episode: Playable, forceStream: Boolean = false) {
+    private suspend fun playNowSync(episode: Playable, forceStream: Boolean = false, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play now: ${episode.uuid} ${episode.title}")
 
         if (episode.isArchived) {
@@ -360,7 +359,7 @@ open class PlaybackManager @Inject constructor(
             pause(transientLoss = true)
             upNextQueue.playNow(episode) {
                 launch {
-                    loadCurrentEpisode(play = true, forceStream = forceStream)
+                    loadCurrentEpisode(play = true, forceStream = forceStream, playbackSource = playbackSource)
                 }
             }
 
@@ -370,7 +369,7 @@ open class PlaybackManager @Inject constructor(
             }
         } else if (!switchEpisode && playbackStateRelay.blockingFirst().isPaused) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No player switch required. Playing queue.")
-            playQueue()
+            playQueue(playbackSource)
         }
     }
 
@@ -392,11 +391,11 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun loadEpisodeWhenRequired() {
+    private suspend fun loadEpisodeWhenRequired(playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         if (isPlayerSwitchRequired()) {
-            loadCurrentEpisode(play = true)
+            loadCurrentEpisode(play = true, playbackSource = playbackSource)
         } else {
-            play()
+            play(playbackSource)
         }
     }
 
@@ -457,14 +456,14 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun pause(transientLoss: Boolean = false) {
+    fun pause(transientLoss: Boolean = false, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         if (!transientLoss) {
             focusManager.giveUpAudioFocus()
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused - Not transient")
-            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE)
+            trackPlayback(AnalyticsEvent.PLAYBACK_PAUSE, playbackSource)
         } else {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = true))
@@ -479,10 +478,10 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun stopAsync(isAudioFocusFailed: Boolean = false) {
+    fun stopAsync(isAudioFocusFailed: Boolean = false, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         launch {
             if (!isAudioFocusFailed) {
-                trackPlayback(AnalyticsEvent.PLAYBACK_STOP)
+                trackPlayback(AnalyticsEvent.PLAYBACK_STOP, playbackSource)
             }
             stop()
         }
@@ -587,7 +586,7 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun skipForward() {
+    fun skipForward(playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
 
@@ -608,10 +607,10 @@ open class PlaybackManager @Inject constructor(
                 onCompletion(episode.uuid)
             }
         }
-        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD)
+        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_FORWARD, playbackSource)
     }
 
-    fun skipBackward() {
+    fun skipBackward(playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip backward tapped")
 
@@ -624,7 +623,7 @@ open class PlaybackManager @Inject constructor(
             val newPositionMs = Math.max(currentTimeMs - jumpAmountMs, 0)
             seekToTimeMsInternal(newPositionMs)
         }
-        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK)
+        trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK, playbackSource)
     }
 
     fun skipToNextChapter() {
@@ -1233,7 +1232,7 @@ open class PlaybackManager @Inject constructor(
     /**
      * Load the episode
      */
-    private suspend fun loadCurrentEpisode(play: Boolean, forceStream: Boolean = false) {
+    private suspend fun loadCurrentEpisode(play: Boolean, forceStream: Boolean = false, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         // make sure we have the most recent copy from the database
         val currentUpNextEpisode = upNextQueue.currentEpisode
         val episode: Playable? = if (currentUpNextEpisode is Episode) {
@@ -1419,7 +1418,7 @@ open class PlaybackManager @Inject constructor(
             if (sameEpisode && currentPosition != null) {
                 player?.seekToTimeMs(currentPosition)
             }
-            play()
+            play(playbackSource)
         } else {
             player?.load(episode.playedUpToMs)
             onPlayerPaused()
@@ -1520,7 +1519,7 @@ open class PlaybackManager @Inject constructor(
         return PendingIntent.getBroadcast(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
     }
 
-    private suspend fun play() {
+    private suspend fun play(playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         val episode = getCurrentEpisode()
         if (episode == null || player == null) {
             return
@@ -1565,7 +1564,8 @@ open class PlaybackManager @Inject constructor(
         )
 
         player?.play(currentTimeMs)
-        trackPlayback(AnalyticsEvent.PLAYBACK_PLAY)
+
+        trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, playbackSource)
     }
 
     private suspend fun addPodcastStartFromSettings(episode: Episode, podcast: Podcast?, isPlaying: Boolean) {
@@ -1841,12 +1841,11 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private fun trackPlayback(event: AnalyticsEvent) {
+    private fun trackPlayback(event: AnalyticsEvent, playbackSource: PlaybackSource) {
         if (playbackSource == PlaybackSource.UNKNOWN) {
             Timber.w("Found unknown playback source.")
         }
         analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
-        playbackSource = PlaybackSource.UNKNOWN
     }
 
     enum class PlaybackSource(val analyticsValue: String) {

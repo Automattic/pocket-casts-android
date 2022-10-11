@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,7 +61,6 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
             return
         }
 
-        playbackManager.playbackSource = PlaybackManager.PlaybackSource.NOTIFICATION
         // remove the notification
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationTag = bundle.getString(INTENT_EXTRA_NOTIFICATION_TAG, null)
@@ -90,7 +90,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun playNow(episodeUuid: String, forceStream: Boolean) {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNow(episode, forceStream)
+                playbackManager.playNow(episode, forceStream = forceStream, playbackSource = PlaybackSource.NOTIFICATION)
             }
         }
     }

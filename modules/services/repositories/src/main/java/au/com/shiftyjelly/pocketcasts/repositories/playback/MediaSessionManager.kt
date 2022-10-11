@@ -390,7 +390,6 @@ class MediaSessionManager(
                     @Suppress("DEPRECATION")
                     mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
                 } ?: return false
-                playbackManager.playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
@@ -430,7 +429,7 @@ class MediaSessionManager(
                         object : TimerTask() {
                             override fun run() {
                                 logEvent("play from headset hook", inSessionCallback = false)
-                                playbackManager.playPause()
+                                playbackManager.playPause(PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
                                 playPauseTimer = null
                             }
                         },
@@ -461,12 +460,12 @@ class MediaSessionManager(
 
         override fun onPlay() {
             logEvent("play")
-            playbackManager.playQueue()
+            playbackManager.playQueue(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
         }
 
         override fun onPause() {
             logEvent("pause")
-            playbackManager.pause()
+            playbackManager.pause(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
@@ -487,12 +486,12 @@ class MediaSessionManager(
 
         override fun onSkipToPrevious() {
             logEvent("skip backwards")
-            playbackManager.skipBackward()
+            playbackManager.skipBackward(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
         }
 
         override fun onSkipToNext() {
             logEvent("skip forwards")
-            playbackManager.skipForward()
+            playbackManager.skipForward(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
         }
 
         override fun onSetRating(rating: RatingCompat?) {

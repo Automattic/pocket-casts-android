@@ -54,14 +54,12 @@ class PlayButtonListener @Inject constructor(
     }
 
     private fun play(episode: Playable, force: Boolean = true) {
-        playbackManager.playbackSource = playbackSource
-        playbackManager.playNow(episode, force)
+        playbackManager.playNow(episode = episode, forceStream = force, playbackSource = playbackSource)
         warningsHelper.showBatteryWarningSnackbarIfAppropriate()
     }
 
     override fun onPauseClicked() {
-        playbackManager.playbackSource = playbackSource
-        playbackManager.pause()
+        playbackManager.pause(playbackSource = playbackSource)
     }
 
     override fun onPlayedClicked(episodeUuid: String) {

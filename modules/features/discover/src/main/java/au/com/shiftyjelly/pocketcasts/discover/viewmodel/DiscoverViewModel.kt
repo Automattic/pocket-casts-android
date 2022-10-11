@@ -162,13 +162,11 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: Episode) {
-        playbackManager.playbackSource = PlaybackSource.DISCOVER
-        playbackManager.playNow(episode, forceStream = true)
+        playbackManager.playNow(episode = episode, forceStream = true, playbackSource = PlaybackSource.DISCOVER)
     }
 
     fun stopPlayback() {
-        playbackManager.playbackSource = PlaybackSource.DISCOVER
-        playbackManager.stopAsync()
+        playbackManager.stopAsync(playbackSource = PlaybackSource.DISCOVER)
     }
 }
 
