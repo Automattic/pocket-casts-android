@@ -1053,7 +1053,7 @@ open class PlaybackManager @Inject constructor(
 
         val podcast = playbackStateRelay.blockingFirst().podcast
         if (podcast != null && podcast.skipLastSecs > 0) {
-            pause()
+            pause(playbackSource = PlaybackSource.AUTO_PAUSE)
         }
         onPlayerPaused()
 
@@ -1163,7 +1163,7 @@ open class PlaybackManager @Inject constructor(
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost while playing")
             focusWasPlaying = Date()
 
-            pause(transientLoss = transientLoss)
+            pause(transientLoss = transientLoss, playbackSource = PlaybackSource.AUTO_PAUSE)
         } else {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost not playing")
             focusWasPlaying = null
@@ -1186,7 +1186,7 @@ open class PlaybackManager @Inject constructor(
             return
         }
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "System fired 'Audio Becoming Noisy' event, pausing playback.")
-        pause()
+        pause(playbackSource = PlaybackSource.AUTO_PAUSE)
         focusWasPlaying = null
     }
 
@@ -1845,10 +1845,13 @@ open class PlaybackManager @Inject constructor(
         if (playbackSource == PlaybackSource.UNKNOWN) {
             Timber.w("Found unknown playback source.")
         }
-        if (playbackSource != PlaybackSource.AUTO_PLAY) {
+        if (!playbackSource.skipTracking()) {
             analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
         }
     }
+
+    private fun PlaybackSource.skipTracking() =
+        this in listOf(PlaybackSource.AUTO_PLAY, PlaybackSource.AUTO_PAUSE)
 
     enum class PlaybackSource(val analyticsValue: String) {
         PODCAST_SCREEN("podcast_screen"),
@@ -1869,6 +1872,7 @@ open class PlaybackManager @Inject constructor(
         MEDIA_BUTTON_BROADCAST_SEARCH_ACTION("media_button_broadcast_search_action"),
         CHROMECAST("chromecast"),
         AUTO_PLAY("auto_play"),
+        AUTO_PAUSE("auto_pause"),
         UNKNOWN("unknown"),
     }
 }
