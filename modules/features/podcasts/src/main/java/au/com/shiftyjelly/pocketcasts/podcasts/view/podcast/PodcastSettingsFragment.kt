@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
