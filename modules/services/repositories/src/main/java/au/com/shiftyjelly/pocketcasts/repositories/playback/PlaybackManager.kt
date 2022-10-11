@@ -1870,6 +1870,7 @@ open class PlaybackManager @Inject constructor(
         UP_NEXT("up_next"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
         MEDIA_BUTTON_BROADCAST_SEARCH_ACTION("media_button_broadcast_search_action"),
+        PLAYER_BROADCAST_ACTION("player_broadcast_action"),
         CHROMECAST("chromecast"),
         AUTO_PLAY("auto_play"),
         AUTO_PAUSE("auto_pause"),

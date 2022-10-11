@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,26 +52,26 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun skipBackward() {
-        playbackManager.skipBackward()
+        playbackManager.skipBackward(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
     }
 
     private fun skipForward() {
-        playbackManager.skipForward()
+        playbackManager.skipForward(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
     }
 
     private fun pause() {
-        playbackManager.pause()
+        playbackManager.pause(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
     }
 
     private fun play() {
-        playbackManager.playQueue()
+        playbackManager.playQueue(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
     }
 
     private fun playNext() {
-        playbackManager.playNextInQueue()
+        playbackManager.playNextInQueue(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
     }
 
     private fun stop() {
-        playbackManager.stopAsync()
+        playbackManager.stopAsync(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
     }
 }
