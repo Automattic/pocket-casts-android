@@ -257,6 +257,15 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
     UP_NEXT_DISMISSED("up_next_dismissed"),
 
+    /* Player */
+    PLAYER_SHOWN("player_shown"),
+    PLAYER_DISMISSED("player_dismissed"),
+    PLAYER_TAB_SELECTED("player_tab_selected"),
+    PLAYER_SHOW_NOTES_LINK_TAPPED("player_show_notes_link_tapped"),
+    PLAYER_CHAPTER_SELECTED("player_chapter_selected"),
+    PLAYER_PREVIOUS_CHAPTER_TAPPED("player_previous_chapter_tapped"),
+    PLAYER_NEXT_CHAPTER_TAPPED("player_next_chapter_tapped"),
+
     /* Player - Sleep Timer */
     PLAYER_SLEEP_TIMER_ENABLED("player_sleep_timer_enabled"),
     PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),

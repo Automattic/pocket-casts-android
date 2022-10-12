@@ -110,6 +110,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         }.attach()
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            private var previousPosition: Int = INVALID_TAB_POSITION
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
                 if (state == SCROLL_STATE_IDLE) {
@@ -120,9 +121,24 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 when (position) {
-                    1 -> FirebaseAnalyticsTracker.openedPlayerNotes()
-                    2 -> FirebaseAnalyticsTracker.openedPlayerChapters()
+                    0 -> {
+                        if (previousPosition == INVALID_TAB_POSITION) return
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to NOW_PLAYING))
+                        FirebaseAnalyticsTracker.nowPlayingOpen()
+                    }
+                    1 -> {
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to SHOW_NOTES))
+                        FirebaseAnalyticsTracker.openedPlayerNotes()
+                    }
+                    2 -> {
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to CHAPTERS))
+                        FirebaseAnalyticsTracker.openedPlayerChapters()
+                    }
+                    else -> {
+                        Timber.e("Invalid tab selected")
+                    }
                 }
+                previousPosition = position
             }
         })
 
@@ -208,7 +224,12 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     companion object {
+        private const val INVALID_TAB_POSITION = -1
         private const val SOURCE_KEY = "source"
+        private const val TAB_KEY = "tab"
+        private const val NOW_PLAYING = "now_playing"
+        private const val SHOW_NOTES = "show_notes"
+        private const val CHAPTERS = "chapters"
     }
 }
 
