@@ -1850,14 +1850,9 @@ open class PlaybackManager @Inject constructor(
         if (playbackSource == PlaybackSource.UNKNOWN) {
             Timber.w("Found unknown playback source.")
         }
-<<<<<<< HEAD
         if (!playbackSource.skipTracking()) {
-            analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
+            analyticsTracker.track(event, mapOf(SOURCE_KEY to playbackSource.analyticsValue))
         }
-=======
-        analyticsTracker.track(event, mapOf(SOURCE_KEY to playbackSource.analyticsValue))
-        playbackSource = PlaybackSource.UNKNOWN
->>>>>>> origin/main
     }
 
     fun trackPlaybackSeek(
@@ -1909,19 +1904,15 @@ open class PlaybackManager @Inject constructor(
         FULL_SCREEN_VIDEO("full_screen_video"),
         UP_NEXT("up_next"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
-<<<<<<< HEAD
         MEDIA_BUTTON_BROADCAST_SEARCH_ACTION("media_button_broadcast_search_action"),
         PLAYER_BROADCAST_ACTION("player_broadcast_action"),
         CHROMECAST("chromecast"),
         AUTO_PLAY("auto_play"),
         AUTO_PAUSE("auto_pause"),
+        PLAYER_PLAYBACK_EFFECTS("player_playback_effects"),
+        PODCAST_SETTINGS("podcast_settings"),
         UNKNOWN("unknown");
 
         fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
-=======
-        PLAYER_PLAYBACK_EFFECTS("player_playback_effects"),
-        PODCAST_SETTINGS("podcast_settings"),
-        UNKNOWN("unknown"),
->>>>>>> origin/main
     }
 }

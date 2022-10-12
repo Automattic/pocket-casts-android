@@ -67,13 +67,10 @@ android {
 }
 
 sentry {
-<<<<<<< HEAD
+    includeProguardMapping = file("$rootDir/sentry.properties").exists()
     tracingInstrumentation {
         features = EnumSet.allOf(InstrumentationFeature) - InstrumentationFeature.FILE_IO
   }
-=======
-    includeProguardMapping = file("$rootDir/sentry.properties").exists()
->>>>>>> origin/main
 }
 
 dependencies {
