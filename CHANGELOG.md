@@ -12,6 +12,8 @@
         ([#342](https://github.com/Automattic/pocket-casts-android/pull/342)).
     *   Add a helpful alert if the user is signed out in the background.
         ([#340](https://github.com/Automattic/pocket-casts-android/pull/340)).
+    *   Fix in-app logs not updating appropriately.
+    *   ([#395](https://github.com/Automattic/pocket-casts-android/pull/395)).
 *   Health:
     *   Migrate app to Android 13 by targeting the SDK version 33.
         ([#312](https://github.com/Automattic/pocket-casts-android/pull/312)).
