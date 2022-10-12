@@ -57,7 +57,7 @@ class FiltersFragmentViewModel @Inject constructor(
         return adapterState.toList()
     }
 
-    fun commitMoves() {
+    fun commitMoves(moved: Boolean) {
         val playlists = adapterState
 
         playlists.forEachIndexed { index, playlist ->
@@ -65,7 +65,12 @@ class FiltersFragmentViewModel @Inject constructor(
             playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
         }
 
-        runBlocking(Dispatchers.Default) { playlistManager.updateAll(playlists) }
+        runBlocking(Dispatchers.Default) {
+            playlistManager.updateAll(playlists)
+            if (moved) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_LIST_REORDERED)
+            }
+        }
     }
 
     fun onFragmentPause(isChangingConfigurations: Boolean?) {

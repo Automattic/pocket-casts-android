@@ -59,6 +59,8 @@ class PodcastSelectFragment : BaseFragment() {
     private var adapter: PodcastSelectAdapter? = null
     private var binding: SettingsFragmentPodcastSelectBinding? = null
 
+    private var userChanged = false
+
     @Inject lateinit var podcastManager: PodcastManager
     val disposables = CompositeDisposable()
 
@@ -109,6 +111,7 @@ class PodcastSelectFragment : BaseFragment() {
                         val selectedList = it.map { it.uuid }
                         binding.lblPodcastsChosen.text = resources.getStringPluralPodcastsSelected(selectedList.size)
                         listener.podcastSelectFragmentSelectionChanged(selectedList)
+                        userChanged = true
                     }
 
                     val selected = it.filter { it.selected }
@@ -158,6 +161,8 @@ class PodcastSelectFragment : BaseFragment() {
         adapter?.deselectAll()
         updateSelectButtonText(0, adapter?.list?.size ?: 0)
     }
+
+    fun userChanged() = userChanged
 }
 
 private data class SelectablePodcast(val podcast: Podcast, var selected: Boolean)

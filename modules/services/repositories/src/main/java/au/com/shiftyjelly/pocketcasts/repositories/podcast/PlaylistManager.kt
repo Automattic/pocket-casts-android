@@ -31,7 +31,7 @@ interface PlaylistManager {
     fun createPlaylist(name: String, iconId: Int, draft: Boolean): Playlist
 
     fun create(playlist: Playlist): Long
-    fun update(playlist: Playlist)
+    fun update(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?)
 
     fun updateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean)
     fun rxUpdateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean): Completable

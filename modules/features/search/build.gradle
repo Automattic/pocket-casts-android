@@ -1,5 +1,14 @@
 apply from: "../../modules.gradle"
 
+android {
+    namespace 'au.com.shiftyjelly.pocketcasts.search'
+    buildFeatures {
+        viewBinding true
+        dataBinding = true
+        compose true
+    }
+}
+
 dependencies {
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')
@@ -11,12 +20,4 @@ dependencies {
     implementation project(':modules:services:servers')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:model')
-}
-
-android {
-    buildFeatures {
-        viewBinding true
-        dataBinding = true
-        compose true
-    }
 }

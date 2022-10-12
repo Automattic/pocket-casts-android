@@ -12,6 +12,8 @@ import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
 import androidx.databinding.DataBindingUtil
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewPlayerBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.helper.BottomSheetAnimation
@@ -28,11 +30,16 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.isHidden
 import au.com.shiftyjelly.pocketcasts.views.extensions.isVisible
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
+@AndroidEntryPoint
 class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs), CoroutineScope {
+
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
@@ -225,6 +232,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         isPlayerOpen = false
         listener?.onPlayerClosed()
         animations?.forEach { it.onCollapsed() }
+        analyticsTracker.track(AnalyticsEvent.PLAYER_DISMISSED)
 
         binding.player.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
         binding.miniPlayer.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
@@ -242,6 +250,7 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
         isPlayerOpen = true
         listener?.onPlayerOpen()
         animations?.forEach { it.onExpanded() }
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SHOWN)
 
         binding.player.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         binding.miniPlayer.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS

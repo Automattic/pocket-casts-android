@@ -17,12 +17,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -42,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 @AndroidEntryPoint
 class PlayerContainerFragment : BaseFragment(), HasBackstack {
     @Inject lateinit var settings: Settings
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var upNextBottomSheetBehavior: BottomSheetBehavior<View>
 
@@ -64,7 +68,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
         adapter = ViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
 
-        val upNextFragment = UpNextFragment.newInstance(embedded = true)
+        val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.NOW_PLAYING)
         childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment).commitAllowingStateLoss()
 
         val binding = binding ?: return
@@ -76,6 +80,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
                     upNextBottomSheetBehavior.setPeekHeight(0, false)
                     updateUpNextVisibility(true)
 
@@ -88,6 +93,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
                     FirebaseAnalyticsTracker.openedUpNext()
                 } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
                     updateUpNextVisibility(false)
 
                     (activity as? FragmentHostListener)?.updateSystemColors()
@@ -104,6 +110,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         }.attach()
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            private var previousPosition: Int = INVALID_TAB_POSITION
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
                 if (state == SCROLL_STATE_IDLE) {
@@ -114,9 +121,24 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 when (position) {
-                    1 -> FirebaseAnalyticsTracker.openedPlayerNotes()
-                    2 -> FirebaseAnalyticsTracker.openedPlayerChapters()
+                    0 -> {
+                        if (previousPosition == INVALID_TAB_POSITION) return
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to NOW_PLAYING))
+                        FirebaseAnalyticsTracker.nowPlayingOpen()
+                    }
+                    1 -> {
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to SHOW_NOTES))
+                        FirebaseAnalyticsTracker.openedPlayerNotes()
+                    }
+                    2 -> {
+                        analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to CHAPTERS))
+                        FirebaseAnalyticsTracker.openedPlayerChapters()
+                    }
+                    else -> {
+                        Timber.e("Invalid tab selected")
+                    }
                 }
+                previousPosition = position
             }
         })
 
@@ -139,7 +161,10 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
             binding.upNextButton.setImageDrawable(upNextDrawable)
             binding.countText.text = if (upNextCount == 0) "" else upNextCount.toString()
 
-            binding.upNextButton.setOnClickListener { openUpNext() }
+            binding.upNextButton.setOnClickListener {
+                analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue))
+                openUpNext()
+            }
 
             view.setBackgroundColor(it.podcastHeader.backgroundColor)
         }
@@ -157,7 +182,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     fun openUpNext() {
-        val upNextFragment = UpNextFragment()
+        val upNextFragment = UpNextFragment.newInstance(source = UpNextSource.PLAYER)
         (activity as? FragmentHostListener)?.showBottomSheet(upNextFragment)
     }
 
@@ -196,6 +221,15 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         } else {
             false
         }
+    }
+
+    companion object {
+        private const val INVALID_TAB_POSITION = -1
+        private const val SOURCE_KEY = "source"
+        private const val TAB_KEY = "tab"
+        private const val NOW_PLAYING = "now_playing"
+        private const val SHOW_NOTES = "show_notes"
+        private const val CHAPTERS = "chapters"
     }
 }
 

@@ -130,4 +130,8 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
 
     override fun overrideNextRefreshTimer() {
     }
+
+    override fun isUpNextShowing(): Boolean {
+        return false
+    }
 }

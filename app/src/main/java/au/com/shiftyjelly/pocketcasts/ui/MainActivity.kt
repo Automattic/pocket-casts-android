@@ -58,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -125,6 +126,7 @@ class MainActivity :
 
     companion object {
         private const val INITIAL_KEY = "initial"
+        private const val SOURCE_KEY = "source"
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -431,11 +433,16 @@ class MainActivity :
     }
 
     override fun onUpNextClicked() {
-        showBottomSheet(UpNextFragment())
+        showUpNextFragment(UpNextSource.MINI_PLAYER)
     }
 
     override fun onMiniPlayerLongClick() {
-        MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager).show(this)
+        MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager, analyticsTracker).show(this)
+    }
+
+    private fun showUpNextFragment(source: UpNextSource) {
+        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
+        showBottomSheet(UpNextFragment.newInstance(source = source))
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -522,6 +529,7 @@ class MainActivity :
 
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
                         supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                             removeBottomSheetFragment(it)
                         }
@@ -580,7 +588,7 @@ class MainActivity :
         if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {
             intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
             binding.playerBottomSheet.openPlayer()
-            onUpNextClicked()
+            showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
         }
     }
 
@@ -646,6 +654,8 @@ class MainActivity :
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
+
+    override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
 
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name

@@ -478,23 +478,23 @@ class FilterEpisodeListFragment : BaseFragment() {
                 .setTitle(getString(LR.string.sort_by))
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_newest_to_oldest,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.NEWEST_TO_OLDEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_oldest_to_newest,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_OLDEST_TO_NEWEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_OLDEST_TO_NEWEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.OLDEST_TO_NEWEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.OLDEST_TO_NEWEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_short_to_long,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_SHORTEST_TO_LONGEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_SHORTEST_TO_LONGEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.SHORTEST_TO_LONGEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.SHORTEST_TO_LONGEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_long_to_short,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_LONGEST_TO_SHORTEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_LONGEST_TO_SHORTEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.LONGEST_TO_SHORTEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.LONGEST_TO_SHORTEST)
                 )
             dialog.show(parentFragmentManager, "sort_options")
         }

@@ -107,7 +107,12 @@ open class PlaybackManager @Inject constructor(
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES = 30
         private const val MAX_TIME_WITHOUT_FOCUS_FOR_RESUME = (MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES * 60 * 1000).toLong()
         private const val PAUSE_TIMER_DELAY = ((MAX_TIME_WITHOUT_FOCUS_FOR_RESUME_MINUTES + 1) * 60 * 1000).toLong()
-        private const val KEY_SOURCE = "source"
+        private const val SOURCE_KEY = "source"
+        private const val SEEK_TO_PERCENT_KEY = "seek_to_percent"
+        private const val SEEK_FROM_PERCENT_KEY = "seek_from_percent"
+        const val SPEED_KEY = "speed"
+        const val AMOUNT_KEY = "amount"
+        const val ENABLED_KEY = "enabled"
     }
 
     override val coroutineContext: CoroutineContext
@@ -1845,9 +1850,47 @@ open class PlaybackManager @Inject constructor(
         if (playbackSource == PlaybackSource.UNKNOWN) {
             Timber.w("Found unknown playback source.")
         }
+<<<<<<< HEAD
         if (!playbackSource.skipTracking()) {
             analyticsTracker.track(event, mapOf(KEY_SOURCE to playbackSource.analyticsValue))
         }
+=======
+        analyticsTracker.track(event, mapOf(SOURCE_KEY to playbackSource.analyticsValue))
+        playbackSource = PlaybackSource.UNKNOWN
+>>>>>>> origin/main
+    }
+
+    fun trackPlaybackSeek(
+        positionMs: Int,
+        playbackSource: PlaybackSource
+    ) {
+        val episode = getCurrentEpisode()
+        episode?.let {
+            val fromPositionMs = episode.playedUpToMs.toDouble()
+            val durationMs = episode.duration * 1000
+            val seekFromPercent = ((fromPositionMs / durationMs) * 100).toInt()
+            val seekToPercent = ((positionMs / durationMs) * 100).toInt()
+
+            analyticsTracker.track(
+                AnalyticsEvent.PLAYBACK_SEEK,
+                mapOf(
+                    SOURCE_KEY to playbackSource.analyticsValue,
+                    SEEK_FROM_PERCENT_KEY to seekFromPercent,
+                    SEEK_TO_PERCENT_KEY to seekToPercent
+                )
+            )
+        }
+    }
+
+    fun trackPlaybackEffectsEvent(
+        event: AnalyticsEvent,
+        props: Map<String, Any> = emptyMap(),
+        playbackSource: PlaybackSource
+    ) {
+        val properties = HashMap<String, Any>()
+        properties[SOURCE_KEY] = playbackSource.analyticsValue
+        properties.putAll(props)
+        analyticsTracker.track(event, properties)
     }
 
     enum class PlaybackSource(val analyticsValue: String) {
@@ -1866,6 +1909,7 @@ open class PlaybackManager @Inject constructor(
         FULL_SCREEN_VIDEO("full_screen_video"),
         UP_NEXT("up_next"),
         MEDIA_BUTTON_BROADCAST_ACTION("media_button_broadcast_action"),
+<<<<<<< HEAD
         MEDIA_BUTTON_BROADCAST_SEARCH_ACTION("media_button_broadcast_search_action"),
         PLAYER_BROADCAST_ACTION("player_broadcast_action"),
         CHROMECAST("chromecast"),
@@ -1874,5 +1918,10 @@ open class PlaybackManager @Inject constructor(
         UNKNOWN("unknown");
 
         fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
+=======
+        PLAYER_PLAYBACK_EFFECTS("player_playback_effects"),
+        PODCAST_SETTINGS("podcast_settings"),
+        UNKNOWN("unknown"),
+>>>>>>> origin/main
     }
 }

@@ -206,6 +206,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SKIP_BACK("playback_skip_back"),
     PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
     PLAYBACK_STOP("playback_stop"),
+    PLAYBACK_SEEK("playback_seek"),
 
     /* Privacy */
     PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
@@ -214,9 +215,14 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
 
     /* Filters screen */
+    FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED("filter_auto_download_limit_updated"),
+    FILTER_AUTO_DOWNLOAD_UPDATED("filter_auto_download_updated"),
+    FILTER_DELETED("filter_deleted"),
+    FILTER_EDIT_DISMISSED("filter_edit_dismissed"),
     FILTER_LIST_SHOWN("filter_list_shown"),
     FILTER_SHOWN("filter_shown"),
-    FILTER_DELETED("filter_deleted"),
+    FILTER_SORT_BY_CHANGED("filter_sort_by_changed"),
+    FILTER_UPDATED("filter_updated"),
 
     /* Discover */
     DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
@@ -233,4 +239,42 @@ enum class AnalyticsEvent(val key: String) {
     DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
     DISCOVER_REGION_CHANGED("discover_region_changed"),
     DISCOVER_COLLECTION_LINK_TAPPED("discover_collection_link_tapped"),
+
+    /* Mini Player */
+    MINI_PLAYER_LONG_PRESS_MENU_SHOWN("mini_player_long_press_menu_shown"),
+    MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED("mini_player_long_press_menu_option_tapped"),
+    MINI_PLAYER_LONG_PRESS_MENU_DISMISSED("mini_player_long_press_menu_dismissed"),
+
+    /* Up Next */
+    UP_NEXT_SHOWN("up_next_shown"),
+    UP_NEXT_QUEUE_CLEARED("up_next_queue_cleared"),
+    UP_NEXT_NOW_PLAYING_TAPPED("up_next_now_playing_tapped"),
+    UP_NEXT_QUEUE_EPISODE_TAPPED("up_next_queue_episode_tapped"),
+    UP_NEXT_QUEUE_EPISODE_LONG_PRESSED("up_next_queue_episode_long_pressed"),
+    UP_NEXT_MULTI_SELECT_ENTERED("up_next_multi_select_entered"),
+    UP_NEXT_SELECT_ALL_TAPPED("up_next_select_all_tapped"),
+    UP_NEXT_MULTI_SELECT_EXITED("up_next_multi_select_exited"),
+    UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
+    UP_NEXT_DISMISSED("up_next_dismissed"),
+
+    /* Player */
+    PLAYER_SHOWN("player_shown"),
+    PLAYER_DISMISSED("player_dismissed"),
+    PLAYER_TAB_SELECTED("player_tab_selected"),
+    PLAYER_SHOW_NOTES_LINK_TAPPED("player_show_notes_link_tapped"),
+    PLAYER_CHAPTER_SELECTED("player_chapter_selected"),
+    PLAYER_PREVIOUS_CHAPTER_TAPPED("player_previous_chapter_tapped"),
+    PLAYER_NEXT_CHAPTER_TAPPED("player_next_chapter_tapped"),
+
+    /* Player - Sleep Timer */
+    PLAYER_SLEEP_TIMER_ENABLED("player_sleep_timer_enabled"),
+    PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
+    PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
+
+    /* Player - Playback effects */
+    PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
+    PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED("playback_effect_trim_silence_toggled"),
+    PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED("playback_effect_trim_silence_amount_changed"),
+    PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED("playback_effect_volume_boost_toggled"),
+    FILTER_LIST_REORDERED("filter_list_reordered"),
 }

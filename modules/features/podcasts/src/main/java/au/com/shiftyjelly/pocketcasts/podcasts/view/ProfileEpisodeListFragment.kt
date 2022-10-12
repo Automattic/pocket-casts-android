@@ -183,10 +183,12 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             binding?.toolbar?.isVisible = !isMultiSelecting
             binding?.multiSelectToolbar?.setNavigationIcon(R.drawable.ic_arrow_back)
 
-            if (isMultiSelecting) {
-                trackMultiSelectEntered()
-            } else if (wasMultiSelecting) {
-                trackMultiSelectExited()
+            if ((activity as? FragmentHostListener)?.isUpNextShowing() == false) {
+                if (isMultiSelecting) {
+                    trackMultiSelectEntered()
+                } else if (wasMultiSelecting) {
+                    trackMultiSelectExited()
+                }
             }
 
             adapter.notifyDataSetChanged()

@@ -8,7 +8,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.combineLatest
@@ -111,15 +114,27 @@ class PodcastSettingsViewModel @Inject constructor(
                 playlistManager.findAll().forEach { playlist ->
                     val currentSelection = playlist.podcastUuidList.toMutableList()
                     val included = newSelection.contains(playlist.uuid)
-                    if (included && !currentSelection.contains(podcastUuid)) {
-                        currentSelection.add(podcastUuid)
-                    } else if (!included && currentSelection.contains(podcastUuid)) {
-                        currentSelection.remove(podcastUuid)
-                    }
 
-                    playlist.podcastUuidList = currentSelection
-                    playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
-                    playlistManager.update(playlist)
+                    val isUpdated =
+                        if (included && !currentSelection.contains(podcastUuid)) {
+                            currentSelection.add(podcastUuid)
+                            true
+                        } else if (!included && currentSelection.contains(podcastUuid)) {
+                            currentSelection.remove(podcastUuid)
+                            true
+                        } else {
+                            false
+                        }
+
+                    if (isUpdated) {
+                        playlist.podcastUuidList = currentSelection
+                        playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
+                        val userPlaylistUpdate = UserPlaylistUpdate(
+                            listOf(PlaylistProperty.Podcasts),
+                            PlaylistUpdateSource.PODCAST_SETTINGS
+                        )
+                        playlistManager.update(playlist, userPlaylistUpdate)
+                    }
                 }
             }
         }
