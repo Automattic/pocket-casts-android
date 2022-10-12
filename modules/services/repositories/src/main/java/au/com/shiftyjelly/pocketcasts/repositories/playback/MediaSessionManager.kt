@@ -80,6 +80,7 @@ class MediaSessionManager(
     val mediaSession = MediaSessionCompat(context, "PocketCastsMediaSession")
     val disposables = CompositeDisposable()
     var seeking = false
+    private val playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -429,7 +430,7 @@ class MediaSessionManager(
                         object : TimerTask() {
                             override fun run() {
                                 logEvent("play from headset hook", inSessionCallback = false)
-                                playbackManager.playPause(PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+                                playbackManager.playPause(playbackSource = playbackSource)
                                 playPauseTimer = null
                             }
                         },
@@ -442,7 +443,7 @@ class MediaSessionManager(
                 playPauseTimer = null
 
                 logEvent("skip forwards from headset hook")
-                playbackManager.skipForward(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+                playbackManager.skipForward(playbackSource = playbackSource)
             }
         }
 
@@ -460,12 +461,12 @@ class MediaSessionManager(
 
         override fun onPlay() {
             logEvent("play")
-            playbackManager.playQueue(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+            playbackManager.playQueue(playbackSource = playbackSource)
         }
 
         override fun onPause() {
             logEvent("pause")
-            playbackManager.pause(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+            playbackManager.pause(playbackSource = playbackSource)
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
@@ -480,18 +481,18 @@ class MediaSessionManager(
             logEvent("stop")
             launch {
                 // note: the stop event is called from cars when they only want to pause, this is less destructive and doesn't cause issues if they try to play again
-                playbackManager.pause(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+                playbackManager.pause(playbackSource = playbackSource)
             }
         }
 
         override fun onSkipToPrevious() {
             logEvent("skip backwards")
-            playbackManager.skipBackward(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+            playbackManager.skipBackward(playbackSource = playbackSource)
         }
 
         override fun onSkipToNext() {
             logEvent("skip forwards")
-            playbackManager.skipForward(playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+            playbackManager.skipForward(playbackSource = playbackSource)
         }
 
         override fun onSetRating(rating: RatingCompat?) {
@@ -512,7 +513,7 @@ class MediaSessionManager(
                 val autoMediaId = AutoMediaId.fromMediaId(mediaId)
                 val playableId = autoMediaId.playableId
                 episodeManager.findPlayableByUuid(playableId)?.let { episode ->
-                    playbackManager.playNow(episode, playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+                    playbackManager.playNow(episode, playbackSource = playbackSource)
 
                     playbackManager.lastLoadedFromPodcastOrPlaylistUuid = autoMediaId.sourceId
                 }
@@ -537,7 +538,7 @@ class MediaSessionManager(
             if (state is UpNextQueue.State.Loaded) {
                 state.queue.find { it.adapterId == id }?.let { episode ->
                     logEvent("play from skip to queue item")
-                    playbackManager.playNow(episode, playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
+                    playbackManager.playNow(episode = episode, playbackSource = playbackSource)
                 }
             }
         }
@@ -676,7 +677,7 @@ class MediaSessionManager(
                 val episodesToPlay = playlistManager.findEpisodes(playlist, episodeManager, playbackManager).take(5)
                 if (episodesToPlay.isEmpty()) return@launch
 
-                playEpisodes(episodesToPlay)
+                playEpisodes(episodesToPlay, playbackSource)
 
                 return@launch
             }
@@ -703,12 +704,12 @@ class MediaSessionManager(
         return Completable.fromAction { performPlayFromSearch(searchTerm) }
     }
 
-    private fun playEpisodes(episodes: List<Episode>) {
+    private fun playEpisodes(episodes: List<Episode>, playbackSource: PlaybackSource) {
         if (episodes.isEmpty()) {
             return
         }
 
-        playbackManager.playEpisodes(episodes = episodes, playbackSource = PlaybackSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION)
+        playbackManager.playEpisodes(episodes = episodes, playbackSource = playbackSource)
     }
 
     private suspend fun playPodcast(podcast: Podcast, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {

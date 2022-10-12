@@ -28,6 +28,7 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
 
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var playbackManager: PlaybackManager
+    private val playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == INTENT_ACTION_REFRESH_PODCASTS) {
@@ -52,26 +53,26 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun skipBackward() {
-        playbackManager.skipBackward(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
+        playbackManager.skipBackward(playbackSource = playbackSource)
     }
 
     private fun skipForward() {
-        playbackManager.skipForward(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
+        playbackManager.skipForward(playbackSource = playbackSource)
     }
 
     private fun pause() {
-        playbackManager.pause(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
+        playbackManager.pause(playbackSource = playbackSource)
     }
 
     private fun play() {
-        playbackManager.playQueue(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
+        playbackManager.playQueue(playbackSource = playbackSource)
     }
 
     private fun playNext() {
-        playbackManager.playNextInQueue(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
+        playbackManager.playNextInQueue(playbackSource = playbackSource)
     }
 
     private fun stop() {
-        playbackManager.stopAsync(playbackSource = PlaybackSource.PLAYER_BROADCAST_ACTION)
+        playbackManager.stopAsync(playbackSource = playbackSource)
     }
 }

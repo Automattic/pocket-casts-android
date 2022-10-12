@@ -27,6 +27,8 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var playbackManager: PlaybackManager
 
+    private val playbackSource = PlaybackSource.NOTIFICATION
+
     companion object {
 
         const val NOTIFICATION_ID = 541251
@@ -90,7 +92,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun playNow(episodeUuid: String, forceStream: Boolean) {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNow(episode, forceStream = forceStream, playbackSource = PlaybackSource.NOTIFICATION)
+                playbackManager.playNow(episode, forceStream = forceStream, playbackSource = playbackSource)
             }
         }
     }
@@ -132,7 +134,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playLast(episode)
                 if (playNext) {
-                    playbackManager.playNextInQueue(playbackSource = PlaybackManager.PlaybackSource.NOTIFICATION)
+                    playbackManager.playNextInQueue(playbackSource = playbackSource)
                 }
             }
         }

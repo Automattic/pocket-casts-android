@@ -149,7 +149,7 @@ class PlayerViewModel @Inject constructor(
     ) {
         fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
     }
-
+    private val playbackSource = PlaybackSource.PLAYER
     private val _showPlayerFlow = MutableSharedFlow<Unit>()
     val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
 
@@ -368,10 +368,10 @@ class PlayerViewModel @Inject constructor(
 
     fun play() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play clicked in player")
-        playbackManager.playQueue(playbackSource = PlaybackSource.PLAYER)
+        playbackManager.playQueue(playbackSource = playbackSource)
     }
 
-    fun playEpisode(uuid: String, playbackSource: PlaybackManager.PlaybackSource = PlaybackManager.PlaybackSource.UNKNOWN) {
+    fun playEpisode(uuid: String, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         launch {
             val episode = episodeManager.findPlayableByUuid(uuid) ?: return@launch
             playbackManager.playNow(episode = episode, playbackSource = playbackSource)
@@ -379,11 +379,11 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun skipBackward() {
-        playbackManager.skipBackward(playbackSource = PlaybackSource.PLAYER)
+        playbackManager.skipBackward(playbackSource = playbackSource)
     }
 
     fun skipForward() {
-        playbackManager.skipForward(playbackSource = PlaybackSource.PLAYER)
+        playbackManager.skipForward(playbackSource = playbackSource)
     }
 
     fun longSkipForwardOptionsDialog(): OptionsDialog {
@@ -395,7 +395,7 @@ class PlayerViewModel @Inject constructor(
         }
         if (playbackManager.upNextQueue.queueEpisodes.isNotEmpty()) {
             optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.next_episode) {
-                playbackManager.playNextInQueue(playbackSource = PlaybackManager.PlaybackSource.PLAYER)
+                playbackManager.playNextInQueue(playbackSource = playbackSource)
             }
         }
 

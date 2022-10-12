@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -30,7 +31,7 @@ class PlayButtonListener @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    override var playbackSource = PlaybackManager.PlaybackSource.UNKNOWN
+    override var playbackSource = PlaybackSource.UNKNOWN
 
     override fun onPlayClicked(episodeUuid: String) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "In app play button pushed for $episodeUuid")

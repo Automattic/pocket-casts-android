@@ -76,6 +76,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private var binding: AdapterPlayerHeaderBinding? = null
     private var skippedFirstTouch: Boolean = false
     private var hasReceivedOnTouchDown = false
+    private val playbackSource = PlaybackSource.PLAYER
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
@@ -475,7 +476,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onPlayClicked() {
         if (playbackManager.isPlaying()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
-            playbackManager.pause(playbackSource = PlaybackSource.PLAYER)
+            playbackManager.pause(playbackSource = playbackSource)
         } else {
             if (playbackManager.shouldWarnAboutPlayback()) {
                 launch {
@@ -486,7 +487,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 viewModel.play()
                                 warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
                             } else {
-                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, playbackSource = PlaybackSource.PLAYER)
+                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, playbackSource = playbackSource)
                                     .show(parentFragmentManager, "streaming dialog")
                             }
                         }

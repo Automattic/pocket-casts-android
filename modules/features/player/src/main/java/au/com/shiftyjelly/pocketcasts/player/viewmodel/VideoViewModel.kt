@@ -27,24 +27,25 @@ class VideoViewModel @Inject constructor(
     private var lastTimeHidingControls = 0L
 
     private var controlsVisibleMutable = MutableLiveData(true)
+    private val playbackSource = PlaybackSource.FULL_SCREEN_VIDEO
     val controlsVisible: LiveData<Boolean> get() = controlsVisibleMutable
 
     fun play() {
-        playbackManager.playQueue(playbackSource = PlaybackSource.FULL_SCREEN_VIDEO)
+        playbackManager.playQueue(playbackSource = playbackSource)
         startHideControlsTimer()
     }
 
     fun pause() {
-        playbackManager.pause(playbackSource = PlaybackSource.FULL_SCREEN_VIDEO)
+        playbackManager.pause(playbackSource = playbackSource)
     }
 
     fun skipBackward() {
-        playbackManager.skipBackward(playbackSource = PlaybackSource.FULL_SCREEN_VIDEO)
+        playbackManager.skipBackward(playbackSource = playbackSource)
         startHideControlsTimer()
     }
 
     fun skipForward() {
-        playbackManager.skipForward(playbackSource = PlaybackSource.FULL_SCREEN_VIDEO)
+        playbackManager.skipForward(playbackSource = playbackSource)
         startHideControlsTimer()
     }
 
