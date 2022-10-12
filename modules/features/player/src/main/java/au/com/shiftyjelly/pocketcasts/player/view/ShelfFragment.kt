@@ -77,7 +77,10 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
         val toolbar = binding.toolbar
         toolbar.setTitle(LR.string.rearrange_actions)
         toolbar.setTitleTextColor(toolbar.context.getThemeColor(UR.attr.player_contrast_01))
-        toolbar.setNavigationOnClickListener { (activity as? FragmentHostListener)?.closeModal(this) }
+        toolbar.setNavigationOnClickListener {
+            trackRearrangeFinishedEvent()
+            (activity as? FragmentHostListener)?.closeModal(this)
+        }
         toolbar.navigationIcon?.setTint(ThemeColor.playerContrast01(theme.activeTheme))
 
         val backgroundColor = theme.playerBackground2Color(playerViewModel.podcast)
@@ -110,6 +113,11 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
         playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (playable, _) ->
             adapter.playable = playable
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        trackRearrangeFinishedEvent()
+        return super.onBackPressed()
     }
 
     override fun onShelfItemMove(fromPosition: Int, toPosition: Int) {
@@ -175,6 +183,10 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
             )
             dragStartPosition = null
         }
+    }
+
+    private fun trackRearrangeFinishedEvent() {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED)
     }
 
     companion object {
