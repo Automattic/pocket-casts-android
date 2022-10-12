@@ -110,6 +110,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
         }.attach()
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            private var previousPosition: Int = INVALID_TAB_POSITION
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
                 if (state == SCROLL_STATE_IDLE) {
@@ -121,6 +122,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                 super.onPageSelected(position)
                 when (position) {
                     0 -> {
+                        if (previousPosition == INVALID_TAB_POSITION) return
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to NOW_PLAYING))
                         FirebaseAnalyticsTracker.nowPlayingOpen()
                     }
@@ -136,6 +138,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
                         Timber.e("Invalid tab selected")
                     }
                 }
+                previousPosition = position
             }
         })
 
@@ -221,6 +224,7 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
     }
 
     companion object {
+        private const val INVALID_TAB_POSITION = -1
         private const val SOURCE_KEY = "source"
         private const val TAB_KEY = "tab"
         private const val NOW_PLAYING = "now_playing"
