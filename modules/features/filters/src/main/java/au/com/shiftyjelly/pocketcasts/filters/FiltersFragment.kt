@@ -101,8 +101,8 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
         val touchHelperCallback = FiltersListItemTouchCallback({ from, to ->
             val newList = viewModel.movePlaylist(from, to)
             adapter.submitList(newList)
-        }) {
-            viewModel.commitMoves()
+        }) { from, to ->
+            viewModel.commitMoves(from != to)
         }
         val itemTouchHelper = ItemTouchHelper(touchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
@@ -166,17 +166,33 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     }
 }
 
-private class FiltersListItemTouchCallback(val onMoveListener: (Int, Int) -> Unit, val onFinish: () -> Unit) : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP.or(ItemTouchHelper.DOWN), 0) {
+private class FiltersListItemTouchCallback(
+    val onMoveListener: (from: Int, to: Int) -> Unit,
+    val onFinish: (from: Int?, to: Int?) -> Unit
+) : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP.or(ItemTouchHelper.DOWN), 0) {
+    private var moveFrom: Int? = null
+    private var moveTo: Int? = null
+
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+
+        // Only update moveFrom if it is not initialized because it represents the position where the move started
+        if (moveFrom == null) {
+            moveFrom = viewHolder.bindingAdapterPosition
+        }
+
+        // Always update moveTo because it represents the final position
+        moveTo = target.bindingAdapterPosition
+
         onMoveListener(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
         return true
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-    }
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
-        onFinish()
+        onFinish(moveFrom, moveTo)
+        moveFrom = null
+        moveTo = null
     }
 }
