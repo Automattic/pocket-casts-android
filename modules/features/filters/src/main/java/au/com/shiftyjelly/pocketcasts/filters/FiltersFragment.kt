@@ -175,7 +175,7 @@ private class FiltersListItemTouchCallback(
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
 
-        // Onlu update moveFrom if it is not initialized because it represents the position where the move started
+        // Only update moveFrom if it is not initialized because it represents the position where the move started
         if (moveFrom == null) {
             moveFrom = viewHolder.bindingAdapterPosition
         }
