@@ -378,10 +378,6 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun pause() {
-        playbackManager.pause()
-    }
-
     fun skipBackward() {
         playbackManager.skipBackward(playbackSource = PlaybackSource.PLAYER)
     }
@@ -572,10 +568,6 @@ class PlayerViewModel @Inject constructor(
 
     fun previousChapter() {
         playbackManager.skipToPreviousChapter()
-    }
-
-    fun playPause() {
-        playbackManager.playPause()
     }
 
     fun onChapterClick(chapter: Chapter) {

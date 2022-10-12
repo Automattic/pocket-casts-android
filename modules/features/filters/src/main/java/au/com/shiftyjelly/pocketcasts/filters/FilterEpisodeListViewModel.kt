@@ -123,15 +123,6 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun playAll() {
-        launch {
-            val episodes = episodesList.value ?: emptyList()
-            if (episodes.isNotEmpty()) {
-                onPlayAllFromHere(episodes.first())
-            }
-        }
-    }
-
     fun changeSort(sortOrder: Int) {
         launch {
             playlist.value?.let { playlist ->
