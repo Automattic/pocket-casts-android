@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
+import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -117,19 +118,5 @@ class ShelfBottomSheet : BaseDialogFragment() {
             mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to analyticsAction)
         )
         dismiss()
-    }
-
-    companion object {
-        object AnalyticsProp {
-            object Key {
-                const val FROM = "from"
-                const val ACTION = "action"
-            }
-            object Value {
-                const val SHELF = "shelf"
-                const val OVERFLOW_MENU = "overflow_menu"
-                const val UNKNOWN = "unknown"
-            }
-        }
     }
 }

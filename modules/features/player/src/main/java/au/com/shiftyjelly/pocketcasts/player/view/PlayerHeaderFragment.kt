@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
-import au.com.shiftyjelly.pocketcasts.player.view.ShelfBottomSheet.Companion.AnalyticsProp
+import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -492,6 +492,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) {
             return
         }
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
         ShelfBottomSheet().show(childFragmentManager, "shelf_bottom_sheet")
     }
 
