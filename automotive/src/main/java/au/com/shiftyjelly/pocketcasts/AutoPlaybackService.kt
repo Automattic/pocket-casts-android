@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playback.MEDIA_ID_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PODCASTS_ROOT
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
@@ -72,7 +73,7 @@ class AutoPlaybackService : PlaybackService() {
         super.onDestroy()
         Log.d(Settings.LOG_TAG_AUTO, "Auto playback service destroyed")
 
-        playbackManager.pause(transientLoss = false)
+        playbackManager.pause(transientLoss = false, playbackSource = PlaybackSource.AUTO_PAUSE)
     }
 
     override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>) {

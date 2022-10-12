@@ -686,41 +686,37 @@ class MainActivity :
     }
 
     override fun onPlayClicked() {
-        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
         if (playbackManager.shouldWarnAboutPlayback()) {
             launch {
                 // show the stream warning if the episode isn't downloaded
                 playbackManager.getCurrentEpisode()?.let { episode ->
                     launch(Dispatchers.Main) {
                         if (episode.isDownloaded) {
-                            playbackManager.playQueue()
+                            playbackManager.playQueue(PlaybackSource.MINIPLAYER)
                             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                         } else {
-                            warningsHelper.streamingWarningDialog(episode)
+                            warningsHelper.streamingWarningDialog(episode = episode, playbackSource = PlaybackSource.MINIPLAYER)
                                 .show(supportFragmentManager, "streaming dialog")
                         }
                     }
                 }
             }
         } else {
-            playbackManager.playQueue()
+            playbackManager.playQueue(PlaybackSource.MINIPLAYER)
             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
         }
     }
 
     override fun onPauseClicked() {
-        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
-        playbackManager.pause()
+        playbackManager.pause(playbackSource = PlaybackSource.MINIPLAYER)
     }
 
     override fun onSkipBackwardClicked() {
-        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
-        playbackManager.skipBackward()
+        playbackManager.skipBackward(playbackSource = PlaybackSource.MINIPLAYER)
     }
 
     override fun onSkipForwardClicked() {
-        playbackManager.playbackSource = PlaybackSource.MINIPLAYER
-        playbackManager.skipForward()
+        playbackManager.skipForward(playbackSource = PlaybackSource.MINIPLAYER)
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean) {

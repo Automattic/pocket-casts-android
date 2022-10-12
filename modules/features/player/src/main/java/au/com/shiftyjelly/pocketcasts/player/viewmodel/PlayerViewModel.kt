@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -148,7 +149,7 @@ class PlayerViewModel @Inject constructor(
     ) {
         fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
     }
-
+    private val playbackSource = PlaybackSource.PLAYER
     private val _showPlayerFlow = MutableSharedFlow<Unit>()
     val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
 
@@ -367,26 +368,22 @@ class PlayerViewModel @Inject constructor(
 
     fun play() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play clicked in player")
-        playbackManager.playQueue()
+        playbackManager.playQueue(playbackSource = playbackSource)
     }
 
-    fun playEpisode(uuid: String) {
+    fun playEpisode(uuid: String, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
         launch {
             val episode = episodeManager.findPlayableByUuid(uuid) ?: return@launch
-            playbackManager.playNow(episode)
+            playbackManager.playNow(episode = episode, playbackSource = playbackSource)
         }
     }
 
-    fun pause() {
-        playbackManager.pause()
-    }
-
     fun skipBackward() {
-        playbackManager.skipBackward()
+        playbackManager.skipBackward(playbackSource = playbackSource)
     }
 
     fun skipForward() {
-        playbackManager.skipForward()
+        playbackManager.skipForward(playbackSource = playbackSource)
     }
 
     fun longSkipForwardOptionsDialog(): OptionsDialog {
@@ -398,7 +395,7 @@ class PlayerViewModel @Inject constructor(
         }
         if (playbackManager.upNextQueue.queueEpisodes.isNotEmpty()) {
             optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.next_episode) {
-                playbackManager.playNextInQueue()
+                playbackManager.playNextInQueue(playbackSource = playbackSource)
             }
         }
 
@@ -571,10 +568,6 @@ class PlayerViewModel @Inject constructor(
 
     fun previousChapter() {
         playbackManager.skipToPreviousChapter()
-    }
-
-    fun playPause() {
-        playbackManager.playPause()
     }
 
     fun onChapterClick(chapter: Chapter) {
