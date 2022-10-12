@@ -26,33 +26,33 @@ sealed class ShelfItem(val id: String, var title: (Playable?) -> Int, var iconRe
         object UserEpisodeOnly : Shown()
     }
 
-    object Effects : ShelfItem("effects", { LR.string.podcast_playback_effects }, { R.drawable.ic_effects_off }, Shown.Always)
+    object Effects : ShelfItem(ShelfItemId.EFFECTS.value, { LR.string.podcast_playback_effects }, { R.drawable.ic_effects_off }, Shown.Always)
 
-    object Sleep : ShelfItem("sleep", { LR.string.player_sleep_timer }, { R.drawable.ic_sleep }, Shown.Always)
+    object Sleep : ShelfItem(ShelfItemId.SLEEP.value, { LR.string.player_sleep_timer }, { R.drawable.ic_sleep }, Shown.Always)
 
     object Star : ShelfItem(
-        "star",
+        ShelfItemId.STAR.value,
         { if (it is Episode && it.isStarred) LR.string.unstar_episode else LR.string.star_episode },
         { if (it is Episode && it.isStarred) IR.drawable.ic_star_filled else IR.drawable.ic_star },
         Shown.EpisodeOnly,
         LR.string.player_actions_hidden_for_custom
     )
 
-    object Share : ShelfItem("share", { LR.string.podcast_share_episode }, { IR.drawable.ic_share }, Shown.EpisodeOnly, LR.string.player_actions_hidden_for_custom)
+    object Share : ShelfItem(ShelfItemId.SHARE.value, { LR.string.podcast_share_episode }, { IR.drawable.ic_share }, Shown.EpisodeOnly, LR.string.player_actions_hidden_for_custom)
 
     object Podcast : ShelfItem(
-        "podcast",
+        ShelfItemId.PODCAST.value,
         { if (it is UserEpisode) LR.string.go_to_files else LR.string.go_to_podcast },
         { R.drawable.ic_arrow_goto },
         Shown.Always
     )
 
-    object Cast : ShelfItem("cast", { LR.string.chromecast }, { com.google.android.gms.cast.framework.R.drawable.quantum_ic_cast_connected_white_24 }, Shown.Always)
+    object Cast : ShelfItem(ShelfItemId.CAST.value, { LR.string.chromecast }, { com.google.android.gms.cast.framework.R.drawable.quantum_ic_cast_connected_white_24 }, Shown.Always)
 
-    object Played : ShelfItem("played", { LR.string.mark_as_played }, { R.drawable.ic_markasplayed }, Shown.Always)
+    object Played : ShelfItem(ShelfItemId.PLAYED.value, { LR.string.mark_as_played }, { R.drawable.ic_markasplayed }, Shown.Always)
 
     object Archive : ShelfItem(
-        "archive",
+        ShelfItemId.ARCHIVE.value,
         { if (it is UserEpisode) LR.string.delete else LR.string.archive },
         { if (it is UserEpisode) VR.drawable.ic_delete else IR.drawable.ic_archive },
         Shown.Always,
@@ -60,7 +60,7 @@ sealed class ShelfItem(val id: String, var title: (Playable?) -> Int, var iconRe
     )
 
     object Download : ShelfItem(
-        "download",
+        ShelfItemId.DOWNLOAD.value,
         {
             if (it?.isDownloaded == true) {
                 LR.string.delete_download
@@ -81,4 +81,21 @@ sealed class ShelfItem(val id: String, var title: (Playable?) -> Int, var iconRe
         },
         Shown.Always
     )
+
+    enum class ShelfItemId(val value: String, val analyticsValue: String) {
+        EFFECTS("effects", "playback_effects"),
+        SLEEP("sleep", "sleep_timer"),
+        STAR("star", "star_episode"),
+        SHARE("share", "share_episode"),
+        PODCAST("podcast", "go_to_podcast"),
+        CAST("cast", "chromecast"),
+        PLAYED("played", "mark_as_played"),
+        ARCHIVE("archive", "archive"),
+        DOWNLOAD("download", "download");
+
+        companion object {
+            fun fromId(id: String?) =
+                ShelfItemId.values().find { it.value == id }
+        }
+    }
 }

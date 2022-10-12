@@ -17,11 +17,14 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
+import au.com.shiftyjelly.pocketcasts.player.view.ShelfBottomSheet.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -70,6 +73,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var imageLoader: PodcastImageLoaderThemed
     private val viewModel: PlayerViewModel by activityViewModels()
@@ -158,15 +162,25 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.share.setOnClickListener { onShareClick() }
         binding.playerActions.setOnClickListener { onMoreClicked() }
         binding.podcast.setOnClickListener { showPodcast() }
-        binding.played.setOnClickListener { viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played") }
-        binding.archive.setOnClickListener { viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive") }
-        binding.download.setOnClickListener { viewModel.downloadCurrentlyPlaying() }
+        binding.played.setOnClickListener {
+            trackShelfAction(ShelfItem.ShelfItemId.PLAYED.analyticsValue)
+            viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played")
+        }
+        binding.archive.setOnClickListener {
+            trackShelfAction(ShelfItem.ShelfItemId.ARCHIVE.analyticsValue)
+            viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
+        }
+        binding.download.setOnClickListener {
+            trackShelfAction(ShelfItem.ShelfItemId.DOWNLOAD.analyticsValue)
+            viewModel.downloadCurrentlyPlaying()
+        }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
         CastButtonFactory.setUpMediaRouteButton(binding.root.context, binding.castButton)
         binding.castButton.setAlwaysVisible(true)
         binding.castButton.updateColor(ThemeColor.playerContrast03(theme.activeTheme))
+        binding.castButton.setOnClickListener { trackShelfAction(ShelfItem.ShelfItemId.CAST.analyticsValue) }
 
         setupUpNextDrag(view, binding.topView)
 
@@ -429,22 +443,27 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onEffectsClick() {
+        trackShelfAction(ShelfItem.ShelfItemId.EFFECTS.analyticsValue)
         EffectsFragment().show(parentFragmentManager, "effects_sheet")
     }
 
     override fun onSleepClick() {
+        trackShelfAction(ShelfItem.ShelfItemId.SLEEP.analyticsValue)
         SleepFragment().show(parentFragmentManager, "effects_sheet")
     }
 
     override fun onStarClick() {
+        trackShelfAction(ShelfItem.ShelfItemId.STAR.analyticsValue)
         viewModel.starToggle()
     }
 
     override fun onShareClick() {
+        trackShelfAction(ShelfItem.ShelfItemId.SHARE.analyticsValue)
         viewModel.shareDialog(context, childFragmentManager)?.show()
     }
 
     private fun showPodcast() {
+        trackShelfAction(ShelfItem.ShelfItemId.PODCAST.analyticsValue)
         val podcast = viewModel.podcast
         (activity as FragmentHostListener).closePlayer()
         if (podcast != null) {
@@ -528,5 +547,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onHeaderChapterClick(chapter: Chapter) {
         (parentFragment as? PlayerContainerFragment)?.openChaptersAt(chapter)
+    }
+
+    private fun trackShelfAction(analyticsAction: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction)
+        )
     }
 }

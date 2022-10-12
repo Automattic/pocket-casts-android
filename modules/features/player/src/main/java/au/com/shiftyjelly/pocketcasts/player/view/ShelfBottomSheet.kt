@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomSheetBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -20,6 +22,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
     @Inject lateinit var castManager: CastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     override val statusBarColor: StatusBarColor? = null
 
@@ -63,14 +66,26 @@ class ShelfBottomSheet : BaseDialogFragment() {
     }
 
     private fun onClick(item: ShelfItem) {
+        val analyticsAction: String
         when (item) {
-            is ShelfItem.Effects -> { EffectsFragment().show(parentFragmentManager, "effects") }
-            is ShelfItem.Sleep -> { SleepFragment().show(parentFragmentManager, "sleep") }
-            is ShelfItem.Star -> { playerViewModel.starToggle() }
+            is ShelfItem.Effects -> {
+                analyticsAction = ShelfItem.ShelfItemId.EFFECTS.analyticsValue
+                EffectsFragment().show(parentFragmentManager, "effects")
+            }
+            is ShelfItem.Sleep -> {
+                analyticsAction = ShelfItem.ShelfItemId.SLEEP.analyticsValue
+                SleepFragment().show(parentFragmentManager, "sleep")
+            }
+            is ShelfItem.Star -> {
+                analyticsAction = ShelfItem.ShelfItemId.STAR.analyticsValue
+                playerViewModel.starToggle()
+            }
             is ShelfItem.Share -> {
+                analyticsAction = ShelfItem.ShelfItemId.SHARE.analyticsValue
                 playerViewModel.shareDialog(context, parentFragmentManager)?.show()
             }
             is ShelfItem.Podcast -> {
+                analyticsAction = ShelfItem.ShelfItemId.PODCAST.analyticsValue
                 (activity as FragmentHostListener).closePlayer()
                 val podcast = playerViewModel.podcast
                 if (podcast != null) {
@@ -79,16 +94,42 @@ class ShelfBottomSheet : BaseDialogFragment() {
                     (activity as? FragmentHostListener)?.openCloudFiles()
                 }
             }
-            is ShelfItem.Cast -> { binding?.mediaRouteButton?.performClick() }
+            is ShelfItem.Cast -> {
+                analyticsAction = ShelfItem.ShelfItemId.CAST.analyticsValue
+                binding?.mediaRouteButton?.performClick()
+            }
             is ShelfItem.Played -> {
+                analyticsAction = ShelfItem.ShelfItemId.PLAYED.analyticsValue
                 context?.let {
                     playerViewModel.markCurrentlyPlayingAsPlayed(it)?.show(parentFragmentManager, "mark_as_played")
                 }
             }
-            is ShelfItem.Archive -> { playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive") }
-            else -> {}
+            is ShelfItem.Archive -> {
+                analyticsAction = ShelfItem.ShelfItemId.ARCHIVE.analyticsValue
+                playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive")
+            }
+            else -> {
+                analyticsAction = AnalyticsProp.Value.UNKNOWN
+            }
         }
-
+        analyticsTracker.track(
+            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to analyticsAction)
+        )
         dismiss()
+    }
+
+    companion object {
+        object AnalyticsProp {
+            object Key {
+                const val FROM = "from"
+                const val ACTION = "action"
+            }
+            object Value {
+                const val SHELF = "shelf"
+                const val OVERFLOW_MENU = "overflow_menu"
+                const val UNKNOWN = "unknown"
+            }
+        }
     }
 }
