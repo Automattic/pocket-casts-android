@@ -80,6 +80,7 @@ class EpisodeFragment : BaseDialogFragment() {
         private object AnalyticsProp {
             object Key {
                 const val SOURCE = "source"
+                const val EPISODE_UUID = "episode_uuid"
             }
         }
         fun newInstance(
@@ -345,6 +346,13 @@ class EpisodeFragment : BaseDialogFragment() {
                         binding.lblAuthor.setOnClickListener {
                             dismiss()
                             if (!overridePodcastLink) {
+                                analyticsTracker.track(
+                                    AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
+                                    mapOf(
+                                        AnalyticsProp.Key.EPISODE_UUID to state.episode.uuid,
+                                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
+                                    )
+                                )
                                 (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid)
                             }
                         }
