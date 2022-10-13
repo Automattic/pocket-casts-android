@@ -277,4 +277,8 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED("playback_effect_trim_silence_amount_changed"),
     PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED("playback_effect_volume_boost_toggled"),
     FILTER_LIST_REORDERED("filter_list_reordered"),
+
+    /* Episode Details */
+    EPISODE_DETAIL_SHOWN("episode_detail_shown"),
+    EPISODE_DETAIL_DISMISSED("episode_detail_dismissed"),
 }

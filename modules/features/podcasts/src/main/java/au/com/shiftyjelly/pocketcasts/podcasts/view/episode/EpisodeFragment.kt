@@ -25,11 +25,14 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
@@ -64,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val ARG_EPISODE_UUID = "episodeUUID"
+private const val ARG_EPISODE_VIEW_SOURCE = "episode_view_source"
 private const val ARG_OVERRIDE_PODCAST_LINK = "override_podcast_link"
 private const val ARG_PODCAST_UUID = "podcastUUID"
 private const val ARG_FROMLIST_UUID = "fromListUUID"
@@ -72,14 +76,41 @@ private const val ARG_FORCE_DARK = "forceDark"
 @AndroidEntryPoint
 class EpisodeFragment : BaseDialogFragment() {
     companion object {
-        fun newInstance(episode: Episode, overridePodcastLink: Boolean = false, fromListUuid: String? = null, forceDark: Boolean = false): EpisodeFragment {
-            return newInstance(episode.uuid, overridePodcastLink, episode.podcastUuid, fromListUuid, forceDark)
+
+        private object AnalyticsProp {
+            object Key {
+                const val SOURCE = "source"
+            }
+        }
+        fun newInstance(
+            episode: Episode,
+            source: EpisodeViewSource,
+            overridePodcastLink: Boolean = false,
+            fromListUuid: String? = null,
+            forceDark: Boolean = false
+        ): EpisodeFragment {
+            return newInstance(
+                episodeUuid = episode.uuid,
+                source = source,
+                overridePodcastLink = overridePodcastLink,
+                podcastUuid = episode.podcastUuid,
+                fromListUuid = fromListUuid,
+                forceDark = forceDark
+            )
         }
 
-        fun newInstance(episodeUuid: String, overridePodcastLink: Boolean = false, podcastUuid: String? = null, fromListUuid: String? = null, forceDark: Boolean = false): EpisodeFragment {
+        fun newInstance(
+            episodeUuid: String,
+            source: EpisodeViewSource,
+            overridePodcastLink: Boolean = false,
+            podcastUuid: String? = null,
+            fromListUuid: String? = null,
+            forceDark: Boolean = false
+        ): EpisodeFragment {
             return EpisodeFragment().apply {
                 arguments = bundleOf(
                     ARG_EPISODE_UUID to episodeUuid,
+                    ARG_EPISODE_VIEW_SOURCE to source.value,
                     ARG_OVERRIDE_PODCAST_LINK to overridePodcastLink,
                     ARG_PODCAST_UUID to podcastUuid,
                     ARG_FROMLIST_UUID to fromListUuid,
@@ -99,6 +130,7 @@ class EpisodeFragment : BaseDialogFragment() {
     @Inject lateinit var serverManager: ServerManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: EpisodeFragmentViewModel by viewModels()
     private var binding: FragmentEpisodeBinding? = null
@@ -110,6 +142,9 @@ class EpisodeFragment : BaseDialogFragment() {
 
     val episodeUUID: String?
         get() = arguments?.getString(ARG_EPISODE_UUID)
+
+    private val episodeViewSource: EpisodeViewSource
+        get() = EpisodeViewSource.fromString(arguments?.getString(ARG_EPISODE_VIEW_SOURCE))
 
     val overridePodcastLink: Boolean
         get() = arguments?.getBoolean(ARG_OVERRIDE_PODCAST_LINK) ?: false
@@ -158,6 +193,7 @@ class EpisodeFragment : BaseDialogFragment() {
 
         episodeUUID?.let { episodeUuid ->
             podcastUuid?.let { podcastUuid ->
+                analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_SHOWN, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
                 FirebaseAnalyticsTracker.openedEpisode(podcastUuid, episodeUuid)
             }
         }
@@ -170,6 +206,9 @@ class EpisodeFragment : BaseDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        if (!viewModel.isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_DISMISSED)
+        }
         webView.cleanup()
         webView = null
         binding = null
@@ -440,6 +479,11 @@ class EpisodeFragment : BaseDialogFragment() {
 
     private fun loadShowNotes(notes: String) {
         webView?.loadDataWithBaseURL("file://android_asset/", notes, "text/html", "UTF-8", null)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.isFragmentChangingConfigurations = activity?.isChangingConfigurations ?: false
     }
 
     override fun onStart() {

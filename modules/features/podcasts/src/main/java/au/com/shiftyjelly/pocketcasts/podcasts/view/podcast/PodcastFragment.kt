@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -207,7 +208,12 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid)
             )
         }
-        val episodeCard = EpisodeFragment.newInstance(episode, overridePodcastLink = true, fromListUuid = fromListUuid)
+        val episodeCard = EpisodeFragment.newInstance(
+            episode = episode,
+            source = EpisodeViewSource.PODCAST_SCREEN,
+            overridePodcastLink = true,
+            fromListUuid = fromListUuid
+        )
         episodeCard.show(parentFragmentManager, "episode_card")
     }
 
