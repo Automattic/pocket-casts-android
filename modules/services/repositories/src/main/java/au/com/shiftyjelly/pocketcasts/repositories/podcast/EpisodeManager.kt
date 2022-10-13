@@ -51,6 +51,7 @@ interface EpisodeManager {
     fun observeDownloadEpisodes(): Flowable<List<Episode>>
     fun observeDownloadedEpisodes(): Flowable<List<Episode>>
     fun observeStarredEpisodes(): Flowable<List<Episode>>
+    suspend fun findStarredEpisodes(): List<Episode>
 
     fun exists(episodeUuid: String): Boolean
 
@@ -120,6 +121,7 @@ interface EpisodeManager {
     fun deleteEpisodes(episodes: List<Episode>, playbackManager: PlaybackManager)
     fun unarchiveAllInList(episodes: List<Episode>)
     fun observePlaybackHistoryEpisodes(): Flowable<List<Episode>>
+    suspend fun findPlaybackHistoryEpisodes(): List<Episode>
     fun checkPodcastForEpisodeLimit(podcast: Podcast, playbackManager: PlaybackManager?)
     fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?)
     fun episodeCanBeCleanedUp(episode: Episode, playbackManager: PlaybackManager): Boolean

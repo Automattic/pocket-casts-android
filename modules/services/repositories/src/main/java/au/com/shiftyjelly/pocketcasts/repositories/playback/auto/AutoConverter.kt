@@ -133,7 +133,11 @@ object AutoConverter {
     fun getBitmapUriForPodcast(podcast: Podcast?, context: Context): Uri? {
         if (podcast == null) return null
 
-        val podcastArtUri = Uri.parse(podcast.getArtworkUrl(480))
+        val url = podcast.getArtworkUrl(480)
+        if (url.isBlank()) {
+            return null
+        }
+        val podcastArtUri = Uri.parse(url)
         return getArtworkUriForContentProvider(podcastArtUri, context)
     }
 

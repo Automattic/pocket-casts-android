@@ -206,6 +206,10 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.observePlaybackHistory()
     }
 
+    override suspend fun findPlaybackHistoryEpisodes(): List<Episode> {
+        return episodeDao.findPlaybackHistoryEpisodes()
+    }
+
     override fun observeDownloadingEpisodes(): LiveData<List<Episode>> {
         return episodeDao.observeDownloadingEpisodes()
     }
@@ -834,6 +838,10 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun observeStarredEpisodes(): Flowable<List<Episode>> {
         return episodeDao.observeStarredEpisodes()
+    }
+
+    override suspend fun findStarredEpisodes(): List<Episode> {
+        return episodeDao.findStarredEpisodes()
     }
 
     override fun exists(episodeUuid: String): Boolean {
