@@ -15,3 +15,4 @@ dependencies {
     implementation project(':modules:services:model')
     implementation project(':modules:services:analytics')
 }
+
