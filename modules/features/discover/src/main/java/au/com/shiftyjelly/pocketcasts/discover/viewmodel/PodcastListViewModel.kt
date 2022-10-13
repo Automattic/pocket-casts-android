@@ -151,13 +151,11 @@ class PodcastListViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: Episode) {
-        playbackManager.playbackSource = PlaybackSource.DISCOVER_PODCAST_LIST
-        playbackManager.playNow(episode, forceStream = true)
+        playbackManager.playNow(episode, forceStream = true, playbackSource = PlaybackSource.DISCOVER_PODCAST_LIST)
     }
 
     fun stopPlayback() {
-        playbackManager.playbackSource = PlaybackSource.DISCOVER_PODCAST_LIST
-        playbackManager.stopAsync()
+        playbackManager.stopAsync(playbackSource = PlaybackSource.DISCOVER_PODCAST_LIST)
     }
 }
 

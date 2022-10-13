@@ -17,7 +17,6 @@ import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,8 +56,6 @@ class VideoActivity : AppCompatActivity() {
         window.navigationBarColor = color
 
         setContentView(R.layout.activity_video)
-
-        playbackManager.playbackSource = PlaybackSource.FULL_SCREEN_VIDEO
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()

@@ -55,6 +55,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
+    private val playbackSource = PlaybackSource.EPISODE_DETAILS
     lateinit var state: LiveData<EpisodeFragmentState>
     val showNotes: MutableLiveData<String> = MutableLiveData()
     lateinit var inUpNext: LiveData<Boolean>
@@ -243,16 +244,15 @@ class EpisodeFragmentViewModel @Inject constructor(
         fromListUuid: String? = null
     ): Boolean {
         episode?.let { episode ->
-            playbackManager.playbackSource = PlaybackSource.EPISODE_DETAILS
             if (isPlaying.value == true) {
-                playbackManager.pause()
+                playbackManager.pause(playbackSource = playbackSource)
                 return false
             } else {
                 fromListUuid?.let {
                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
                 }
-                playbackManager.playNow(episode, force)
+                playbackManager.playNow(episode, forceStream = force, playbackSource = playbackSource)
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                 return true
             }

@@ -41,6 +41,7 @@ class DiscoverViewModel @Inject constructor(
     val userManager: UserManager
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
+    private val playbackSource = PlaybackSource.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.getDiscoveryCountryCode()
     var replacements = emptyMap<String, String>()
@@ -162,13 +163,11 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: Episode) {
-        playbackManager.playbackSource = PlaybackSource.DISCOVER
-        playbackManager.playNow(episode, forceStream = true)
+        playbackManager.playNow(episode = episode, forceStream = true, playbackSource = playbackSource)
     }
 
     fun stopPlayback() {
-        playbackManager.playbackSource = PlaybackSource.DISCOVER
-        playbackManager.stopAsync()
+        playbackManager.stopAsync(playbackSource = playbackSource)
     }
 }
 

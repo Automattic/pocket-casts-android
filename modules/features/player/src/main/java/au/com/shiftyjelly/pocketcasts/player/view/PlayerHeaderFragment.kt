@@ -77,9 +77,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     lateinit var imageLoader: PodcastImageLoaderThemed
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: AdapterPlayerHeaderBinding? = null
-    private val playbackSource = PlaybackSource.PLAYER
     private var skippedFirstTouch: Boolean = false
     private var hasReceivedOnTouchDown = false
+    private val playbackSource = PlaybackSource.PLAYER
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
@@ -103,12 +103,10 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.viewModel = PlayerViewModel.PlayerHeader()
 
         binding.skipBack.setOnClickListener {
-            playbackManager.playbackSource = playbackSource
             onSkipBack()
             (it as LottieAnimationView).playAnimation()
         }
         binding.skipForward.setOnClickListener {
-            playbackManager.playbackSource = playbackSource
             onSkipForward()
             (it as LottieAnimationView).playAnimation()
         }
@@ -482,10 +480,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onPlayClicked() {
-        playbackManager.playbackSource = playbackSource
         if (playbackManager.isPlaying()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
-            playbackManager.pause()
+            playbackManager.pause(playbackSource = playbackSource)
         } else {
             if (playbackManager.shouldWarnAboutPlayback()) {
                 launch {
@@ -496,7 +493,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 viewModel.play()
                                 warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
                             } else {
-                                warningsHelper.streamingWarningDialog(episode, snackbarParentView = view)
+                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, playbackSource = playbackSource)
                                     .show(parentFragmentManager, "streaming dialog")
                             }
                         }

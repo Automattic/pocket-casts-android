@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.containsUuid
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -120,12 +121,12 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun playNow(episode: UserEpisode, forceStream: Boolean) {
-        playbackManager.playNow(episode, forceStream)
+        playbackManager.playNow(episode = episode, forceStream = forceStream, playbackSource = PlaybackSource.FILES)
         analyticsTracker.track(AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED, mapOf(OPTION_KEY to PLAY))
     }
 
     fun pause() {
-        playbackManager.pause()
+        playbackManager.pause(playbackSource = PlaybackSource.FILES)
         analyticsTracker.track(AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED, mapOf(OPTION_KEY to PAUSE))
     }
 
