@@ -524,6 +524,16 @@ class EpisodeFragment : BaseDialogFragment() {
                                 return true
                             }
 
+                            viewModel.episode?.uuid?.let { episodeUuid ->
+                                analyticsTracker.track(
+                                    AnalyticsEvent.EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED,
+                                    mapOf(
+                                        AnalyticsProp.Key.EPISODE_UUID to episodeUuid,
+                                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
+                                    )
+                                )
+                            }
+
                             return IntentUtil.webViewShouldOverrideUrl(url, view.context)
                         }
 

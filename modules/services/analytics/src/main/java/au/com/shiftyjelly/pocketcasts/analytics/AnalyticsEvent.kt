@@ -282,4 +282,5 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DETAIL_SHOWN("episode_detail_shown"),
     EPISODE_DETAIL_DISMISSED("episode_detail_dismissed"),
     EPISODE_DETAIL_PODCAST_NAME_TAPPED("episode_detail_podcast_name_tapped"),
+    EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED("episode_detail_show_notes_link_tapped"),
 }
