@@ -59,6 +59,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
         }
 
         binding.btnEdit.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED)
             (activity as FragmentHostListener).showModal(ShelfFragment())
             dismiss()
         }

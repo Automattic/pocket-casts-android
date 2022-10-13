@@ -272,6 +272,7 @@ enum class AnalyticsEvent(val key: String) {
     /* Player - Shelf */
     PLAYER_SHELF_ACTION_TAPPED("player_shelf_action_tapped"),
     PLAYER_SHELF_OVERFLOW_MENU_SHOWN("player_shelf_overflow_menu_shown"),
+    PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED("player_shelf_overflow_menu_rearrange_started"),
     PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED("player_shelf_overflow_menu_rearrange_action_moved"),
     PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED("player_shelf_overflow_menu_rearrange_finished"),
 }
