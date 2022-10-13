@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -463,12 +462,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onNextChapter() {
         analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
         viewModel.nextChapter()
-    }
-
-    override fun onPlayingEpisodeActionsClick() {
-        viewModel.episode?.let { episode ->
-            (activity as? FragmentHostListener)?.openEpisodeDialog(episode.uuid, (episode as? Episode)?.podcastUuid, forceDark = true)
-        }
     }
 
     fun onMoreClicked() {
