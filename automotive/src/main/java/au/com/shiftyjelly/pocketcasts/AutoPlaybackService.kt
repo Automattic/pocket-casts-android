@@ -1,21 +1,20 @@
 package au.com.shiftyjelly.pocketcasts
 
 import android.annotation.SuppressLint
-import android.app.PendingIntent
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import au.com.shiftyjelly.pocketcasts.account.AccountActivity
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE
+import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
-import au.com.shiftyjelly.pocketcasts.repositories.playback.CONTENT_STYLE_BROWSABLE_HINT
-import au.com.shiftyjelly.pocketcasts.repositories.playback.CONTENT_STYLE_LIST_ITEM_HINT_VALUE
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playback.MEDIA_ID_ROOT
@@ -38,29 +37,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val FILTERS_ROOT = "__FILTERS__"
 const val DISCOVER_ROOT = "__DISCOVER__"
+const val PROFILE_ROOT = "__PROFILE__"
+const val PROFILE_FILES = "__PROFILE_FILES__"
+const val PROFILE_STARRED = "__PROFILE_STARRED__"
+const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 
 @SuppressLint("LogNotTimber")
 @AndroidEntryPoint
 class AutoPlaybackService : PlaybackService() {
-    @Inject
-    lateinit var listSource: ListRepository
 
-    private fun requireLogin() {
-        val loginIntent = Intent(this, AccountActivity::class.java)
-        val loginActivityPendingIntent = PendingIntent.getActivity(this, 0, loginIntent, PendingIntent.FLAG_IMMUTABLE)
-        val extras = Bundle().apply {
-            putString(ERROR_RESOLUTION_ACTION_LABEL, "Login now")
-            putParcelable(ERROR_RESOLUTION_ACTION_INTENT, loginActivityPendingIntent)
-        }
-
-        val playbackState = PlaybackStateCompat.Builder()
-            .setState(PlaybackStateCompat.STATE_ERROR, 0, 0f)
-            .setErrorMessage(PlaybackStateCompat.ERROR_CODE_AUTHENTICATION_EXPIRED, "Please log in to your Pocket Casts account")
-            .setExtras(extras)
-            .build()
-        playbackManager.mediaSession.setPlaybackState(playbackState)
-        playbackManager.mediaSession.setMetadata(MediaMetadataCompat.Builder().build()) // Set no metadata
-    }
+    @Inject lateinit var listSource: ListRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -87,6 +73,10 @@ class AutoPlaybackService : PlaybackService() {
                     PODCASTS_ROOT -> loadPodcastsChildren()
                     FILTERS_ROOT -> loadFiltersRoot()
                     DISCOVER_ROOT -> loadDiscoverRoot()
+                    PROFILE_ROOT -> loadProfileRoot()
+                    PROFILE_FILES -> loadFilesChildren()
+                    PROFILE_LISTENING_HISTORY -> loadListeningHistoryChildren()
+                    PROFILE_STARRED -> loadStarredChildren()
                     else -> {
                         if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
                             loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
@@ -107,44 +97,23 @@ class AutoPlaybackService : PlaybackService() {
     }
 
     override suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
-        // podcasts
-        val podcastsDescription = MediaDescriptionCompat.Builder()
-            .setTitle(getString(LR.string.podcasts))
-            .setMediaId(PODCASTS_ROOT)
-            .setIconUri(AutoConverter.getBitmapUri(IR.drawable.auto_tab_podcasts, this))
-            .build()
-        val podcastItem = MediaBrowserCompat.MediaItem(podcastsDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+        val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
 
-        // filters
-        val extras = Bundle().apply {
-            putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
-        }
-        val filtersDescription = MediaDescriptionCompat.Builder()
-            .setTitle(getString(LR.string.episode_filters))
-            .setMediaId(FILTERS_ROOT)
-            .setIconUri(AutoConverter.getBitmapUri(IR.drawable.auto_tab_filter, this))
-            .setExtras(extras)
-            .build()
-        val filtersItem = MediaBrowserCompat.MediaItem(filtersDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
-
-        // discover
-        val discoverDescription = MediaDescriptionCompat.Builder()
-            .setTitle(getString(LR.string.discover))
-            .setMediaId(DISCOVER_ROOT)
-            .setIconUri(AutoConverter.getBitmapUri(IR.drawable.auto_tab_discover, this))
-            .build()
-        val discoverItem = MediaBrowserCompat.MediaItem(discoverDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+        val podcastsItem = buildListMediaItem(id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
+        val filtersItem = buildListMediaItem(id = FILTERS_ROOT, title = LR.string.filters, drawable = IR.drawable.auto_tab_filter, extras = extrasContentAsList)
+        val discoverItem = buildListMediaItem(id = DISCOVER_ROOT, title = LR.string.discover, drawable = IR.drawable.auto_tab_discover)
+        val profileItem = buildListMediaItem(id = PROFILE_ROOT, title = LR.string.profile, drawable = IR.drawable.auto_tab_profile, extras = extrasContentAsList)
 
         // show the user's podcast collection first if they are subscribed any
         return if (podcastManager.countSubscribed() > 0) {
-            listOf(podcastItem, filtersItem, discoverItem)
+            listOf(podcastsItem, filtersItem, discoverItem, profileItem)
         } else {
-            listOf(discoverItem, podcastItem, filtersItem)
+            listOf(discoverItem, podcastsItem, filtersItem, profileItem)
         }
     }
 
-    fun loadFiltersRoot(): List<MediaBrowserCompat.MediaItem> {
-        return playlistManager.findAll().mapNotNull {
+    suspend fun loadFiltersRoot(): List<MediaBrowserCompat.MediaItem> {
+        return playlistManager.findAllSuspend().mapNotNull {
             Log.d(Settings.LOG_TAG_AUTO, "Filters ${it.title}")
 
             try {
@@ -154,6 +123,28 @@ class AutoPlaybackService : PlaybackService() {
                 null
             }
         }
+    }
+
+    private fun loadProfileRoot(): List<MediaBrowserCompat.MediaItem> {
+        return buildList {
+            // Add the user uploaded Files if they are a Plus subscriber
+            val isPlusUser = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
+            if (isPlusUser) {
+                add(buildListMediaItem(id = PROFILE_FILES, title = LR.string.profile_navigation_files, drawable = IR.drawable.automotive_files))
+            }
+            add(buildListMediaItem(id = PROFILE_STARRED, title = LR.string.profile_navigation_starred, drawable = IR.drawable.automotive_filter_star))
+            add(buildListMediaItem(id = PROFILE_LISTENING_HISTORY, title = LR.string.profile_navigation_listening_history, drawable = IR.drawable.automotive_listening_history))
+        }
+    }
+
+    private fun buildListMediaItem(id: String, @StringRes title: Int, @DrawableRes drawable: Int, extras: Bundle? = null): MediaBrowserCompat.MediaItem {
+        val description = MediaDescriptionCompat.Builder()
+            .setTitle(getString(title))
+            .setMediaId(id)
+            .setExtras(extras)
+            .setIconUri(AutoConverter.getBitmapUri(drawable = drawable, this))
+            .build()
+        return MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
     suspend fun loadDiscoverRoot(): List<MediaBrowserCompat.MediaItem> {
