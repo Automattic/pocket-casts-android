@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.autoDrawableId
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.automotiveDrawableId
@@ -68,7 +69,7 @@ object AutoConverter {
     private const val FULL_IMAGE_SIZE = 800
 
     fun convertEpisodeToMediaItem(context: Context, episode: Playable, parentPodcast: Podcast, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
-        val localUri = getBitmapUriForPodcast(parentPodcast, context)
+        val localUri = getBitmapUriForPodcast(parentPodcast, episode, context)
 
         val extrasForEpisode = extrasForEpisode(episode)
         if (groupTrailers) {
@@ -90,7 +91,7 @@ object AutoConverter {
 
     fun convertPodcastToMediaItem(podcast: Podcast, context: Context): MediaBrowserCompat.MediaItem? {
         return try {
-            val localUri = getBitmapUriForPodcast(podcast, context)
+            val localUri = getBitmapUriForPodcast(podcast = podcast, episode = null, context = context)
 
             val podcastDesc = MediaDescriptionCompat.Builder()
                 .setTitle(podcast.title)
@@ -130,13 +131,18 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(mediaDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
-    fun getBitmapUriForPodcast(podcast: Podcast?, context: Context): Uri? {
-        if (podcast == null) return null
+    fun getBitmapUriForPodcast(podcast: Podcast?, episode: Playable?, context: Context): Uri? {
+        val url = if (episode is UserEpisode) {
+            // the artwork for user uploaded episodes are stored on each episode
+            episode.artworkUrl
+        } else {
+            podcast?.getArtworkUrl(480)
+        }
 
-        val url = podcast.getArtworkUrl(480)
-        if (url.isBlank()) {
+        if (url.isNullOrBlank()) {
             return null
         }
+
         val podcastArtUri = Uri.parse(url)
         return getArtworkUriForContentProvider(podcastArtUri, context)
     }

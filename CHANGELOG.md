@@ -8,6 +8,8 @@
         ([#372](https://github.com/Automattic/pocket-casts-android/pull/372)).
     *   Added Automotive OS setting to show played episodes.
         ([#389](https://github.com/Automattic/pocket-casts-android/pull/389)).
+    *   Added new episode lists to Automotive OS. Starred, Listening History, and Files.
+        ([#403](https://github.com/Automattic/pocket-casts-android/pull/403)).
 
 7.24
 -----
