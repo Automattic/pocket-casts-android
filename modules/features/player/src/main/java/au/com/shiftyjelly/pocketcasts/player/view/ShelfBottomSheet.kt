@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -68,26 +69,20 @@ class ShelfBottomSheet : BaseDialogFragment() {
     }
 
     private fun onClick(item: ShelfItem) {
-        val analyticsAction: String
         when (item) {
             is ShelfItem.Effects -> {
-                analyticsAction = ShelfItem.ShelfItemId.EFFECTS.analyticsValue
                 EffectsFragment().show(parentFragmentManager, "effects")
             }
             is ShelfItem.Sleep -> {
-                analyticsAction = ShelfItem.ShelfItemId.SLEEP.analyticsValue
                 SleepFragment().show(parentFragmentManager, "sleep")
             }
             is ShelfItem.Star -> {
-                analyticsAction = ShelfItem.ShelfItemId.STAR.analyticsValue
                 playerViewModel.starToggle()
             }
             is ShelfItem.Share -> {
-                analyticsAction = ShelfItem.ShelfItemId.SHARE.analyticsValue
                 playerViewModel.shareDialog(context, parentFragmentManager)?.show()
             }
             is ShelfItem.Podcast -> {
-                analyticsAction = ShelfItem.ShelfItemId.PODCAST.analyticsValue
                 (activity as FragmentHostListener).closePlayer()
                 val podcast = playerViewModel.podcast
                 if (podcast != null) {
@@ -97,26 +92,23 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 }
             }
             is ShelfItem.Cast -> {
-                analyticsAction = ShelfItem.ShelfItemId.CAST.analyticsValue
                 binding?.mediaRouteButton?.performClick()
             }
             is ShelfItem.Played -> {
-                analyticsAction = ShelfItem.ShelfItemId.PLAYED.analyticsValue
                 context?.let {
                     playerViewModel.markCurrentlyPlayingAsPlayed(it)?.show(parentFragmentManager, "mark_as_played")
                 }
             }
             is ShelfItem.Archive -> {
-                analyticsAction = ShelfItem.ShelfItemId.ARCHIVE.analyticsValue
                 playerViewModel.archiveCurrentlyPlaying(resources)?.show(parentFragmentManager, "archive")
             }
-            else -> {
-                analyticsAction = AnalyticsProp.Value.UNKNOWN
+            ShelfItem.Download -> {
+                Timber.e("Unexpected click on ShelfItem.Download")
             }
         }
         analyticsTracker.track(
             AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
-            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to analyticsAction)
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.OVERFLOW_MENU, AnalyticsProp.Key.ACTION to item.analyticsValue)
         )
         dismiss()
     }

@@ -163,8 +163,8 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
 
     private fun trackShelfItemMovedEvent(position: Int) {
         dragStartPosition?.let {
-            val title = ShelfItem.ShelfItemId.fromId((items[position] as? ShelfItem)?.id)
-                ?.analyticsValue ?: AnalyticsProp.Value.UNKNOWN
+            val title = (items[position] as? ShelfItem)?.analyticsValue
+                ?: AnalyticsProp.Value.UNKNOWN
             val movedFrom = sectionTitleAt(it)
             val movedTo = sectionTitleAt(position)
             val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {

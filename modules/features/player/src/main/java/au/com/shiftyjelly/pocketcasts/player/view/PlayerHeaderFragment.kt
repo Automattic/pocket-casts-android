@@ -163,15 +163,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.playerActions.setOnClickListener { onMoreClicked() }
         binding.podcast.setOnClickListener { showPodcast() }
         binding.played.setOnClickListener {
-            trackShelfAction(ShelfItem.ShelfItemId.PLAYED.analyticsValue)
+            trackShelfAction(ShelfItem.Played.analyticsValue)
             viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played")
         }
         binding.archive.setOnClickListener {
-            trackShelfAction(ShelfItem.ShelfItemId.ARCHIVE.analyticsValue)
+            trackShelfAction(ShelfItem.Archive.analyticsValue)
             viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
         }
         binding.download.setOnClickListener {
-            trackShelfAction(ShelfItem.ShelfItemId.DOWNLOAD.analyticsValue)
+            trackShelfAction(ShelfItem.Download.analyticsValue)
             viewModel.downloadCurrentlyPlaying()
         }
         binding.videoView.playbackManager = playbackManager
@@ -180,7 +180,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         CastButtonFactory.setUpMediaRouteButton(binding.root.context, binding.castButton)
         binding.castButton.setAlwaysVisible(true)
         binding.castButton.updateColor(ThemeColor.playerContrast03(theme.activeTheme))
-        binding.castButton.setOnClickListener { trackShelfAction(ShelfItem.ShelfItemId.CAST.analyticsValue) }
+        binding.castButton.setOnClickListener { trackShelfAction(ShelfItem.Cast.analyticsValue) }
 
         setupUpNextDrag(view, binding.topView)
 
@@ -443,27 +443,27 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onEffectsClick() {
-        trackShelfAction(ShelfItem.ShelfItemId.EFFECTS.analyticsValue)
+        trackShelfAction(ShelfItem.Effects.analyticsValue)
         EffectsFragment().show(parentFragmentManager, "effects_sheet")
     }
 
     override fun onSleepClick() {
-        trackShelfAction(ShelfItem.ShelfItemId.SLEEP.analyticsValue)
+        trackShelfAction(ShelfItem.Sleep.analyticsValue)
         SleepFragment().show(parentFragmentManager, "effects_sheet")
     }
 
     override fun onStarClick() {
-        trackShelfAction(ShelfItem.ShelfItemId.STAR.analyticsValue)
+        trackShelfAction(ShelfItem.Star.analyticsValue)
         viewModel.starToggle()
     }
 
     override fun onShareClick() {
-        trackShelfAction(ShelfItem.ShelfItemId.SHARE.analyticsValue)
+        trackShelfAction(ShelfItem.Share.analyticsValue)
         viewModel.shareDialog(context, childFragmentManager)?.show()
     }
 
     private fun showPodcast() {
-        trackShelfAction(ShelfItem.ShelfItemId.PODCAST.analyticsValue)
+        trackShelfAction(ShelfItem.Podcast.analyticsValue)
         val podcast = viewModel.podcast
         (activity as FragmentHostListener).closePlayer()
         if (podcast != null) {
