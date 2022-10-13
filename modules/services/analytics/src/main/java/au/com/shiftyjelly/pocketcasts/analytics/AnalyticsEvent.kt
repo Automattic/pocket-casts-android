@@ -214,11 +214,13 @@ enum class AnalyticsEvent(val key: String) {
     ANALYTICS_OPT_OUT("analytics_opt_out"),
     SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
 
-    /* Filters screen */
+    /* Filters */
     FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED("filter_auto_download_limit_updated"),
     FILTER_AUTO_DOWNLOAD_UPDATED("filter_auto_download_updated"),
+    FILTER_CREATED("filter_created"),
     FILTER_DELETED("filter_deleted"),
     FILTER_EDIT_DISMISSED("filter_edit_dismissed"),
+    FILTER_LIST_REORDERED("filter_list_reordered"),
     FILTER_LIST_SHOWN("filter_list_shown"),
     FILTER_SHOWN("filter_shown"),
     FILTER_SORT_BY_CHANGED("filter_sort_by_changed"),
@@ -276,7 +278,6 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED("playback_effect_trim_silence_toggled"),
     PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED("playback_effect_trim_silence_amount_changed"),
     PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED("playback_effect_volume_boost_toggled"),
-    FILTER_LIST_REORDERED("filter_list_reordered"),
 
     /* Player - Shelf */
     PLAYER_SHELF_ACTION_TAPPED("player_shelf_action_tapped"),
