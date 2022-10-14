@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPod
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
@@ -156,7 +157,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     private fun onRowClick(episode: Playable) {
         if (episode is Episode) {
-            val fragment = EpisodeFragment.newInstance(episode)
+            val fragment = EpisodeFragment.newInstance(episode = episode, source = EpisodeViewSource.FILTERS)
             fragment.show(parentFragmentManager, "episode_card")
         }
     }

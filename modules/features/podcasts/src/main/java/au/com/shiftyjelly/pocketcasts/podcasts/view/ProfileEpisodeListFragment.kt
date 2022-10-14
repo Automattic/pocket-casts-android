@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentProfileEpisodeListBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
@@ -99,7 +100,12 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     val onRowClick = { episode: Playable ->
         if (episode is Episode) {
-            val fragment = EpisodeFragment.newInstance(episode)
+            val episodeViewSource = when (mode) {
+                Mode.Downloaded -> EpisodeViewSource.DOWNLOADS
+                Mode.History -> EpisodeViewSource.LISTENING_HISTORY
+                Mode.Starred -> EpisodeViewSource.STARRED
+            }
+            val fragment = EpisodeFragment.newInstance(episode = episode, source = episodeViewSource)
             fragment.show(parentFragmentManager, "episode_card")
         }
     }

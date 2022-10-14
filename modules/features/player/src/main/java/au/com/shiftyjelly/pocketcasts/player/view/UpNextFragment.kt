@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentUpnextBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -336,13 +337,23 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         if (settings.getTapOnUpNextShouldPlay()) {
             playerViewModel.playEpisode(uuid = episodeUuid, playbackSource = playbackSource)
         } else {
-            (activity as? FragmentHostListener)?.openEpisodeDialog(episodeUuid, podcastUuid, forceDark = true)
+            (activity as? FragmentHostListener)?.openEpisodeDialog(
+                episodeUuid = episodeUuid,
+                source = EpisodeViewSource.UP_NEXT,
+                podcastUuid = podcastUuid,
+                forceDark = true
+            )
         }
     }
 
     override fun onEpisodeActionsLongPress(episodeUuid: String, podcastUuid: String?) {
         if (settings.getTapOnUpNextShouldPlay()) {
-            (activity as? FragmentHostListener)?.openEpisodeDialog(episodeUuid, podcastUuid, forceDark = true)
+            (activity as? FragmentHostListener)?.openEpisodeDialog(
+                episodeUuid = episodeUuid,
+                source = EpisodeViewSource.UP_NEXT,
+                podcastUuid = podcastUuid,
+                forceDark = true
+            )
         } else {
             playerViewModel.playEpisode(uuid = episodeUuid, playbackSource = playbackSource)
         }

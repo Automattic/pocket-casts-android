@@ -284,4 +284,10 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED("player_shelf_overflow_menu_rearrange_started"),
     PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED("player_shelf_overflow_menu_rearrange_action_moved"),
     PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED("player_shelf_overflow_menu_rearrange_finished"),
+
+    /* Episode Details */
+    EPISODE_DETAIL_SHOWN("episode_detail_shown"),
+    EPISODE_DETAIL_DISMISSED("episode_detail_dismissed"),
+    EPISODE_DETAIL_PODCAST_NAME_TAPPED("episode_detail_podcast_name_tapped"),
+    EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED("episode_detail_show_notes_link_tapped"),
 }

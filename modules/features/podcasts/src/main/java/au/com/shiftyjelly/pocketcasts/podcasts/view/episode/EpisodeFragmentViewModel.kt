@@ -66,6 +66,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     val disposables = CompositeDisposable()
 
     var episode: Episode? = null
+    var isFragmentChangingConfigurations: Boolean = false
 
     fun setup(episodeUUID: String, podcastUUID: String?, forceDark: Boolean) {
         val isDarkTheme = forceDark || theme.isDarkTheme

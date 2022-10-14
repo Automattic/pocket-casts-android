@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentInfo
 import au.com.shiftyjelly.pocketcasts.navigation.NavigatorAction
@@ -821,7 +822,12 @@ class MainActivity :
                 // intents were being reused for notifications so we had to use the extra to pass action
                 val episodeUuid =
                     intent.extras?.getString(Settings.INTENT_OPEN_APP_EPISODE_UUID, null)
-                openEpisodeDialog(episodeUuid, null, forceDark = false)
+                openEpisodeDialog(
+                    episodeUuid = episodeUuid,
+                    source = EpisodeViewSource.NOTIFICATION,
+                    podcastUuid = null,
+                    forceDark = false
+                )
             } else if (action == Intent.ACTION_VIEW) {
                 val extraPage = intent.extras?.getString(INTENT_EXTRA_PAGE, null)
                 if (extraPage != null) {
@@ -943,7 +949,12 @@ class MainActivity :
         addFragment(PodcastFragment.newInstance(podcastUuid = uuid))
     }
 
-    override fun openEpisodeDialog(episodeUuid: String?, podcastUuid: String?, forceDark: Boolean) {
+    override fun openEpisodeDialog(
+        episodeUuid: String?,
+        source: EpisodeViewSource,
+        podcastUuid: String?,
+        forceDark: Boolean
+    ) {
         episodeUuid ?: return
 
         launch(Dispatchers.Main.immediate) {
@@ -953,13 +964,15 @@ class MainActivity :
                 val podcastUuidFound = podcastUuid ?: return@launch
                 // Assume it's an episode we don't know about
                 EpisodeFragment.newInstance(
-                    episodeUuid,
+                    episodeUuid = episodeUuid,
+                    source = source,
                     podcastUuid = podcastUuidFound,
                     forceDark = forceDark
                 )
             } else if (playable is Episode) {
                 EpisodeFragment.newInstance(
-                    episodeUuid,
+                    episodeUuid = episodeUuid,
+                    source = source,
                     podcastUuid = podcastUuid,
                     forceDark = forceDark
                 )
@@ -1031,7 +1044,12 @@ class MainActivity :
 
                     val episode = result.episode
                     if (episode != null) {
-                        openEpisodeDialog(episode.uuid, podcastUuid, forceDark = false)
+                        openEpisodeDialog(
+                            episodeUuid = episode.uuid,
+                            source = EpisodeViewSource.SHARE,
+                            podcastUuid = podcastUuid,
+                            forceDark = false
+                        )
                     } else {
                         openPodcastPage(podcastUuid)
                     }
