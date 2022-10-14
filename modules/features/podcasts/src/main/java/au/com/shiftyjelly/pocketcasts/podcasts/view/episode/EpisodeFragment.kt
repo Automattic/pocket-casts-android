@@ -344,15 +344,15 @@ class EpisodeFragment : BaseDialogFragment() {
                             binding.lblAuthor.compoundDrawableTintList = ColorStateList.valueOf(iconColor)
                         }
                         binding.lblAuthor.setOnClickListener {
+                            analyticsTracker.track(
+                                AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
+                                mapOf(
+                                    AnalyticsProp.Key.EPISODE_UUID to state.episode.uuid,
+                                    AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
+                                )
+                            )
                             dismiss()
                             if (!overridePodcastLink) {
-                                analyticsTracker.track(
-                                    AnalyticsEvent.EPISODE_DETAIL_PODCAST_NAME_TAPPED,
-                                    mapOf(
-                                        AnalyticsProp.Key.EPISODE_UUID to state.episode.uuid,
-                                        AnalyticsProp.Key.SOURCE to EpisodeViewSource.PODCAST_SCREEN.value
-                                    )
-                                )
                                 (listener as FragmentHostListener).openPodcastPage(state.podcast.uuid)
                             }
                         }
