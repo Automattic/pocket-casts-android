@@ -353,8 +353,6 @@ class MediaSessionManager(
             stateBuilder.addCustomAction(APP_ACTION_CHANGE_SPEED, "Change speed", drawableId)
         }
 
-        addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
-
         if (currentEpisode is Episode) {
             if (currentEpisode.isStarred) {
                 addCustomAction(stateBuilder, APP_ACTION_UNSTAR, "Unstar", IR.drawable.auto_starred)
@@ -362,6 +360,8 @@ class MediaSessionManager(
                 addCustomAction(stateBuilder, APP_ACTION_STAR, "Star", IR.drawable.auto_star)
             }
         }
+
+        addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
     }
 
     private fun addCustomAction(stateBuilder: PlaybackStateCompat.Builder, action: String, name: CharSequence, @DrawableRes icon: Int) {
