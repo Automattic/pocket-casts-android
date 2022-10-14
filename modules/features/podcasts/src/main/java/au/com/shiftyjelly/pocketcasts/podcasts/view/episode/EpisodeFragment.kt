@@ -191,11 +191,16 @@ class EpisodeFragment : BaseDialogFragment() {
         listener = context as FragmentHostListener
 
         imageLoader = PodcastImageLoaderThemed(context)
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         episodeUUID?.let { episodeUuid ->
             podcastUuid?.let { podcastUuid ->
-                analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_SHOWN, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
-                FirebaseAnalyticsTracker.openedEpisode(podcastUuid, episodeUuid)
+                if (!viewModel.isFragmentChangingConfigurations) {
+                    analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_SHOWN, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
+                    FirebaseAnalyticsTracker.openedEpisode(podcastUuid, episodeUuid)
+                }
             }
         }
     }
