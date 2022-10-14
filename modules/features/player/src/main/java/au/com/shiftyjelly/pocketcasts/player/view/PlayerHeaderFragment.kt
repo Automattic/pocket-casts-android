@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
+import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -159,15 +160,25 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.share.setOnClickListener { onShareClick() }
         binding.playerActions.setOnClickListener { onMoreClicked() }
         binding.podcast.setOnClickListener { showPodcast() }
-        binding.played.setOnClickListener { viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played") }
-        binding.archive.setOnClickListener { viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive") }
-        binding.download.setOnClickListener { viewModel.downloadCurrentlyPlaying() }
+        binding.played.setOnClickListener {
+            trackShelfAction(ShelfItem.Played.analyticsValue)
+            viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played")
+        }
+        binding.archive.setOnClickListener {
+            trackShelfAction(ShelfItem.Archive.analyticsValue)
+            viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
+        }
+        binding.download.setOnClickListener {
+            trackShelfAction(ShelfItem.Download.analyticsValue)
+            viewModel.downloadCurrentlyPlaying()
+        }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
         CastButtonFactory.setUpMediaRouteButton(binding.root.context, binding.castButton)
         binding.castButton.setAlwaysVisible(true)
         binding.castButton.updateColor(ThemeColor.playerContrast03(theme.activeTheme))
+        binding.castButton.setOnClickListener { trackShelfAction(ShelfItem.Cast.analyticsValue) }
 
         setupUpNextDrag(view, binding.topView)
 
@@ -430,22 +441,27 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onEffectsClick() {
+        trackShelfAction(ShelfItem.Effects.analyticsValue)
         EffectsFragment().show(parentFragmentManager, "effects_sheet")
     }
 
     override fun onSleepClick() {
+        trackShelfAction(ShelfItem.Sleep.analyticsValue)
         SleepFragment().show(parentFragmentManager, "effects_sheet")
     }
 
     override fun onStarClick() {
+        trackShelfAction(ShelfItem.Star.analyticsValue)
         viewModel.starToggle()
     }
 
     override fun onShareClick() {
+        trackShelfAction(ShelfItem.Share.analyticsValue)
         viewModel.shareDialog(context, childFragmentManager)?.show()
     }
 
     private fun showPodcast() {
+        trackShelfAction(ShelfItem.Podcast.analyticsValue)
         val podcast = viewModel.podcast
         (activity as FragmentHostListener).closePlayer()
         if (podcast != null) {
@@ -476,6 +492,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) {
             return
         }
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
         ShelfBottomSheet().show(childFragmentManager, "shelf_bottom_sheet")
     }
 
@@ -530,5 +547,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onHeaderChapterClick(chapter: Chapter) {
         (parentFragment as? PlayerContainerFragment)?.openChaptersAt(chapter)
+    }
+
+    private fun trackShelfAction(analyticsAction: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction)
+        )
     }
 }

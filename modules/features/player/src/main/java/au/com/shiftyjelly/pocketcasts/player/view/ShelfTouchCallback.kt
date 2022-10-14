@@ -10,7 +10,7 @@ class ShelfTouchCallback(
     interface ItemTouchHelperAdapter {
         fun onShelfItemMove(fromPosition: Int, toPosition: Int)
         fun onShelfItemStartDrag(viewHolder: ShelfAdapter.ItemViewHolder)
-        fun onShelfItemTouchHelperFinished()
+        fun onShelfItemTouchHelperFinished(position: Int)
     }
 
     interface ItemTouchHelperViewHolder {
@@ -59,7 +59,7 @@ class ShelfTouchCallback(
         if (viewHolder is ItemTouchHelperViewHolder) {
             viewHolder.onItemClear()
         }
-        listener.onShelfItemTouchHelperFinished()
+        listener.onShelfItemTouchHelperFinished(viewHolder.bindingAdapterPosition)
     }
 
     override fun isItemViewSwipeEnabled(): Boolean {
