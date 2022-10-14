@@ -213,7 +213,7 @@ class EpisodeFragment : BaseDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         if (!viewModel.isFragmentChangingConfigurations) {
-            analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_DISMISSED)
+            analyticsTracker.track(AnalyticsEvent.EPISODE_DETAIL_DISMISSED, mapOf(AnalyticsProp.Key.SOURCE to episodeViewSource.value))
         }
         webView.cleanup()
         webView = null
