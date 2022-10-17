@@ -120,6 +120,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun setUserVisibleHint(visible: Boolean) {
         super.setUserVisibleHint(visible)
         if (visible && isAdded) {
