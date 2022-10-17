@@ -43,19 +43,24 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         view.isFocusable = true
     }
 
-    @Suppress("DEPRECATION")
-    override fun setUserVisibleHint(visible: Boolean) {
-        super.setUserVisibleHint(visible)
+    override fun onResume() {
+        super.onResume()
 
         // Need to make sure we are the top fragment before updating the status bar
-        val backstack = activity?.supportFragmentManager?.backStackEntryCount
-        if (visible && (backstack == 0 || activity?.supportFragmentManager?.fragments?.last() == this)) {
+        val fragmentManager = activity?.supportFragmentManager
+        if (fragmentManager != null && (fragmentManager.backStackEntryCount == 0 || fragmentManager.fragments.last() == this)) {
             updateStatusBar()
         }
     }
 
     fun updateStatusBar() {
-        (activity as? FragmentHostListener)?.updateStatusBar()
+        val activity = activity ?: return
+
+        if (activity is FragmentHostListener) {
+            activity.updateStatusBar()
+        } else {
+            theme.updateWindowStatusBar(window = activity.window, statusBarColor = statusBarColor, context = activity)
+        }
     }
 
     fun updateStatusBarColor(@ColorInt color: Int) {
