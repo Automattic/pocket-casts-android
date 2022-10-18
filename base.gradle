@@ -27,6 +27,9 @@ android {
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.settingsEncryptSecret}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
 
+        // Feature Flags
+        buildConfigField "boolean", "END_OF_YEAR_ENABLED", "false"
+
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
         vectorDrawables.useSupportLibrary = true
