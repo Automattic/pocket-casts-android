@@ -127,6 +127,14 @@ class AppIcon @Inject constructor(
             isPlus = true,
             launcherIcon = IR.mipmap.ic_launcher_radioactive,
             aliasName = ".ui.MainActivity_8"
+        ),
+        HALLOWEEN(
+            id = "halloween",
+            labelId = LR.string.settings_app_icon_halloween,
+            resourceId = IR.drawable.appicon_halloween,
+            isPlus = true,
+            launcherIcon = IR.mipmap.ic_launcher_halloween,
+            aliasName = ".ui.MainActivity_13"
         );
 
         companion object {
