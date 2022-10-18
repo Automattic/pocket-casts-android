@@ -19,12 +19,14 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentUpnextBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -44,6 +46,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.abs
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -53,12 +56,20 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemTouchHelperAdapter {
     companion object {
         private const val ARG_EMBEDDED = "embedded"
+        private const val ARG_SOURCE = "source"
         private const val ACTION_KEY = "action"
         private const val SOURCE_KEY = "source"
+        private const val SELECT_ALL_KEY = "select_all"
+        private const val DIRECTION_KEY = "direction"
+        private const val SLOTS_KEY = "slots"
+        private const val IS_NEXT_KEY = "is_next"
+        private const val DOWN = "down"
+        private const val UP = "up"
+        private const val UP_NEXT_ADAPTER_POSITION = 2
 
-        fun newInstance(embedded: Boolean = false): UpNextFragment {
+        fun newInstance(embedded: Boolean = false, source: UpNextSource): UpNextFragment {
             val fragment = UpNextFragment()
-            fragment.arguments = bundleOf(ARG_EMBEDDED to embedded)
+            fragment.arguments = bundleOf(ARG_EMBEDDED to embedded, ARG_SOURCE to source.analyticsValue)
             return fragment
         }
     }
@@ -73,6 +84,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     private val playbackSource = PlaybackSource.UP_NEXT
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private var userRearrangingFrom: Int? = null
+    private var userDraggingStart: Int? = null
     private var playingEpisodeAtStartOfDrag: String? = null
 
     private var realBinding: FragmentUpnextBinding? = null
@@ -87,6 +99,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     val isEmbedded: Boolean
         get() = arguments?.getBoolean(ARG_EMBEDDED) ?: false
+
+    val upNextSource: UpNextSource
+        get() = arguments?.getString(ARG_SOURCE)?.let { UpNextSource.fromString(it) } ?: UpNextSource.UNKNOWN
 
     val overrideTheme: Theme.ThemeType
         get() = if (Theme.isDark(context)) theme.activeTheme else Theme.ThemeType.DARK
@@ -112,7 +127,17 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val imageLoader = PodcastImageLoaderThemed(context)
-        adapter = UpNextAdapter(context, imageLoader, episodeManager, this, multiSelectHelper, childFragmentManager)
+        adapter = UpNextAdapter(
+            context = context,
+            imageLoader = imageLoader,
+            episodeManager = episodeManager,
+            listener = this,
+            multiSelectHelper = multiSelectHelper,
+            fragmentManager = childFragmentManager,
+            analyticsTracker = analyticsTracker,
+            upNextSource = upNextSource,
+            settings = settings
+        )
         adapter.theme = overrideTheme
 
         if (!isEmbedded) {
@@ -177,20 +202,33 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
 
         val multiSelectToolbar = view.findViewById<MultiSelectToolbar>(R.id.multiSelectToolbar)
-        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) {
-            multiSelectToolbar.isVisible = it
-            toolbar.isVisible = !it
+        multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
+            val wasMultiSelecting = multiSelectToolbar.isVisible
+            multiSelectToolbar.isVisible = isMultiSelecting
+            toolbar.isVisible = !isMultiSelecting
+
+            /* Track only if not embedded. If it is an embedded fragment, then track only when in expanded state */
+            if (!isEmbedded || isEmbeddedExpanded()) {
+                if (isMultiSelecting) {
+                    trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_ENTERED)
+                } else if (wasMultiSelecting) {
+                    trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_EXITED)
+                }
+            }
+
             multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)
 
             adapter.notifyDataSetChanged()
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener {
             override fun multiSelectSelectAll() {
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to true))
                 upNextPlayables.forEach { multiSelectHelper.select(it) }
                 adapter.notifyDataSetChanged()
             }
 
             override fun multiSelectSelectNone() {
+                trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to false))
                 upNextPlayables.forEach { multiSelectHelper.deselect(it) }
                 adapter.notifyDataSetChanged()
             }
@@ -224,7 +262,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     override fun onPause() {
         super.onPause()
-        multiSelectHelper.isMultiSelecting = false
+        if (multiSelectHelper.isMultiSelecting) {
+            multiSelectHelper.isMultiSelecting = false
+        }
     }
 
     fun moveToTop(episode: Playable, position: Int) {
@@ -269,8 +309,12 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         }
     }
 
+    private fun isEmbeddedExpanded() =
+        isEmbedded && (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
+
     override fun onClearUpNext() {
-        playerViewModel.clearUpNext(requireContext()).showOrClear(parentFragmentManager)
+        playerViewModel.clearUpNext(context = requireContext(), upNextSource = upNextSource)
+            .showOrClear(parentFragmentManager)
     }
 
     override fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder) {
@@ -279,6 +323,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
         itemTouchHelper.startDrag(viewHolder)
         viewHolder.setIsRecyclable(false)
+        userDraggingStart = viewHolder.bindingAdapterPosition
 
         // Clear out any open swipes on drag
         val firstPosition = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
@@ -292,13 +337,23 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         if (settings.getTapOnUpNextShouldPlay()) {
             playerViewModel.playEpisode(uuid = episodeUuid, playbackSource = playbackSource)
         } else {
-            (activity as? FragmentHostListener)?.openEpisodeDialog(episodeUuid, podcastUuid, forceDark = true)
+            (activity as? FragmentHostListener)?.openEpisodeDialog(
+                episodeUuid = episodeUuid,
+                source = EpisodeViewSource.UP_NEXT,
+                podcastUuid = podcastUuid,
+                forceDark = true
+            )
         }
     }
 
     override fun onEpisodeActionsLongPress(episodeUuid: String, podcastUuid: String?) {
         if (settings.getTapOnUpNextShouldPlay()) {
-            (activity as? FragmentHostListener)?.openEpisodeDialog(episodeUuid, podcastUuid, forceDark = true)
+            (activity as? FragmentHostListener)?.openEpisodeDialog(
+                episodeUuid = episodeUuid,
+                source = EpisodeViewSource.UP_NEXT,
+                podcastUuid = podcastUuid,
+                forceDark = true
+            )
         } else {
             playerViewModel.playEpisode(uuid = episodeUuid, playbackSource = playbackSource)
         }
@@ -331,7 +386,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         }
     }
 
-    override fun onUpNextItemTouchHelperFinished() {
+    override fun onUpNextItemTouchHelperFinished(position: Int) {
         if (playingEpisodeAtStartOfDrag == playbackManager.upNextQueue.currentEpisode?.uuid) {
             playerViewModel.changeUpNextEpisodes(upNextEpisodes.subList(1, upNextEpisodes.size).filterIsInstance<Playable>())
         } else {
@@ -341,7 +396,21 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
             }
         }
 
+        userDraggingStart?.let { dragStartPosition ->
+            if (position != userDraggingStart) {
+                trackUpNextEvent(
+                    AnalyticsEvent.UP_NEXT_QUEUE_REORDERED,
+                    mapOf(
+                        SLOTS_KEY to abs(position.minus(dragStartPosition)),
+                        DIRECTION_KEY to if (position > dragStartPosition) DOWN else UP,
+                        IS_NEXT_KEY to (position == UP_NEXT_ADAPTER_POSITION),
+                    )
+                )
+            }
+        }
+
         userRearrangingFrom = null
+        userDraggingStart = null
         playingEpisodeAtStartOfDrag = null
     }
 
@@ -358,6 +427,13 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 SOURCE_KEY to SwipeSource.UP_NEXT.analyticsValue
             )
         )
+    }
+
+    private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
+        val properties = HashMap<String, Any>()
+        properties[SOURCE_KEY] = upNextSource.analyticsValue
+        properties.putAll(props)
+        analyticsTracker.track(event, properties)
     }
 }
 

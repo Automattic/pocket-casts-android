@@ -54,9 +54,21 @@ project.ext {
 
     // App Signing
     storeFile = file("$rootDir/${secretProperties.getProperty("signingKeyStoreFile", null)}")
-    storePassword = secretProperties.getProperty("signingKeyStorePassword", null)
-    keyAlias = secretProperties.getProperty("signingKeyAlias", null)
-    keyPassword = secretProperties.getProperty("signingKeyPassword", null)
+    if (storeFile.exists()) {
+        // Use secret properties
+        storePassword = secretProperties.getProperty("signingKeyStorePassword", null)
+        keyAlias = secretProperties.getProperty("signingKeyAlias", null)
+        keyPassword = secretProperties.getProperty("signingKeyPassword", null)
+    } else {
+        // Check local gradle properties
+        def keystoreFilePropertyKey = "pocketcastsKeyStoreFile"
+        if (project.hasProperty(keystoreFilePropertyKey)) {
+            storeFile = file(project.getProperty(keystoreFilePropertyKey))
+            storePassword = project.getProperty("pocketcastsKeyStorePassword")
+            keyAlias = project.getProperty("pocketcastsKeyStoreAlias")
+            keyPassword = project.getProperty("pocketcastsKeyStoreAliasPassword")
+        }
+    }
     canSignRelease = storeFile.exists()
 
     // Secrets
@@ -100,7 +112,7 @@ project.ext {
             cast: "com.google.android.gms:play-services-cast-framework:21.1.0",
             desugarJdk: "com.android.tools:desugar_jdk_libs:1.1.5",
             // Firebase BoM (Bill of Materials enables you to manage all your Firebase library versions by specifying only one version)
-            firebaseBom: "com.google.firebase:firebase-bom:30.3.2",
+            firebaseBom: "com.google.firebase:firebase-bom:30.5.0",
             firebaseAnalytics: "com.google.firebase:firebase-analytics-ktx",
             firebaseConfig: "com.google.firebase:firebase-config-ktx",
             constraintLayout: "androidx.constraintlayout:constraintlayout:2.1.4",
@@ -219,10 +231,13 @@ project.ext {
             // Automattic Tracks
             automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks",
             // Sentry
-            sentryBom: 'io.sentry:sentry-bom:6.4.1',
+            sentryBom: 'io.sentry:sentry-bom:6.4.2',
             sentry: 'io.sentry:sentry-android',
             sentryFragment: 'io.sentry:sentry-android-fragment',
-            sentryTimber: 'io.sentry:sentry-android-timber'
+            sentryTimber: 'io.sentry:sentry-android-timber',
+            // AboutLibraries - https://github.com/mikepenz/AboutLibraries
+            aboutLibrariesCore: 'com.mikepenz:aboutlibraries-core:10.5.0',
+            aboutLibrariesCompose: 'com.mikepenz:aboutlibraries-compose:10.5.0'
     ]
 
 }

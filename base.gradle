@@ -32,8 +32,10 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
-    lintOptions {
+    lint {
         abortOnError false
+        disable 'AppCompatResource', 'ContentDescription', 'DiffUtilEquals'
+        xmlReport true
     }
 
     compileOptions {
@@ -64,12 +66,16 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/rxjava.properties'
-        exclude 'META-INF/AL2.0'
-        exclude 'META-INF/LGPL2.1'
-        exclude 'META-INF/licenses/ASM'
-        // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
-        exclude '**/attach_hotspot_windows.dll'
+        resources {
+            excludes += [
+                'META-INF/rxjava.properties',
+                'META-INF/AL2.0',
+                'META-INF/LGPL2.1',
+                'META-INF/licenses/ASM',
+                // Fixes issue running './gradlew connectedDebugAndroidTest' with clashing testing libraries.
+                '**/attach_hotspot_windows.dll'
+            ]
+        }
     }
 
     if (canSignRelease) {
@@ -139,10 +145,6 @@ android {
         }
     }
 
-    lintOptions {
-        disable 'AppCompatResource', 'ContentDescription', 'DiffUtilEquals'
-        xmlReport true
-    }
 }
 
 dependencies {

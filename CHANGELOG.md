@@ -1,6 +1,19 @@
+7.26
+-----
+
+
 7.25
 -----
 
+*   Bug Fixes:
+    *   Allow Discover feed collection titles to wrap.
+        ([#335](https://github.com/Automattic/pocket-casts-android/pull/335)).
+    *   Allow select text in show notes from episode details view.
+        ([#372](https://github.com/Automattic/pocket-casts-android/pull/372)).
+    *   Added Automotive OS setting to show played episodes.
+        ([#389](https://github.com/Automattic/pocket-casts-android/pull/389)).
+    *   Added new episode lists to Automotive OS. Starred, Listening History, and Files.
+        ([#403](https://github.com/Automattic/pocket-casts-android/pull/403)).
 
 7.24
 -----

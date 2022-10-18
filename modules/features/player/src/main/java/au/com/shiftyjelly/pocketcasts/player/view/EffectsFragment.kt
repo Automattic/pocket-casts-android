@@ -10,6 +10,7 @@ import android.widget.CompoundButton
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentEffectsBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
@@ -39,6 +41,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     @Inject lateinit var stats: StatsManager
     @Inject lateinit var settings: Settings
+    @Inject lateinit var playbackManager: PlaybackManager
 
     override val statusBarColor: StatusBarColor? = null
 
@@ -46,6 +49,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
     private lateinit var imageLoader: PodcastImageLoaderThemed
     private var binding: FragmentEffectsBinding? = null
     private val trimToggleGroupButtonIds = arrayOf(R.id.trimLow, R.id.trimMedium, R.id.trimHigh)
+    private var updatedSpeed: Double? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -70,8 +74,13 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         return binding?.root
     }
 
+    override fun onPause() {
+        super.onPause()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        trackSpeedChangeIfNeeded()
         binding = null
     }
 
@@ -151,6 +160,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         // val speed = (amount.clipToRange(0.5, 3.0) * 10.0).toInt() / 10.0
         val speed = round(amount.clipToRange(0.5, 3.0) * 10.0) / 10.0
         effects.playbackSpeed = speed
+        updatedSpeed = speed
         binding.playbackSpeedString = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
@@ -185,6 +195,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         val podcast = binding.podcast ?: return
 
         if (buttonView.id == binding.switchTrim.id) {
+            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
             if (effects.trimMode == TrimMode.OFF && isChecked) {
                 effects.trimMode = TrimMode.LOW
                 this.binding?.trimToggleGroup?.check(R.id.trimLow)
@@ -195,6 +206,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
             updateTrimState()
         } else if (buttonView.id == binding.switchVolume.id) {
+            trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED, mapOf(PlaybackManager.ENABLED_KEY to isChecked))
             effects.isVolumeBoosted = isChecked
             viewModel.saveEffects(effects, podcast)
         }
@@ -210,6 +222,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             val newTrimMode = TrimMode.values()[index + 1]
             if (effects.trimMode != newTrimMode) {
                 effects.trimMode = newTrimMode
+                trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED, mapOf(PlaybackManager.AMOUNT_KEY to newTrimMode.analyticsVale))
                 viewModel.saveEffects(effects, podcast)
             }
         }
@@ -232,5 +245,13 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
                 }
             }
         }
+    }
+
+    private fun trackSpeedChangeIfNeeded() {
+        updatedSpeed?.let { trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED, mapOf(PlaybackManager.SPEED_KEY to it)) }
+    }
+
+    private fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
+        playbackManager.trackPlaybackEffectsEvent(event, props, PlaybackManager.PlaybackSource.PLAYER_PLAYBACK_EFFECTS)
     }
 }

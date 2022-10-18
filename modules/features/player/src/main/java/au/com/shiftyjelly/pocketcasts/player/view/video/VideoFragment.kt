@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.VideoViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -156,6 +157,7 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
 
     override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
         viewModel.seekToMs(progress)
+        playbackManager.trackPlaybackSeek(progress, PlaybackSource.FULL_SCREEN_VIDEO)
         seekComplete()
     }
 }

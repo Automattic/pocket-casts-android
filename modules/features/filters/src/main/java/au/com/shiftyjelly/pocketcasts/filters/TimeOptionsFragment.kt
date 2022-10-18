@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FilterOptionsFragmentBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -52,11 +55,14 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
     @Inject
     lateinit var playlistManager: PlaylistManager
 
+    private var userChanged = false
+
     val onCheckedChanged = { value: Boolean, position: Int ->
         val previousSelected = selectedPosition
         if (value) {
             selectedPosition = position
             updatedSelected(previousSelected, selectedPosition)
+            userChanged = true
         }
     }
 
@@ -66,8 +72,14 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
     var playlist: Playlist? = null
     var adapter: FilterOptionsAdapter? = null
     var selectedPosition: Int = 0
-    val optionType: String
-        get() = arguments?.getString(ARG_OPTIONS_TYPE) ?: OptionsType.Time.type
+
+    private val optionType: OptionsType
+        get() = when (val optionsTypeString = arguments?.getString(ARG_OPTIONS_TYPE)) {
+            "time" -> OptionsType.Time
+            "downloaded" -> OptionsType.Downloaded
+            "audioVideo" -> OptionsType.AudioVideo
+            else -> throw IllegalStateException("Unknown options type: $optionsTypeString")
+        }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FilterOptionsFragmentBinding.inflate(inflater, container, false)
@@ -144,19 +156,17 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
         )
 
         options = when (optionType) {
-            OptionsType.Time.type -> listOf(anytime, last24Hours, last3Days, lastWeek, last2Weeks, lastMonth)
-            OptionsType.Downloaded.type -> listOf(downloadAll, downloadedOption, notDownloadedOption)
-            OptionsType.AudioVideo.type -> listOf(allOption, audioOption, videoOption)
-            else -> throw IllegalStateException("Unknown options type")
+            OptionsType.Time -> listOf(anytime, last24Hours, last3Days, lastWeek, last2Weeks, lastMonth)
+            OptionsType.Downloaded -> listOf(downloadAll, downloadedOption, notDownloadedOption)
+            OptionsType.AudioVideo -> listOf(allOption, audioOption, videoOption)
         }
 
         val binding = binding ?: return
 
         val titleId = when (optionType) {
-            OptionsType.Time.type -> LR.string.filters_release_date
-            OptionsType.Downloaded.type -> LR.string.filters_download_options
-            OptionsType.AudioVideo.type -> LR.string.filters_chip_media_type
-            else -> throw IllegalStateException("Unknown options type")
+            OptionsType.Time -> LR.string.filters_release_date
+            OptionsType.Downloaded -> LR.string.filters_download_options
+            OptionsType.AudioVideo -> LR.string.filters_chip_media_type
         }
         binding.lblTitle.setText(titleId)
 
@@ -169,10 +179,9 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
             this@TimeOptionsFragment.playlist = playlist
 
             selectedPosition = when (optionType) {
-                OptionsType.Time.type -> options.indexOfFirst { it.playlistValue!! >= playlist.filterHours }
-                OptionsType.Downloaded.type -> if (playlist.downloaded && playlist.notDownloaded) 0 else if (playlist.downloaded) 1 else 2
-                OptionsType.AudioVideo.type -> if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_ALL) 0 else if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY) 1 else 2
-                else -> throw IllegalStateException("Unknown options type")
+                OptionsType.Time -> options.indexOfFirst { it.playlistValue!! >= playlist.filterHours }
+                OptionsType.Downloaded -> if (playlist.downloaded && playlist.notDownloaded) 0 else if (playlist.downloaded) 1 else 2
+                OptionsType.AudioVideo -> if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_ALL) 0 else if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY) 1 else 2
             }
 
             updatedSelected(0, selectedPosition)
@@ -193,35 +202,50 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
         btnSave.setOnClickListener {
             playlist?.let { playlist ->
                 when (optionType) {
-                    OptionsType.Time.type -> {
+                    OptionsType.Time -> {
                         playlist.filterHours = options[selectedPosition].playlistValue ?: 0
                     }
-                    OptionsType.Downloaded.type -> {
-                        if (selectedPosition == 0) {
+
+                    OptionsType.Downloaded -> when (selectedPosition) {
+                        0 -> {
                             playlist.downloaded = true
                             playlist.notDownloaded = true
-                        } else if (selectedPosition == 1) {
+                        }
+
+                        1 -> {
                             playlist.downloaded = true
                             playlist.notDownloaded = false
-                        } else if (selectedPosition == 2) {
+                        }
+
+                        2 -> {
                             playlist.downloaded = false
                             playlist.notDownloaded = true
                         }
                     }
-                    OptionsType.AudioVideo.type -> {
-                        if (selectedPosition == 0) {
-                            playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL
-                        } else if (selectedPosition == 1) {
-                            playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
-                        } else if (selectedPosition == 2) {
-                            playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
-                        }
+
+                    OptionsType.AudioVideo -> when (selectedPosition) {
+                        0 -> playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL
+                        1 -> playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
+                        2 -> playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
                     }
                 }
 
                 launch(Dispatchers.Default) {
                     playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
-                    playlistManager.update(playlist)
+
+                    val playlistProperty = when (optionType) {
+                        OptionsType.AudioVideo -> PlaylistProperty.MediaType
+                        OptionsType.Downloaded -> PlaylistProperty.Downloaded
+                        OptionsType.Time -> PlaylistProperty.ReleaseDate
+                    }
+                    val userPlaylistUpdate = if (userChanged) {
+                        UserPlaylistUpdate(
+                            listOf(playlistProperty),
+                            PlaylistUpdateSource.FILTER_EPISODE_LIST
+                        )
+                    } else null
+
+                    playlistManager.update(playlist, userPlaylistUpdate)
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@TimeOptionsFragment) }
                 }
             }

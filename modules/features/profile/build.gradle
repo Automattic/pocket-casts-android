@@ -3,6 +3,15 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 
+android {
+    namespace 'au.com.shiftyjelly.pocketcasts.profile'
+    buildFeatures {
+        viewBinding true
+        dataBinding = true
+        compose true
+    }
+}
+
 dependencies {
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')
@@ -20,12 +29,4 @@ dependencies {
     implementation project(':modules:features:podcasts')
     implementation project(':modules:features:cartheme')
     implementation project(':modules:features:account')
-}
-
-android {
-    buildFeatures {
-        viewBinding true
-        dataBinding = true
-        compose true
-    }
 }

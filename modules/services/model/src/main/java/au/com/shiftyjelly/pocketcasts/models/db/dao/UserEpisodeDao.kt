@@ -41,6 +41,9 @@ abstract class UserEpisodeDao {
     @Query("SELECT * FROM user_episodes ORDER BY added_date DESC")
     abstract fun observeUserEpisodesDesc(): Flowable<List<UserEpisode>>
 
+    @Query("SELECT * FROM user_episodes ORDER BY added_date DESC")
+    abstract suspend fun findUserEpisodesDesc(): List<UserEpisode>
+
     @Query("SELECT * FROM user_episodes ORDER BY added_date ASC")
     abstract fun observeUserEpisodesAsc(): Flowable<List<UserEpisode>>
 

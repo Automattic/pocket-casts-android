@@ -9,6 +9,9 @@ import au.com.shiftyjelly.pocketcasts.filters.databinding.DurationOptionsFragmen
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -40,6 +43,8 @@ class DurationOptionsFragment : BaseFragment() {
     var playlist: Playlist? = null
 
     private var binding: DurationOptionsFragmentBinding? = null
+    private var userChanged = false
+    private var switchDurationInitialized = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DurationOptionsFragmentBinding.inflate(inflater, container, false)
@@ -89,8 +94,10 @@ class DurationOptionsFragment : BaseFragment() {
         switchDuration.setOnCheckedChangeListener { _, isChecked ->
             playlist?.filterDuration = isChecked
             enableDurations(isChecked)
+            if (switchDurationInitialized) {
+                userChanged = true
+            }
         }
-
         val btnSave = binding.btnSave
         val btnClose = binding.btnClose
 
@@ -99,9 +106,20 @@ class DurationOptionsFragment : BaseFragment() {
             this@DurationOptionsFragment.playlist = playlist
 
             enableDurations(playlist.filterDuration)
+            switchDurationInitialized = false
             switchDuration.isChecked = playlist.filterDuration
+            switchDurationInitialized = true
+
+            val onStepperValueChanged = { _: Int -> userChanged = true }
+
+            // Do not want the onStepperValueChanged callback to fire during initialization because that is not a user initiated change
+            stepperLongerThan.onValueChanged = null
             stepperLongerThan.value = playlist.longerThan
+            stepperLongerThan.onValueChanged = onStepperValueChanged
+
+            stepperShorterThan.onValueChanged = null
             stepperShorterThan.value = playlist.shorterThan
+            stepperShorterThan.onValueChanged = onStepperValueChanged
 
             val color = playlist.getColor(context)
             val filterTintColor = ThemeColor.filterInteractive01(theme.activeTheme, color)
@@ -130,7 +148,13 @@ class DurationOptionsFragment : BaseFragment() {
                     playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
                     playlist.shorterThan = shorterValue
                     playlist.longerThan = longerValue
-                    playlistManager.update(playlist)
+                    val userPlaylistUpdate = if (userChanged) {
+                        UserPlaylistUpdate(
+                            listOf(PlaylistProperty.Duration),
+                            PlaylistUpdateSource.FILTER_EPISODE_LIST
+                        )
+                    } else null
+                    playlistManager.update(playlist, userPlaylistUpdate)
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@DurationOptionsFragment) }
                 }
             }

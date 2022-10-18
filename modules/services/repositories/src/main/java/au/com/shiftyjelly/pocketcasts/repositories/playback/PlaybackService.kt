@@ -524,7 +524,13 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         } else {
             val podcastFound = podcastManager.findPodcastByUuidSuspend(parentId) ?: podcastManager.findOrDownloadPodcastRx(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
-                val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast).filterNot { it.isFinished || it.isArchived }.take(EPISODE_LIMIT).toMutableList()
+
+                val showPlayed = settings.getAutoShowPlayed()
+                val episodes = episodeManager
+                    .findEpisodesByPodcastOrdered(podcast)
+                    .filterNot { !showPlayed && (it.isFinished || it.isArchived) }
+                    .take(EPISODE_LIMIT)
+                    .toMutableList()
                 if (!podcast.isSubscribed) {
                     episodes.sortBy { it.episodeType !is Episode.EpisodeType.Trailer } // Bring trailers to the top
                 }
@@ -537,9 +543,27 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         return episodeItems
     }
 
-    private fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
-        val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title)
-        return userEpisodeManager.observeUserEpisodes().firstOrError().blockingGet().map { AutoConverter.convertEpisodeToMediaItem(this, it, podcast) }
+    protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
+        return userEpisodeManager.findUserEpisodes().map {
+            val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title, thumbnailUrl = it.artworkUrl)
+            AutoConverter.convertEpisodeToMediaItem(this, it, podcast)
+        }
+    }
+
+    protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
+        return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
+            podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
+                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+            }
+        }
+    }
+
+    protected suspend fun loadListeningHistoryChildren(): List<MediaBrowserCompat.MediaItem> {
+        return episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
+            podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
+                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+            }
+        }
     }
 
     override fun onSearch(query: String, extras: Bundle?, result: Result<List<MediaBrowserCompat.MediaItem>>) {

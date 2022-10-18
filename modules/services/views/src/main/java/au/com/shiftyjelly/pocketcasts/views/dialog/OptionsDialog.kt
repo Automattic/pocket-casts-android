@@ -119,4 +119,9 @@ class OptionsDialog : BottomSheetDialogFragment() {
             }
         }
     }
+
+    fun setOnDismiss(onDismiss: (() -> Unit)?): OptionsDialog {
+        this.onDismiss = onDismiss
+        return this
+    }
 }
