@@ -1,0 +1,14 @@
+apply from: "../../modules.gradle"
+
+android {
+    namespace 'au.com.shiftyjelly.pocketcasts.endofyear'
+    buildFeatures {
+        viewBinding true
+        dataBinding = true
+        compose true
+    }
+}
+
+dependencies {
+    implementation project(':modules:services:localization')
+}
