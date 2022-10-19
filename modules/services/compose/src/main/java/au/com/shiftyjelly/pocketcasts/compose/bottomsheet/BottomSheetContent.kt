@@ -82,7 +82,6 @@ fun BottomSheetContent(
             TextH40(
                 text = content.titleText,
                 color = MaterialTheme.theme.colors.primaryText01,
-                maxLines = 1
             )
 
             Spacer(modifier = modifier.height(16.dp))
