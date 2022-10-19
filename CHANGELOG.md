@@ -4,11 +4,15 @@
 7.24.2
 -----
 
+*   New Features:
+    *   Added a Halloween icon.
+        ([#415](https://github.com/Automattic/pocket-casts-android/pull/415)).
+
 *   Bug Fixes:
     *   Add missing POST_NOTIFICATIONS permission for Android 13
         ([#330](https://github.com/Automattic/pocket-casts-android/pull/436)).
 
-7.24.0
+7.24
 -----
 
 *   Bug Fixes:
