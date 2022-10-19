@@ -1378,4 +1378,11 @@
     <string name="server_files_storage_limit_exceeded">You have exceeded the storage limit for your account.</string>
     <string name="server_files_title_required">Title is required.</string>
 
+    <!-- End of Year -->
+
+    <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
+    <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
+    <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
+    <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
+
 </resources>
