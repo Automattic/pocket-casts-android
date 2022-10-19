@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
 import android.os.Build
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -36,18 +34,10 @@ private const val CREATED_DEFAULT_PLAYLISTS = "createdDefaultPlaylists"
 class PlaylistManagerImpl @Inject constructor(
     private val settings: Settings,
     private val downloadManager: DownloadManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val playlistUpdateAnalytics: PlaylistUpdateAnalytics,
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase
 ) : PlaylistManager, CoroutineScope {
-
-    companion object {
-        const val ENABLED_KEY = "enabled"
-        const val LIMIT_KEY = "limit"
-        const val GROUP_KEY = "group"
-        const val SOURCE_KEY = "source"
-        const val SORT_ORDER_KEY = "sort_order"
-    }
 
     private val playlistDao = appDatabase.playlistDao()
 
@@ -206,9 +196,13 @@ class PlaylistManagerImpl @Inject constructor(
     /**
      * A null userPlayListUpdate parameter indicates that  the user did not initiate this update
      */
-    override fun update(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?) {
+    override fun update(
+        playlist: Playlist,
+        userPlaylistUpdate: UserPlaylistUpdate?,
+        isCreatingFilter: Boolean
+    ) {
         playlistDao.update(playlist)
-        sendPlaylistUpdateAnalytics(playlist, userPlaylistUpdate)
+        playlistUpdateAnalytics.update(playlist, userPlaylistUpdate, isCreatingFilter)
     }
 
     override fun updateAll(playlists: List<Playlist>) {
@@ -337,57 +331,6 @@ class PlaylistManagerImpl @Inject constructor(
 
     override fun findPlaylistsToSync(): List<Playlist> {
         return playlistDao.findNotSynced()
-    }
-
-    private fun sendPlaylistUpdateAnalytics(
-        playlist: Playlist,
-        userPlaylistUpdate: UserPlaylistUpdate?
-    ) {
-        // Don't send a filter updated event if the playlist is being created or if
-        // the user did not initiate the update
-        if (!playlist.draft && userPlaylistUpdate != null) {
-            userPlaylistUpdate.properties.map { playlistProperty ->
-                when (playlistProperty) {
-
-                    is FilterUpdatedEvent -> {
-                        val properties = mapOf(
-                            GROUP_KEY to playlistProperty.groupValue,
-                            SOURCE_KEY to userPlaylistUpdate.source.analyticsValue
-                        )
-                        analyticsTracker.track(AnalyticsEvent.FILTER_UPDATED, properties)
-                    }
-
-                    is PlaylistProperty.AutoDownload -> {
-                        val properties = mapOf(
-                            SOURCE_KEY to userPlaylistUpdate.source.analyticsValue,
-                            ENABLED_KEY to playlistProperty.enabled
-                        )
-                        analyticsTracker.track(AnalyticsEvent.FILTER_AUTO_DOWNLOAD_UPDATED, properties)
-                    }
-
-                    is PlaylistProperty.AutoDownloadLimit -> {
-                        val properties = mapOf(LIMIT_KEY to playlistProperty.limit)
-                        analyticsTracker.track(AnalyticsEvent.FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED, properties)
-                    }
-
-                    is PlaylistProperty.Sort -> {
-                        val sortOrderString = when (playlistProperty.sortOrder) {
-                            Playlist.SortOrder.NEWEST_TO_OLDEST -> "newest_to_oldest"
-                            Playlist.SortOrder.OLDEST_TO_NEWEST -> "oldest_to_newest"
-                            Playlist.SortOrder.SHORTEST_TO_LONGEST -> "shortest_to_longest"
-                            Playlist.SortOrder.LONGEST_TO_SHORTEST -> "longest_to_shortest"
-                            Playlist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE -> "last_download_attempt_date"
-                        }
-                        val properties = mapOf(SORT_ORDER_KEY to sortOrderString)
-                        analyticsTracker.track(AnalyticsEvent.FILTER_SORT_BY_CHANGED, properties)
-                    }
-
-                    PlaylistProperty.Color,
-                    PlaylistProperty.FilterName,
-                    PlaylistProperty.Icon -> { /* Do nothing. These are handled by the filter_edit_dismissed event. */ }
-                }
-            }
-        }
     }
 
     /**

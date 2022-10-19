@@ -108,7 +108,7 @@ class CreateFilterViewModel @Inject constructor(
         userChangedFilterName.changedSinceFilterUpdated = false
         userChangedIcon.changedSinceFilterUpdated = false
 
-        playlistManager.update(playlist, userPlaylistUpdate)
+        playlistManager.update(playlist, userPlaylistUpdate, isCreatingFilter = true)
     }
 
     fun updateAutodownload(autoDownload: Boolean) {
