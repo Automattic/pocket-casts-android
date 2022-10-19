@@ -57,38 +57,14 @@ class PlaylistUpdateAnalytics @Inject constructor(
 
     private fun iconAnalyticsValue(playlist: Playlist) =
         when (playlist.drawableId) {
-            IR.drawable.ic_filters_list,
-            IR.drawable.auto_filter_list,
-            IR.drawable.automotive_filter_list -> Value.IconName.LIST
-
-            IR.drawable.ic_filters_headphones,
-            IR.drawable.auto_filter_headphones,
-            IR.drawable.automotive_filter_headphones -> Value.IconName.HEADPHONES
-
-            IR.drawable.ic_filters_clock,
-            IR.drawable.auto_filter_clock,
-            IR.drawable.automotive_filter_clock -> Value.IconName.CLOCK
-
-            IR.drawable.ic_filters_download,
-            IR.drawable.auto_filter_downloaded,
-            IR.drawable.automotive_filter_downloaded -> Value.IconName.DOWNLOADED
-
-            IR.drawable.ic_filters_play,
-            IR.drawable.auto_filter_play,
-            IR.drawable.automotive_filter_play -> Value.IconName.PLAY
-
-            IR.drawable.ic_filters_volume,
-            IR.drawable.auto_filter_volume,
-            IR.drawable.automotive_filter_volume -> Value.IconName.VOLUME
-
-            IR.drawable.ic_filters_video,
-            IR.drawable.auto_filter_video,
-            IR.drawable.automotive_filter_video -> Value.IconName.VIDEO
-
-            IR.drawable.ic_filters_star,
-            IR.drawable.auto_filter_star,
-            IR.drawable.automotive_filter_star -> Value.IconName.STARRED
-
+            IR.drawable.ic_filters_list -> Value.IconName.LIST
+            IR.drawable.ic_filters_headphones -> Value.IconName.HEADPHONES
+            IR.drawable.ic_filters_clock -> Value.IconName.CLOCK
+            IR.drawable.ic_filters_download -> Value.IconName.DOWNLOADED
+            IR.drawable.ic_filters_play -> Value.IconName.PLAY
+            IR.drawable.ic_filters_volume -> Value.IconName.VOLUME
+            IR.drawable.ic_filters_video -> Value.IconName.VIDEO
+            IR.drawable.ic_filters_star -> Value.IconName.STARRED
             else -> {
                 Timber.e("No matching analytics icon found")
                 null
