@@ -1,6 +1,9 @@
 7.26
 -----
 
+*   New Features:
+    *   Added a Halloween icon.
+        ([#415](https://github.com/Automattic/pocket-casts-android/pull/415)).
 
 7.25
 -----
