@@ -55,7 +55,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_CREATED, properties)
     }
 
-    private fun iconAnalayticsValue(playlist: Playlist) =
+    private fun iconAnalyticsValue(playlist: Playlist) =
         when (playlist.drawableId) {
             IR.drawable.ic_filters_list,
             IR.drawable.auto_filter_list,
