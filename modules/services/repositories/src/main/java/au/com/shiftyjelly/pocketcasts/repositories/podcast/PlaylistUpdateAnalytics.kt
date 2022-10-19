@@ -73,9 +73,9 @@ class PlaylistUpdateAnalytics @Inject constructor(
 
     private fun mediaTypeAnalyticsValue(playlist: Playlist) =
         when (playlist.audioVideo) {
-            0 -> Value.MediaType.ALL
-            1 -> Value.MediaType.AUDIO
-            2 -> Value.MediaType.VIDEO
+            Playlist.AUDIO_VIDEO_FILTER_ALL -> Value.MediaType.ALL
+            Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY -> Value.MediaType.AUDIO
+            Playlist.AUDIO_VIDEO_FILTER_VIDEO_ONLY -> Value.MediaType.VIDEO
             else -> {
                 Timber.e("No match found for audioVideo Int")
                 null
