@@ -40,7 +40,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
             put(Key.EPISODE_STATUS_IN_PROGRESS, playlist.partiallyPlayed)
             put(Key.EPISODE_STATUS_PLAYED, playlist.finished)
             put(Key.EPISODE_STATUS_UNPLAYED, playlist.unplayed)
-            iconAnalayticsValue(playlist)?.let {
+            iconAnalyticsValue(playlist)?.let {
                 put(Key.ICON_NAME, it)
             }
             mediaTypeAnalyticsValue(playlist)?.let {
