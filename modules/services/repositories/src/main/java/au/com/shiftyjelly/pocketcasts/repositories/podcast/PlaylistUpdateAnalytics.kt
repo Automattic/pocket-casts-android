@@ -36,6 +36,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
                 put(Key.COLOR, it)
             }
             put(Key.DOWNLOADED, playlist.downloaded)
+            put(Key.NOT_DOWNLOADED, playlist.notDownloaded)
             put(Key.DURATION, playlist.filterDuration)
             put(Key.EPISODE_STATUS_IN_PROGRESS, playlist.partiallyPlayed)
             put(Key.EPISODE_STATUS_PLAYED, playlist.finished)
@@ -167,6 +168,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
             const val EPISODE_STATUS_PLAYED = "episode_status_played"
             const val EPISODE_STATUS_UNPLAYED = "episode_status_unplayed"
             const val MEDIA_TYPE = "media_type"
+            const val NOT_DOWNLOADED = "not_downloaded"
             const val RELEASE_DATE = "release_date"
             const val SORT_ORDER = "sort_order"
             const val SOURCE = "source"
