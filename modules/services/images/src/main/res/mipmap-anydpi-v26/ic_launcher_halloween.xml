@@ -2,5 +2,5 @@
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@mipmap/ic_launcher_halloween_background"/>
     <foreground android:drawable="@mipmap/ic_launcher_halloween_foreground"/>
-    <monochrome android:drawable="@drawable/ic_launcher_monochrome" />
+    <monochrome android:drawable="@drawable/ic_launcher_halloween_monochrome" />
 </adaptive-icon>
