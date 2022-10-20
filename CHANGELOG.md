@@ -6,6 +6,7 @@
         ([#415](https://github.com/Automattic/pocket-casts-android/pull/415)).
     *   Fixed skip backwards settings
         ([#425](https://github.com/Automattic/pocket-casts-android/pull/425)).
+    *   Added ARCHIVE intent
 
 7.25
 -----
