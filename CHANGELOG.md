@@ -4,6 +4,8 @@
 *   New Features:
     *   Added a Halloween icon.
         ([#415](https://github.com/Automattic/pocket-casts-android/pull/415)).
+    *   Fixed skip backwards settings
+        ([#425](https://github.com/Automattic/pocket-casts-android/pull/425)).
 
 7.25
 -----
