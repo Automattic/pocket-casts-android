@@ -5,8 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rxjava2.subscribeAsState
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.ActivityConfigBase
-import au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.activity.ComposableConfigPlayPlaylist
-import au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.activity.ConfigPlayPlaylistState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
