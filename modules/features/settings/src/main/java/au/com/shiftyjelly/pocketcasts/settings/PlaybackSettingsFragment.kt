@@ -150,7 +150,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                     SkipTime(
                         primaryText = stringResource(LR.string.settings_skip_back_time),
                         saved = settings.skipBackwardInSecsObservable
-                            .subscribeAsState(settings.getSkipForwardInSecs())
+                            .subscribeAsState(settings.getSkipBackwardInSecs())
                             .value,
                         onSave = settings::setSkipBackwardInSec
                     )
