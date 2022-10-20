@@ -5,9 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -33,8 +30,9 @@ class StoriesFragment : BaseDialogFragment() {
             setContent {
                 AppTheme(theme.activeTheme) {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    Column(modifier = Modifier.fillMaxHeight()) {
-                    }
+                    StoriesScreen(
+                        onCloseClicked = { dismiss() },
+                    )
                 }
             }
         }
