@@ -185,7 +185,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             val headerViewModel = it.podcastHeader
             binding.viewModel = headerViewModel
 
-            binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = false)
+            binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = true)
 
             val playerContrast1 = ThemeColor.playerContrast01(headerViewModel.theme)
             binding.largePlayButton.setCircleTintColor(playerContrast1)
