@@ -85,7 +85,7 @@ class AppearanceIconSettingsAdapter(
             val showOption = !appIcon.isPlus || isPlusSignedIn
             binding.appIconItem.alpha = if (showOption) 1.0f else 0.65f
 
-            val drawable = AppCompatResources.getDrawable(itemView.context, appIcon.resourceId)
+            val drawable = AppCompatResources.getDrawable(itemView.context, appIcon.settingsIcon)
             binding.imgIcon.setImageDrawable(drawable)
             var tickDrawable: Drawable? = null
             if (showOption && selected) {
