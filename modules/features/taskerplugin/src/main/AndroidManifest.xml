@@ -7,7 +7,7 @@
         android:name=".playplaylist.config.ActivityConfigPlayPlaylist"
         android:exported="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Pocket Casts Play Playlist">
+        android:label="Pocket Casts Play Filter">
         <intent-filter>
             <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
         </intent-filter>

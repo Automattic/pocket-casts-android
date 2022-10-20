@@ -1384,4 +1384,9 @@
     <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
 
+    <!--    Tasker Plugin-->
+
+    <string name="must_provide_filter_name">Must provide filter name</string>
+    <string name="filter_x_not_found">Filter %1$s not found</string>
+    <string name="no_episodes_in_filter_x">No episodes in Filter %1$s</string>
 </resources>
