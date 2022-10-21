@@ -4,6 +4,9 @@
 *   New Features:
     *   Fixed background color for screens using the compose theme
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
+*   Bug Fixes:
+    *   Fixed Help & Feedback buttons being hidden when using text zoom.
+        ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
 
 7.25
 -----
