@@ -195,18 +195,18 @@ data class Podcast(
     }
 
     @Suppress("DEPRECATION")
-    fun displayableNextEpisodeDate(resources: Resources): String {
-        val expectedDate = estimatedNextEpisode ?: return resources.getString(LR.string.podcast_next_episode)
+    fun displayableNextEpisodeDate(resources: Resources): String? {
+        val expectedDate = estimatedNextEpisode ?: return null
         val expectedTime = expectedDate.time
         if (expectedTime <= 0) {
-            return resources.getString(LR.string.podcast_next_episode)
+            return null
         }
         val sevenDaysInMs = 7 * DateUtils.DAY_IN_MILLIS
         val now = System.currentTimeMillis()
         val sevenDaysAgo = now - sevenDaysInMs
         val sevenDaysFuture = now + sevenDaysInMs
         return when {
-            expectedTime < sevenDaysAgo -> resources.getString(LR.string.podcast_next_episode)
+            expectedTime < sevenDaysAgo -> null
             DateUtils.isToday(expectedTime) -> resources.getString(LR.string.podcast_next_episode_today)
             DateUtils.isToday(expectedTime - DateUtils.DAY_IN_MILLIS) -> resources.getString(LR.string.podcast_next_episode_tomorrow)
             expectedTime in sevenDaysAgo..now -> resources.getString(LR.string.podcast_next_episode_any_day_now)

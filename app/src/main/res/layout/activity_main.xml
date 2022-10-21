@@ -62,6 +62,12 @@
             android:clickable="true"
             android:translationZ="200dp"/>
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/modalBottomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:translationZ="200dp"/>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <au.com.shiftyjelly.pocketcasts.views.component.RadioactiveLineView

@@ -145,8 +145,14 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM episodes WHERE starred = 1")
     abstract fun observeStarredEpisodes(): Flowable<List<Episode>>
 
+    @Query("SELECT * FROM episodes WHERE starred = 1")
+    abstract suspend fun findStarredEpisodes(): List<Episode>
+
     @Query("SELECT * FROM episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
     abstract fun observePlaybackHistory(): Flowable<List<Episode>>
+
+    @Query("SELECT * FROM episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
+    abstract suspend fun findPlaybackHistoryEpisodes(): List<Episode>
 
     @Update
     abstract fun update(episode: Episode)

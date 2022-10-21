@@ -64,6 +64,7 @@ interface UserEpisodeManager {
     suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager)
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     fun observeUserEpisodes(): Flowable<List<UserEpisode>>
+    suspend fun findUserEpisodes(): List<UserEpisode>
     fun observeEpisode(uuid: String): Flowable<UserEpisode>
     fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
@@ -201,6 +202,10 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override fun observeUserEpisodes(): Flowable<List<UserEpisode>> {
         return userEpisodeDao.observeUserEpisodesDesc()
+    }
+
+    override suspend fun findUserEpisodes(): List<UserEpisode> {
+        return userEpisodeDao.findUserEpisodesDesc()
     }
 
     override fun observeUserEpisodesSorted(sortOrder: Settings.CloudSortOrder): Flowable<List<UserEpisode>> {

@@ -33,7 +33,7 @@ data class Playlist(
     @ColumnInfo(name = "autoDownload") var autoDownload: Boolean = false,
     @ColumnInfo(name = "autoDownloadWifiOnly") var autoDownloadUnmeteredOnly: Boolean = false,
     @ColumnInfo(name = "autoDownloadPowerOnly") var autoDownloadPowerOnly: Boolean = false,
-    @ColumnInfo(name = "sortId") var sortId: Int = PLAYLIST_SORT_NEWEST_TO_OLDEST,
+    @ColumnInfo(name = "sortId") var sortId: Int = SortOrder.NEWEST_TO_OLDEST.value,
     @ColumnInfo(name = "iconId") var iconId: Int = 0,
     @ColumnInfo(name = "filterHours") var filterHours: Int = 0,
     @ColumnInfo(name = "starred") var starred: Boolean = false,
@@ -54,12 +54,6 @@ data class Playlist(
         const val AUDIO_VIDEO_FILTER_ALL = 0
         const val AUDIO_VIDEO_FILTER_AUDIO_ONLY = 1
         const val AUDIO_VIDEO_FILTER_VIDEO_ONLY = 2
-
-        const val PLAYLIST_SORT_NEWEST_TO_OLDEST = 0
-        const val PLAYLIST_SORT_OLDEST_TO_NEWEST = 1
-        const val PLAYLIST_SORT_SHORTEST_TO_LONGEST = 2
-        const val PLAYLIST_SORT_LONGEST_TO_SHORTEST = 3
-        const val PLAYLIST_SORT_LAST_DOWNLOAD_ATTEMPT_DATE = 100
 
         const val SYNC_STATUS_NOT_SYNCED = 0
         const val SYNC_STATUS_SYNCED = 1
@@ -156,4 +150,19 @@ data class Playlist(
 
     val isAllEpisodes: Boolean
         get() = unplayed && partiallyPlayed && finished && notDownloaded && downloaded && audioVideo == AUDIO_VIDEO_FILTER_ALL && allPodcasts && !filterDuration && filterHours == 0 && !starred
+
+    fun sortOrder() = SortOrder.fromInt(sortId)
+
+    enum class SortOrder(val value: Int) {
+        NEWEST_TO_OLDEST(0),
+        OLDEST_TO_NEWEST(1),
+        SHORTEST_TO_LONGEST(2),
+        LONGEST_TO_SHORTEST(3),
+        LAST_DOWNLOAD_ATTEMPT_DATE(100);
+
+        companion object {
+            fun fromInt(value: Int) =
+                SortOrder.values().find { it.value == value }
+        }
+    }
 }

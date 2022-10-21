@@ -16,11 +16,14 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
@@ -82,6 +85,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var imageLoader: PodcastImageLoader
 
@@ -156,7 +160,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     private fun onRowClick(episode: Playable) {
         if (episode is Episode) {
-            val fragment = EpisodeFragment.newInstance(episode)
+            val fragment = EpisodeFragment.newInstance(episode = episode, source = EpisodeViewSource.FILTERS)
             fragment.show(parentFragmentManager, "episode_card")
         }
     }
@@ -387,10 +391,19 @@ class FilterEpisodeListFragment : BaseFragment() {
         multiSelectHelper.isMultiSelectingLive.observe(
             viewLifecycleOwner,
             Observer {
+
                 if (!multiSelectLoaded) {
                     multiSelectLoaded = true
                     return@Observer // Skip the initial value or else it will always hide the filter controls on load
                 }
+
+                analyticsTracker.track(
+                    if (it) {
+                        AnalyticsEvent.FILTER_MULTI_SELECT_ENTERED
+                    } else {
+                        AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
+                    }
+                )
 
                 if (!multiSelectToolbar.isVisible) {
                     showingFilterOptionsBeforeMultiSelect = layoutFilterOptions.isVisible
@@ -407,6 +420,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.listener = object : MultiSelectHelper.Listener {
             override fun multiSelectSelectAll() {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BUTTON_TAPPED)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
@@ -423,6 +437,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
 
             override fun multiSelectSelectAllUp(episode: Playable) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_ABOVE)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(episode)
@@ -435,6 +450,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
 
             override fun multiSelectSelectAllDown(episode: Playable) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BELOW)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(episode)
@@ -478,23 +494,23 @@ class FilterEpisodeListFragment : BaseFragment() {
                 .setTitle(getString(LR.string.sort_by))
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_newest_to_oldest,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.NEWEST_TO_OLDEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_oldest_to_newest,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_OLDEST_TO_NEWEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_OLDEST_TO_NEWEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.OLDEST_TO_NEWEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.OLDEST_TO_NEWEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_short_to_long,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_SHORTEST_TO_LONGEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_SHORTEST_TO_LONGEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.SHORTEST_TO_LONGEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.SHORTEST_TO_LONGEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_long_to_short,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_LONGEST_TO_SHORTEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_LONGEST_TO_SHORTEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.LONGEST_TO_SHORTEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.LONGEST_TO_SHORTEST)
                 )
             dialog.show(parentFragmentManager, "sort_options")
         }

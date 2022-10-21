@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -31,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.Play
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -74,7 +76,8 @@ class PlayerViewModel @Inject constructor(
     private val sleepTimer: SleepTimer,
     private val settings: Settings,
     private val theme: Theme,
-    @ApplicationContext private val context: Context
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    @ApplicationContext private val context: Context,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -556,8 +559,14 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun clearUpNext(context: Context): ClearUpNextDialog {
-        val dialog = ClearUpNextDialog(removeNowPlaying = false, playbackManager = playbackManager, context = context)
+    fun clearUpNext(context: Context, upNextSource: UpNextSource): ClearUpNextDialog {
+        val dialog = ClearUpNextDialog(
+            source = upNextSource,
+            removeNowPlaying = false,
+            playbackManager = playbackManager,
+            analyticsTracker = analyticsTracker,
+            context = context
+        )
         dialog.setForceDarkTheme(true)
         return dialog
     }

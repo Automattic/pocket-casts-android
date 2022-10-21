@@ -303,7 +303,7 @@ class MediaSessionManager(
 
         if (settings.showArtworkOnLockScreen()) {
             if (Util.isAutomotive(context)) {
-                val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, context)?.toString()
+                val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
                 nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
                 nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
             } else {
@@ -548,6 +548,7 @@ class MediaSessionManager(
             seeking = true
             launch {
                 playbackManager.seekToTimeMs(pos.toInt())
+                playbackManager.trackPlaybackSeek(pos.toInt(), PlaybackSource.MEDIA_BUTTON_BROADCAST_ACTION)
             }
         }
     }

@@ -491,7 +491,11 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getAutoSubscribeToPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
+        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, true)
+    }
+
+    override fun getAutoShowPlayed(): Boolean {
+        return getBoolean(Settings.PREFERENCE_AUTO_SHOW_PLAYED, false)
     }
 
     override fun canDuckAudioWithNotifications(): Boolean {

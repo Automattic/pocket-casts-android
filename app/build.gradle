@@ -11,6 +11,8 @@ apply from: "../base.gradle"
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
+    namespace 'au.com.shiftyjelly.pocketcasts'
+
     defaultConfig {
         applicationId project.applicationId
         multiDexEnabled true
@@ -24,10 +26,6 @@ android {
         viewBinding true
         dataBinding = true
         compose true
-    }
-
-    lintOptions {
-        abortOnError false
     }
 
     buildTypes {
@@ -69,6 +67,7 @@ android {
 }
 
 sentry {
+    includeProguardMapping = file("$rootDir/sentry.properties").exists()
     tracingInstrumentation {
         features = EnumSet.allOf(InstrumentationFeature) - InstrumentationFeature.FILE_IO
   }

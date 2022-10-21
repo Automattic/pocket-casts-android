@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -79,7 +80,12 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?) {
-        val fragment = EpisodeFragment.newInstance(episodeUuid = episode.uuid, podcastUuid = episode.podcast_uuid, fromListUuid = listUuid)
+        val fragment = EpisodeFragment.newInstance(
+            episodeUuid = episode.uuid,
+            source = EpisodeViewSource.DISCOVER,
+            podcastUuid = episode.podcast_uuid,
+            fromListUuid = listUuid
+        )
         fragment.show(parentFragmentManager, "episode_card")
     }
 
@@ -171,6 +177,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.scrollToPosition(0)
     }
 
+    @Suppress("DEPRECATION")
     override fun setUserVisibleHint(visible: Boolean) {
         super.setUserVisibleHint(visible)
         if (visible) {

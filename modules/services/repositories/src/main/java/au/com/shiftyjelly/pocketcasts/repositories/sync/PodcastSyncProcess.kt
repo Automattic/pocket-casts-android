@@ -631,7 +631,7 @@ class PodcastSyncProcess(
             if (playlist.id == null) {
                 playlist.id = playlistManager.create(playlist)
             } else {
-                playlistManager.update(playlist)
+                playlistManager.update(playlist, userPlaylistUpdate = null)
             }
 
             return@fromCallable playlist
