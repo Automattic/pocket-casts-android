@@ -14,8 +14,15 @@
         ([#389](https://github.com/Automattic/pocket-casts-android/pull/389)).
     *   Added new episode lists to Automotive OS. Starred, Listening History, and Files.
         ([#403](https://github.com/Automattic/pocket-casts-android/pull/403)).
+    * 
+7.24.2
+-----
 
-7.24
+*   Bug Fixes:
+    *   Add missing POST_NOTIFICATIONS permission for Android 13
+        ([#330](https://github.com/Automattic/pocket-casts-android/pull/436)).
+
+7.24.0
 -----
 
 *   Bug Fixes:
