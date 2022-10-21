@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.taskerplugin.hilt
+package au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager

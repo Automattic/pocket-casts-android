@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.taskerplugin.hilt.appTheme
+import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.appTheme
 
 abstract class ActivityConfigBase<TViewModel : ViewModelBase<*, *>> : ComponentActivity() {
     protected abstract val viewModel: TViewModel

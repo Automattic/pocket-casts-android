@@ -12,5 +12,14 @@
             <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
         </intent-filter>
     </activity>
+    <activity
+        android:name=".controlplayback.config.ActivityConfigControlPlayback"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Pocket Casts Control Playback">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
 </application>
 </manifest>

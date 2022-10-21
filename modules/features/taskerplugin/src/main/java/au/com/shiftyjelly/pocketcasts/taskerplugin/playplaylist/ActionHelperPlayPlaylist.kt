@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist
 
-import au.com.shiftyjelly.pocketcasts.taskerplugin.R
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfigHelperNoOutput
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput

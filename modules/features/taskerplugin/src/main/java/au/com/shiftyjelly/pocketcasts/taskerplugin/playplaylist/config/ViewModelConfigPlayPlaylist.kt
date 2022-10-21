@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.config
 
 import android.app.Application
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.ViewModelBase
-import au.com.shiftyjelly.pocketcasts.taskerplugin.hilt.playlistManager
+import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playlistManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.ActionHelperPlayPlaylist
 import au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.InputPlayPlaylist
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
@@ -14,7 +14,6 @@ import javax.inject.Inject
 class ViewModelConfigPlayPlaylist @Inject constructor(
     application: Application
 ) : ViewModelBase<InputPlayPlaylist, ActionHelperPlayPlaylist>(application), TaskerPluginConfig<InputPlayPlaylist> {
-    override val context get() = getApplication<Application>()
 
     val titleState by lazy { MutableStateFlow(input?.title) }
 

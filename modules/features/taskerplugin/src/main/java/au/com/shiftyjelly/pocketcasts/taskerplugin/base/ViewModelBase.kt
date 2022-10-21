@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.taskerplugin.base
 import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
+import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.InputControlPlayback
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerActionNoOutput
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfigHelperNoOutput
@@ -23,6 +24,7 @@ abstract class ViewModelBase<TInput : Any, THelper : TaskerPluginConfigHelperNoO
     override val inputForTasker: TaskerInput<TInput>
         get() = taskerInput
 
+    fun getDescription(command: InputControlPlayback.PlaybackCommand) = command.getDescription(context)
     override fun assignFromInput(input: TaskerInput<TInput>) {
         taskerInput = input
     }
@@ -44,4 +46,6 @@ abstract class ViewModelBase<TInput : Any, THelper : TaskerPluginConfigHelperNoO
     override fun setResult(resultCode: Int, data: Intent) = setResultFunc?.invoke(resultCode, data) ?: Unit
 
     fun finishForTasker() = taskerHelper.finishForTasker()
+
+    val taskerVariables get() = taskerHelper.relevantVariables
 }
