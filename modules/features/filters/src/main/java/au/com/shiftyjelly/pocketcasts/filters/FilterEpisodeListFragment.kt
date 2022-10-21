@@ -16,6 +16,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -83,6 +85,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var imageLoader: PodcastImageLoader
 
@@ -388,10 +391,19 @@ class FilterEpisodeListFragment : BaseFragment() {
         multiSelectHelper.isMultiSelectingLive.observe(
             viewLifecycleOwner,
             Observer {
+
                 if (!multiSelectLoaded) {
                     multiSelectLoaded = true
                     return@Observer // Skip the initial value or else it will always hide the filter controls on load
                 }
+
+                analyticsTracker.track(
+                    if (it) {
+                        AnalyticsEvent.FILTER_MULTI_SELECT_ENTERED
+                    } else {
+                        AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
+                    }
+                )
 
                 if (!multiSelectToolbar.isVisible) {
                     showingFilterOptionsBeforeMultiSelect = layoutFilterOptions.isVisible
@@ -408,6 +420,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.listener = object : MultiSelectHelper.Listener {
             override fun multiSelectSelectAll() {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BUTTON_TAPPED)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
@@ -424,6 +437,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
 
             override fun multiSelectSelectAllUp(episode: Playable) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_ABOVE)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(episode)
@@ -436,6 +450,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
 
             override fun multiSelectSelectAllDown(episode: Playable) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BELOW)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(episode)

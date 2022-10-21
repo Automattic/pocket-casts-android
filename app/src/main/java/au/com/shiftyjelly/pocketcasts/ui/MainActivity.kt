@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -26,8 +27,13 @@ import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.BottomSheetContentState
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.BottomSheetContentState.Content.Button
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.ModalBottomSheet
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -249,6 +255,10 @@ class MainActivity :
         handleIntent(intent, savedInstanceState)
 
         updateSystemColors()
+
+        if (BuildConfig.END_OF_YEAR_ENABLED) {
+            setupEndOfYearLaunchBottomSheet()
+        }
     }
 
     override fun onStart() {
@@ -444,6 +454,30 @@ class MainActivity :
     private fun showUpNextFragment(source: UpNextSource) {
         analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
         showBottomSheet(UpNextFragment.newInstance(source = source))
+    }
+
+    private fun setupEndOfYearLaunchBottomSheet() {
+        binding.modalBottomSheet.setContent {
+            AppTheme(themeType = theme.activeTheme) {
+                ModalBottomSheet(
+                    showOnLoad = true,
+                    content = BottomSheetContentState.Content(
+                        titleText = stringResource(LR.string.end_of_year_launch_modal_title),
+                        summaryText = stringResource(LR.string.end_of_year_launch_modal_summary),
+                        primaryButton = Button.Primary(
+                            label = stringResource(LR.string.end_of_year_launch_modal_primary_button_title),
+                            onClick = {
+                                StoriesFragment.newInstance()
+                                    .show(supportFragmentManager, "stories_dialog")
+                            }
+                        ),
+                        secondaryButton = Button.Secondary(
+                            label = stringResource(LR.string.end_of_year_launch_modal_secondary_button_title),
+                        ),
+                    )
+                )
+            }
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)

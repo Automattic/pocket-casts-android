@@ -130,14 +130,16 @@ fun TextP50(
     modifier: Modifier = Modifier,
     color: Color? = null,
     maxLines: Int? = null,
-    style: TextStyle? = null
+    style: TextStyle? = null,
+    textAlign: TextAlign? = null,
 ) {
     TextP50(
         text = AnnotatedString(text),
         modifier = modifier,
         color = color,
         maxLines = maxLines,
-        style = style
+        style = style,
+        textAlign = textAlign,
     )
 }
 
@@ -147,7 +149,8 @@ fun TextP50(
     modifier: Modifier = Modifier,
     color: Color? = null,
     maxLines: Int? = null,
-    style: TextStyle? = null
+    style: TextStyle? = null,
+    textAlign: TextAlign? = null,
 ) {
     Text(
         text = text,
@@ -157,6 +160,7 @@ fun TextP50(
         maxLines = maxLines ?: Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis,
         style = style ?: LocalTextStyle.current,
+        textAlign = textAlign,
         modifier = modifier
     )
 }

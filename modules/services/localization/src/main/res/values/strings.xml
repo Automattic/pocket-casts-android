@@ -401,7 +401,6 @@
     <string name="podcast_group_unplayed" translatable="false">@string/unplayed</string>
     <string name="podcast_hide_archived">Hide archived</string>
     <string name="podcast_load_error">There was an error loading the podcast.</string>
-    <string name="podcast_next_episode" translatable="false">@string/next_episode</string>
     <string name="podcast_next_episode_any_day_now">Next episode any day now</string>
     <string name="podcast_next_episode_today">Next episode today</string>
     <string name="podcast_next_episode_tomorrow">Next episode tomorrow</string>
@@ -1377,5 +1376,12 @@
     <string name="server_files_file_too_large">This file is too big to upload.</string>
     <string name="server_files_storage_limit_exceeded">You have exceeded the storage limit for your account.</string>
     <string name="server_files_title_required">Title is required.</string>
+
+    <!-- End of Year -->
+
+    <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
+    <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
+    <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
+    <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
 
 </resources>

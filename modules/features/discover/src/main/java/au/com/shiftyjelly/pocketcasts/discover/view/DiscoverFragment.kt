@@ -177,6 +177,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         binding?.recyclerView?.scrollToPosition(0)
     }
 
+    @Suppress("DEPRECATION")
     override fun setUserVisibleHint(visible: Boolean) {
         super.setUserVisibleHint(visible)
         if (visible) {
