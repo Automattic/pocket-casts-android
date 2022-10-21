@@ -89,6 +89,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
             webViewClient = SupportWebViewClient()
             loadUrl(loadedUrl ?: "https://support.pocketcasts.com/android/?device=android")
             settings.javaScriptEnabled = true
+            settings.textZoom = 100
         }
         loadingView = view.findViewById(VR.id.progress_circle)
         layoutError = view.findViewById(VR.id.layoutLoadingError)
