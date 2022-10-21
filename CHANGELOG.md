@@ -2,10 +2,6 @@
 -----
 
 *   New Features:
-    *   Added a Halloween icon.
-        ([#415](https://github.com/Automattic/pocket-casts-android/pull/415)).
-    *   Fixed skip backwards settings
-        ([#425](https://github.com/Automattic/pocket-casts-android/pull/425)).
     *   Fixed background color for screens using the compose theme
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
 
