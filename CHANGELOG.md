@@ -16,6 +16,7 @@
         ([#403](https://github.com/Automattic/pocket-casts-android/pull/403)).
     *   Fixed skip backwards settings
         ([#425](https://github.com/Automattic/pocket-casts-android/pull/425)).
+
 7.24.2
 -----
 
