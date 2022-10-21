@@ -420,9 +420,6 @@
         <activity android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
             android:theme="@style/Theme.AppCompat.DayNight"/>
 
-        <!-- services which are user triggered, eg: run in the foreground -->
-        <service android:name="au.com.shiftyjelly.pocketcasts.ui.tasks.RefreshArtworkTask"/>
-
         <!-- services which are periodic or trigerred by the app automatically triggered, eg: can run in the background -->
         <service android:name="au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsJob"
                  android:permission="android.permission.BIND_JOB_SERVICE"
@@ -482,11 +479,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>
-        </receiver>
-
-        <receiver
-                android:name="au.com.shiftyjelly.pocketcasts.views.component.CustomTabsBroadcastReceiver"
-                android:enabled="true">
         </receiver>
 
         <!-- Google play services -->
