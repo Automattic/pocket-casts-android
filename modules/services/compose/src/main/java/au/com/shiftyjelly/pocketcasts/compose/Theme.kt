@@ -104,7 +104,7 @@ private fun buildMaterialColors(colors: ThemeColors, isLight: Boolean): Colors {
         primaryVariant = colors.primaryInteractive01,
         secondary = colors.primaryInteractive01,
         secondaryVariant = colors.primaryInteractive01,
-        background = colors.primaryUi04,
+        background = colors.primaryUi01,
         surface = colors.primaryUi01,
         error = colors.support05,
         onPrimary = colors.primaryInteractive02,
