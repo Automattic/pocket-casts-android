@@ -4,6 +4,8 @@
 *   New Features:
     *   Fixed background color for screens using the compose theme
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
+    *   Updated design of the fullscreen player share option
+        ([#451](https://github.com/Automattic/pocket-casts-android/pull/451)).
 *   Bug Fixes:
     *   Fixed Help & Feedback buttons being hidden when using text zoom.
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
