@@ -7,6 +7,8 @@
 *   Bug Fixes:
     *   Fixed Help & Feedback buttons being hidden when using text zoom.
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
+    *   Fixed when system bar didn't disappear on full screen video player
+        ([#461](https://github.com/Automattic/pocket-casts-android/pull/461)).
 
 7.25
 -----
