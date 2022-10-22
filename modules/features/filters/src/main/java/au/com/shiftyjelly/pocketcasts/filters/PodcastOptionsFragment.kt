@@ -117,7 +117,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
         btnSave.setOnClickListener {
             playlist?.let { playlist ->
                 playlist.podcastUuidList = podcastSelection
-                playlist.allPodcasts = switchAllPodcasts.isChecked
+                playlist.allPodcasts = switchAllPodcasts.isChecked || playlist.podcastUuidList.isEmpty()
                 launch(Dispatchers.Default) {
                     playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
 
