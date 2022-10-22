@@ -8,7 +8,7 @@
     *   Fixed Help & Feedback buttons being hidden when using text zoom.
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
     *   Fixed When no podcasts were selected for a filter, change the chip to 'All Your Podcasts'
-        ([#75])(https://github.com/Automattic/pocket-casts-android/issues/75)
+        ([#75](https://github.com/Automattic/pocket-casts-android/issues/75)).
 
 7.25
 -----
