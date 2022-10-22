@@ -18,8 +18,8 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
@@ -80,7 +80,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 playerViewModel.starToggle()
             }
             is ShelfItem.Share -> {
-                playerViewModel.shareDialog(context, parentFragmentManager)?.show()
+                ShareFragment().show(parentFragmentManager, "sleep")
             }
             is ShelfItem.Podcast -> {
                 (activity as FragmentHostListener).closePlayer()
