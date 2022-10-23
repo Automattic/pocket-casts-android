@@ -9,6 +9,8 @@
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
     *   Fixed when system bar didn't disappear on full screen video player
         ([#461](https://github.com/Automattic/pocket-casts-android/pull/461)).
+    *   Fixed when full screen video player was not closing on the first time in landscape mode
+        ([#464](https://github.com/Automattic/pocket-casts-android/pull/464)).
 
 7.25
 -----
