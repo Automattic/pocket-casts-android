@@ -27,6 +27,6 @@ All released versions are tagged with the version number. For example, the 7.19.
 
 When you are ready, please, spend time crafting a good Pull Request, since it will have a huge impact on the work of reviewers, release managers and testers.
 
-We have a [Pull Request template](.github/pull_request_template.md) to help. 
+We have a [Pull Request template](../.github/pull_request_template.md) to help. 
 
 _Thank you very much for contributing to Pocket Casts Android!_
