@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -25,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -38,19 +42,29 @@ class TaskerInputFieldState<T>(val content: Content<T>) {
         val value: String?,
         @StringRes val labelResId: Int,
         val onTextChange: (String) -> Unit,
-        val taskerVariables: Array<String>,
+        val taskerVariables: List<String>,
         val possibleItems: List<T>? = null,
         val itemToString: (T?) -> String = { it?.toString() ?: "" },
         val itemContent: @Composable (T) -> Unit = { Text(text = itemToString(it)) }
     )
 }
 
+private enum class TaskerInputFieldSelectMode { Variable, ItemList }
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
-    var isSearching by remember { mutableStateOf(false) }
-    var isSelectingTaskerVariable by remember { mutableStateOf(false) }
+    var selectionMode by remember { mutableStateOf(null as TaskerInputFieldSelectMode?) }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    /**
+     * @param selection if null, just hide dropdown and don't signal text change
+     */
+    fun finishSelecting(selection: String? = null) {
+        selectionMode = null
+        keyboardController?.hide()
+        selection?.let { content.onTextChange(it) }
+    }
     Box {
 
         Row {
@@ -59,16 +73,21 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
             val hasSuggestedItems = !possibleItems.isNullOrEmpty()
             val hasTaskerVariables = content.taskerVariables.isNotEmpty()
             OutlinedTextField(
-                value = content.value ?: "", label = { Text(text = stringResource(id = content.labelResId)) }, onValueChange = {
+                modifier = Modifier.weight(1f),
+                value = content.value ?: "",
+                label = { Text(text = stringResource(id = content.labelResId)) },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { finishSelecting() }),
+                onValueChange = {
                     content.onTextChange(it)
-                }, modifier = Modifier.weight(1f),
+                },
                 trailingIcon = if (!hasSuggestedItems && !hasTaskerVariables) null else {
                     {
                         Row {
                             if (hasTaskerVariables) {
-                                IconButton(onClick = { isSelectingTaskerVariable = true }) {
+                                IconButton(onClick = { selectionMode = TaskerInputFieldSelectMode.Variable }) {
                                     Icon(
-                                        painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_filters),
+                                        painter = painterResource(au.com.shiftyjelly.pocketcasts.taskerplugin.R.drawable.label_outline),
                                         contentDescription = stringResource(R.string.tasker_variables),
                                         tint = MaterialTheme.theme.colors.primaryIcon01,
                                         modifier = Modifier.padding(end = 16.dp, start = 16.dp)
@@ -76,7 +95,7 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                                 }
                             }
                             if (hasSuggestedItems) {
-                                IconButton(onClick = { isSearching = true }) {
+                                IconButton(onClick = { selectionMode = TaskerInputFieldSelectMode.ItemList }) {
                                     Icon(
                                         painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_search),
                                         contentDescription = stringResource(R.string.search),
@@ -89,36 +108,35 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                     }
                 }
             )
-            if (possibleItems != null && !possibleItems.isEmpty()) {
-                DropdownMenu(
-                    expanded = isSearching,
-                    onDismissRequest = { },
-                    properties = PopupProperties(focusable = false)
-                ) {
-                    possibleItems.forEach {
-                        DropdownMenuItem(onClick = {
-                            isSearching = false
-                            keyboardController?.hide()
-                            content.onTextChange(content.itemToString(it))
-                        }) {
-                            content.itemContent(it)
-                        }
-                    }
-                }
-            }
+            val dropdownMaxHeight = screenSize.height / 6 * 2 //at most dropdown can be 2/6 of the screen size so it doesn't draw over its parent
             if (hasTaskerVariables) {
                 DropdownMenu(
-                    expanded = isSelectingTaskerVariable,
-                    onDismissRequest = { },
+                    modifier = Modifier.requiredSizeIn(maxHeight = dropdownMaxHeight),
+                    expanded = selectionMode == TaskerInputFieldSelectMode.Variable,
+                    onDismissRequest = { finishSelecting() },
                     properties = PopupProperties(focusable = false)
                 ) {
                     content.taskerVariables.forEach {
                         DropdownMenuItem(onClick = {
-                            isSelectingTaskerVariable = false
-                            keyboardController?.hide()
-                            content.onTextChange(it)
+                            finishSelecting(it)
                         }) {
                             Text(it)
+                        }
+                    }
+                }
+            }
+            if (possibleItems != null && possibleItems.isNotEmpty()) {
+                DropdownMenu(
+                    modifier = Modifier.requiredSizeIn(maxHeight = dropdownMaxHeight),
+                    expanded = selectionMode == TaskerInputFieldSelectMode.ItemList,
+                    onDismissRequest = { finishSelecting() },
+                    properties = PopupProperties(focusable = false)
+                ) {
+                    possibleItems.forEach {
+                        DropdownMenuItem(onClick = {
+                            finishSelecting(content.itemToString(it))
+                        }) {
+                            content.itemContent(it)
                         }
                     }
                 }
@@ -134,7 +152,7 @@ private fun ComposableTaskerInputFieldPreview() {
         ComposableTaskerInputField(
             TaskerInputFieldState.Content(
                 "some value", R.string.archive, {},
-                arrayOf("%test"),
+                listOf("%test"),
                 listOf("Hi", "Hello")
             )
         )

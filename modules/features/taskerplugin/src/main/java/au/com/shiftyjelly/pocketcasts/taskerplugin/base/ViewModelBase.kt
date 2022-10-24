@@ -8,6 +8,7 @@ import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerActionNoOutput
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfigHelperNoOutput
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
+import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class ViewModelBase<TInput : Any, THelper : TaskerPluginConfigHelperNoOutput<TInput, out TaskerPluginRunnerActionNoOutput<TInput>>>(application: Application) : AndroidViewModel(application), TaskerPluginConfig<TInput> {
     override val context get() = getApplication<Application>()
@@ -47,5 +48,5 @@ abstract class ViewModelBase<TInput : Any, THelper : TaskerPluginConfigHelperNoO
 
     fun finishForTasker() = taskerHelper.finishForTasker()
 
-    val taskerVariables get() = taskerHelper.relevantVariables
+    val taskerVariables by lazy { taskerHelper.relevantVariables.distinct().sortedBy { it } }
 }

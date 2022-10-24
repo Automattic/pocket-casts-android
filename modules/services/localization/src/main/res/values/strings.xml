@@ -1398,4 +1398,8 @@
     <string name="skip_to_next_chapter">Skip To Next Chapter</string>
     <string name="skip_to_previous_chapter">Skip To Previous Chapter</string>
     <string name="skip_to_chapter">Skip To Chapter</string>
+    <string name="play_next_in_queue">Play Next In Queue</string>
+    <string name="skip_to_time">Skip To Time</string>
+    <string name="time_to_skip_to_seconds">Time To Skip To (Seconds)</string>
+    <string name="time_to_skip_to_not_valid">Time to skip to %1$s not valid</string>
 </resources>

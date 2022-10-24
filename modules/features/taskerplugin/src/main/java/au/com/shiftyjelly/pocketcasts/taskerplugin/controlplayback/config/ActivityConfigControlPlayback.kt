@@ -23,11 +23,21 @@ class ActivityConfigControlPlayback : ActivityConfigBase<ViewModelConfigControlP
         ) {
             Text(viewModel.getDescription(it))
         }
-        val skipToChapterContent = if (viewModel.askForChapterToSkipToState.collectAsState().value) {
+        val chapterToSkipToContent = if (viewModel.shouldAskForChapter.collectAsState().value) {
             TaskerInputFieldState.Content<String>(
-                viewModel.chapterToSkipToState.collectAsState().value,
+                viewModel.chapterToSkipTo.collectAsState().value,
                 au.com.shiftyjelly.pocketcasts.localization.R.string.chapter_to_skip_to,
-                { viewModel.chapterToSkipTo = it },
+                { viewModel.setChapterToSkipTo(it) },
+                viewModel.taskerVariables
+            )
+        } else {
+            null
+        }
+        val timeToSkipToContent = if (viewModel.showAskForTime.collectAsState().value) {
+            TaskerInputFieldState.Content<String>(
+                viewModel.timeToSkipTo.collectAsState().value,
+                au.com.shiftyjelly.pocketcasts.localization.R.string.time_to_skip_to_seconds,
+                { viewModel.setTimeToSkipTo(it) },
                 viewModel.taskerVariables
             )
         } else {
@@ -35,7 +45,8 @@ class ActivityConfigControlPlayback : ActivityConfigBase<ViewModelConfigControlP
         }
         ComposableConfigControlPlayback(
             commandContent,
-            skipToChapterContent
+            chapterToSkipToContent,
+            timeToSkipToContent
         ) { viewModel.finishForTasker() }
     }
 }

@@ -17,7 +17,7 @@ fun ComposableConfigPlayPlaylist(content: TaskerInputFieldState.Content<String>,
 private fun ComposableConfigPlayPlaylistPreview() {
     AppTheme(Theme.ThemeType.CLASSIC_LIGHT) {
         ComposableConfigPlayPlaylist(
-            TaskerInputFieldState.Content("New Release", au.com.shiftyjelly.pocketcasts.localization.R.string.filters_filter_name, {}, arrayOf("%test"), listOf("New Releases", "Up Next")), {}
+            TaskerInputFieldState.Content("New Release", au.com.shiftyjelly.pocketcasts.localization.R.string.filters_filter_name, {}, listOf("%test"), listOf("New Releases", "Up Next")), {}
         )
     }
 }
