@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.text.format.DateUtils
@@ -8,6 +9,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.to.Bundle
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -15,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
-import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import java.io.Serializable
 import java.net.MalformedURLException
 import java.net.URL
@@ -195,7 +196,7 @@ data class Podcast(
     }
 
     @Suppress("DEPRECATION")
-    fun displayableNextEpisodeDate(resources: Resources): String? {
+    fun displayableNextEpisodeDate(context: Context): String? {
         val expectedDate = estimatedNextEpisode ?: return null
         val expectedTime = expectedDate.time
         if (expectedTime <= 0) {
@@ -204,15 +205,17 @@ data class Podcast(
         val sevenDaysInMs = 7 * DateUtils.DAY_IN_MILLIS
         val now = System.currentTimeMillis()
         val sevenDaysAgo = now - sevenDaysInMs
-        val sevenDaysFuture = now + sevenDaysInMs
+
+        val resources = context.resources
         return when {
             expectedTime < sevenDaysAgo -> null
             DateUtils.isToday(expectedTime) -> resources.getString(LR.string.podcast_next_episode_today)
             DateUtils.isToday(expectedTime - DateUtils.DAY_IN_MILLIS) -> resources.getString(LR.string.podcast_next_episode_tomorrow)
             expectedTime in sevenDaysAgo..now -> resources.getString(LR.string.podcast_next_episode_any_day_now)
-            expectedTime < sevenDaysFuture -> resources.getString(LR.string.podcast_next_episode_value, expectedDate.toLocalizedFormatPattern("EEEE"))
-            expectedDate.year == Date().year -> resources.getString(LR.string.podcast_next_episode_value, expectedDate.toLocalizedFormatPattern("d MMMM"))
-            else -> resources.getString(LR.string.podcast_next_episode_value, expectedDate.toLocalizedFormatLongStyle())
+            else -> {
+                val formattedDate = RelativeDateFormatter(context).format(expectedDate)
+                resources.getString(LR.string.podcast_next_episode_value, formattedDate)
+            }
         }
     }
 }

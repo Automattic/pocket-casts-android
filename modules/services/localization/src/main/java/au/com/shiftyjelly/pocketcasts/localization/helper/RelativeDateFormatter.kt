@@ -26,7 +26,7 @@ class RelativeDateFormatter(val context: Context) {
     private val currentYear: Int = Calendar.getInstance().get(Calendar.YEAR)
     private var relativeDateFormatter: RelativeDateTimeFormatter? = null
 
-    fun format(date: Date, resources: Resources): String {
+    fun format(date: Date): String {
         val calendar = Calendar.getInstance()
         calendar.time = date
         val format = when {
@@ -43,7 +43,7 @@ class RelativeDateFormatter(val context: Context) {
             }
         } else if (Locale.getDefault().language == "en") {
             // if using an old Android version but using English then add Today and Yesterday
-            val alternativeString = formatCloseDaysOld(calendar, resources)
+            val alternativeString = formatCloseDaysOld(calendar, context.resources)
             if (alternativeString != null) {
                 return alternativeString
             }
