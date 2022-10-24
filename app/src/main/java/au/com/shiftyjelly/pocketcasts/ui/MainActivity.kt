@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.BottomSheetContentStat
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.ModalBottomSheet
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -465,7 +466,10 @@ class MainActivity :
                         summaryText = stringResource(LR.string.end_of_year_launch_modal_summary),
                         primaryButton = Button.Primary(
                             label = stringResource(LR.string.end_of_year_launch_modal_primary_button_title),
-                            onClick = {}
+                            onClick = {
+                                StoriesFragment.newInstance()
+                                    .show(supportFragmentManager, "stories_dialog")
+                            }
                         ),
                         secondaryButton = Button.Secondary(
                             label = stringResource(LR.string.end_of_year_launch_modal_secondary_button_title),

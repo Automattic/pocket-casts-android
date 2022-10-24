@@ -95,7 +95,12 @@ fun BottomSheetContent(
 
             Spacer(modifier = modifier.height(16.dp))
 
-            Button(onClick = content.primaryButton.onClick) {
+            Button(
+                onClick = {
+                    onDismiss.invoke()
+                    content.primaryButton.onClick.invoke()
+                }
+            ) {
                 Text(text = content.primaryButton.label)
             }
 

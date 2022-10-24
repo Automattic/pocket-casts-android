@@ -2,10 +2,15 @@
 -----
 
 *   New Features:
-    *   Added a Halloween icon.
-        ([#415](https://github.com/Automattic/pocket-casts-android/pull/415)).
     *   Added Tasker integration with "Play Filter" and "Control Playback" actions.
         ([#415](https://github.com/Automattic/pocket-casts-android/pull/431)).
+    *   Fixed background color for screens using the compose theme
+        ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
+*   Bug Fixes:
+    *   Fixed Help & Feedback buttons being hidden when using text zoom.
+        ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
+    *   Fixed when system bar didn't disappear on full screen video player
+        ([#461](https://github.com/Automattic/pocket-casts-android/pull/461)).
 
 7.25
 -----
@@ -19,6 +24,19 @@
         ([#389](https://github.com/Automattic/pocket-casts-android/pull/389)).
     *   Added new episode lists to Automotive OS. Starred, Listening History, and Files.
         ([#403](https://github.com/Automattic/pocket-casts-android/pull/403)).
+    *   Fixed skip backwards settings
+        ([#425](https://github.com/Automattic/pocket-casts-android/pull/425)).
+
+7.24.2
+-----
+
+*   New Features:
+    *   Added a Halloween icon.
+        ([#415](https://github.com/Automattic/pocket-casts-android/pull/415)).
+
+*   Bug Fixes:
+    *   Add missing POST_NOTIFICATIONS permission for Android 13
+        ([#330](https://github.com/Automattic/pocket-casts-android/pull/436)).
 
 7.24
 -----

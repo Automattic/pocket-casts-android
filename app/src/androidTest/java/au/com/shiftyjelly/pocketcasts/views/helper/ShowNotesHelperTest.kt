@@ -31,5 +31,10 @@ class ShowNotesHelperTest {
         actual = ShowNotesHelper.convertTimesToLinks("<li><a href=\"https://overcast.fm/+BtuyYAAIQ/16:45\">Confirmation of John's prediction about face swipe timing</a></li>")
         expected = "<li><a href=\"https://overcast.fm/+BtuyYAAIQ/16:45\">Confirmation of John's prediction about face swipe timing</a></li>"
         assertEquals(actual, expected)
+
+        // Do not replace timeskip when it is in an URL - https://github.com/Automattic/pocket-casts-android/issues/145
+        actual = ShowNotesHelper.convertTimesToLinks("<li><a href=\"https://www.theverge.com/2021/12/21/22848957/lg-dualup-32-inch-4k-ultra-fine-monitors-announced-specs\">LG’s new 16:18 monitor looks like a multitasking powerhouse</a></li>")
+        expected = "<li><a href=\"https://www.theverge.com/2021/12/21/22848957/lg-dualup-32-inch-4k-ultra-fine-monitors-announced-specs\">LG’s new 16:18 monitor looks like a multitasking powerhouse</a></li>"
+        assertEquals(actual, expected)
     }
 }

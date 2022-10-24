@@ -94,6 +94,7 @@ dependencies {
     implementation project(':modules:features:navigation')
     implementation project(':modules:features:account')
     implementation project(':modules:features:taskerplugin')
+    implementation project(':modules:features:endofyear')
 }
 
 task appStart(type: Exec, dependsOn: 'installDebug') {
