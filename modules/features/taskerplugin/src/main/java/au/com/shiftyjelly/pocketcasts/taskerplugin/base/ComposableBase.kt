@@ -164,7 +164,9 @@ fun ComposableTaskerInputFieldList(
     fieldContents: List<TaskerInputFieldState.Content<*>>,
     onFinish: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxHeight()) {
+    Box(modifier = Modifier
+            .padding(8.dp)
+            .fillMaxHeight()) {
         LazyColumn {
             fieldContents.forEach { content ->
                 item {
