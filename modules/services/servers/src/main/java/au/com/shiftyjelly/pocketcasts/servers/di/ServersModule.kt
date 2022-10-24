@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatusMoshiAdapt
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.bumpstats.AnonymousBumpStatsRequest
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
@@ -246,6 +247,21 @@ class ServersModule {
     }
 
     @Provides
+    @WpComServerRetrofit
+    @Singleton
+    internal fun provideWpComApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient): Retrofit {
+        val moshi = Moshi.Builder()
+            .add(AnonymousBumpStatsRequest.Event.Adapter)
+            .build()
+
+        return Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl(Settings.WP_COM_API_URL)
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Provides
     @RefreshServerRetrofit
     @Singleton
     internal fun provideRefreshRetrofit(@NoCacheTokenedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
@@ -402,6 +418,10 @@ annotation class SyncServerRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class OldSyncServerRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class WpComServerRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
