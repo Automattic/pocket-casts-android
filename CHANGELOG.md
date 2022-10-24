@@ -4,7 +4,7 @@
 *   New Features:
     *   Added a Halloween icon.
         ([#415](https://github.com/Automattic/pocket-casts-android/pull/415)).
-    *   Added Tasker integration with filter and basic playback controls.
+    *   Added Tasker integration with "Play Filter" and "Control Playback" actions.
         ([#415](https://github.com/Automattic/pocket-casts-android/pull/431)).
 
 7.25
