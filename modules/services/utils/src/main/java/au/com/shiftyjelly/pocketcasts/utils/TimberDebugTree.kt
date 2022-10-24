@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.utils
 
 import android.os.Build
 import android.util.Log
+import timber.log.Timber
 import java.util.regex.Pattern
 import kotlin.math.min
-import timber.log.Timber
 
 class TimberDebugTree : Timber.Tree() {
 

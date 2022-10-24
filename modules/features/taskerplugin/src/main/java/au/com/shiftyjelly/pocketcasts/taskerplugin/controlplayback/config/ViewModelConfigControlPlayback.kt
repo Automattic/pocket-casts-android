@@ -6,8 +6,8 @@ import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.ActionHelperC
 import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.InputControlPlayback
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
 
 @HiltViewModel
 class ViewModelConfigControlPlayback @Inject constructor(
@@ -59,24 +59,21 @@ class ViewModelConfigControlPlayback @Inject constructor(
             optionalFields.forEach { it.updateAskForState() }
         }
 
-
     val availableCommands get() = InputControlPlayback.PlaybackCommand.values()
 
     /*Chapter To skip to*/
     val shouldAskForChapter get() = optionalFieldChapterToSkipTo.shouldAskForState
     val chapterToSkipTo get() = optionalFieldChapterToSkipTo.valueState
-    fun setChapterToSkipTo(value:String){
+    fun setChapterToSkipTo(value: String) {
         optionalFieldChapterToSkipTo.value = value
     }
     /*End chapter To skip to*/
 
-
     /*Time To skip to*/
     val showAskForTime get() = optionalFieldTimeToSkipTo.shouldAskForState
     val timeToSkipTo get() = optionalFieldTimeToSkipTo.valueState
-    fun setTimeToSkipTo(value:String){
+    fun setTimeToSkipTo(value: String) {
         optionalFieldTimeToSkipTo.value = value
     }
     /*End time To skip to*/
-
 }
