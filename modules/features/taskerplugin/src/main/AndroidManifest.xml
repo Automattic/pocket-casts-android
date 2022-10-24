@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+<application>
+
+    <activity
+        android:name=".playplaylist.config.ActivityConfigPlayPlaylist"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Pocket Casts Play Filter">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
+    <activity
+        android:name=".controlplayback.config.ActivityConfigControlPlayback"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Pocket Casts Control Playback">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
+</application>
+</manifest>

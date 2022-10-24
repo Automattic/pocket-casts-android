@@ -2,6 +2,8 @@
 -----
 
 *   New Features:
+    *   Added Tasker integration with "Play Filter" and "Control Playback" actions.
+        ([#415](https://github.com/Automattic/pocket-casts-android/pull/431)).
     *   Fixed background color for screens using the compose theme
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
 *   Bug Fixes:

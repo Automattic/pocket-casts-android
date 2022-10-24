@@ -1384,4 +1384,22 @@
     <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
 
+    <!--    Tasker Plugin-->
+
+    <string name="must_provide_filter_name">Must provide filter name</string>
+    <string name="filter_x_not_found">Filter %1$s not found</string>
+    <string name="no_episodes_in_filter_x">No episodes in Filter %1$s</string>
+    <string name="must_provide_command_name">Must provide command name</string>
+    <string name="command_x_not_valid">Command %1$s not valid</string>
+    <string name="playback_command">Playback Command</string>
+    <string name="chapter_to_skip_to">Chapter To Skip To</string>
+    <string name="chapter_to_skip_to_not_valid">Chapter to skip to %1$s not valid</string>
+    <string name="tasker_variables">Tasker Variables</string>
+    <string name="skip_to_next_chapter">Skip To Next Chapter</string>
+    <string name="skip_to_previous_chapter">Skip To Previous Chapter</string>
+    <string name="skip_to_chapter">Skip To Chapter</string>
+    <string name="play_next_in_queue">Play Next In Queue</string>
+    <string name="skip_to_time">Skip To Time</string>
+    <string name="time_to_skip_to_seconds">Time To Skip To (Seconds)</string>
+    <string name="time_to_skip_to_not_valid">Time to skip to %1$s not valid</string>
 </resources>
