@@ -27,7 +27,7 @@ class StorageOptions {
             determineFolderLocations(confirmedMountPoints, context)
         }
 
-        return folderLocations!!
+        return folderLocations as List<FolderLocation>
     }
 
     private fun testAndCleanMountsList(confirmedMountPoints: ArrayList<String>) {
@@ -61,14 +61,18 @@ class StorageOptions {
         if (!Environment.isExternalStorageRemovable()
             || Environment.isExternalStorageEmulated()
         ) {
-            folderLocations!!.add(
+            requireNotNull(folderLocations) {
+                "folderLocations can not be null"
+            }.add(
                 FolderLocation(
                     firstMountPoint,
                     resources.getString(R.string.settings_storage_phone)
                 )
             )
         } else {
-            folderLocations!!.add(
+            requireNotNull(folderLocations) {
+                "folderLocations can not be null"
+            }.add(
                 FolderLocation(
                     firstMountPoint,
                     resources.getString(R.string.settings_storage_sd_card)
@@ -87,7 +91,9 @@ class StorageOptions {
                     externalSDCardCount.toString()
                 )
             }
-            folderLocations!!.add(FolderLocation(mountPoint, label))
+            requireNotNull(folderLocations) {
+                "folderLocations can not be null"
+            }.add(FolderLocation(mountPoint, label))
             externalSDCardCount++
         }
     }
