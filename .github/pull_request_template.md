@@ -15,6 +15,7 @@ Fixes # <!-- issue number, if applicable -->
 ## Checklist
 - [ ] If this is a user-facing change, I have added an entry in CHANGELOG.md
 - [ ] I have considered whether it makes sense to add tests for my changes
+- [ ] All strings that need to be localized are in `modules/services/localization/src/main/res/values/strings.xml`
 - [ ] Any jetpack compose components I added or changed are covered by compose previews
  
 #### I have tested any UI changes...
