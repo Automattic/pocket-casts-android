@@ -108,7 +108,7 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                     }
                 }
             )
-            val dropdownMaxHeight = screenSize.height / 6 * 2 //at most dropdown can be 2/6 of the screen size so it doesn't draw over its parent
+            val dropdownMaxHeight = screenSize.height / 6 * 2 // at most dropdown can be 2/6 of the screen size so it doesn't draw over its parent
             if (hasTaskerVariables) {
                 DropdownMenu(
                     modifier = Modifier.requiredSizeIn(maxHeight = dropdownMaxHeight),
