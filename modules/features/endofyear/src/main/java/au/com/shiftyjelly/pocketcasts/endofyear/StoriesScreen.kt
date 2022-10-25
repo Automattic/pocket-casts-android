@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,9 +46,10 @@ private const val NumberOfSegments = 2
 
 @Composable
 fun StoriesScreen(
+    viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
+    val state: StoriesViewModel.State by viewModel.state.collectAsState()
     var running by remember { mutableStateOf(false) }
     val progress: Float by animateFloatAsState(
         if (running) 1f else 0f,
@@ -56,6 +58,25 @@ fun StoriesScreen(
             easing = LinearEasing
         )
     )
+    StoriesView(
+        state = state,
+        progress = progress,
+        onCloseClicked = onCloseClicked,
+    )
+
+    LaunchedEffect(Unit) {
+        running = true
+    }
+}
+
+@Suppress("UNUSED_PARAMETER")
+@Composable
+private fun StoriesView(
+    state: StoriesViewModel.State,
+    progress: Float,
+    onCloseClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Box(modifier = modifier.background(color = Color.Black)) {
         StoryView(color = Color.Gray)
         SegmentedProgressIndicator(
@@ -66,10 +87,6 @@ fun StoriesScreen(
                 .fillMaxWidth(),
         )
         CloseButtonView(onCloseClicked)
-    }
-
-    LaunchedEffect(Unit) {
-        running = true
     }
 }
 
@@ -134,7 +151,9 @@ private fun StoriesScreenPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        StoriesScreen(
+        StoriesView(
+            state = StoriesViewModel.State.Loaded,
+            progress = 1f,
             onCloseClicked = {}
         )
     }
