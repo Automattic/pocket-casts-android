@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import androidx.annotation.FloatRange
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,10 +21,15 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -52,6 +59,10 @@ fun StoriesScreen(
         is State.Loaded -> StoriesView(
             state = state as State.Loaded,
             progress = progress,
+            onSkipPrevious = { viewModel.skipPrevious() },
+            onSkipNext = { viewModel.skipNext() },
+            onPause = { viewModel.pause() },
+            onStart = { viewModel.start() },
             onCloseClicked = onCloseClicked
         )
         State.Loading -> StoriesLoadingView(onCloseClicked)
@@ -62,14 +73,47 @@ fun StoriesScreen(
 @Composable
 private fun StoriesView(
     state: State.Loaded,
-    progress: Float,
+    @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    onSkipPrevious: () -> Unit,
+    onSkipNext: () -> Unit,
+    onPause: () -> Unit,
+    onStart: () -> Unit,
     onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var screenWidth by remember { mutableStateOf(1) }
+    var isPaused by remember { mutableStateOf(false) }
     Box(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(color = Color.Black)
+            .onGloballyPositioned {
+                screenWidth = it.size.width
+            }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        if (!isPaused) {
+                            if (it.x > screenWidth / 2) {
+                                onSkipNext()
+                            } else {
+                                onSkipPrevious()
+                            }
+                        }
+                    },
+                    onLongPress = {
+                        isPaused = true
+                        onPause()
+                    },
+                    onPress = {
+                        awaitRelease()
+                        if (isPaused) {
+                            onStart()
+                            isPaused = false
+                        }
+                    }
+                )
+            }
     ) {
         state.currentStory?.let {
             StoryView(it)
@@ -197,8 +241,12 @@ private fun StoriesScreenPreview(
 ) {
     AppTheme(themeType) {
         StoriesView(
-            state = State.Loaded(currentStory = StoryFake1(), numberOfStories = 1),
-            progress = 1f,
+            state = State.Loaded(currentStory = StoryFake1(), numberOfStories = 2),
+            progress = 0.5f,
+            onSkipPrevious = {},
+            onSkipNext = {},
+            onPause = {},
+            onStart = {},
             onCloseClicked = {}
         )
     }
