@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 @Dao
@@ -307,4 +308,7 @@ abstract class EpisodeDao {
 
     @Query("UPDATE episodes SET playing_status = :playingStatus, playing_status_modified = :modified, played_up_to = 0, played_up_to_modified = :modified WHERE uuid IN (:episodesUUIDs)")
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
+
+    @Query("SELECT * FROM episodes LIMIT 1")
+    abstract fun findRandomEpisode(): Flow<Episode?>
 }
