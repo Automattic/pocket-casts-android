@@ -39,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -387,20 +386,18 @@ class PlayerViewModel @Inject constructor(
         playbackManager.skipForward(playbackSource = playbackSource)
     }
 
-    fun longSkipForwardOptionsDialog(): OptionsDialog {
-        var optionsDialogBuilder = OptionsDialog().setForceDarkTheme(true)
-        optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.mark_played) {
-            playbackManager.upNextQueue.currentEpisode?.let {
-                markAsPlayedConfirmed(it)
-            }
+    fun onMarkAsPlayedClick() {
+        playbackManager.upNextQueue.currentEpisode?.let {
+            markAsPlayedConfirmed(it)
         }
-        if (playbackManager.upNextQueue.queueEpisodes.isNotEmpty()) {
-            optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.next_episode) {
-                playbackManager.playNextInQueue(playbackSource = playbackSource)
-            }
-        }
+    }
 
-        return optionsDialogBuilder
+    fun hasNextEpisode(): Boolean {
+        return playbackManager.upNextQueue.queueEpisodes.isNotEmpty()
+    }
+
+    fun onNextEpisodeClick() {
+        playbackManager.playNextInQueue(playbackSource = playbackSource)
     }
 
     private fun markAsPlayedConfirmed(episode: Playable) {

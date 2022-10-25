@@ -436,7 +436,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onSkipForwardLongPress() {
-        viewModel.longSkipForwardOptionsDialog().show(parentFragmentManager, "longpressoptions")
+        LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
     }
 
     override fun onEffectsClick() {
