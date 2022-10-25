@@ -7,6 +7,10 @@
             android:key="importPodcasts"
             android:summary="@string/settings_import_file_summary"
             android:title="@string/settings_import_file" />
+        <EditTextPreference
+            android:key="importPodcastsByUrl"
+            android:summary="@string/settings_import_url_summary"
+            android:title="@string/settings_import_url" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_export_subscriptions" >
         <Preference
