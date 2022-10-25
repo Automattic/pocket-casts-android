@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConve
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
+import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
@@ -26,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -39,16 +41,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Database(
     entities = [
-        Podcast::class,
+        AnonymousBumpStat::class,
         Episode::class,
+        Folder::class,
         Playlist::class,
         PlaylistEpisode::class,
-        UpNextEpisode::class,
+        Podcast::class,
         UpNextChange::class,
+        UpNextEpisode::class,
         UserEpisode::class,
-        Folder::class
     ],
-    version = 72,
+    version = 73,
     exportSchema = true
 )
 @TypeConverters(
@@ -60,7 +63,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     BundlePaidTypeConverter::class,
     TrimModeTypeConverter::class,
     PodcastsSortTypeConverter::class,
-    EpisodesSortTypeConverter::class
+    EpisodesSortTypeConverter::class,
+    AnonymousBumpStat.CustomEventPropsTypeConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -70,6 +74,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun upNextChangeDao(): UpNextChangeDao
     abstract fun userEpisodeDao(): UserEpisodeDao
     abstract fun folderDao(): FolderDao
+    abstract fun bumpStatDao(): BumpStatDao
 
     companion object {
         // This seems dodgy but I got it from Google, https://github.com/googlesamples/android-sunflower/blob/master/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt
@@ -354,6 +359,19 @@ abstract class AppDatabase : RoomDatabase() {
             if (!podcastColumnNames.contains("folder_uuid")) {
                 database.execSQL("ALTER TABLE podcasts ADD COLUMN folder_uuid TEXT")
             }
+        }
+
+        val MIGRATION_72_73 = addMigration(72, 73) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS bump_stats (
+                      name TEXT NOT NULL,
+                      event_time INTEGER NOT NULL,
+                      custom_event_props TEXT NOT NULL,
+                      PRIMARY KEY(name, event_time)
+                    );
+                """.trimIndent()
+            )
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
@@ -717,7 +735,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_68_69,
                 MIGRATION_69_70,
                 MIGRATION_70_71,
-                MIGRATION_71_72
+                MIGRATION_71_72,
+                MIGRATION_72_73
             )
         }
 
