@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -25,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -35,7 +37,9 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -49,7 +53,7 @@ fun StoriesScreen(
     viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
 ) {
-    val state: StoriesViewModel.State by viewModel.state.collectAsState()
+    val state: State by viewModel.state.collectAsState()
     var running by remember { mutableStateOf(false) }
     val progress: Float by animateFloatAsState(
         if (running) 1f else 0f,
@@ -58,11 +62,15 @@ fun StoriesScreen(
             easing = LinearEasing
         )
     )
-    StoriesView(
-        state = state,
-        progress = progress,
-        onCloseClicked = onCloseClicked,
-    )
+    when (state) {
+        State.Loaded -> StoriesView(
+            state = state as State.Loaded,
+            progress = progress,
+            onCloseClicked = onCloseClicked
+        )
+        State.Loading -> StoriesLoadingView(onCloseClicked)
+        State.Error -> StoriesErrorView(onCloseClicked)
+    }
 
     LaunchedEffect(Unit) {
         running = true
@@ -72,7 +80,7 @@ fun StoriesScreen(
 @Suppress("UNUSED_PARAMETER")
 @Composable
 private fun StoriesView(
-    state: StoriesViewModel.State,
+    state: State,
     progress: Float,
     onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -145,6 +153,56 @@ private fun CloseButtonView(
     }
 }
 
+@Composable
+private fun StoriesLoadingView(
+    onCloseClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    StoriesEmptyView(
+        content = { CircularProgressIndicator(color = Color.White) },
+        onCloseClicked = onCloseClicked,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun StoriesErrorView(
+    onCloseClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    StoriesEmptyView(
+        content = {
+            TextP50(
+                text = "Failed to load stories.", // TODO: replace hardcoded text
+                color = Color.White,
+            )
+        },
+        onCloseClicked = onCloseClicked,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun StoriesEmptyView(
+    onCloseClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit = {},
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color.Black)
+    ) {
+        CloseButtonView(onCloseClicked)
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier.fillMaxSize()
+        ) {
+            content()
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun StoriesScreenPreview(
@@ -152,8 +210,32 @@ private fun StoriesScreenPreview(
 ) {
     AppTheme(themeType) {
         StoriesView(
-            state = StoriesViewModel.State.Loaded,
+            state = State.Loaded,
             progress = 1f,
+            onCloseClicked = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun StoriesLoadingViewPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        StoriesLoadingView(
+            onCloseClicked = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun StoriesErrorViewPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppTheme(themeType) {
+        StoriesErrorView(
             onCloseClicked = {}
         )
     }
