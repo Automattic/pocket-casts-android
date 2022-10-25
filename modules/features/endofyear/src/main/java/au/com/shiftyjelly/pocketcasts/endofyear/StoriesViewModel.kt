@@ -34,17 +34,18 @@ class StoriesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val stories = storiesDataSource.loadStories()
-            val state = if (stories.isEmpty()) {
-                State.Error
-            } else {
-                State.Loaded(
-                    currentStory = storiesDataSource.storyAt(currentIndex),
-                    numberOfStories = numOfStories
-                )
+            storiesDataSource.loadStories().collect { stories ->
+                val state = if (stories.isEmpty()) {
+                    State.Error
+                } else {
+                    State.Loaded(
+                        currentStory = storiesDataSource.storyAt(currentIndex),
+                        numberOfStories = numOfStories
+                    )
+                }
+                mutableState.value = state
+                if (state is State.Loaded) start()
             }
-            mutableState.value = state
-            if (state is State.Loaded) start()
         }
     }
 

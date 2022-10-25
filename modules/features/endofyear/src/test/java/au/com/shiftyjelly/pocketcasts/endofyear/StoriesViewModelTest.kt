@@ -7,6 +7,8 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -112,9 +114,9 @@ class StoriesViewModelTest {
     class MockStoriesDataSource(private val mockStories: List<Story>) : StoriesDataSource {
         override var stories: List<Story> = emptyList()
 
-        override fun loadStories(): List<Story> {
+        override suspend fun loadStories(): Flow<List<Story>> {
             stories = mockStories
-            return stories
+            return flowOf(mockStories)
         }
 
         override fun storyAt(index: Int): Story? {
