@@ -40,6 +40,8 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -63,7 +65,7 @@ fun StoriesScreen(
         )
     )
     when (state) {
-        State.Loaded -> StoriesView(
+        is State.Loaded -> StoriesView(
             state = state as State.Loaded,
             progress = progress,
             onCloseClicked = onCloseClicked
@@ -77,16 +79,17 @@ fun StoriesScreen(
     }
 }
 
-@Suppress("UNUSED_PARAMETER")
 @Composable
 private fun StoriesView(
-    state: State,
+    state: State.Loaded,
     progress: Float,
     onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.background(color = Color.Black)) {
-        StoryView(color = Color.Gray)
+        state.currentStory?.let {
+            StoryView(it)
+        }
         SegmentedProgressIndicator(
             progress = progress,
             numberOfSegments = NumberOfSegments,
@@ -100,7 +103,7 @@ private fun StoriesView(
 
 @Composable
 private fun StoryView(
-    color: Color,
+    story: Story,
     modifier: Modifier = Modifier,
 ) {
     Column {
@@ -109,7 +112,7 @@ private fun StoryView(
                 .fillMaxSize()
                 .weight(weight = 1f, fill = true)
                 .clip(RoundedCornerShape(StoryViewCornerSize))
-                .background(color = color)
+                .background(color = story.backgroundColor)
         ) {}
         ShareButton()
     }
@@ -210,7 +213,7 @@ private fun StoriesScreenPreview(
 ) {
     AppTheme(themeType) {
         StoriesView(
-            state = State.Loaded,
+            state = State.Loaded(currentStory = StoryFake1()),
             progress = 1f,
             onCloseClicked = {}
         )
