@@ -14,5 +14,6 @@ dependencies {
     implementation project(':modules:services:compose')
     implementation project(':modules:services:localization')
     implementation project(':modules:services:ui')
+    implementation project(':modules:services:utils')
     implementation project(':modules:services:views')
 }

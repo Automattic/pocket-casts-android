@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,12 +17,8 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,10 +38,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val ProgressDurationMs = 5_000
 private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
-private const val NumberOfSegments = 2
 
 @Composable
 fun StoriesScreen(
@@ -56,14 +47,7 @@ fun StoriesScreen(
     onCloseClicked: () -> Unit,
 ) {
     val state: State by viewModel.state.collectAsState()
-    var running by remember { mutableStateOf(false) }
-    val progress: Float by animateFloatAsState(
-        if (running) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = ProgressDurationMs,
-            easing = LinearEasing
-        )
-    )
+    val progress: Float by viewModel.progress.collectAsState()
     when (state) {
         is State.Loaded -> StoriesView(
             state = state as State.Loaded,
@@ -72,10 +56,6 @@ fun StoriesScreen(
         )
         State.Loading -> StoriesLoadingView(onCloseClicked)
         State.Error -> StoriesErrorView(onCloseClicked)
-    }
-
-    LaunchedEffect(Unit) {
-        running = true
     }
 }
 
@@ -86,13 +66,17 @@ private fun StoriesView(
     onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.background(color = Color.Black)) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = Color.Black)
+    ) {
         state.currentStory?.let {
             StoryView(it)
         }
         SegmentedProgressIndicator(
             progress = progress,
-            numberOfSegments = NumberOfSegments,
+            numberOfSegments = state.numberOfStories,
             modifier = modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
@@ -213,7 +197,7 @@ private fun StoriesScreenPreview(
 ) {
     AppTheme(themeType) {
         StoriesView(
-            state = State.Loaded(currentStory = StoryFake1()),
+            state = State.Loaded(currentStory = StoryFake1(), numberOfStories = 1),
             progress = 1f,
             onCloseClicked = {}
         )
