@@ -23,7 +23,7 @@ class StoriesViewModel @Inject constructor(
     val progress: StateFlow<Float> = mutableProgress
 
     private val numOfStories: Int
-        get() = storiesDataSource.stories.size
+        get() = storiesDataSource.numOfStories
 
     private var currentIndex: Int = 0
     private val nextIndex

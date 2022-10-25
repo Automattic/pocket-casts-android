@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake2
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +19,8 @@ import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
-private val story1 = StoryFake1()
-private val story2 = StoryFake2()
+private val story1 = mock<Story>()
+private val story2 = mock<Story>()
 
 @RunWith(MockitoJUnitRunner::class)
 class StoriesViewModelTest {
@@ -111,12 +109,12 @@ class StoriesViewModelTest {
         assertEquals(state.currentStory, story1)
     }
 
-    class MockStoriesDataSource(private val mockStories: List<Story>) : StoriesDataSource {
-        override var stories: List<Story> = emptyList()
+    class MockStoriesDataSource(private val mockStories: List<Story>) : StoriesDataSource() {
+        override val stories = mutableListOf<Story>()
 
         override suspend fun loadStories(): Flow<List<Story>> {
-            stories = mockStories
-            return flowOf(mockStories)
+            stories.addAll(mockStories)
+            return flowOf(stories)
         }
 
         override fun storyAt(index: Int): Story? {
