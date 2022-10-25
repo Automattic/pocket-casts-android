@@ -13,6 +13,7 @@ include ':modules:features:podcasts'
 include ':modules:features:profile'
 include ':modules:features:search'
 include ':modules:features:settings'
+include ':modules:features:taskerplugin'
 
 // services
 include ':modules:services:analytics'
