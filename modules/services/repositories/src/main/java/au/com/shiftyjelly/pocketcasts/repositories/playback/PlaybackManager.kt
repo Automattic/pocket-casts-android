@@ -656,6 +656,12 @@ open class PlaybackManager @Inject constructor(
             seekToTimeMsInternal(chapter.startTime)
         }
     }
+    fun skipToChapter(index: Int) {
+        launch {
+            val chapter = playbackStateRelay.blockingFirst().chapters.getList().firstOrNull { it.index == index } ?: return@launch
+            seekToTimeMsInternal(chapter.startTime)
+        }
+    }
 
     fun clearUpNextAsync() {
         launch {
@@ -1911,7 +1917,8 @@ open class PlaybackManager @Inject constructor(
         AUTO_PAUSE("auto_pause"),
         PLAYER_PLAYBACK_EFFECTS("player_playback_effects"),
         PODCAST_SETTINGS("podcast_settings"),
-        UNKNOWN("unknown");
+        UNKNOWN("unknown"),
+        TASKER("tasker");
 
         fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
     }

@@ -136,10 +136,12 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
 
     private fun hideSystemUi() {
         getInsetsController()?.hide(WindowInsetsCompat.Type.statusBars())
+        getInsetsController()?.hide(WindowInsetsCompat.Type.navigationBars())
     }
 
     private fun showSystemUi() {
         getInsetsController()?.show(WindowInsetsCompat.Type.statusBars())
+        getInsetsController()?.show(WindowInsetsCompat.Type.navigationBars())
     }
 
     private fun getInsetsController(): WindowInsetsControllerCompat? {
