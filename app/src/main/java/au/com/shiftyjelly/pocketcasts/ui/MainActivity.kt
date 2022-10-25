@@ -266,7 +266,6 @@ class MainActivity :
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if (!videoPlayerShown && playbackManager.getCurrentEpisode()?.isVideo == true && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
                 openFullscreenViewPlayer()
-                videoPlayerShown = true
             } else {
                 videoPlayerShown = false
             }
@@ -274,6 +273,7 @@ class MainActivity :
     }
 
     private fun openFullscreenViewPlayer() {
+        videoPlayerShown = true
         startActivity(VideoActivity.buildIntent(context = this))
     }
 

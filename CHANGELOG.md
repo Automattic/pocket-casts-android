@@ -15,6 +15,8 @@
         ([#461](https://github.com/Automattic/pocket-casts-android/pull/461)).
     *   Fixed background color for screens using the compose theme
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
+    *   Fixed full screen video player not closing the first time in landscape mode
+        ([#464](https://github.com/Automattic/pocket-casts-android/pull/464)).
 
 7.25
 -----
