@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
@@ -35,6 +36,7 @@ import org.xml.sax.SAXException
 import org.xml.sax.helpers.DefaultHandler
 import java.io.InputStream
 import java.io.StringReader
+import java.net.URL
 import java.util.Scanner
 import java.util.regex.Pattern
 import javax.xml.parsers.SAXParserFactory
@@ -52,13 +54,23 @@ class OpmlImportTask @AssistedInject constructor(
 
     companion object {
         const val INPUT_URI = "INPUT_URI"
+        const val INPUT_URL = "INPUT_URL"
 
         fun run(uri: Uri, context: Context) {
+            val data = workDataOf(INPUT_URI to uri.toString())
+            run(data, context)
+        }
+
+        fun run(url: String, context: Context) {
+            val data = workDataOf(INPUT_URL to url)
+            run(data, context)
+        }
+
+        private fun run(data: Data, context: Context) {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
-            val data = workDataOf(INPUT_URI to uri.toString())
             val task = OneTimeWorkRequestBuilder<OpmlImportTask>()
                 .setInputData(data)
                 .setConstraints(constraints)
@@ -132,6 +144,12 @@ class OpmlImportTask @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
+            val url = inputData.getString(INPUT_URL)
+            if (!url.isNullOrBlank()) {
+                processUrl(URL(url))
+                return Result.success()
+            }
+
             val uri = Uri.parse(inputData.getString(INPUT_URI)) ?: return Result.failure()
             processFile(uri)
             return Result.success()
@@ -139,6 +157,22 @@ class OpmlImportTask @AssistedInject constructor(
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
             return Result.failure()
         }
+    }
+
+    private suspend fun processUrl(url: URL) {
+        var urls = emptyList<String>()
+
+        try {
+            url.openStream()?.use { inputStream ->
+                urls = readOpmlUrlsSax(inputStream)
+            }
+        } catch (e: SAXException) {
+            url.openStream()?.use { inputStream ->
+                urls = readOpmlUrlsRegex(inputStream)
+            }
+        }
+
+        processUrls(urls)
     }
 
     private suspend fun processFile(uri: Uri) {
@@ -155,6 +189,10 @@ class OpmlImportTask @AssistedInject constructor(
             }
         }
 
+        processUrls(urls)
+    }
+
+    private suspend fun processUrls(urls: List<String>) {
         val podcastCount = urls.size
         val initialDatabaseCount = podcastManager.countPodcasts()
 
