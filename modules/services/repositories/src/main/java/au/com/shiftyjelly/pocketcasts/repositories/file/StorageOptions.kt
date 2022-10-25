@@ -58,8 +58,8 @@ class StorageOptions {
 
         val resources = context.resources
         // the first mount point is different to the rest
-        if (!Environment.isExternalStorageRemovable()
-            || Environment.isExternalStorageEmulated()
+        if (!Environment.isExternalStorageRemovable() ||
+            Environment.isExternalStorageEmulated()
         ) {
             requireNotNull(folderLocations) {
                 "folderLocations can not be null"
