@@ -6,6 +6,8 @@
         ([#415](https://github.com/Automattic/pocket-casts-android/pull/431)).
     *   Import OPML from a URL
         ([#482](https://github.com/Automattic/pocket-casts-android/pull/482)).
+    *   Redesign of the fullscreen player share option
+        ([#451](https://github.com/Automattic/pocket-casts-android/pull/451)).
 *   Bug Fixes:
     *   Fixed Help & Feedback buttons being hidden when using text zoom.
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
