@@ -11,6 +11,12 @@ steps:
       ./gradlew testDebugUnitTest
     plugins: *common_plugins
 
+  - label: 'Spotless formatting check'
+    command: |
+      echo "--- 🔎 Checking formatting with Spotless"
+      ./gradlew spotlessCheck
+    plugins: *common_plugins
+
   - label: 'Lint'
     command: |
       echo "--- 🧹 Linting"

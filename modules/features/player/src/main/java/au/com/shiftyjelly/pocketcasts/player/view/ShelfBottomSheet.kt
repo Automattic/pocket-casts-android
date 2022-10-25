@@ -80,7 +80,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
                 playerViewModel.starToggle()
             }
             is ShelfItem.Share -> {
-                playerViewModel.shareDialog(context, parentFragmentManager)?.show()
+                ShareFragment().show(parentFragmentManager, "sleep")
             }
             is ShelfItem.Podcast -> {
                 (activity as FragmentHostListener).closePlayer()

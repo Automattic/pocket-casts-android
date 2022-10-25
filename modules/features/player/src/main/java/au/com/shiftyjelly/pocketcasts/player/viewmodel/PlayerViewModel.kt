@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.content.Context
 import android.content.res.Resources
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
@@ -41,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -460,24 +458,6 @@ class PlayerViewModel @Inject constructor(
 
     fun seekToMs(seekTimeMs: Int, seekComplete: () -> Unit) {
         playbackManager.seekToTimeMs(seekTimeMs, seekComplete)
-    }
-
-    fun shareDialog(context: Context?, fragmentManager: FragmentManager): ShareDialog? {
-        val contextFound = context ?: return null
-        val podcast = this.podcast ?: return null
-        val episode = this.episode ?: return null
-
-        return if (episode is Episode) {
-            ShareDialog(
-                podcast = podcast,
-                episode = episode,
-                fragmentManager = fragmentManager,
-                context = contextFound,
-                forceDarkTheme = true
-            )
-        } else {
-            null
-        }
     }
 
     override fun onCleared() {

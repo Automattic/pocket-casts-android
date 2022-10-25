@@ -4,6 +4,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import java.util.Date
 
+private val paidSubscriptionPlatforms = listOf(SubscriptionPlatform.ANDROID, SubscriptionPlatform.IOS, SubscriptionPlatform.WEB)
+
 sealed class SignInState {
     data class SignedIn(val email: String, val subscriptionStatus: SubscriptionStatus) : SignInState()
     class SignedOut : SignInState()
@@ -18,7 +20,7 @@ sealed class SignInState {
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus
 
     val isSignedInAsPlusPaid: Boolean
-        get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && this.subscriptionStatus.autoRenew
+        get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && paidSubscriptionPlatforms.contains(this.subscriptionStatus.platform)
 
     val isSignedInAsPlusGifted: Boolean
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && this.subscriptionStatus.platform == SubscriptionPlatform.GIFT && this.subscriptionStatus.giftDays != 0
