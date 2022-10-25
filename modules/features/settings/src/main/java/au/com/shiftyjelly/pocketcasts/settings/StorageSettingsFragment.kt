@@ -72,7 +72,7 @@ class StorageSettingsFragment : BaseFragment() {
         viewModel.onFragmentResume()
     }
 
-    private fun getFileLocations() = StorageOptions().getFolderLocations(activity)
+    private fun getFileLocations() = StorageOptions().getFolderLocations(requireActivity())
 
     private fun permissionGranted() =
         ContextCompat.checkSelfPermission(
