@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.util.Timer
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
@@ -31,17 +33,19 @@ class StoriesViewModel @Inject constructor(
     private var timerCancelled = false
 
     init {
-        val stories = storiesDataSource.loadStories()
-        val state = if (stories.isEmpty()) {
-            State.Error
-        } else {
-            State.Loaded(
-                currentStory = storiesDataSource.storyAt(currentIndex),
-                numberOfStories = numOfStories
-            )
+        viewModelScope.launch {
+            val stories = storiesDataSource.loadStories()
+            val state = if (stories.isEmpty()) {
+                State.Error
+            } else {
+                State.Loaded(
+                    currentStory = storiesDataSource.storyAt(currentIndex),
+                    numberOfStories = numOfStories
+                )
+            }
+            mutableState.value = state
+            if (state is State.Loaded) start()
         }
-        mutableState.value = state
-        if (state is State.Loaded) start()
     }
 
     fun start() {
