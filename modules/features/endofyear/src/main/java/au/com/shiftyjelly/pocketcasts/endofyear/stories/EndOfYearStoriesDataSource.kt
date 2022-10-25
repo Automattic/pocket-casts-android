@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.stories
 
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
@@ -10,6 +11,7 @@ class EndOfYearStoriesDataSource @Inject constructor() : StoriesDataSource {
     override var stories: List<Story> = emptyList()
 
     override suspend fun loadStories(): Flow<List<Story>> {
+        delay(1000L) // TODO: Remove hardcoded delay added for testing
         stories = listOf(StoryFake1(), StoryFake2())
         return flowOf(stories)
     }
