@@ -1,16 +1,25 @@
-# Description
+## Description
+<!-- Please include a summary of what this PR is changing and why these changes are needed. -->
 
-Please include a summary of the changes and the related issue.
+Fixes # <!-- issue number, if applicable -->
 
-Fixes # (issue)
+## Testing Instructions
+<!-- Please include step by step instructions on how to test this PR. -->
+<!-- 1. Tap on the Filters tab -->
+<!-- 2. Tap on a filter -->
+<!-- 3. etc. -->
 
-# Checklist
+## Screenshots or Screencast 
+<!-- if applicable -->
 
-- [ ] Should this change be included in the release notes? If yes, please add a line in CHANGELOG.md
-- [ ] Have you tested in landscape?
-- [ ] Have you tested accessibility with TalkBack?
-- [ ] Have you tested in different themes?
-- [ ] Does the change work with a large display font?
-- [ ] Are all the strings localized?
-- [ ] Could you have written any new tests?
-- [ ] Did you include Compose previews with any components?
+## Checklist
+- [ ] If this is a user-facing change, I have added an entry in CHANGELOG.md
+- [ ] I have considered whether it makes sense to add tests for my changes
+- [ ] Any jetpack compose components I added or changed are covered by compose previews
+ 
+#### I have tested any UI changes...
+<!-- If this PR does not contain UI changes, ignore these items -->
+- [ ] with different themes
+- [ ] with a landscape orientation
+- [ ] with the device set to have a large display and font size
+- [ ] for accessibility with TalkBack
