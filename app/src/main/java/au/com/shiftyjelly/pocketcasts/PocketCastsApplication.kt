@@ -8,6 +8,7 @@ import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -70,7 +71,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var appIcon: AppIcon
     @Inject lateinit var coilImageLoader: ImageLoader
     @Inject lateinit var userManager: UserManager
-    @Inject lateinit var tracker: TracksAnalyticsTracker
+    @Inject lateinit var tracksTracker: TracksAnalyticsTracker
+    @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
     @Inject lateinit var auth: AccountAuth
 
     private val applicationScope = MainScope()
@@ -102,7 +104,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     }
 
     private fun setupAnalytics() {
-        AnalyticsTracker.registerTracker(tracker)
+        AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
         retrieveUserIdIfNeededAndRefreshMetadata()
     }
