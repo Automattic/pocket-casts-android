@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -241,7 +242,7 @@ private fun StoriesScreenPreview(
 ) {
     AppTheme(themeType) {
         StoriesView(
-            state = State.Loaded(currentStory = StoryFake1(), numberOfStories = 2),
+            state = State.Loaded(currentStory = StoryFake1(listOf(Podcast())), numberOfStories = 2),
             progress = 0.5f,
             onSkipPrevious = {},
             onSkipNext = {},
