@@ -8,6 +8,8 @@
         ([#482](https://github.com/Automattic/pocket-casts-android/pull/482)).
     *   Redesign of the fullscreen player share option
         ([#451](https://github.com/Automattic/pocket-casts-android/pull/451)).
+    *   Redesign of the fullscreen player long press option
+        ([#483](https://github.com/Automattic/pocket-casts-android/pull/483)).
     *   Updated select filters title & hide podcast setting filter option when applicable
         ([#494](https://github.com/Automattic/pocket-casts-android/pull/494)).
 *   Bug Fixes:
