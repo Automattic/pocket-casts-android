@@ -1,20 +1,26 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.stories
 
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EndOfYearManager
+import kotlinx.coroutines.flow.combine
 import timber.log.Timber
 import javax.inject.Inject
 
-class EndOfYearStoriesDataSource @Inject constructor() : StoriesDataSource() {
+class EndOfYearStoriesDataSource @Inject constructor(
+    private val endOfYearManager: EndOfYearManager,
+) : StoriesDataSource() {
     override val stories = mutableListOf<Story>()
 
-    override suspend fun loadStories(): Flow<List<Story>> {
-        delay(1000L) // TODO: Remove hardcoded delay added for testing
-        stories.addAll(listOf(StoryFake1(), StoryFake2()))
-        return flowOf(stories)
-    }
+    override suspend fun loadStories() =
+        combine(
+            endOfYearManager.findRandomPodcasts(),
+            endOfYearManager.findRandomEpisode()
+        ) { podcasts, episode ->
+            if (podcasts.isNotEmpty()) stories.add(StoryFake1(podcasts))
+            episode?.let { stories.add(StoryFake2(it)) }
+
+            stories
+        }
 
     override fun storyAt(index: Int) = try {
         stories[index]
