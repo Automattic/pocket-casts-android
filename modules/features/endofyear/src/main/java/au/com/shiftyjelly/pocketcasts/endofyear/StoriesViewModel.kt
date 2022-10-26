@@ -1,12 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Timer
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
@@ -37,10 +40,15 @@ class StoriesViewModel @Inject constructor(
                 val state = if (stories.isEmpty()) {
                     State.Error
                 } else {
-                    State.Loaded(
-                        currentStory = storiesDataSource.storyAt(currentIndex),
-                        numberOfStories = numOfStories
-                    )
+                    with(storiesDataSource) {
+                        State.Loaded(
+                            currentStory = storyAt(currentIndex),
+                            segmentsData = SegmentsData(
+                                xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
+                                widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
+                            )
+                        )
+                    }
                 }
                 mutableState.value = state
                 if (state is State.Loaded) start()
@@ -85,6 +93,7 @@ class StoriesViewModel @Inject constructor(
     private fun skipToStoryAtIndex(index: Int) {
         if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
+        currentIndex = index
         mutableState.value =
             (state.value as State.Loaded).copy(currentStory = storiesDataSource.storyAt(index))
     }
@@ -101,16 +110,28 @@ class StoriesViewModel @Inject constructor(
 
     private fun Float.roundOff() = (this * 100.0).roundToInt()
 
-    private fun getXStartOffsetAtIndex(index: Int) =
-        (PROGRESS_END_VALUE / numOfStories.toFloat()).coerceAtMost(PROGRESS_END_VALUE) * index
+    @FloatRange(from = 0.0, to = 1.0)
+    fun getXStartOffsetAtIndex(index: Int): Float {
+        val sumOfStoryLengthsTillIndex = try {
+            storiesDataSource.storyLengthsInMs.subList(0, index).sum()
+        } catch (e: IndexOutOfBoundsException) {
+            Timber.e("Story offset checked at invalid index")
+            0L
+        }
+        return (sumOfStoryLengthsTillIndex + StoriesDataSource.STORY_GAP_LENGTH_MS * index) / storiesDataSource.totalLengthInMs.toFloat()
+    }
 
     sealed class State {
         object Loading : State()
         data class Loaded(
             val currentStory: Story?,
-            val numberOfStories: Int,
-        ) : State()
-
+            val segmentsData: SegmentsData,
+        ) : State() {
+            data class SegmentsData(
+                val widths: List<Float> = emptyList(),
+                val xStartOffsets: List<Float> = emptyList(),
+            )
+        }
         object Error : State()
     }
 
