@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColors
@@ -177,9 +178,11 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
             hideLoading()
         }
 
-        viewModel.includedFilters.observe(viewLifecycleOwner) {
-            updateFiltersSummary(it)
-        }
+        viewModel.includedFilters
+            .combineLatest(viewModel.availableFilters)
+            .observe(viewLifecycleOwner) { (included, available) ->
+                updateFiltersSummary(included, available)
+            }
 
         viewModel.globalSettings.observe(viewLifecycleOwner) {
             val summary = when (it.second) {
@@ -418,13 +421,14 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
         preferenceSkipLast?.icon = context.getTintedDrawable(R.drawable.ic_skip_outro, tintColor)
     }
 
-    private fun updateFiltersSummary(filters: List<Playlist>) {
-        val filterTitles = filters.map { it.title }
+    private fun updateFiltersSummary(includedFilters: List<Playlist>, availableFilters: List<Playlist>) {
+        val filterTitles = includedFilters.map { it.title }
         if (filterTitles.isEmpty()) {
             preferenceFilters?.summary = getString(LR.string.podcast_not_in_filters)
         } else {
             preferenceFilters?.summary = getString(LR.string.podcast_included_in_filters, filterTitles.joinToString())
         }
+        preferenceFilters?.isVisible = availableFilters.isNotEmpty()
     }
 
     override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {
