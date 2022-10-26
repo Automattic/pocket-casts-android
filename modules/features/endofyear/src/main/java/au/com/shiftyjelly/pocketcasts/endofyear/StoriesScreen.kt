@@ -42,6 +42,9 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake2
+import au.com.shiftyjelly.pocketcasts.endofyear.storyviews.StoryFake1View
+import au.com.shiftyjelly.pocketcasts.endofyear.storyviews.StoryFake2View
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -141,8 +144,14 @@ private fun StoryView(
                 .fillMaxSize()
                 .weight(weight = 1f, fill = true)
                 .clip(RoundedCornerShape(StoryViewCornerSize))
-                .background(color = story.backgroundColor)
-        ) {}
+                .background(color = story.backgroundColor),
+            contentAlignment = Alignment.Center
+        ) {
+            when (story) {
+                is StoryFake1 -> StoryFake1View(story)
+                is StoryFake2 -> StoryFake2View(story)
+            }
+        }
         ShareButton()
     }
 }

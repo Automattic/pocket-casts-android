@@ -27,6 +27,7 @@ fun PodcastItem(
     modifier: Modifier = Modifier,
     subscribed: Boolean = false,
     showSubscribed: Boolean = false,
+    showDivider: Boolean = true,
 ) {
     Column {
         Row(
@@ -65,6 +66,8 @@ fun PodcastItem(
                 )
             }
         }
-        HorizontalDivider()
+        if (showDivider) {
+            HorizontalDivider()
+        }
     }
 }
