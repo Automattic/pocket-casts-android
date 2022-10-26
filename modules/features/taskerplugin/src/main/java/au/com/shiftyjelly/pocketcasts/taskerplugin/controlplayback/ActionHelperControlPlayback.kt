@@ -13,6 +13,8 @@ class ActionHelperControlPlayback(config: TaskerPluginConfig<InputControlPlaybac
         when (commandEnum) {
             InputControlPlayback.PlaybackCommand.SkipToChapter -> blurbBuilder.append("\n${context.getString(au.com.shiftyjelly.pocketcasts.localization.R.string.chapter_to_skip_to)}: ${inputControlPlayback.chapterToSkipTo}")
             InputControlPlayback.PlaybackCommand.SkipToTime -> blurbBuilder.append("\n${context.getString(au.com.shiftyjelly.pocketcasts.localization.R.string.time_to_skip_to_seconds)}: ${inputControlPlayback.timeToSkipToSeconds}")
+            InputControlPlayback.PlaybackCommand.SkipForward -> blurbBuilder.append("\n${context.getString(au.com.shiftyjelly.pocketcasts.localization.R.string.skip_forward)}: ${inputControlPlayback.timeToSkipSeconds}")
+            InputControlPlayback.PlaybackCommand.SkipBack -> blurbBuilder.append("\n${context.getString(au.com.shiftyjelly.pocketcasts.localization.R.string.skip_back)}: ${inputControlPlayback.timeToSkipSeconds}")
             else -> {}
         }
     }

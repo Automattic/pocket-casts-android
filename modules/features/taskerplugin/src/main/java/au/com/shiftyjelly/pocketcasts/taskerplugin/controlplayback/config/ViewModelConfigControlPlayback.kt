@@ -17,12 +17,14 @@ class ViewModelConfigControlPlayback @Inject constructor(
 
     /**
      * A field that only appears depending on the type of the playback command. For example, the field "Time to Skip To" will only appear if the command is "Skip To Time"
-     * @param showForCommand the type of playback command that makes this field appear
+     * @param showForCommands the types of playback commands that makes this field appear
      * @param valueGetter how to get the value of this input field from the Tasker input
      * @param valueSetter how to set a newly assigned value of this field to the Tasker input
      */
-    inner class OptionalField(val showForCommand: InputControlPlayback.PlaybackCommand, valueGetter: (InputControlPlayback?) -> String?, val valueSetter: (String?) -> Unit) {
-        private val askFor get() = input?.commandEnum == showForCommand
+    inner class OptionalField constructor(val showForCommands: List<InputControlPlayback.PlaybackCommand>, valueGetter: (InputControlPlayback?) -> String?, val valueSetter: (String?) -> Unit) {
+        constructor(showForCommand: InputControlPlayback.PlaybackCommand, valueGetter: (InputControlPlayback?) -> String?, valueSetter: (String?) -> Unit) : this(listOf(showForCommand), valueGetter, valueSetter)
+
+        private val askFor get() = showForCommands.contains(input?.commandEnum)
         val shouldAskForState by lazy { MutableStateFlow(askFor) }
         fun updateAskForState() {
             shouldAskForState.tryEmit(askFor)
@@ -41,9 +43,11 @@ class ViewModelConfigControlPlayback @Inject constructor(
      */
     private val optionalFieldChapterToSkipTo by lazy { OptionalField(InputControlPlayback.PlaybackCommand.SkipToChapter, { input?.chapterToSkipTo }, { input?.chapterToSkipTo = it }) }
     private val optionalFieldTimeToSkipTo by lazy { OptionalField(InputControlPlayback.PlaybackCommand.SkipToTime, { input?.timeToSkipToSeconds }, { input?.timeToSkipToSeconds = it }) }
+    private val optionalFieldTimeToSkip by lazy { OptionalField(listOf(InputControlPlayback.PlaybackCommand.SkipForward, InputControlPlayback.PlaybackCommand.SkipBack), { input?.timeToSkipSeconds }, { input?.timeToSkipSeconds = it }) }
     private val optionalFields = listOf(
         optionalFieldChapterToSkipTo,
-        optionalFieldTimeToSkipTo
+        optionalFieldTimeToSkipTo,
+        optionalFieldTimeToSkip
     )
 
     val commandState by lazy {
@@ -70,10 +74,18 @@ class ViewModelConfigControlPlayback @Inject constructor(
     /*End chapter To skip to*/
 
     /*Time To skip to*/
-    val showAskForTime get() = optionalFieldTimeToSkipTo.shouldAskForState
+    val showAskForTimeToSkipTo get() = optionalFieldTimeToSkipTo.shouldAskForState
     val timeToSkipTo get() = optionalFieldTimeToSkipTo.valueState
     fun setTimeToSkipTo(value: String) {
         optionalFieldTimeToSkipTo.value = value
+    }
+    /*End time To skip to*/
+
+    /*Time To skip */
+    val showAskForTimeToSkip get() = optionalFieldTimeToSkip.shouldAskForState
+    val timeToSkip get() = optionalFieldTimeToSkip.valueState
+    fun setTimeToSkip(value: String) {
+        optionalFieldTimeToSkip.value = value
     }
     /*End time To skip to*/
 }
