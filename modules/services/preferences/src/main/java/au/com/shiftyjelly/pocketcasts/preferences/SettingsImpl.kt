@@ -68,6 +68,7 @@ class SettingsImpl @Inject constructor(
         private const val SEND_USAGE_STATS_KEY = "SendUsageStatsKey"
         private const val SEND_CRASH_REPORTS_KEY = "SendCrashReportsKey"
         private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
+        private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
     }
 
     private var languageCode: String? = null
@@ -1445,4 +1446,11 @@ class SettingsImpl @Inject constructor(
 
     override fun getLinkCrashReportsToUser(): Boolean =
         getBoolean(LINK_CRASH_REPORTS_TO_USER_KEY, false)
+
+    override fun setEndOfYearShowBadge2022(value: Boolean) {
+        setBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, value)
+    }
+
+    override fun getEndOfYearShowBadge2022(): Boolean =
+        getBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, true)
 }
