@@ -6,4 +6,5 @@ import au.com.shiftyjelly.pocketcasts.utils.seconds
 abstract class Story {
     open val storyLength: Long = 2.seconds()
     abstract val backgroundColor: Color
+    val tintColor: Color = Color.White
 }

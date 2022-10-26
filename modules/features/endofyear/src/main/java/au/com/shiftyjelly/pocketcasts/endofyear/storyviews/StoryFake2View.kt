@@ -19,6 +19,7 @@ fun StoryFake2View(
         TextH30(
             text = "The longest episode you listened to was ${story.episode.title}",
             textAlign = TextAlign.Center,
+            color = story.tintColor,
             modifier = modifier
                 .fillMaxWidth()
                 .padding(16.dp)

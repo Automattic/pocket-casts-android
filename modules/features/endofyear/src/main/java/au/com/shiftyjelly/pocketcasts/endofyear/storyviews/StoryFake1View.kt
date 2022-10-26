@@ -21,6 +21,7 @@ fun StoryFake1View(
         TextH30(
             text = "Your Top Podcasts",
             textAlign = TextAlign.Center,
+            color = story.tintColor,
             modifier = modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -30,6 +31,7 @@ fun StoryFake1View(
                 PodcastItem(
                     podcast = story.podcasts[index],
                     onClick = {},
+                    tintColor = story.tintColor,
                     showDivider = false
                 )
             }

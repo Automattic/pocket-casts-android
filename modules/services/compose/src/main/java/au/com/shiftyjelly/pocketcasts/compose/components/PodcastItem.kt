@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,7 @@ fun PodcastItem(
     podcast: Podcast,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    tintColor: Color? = null,
     subscribed: Boolean = false,
     showSubscribed: Boolean = false,
     showDivider: Boolean = true,
@@ -50,19 +52,20 @@ fun PodcastItem(
             ) {
                 TextP40(
                     text = podcast.title,
-                    maxLines = 1
+                    maxLines = 1,
+                    color = tintColor ?: MaterialTheme.theme.colors.primaryText01
                 )
                 TextP50(
                     text = podcast.author,
                     maxLines = 1,
-                    color = MaterialTheme.theme.colors.primaryText02
+                    color = tintColor ?: MaterialTheme.theme.colors.primaryText02
                 )
             }
             if (subscribed && showSubscribed) {
                 Icon(
                     painter = painterResource(IR.drawable.ic_tick),
                     contentDescription = stringResource(LR.string.podcast_subscribed),
-                    tint = MaterialTheme.theme.colors.support02
+                    tint = tintColor ?: MaterialTheme.theme.colors.support02
                 )
             }
         }
