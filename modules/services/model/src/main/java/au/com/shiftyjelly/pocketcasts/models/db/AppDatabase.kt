@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConve
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
-import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
@@ -74,7 +74,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun upNextChangeDao(): UpNextChangeDao
     abstract fun userEpisodeDao(): UserEpisodeDao
     abstract fun folderDao(): FolderDao
-    abstract fun bumpStatDao(): BumpStatDao
+    abstract fun bumpStatsDao(): BumpStatsDao
 
     companion object {
         // This seems dodgy but I got it from Google, https://github.com/googlesamples/android-sunflower/blob/master/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt

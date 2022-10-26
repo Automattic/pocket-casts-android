@@ -26,7 +26,7 @@ class BumpStatsTask @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
 
-        val bumpStatsDao = appDatabase.bumpStatDao()
+        val bumpStatsDao = appDatabase.bumpStatsDao()
         val bumpStats = bumpStatsDao.get()
 
         return if (bumpStats.isNotEmpty()) {

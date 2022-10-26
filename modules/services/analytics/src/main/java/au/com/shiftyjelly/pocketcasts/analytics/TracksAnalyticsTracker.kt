@@ -17,7 +17,7 @@ class TracksAnalyticsTracker @Inject constructor(
     @PublicSharedPreferences preferences: SharedPreferences,
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
-) : Tracker(preferences) {
+) : IdentifyingTracker(preferences) {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
     override val anonIdPrefKey: String = TRACKS_ANON_ID
     private val plusSubscription: SubscriptionStatus.Plus?

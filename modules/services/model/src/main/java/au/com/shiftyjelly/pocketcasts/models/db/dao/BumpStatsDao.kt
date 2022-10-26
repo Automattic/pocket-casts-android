@@ -8,7 +8,7 @@ import androidx.room.Query
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 
 @Dao
-abstract class BumpStatDao {
+abstract class BumpStatsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(bumpStat: AnonymousBumpStat)
