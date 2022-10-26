@@ -7,7 +7,7 @@
         android:name=".playplaylist.config.ActivityConfigPlayPlaylist"
         android:exported="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Pocket Casts Play Filter">
+        android:label="@string/pocket_casts_play_filter">
         <intent-filter>
             <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
         </intent-filter>
@@ -16,7 +16,7 @@
         android:name=".controlplayback.config.ActivityConfigControlPlayback"
         android:exported="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Pocket Casts Control Playback">
+        android:label="@string/pocket_casts_control_playback">
         <intent-filter>
             <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
         </intent-filter>
