@@ -26,6 +26,8 @@ We always try to avoid duplicating efforts, so if you decide to work on an issue
 
 If the change is trivial, feel free to send a pull request without notifying us.
 
+We use [Spotless](https://github.com/diffplug/spotless) to maintain a consistent code style consistent. Please run the `spotlessCheck` gradle task to check for any issues with your code (which can be fixed with `spotlessApply`).
+
 ### Pull Requests and Code Reviews
 
 All code contributions pass through pull requests. If you haven't created a pull request before, we recommend this free video series, [How to Contribute to an Open Source Project on GitHub](https://egghead.io/courses/how-to-contribute-to-an-open-source-project-on-github).
@@ -40,4 +42,4 @@ Note: If you are part of the org and have the permissions on the repo, don't for
 
 * PRs require one reviewer to approve the PR before it can be merged to the base branch
 * We keep the PR git history when merging (merge via "merge commit")
-* The reviewer who approved the PR will merge it right after approval (without waiting for the PR author) if all checks are green.
+* The reviewer who approved the PR may merge it right after approval (without waiting for the PR author) if all checks are green.

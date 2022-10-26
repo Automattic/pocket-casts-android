@@ -973,6 +973,7 @@
     <string name="settings_battery_update_message">Please tap the \"%s\" switch above to update your battery settings.</string>
     <string name="settings_battery_usage_message">Battery usage must be unrestricted to ensure uninterrupted playback when your screen is off.</string>
     <string name="settings_battery_learn_more_url" translatable="false">https://support.pocketcasts.com/article/playback-pausing-randomly-or-when-screen-is-locked/</string>
+    <string name="settings_select_filters">Select filters</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
     <string name="settings_developer">Developer</string>
@@ -992,6 +993,8 @@
     <string name="settings_import_choose_file">Choose an OPML file.</string>
     <string name="settings_import_file">Select file</string>
     <string name="settings_import_file_summary">If you have podcast subscriptions in another app or service, Pocket Casts can import them from an OPML file.</string>
+    <string name="settings_import_url">By URL</string>
+    <string name="settings_import_url_summary">Import your podcasts from an OPML file using a URL.</string>
     <string name="settings_import_opml_progress">%1$d of %2$d podcasts</string>
     <string name="settings_import_opml_stop">Stop</string>
     <string name="settings_import_opml_title">Import OPML</string>

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import java.io.BufferedReader;
 import java.io.File;
@@ -179,7 +181,7 @@ public class FileUtil {
     }
 
 
-    public static Uri createUriWithReadPermissions(File file, Intent intent, Context context) {
+    public static Uri createUriWithReadPermissions(@NonNull File file, @NonNull Intent intent, @NonNull Context context) {
         Uri uri = FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".fileprovider", file);
         // give the email clients read access
         List<ResolveInfo> resInfoList = context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
