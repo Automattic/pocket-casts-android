@@ -551,4 +551,7 @@ interface Settings {
 
     fun setLinkCrashReportsToUser(value: Boolean)
     fun getLinkCrashReportsToUser(): Boolean
+
+    fun setEndOfYearShowBadge2022(value: Boolean)
+    fun getEndOfYearShowBadge2022(): Boolean
 }

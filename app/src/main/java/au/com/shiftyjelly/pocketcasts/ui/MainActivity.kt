@@ -186,6 +186,10 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
+        if (settings.getEndOfYearShowBadge2022()) {
+            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+        }
+
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(
             VR.id.navigation_podcasts to { FragmentInfo(PodcastsFragment(), true) },
@@ -243,7 +247,11 @@ class MainActivity :
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
+                            VR.id.navigation_profile -> {
+                                binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+                                settings.setEndOfYearShowBadge2022(false)
+                                FirebaseAnalyticsTracker.navigatedToProfile()
+                            }
                         }
                     }
                     settings.setSelectedTab(currentTab)
