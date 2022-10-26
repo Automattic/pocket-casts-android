@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.endofyear.storyviews
+package au.com.shiftyjelly.pocketcasts.endofyear.views
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
