@@ -368,7 +368,7 @@ abstract class AppDatabase : RoomDatabase() {
                       name TEXT NOT NULL,
                       event_time INTEGER NOT NULL,
                       custom_event_props TEXT NOT NULL,
-                      PRIMARY KEY(name, event_time)
+                      PRIMARY KEY(name, event_time, custom_event_props)
                     );
                 """.trimIndent()
             )

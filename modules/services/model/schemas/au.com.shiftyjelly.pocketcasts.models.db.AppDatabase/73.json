@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 73,
-    "identityHash": "514e25c0954e7886b6a00c8c07bae784",
+    "identityHash": "d858de797cee44020ce6b3c728e81aff",
     "entities": [
       {
         "tableName": "bump_stats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `event_time` INTEGER NOT NULL, `custom_event_props` TEXT NOT NULL, PRIMARY KEY(`name`, `event_time`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `event_time` INTEGER NOT NULL, `custom_event_props` TEXT NOT NULL, PRIMARY KEY(`name`, `event_time`, `custom_event_props`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -30,7 +30,8 @@
         "primaryKey": {
           "columnNames": [
             "name",
-            "event_time"
+            "event_time",
+            "custom_event_props"
           ],
           "autoGenerate": false
         },
@@ -1252,7 +1253,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '514e25c0954e7886b6a00c8c07bae784')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd858de797cee44020ce6b3c728e81aff')"
     ]
   }
 }
