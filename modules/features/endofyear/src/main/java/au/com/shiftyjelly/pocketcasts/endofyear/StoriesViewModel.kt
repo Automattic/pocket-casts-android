@@ -30,7 +30,6 @@ class StoriesViewModel @Inject constructor(
         get() = (currentIndex.plus(1)).coerceAtMost(numOfStories.minus(1))
 
     private var timer: Timer? = null
-    private var timerCancelled = false
 
     init {
         viewModelScope.launch {
@@ -56,7 +55,6 @@ class StoriesViewModel @Inject constructor(
                 .coerceAtMost(PROGRESS_END_VALUE)
 
         timer = fixedRateTimer(period = PROGRESS_UPDATE_INTERVAL_MS) {
-            timerCancelled = false
             val newProgress = (progress.value + progressFraction)
                 .coerceIn(PROGRESS_START_VALUE, PROGRESS_END_VALUE)
 
@@ -85,7 +83,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     private fun skipToStoryAtIndex(index: Int) {
-        if (timerCancelled) start()
+        if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         mutableState.value =
             (state.value as State.Loaded).copy(currentStory = storiesDataSource.storyAt(index))
@@ -93,7 +91,7 @@ class StoriesViewModel @Inject constructor(
 
     private fun cancelTimer() {
         timer?.cancel()
-        timerCancelled = true
+        timer = null
     }
 
     override fun onCleared() {
