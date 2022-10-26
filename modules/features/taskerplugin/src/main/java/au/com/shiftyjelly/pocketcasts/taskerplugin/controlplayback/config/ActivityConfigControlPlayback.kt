@@ -14,11 +14,12 @@ class ActivityConfigControlPlayback : ActivityConfigBase<ViewModelConfigControlP
 
     @Composable
     override fun Content() {
+        val taskerVariables = viewModel.taskerVariables
         val commandContent = TaskerInputFieldState.Content(
             viewModel.commandState.collectAsState().value,
             au.com.shiftyjelly.pocketcasts.localization.R.string.playback_command,
             { viewModel.command = it },
-            viewModel.taskerVariables,
+            taskerVariables,
             viewModel.availableCommands.toList()
         ) {
             Text(viewModel.getDescription(it))
@@ -28,17 +29,27 @@ class ActivityConfigControlPlayback : ActivityConfigBase<ViewModelConfigControlP
                 viewModel.chapterToSkipTo.collectAsState().value,
                 au.com.shiftyjelly.pocketcasts.localization.R.string.chapter_to_skip_to,
                 { viewModel.setChapterToSkipTo(it) },
-                viewModel.taskerVariables
+                taskerVariables
             )
         } else {
             null
         }
-        val timeToSkipToContent = if (viewModel.showAskForTime.collectAsState().value) {
+        val timeToSkipToContent = if (viewModel.showAskForTimeToSkipTo.collectAsState().value) {
             TaskerInputFieldState.Content<String>(
                 viewModel.timeToSkipTo.collectAsState().value,
                 au.com.shiftyjelly.pocketcasts.localization.R.string.time_to_skip_to_seconds,
                 { viewModel.setTimeToSkipTo(it) },
-                viewModel.taskerVariables
+                taskerVariables
+            )
+        } else {
+            null
+        }
+        val timeToSkipContent = if (viewModel.showAskForTimeToSkip.collectAsState().value) {
+            TaskerInputFieldState.Content<String>(
+                viewModel.timeToSkip.collectAsState().value,
+                au.com.shiftyjelly.pocketcasts.localization.R.string.time_to_skip_seconds,
+                { viewModel.setTimeToSkip(it) },
+                taskerVariables
             )
         } else {
             null
@@ -46,7 +57,8 @@ class ActivityConfigControlPlayback : ActivityConfigBase<ViewModelConfigControlP
         ComposableConfigControlPlayback(
             commandContent,
             chapterToSkipToContent,
-            timeToSkipToContent
+            timeToSkipToContent,
+            timeToSkipContent
         ) { viewModel.finishForTasker() }
     }
 }
