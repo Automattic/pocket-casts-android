@@ -107,17 +107,27 @@
                 app:layout_constraintStart_toStartOf="@+id/lblDaysSaved"
                 app:layout_constraintTop_toBottomOf="@+id/lblDaysSaved" />
 
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/endOfYearPromptCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="?attr/primary_ui_02"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imgBannerBackground" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/primary_ui_02"
                 android:clipToPadding="false"
-                android:paddingTop="16dp"
                 android:paddingBottom="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/imgBannerBackground" />
+                app:layout_constraintTop_toBottomOf="@id/endOfYearPromptCard" />
 
             <TextView
                 android:id="@+id/lblRefreshStatus"
