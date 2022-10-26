@@ -183,7 +183,7 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
-        if (settings.getEndOfYearShowBadge2022()) {
+        if (BuildConfig.END_OF_YEAR_ENABLED && settings.getEndOfYearShowBadge2022()) {
             binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
         }
 
