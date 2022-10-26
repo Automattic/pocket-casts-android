@@ -38,6 +38,7 @@
             android:supportsRtl="false"
             tools:replace="android:supportsRtl"
             android:theme="@style/ThemeDark"
+            android:networkSecurityConfig="@xml/network_security_config"
             tools:ignore="UnusedAttribute">
 
         <meta-data android:name="com.google.android.gms.car.application"
