@@ -13,11 +13,13 @@ fun ComposableConfigControlPlayback(
     inputCommandContent: TaskerInputFieldState.Content<InputControlPlayback.PlaybackCommand>,
     inputChapterToSkipToContent: TaskerInputFieldState.Content<String>?,
     inputTimeToSkipToContent: TaskerInputFieldState.Content<String>?,
+    inputTimeToSkipContent: TaskerInputFieldState.Content<String>?,
     onFinish: () -> Unit
 ) {
     val inputList = mutableListOf<TaskerInputFieldState.Content<*>>(inputCommandContent)
     inputChapterToSkipToContent?.let { inputList.add(it) }
     inputTimeToSkipToContent?.let { inputList.add(it) }
+    inputTimeToSkipContent?.let { inputList.add(it) }
     ComposableTaskerInputFieldList(inputList, onFinish)
 }
 
@@ -40,6 +42,11 @@ private fun ComposableConfigControlPlaybackPreview() {
             TaskerInputFieldState.Content(
                 "60",
                 au.com.shiftyjelly.pocketcasts.localization.R.string.time_to_skip_to_seconds,
+                {}, listOf("%test")
+            ),
+            TaskerInputFieldState.Content(
+                "60",
+                au.com.shiftyjelly.pocketcasts.localization.R.string.time_to_skip_seconds,
                 {}, listOf("%test")
             )
         ) {}

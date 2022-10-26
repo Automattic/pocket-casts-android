@@ -1406,6 +1406,7 @@
     <string name="play_next_in_queue">Play Next In Queue</string>
     <string name="skip_to_time">Skip To Time</string>
     <string name="time_to_skip_to_seconds">Time To Skip To (Seconds)</string>
+    <string name="time_to_skip_seconds">Time To Skip (Seconds)</string>
     <string name="time_to_skip_to_not_valid">Time to skip to %1$s not valid</string>
     <string name="pocket_casts_play_filter">Pocket Casts Play Filter</string>
     <string name="pocket_casts_control_playback">Pocket Casts Control Playback</string>
