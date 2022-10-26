@@ -9,7 +9,7 @@ import com.squareup.moshi.ToJson
 import com.squareup.moshi.Types
 import timber.log.Timber
 
-@Entity(tableName = "bump_stats", primaryKeys = ["name", "event_time"])
+@Entity(tableName = "bump_stats", primaryKeys = ["name", "event_time", "custom_event_props"])
 data class AnonymousBumpStat(
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "event_time") var eventTime: Long = System.currentTimeMillis(),
