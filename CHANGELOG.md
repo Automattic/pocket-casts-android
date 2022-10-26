@@ -15,6 +15,8 @@
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
     *   Fixed when system bar didn't disappear on full screen video player
         ([#461](https://github.com/Automattic/pocket-casts-android/pull/461)).
+    *   Fixed When no podcasts were selected for a filter, change the chip to 'All Your Podcasts'
+        ([#460](https://github.com/Automattic/pocket-casts-android/pull/460)).
     *   Fixed background color for screens using the compose theme
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
     *   Fixed full screen video player not closing the first time in landscape mode
