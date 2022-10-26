@@ -32,11 +32,10 @@ class AnonymousBumpStatsTracker @Inject constructor(
     override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
         if (shouldTrack(event)) {
             launch {
-                val name = "pcandroid_" + event.name.lowercase(Locale.ENGLISH) + "_bump"
                 val bumpStat = AnonymousBumpStat(
-                    name = name,
+                    name = event.name.lowercase(Locale.getDefault()),
                     customEventProps = properties
-                )
+                ).withBumpName()
                 bumpStatsDao.insert(bumpStat)
             }
         }
