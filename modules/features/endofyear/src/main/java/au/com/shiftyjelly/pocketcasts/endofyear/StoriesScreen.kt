@@ -124,7 +124,7 @@ private fun StoriesView(
         }
         SegmentedProgressIndicator(
             progress = progress,
-            numberOfSegments = state.numberOfStories,
+            segmentsData = state.segmentsData,
             modifier = modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
@@ -251,8 +251,14 @@ private fun StoriesScreenPreview(
 ) {
     AppTheme(themeType) {
         StoriesView(
-            state = State.Loaded(currentStory = StoryFake1(listOf(Podcast())), numberOfStories = 2),
-            progress = 0.5f,
+            state = State.Loaded(
+                currentStory = StoryFake1(listOf(Podcast())),
+                segmentsData = State.Loaded.SegmentsData(
+                    xStartOffsets = listOf(0.0f, 0.28f),
+                    widths = listOf(0.25f, 0.75f)
+                )
+            ),
+            progress = 0.75f,
             onSkipPrevious = {},
             onSkipNext = {},
             onPause = {},
