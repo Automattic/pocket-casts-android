@@ -8,10 +8,11 @@ import androidx.compose.runtime.Composable
 @Composable
 fun LoginOrSignUpView(
     onNotNowPressed: () -> Unit,
+    onSignUpFreePressed: () -> Unit,
     showToast: (String) -> Unit
 ) {
     Column {
-        Text(OnboardingNavRoute.login_or_sign_up)
+        Text(OnboardingNavRoute.loginOrSignUp)
 
         Button(onClick = onNotNowPressed) {
             Text("Not Now")
@@ -23,9 +24,7 @@ fun LoginOrSignUpView(
             Text("Continue with Google")
         }
 
-        Button(onClick = {
-            showToast("Tapped\nSign up Free")
-        }) {
+        Button(onClick = onSignUpFreePressed) {
             Text("Sign up Free")
         }
 

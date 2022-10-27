@@ -268,7 +268,9 @@ class MainActivity :
         }
 
         if (BuildConfig.ONBOARDING_ENABLED) {
-            showBottomSheet(OnboardingFragment())
+            supportFragmentManager.commitNow {
+                replace(R.id.onboardingFrame, OnboardingFragment())
+            }
         }
     }
 
