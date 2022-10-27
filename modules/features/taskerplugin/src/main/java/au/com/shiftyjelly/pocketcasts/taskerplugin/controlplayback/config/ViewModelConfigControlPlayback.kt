@@ -42,8 +42,8 @@ class ViewModelConfigControlPlayback @Inject constructor(
      * When adding new optional fields here make sure to add them to the [optionalFields] list below so that everything is correctly updated
      */
     private val optionalFieldChapterToSkipTo by lazy { OptionalField(InputControlPlayback.PlaybackCommand.SkipToChapter, { input?.chapterToSkipTo }, { input?.chapterToSkipTo = it }) }
-    private val optionalFieldTimeToSkipTo by lazy { OptionalField(InputControlPlayback.PlaybackCommand.SkipToTime, { input?.timeToSkipToSeconds }, { input?.timeToSkipToSeconds = it }) }
-    private val optionalFieldTimeToSkip by lazy { OptionalField(listOf(InputControlPlayback.PlaybackCommand.SkipForward, InputControlPlayback.PlaybackCommand.SkipBack), { input?.timeToSkipSeconds }, { input?.timeToSkipSeconds = it }) }
+    private val optionalFieldTimeToSkipTo by lazy { OptionalField(InputControlPlayback.PlaybackCommand.SkipToTime, { input?.skipToSeconds }, { input?.skipToSeconds = it }) }
+    private val optionalFieldTimeToSkip by lazy { OptionalField(listOf(InputControlPlayback.PlaybackCommand.SkipForward, InputControlPlayback.PlaybackCommand.SkipBack), { input?.skipSeconds }, { input?.skipSeconds = it }) }
     private val optionalFields = listOf(
         optionalFieldChapterToSkipTo,
         optionalFieldTimeToSkipTo,
