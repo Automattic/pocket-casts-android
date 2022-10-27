@@ -64,6 +64,9 @@ class StoriesViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `when stories are found, then progress increments`() = runTest {
+        val storyLengthInMs = 2.seconds()
+        whenever(story1.storyLength).thenReturn(storyLengthInMs)
+        whenever(story2.storyLength).thenReturn(storyLengthInMs)
         val viewModel = StoriesViewModel(MockStoriesDataSource(listOf(story1, story2)))
 
         val progress = mutableListOf<Float>()
