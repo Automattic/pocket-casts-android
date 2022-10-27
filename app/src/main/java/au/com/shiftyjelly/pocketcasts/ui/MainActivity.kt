@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -279,9 +278,6 @@ class MainActivity :
                     OnboardingFlowComposable(
                         activeTheme = theme.activeTheme,
                         completeOnboarding = { show = false },
-                        showToast = {
-                            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
-                        }
                     )
                 }
             }

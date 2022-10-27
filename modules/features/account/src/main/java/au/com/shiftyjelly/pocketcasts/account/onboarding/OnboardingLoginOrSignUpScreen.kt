@@ -6,30 +6,28 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun OnboardingLoginOrSignUpView(
-    onNotNowPressed: () -> Unit,
-    onSignUpFreePressed: () -> Unit,
-    onLoginPressed: () -> Unit,
-    showToast: (String) -> Unit
+internal fun OnboardingLoginOrSignUpScreen(
+    onNotNowClicked: () -> Unit,
+    onSignUpFreeClicked: () -> Unit,
+    onLoginClicked: () -> Unit,
+    onLoginGoogleClicked: () -> Unit
 ) {
     Column {
         Text("login_or_sign_up")
 
-        Button(onClick = onNotNowPressed) {
+        Button(onClick = onNotNowClicked) {
             Text("Not Now")
         }
 
-        Button(onClick = {
-            showToast("Tapped\nContinue with Google")
-        }) {
+        Button(onClick = onLoginGoogleClicked) {
             Text("Continue with Google")
         }
 
-        Button(onClick = onSignUpFreePressed) {
+        Button(onClick = onSignUpFreeClicked) {
             Text("Sign up Free")
         }
 
-        Button(onClick = onLoginPressed) {
+        Button(onClick = onLoginClicked) {
             Text("Log in")
         }
     }

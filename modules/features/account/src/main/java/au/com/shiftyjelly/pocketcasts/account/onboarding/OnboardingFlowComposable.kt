@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
-    showToast: (String) -> Unit
 ) {
     AppThemeWithBackground(activeTheme) {
         val navController = rememberNavController()
@@ -29,24 +28,30 @@ fun OnboardingFlowComposable(
             startDestination = OnboardingNavRoute.logInOrSignUp
         ) {
             composable(OnboardingNavRoute.logInOrSignUp) {
-                OnboardingLoginOrSignUpView(
-                    onNotNowPressed = completeOnboarding,
-                    onSignUpFreePressed = {
+                OnboardingLoginOrSignUpScreen(
+                    onNotNowClicked = completeOnboarding,
+                    onSignUpFreeClicked = {
                         navController.navigate(OnboardingNavRoute.createFreeAccount)
                     },
-                    onLoginPressed = {
+                    onLoginClicked = {
                         navController.navigate(OnboardingNavRoute.logIn)
                     },
-                    showToast = showToast
+                    onLoginGoogleClicked = {
+                        navController.navigate(OnboardingNavRoute.logInGoogle)
+                    }
                 )
             }
 
             composable(OnboardingNavRoute.createFreeAccount) {
-                OnboardingCreateFreeAccountView()
+                OnboardingCreateFreeAccountScreen()
             }
 
             composable(OnboardingNavRoute.logIn) {
-                OnboardingLoginView()
+                OnboardingLoginScreen()
+            }
+
+            composable(OnboardingNavRoute.logInGoogle) {
+                OnboardingLoginGoogleScreen()
             }
         }
     }
@@ -56,4 +61,5 @@ private object OnboardingNavRoute {
     const val logInOrSignUp = "log_in_or_sign_up"
     const val createFreeAccount = "create_free_account"
     const val logIn = "log_in"
+    const val logInGoogle = "log_in_google"
 }
