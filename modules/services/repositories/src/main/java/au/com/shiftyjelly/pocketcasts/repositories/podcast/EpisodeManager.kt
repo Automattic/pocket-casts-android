@@ -12,6 +12,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 interface EpisodeManager {
@@ -134,4 +135,6 @@ interface EpisodeManager {
     suspend fun updatePlaybackInteractionDate(episode: Playable?)
     suspend fun deleteEpisodeFiles(episodes: List<Episode>, playbackManager: PlaybackManager)
     suspend fun findStaleDownloads(): List<Episode>
+
+    fun findRandomEpisode(): Flow<Episode?>
 }

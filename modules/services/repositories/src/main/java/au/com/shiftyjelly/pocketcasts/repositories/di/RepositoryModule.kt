@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactoryImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EndOfYearManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -110,4 +112,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideUserEpisodeManager(userEpisodeManagerImpl: UserEpisodeManagerImpl): UserEpisodeManager
+
+    @Binds
+    @Singleton
+    abstract fun provideEndOfYearManager(endOfYearManagerImpl: EndOfYearManagerImpl): EndOfYearManager
 }
