@@ -11,8 +11,8 @@ import com.joaomgcd.taskerpluginlibrary.input.TaskerInputRoot
 class InputControlPlayback @JvmOverloads constructor(
     @field:TaskerInputField("command") var command: String? = null,
     @field:TaskerInputField("skipToChapter") var chapterToSkipTo: String? = null,
-    @field:TaskerInputField("timeToSkipToSeconds") var timeToSkipToSeconds: String? = null,
-    @field:TaskerInputField("timeToSkipSeconds") var timeToSkipSeconds: String? = null
+    @field:TaskerInputField("skipToSeconds") var skipToSeconds: String? = null,
+    @field:TaskerInputField("skipSeconds") var skipSeconds: String? = null
 ) {
 
     val commandEnum get() = tryOrNull { command?.let { PlaybackCommand.valueOf(it) } }
@@ -22,7 +22,7 @@ class InputControlPlayback @JvmOverloads constructor(
         SkipForward(R.string.skip_forward),
         SkipBack(R.string.skip_back),
         SkipToNextChapter(R.string.skip_to_next_chapter),
-        SkipToPrevious(R.string.skip_to_previous_chapter),
+        SkipToPreviousChapter(R.string.skip_to_previous_chapter),
         SkipToChapter(R.string.skip_to_chapter),
         SkipToTime(R.string.skip_to_time);
 
