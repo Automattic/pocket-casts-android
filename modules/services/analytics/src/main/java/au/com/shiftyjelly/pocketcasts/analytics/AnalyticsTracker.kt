@@ -11,8 +11,8 @@ object AnalyticsTracker {
         trackers.forEach { it.clearAllData() }
     }
 
-    fun registerTracker(tracker: Tracker?) {
-        tracker?.let { trackers.add(tracker) }
+    fun register(vararg trackers: Tracker) {
+        this.trackers.addAll(trackers)
     }
 
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
