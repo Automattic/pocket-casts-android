@@ -12,7 +12,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.ui.res.stringResource
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -28,12 +27,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.BottomSheetContentState
-import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.BottomSheetContentState.Content.Button
-import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.ModalBottomSheet
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -60,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
+import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
@@ -186,6 +184,10 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
+        if (BuildConfig.END_OF_YEAR_ENABLED && settings.getEndOfYearShowBadge2022()) {
+            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+        }
+
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(
             VR.id.navigation_podcasts to { FragmentInfo(PodcastsFragment(), true) },
@@ -243,7 +245,11 @@ class MainActivity :
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
+                            VR.id.navigation_profile -> {
+                                binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+                                settings.setEndOfYearShowBadge2022(false)
+                                FirebaseAnalyticsTracker.navigatedToProfile()
+                            }
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -285,8 +291,8 @@ class MainActivity :
         }
 
         refreshApp()
-
         addLineView()
+        BumpStatsTask.scheduleToRun(this)
     }
 
     override fun onPause() {
@@ -459,22 +465,11 @@ class MainActivity :
     private fun setupEndOfYearLaunchBottomSheet() {
         binding.modalBottomSheet.setContent {
             AppTheme(themeType = theme.activeTheme) {
-                ModalBottomSheet(
-                    showOnLoad = true,
-                    content = BottomSheetContentState.Content(
-                        titleText = stringResource(LR.string.end_of_year_launch_modal_title),
-                        summaryText = stringResource(LR.string.end_of_year_launch_modal_summary),
-                        primaryButton = Button.Primary(
-                            label = stringResource(LR.string.end_of_year_launch_modal_primary_button_title),
-                            onClick = {
-                                StoriesFragment.newInstance()
-                                    .show(supportFragmentManager, "stories_dialog")
-                            }
-                        ),
-                        secondaryButton = Button.Secondary(
-                            label = stringResource(LR.string.end_of_year_launch_modal_secondary_button_title),
-                        ),
-                    )
+                EndOfYearLaunchBottomSheet(
+                    onClick = {
+                        StoriesFragment.newInstance()
+                            .show(supportFragmentManager, "stories_dialog")
+                    }
                 )
             }
         }
