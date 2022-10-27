@@ -28,7 +28,7 @@ fun OnboardingFlowComposable(
             startDestination = OnboardingNavRoute.logInOrSignUp
         ) {
             composable(OnboardingNavRoute.logInOrSignUp) {
-                OnboardingLoginOrSignUpScreen(
+                OnboardingLoginOrSignUpPage(
                     onNotNowClicked = completeOnboarding,
                     onSignUpFreeClicked = {
                         navController.navigate(OnboardingNavRoute.createFreeAccount)
@@ -43,15 +43,15 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.createFreeAccount) {
-                OnboardingCreateFreeAccountScreen()
+                OnboardingCreateFreeAccountPage()
             }
 
             composable(OnboardingNavRoute.logIn) {
-                OnboardingLoginScreen()
+                OnboardingLoginPage()
             }
 
             composable(OnboardingNavRoute.logInGoogle) {
-                OnboardingLoginGoogleScreen()
+                OnboardingLoginGooglePage()
             }
         }
     }

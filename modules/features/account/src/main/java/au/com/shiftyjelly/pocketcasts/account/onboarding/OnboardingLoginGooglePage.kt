@@ -4,6 +4,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-internal fun OnboardingLoginGoogleScreen() {
+internal fun OnboardingLoginGooglePage() {
     Text("login_google")
 }

@@ -4,6 +4,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-internal fun OnboardingCreateFreeAccountScreen() {
+internal fun OnboardingCreateFreeAccountPage() {
     Text("create_free_account")
 }

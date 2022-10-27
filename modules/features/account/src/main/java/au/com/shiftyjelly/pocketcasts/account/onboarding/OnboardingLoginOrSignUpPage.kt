@@ -6,7 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-internal fun OnboardingLoginOrSignUpScreen(
+internal fun OnboardingLoginOrSignUpPage(
     onNotNowClicked: () -> Unit,
     onSignUpFreeClicked: () -> Unit,
     onLoginClicked: () -> Unit,
