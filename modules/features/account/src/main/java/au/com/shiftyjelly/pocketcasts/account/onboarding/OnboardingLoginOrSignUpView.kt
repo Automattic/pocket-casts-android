@@ -13,7 +13,7 @@ fun OnboardingLoginOrSignUpView(
     showToast: (String) -> Unit
 ) {
     Column {
-        Text(OnboardingNavRoute.loginOrSignUp)
+        Text("login_or_sign_up")
 
         Button(onClick = onNotNowPressed) {
             Text("Not Now")
