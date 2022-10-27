@@ -23,20 +23,23 @@ class OnboardingFragment : BaseFragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 AppThemeWithBackground(theme.activeTheme) {
-                    val navHostController = rememberNavController()
-                    BackHandler(enabled = navHostController.backQueue.isNotEmpty()) {
-                        navHostController.popBackStack()
+                    val navController = rememberNavController()
+                    BackHandler(enabled = navController.backQueue.isNotEmpty()) {
+                        navController.popBackStack()
                     }
 
-                    NavHost(navController = navHostController, startDestination = OnboardingNavRoute.loginOrSignUp) {
+                    NavHost(navController = navController, startDestination = OnboardingNavRoute.loginOrSignUp) {
                         composable(OnboardingNavRoute.loginOrSignUp) {
-                            LoginOrSignUpView(
+                            OnboardingLoginOrSignUpView(
                                 onNotNowPressed = {
                                     @Suppress("DEPRECATION")
                                     activity?.onBackPressed()
                                 },
                                 onSignUpFreePressed = {
-                                    navHostController.navigate(OnboardingNavRoute.createFreeAccount)
+                                    navController.navigate(OnboardingNavRoute.createFreeAccount)
+                                },
+                                onLoginPressed = {
+                                    navController.navigate(OnboardingNavRoute.logIn)
                                 },
                                 showToast = {
                                     Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
@@ -45,7 +48,11 @@ class OnboardingFragment : BaseFragment() {
                         }
 
                         composable(OnboardingNavRoute.createFreeAccount) {
-                            CreateFreeAccountView()
+                            OnboardingCreateFreeAccountView()
+                        }
+
+                        composable(OnboardingNavRoute.logIn) {
+                            OnboardingLoginView()
                         }
                     }
                 }
@@ -57,4 +64,5 @@ class OnboardingFragment : BaseFragment() {
 object OnboardingNavRoute {
     const val loginOrSignUp = "login_or_sign_up"
     const val createFreeAccount = "create_free_account"
+    const val logIn = "log_in"
 }

@@ -6,9 +6,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun LoginOrSignUpView(
+fun OnboardingLoginOrSignUpView(
     onNotNowPressed: () -> Unit,
     onSignUpFreePressed: () -> Unit,
+    onLoginPressed: () -> Unit,
     showToast: (String) -> Unit
 ) {
     Column {
@@ -28,9 +29,7 @@ fun LoginOrSignUpView(
             Text("Sign up Free")
         }
 
-        Button(onClick = {
-            showToast("Tapped\nLog in")
-        }) {
+        Button(onClick = onLoginPressed) {
             Text("Log in")
         }
     }

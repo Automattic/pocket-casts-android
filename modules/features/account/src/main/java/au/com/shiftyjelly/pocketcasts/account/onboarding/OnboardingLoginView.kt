@@ -4,6 +4,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 
 @Composable
-fun CreateFreeAccountView() {
-    Text("create_free_account")
+fun OnboardingLoginView() {
+    Text("login_view")
 }
