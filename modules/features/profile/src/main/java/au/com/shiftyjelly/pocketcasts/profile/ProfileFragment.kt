@@ -23,6 +23,9 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
@@ -95,6 +98,10 @@ class ProfileFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
+
+        if (BuildConfig.END_OF_YEAR_ENABLED) {
+            binding.setupEndOfYearPromptCard()
+        }
 
         binding.btnSettings.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
@@ -213,6 +220,19 @@ class ProfileFragment : BaseFragment() {
 
         if (!viewModel.isFragmentChangingConfigurations) {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SHOWN)
+        }
+    }
+
+    private fun FragmentProfileBinding.setupEndOfYearPromptCard() {
+        endOfYearPromptCard.setContent {
+            AppTheme(theme.activeTheme) {
+                EndOfYearPromptCard(
+                    onClick = {
+                        StoriesFragment.newInstance()
+                            .show(childFragmentManager, "stories_dialog")
+                    }
+                )
+            }
         }
     }
 

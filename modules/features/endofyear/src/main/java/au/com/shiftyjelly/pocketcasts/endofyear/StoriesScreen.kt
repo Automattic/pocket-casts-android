@@ -43,8 +43,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake2
-import au.com.shiftyjelly.pocketcasts.endofyear.storyviews.StoryFake1View
-import au.com.shiftyjelly.pocketcasts.endofyear.storyviews.StoryFake2View
+import au.com.shiftyjelly.pocketcasts.endofyear.views.StoryFake1View
+import au.com.shiftyjelly.pocketcasts.endofyear.views.StoryFake2View
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
