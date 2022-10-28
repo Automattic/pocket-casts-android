@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-13 16:54:03+0000
+Translation-Revision-Date: 2022-10-25 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">Niet nu</string>
+	<string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
+	<string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
+	<string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
+	<string name="settings_app_icon_halloween">Halloween</string>
+	<string name="settings_show_played_summary">Afleveringen die helemaal zijn afgespeeld, worden nog steeds weergegeven</string>
+	<string name="settings_show_played">Afgespeelde afleveringen weergeven</string>
+	<string name="settings_privacy_crash_link_summary">Sta ons toe om je Pocket Casts-account aan crash-rapporten te koppelen.</string>
+	<string name="settings_privacy_crash_link">Je account koppelen aan crashes</string>
+	<string name="settings_privacy_crash_summary">Sta ons toe om crash-rapporten te verzamelen.</string>
+	<string name="settings_privacy_crash">Crash-rapporten</string>
+	<string name="settings_privacy_analytics_summary">Sta ons toe om analytische gegevens te verzamelen.</string>
+	<string name="settings_privacy_analytics">Analytische gegevens</string>
+	<string name="settings_privacy_summary">Wanneer we analytische gegevens en crash-rapporten mogen verzamelen, helpt dat ons met het verbeteren van de app. We begrijpen het als je deze gegevens liever niet deelt.</string>
+	<string name="settings_title_privacy">Privacy</string>
+	<string name="profile_privacy_policy_read">Privacybeleid lezen</string>
+	<string name="token_refresh_sign_in_error_description">Er is een probleem opgetreden. Je bent uitgelogd. Tik hier om terug in te loggen.</string>
+	<string name="token_refresh_sign_in_error_title">Inlogfout</string>
 	<string name="settings_downloads_clean_up_summary">Weet je zeker dat je deze gedownloade bestanden wilt verwijderen?</string>
 	<string name="settings_storage_section_heading_mobile_data">Mobiele data</string>
 	<string name="settings_storage_section_heading_usage">Gebruik</string>
