@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-14 09:54:03+0000
+Translation-Revision-Date: 2022-10-26 09:54:23+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">不用了</string>
+	<string name="end_of_year_launch_modal_primary_button_title">查看我的 2022 年度盘点</string>
+	<string name="end_of_year_launch_modal_summary">查看您的热门播客、分类、收听统计数据等。 分享给朋友，告诉他们您最喜欢的创作者！</string>
+	<string name="end_of_year_launch_modal_title">您的年度播客盘点</string>
+	<string name="settings_app_icon_halloween">万圣节</string>
+	<string name="settings_show_played_summary">您已播放完的剧集仍会显示</string>
+	<string name="settings_show_played">显示已播放的剧集</string>
+	<string name="settings_privacy_crash_link_summary">允许我们将您的 Pocket Casts 账户与崩溃报告相关联。</string>
+	<string name="settings_privacy_crash_link">将您的账户与崩溃报告相关联</string>
+	<string name="settings_privacy_crash_summary">允许我们收集崩溃报告</string>
+	<string name="settings_privacy_crash">崩溃报告</string>
+	<string name="settings_privacy_analytics_summary">允许我们收集分析。</string>
+	<string name="settings_privacy_analytics">分析</string>
+	<string name="settings_privacy_summary">允许我们收集分析数据和崩溃报告有助于我们构建更好的应用。 如果您不愿意分享共享此信息，我们也能理解。</string>
+	<string name="settings_title_privacy">隐私</string>
+	<string name="profile_privacy_policy_read">阅读隐私政策</string>
+	<string name="token_refresh_sign_in_error_description">出了点问题，您已退出。 点击此处重新登录。</string>
+	<string name="token_refresh_sign_in_error_title">登录错误</string>
 	<string name="settings_downloads_clean_up_summary">是否确定要删除下载的这些文件？</string>
 	<string name="settings_storage_section_heading_mobile_data">移动数据</string>
 	<string name="settings_storage_section_heading_usage">使用情况</string>

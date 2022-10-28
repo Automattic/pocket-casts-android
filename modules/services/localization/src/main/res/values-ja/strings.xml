@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-13 11:54:04+0000
+Translation-Revision-Date: 2022-10-26 09:54:23+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">後で</string>
+	<string name="end_of_year_launch_modal_primary_button_title">私の2022年をプレビュー</string>
+	<string name="end_of_year_launch_modal_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。 友達と共有したり、お気に入りのクリエイターにエールを送ったりしましょう。</string>
+	<string name="end_of_year_launch_modal_title">ポッドキャストで振り返る1年</string>
+	<string name="settings_app_icon_halloween">ハロウィーン</string>
+	<string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
+	<string name="settings_show_played">Show played episodes</string>
+	<string name="settings_privacy_crash_link_summary">クラッシュレポートへの Pocket Casts アカウントのリンクを許可します。 </string>
+	<string name="settings_privacy_crash_link">アカウントをクラッシュにリンク</string>
+	<string name="settings_privacy_crash_summary">クラッシュレポートの収集を許可します。</string>
+	<string name="settings_privacy_crash">クラッシュレポート</string>
+	<string name="settings_privacy_analytics_summary">アナリティクスの収集を許可します。</string>
+	<string name="settings_privacy_analytics">アナリティクス</string>
+	<string name="settings_privacy_summary">アナリティクスとクラッシュレポートの収集を許可することで、より優れたアプリを構築できます。この情報を共有したくない場合は考慮されます。</string>
+	<string name="settings_title_privacy">プライバシー</string>
+	<string name="profile_privacy_policy_read">個人情報保護方針を読む</string>
+	<string name="token_refresh_sign_in_error_description">問題が発生したため、ログアウトしました。 ここをタップして再度ログインしてください。</string>
+	<string name="token_refresh_sign_in_error_title">ログインエラー</string>
 	<string name="settings_downloads_clean_up_summary">これらのダウンロードされたファイルを削除してもよろしいですか ?</string>
 	<string name="settings_storage_section_heading_mobile_data">モバイルデータ</string>
 	<string name="settings_storage_section_heading_usage">使用量</string>

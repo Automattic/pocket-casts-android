@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-13 11:54:04+0000
+Translation-Revision-Date: 2022-10-25 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">Не сейчас</string>
+	<string name="end_of_year_launch_modal_primary_button_title">Вспомнить 2022</string>
+	<string name="end_of_year_launch_modal_summary">Просмотрите свой топ подкастов и рубрик, статистику прослушивания и другие показатели. Поделитесь ими с друзьями и поблагодарите любимых подкастеров.</string>
+	<string name="end_of_year_launch_modal_title">Ваш год в подкастах</string>
+	<string name="settings_app_icon_halloween">Хэллоуин</string>
+	<string name="settings_show_played_summary">Выпуски, которые вы уже прослушали, будут по-прежнему отображаться</string>
+	<string name="settings_show_played">Показывать прослушанные выпуски</string>
+	<string name="settings_privacy_crash_link_summary">Разрешите подключить вашу учётную запись Pocket Casts к отчётам о сбоях.</string>
+	<string name="settings_privacy_crash_link">Подключить учётную запись к данным о сбоях</string>
+	<string name="settings_privacy_crash_summary">Разрешите собирать отчёты о сбоях.</string>
+	<string name="settings_privacy_crash">Отчёты о сбоях</string>
+	<string name="settings_privacy_analytics_summary">Разрешите собирать аналитические данные.</string>
+	<string name="settings_privacy_analytics">Аналитические данные</string>
+	<string name="settings_privacy_summary">Разрешая собирать аналитические данные и отчёты о сбоях, вы помогаете нам улучшать приложение. Мы поймём, если вы решите не предоставлять эту информацию.</string>
+	<string name="settings_title_privacy">Политика конфиденциальности</string>
+	<string name="profile_privacy_policy_read">Ознакомиться с политикой конфиденциальности</string>
+	<string name="token_refresh_sign_in_error_description">Возникла проблема, и был выполнен выход из системы. Коснитесь здесь, чтобы войти.</string>
+	<string name="token_refresh_sign_in_error_title">Ошибка входа</string>
 	<string name="settings_downloads_clean_up_summary">Удалить эти загруженные файлы?</string>
 	<string name="settings_storage_section_heading_mobile_data">Мобильные данные</string>
 	<string name="settings_storage_section_heading_usage">Использование</string>
