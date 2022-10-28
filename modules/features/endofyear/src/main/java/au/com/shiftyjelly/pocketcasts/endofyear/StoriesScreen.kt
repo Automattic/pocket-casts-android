@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -43,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake2
+import au.com.shiftyjelly.pocketcasts.endofyear.views.snapShot
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryFake1View
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryFake2View
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -56,6 +58,7 @@ private val StoryViewCornerSize = 10.dp
 fun StoriesScreen(
     viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
+    onShareClicked: (() -> Bitmap) -> Unit,
 ) {
     val state: State by viewModel.state.collectAsState()
     val progress: Float by viewModel.progress.collectAsState()
@@ -67,8 +70,10 @@ fun StoriesScreen(
             onSkipNext = { viewModel.skipNext() },
             onPause = { viewModel.pause() },
             onStart = { viewModel.start() },
-            onCloseClicked = onCloseClicked
+            onCloseClicked = onCloseClicked,
+            onShareClicked = onShareClicked,
         )
+
         State.Loading -> StoriesLoadingView(onCloseClicked)
         State.Error -> StoriesErrorView(onCloseClicked)
     }
@@ -83,6 +88,7 @@ private fun StoriesView(
     onPause: () -> Unit,
     onStart: () -> Unit,
     onCloseClicked: () -> Unit,
+    onShareClicked: (() -> Bitmap) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var screenWidth by remember { mutableStateOf(1) }
@@ -120,7 +126,7 @@ private fun StoriesView(
             }
     ) {
         state.currentStory?.let {
-            StoryView(it)
+            StoryView(story = it, onShareClicked = onShareClicked)
         }
         SegmentedProgressIndicator(
             progress = progress,
@@ -137,27 +143,50 @@ private fun StoriesView(
 private fun StoryView(
     story: Story,
     modifier: Modifier = Modifier,
+    onShareClicked: (() -> Bitmap) -> Unit,
 ) {
+    var onCaptureBitmap: (() -> Bitmap)? = null
     Column {
-        Box(
+        Column(
             modifier = modifier
                 .fillMaxSize()
-                .weight(weight = 1f, fill = true)
-                .clip(RoundedCornerShape(StoryViewCornerSize))
-                .background(color = story.backgroundColor),
-            contentAlignment = Alignment.Center
+                .weight(weight = 1f, fill = true),
         ) {
-            when (story) {
-                is StoryFake1 -> StoryFake1View(story)
-                is StoryFake2 -> StoryFake2View(story)
-            }
+            onCaptureBitmap = snapShot(
+                content = { StorySharableContent(story, modifier) }
+            )
         }
-        ShareButton()
+        ShareButton(
+            onClick = {
+                onShareClicked.invoke(requireNotNull(onCaptureBitmap))
+            }
+        )
     }
 }
 
 @Composable
-private fun ShareButton() {
+private fun StorySharableContent(
+    story: Story,
+    modifier: Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(StoryViewCornerSize))
+            .background(color = story.backgroundColor),
+        contentAlignment = Alignment.Center
+    ) {
+        when (story) {
+            is StoryFake1 -> StoryFake1View(story)
+            is StoryFake2 -> StoryFake2View(story)
+        }
+    }
+}
+
+@Composable
+private fun ShareButton(
+    onClick: () -> Unit,
+) {
     RowOutlinedButton(
         text = stringResource(id = LR.string.share),
         border = BorderStroke(ShareButtonStrokeWidth, Color.White),
@@ -167,7 +196,9 @@ private fun ShareButton() {
                 contentColor = Color.White,
             ),
         iconImage = Icons.Default.Share,
-        onClick = {}
+        onClick = {
+            onClick.invoke()
+        }
     )
 }
 
@@ -263,7 +294,8 @@ private fun StoriesScreenPreview(
             onSkipNext = {},
             onPause = {},
             onStart = {},
-            onCloseClicked = {}
+            onCloseClicked = {},
+            onShareClicked = {}
         )
     }
 }

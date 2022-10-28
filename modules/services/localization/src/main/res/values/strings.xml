@@ -1388,6 +1388,7 @@
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
     <string name="end_of_year_prompt_card_title" translatable="false">@string/end_of_year_launch_modal_title</string>
     <string name="end_of_year_prompt_card_summary">See your top podcasts, categories, listening stats and more.</string>
+    <string name="end_of_year_share_via">@string/podcasts_share_via</string>
 
     <!--    Tasker Plugin-->
 

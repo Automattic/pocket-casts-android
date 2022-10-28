@@ -1,15 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.content.Context
+import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
 import java.util.Timer
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
@@ -18,6 +22,7 @@ import kotlin.math.roundToInt
 @HiltViewModel
 class StoriesViewModel @Inject constructor(
     private val storiesDataSource: StoriesDataSource,
+    private val fileUtilWrapper: FileUtilWrapper,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow<State>(State.Loading)
     val state: StateFlow<State> = mutableState
@@ -121,6 +126,20 @@ class StoriesViewModel @Inject constructor(
         return (sumOfStoryLengthsTillIndex + StoriesDataSource.STORY_GAP_LENGTH_MS * index) / storiesDataSource.totalLengthInMs.toFloat()
     }
 
+    fun onShareClicked(
+        onCaptureBitmap: () -> Bitmap,
+        context: Context,
+        showShareForFile: (File) -> Unit
+    ) = viewModelScope.launch {
+        val savedFile = fileUtilWrapper.saveBitmapToFile(
+            onCaptureBitmap.invoke(),
+            context,
+            EOY_STORY_SAVE_FOLDER_NAME,
+            EOY_STORY_SAVE_FILE_NAME
+        )
+        savedFile?.let { showShareForFile.invoke(it) }
+    }
+
     sealed class State {
         object Loading : State()
         data class Loaded(
@@ -132,6 +151,7 @@ class StoriesViewModel @Inject constructor(
                 val xStartOffsets: List<Float> = emptyList(),
             )
         }
+
         object Error : State()
     }
 
@@ -139,5 +159,7 @@ class StoriesViewModel @Inject constructor(
         private const val PROGRESS_START_VALUE = 0f
         private const val PROGRESS_END_VALUE = 1f
         private const val PROGRESS_UPDATE_INTERVAL_MS = 10L
+        private const val EOY_STORY_SAVE_FOLDER_NAME = "eoy_images_cache"
+        private const val EOY_STORY_SAVE_FILE_NAME = "eoy_shared_image.png"
     }
 }

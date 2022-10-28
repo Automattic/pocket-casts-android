@@ -16,7 +16,7 @@ class FileUtilWrapper @Inject constructor() {
     }
 
     suspend fun saveBitmapToFile(
-        image: Bitmap,
+        bitmap: Bitmap,
         context: Context,
         saveFolderName: String,
         saveFileName: String,
@@ -27,7 +27,7 @@ class FileUtilWrapper @Inject constructor() {
             imagesFolder.mkdirs()
             file = File(imagesFolder, saveFileName)
             val stream = FileOutputStream(file)
-            image.compress(Bitmap.CompressFormat.PNG, 90, stream)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
             stream.flush()
             stream.close()
         } catch (e: IOException) {
