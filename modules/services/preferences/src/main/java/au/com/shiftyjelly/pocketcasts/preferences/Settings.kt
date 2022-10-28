@@ -25,6 +25,7 @@ interface Settings {
         const val SERVER_SHORT_URL = BuildConfig.SERVER_SHORT_URL
         const val SERVER_LIST_URL = BuildConfig.SERVER_LIST_URL
         const val SERVER_LIST_HOST = BuildConfig.SERVER_LIST_HOST
+        const val WP_COM_API_URL = "https://public-api.wordpress.com"
 
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
@@ -551,4 +552,7 @@ interface Settings {
 
     fun setLinkCrashReportsToUser(value: Boolean)
     fun getLinkCrashReportsToUser(): Boolean
+
+    fun setEndOfYearShowBadge2022(value: Boolean)
+    fun getEndOfYearShowBadge2022(): Boolean
 }

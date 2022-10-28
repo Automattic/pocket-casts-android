@@ -1069,4 +1069,6 @@ class EpisodeManagerImpl @Inject constructor(
                 }
             }
     }
+
+    override fun findRandomEpisode() = episodeDao.findRandomEpisode()
 }

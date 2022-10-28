@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsFragmentPodcastSelectBinding
+import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentFilterSelectBinding
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowFilterBinding
 import au.com.shiftyjelly.pocketcasts.views.helper.PlaylistHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,7 +46,7 @@ class FilterSelectFragment : BaseFragment() {
 
     private lateinit var listener: Listener
     private var adapter: FilterSelectAdapter? = null
-    private var binding: SettingsFragmentPodcastSelectBinding? = null
+    private var binding: FragmentFilterSelectBinding? = null
 
     @Inject lateinit var playlistManager: PlaylistManager
 
@@ -61,7 +61,7 @@ class FilterSelectFragment : BaseFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = SettingsFragmentPodcastSelectBinding.inflate(inflater, container, false)
+        binding = FragmentFilterSelectBinding.inflate(inflater, container, false)
         return binding?.root
     }
 
@@ -88,12 +88,12 @@ class FilterSelectFragment : BaseFragment() {
                 onSuccess = {
                     val adapter = FilterSelectAdapter(theme.isDarkTheme, it) {
                         val selectedList = it.map { it.uuid }
-                        binding?.lblPodcastsChosen?.text = resources.getStringPlural(count = selectedList.size, singular = LR.string.filters_chosen_singular, plural = LR.string.filters_chosen_plural)
+                        binding?.lblFiltersChosen?.text = resources.getStringPlural(count = selectedList.size, singular = LR.string.filters_chosen_singular, plural = LR.string.filters_chosen_plural)
                         listener.filterSelectFragmentSelectionChanged(selectedList)
                     }
 
                     val selected = it.filter { it.selected }
-                    binding?.lblPodcastsChosen?.text = resources.getStringPlural(count = selected.size, singular = LR.string.filters_chosen_singular, plural = LR.string.filters_chosen_plural)
+                    binding?.lblFiltersChosen?.text = resources.getStringPlural(count = selected.size, singular = LR.string.filters_chosen_singular, plural = LR.string.filters_chosen_plural)
                     binding?.recyclerView?.layoutManager = layoutManager
                     binding?.recyclerView?.adapter = adapter
 

@@ -16,6 +16,7 @@ dependencies {
     // features
     implementation project(':modules:features:account')
     implementation project(':modules:features:cartheme')
+    implementation project(':modules:features:endofyear')
     implementation project(':modules:features:podcasts')
     implementation project(':modules:features:settings')
 

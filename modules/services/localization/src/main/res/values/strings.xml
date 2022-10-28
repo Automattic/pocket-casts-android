@@ -973,6 +973,7 @@
     <string name="settings_battery_update_message">Please tap the \"%s\" switch above to update your battery settings.</string>
     <string name="settings_battery_usage_message">Battery usage must be unrestricted to ensure uninterrupted playback when your screen is off.</string>
     <string name="settings_battery_learn_more_url" translatable="false">https://support.pocketcasts.com/article/playback-pausing-randomly-or-when-screen-is-locked/</string>
+    <string name="settings_select_filters">Select filters</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
     <string name="settings_developer">Developer</string>
@@ -992,6 +993,8 @@
     <string name="settings_import_choose_file">Choose an OPML file.</string>
     <string name="settings_import_file">Select file</string>
     <string name="settings_import_file_summary">If you have podcast subscriptions in another app or service, Pocket Casts can import them from an OPML file.</string>
+    <string name="settings_import_url">By URL</string>
+    <string name="settings_import_url_summary">Import your podcasts from an OPML file using a URL.</string>
     <string name="settings_import_opml_progress">%1$d of %2$d podcasts</string>
     <string name="settings_import_opml_stop">Stop</string>
     <string name="settings_import_opml_title">Import OPML</string>
@@ -1383,6 +1386,8 @@
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
     <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
+    <string name="end_of_year_prompt_card_title" translatable="false">@string/end_of_year_launch_modal_title</string>
+    <string name="end_of_year_prompt_card_summary">See your top podcasts, categories, listening stats and more.</string>
 
     <!--    Tasker Plugin-->
 
@@ -1401,5 +1406,9 @@
     <string name="play_next_in_queue">Play Next In Queue</string>
     <string name="skip_to_time">Skip To Time</string>
     <string name="time_to_skip_to_seconds">Time To Skip To (Seconds)</string>
+    <string name="time_to_skip_seconds">Time To Skip (Seconds)</string>
     <string name="time_to_skip_to_not_valid">Time to skip to %1$s not valid</string>
+    <string name="time_to_skip_not_valid">Time to skip %1$s not valid</string>
+    <string name="pocket_casts_play_filter">Pocket Casts Play Filter</string>
+    <string name="pocket_casts_control_playback">Pocket Casts Control Playback</string>
 </resources>

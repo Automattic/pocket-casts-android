@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 
 class StoriesFragment : BaseDialogFragment() {
+    private val viewModel: StoriesViewModel by viewModels()
     override val statusBarColor: StatusBarColor
         get() = StatusBarColor.Custom(Color.BLACK, true)
 
@@ -31,6 +33,7 @@ class StoriesFragment : BaseDialogFragment() {
                 AppTheme(theme.activeTheme) {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     StoriesScreen(
+                        viewModel = viewModel,
                         onCloseClicked = { dismiss() },
                     )
                 }

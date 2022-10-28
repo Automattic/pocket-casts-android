@@ -344,4 +344,7 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET start_from = :startFromSecs, skip_last = :skipLastSecs, folder_uuid = :folderUuid, sort_order = :sortPosition, added_date = :addedDate WHERE uuid = :uuid")
     abstract suspend fun updateSyncData(uuid: String, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date)
+
+    @Query("SELECT * FROM podcasts LIMIT 5")
+    abstract fun findRandomPodcasts(): Flow<List<Podcast>>
 }
