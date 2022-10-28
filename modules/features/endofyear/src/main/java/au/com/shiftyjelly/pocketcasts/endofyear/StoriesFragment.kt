@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
@@ -22,6 +23,11 @@ class StoriesFragment : BaseDialogFragment() {
     private val viewModel: StoriesViewModel by viewModels()
     override val statusBarColor: StatusBarColor
         get() = StatusBarColor.Custom(Color.BLACK, true)
+
+    private val shareLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        /* Share activity dismissed, start paused story */
+        viewModel.start()
+    }
 
     override fun onCreate(savedInstance: Bundle?) {
         super.onCreate(savedInstance)
@@ -60,12 +66,7 @@ class StoriesFragment : BaseDialogFragment() {
             intent.type = "image/png"
             val uri = FileUtil.createUriWithReadPermissions(file, intent, requireContext())
             intent.putExtra(Intent.EXTRA_STREAM, uri)
-            context.startActivity(
-                Intent.createChooser(
-                    intent,
-                    context.getString(LR.string.end_of_year_share_via)
-                )
-            )
+            shareLauncher.launch(Intent.createChooser(intent, context.getString(LR.string.end_of_year_share_via)))
         } catch (e: Exception) {
             Timber.e(e)
         }

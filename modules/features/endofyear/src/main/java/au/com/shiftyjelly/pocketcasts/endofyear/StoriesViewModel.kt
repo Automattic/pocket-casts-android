@@ -130,14 +130,17 @@ class StoriesViewModel @Inject constructor(
         onCaptureBitmap: () -> Bitmap,
         context: Context,
         showShareForFile: (File) -> Unit
-    ) = viewModelScope.launch {
-        val savedFile = fileUtilWrapper.saveBitmapToFile(
-            onCaptureBitmap.invoke(),
-            context,
-            EOY_STORY_SAVE_FOLDER_NAME,
-            EOY_STORY_SAVE_FILE_NAME
-        )
-        savedFile?.let { showShareForFile.invoke(it) }
+    ) {
+        pause()
+        viewModelScope.launch {
+            val savedFile = fileUtilWrapper.saveBitmapToFile(
+                onCaptureBitmap.invoke(),
+                context,
+                EOY_STORY_SAVE_FOLDER_NAME,
+                EOY_STORY_SAVE_FILE_NAME
+            )
+            savedFile?.let { showShareForFile.invoke(it) }
+        }
     }
 
     sealed class State {
