@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-12 15:54:03+0000
+Translation-Revision-Date: 2022-10-24 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">Non ora</string>
+	<string name="end_of_year_launch_modal_primary_button_title">Mostra il mio 2022</string>
+	<string name="end_of_year_launch_modal_summary">Visualizza i tuoi podcast principali, le categorie, le statistiche di ascolto e molto altro ancora. Condividi con gli amici e ringrazia pubblicamente i tuoi creatori preferiti!</string>
+	<string name="end_of_year_launch_modal_title">Il tuo anno in podcast</string>
+	<string name="settings_app_icon_halloween">Halloween</string>
+	<string name="settings_show_played_summary">Gli episodi che hai terminato di riprodurre verranno ancora visualizzati</string>
+	<string name="settings_show_played">Mostra gli episodi riprodotti</string>
+	<string name="settings_privacy_crash_link_summary">Consentici di collegare il tuo account Pocket Casts ai rapporti sugli arresti anomali.</string>
+	<string name="settings_privacy_crash_link">Collega il tuo account agli arresti anomali</string>
+	<string name="settings_privacy_crash_summary">Consentici di raccogliere rapporti sugli arresti anomali.</string>
+	<string name="settings_privacy_crash">Rapporti sugli arresti anomali</string>
+	<string name="settings_privacy_analytics_summary">Consentici di raccogliere i dati analitici.</string>
+	<string name="settings_privacy_analytics">Analisi</string>
+	<string name="settings_privacy_summary">Consentirci di raccogliere dati analitici e rapporti sugli arresti anomali ci aiuta a creare un\'app migliore. Comprendiamo se preferisci non condividere queste informazioni.</string>
+	<string name="settings_title_privacy">Privacy</string>
+	<string name="profile_privacy_policy_read">Leggi la politica sulla privacy</string>
+	<string name="token_refresh_sign_in_error_description">Si è verificato un problema e sei stato disconnesso. Tocca qui per accedere di nuovo.</string>
+	<string name="token_refresh_sign_in_error_title">Errore di accesso</string>
 	<string name="settings_downloads_clean_up_summary">Desideri eliminare questi file scaricati?</string>
 	<string name="settings_storage_section_heading_mobile_data">Dati dispositivi mobili</string>
 	<string name="settings_storage_section_heading_usage">Utilizzo</string>
