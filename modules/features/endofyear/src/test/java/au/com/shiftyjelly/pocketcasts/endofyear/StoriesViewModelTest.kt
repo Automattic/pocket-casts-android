@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,6 +14,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -22,6 +24,8 @@ private val story2 = mock<Story>()
 
 @RunWith(MockitoJUnitRunner::class)
 class StoriesViewModelTest {
+    @Mock
+    private lateinit var fileUtilWrapper: FileUtilWrapper
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -33,7 +37,7 @@ class StoriesViewModelTest {
     @Test
     fun `when vm starts, then loading is shown`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
-        val viewModel = StoriesViewModel(MockStoriesDataSource(listOf(story1, story2)))
+        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
 
         assertEquals(viewModel.state.value is StoriesViewModel.State.Loading, true)
     }
@@ -42,7 +46,7 @@ class StoriesViewModelTest {
     @Test
     fun `when vm starts, then progress is zero`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
-        val viewModel = StoriesViewModel(MockStoriesDataSource(listOf(story1, story2)))
+        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
 
         assertEquals(viewModel.progress.value, 0f)
     }
@@ -51,28 +55,28 @@ class StoriesViewModelTest {
     @Test
     fun `when vm starts, then stories are loaded`() = runTest {
         val dataSource = mock<StoriesDataSource>()
-        StoriesViewModel(dataSource)
+        initViewModel(dataSource)
 
         verify(dataSource).loadStories()
     }
 
     @Test
     fun `given no stories found, when vm starts, then error is shown`() {
-        val viewModel = StoriesViewModel(MockStoriesDataSource(emptyList()))
+        val viewModel = initViewModel(MockStoriesDataSource(emptyList()))
 
         assertEquals(viewModel.state.value is StoriesViewModel.State.Error, true)
     }
 
     @Test
     fun `given stories found, when vm starts, then screen is loaded`() {
-        val viewModel = StoriesViewModel(MockStoriesDataSource(listOf(story1, story2)))
+        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
 
         assertEquals(viewModel.state.value is StoriesViewModel.State.Loaded, true)
     }
 
     @Test
     fun `when next is invoked, then next story is shown`() {
-        val viewModel = StoriesViewModel(MockStoriesDataSource(listOf(story1, story2)))
+        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
 
         viewModel.skipNext()
 
@@ -82,7 +86,7 @@ class StoriesViewModelTest {
 
     @Test
     fun `when previous is invoked, then previous story is shown`() {
-        val viewModel = StoriesViewModel(MockStoriesDataSource(listOf(story1, story2)))
+        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
         viewModel.skipNext()
 
         viewModel.skipPrevious()
@@ -90,6 +94,11 @@ class StoriesViewModelTest {
         val state = viewModel.state.value as StoriesViewModel.State.Loaded
         assertEquals(state.currentStory, story1)
     }
+
+    private fun initViewModel(storiesDataSource: StoriesDataSource) = StoriesViewModel(
+        storiesDataSource = storiesDataSource,
+        fileUtilWrapper = fileUtilWrapper
+    )
 
     class MockStoriesDataSource(private val mockStories: List<Story>) : StoriesDataSource() {
         override val stories = mutableListOf<Story>()
