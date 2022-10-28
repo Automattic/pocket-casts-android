@@ -43,11 +43,15 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.createFreeAccount) {
-                OnboardingCreateFreeAccountPage()
+                OnboardingCreateFreeAccountPage(
+                    onBackPressed = { navController.popBackStack() }
+                )
             }
 
             composable(OnboardingNavRoute.logIn) {
-                OnboardingLoginPage()
+                OnboardingLoginPage(
+                    onBackPressed = { navController.popBackStack() }
+                )
             }
 
             composable(OnboardingNavRoute.logInGoogle) {
