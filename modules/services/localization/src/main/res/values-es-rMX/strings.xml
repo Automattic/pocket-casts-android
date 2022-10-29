@@ -1230,4 +1230,5 @@ Language: es_MX
 	<string name="unarchive">Eliminar de los archivos</string>
 	<string name="archive">Archivar</string>
 	<string name="add_to_up_next">Agregar a A continuación</string>
+    <string name="profile_account_upgraded">Cuenta actualizada</string>
 </resources>

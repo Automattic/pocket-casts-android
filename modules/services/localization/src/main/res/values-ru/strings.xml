@@ -1230,4 +1230,5 @@ Language: ru
 	<string name="unarchive">Из&amp;nbsp;архива</string>
 	<string name="archive">Архив</string>
 	<string name="add_to_up_next">Добавить в «Следующие»</string>
+    <string name="profile_account_upgraded">Учетная запись обновлена</string>
 </resources>

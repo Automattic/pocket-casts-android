@@ -1230,4 +1230,5 @@ Language: it
 	<string name="unarchive">Annulla archiviazione</string>
 	<string name="archive">Archivia</string>
 	<string name="add_to_up_next">Aggiungi a Prossimo</string>
+    <string name="profile_account_upgraded">Account aggiornato</string>
 </resources>

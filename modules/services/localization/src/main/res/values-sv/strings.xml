@@ -1230,4 +1230,5 @@ Language: sv_SE
 	<string name="unarchive">Avarkivera</string>
 	<string name="archive">Arkiv</string>
 	<string name="add_to_up_next">Lägg till i Nästa</string>
+    <string name="profile_account_upgraded">Konto uppgraderat</string>
 </resources>

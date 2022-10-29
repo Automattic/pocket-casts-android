@@ -1177,4 +1177,5 @@ Language: en_GB
 	<string name="unarchive">Unarchive</string>
 	<string name="archive">Archive</string>
 	<string name="add_to_up_next">Add to Up Next</string>
+	<string name="profile_account_upgraded">Account Upgraded</string>
 </resources>
