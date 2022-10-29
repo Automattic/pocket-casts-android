@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.content.Context
 import android.net.Uri
+import au.com.shiftyjelly.pocketcasts.models.to.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -258,6 +259,7 @@ interface Settings {
     val autoAddUpNextLimit: Observable<Int>
 
     val defaultPodcastGroupingFlow: StateFlow<PodcastGrouping>
+    val defaultMediaNotificationControlsFlow: StateFlow<List<MediaNotificationControls>>
     val defaultShowArchivedFlow: StateFlow<Boolean>
     val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
     val keepScreenAwakeFlow: StateFlow<Boolean>
@@ -520,6 +522,8 @@ interface Settings {
     fun getAutoPlayNextEpisodeOnEmpty(): Boolean
     fun defaultShowArchived(): Boolean
     fun setDefaultShowArchived(value: Boolean)
+    fun defaultMediaNotificationControls(): List<MediaNotificationControls>
+    fun setDefaultMediaNotificationControls(mediaNotificationControls: List<MediaNotificationControls>)
     fun setMultiSelectItems(items: List<Int>)
     fun getMultiSelectItems(): List<Int>
     fun setLastPauseTime(date: Date)
