@@ -17,6 +17,7 @@ import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
+import au.com.shiftyjelly.pocketcasts.models.to.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -35,7 +36,9 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapter
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.lang.IllegalArgumentException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -93,6 +96,7 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val defaultPodcastGroupingFlow = MutableStateFlow(defaultPodcastGrouping())
+    override val defaultMediaNotificationControlsFlow = MutableStateFlow(defaultMediaNotificationControls())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
@@ -1186,6 +1190,43 @@ class SettingsImpl @Inject constructor(
     override fun setDefaultShowArchived(value: Boolean) {
         setBoolean("default_show_archived", value)
         defaultShowArchivedFlow.update { value }
+    }
+
+    override fun defaultMediaNotificationControls(): List<MediaNotificationControls> {
+        val selectedValue = MediaNotificationControls.MediaControlKeys.map { key->
+            val defaultValue = (key == MediaNotificationControls.playback_speed_key || key == MediaNotificationControls.star_key)
+            Pair(key,getBoolean(key,defaultValue))
+        }
+
+        return selectedValue.filter { (_,value) -> value }.map { (key,_) ->
+            when (key) {
+                MediaNotificationControls.archive_key -> MediaNotificationControls.Archive
+                MediaNotificationControls.markAsPlayed_key -> MediaNotificationControls.MarkAsPlayed
+                MediaNotificationControls.play_next_key-> MediaNotificationControls.PlayNext
+                MediaNotificationControls.playback_speed_key -> MediaNotificationControls.PlaybackSpeed
+                MediaNotificationControls.star_key-> MediaNotificationControls.Star
+                else -> return listOf(MediaNotificationControls.PlaybackSpeed, MediaNotificationControls.Star)
+            }
+        }
+    }
+
+    override fun setDefaultMediaNotificationControls(mediaNotificationControls: List<MediaNotificationControls>) {
+        MediaNotificationControls.All.forEach { mediaControl ->
+            val selectedKey = when (mediaControl) {
+                MediaNotificationControls.Archive -> MediaNotificationControls.archive_key
+                MediaNotificationControls.MarkAsPlayed -> MediaNotificationControls.markAsPlayed_key
+                MediaNotificationControls.PlayNext -> MediaNotificationControls.play_next_key
+                MediaNotificationControls.PlaybackSpeed -> MediaNotificationControls.playback_speed_key
+                MediaNotificationControls.Star -> MediaNotificationControls.star_key
+            }
+
+            if (mediaNotificationControls.contains(mediaControl)) {
+                setBoolean(selectedKey,true)
+            } else {
+                setBoolean(selectedKey, false)
+            }
+        }
+        defaultMediaNotificationControlsFlow.update { mediaNotificationControls }
     }
 
     override fun defaultPodcastGrouping(): PodcastGrouping {

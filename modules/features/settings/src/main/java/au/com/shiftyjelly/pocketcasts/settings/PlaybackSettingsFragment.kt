@@ -39,12 +39,14 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingCheckBoxDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.models.to.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -131,6 +133,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = {
                             settings.setDefaultShowArchived(it)
                             showSetAllArchiveDialog(it)
+                        }
+                    )
+
+                    MediaNotificationControls(
+                        saved = settings.defaultMediaNotificationControlsFlow.collectAsState().value,
+                        onSave = {
+                            settings.setDefaultMediaNotificationControls(it)
                         }
                     )
                 }
@@ -271,6 +280,29 @@ class PlaybackSettingsFragment : BaseFragment() {
             }
         },
     )
+
+    @Composable
+    fun MediaNotificationControls(
+        saved:List<MediaNotificationControls>,
+        onSave: (List<MediaNotificationControls>) -> Unit
+    ) = SettingCheckBoxDialogRow(
+        primaryText = stringResource(LR.string.settings_media_notification_controls),
+        secondaryText = stringResource(LR.string.settings_media_notification_controls_summary),
+        options = MediaNotificationControls.All,
+        maxOptions = MediaNotificationControls.MaxSelectedOptions,
+        savedOption = saved,
+        optionToLocalisedString = {getString(mediaControlsToStringRes(it))},
+        onSave = onSave
+    )
+
+    @StringRes
+    private fun mediaControlsToStringRes(controls: MediaNotificationControls) = when (controls) {
+        MediaNotificationControls.Archive -> LR.string.settings_media_notification_controls_title_archive
+        MediaNotificationControls.MarkAsPlayed -> LR.string.settings_media_notification_controls_title_mark_as_played
+        MediaNotificationControls.PlayNext -> LR.string.settings_media_notification_controls_title_play_next
+        MediaNotificationControls.PlaybackSpeed -> LR.string.settings_media_notification_controls_title_playback_speed
+        MediaNotificationControls.Star -> LR.string.settings_media_notification_controls_title_star
+    }
 
     @Composable
     private fun SkipTime(
