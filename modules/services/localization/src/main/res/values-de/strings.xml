@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-13 14:54:03+0000
+Translation-Revision-Date: 2022-10-26 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">Nicht jetzt</string>
+	<string name="end_of_year_launch_modal_primary_button_title">Mein Jahr 2022 anzeigen</string>
+	<string name="end_of_year_launch_modal_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an. Teile es mit Freunden und nenne deine bevorzugten Ersteller!</string>
+	<string name="end_of_year_launch_modal_title">Dein Jahr in Podcasts</string>
+	<string name="settings_app_icon_halloween">Halloween</string>
+	<string name="settings_show_played_summary">Folgen, die du bereits abgespielt hast, werden weiterhin angezeigt</string>
+	<string name="settings_show_played">Abgespielte Folgen anzeigen</string>
+	<string name="settings_privacy_crash_link_summary">Erlaube uns, dein Pocket Casts-Konto mit Absturzberichten zu verknüpfen.</string>
+	<string name="settings_privacy_crash_link">Dein Konto mit Abstürzen verknüpfen</string>
+	<string name="settings_privacy_crash_summary">Erlaube uns, Absturzberichte zu erfassen.</string>
+	<string name="settings_privacy_crash">Absturzberichte</string>
+	<string name="settings_privacy_analytics_summary">Erlaube uns, Statistiken zu erfassen.</string>
+	<string name="settings_privacy_analytics">Statistiken</string>
+	<string name="settings_privacy_summary">Deine Erlaubnis, Statistiken und Absturzberichte zu erfassen, ermöglicht uns, eine bessere App zu entwickeln. Wir verstehen, wenn du diese Informationen lieber nicht teilen möchtest.</string>
+	<string name="settings_title_privacy">Datenschutz</string>
+	<string name="profile_privacy_policy_read">Datenschutzerklärung lesen</string>
+	<string name="token_refresh_sign_in_error_description">Es ist ein Problem aufgetreten und du wurdest abgemeldet. Tippe hier, um dich wieder anzumelden.</string>
+	<string name="token_refresh_sign_in_error_title">Anmeldefehler</string>
 	<string name="settings_downloads_clean_up_summary">Bist du sicher, dass du diese heruntergeladenen Dateien löschen möchtest?</string>
 	<string name="settings_storage_section_heading_mobile_data">Mobile Daten</string>
 	<string name="settings_storage_section_heading_usage">Nutzung</string>
