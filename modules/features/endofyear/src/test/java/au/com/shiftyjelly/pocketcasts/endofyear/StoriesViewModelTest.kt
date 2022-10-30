@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -18,65 +17,65 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 private val story1 = mock<Story>()
 private val story2 = mock<Story>()
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class StoriesViewModelTest {
     @Mock
     private lateinit var fileUtilWrapper: FileUtilWrapper
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @Mock
+    private lateinit var storiesDataSource: StoriesDataSource
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `when vm starts, then loading is shown`() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher())
-        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
-
-        assertEquals(viewModel.state.value is StoriesViewModel.State.Loading, true)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `when vm starts, then progress is zero`() = runTest {
         Dispatchers.setMain(StandardTestDispatcher())
-        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
+        val viewModel = initViewModel(listOf(story1, story2))
 
         assertEquals(viewModel.progress.value, 0f)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `when vm starts, then stories are loaded`() = runTest {
-        val dataSource = mock<StoriesDataSource>()
-        initViewModel(dataSource)
+    fun `when vm starts, then loading is shown`() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher())
+        val viewModel = initViewModel(listOf(story1, story2))
 
-        verify(dataSource).loadStories()
+        assertEquals(viewModel.state.value is StoriesViewModel.State.Loading, true)
     }
 
     @Test
-    fun `given no stories found, when vm starts, then error is shown`() {
-        val viewModel = initViewModel(MockStoriesDataSource(emptyList()))
+    fun `when vm starts, then stories are loaded`() = runTest {
+        initViewModel(emptyList())
+
+        verify(storiesDataSource).loadStories()
+    }
+
+    @Test
+    fun `given no stories found, when vm starts, then error is shown`() = runTest {
+        val viewModel = initViewModel(emptyList())
 
         assertEquals(viewModel.state.value is StoriesViewModel.State.Error, true)
     }
 
     @Test
-    fun `given stories found, when vm starts, then screen is loaded`() {
-        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
+    fun `given stories found, when vm starts, then screen is loaded`() = runTest {
+        val viewModel = initViewModel(listOf(story1, story2))
 
         assertEquals(viewModel.state.value is StoriesViewModel.State.Loaded, true)
     }
 
     @Test
-    fun `when next is invoked, then next story is shown`() {
-        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
+    fun `when next is invoked, then next story is shown`() = runTest {
+        val viewModel = initViewModel(listOf(story1, story2))
 
         viewModel.skipNext()
 
@@ -85,8 +84,8 @@ class StoriesViewModelTest {
     }
 
     @Test
-    fun `when previous is invoked, then previous story is shown`() {
-        val viewModel = initViewModel(MockStoriesDataSource(listOf(story1, story2)))
+    fun `when previous is invoked, then previous story is shown`() = runTest {
+        val viewModel = initViewModel(listOf(story1, story2))
         viewModel.skipNext()
 
         viewModel.skipPrevious()
@@ -95,25 +94,11 @@ class StoriesViewModelTest {
         assertEquals(state.currentStory, story1)
     }
 
-    private fun initViewModel(storiesDataSource: StoriesDataSource) = StoriesViewModel(
-        storiesDataSource = storiesDataSource,
-        fileUtilWrapper = fileUtilWrapper
-    )
-
-    class MockStoriesDataSource(private val mockStories: List<Story>) : StoriesDataSource() {
-        override val stories = mutableListOf<Story>()
-
-        override suspend fun loadStories(): Flow<List<Story>> {
-            stories.addAll(mockStories)
-            return flowOf(stories)
-        }
-
-        override fun storyAt(index: Int): Story? {
-            return try {
-                stories[index]
-            } catch (e: IndexOutOfBoundsException) {
-                null
-            }
-        }
+    private suspend fun initViewModel(mockStories: List<Story>): StoriesViewModel {
+        whenever(storiesDataSource.loadStories()).thenReturn(flowOf(mockStories))
+        return StoriesViewModel(
+            storiesDataSource = storiesDataSource,
+            fileUtilWrapper = fileUtilWrapper
+        )
     }
 }

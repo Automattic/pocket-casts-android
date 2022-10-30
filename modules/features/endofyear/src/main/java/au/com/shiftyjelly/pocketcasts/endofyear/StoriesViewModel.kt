@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -30,30 +31,37 @@ class StoriesViewModel @Inject constructor(
     private val mutableProgress = MutableStateFlow(0f)
     val progress: StateFlow<Float> = mutableProgress
 
+    private val stories = mutableListOf<Story>()
     private val numOfStories: Int
-        get() = storiesDataSource.numOfStories
+        get() = stories.size
 
     private var currentIndex: Int = 0
     private val nextIndex
         get() = (currentIndex.plus(1)).coerceAtMost(numOfStories.minus(1))
+    private val totalLengthInMs
+        get() = storyLengthsInMs.sum() + gapLengthsInMs
+    private val storyLengthsInMs: List<Long>
+        get() = stories.map { it.storyLength }
+    private val gapLengthsInMs: Long
+        get() = STORY_GAP_LENGTH_MS * numOfStories.minus(1).coerceAtLeast(0)
 
     private var timer: Timer? = null
 
     init {
         viewModelScope.launch {
-            storiesDataSource.loadStories().collect { stories ->
-                val state = if (stories.isEmpty()) {
+            storiesDataSource.loadStories().stateIn(viewModelScope).collect { result ->
+                stories.clear()
+                val state = if (result.isEmpty()) {
                     State.Error
                 } else {
-                    with(storiesDataSource) {
-                        State.Loaded(
-                            currentStory = storyAt(currentIndex),
-                            segmentsData = SegmentsData(
-                                xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
-                                widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
-                            )
+                    stories.addAll(result)
+                    State.Loaded(
+                        currentStory = result[currentIndex],
+                        segmentsData = SegmentsData(
+                            xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
+                            widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
                         )
-                    }
+                    )
                 }
                 mutableState.value = state
                 if (state is State.Loaded) start()
@@ -64,7 +72,7 @@ class StoriesViewModel @Inject constructor(
     fun start() {
         val currentState = state.value as State.Loaded
         val progressFraction =
-            (PROGRESS_UPDATE_INTERVAL_MS / storiesDataSource.totalLengthInMs.toFloat())
+            (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat())
                 .coerceAtMost(PROGRESS_END_VALUE)
 
         timer = fixedRateTimer(period = PROGRESS_UPDATE_INTERVAL_MS) {
@@ -74,7 +82,7 @@ class StoriesViewModel @Inject constructor(
             if (newProgress.roundOff() == getXStartOffsetAtIndex(nextIndex).roundOff()) {
                 currentIndex = nextIndex
                 mutableState.value =
-                    currentState.copy(currentStory = storiesDataSource.storyAt(currentIndex))
+                    currentState.copy(currentStory = stories[currentIndex])
             }
 
             mutableProgress.value = newProgress
@@ -100,7 +108,7 @@ class StoriesViewModel @Inject constructor(
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
         mutableState.value =
-            (state.value as State.Loaded).copy(currentStory = storiesDataSource.storyAt(index))
+            (state.value as State.Loaded).copy(currentStory = stories[index])
     }
 
     private fun cancelTimer() {
@@ -118,12 +126,12 @@ class StoriesViewModel @Inject constructor(
     @FloatRange(from = 0.0, to = 1.0)
     fun getXStartOffsetAtIndex(index: Int): Float {
         val sumOfStoryLengthsTillIndex = try {
-            storiesDataSource.storyLengthsInMs.subList(0, index).sum()
+            storyLengthsInMs.subList(0, index).sum()
         } catch (e: IndexOutOfBoundsException) {
             Timber.e("Story offset checked at invalid index")
             0L
         }
-        return (sumOfStoryLengthsTillIndex + StoriesDataSource.STORY_GAP_LENGTH_MS * index) / storiesDataSource.totalLengthInMs.toFloat()
+        return (sumOfStoryLengthsTillIndex + STORY_GAP_LENGTH_MS * index) / totalLengthInMs.toFloat()
     }
 
     fun onShareClicked(
@@ -159,6 +167,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     companion object {
+        private const val STORY_GAP_LENGTH_MS = 100L
         private const val PROGRESS_START_VALUE = 0f
         private const val PROGRESS_END_VALUE = 1f
         private const val PROGRESS_UPDATE_INTERVAL_MS = 10L
