@@ -1,9 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.content.Context
+import android.util.LayoutDirection
+import androidx.core.text.layoutDirection
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import timber.log.Timber
+import java.util.*
 import java.util.regex.Pattern
 
 class ShowNotesFormatter(settings: Settings?, private val context: Context) {
@@ -61,7 +64,10 @@ class ShowNotesFormatter(settings: Settings?, private val context: Context) {
             }
 
             addShowNotesHead(html)
-            html.append("<body>")
+
+            val isRtl = Locale.getDefault().layoutDirection == LayoutDirection.RTL
+            html.append("<body ${if (isRtl) "dir=\"rtl\"" else ""}>")
+
             val bodyTrimmed = body.trim { it <= ' ' }
             val addParagraph = !bodyTrimmed.startsWith("<p")
             if (addParagraph) {
