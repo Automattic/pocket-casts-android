@@ -54,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
 
+private var onCaptureBitmap: (() -> Bitmap)? = null
 @Composable
 fun StoriesScreen(
     viewModel: StoriesViewModel,
@@ -91,70 +92,26 @@ private fun StoriesView(
     onShareClicked: (() -> Bitmap) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var screenWidth by remember { mutableStateOf(1) }
-    var isPaused by remember { mutableStateOf(false) }
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = Color.Black)
-            .onGloballyPositioned {
-                screenWidth = it.size.width
-            }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = {
-                        if (!isPaused) {
-                            if (it.x > screenWidth / 2) {
-                                onSkipNext()
-                            } else {
-                                onSkipPrevious()
-                            }
-                        }
-                    },
-                    onLongPress = {
-                        isPaused = true
-                        onPause()
-                    },
-                    onPress = {
-                        awaitRelease()
-                        if (isPaused) {
-                            onStart()
-                            isPaused = false
-                        }
-                    }
+    Column(modifier = modifier.background(color = Color.Black)) {
+        Box(modifier = modifier.weight(weight = 1f, fill = true)) {
+            state.currentStory?.let {
+                if (!it.isInteractive) StoryView(story = it)
+                StorySwitcher(
+                    onSkipPrevious = onSkipPrevious,
+                    onSkipNext = onSkipNext,
+                    onPause = onPause,
+                    onStart = onStart,
+                    content = { if (it.isInteractive) StoryView(story = it) }
                 )
             }
-    ) {
-        state.currentStory?.let {
-            StoryView(story = it, onShareClicked = onShareClicked)
-        }
-        SegmentedProgressIndicator(
-            progress = progress,
-            segmentsData = state.segmentsData,
-            modifier = modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-        )
-        CloseButtonView(onCloseClicked)
-    }
-}
-
-@Composable
-private fun StoryView(
-    story: Story,
-    modifier: Modifier = Modifier,
-    onShareClicked: (() -> Bitmap) -> Unit,
-) {
-    var onCaptureBitmap: (() -> Bitmap)? = null
-    Column {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .weight(weight = 1f, fill = true),
-        ) {
-            onCaptureBitmap = snapShot(
-                content = { StorySharableContent(story, modifier) }
+            SegmentedProgressIndicator(
+                progress = progress,
+                segmentsData = state.segmentsData,
+                modifier = modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
             )
+            CloseButtonView(onCloseClicked)
         }
         ShareButton(
             onClick = {
@@ -162,6 +119,16 @@ private fun StoryView(
             }
         )
     }
+}
+
+@Composable
+private fun StoryView(
+    story: Story,
+    modifier: Modifier = Modifier,
+) {
+    onCaptureBitmap = snapShot(
+        content = { StorySharableContent(story, modifier) }
+    )
 }
 
 @Composable
@@ -272,6 +239,52 @@ private fun StoriesEmptyView(
         ) {
             content()
         }
+    }
+}
+
+@Composable
+private fun StorySwitcher(
+    onSkipPrevious: () -> Unit,
+    onSkipNext: () -> Unit,
+    onPause: () -> Unit,
+    onStart: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: (@Composable () -> Unit)?,
+) {
+    var screenWidth by remember { mutableStateOf(1) }
+    var isPaused by remember { mutableStateOf(false) }
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .onGloballyPositioned {
+                screenWidth = it.size.width
+            }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        if (!isPaused) {
+                            if (it.x > screenWidth / 2) {
+                                onSkipNext()
+                            } else {
+                                onSkipPrevious()
+                            }
+                        }
+                    },
+                    onLongPress = {
+                        isPaused = true
+                        onPause()
+                    },
+                    onPress = {
+                        awaitRelease()
+                        if (isPaused) {
+                            onStart()
+                            isPaused = false
+                        }
+                    }
+                )
+            }
+    ) {
+        content?.invoke()
     }
 }
 
