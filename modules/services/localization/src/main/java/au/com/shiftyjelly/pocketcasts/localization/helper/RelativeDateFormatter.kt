@@ -22,6 +22,7 @@ import java.util.Locale
 class RelativeDateFormatter(val context: Context) {
 
     private val sevenDaysAgo: Calendar = Calendar.getInstance().apply { add(Calendar.DATE, -7) }
+    private val sevenDaysFromNow: Calendar = Calendar.getInstance().apply { add(Calendar.DATE, 7) }
     private val yesterday: Calendar = Calendar.getInstance().apply { add(Calendar.DATE, -1) }
     private val currentYear: Int = Calendar.getInstance().get(Calendar.YEAR)
     private var relativeDateFormatter: RelativeDateTimeFormatter? = null
@@ -29,11 +30,6 @@ class RelativeDateFormatter(val context: Context) {
     fun format(date: Date): String {
         val calendar = Calendar.getInstance()
         calendar.time = date
-        val format = when {
-            calendar.get(Calendar.YEAR) != currentYear -> DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
-            calendar.after(sevenDaysAgo) -> DateUtils.FORMAT_SHOW_WEEKDAY
-            else -> DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // Try to add "Today" and "Yesterday"
@@ -47,6 +43,12 @@ class RelativeDateFormatter(val context: Context) {
             if (alternativeString != null) {
                 return alternativeString
             }
+        }
+
+        val format = when {
+            calendar.get(Calendar.YEAR) != currentYear -> DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
+            calendar.after(sevenDaysAgo) && calendar.before(sevenDaysFromNow) -> DateUtils.FORMAT_SHOW_WEEKDAY
+            else -> DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR
         }
 
         return DateUtils.formatDateTime(context, calendar.timeInMillis, format)
