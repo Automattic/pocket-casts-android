@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-16 09:55:47+0000
+Translation-Revision-Date: 2022-10-25 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">Ahora no</string>
+	<string name="end_of_year_launch_modal_primary_button_title">Ver mi 2022</string>
+	<string name="end_of_year_launch_modal_summary">Consulta cuáles han sido los podcasts y las categorías que más has escuchado, las estadísticas de escucha y mucho más. Compártelo con tus amigos y haz que todo el mundo sepa cuáles son tus creadores favoritos.</string>
+	<string name="end_of_year_launch_modal_title">Tu año en podcasts</string>
+	<string name="settings_app_icon_halloween">Halloween</string>
+	<string name="settings_show_played_summary">Se seguirán mostrando los episodios que hayas terminado de reproducir.</string>
+	<string name="settings_show_played">Mostrar episodios reproducidos</string>
+	<string name="settings_privacy_crash_link_summary">Permítenos vincular tu cuenta de Pocket Casts a los informes de errores.</string>
+	<string name="settings_privacy_crash_link">Vincular tu cuenta a los errores</string>
+	<string name="settings_privacy_crash_summary">Permítenos recopilar informes de errores.</string>
+	<string name="settings_privacy_crash">Informes de errores</string>
+	<string name="settings_privacy_analytics_summary">Permítenos recopilar análisis.</string>
+	<string name="settings_privacy_analytics">Análisis</string>
+	<string name="settings_privacy_summary">Si nos permites recopilar análisis e informes de errores podremos mejorar la aplicación. Entendemos que prefieras no compartir esta información.</string>
+	<string name="settings_title_privacy">Privacidad</string>
+	<string name="profile_privacy_policy_read">Leer la política de privacidad</string>
+	<string name="token_refresh_sign_in_error_description">Ha habido un problema y tu sesión se ha cerrado. Toca aquí para volver a acceder.</string>
+	<string name="token_refresh_sign_in_error_title">Error al acceder</string>
 	<string name="settings_downloads_clean_up_summary">¿Seguro que quieres eliminar estos archivos descargados?</string>
 	<string name="settings_storage_section_heading_mobile_data">Datos móviles</string>
 	<string name="settings_storage_section_heading_usage">Uso</string>
