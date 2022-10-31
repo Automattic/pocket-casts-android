@@ -43,7 +43,7 @@
                 android:id="@+id/loadingGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="lblDate,lblTimeLeft,lblAuthor,btnDownload, btnShare, btnFav, btnAddToUpNext, btnArchive, btnPlay, btnPlayed"
+                app:constraint_referenced_ids="lblDate,lblTimeLeft,lblAuthor,btnShare,btnFav,buttonGroupLayout"
                 android:visibility="invisible"
                 tools:visibility="visible" />
 
@@ -139,100 +139,103 @@
                 app:layout_constraintTop_toBottomOf="@+id/lblTitle"
                 tools:text="Invisibilia" />
 
-            <View
-                android:id="@+id/topDivider"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/divider_height"
-                android:background="?attr/primary_ui_05"
-                app:layout_constraintBottom_toBottomOf="@+id/btnPlay"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/btnPlay" />
-
-            <au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
-                android:id="@+id/btnPlay"
-                android:layout_width="@dimen/episode_card_dimen"
-                android:layout_height="@dimen/episode_card_dimen"
-                android:layout_marginTop="16dp"
-                app:icon_height="38dp"
-                app:icon_tint="?attr/primary_ui_01"
-                app:icon_width="38dp"
-                app:layout_constraintStart_toStartOf="parent"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/buttonGroupLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lblAuthor" />
-
-            <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButton
-                android:id="@+id/btnDownload"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:paddingBottom="5dp"
-                app:layout_constraintEnd_toStartOf="@+id/btnAddToUpNext"
-                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/topDivider"
-                app:layout_constraintBottom_toTopOf="@+id/buttonBarrier"
-                app:layout_constraintVertical_bias="0.01"
-                android:contentDescription="@string/download"
-                tools:background="@tools:sample/avatars"
-                tools:text="Download" />
+                app:layout_constraintTop_toBottomOf="@+id/lblAuthor">
 
-            <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
-                android:id="@+id/btnAddToUpNext"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                android:gravity="top"
-                tools:background="@tools:sample/avatars"
-                android:contentDescription="@string/add_to_up_next"
-                app:layout_constraintStart_toEndOf="@+id/btnDownload"
-                app:layout_constraintEnd_toStartOf="@+id/btnPadding"
-                app:layout_constraintTop_toTopOf="@+id/btnDownload"
-                app:layout_constraintBottom_toTopOf="@+id/buttonBarrier"
-                app:layout_constraintVertical_bias="0.01"
-                app:layout_constraintHorizontal_chainStyle="packed" />
+                <View
+                    android:id="@+id/topDivider"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/divider_height"
+                    android:background="?attr/primary_ui_05"
+                    app:layout_constraintBottom_toBottomOf="@+id/btnPlay"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/btnPlay" />
 
-            <View
-                android:id="@+id/btnPadding"
-                android:layout_width="@dimen/episode_card_action_middle_padding"
-                android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="@+id/btnPlay"
-                app:layout_constraintStart_toStartOf="@+id/btnPlay"
-                app:layout_constraintTop_toTopOf="@+id/btnDownload"
-                app:layout_constraintHorizontal_chainStyle="packed" />
+                <au.com.shiftyjelly.pocketcasts.views.buttons.AnimatedPlayButton
+                    android:id="@+id/btnPlay"
+                    android:layout_width="@dimen/episode_card_dimen"
+                    android:layout_height="@dimen/episode_card_dimen"
+                    android:layout_marginTop="16dp"
+                    app:icon_height="38dp"
+                    app:icon_tint="?attr/primary_ui_01"
+                    app:icon_width="38dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
-                android:id="@+id/btnPlayed"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                tools:background="@tools:sample/avatars"
-                app:layout_constraintEnd_toStartOf="@+id/btnArchive"
-                app:layout_constraintStart_toEndOf="@+id/btnPadding"
-                app:layout_constraintTop_toTopOf="@+id/btnDownload"
-                app:layout_constraintBottom_toTopOf="@+id/buttonBarrier"
-                app:layout_constraintVertical_bias="0.01"
-                app:layout_constraintHorizontal_chainStyle="packed" />
+                <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButton
+                    android:id="@+id/btnDownload"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:paddingBottom="5dp"
+                    app:layout_constraintEnd_toStartOf="@+id/btnAddToUpNext"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/topDivider"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="0.01"
+                    android:contentDescription="@string/download"
+                    tools:background="@tools:sample/avatars"
+                    tools:text="Download" />
 
-            <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
-                android:id="@+id/btnArchive"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintStart_toEndOf="@+id/btnPlayed"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/btnDownload"
-                app:layout_constraintBottom_toTopOf="@+id/buttonBarrier"
-                app:layout_constraintVertical_bias="0.01"
-                tools:background="@tools:sample/avatars" />
+                <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
+                    android:id="@+id/btnAddToUpNext"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    android:gravity="top"
+                    tools:background="@tools:sample/avatars"
+                    android:contentDescription="@string/add_to_up_next"
+                    app:layout_constraintStart_toEndOf="@+id/btnDownload"
+                    app:layout_constraintEnd_toStartOf="@+id/btnPadding"
+                    app:layout_constraintTop_toTopOf="@+id/btnDownload"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="0.01"
+                    app:layout_constraintHorizontal_chainStyle="packed" />
 
-            <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/buttonBarrier"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:barrierDirection="bottom"
-                app:constraint_referenced_ids="btnDownload,btnAddToUpNext,btnPlayed,btnArchive" />
+                <View
+                    android:id="@+id/btnPadding"
+                    android:layout_width="@dimen/episode_card_action_middle_padding"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@+id/btnPlay"
+                    app:layout_constraintStart_toStartOf="@+id/btnPlay"
+                    app:layout_constraintTop_toTopOf="@+id/btnDownload"
+                    app:layout_constraintHorizontal_chainStyle="packed" />
+
+                <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
+                    android:id="@+id/btnPlayed"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    tools:background="@tools:sample/avatars"
+                    app:layout_constraintEnd_toStartOf="@+id/btnArchive"
+                    app:layout_constraintStart_toEndOf="@+id/btnPadding"
+                    app:layout_constraintTop_toTopOf="@+id/btnDownload"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="0.01"
+                    app:layout_constraintHorizontal_chainStyle="packed" />
+
+                <au.com.shiftyjelly.pocketcasts.podcasts.view.episode.ToggleActionButton
+                    android:id="@+id/btnArchive"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="5dp"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@+id/btnPlayed"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/btnDownload"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="0.01"
+                    tools:background="@tools:sample/avatars" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/errorLayout"
@@ -274,7 +277,7 @@
                 android:layout_marginEnd="64dp"
                 android:paddingTop="10dp"
                 android:textColor="?attr/primary_text_01"
-                app:layout_constraintTop_toTopOf="@+id/buttonBarrier"
+                app:layout_constraintTop_toBottomOf="@+id/buttonGroupLayout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="Error downloading" />
