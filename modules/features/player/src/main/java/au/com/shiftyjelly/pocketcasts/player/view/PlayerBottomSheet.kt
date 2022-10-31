@@ -151,6 +151,10 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
                     })
                 } else {
                     translationY = 0f
+                    if (!shouldAnimateOnAttach) {
+                        listener?.onMiniPlayerVisible()
+                        hasLoadedFirstTime = true
+                    }
                 }
             }
         } else {
