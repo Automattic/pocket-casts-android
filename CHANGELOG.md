@@ -23,6 +23,8 @@
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
     *   Fixed full screen video player not closing the first time in landscape mode
         ([#464](https://github.com/Automattic/pocket-casts-android/pull/464)).
+    *   Fixed some layout issues in the EpisodeFragment
+        ([#459](https://github.com/Automattic/pocket-casts-android/pull/459)).
     *   Fixed RTL support for notes
         ([#514](https://github.com/Automattic/pocket-casts-android/pull/514)).
 
