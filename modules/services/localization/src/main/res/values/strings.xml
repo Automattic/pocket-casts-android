@@ -55,6 +55,7 @@
     <string name="select_all_below">Select all below</string>
     <string name="share_podcast">Share podcast</string>
     <string name="show_archived">Show archived</string>
+    <string name="log_in">Log in</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
@@ -111,7 +112,6 @@
     <string name="please_try_again">Please try again</string>
     <string name="next">Next</string>
     <string name="select_podcasts">Select podcasts</string>
-    <string name="welcome_back">Welcome back</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -1401,6 +1401,17 @@
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_listening_time">In 2022, you spent %1$s listening to podcasts.</string>
     <string name="end_of_year_replay">Replay</string>
+
+    <!-- Onboarding -->
+
+    <string name="onboarding_welcome_back">Welcome back</string>
+    <string name="onboarding_not_now">Not now</string>
+    <string name="onboarding_sign_up_free">Sign up free</string>
+    <string name="onboarding_continue_with_google">Continue with Google</string>
+    <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
+    <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
+    <string name="onboarding_get_the_newsletter">Get the newsletter</string>
+    <string name="onboarding_forgot_password">Forgot password?</string>
 
     <!--    Tasker Plugin-->
 

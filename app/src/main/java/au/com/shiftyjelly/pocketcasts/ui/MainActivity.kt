@@ -279,10 +279,18 @@ class MainActivity :
             if (BuildConfig.ONBOARDING_ENABLED) {
                 var show by rememberSaveable { mutableStateOf(true) }
                 if (show) {
+
+                    @Suppress("DEPRECATION")
+                    window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
                     OnboardingFlowComposable(
                         activeTheme = theme.activeTheme,
                         completeOnboarding = { show = false },
                     )
+                } else {
+                    val defaultSoftInput = WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or
+                        WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
+                    window?.setSoftInputMode(defaultSoftInput)
                 }
             }
         }

@@ -22,6 +22,8 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,12 @@ fun FormField(
     modifier: Modifier = Modifier,
     onNext: () -> Unit = {},
     singleLine: Boolean = true,
+    enabled: Boolean = true,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     imeAction: ImeAction = ImeAction.Done
 ) {
     val focusManager = LocalFocusManager.current
@@ -49,13 +57,21 @@ fun FormField(
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = MaterialTheme.theme.colors.primaryText01,
             placeholderColor = MaterialTheme.theme.colors.primaryText02,
-            unfocusedBorderColor = MaterialTheme.theme.colors.primaryField03
+            unfocusedBorderColor = MaterialTheme.theme.colors.primaryField03,
         ),
+        enabled = enabled,
         placeholder = { Text(placeholder) },
         shape = RoundedCornerShape(6.dp),
-        keyboardOptions = KeyboardOptions(imeAction = imeAction, capitalization = KeyboardCapitalization.Sentences),
+        keyboardOptions = KeyboardOptions(
+            capitalization = capitalization,
+            keyboardType = keyboardType,
+            imeAction = imeAction,
+        ),
         keyboardActions = KeyboardActions(onAny = { onNext() }),
         singleLine = singleLine,
+        visualTransformation = visualTransformation,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
             .onPreviewKeyEvent {

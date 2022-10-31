@@ -30,32 +30,30 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
                     onNotNowClicked = completeOnboarding,
-                    onSignUpFreeClicked = {
-                        navController.navigate(OnboardingNavRoute.createFreeAccount)
-                    },
-                    onLoginClicked = {
-                        navController.navigate(OnboardingNavRoute.logIn)
-                    },
-                    onLoginGoogleClicked = {
-                        navController.navigate(OnboardingNavRoute.logInGoogle)
-                    }
+                    onSignUpFreeClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
+                    onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
+                    onLoginGoogleClicked = { navController.navigate(OnboardingNavRoute.logInGoogle) }
                 )
             }
 
             composable(OnboardingNavRoute.createFreeAccount) {
-                OnboardingCreateFreeAccountPage(
-                    onBackPressed = { navController.popBackStack() }
-                )
+                OnboardingCreateFreeAccountPage(onBackPressed = { navController.popBackStack() })
             }
 
             composable(OnboardingNavRoute.logIn) {
                 OnboardingLoginPage(
-                    onBackPressed = { navController.popBackStack() }
+                    onBackPressed = { navController.popBackStack() },
+                    onLoginComplete = { completeOnboarding() },
+                    onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
             }
 
             composable(OnboardingNavRoute.logInGoogle) {
                 OnboardingLoginGooglePage()
+            }
+
+            composable(OnboardingNavRoute.forgotPassword) {
+                OnboardingForgotPassword(onBackPressed = { navController.popBackStack() })
             }
         }
     }
@@ -66,4 +64,5 @@ private object OnboardingNavRoute {
     const val createFreeAccount = "create_free_account"
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
+    const val forgotPassword = "forgot_password"
 }

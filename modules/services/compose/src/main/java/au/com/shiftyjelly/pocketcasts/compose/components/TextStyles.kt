@@ -21,6 +21,27 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Locale
 
 @Composable
+fun TextH10(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.theme.colors.primaryText01,
+    maxLines: Int = Int.MAX_VALUE,
+    textAlign: TextAlign? = null
+) {
+    Text(
+        text = text,
+        color = color,
+        fontSize = 31.sp,
+        lineHeight = 37.sp,
+        fontWeight = FontWeight.Bold,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = textAlign,
+        modifier = modifier
+    )
+}
+
+@Composable
 fun TextH20(
     text: String,
     modifier: Modifier = Modifier,
