@@ -57,6 +57,11 @@ object IntentUtil {
         return scheme != null && scheme == "pktc" && intent.data != null && intent.data?.path != null
     }
 
+    fun isNativeShareLink(intent: Intent): Boolean {
+        val scheme = intent.scheme
+        return scheme != null && scheme in listOf("http", "https") && intent.data != null && intent.data?.host in listOf("pca.st", "pcast.pocketcasts.net")
+    }
+
     // http://subscribeonandroid.com/geeknewscentral.com/podcast.xml
     fun isSubscribeOnAndroidUrl(intent: Intent): Boolean {
         val scheme = intent.scheme

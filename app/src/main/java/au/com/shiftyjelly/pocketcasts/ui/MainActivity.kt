@@ -104,17 +104,11 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 import com.google.android.material.R as MR
@@ -917,6 +911,8 @@ class MainActivity :
                 } else if (IntentUtil.isShareLink(intent)) { // Must go last, catches all pktc links
                     openSharingUrl(intent)
                     return
+                } else if (IntentUtil.isNativeShareLink(intent)) {
+                    openNativeSharingUrl(intent)
                 }
 
                 val scheme = intent.scheme
@@ -1102,6 +1098,22 @@ class MainActivity :
                 }
             }
         )
+    }
+
+    @Suppress("DEPRECATION")
+    private fun openNativeSharingUrl(intent: Intent) {
+        val urlSegments = intent.data?.pathSegments ?: return
+        if (urlSegments.size < 2) return
+
+        when (urlSegments[0]) {
+            "podcast" -> openPodcastUrl(urlSegments[1])
+            "episode" -> openEpisodeDialog(
+                episodeUuid = urlSegments[1],
+                source = EpisodeViewSource.SHARE,
+                podcastUuid = null,
+                forceDark = false
+            )
+        }
     }
 
     @Suppress("DEPRECATION")
