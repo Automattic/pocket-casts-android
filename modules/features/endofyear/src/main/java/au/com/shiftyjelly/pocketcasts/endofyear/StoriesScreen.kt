@@ -119,11 +119,11 @@ private fun StoriesView(
                 CloseButtonView(onCloseClicked)
             }
         }
-        ShareButton(
-            onClick = {
-                onShareClicked.invoke(requireNotNull(onCaptureBitmap))
-            }
-        )
+        requireNotNull(onCaptureBitmap).let {
+            ShareButton(
+                onClick = { onShareClicked.invoke(it) }
+            )
+        }
     }
 }
 
