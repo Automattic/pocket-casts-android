@@ -26,10 +26,10 @@ class FileUtilWrapper @Inject constructor() {
         try {
             imagesFolder.mkdirs()
             file = File(imagesFolder, saveFileName)
-            val stream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
-            stream.flush()
-            stream.close()
+            FileOutputStream(file).use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream)
+                stream.flush()
+            }
         } catch (e: IOException) {
             Timber.e("Error while saving image to file " + e.message)
         }
