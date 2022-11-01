@@ -606,6 +606,7 @@
     <string name="profile">Profile</string>
     <string name="profile_access_ended">Access ended: %s</string>
     <string name="profile_access_ends">Access ends: %s</string>
+    <string name="profile_account_upgraded">Account Upgraded</string>
     <string name="profile_account_created">Account Created</string>
     <string name="profile_account_delete" translatable="false">@string/delete</string>
     <string name="profile_account_delete_yes">Yes, delete it</string>
