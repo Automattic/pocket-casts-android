@@ -137,4 +137,5 @@ interface EpisodeManager {
     suspend fun findStaleDownloads(): List<Episode>
 
     fun findRandomEpisode(): Flow<Episode?>
+    fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?>
 }

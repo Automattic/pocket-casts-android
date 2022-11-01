@@ -311,4 +311,7 @@ abstract class EpisodeDao {
 
     @Query("SELECT * FROM episodes LIMIT 1")
     abstract fun findRandomEpisode(): Flow<Episode?>
+
+    @Query("SELECT SUM(played_up_to) FROM episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > :fromEpochMs AND last_playback_interaction_date < :toEpochMs")
+    abstract fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?>
 }
