@@ -1071,8 +1071,6 @@ class EpisodeManagerImpl @Inject constructor(
             }
     }
 
-    override fun findRandomEpisode() = episodeDao.findRandomEpisode()
-
     override fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?> =
         episodeDao.calculateListeningTime(fromEpochMs, toEpochMs)
 }

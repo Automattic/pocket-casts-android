@@ -43,11 +43,9 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake2
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryFake1View
-import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryFake2View
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListeningTimeView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -145,7 +143,6 @@ private fun StorySharableContent(
         when (story) {
             is StoryListeningTime -> StoryListeningTimeView(story)
             is StoryFake1 -> StoryFake1View(story)
-            is StoryFake2 -> StoryFake2View(story)
         }
     }
 }

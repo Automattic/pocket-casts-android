@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -24,10 +23,6 @@ class EndOfYearManagerImpl @Inject constructor(
 
     override fun findRandomPodcasts(): Flow<List<Podcast>> {
         return podcastManager.findRandomPodcasts()
-    }
-
-    override fun findRandomEpisode(): Flow<Episode?> {
-        return episodeManager.findRandomEpisode()
     }
 
     override fun getTotalListeningTimeInSecsForYear(year: Int): Flow<Long?> {
