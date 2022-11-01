@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.stories
 
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject

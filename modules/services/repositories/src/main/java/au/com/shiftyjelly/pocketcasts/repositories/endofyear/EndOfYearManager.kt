@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.repositories.podcast
+package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
