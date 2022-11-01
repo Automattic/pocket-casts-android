@@ -11,9 +11,10 @@ class EndOfYearStoriesDataSource @Inject constructor(
 ) : StoriesDataSource {
     override suspend fun loadStories(): Flow<List<Story>> {
         return combine(
+            endOfYearManager.getTotalListeningTimeInSecsForYear(YEAR),
             endOfYearManager.findRandomPodcasts(),
-            endOfYearManager.findRandomEpisode()
-        ) { podcasts, episode ->
+            endOfYearManager.findRandomEpisode(),
+        ) { _, podcasts, episode, ->
             val stories = mutableListOf<Story>()
 
             if (podcasts.isNotEmpty()) stories.add(StoryFake1(podcasts))
@@ -21,5 +22,9 @@ class EndOfYearStoriesDataSource @Inject constructor(
 
             stories
         }
+    }
+
+    companion object {
+        private const val YEAR = 2022
     }
 }

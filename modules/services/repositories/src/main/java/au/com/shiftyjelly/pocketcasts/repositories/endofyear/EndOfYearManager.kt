@@ -8,4 +8,6 @@ interface EndOfYearManager {
     fun findRandomPodcasts(): Flow<List<Podcast>>
 
     fun findRandomEpisode(): Flow<Episode?>
+
+    fun getTotalListeningTimeInSecsForYear(year: Int): Flow<Long?>
 }
