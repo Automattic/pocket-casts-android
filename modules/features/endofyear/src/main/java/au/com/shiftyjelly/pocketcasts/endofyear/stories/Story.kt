@@ -7,4 +7,5 @@ abstract class Story {
     open val storyLength: Long = 2.seconds()
     abstract val backgroundColor: Color
     val tintColor: Color = Color.White
+    val isInteractive: Boolean = false
 }
