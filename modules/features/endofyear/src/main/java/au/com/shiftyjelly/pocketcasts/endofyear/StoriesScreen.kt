@@ -44,7 +44,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake2
-import au.com.shiftyjelly.pocketcasts.endofyear.views.snapShot
+import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryFake1View
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryFake2View
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -96,7 +96,8 @@ private fun StoriesView(
         state.currentStory?.let { story ->
             Box(modifier = modifier.weight(weight = 1f, fill = true)) {
                 if (!story.isInteractive) {
-                    onCaptureBitmap = snapShot(content = { StorySharableContent(story, modifier) })
+                    onCaptureBitmap =
+                        convertibleToBitmap(content = { StorySharableContent(story, modifier) })
                 }
                 StorySwitcher(
                     onSkipPrevious = onSkipPrevious,
@@ -106,7 +107,7 @@ private fun StoriesView(
                 ) {
                     if (story.isInteractive) {
                         onCaptureBitmap =
-                            snapShot(content = { StorySharableContent(story, modifier) })
+                            convertibleToBitmap(content = { StorySharableContent(story, modifier) })
                     }
                 }
                 SegmentedProgressIndicator(

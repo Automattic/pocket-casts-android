@@ -8,18 +8,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.drawToBitmap
 
-/* Returns a callback to get latest composable bitmap.
+/* Returns a callback to get bitmap for the passed composable.
+The composable is converted to ComposeView and laid out into AndroidView otherwise an illegal state exception is thrown:
+View needs to be laid out before calling drawToBitmap()
 Credits: https://rb.gy/g5vuez */
 @Composable
-fun snapShot(
+fun convertibleToBitmap(
     content: @Composable () -> Unit,
 ): () -> Bitmap {
     val context = LocalContext.current
     val composeView = remember { ComposeView(context) }
-
-    fun onCaptureBitmap(): Bitmap {
-        return composeView.drawToBitmap()
-    }
 
     AndroidView(
         factory = {
@@ -31,5 +29,5 @@ fun snapShot(
         }
     )
 
-    return ::onCaptureBitmap
+    return { composeView.drawToBitmap() }
 }
