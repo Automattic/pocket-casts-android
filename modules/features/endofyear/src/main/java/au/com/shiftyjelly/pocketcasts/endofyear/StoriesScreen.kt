@@ -54,7 +54,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
 
-private var onCaptureBitmap: (() -> Bitmap)? = null
 @Composable
 fun StoriesScreen(
     viewModel: StoriesViewModel,
@@ -93,25 +92,32 @@ private fun StoriesView(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.background(color = Color.Black)) {
-        Box(modifier = modifier.weight(weight = 1f, fill = true)) {
-            state.currentStory?.let {
-                if (!it.isInteractive) StoryView(story = it)
+        var onCaptureBitmap: (() -> Bitmap)? = null
+        state.currentStory?.let { story ->
+            Box(modifier = modifier.weight(weight = 1f, fill = true)) {
+                if (!story.isInteractive) {
+                    onCaptureBitmap = snapShot(content = { StorySharableContent(story, modifier) })
+                }
                 StorySwitcher(
                     onSkipPrevious = onSkipPrevious,
                     onSkipNext = onSkipNext,
                     onPause = onPause,
                     onStart = onStart,
-                    content = { if (it.isInteractive) StoryView(story = it) }
+                ) {
+                    if (story.isInteractive) {
+                        onCaptureBitmap =
+                            snapShot(content = { StorySharableContent(story, modifier) })
+                    }
+                }
+                SegmentedProgressIndicator(
+                    progress = progress,
+                    segmentsData = state.segmentsData,
+                    modifier = modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
                 )
+                CloseButtonView(onCloseClicked)
             }
-            SegmentedProgressIndicator(
-                progress = progress,
-                segmentsData = state.segmentsData,
-                modifier = modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-            )
-            CloseButtonView(onCloseClicked)
         }
         ShareButton(
             onClick = {
@@ -119,16 +125,6 @@ private fun StoriesView(
             }
         )
     }
-}
-
-@Composable
-private fun StoryView(
-    story: Story,
-    modifier: Modifier = Modifier,
-) {
-    onCaptureBitmap = snapShot(
-        content = { StorySharableContent(story, modifier) }
-    )
 }
 
 @Composable
