@@ -265,6 +265,10 @@ class MainActivity :
         if (BuildConfig.END_OF_YEAR_ENABLED) {
             setupEndOfYearLaunchBottomSheet()
         }
+
+        if (BuildConfig.ONBOARDING_ENABLED) {
+            // start onboarding flow
+        }
     }
 
     override fun onStart() {
