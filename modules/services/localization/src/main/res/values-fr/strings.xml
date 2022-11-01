@@ -1230,5 +1230,4 @@ Language: fr
 	<string name="unarchive">Désarchiver</string>
 	<string name="archive">Archiver</string>
 	<string name="add_to_up_next">Ajouter à la file d\'attente</string>
-    <string name="profile_account_upgraded">Compte mis à jour</string>
 </resources>

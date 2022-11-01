@@ -1230,5 +1230,4 @@ Language: zh_TW
 	<string name="unarchive">取消封存</string>
 	<string name="archive">封存</string>
 	<string name="add_to_up_next">新增到「接下來播放」</string>
-    <string name="profile_account_upgraded">帳戶升級</string>
 </resources>

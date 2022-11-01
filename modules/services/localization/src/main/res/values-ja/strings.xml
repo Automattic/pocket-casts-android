@@ -1230,5 +1230,4 @@ Language: ja_JP
 	<string name="unarchive">アーカイブを解除</string>
 	<string name="archive">アーカイブ</string>
 	<string name="add_to_up_next">次のエピソードに追加</string>
-    <string name="profile_account_upgraded">アカウントがアップグレードされました</string>
 </resources>

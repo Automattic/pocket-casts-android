@@ -1178,5 +1178,4 @@ Language: nb_NO
 	<string name="unarchive">Fjern fra arkiv</string>
 	<string name="archive">Arkiver</string>
 	<string name="add_to_up_next">Legg til i Neste</string>
-    <string name="profile_account_upgraded">Konto oppgradert</string>
 </resources>

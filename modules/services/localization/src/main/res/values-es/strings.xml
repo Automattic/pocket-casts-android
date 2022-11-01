@@ -1230,5 +1230,4 @@ Language: es
 	<string name="unarchive">Desarchivar</string>
 	<string name="archive">Archivo</string>
 	<string name="add_to_up_next">Añadir a A continuación</string>
-    <string name="profile_account_upgraded">Cuenta actualizada</string>
 </resources>

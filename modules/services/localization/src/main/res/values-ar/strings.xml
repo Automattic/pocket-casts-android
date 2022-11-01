@@ -1178,5 +1178,4 @@ Language: ar
 	<string name="unarchive">إلغاء الأرشفة</string>
 	<string name="archive">أرشيف</string>
 	<string name="add_to_up_next">إضافة إلى التالي</string>
-    <string name="profile_account_upgraded">ترقية الحساب</string>
 </resources>

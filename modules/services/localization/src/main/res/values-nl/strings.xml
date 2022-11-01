@@ -1230,5 +1230,4 @@ Language: nl
 	<string name="unarchive">Dearchiveren</string>
 	<string name="archive">Archiveren</string>
 	<string name="add_to_up_next">Toevoegen aan Hierna</string>
-    <string name="profile_account_upgraded">Account geüpgraded</string>
 </resources>
