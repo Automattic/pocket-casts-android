@@ -1389,6 +1389,7 @@
     <string name="end_of_year_prompt_card_title" translatable="false">@string/end_of_year_launch_modal_title</string>
     <string name="end_of_year_prompt_card_summary">See your top podcasts, categories, listening stats and more.</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
+    <string name="end_of_year_listening_time">In 2022, you spent %1$s listening to podcasts.</string>
 
     <!--    Tasker Plugin-->
 

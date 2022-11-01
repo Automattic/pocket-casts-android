@@ -14,9 +14,10 @@ class EndOfYearStoriesDataSource @Inject constructor(
             endOfYearManager.getTotalListeningTimeInSecsForYear(YEAR),
             endOfYearManager.findRandomPodcasts(),
             endOfYearManager.findRandomEpisode(),
-        ) { _, podcasts, episode, ->
+        ) { listeningTime, podcasts, episode, ->
             val stories = mutableListOf<Story>()
 
+            listeningTime?.let { stories.add(StoryListeningTime(it)) }
             if (podcasts.isNotEmpty()) stories.add(StoryFake1(podcasts))
             episode?.let { stories.add(StoryFake2(it)) }
 
