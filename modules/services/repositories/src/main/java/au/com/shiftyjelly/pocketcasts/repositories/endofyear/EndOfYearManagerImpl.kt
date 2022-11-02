@@ -30,7 +30,7 @@ class EndOfYearManagerImpl @Inject constructor(
             episodeManager.calculateListeningTime(it.start, it.end)
         } ?: flowOf(null)
 
-    override fun findListeningCategoriesForYear(year: Int) =
+    override fun findListenedCategoriesForYear(year: Int) =
         getYearStartAndEndEpochMs(year)?.let {
             episodeManager.findListenedCategories(it.start, it.end)
         } ?: flowOf(emptyList())

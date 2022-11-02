@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface EndOfYearManager {
     fun findRandomPodcasts(): Flow<List<Podcast>>
     fun getTotalListeningTimeInSecsForYear(year: Int): Flow<Long?>
-    fun findListeningCategoriesForYear(year: Int): Flow<List<ListenedCategory>>
+    fun findListenedCategoriesForYear(year: Int): Flow<List<ListenedCategory>>
 }

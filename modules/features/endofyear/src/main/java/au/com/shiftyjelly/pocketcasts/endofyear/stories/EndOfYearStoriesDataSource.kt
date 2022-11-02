@@ -12,7 +12,7 @@ class EndOfYearStoriesDataSource @Inject constructor(
     override suspend fun loadStories(): Flow<List<Story>> {
         return combine(
             endOfYearManager.getTotalListeningTimeInSecsForYear(YEAR),
-            endOfYearManager.findListeningCategoriesForYear(YEAR),
+            endOfYearManager.findListenedCategoriesForYear(YEAR),
             endOfYearManager.findRandomPodcasts(),
         ) { listeningTime, listenedCategories, podcasts ->
             val stories = mutableListOf<Story>()
