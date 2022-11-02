@@ -14,33 +14,33 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun HorizontalLogoPlus(modifier: Modifier = Modifier) {
+fun HorizontalLogo(modifier: Modifier = Modifier) {
 
     val resourceId = if (MaterialTheme.theme.isLight) {
-        IR.drawable.plus_logo_horizontal_light
+        IR.drawable.ic_logo_title_hor_dark
     } else {
-        IR.drawable.plus_logo_horizontal_dark
+        IR.drawable.ic_logo_title_hor_light
     }
 
     Image(
         painter = painterResource(resourceId),
-        contentDescription = stringResource(LR.string.pocket_casts_plus),
+        contentDescription = stringResource(LR.string.pocket_casts),
         modifier = modifier
     )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-private fun HorizontalLogoPlusDarkPreview() {
+private fun HorizontalLogoDarkPreview() {
     AppTheme(Theme.ThemeType.DARK) {
-        HorizontalLogoPlus()
+        HorizontalLogo()
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun VerticalLogoPlusLightPreview() {
+private fun VerticalLogoLightPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
-        HorizontalLogoPlus()
+        HorizontalLogo()
     }
 }
