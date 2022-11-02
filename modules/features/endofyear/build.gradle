@@ -10,6 +10,8 @@ android {
 }
 
 dependencies {
+    // features
+    implementation project(':modules:features:settings')
     // services
     implementation project(':modules:services:compose')
     implementation project(':modules:services:localization')
