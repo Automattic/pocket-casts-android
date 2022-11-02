@@ -16,6 +16,8 @@
         ([#483](https://github.com/Automattic/pocket-casts-android/pull/483)).
     *   Updated select filters title & hide podcast setting filter option when applicable
         ([#494](https://github.com/Automattic/pocket-casts-android/pull/494)).
+    *   Support Android 13 per-app language preferences
+        ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
 *   Bug Fixes:
     *   Fixed Help & Feedback buttons being hidden when using text zoom.
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
