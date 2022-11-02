@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import androidx.lifecycle.LiveData
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -136,4 +137,5 @@ interface EpisodeManager {
     suspend fun deleteEpisodeFiles(episodes: List<Episode>, playbackManager: PlaybackManager)
     suspend fun findStaleDownloads(): List<Episode>
     fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?>
+    fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>>
 }
