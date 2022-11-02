@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +11,7 @@ import java.time.LocalDate
 interface EndOfYearManager {
     fun findRandomPodcasts(): Flow<List<Podcast>>
     fun getTotalListeningTimeInSecsForYear(year: Int): Flow<Long?>
+    fun findListeningCategoriesForYear(year: Int): Flow<List<ListenedCategory>>
 
     fun getYearStartAndEndEpochMs(year: Int): YearStartAndEndEpochMs? {
         var yearStartAndEndEpochMs: YearStartAndEndEpochMs? = null
