@@ -3,9 +3,8 @@ package au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.config
 import android.app.Application
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import au.com.shiftyjelly.pocketcasts.images.R.drawable
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.taskerplugin.R
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.ViewModelBase
 import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.ActionHelperControlPlayback
 import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.InputControlPlayback
@@ -13,6 +12,8 @@ import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class ViewModelConfigControlPlayback @Inject constructor(
@@ -33,34 +34,34 @@ class ViewModelConfigControlPlayback @Inject constructor(
         override val askFor get() = showForCommands.isEmpty() || showForCommands.contains(input?.commandEnum)
     }
 
-    private val inputFieldCommand = object : InputField<InputControlPlayback.PlaybackCommand>(R.string.playback_command, drawable.filter_play, { command }, { setCommand(it) }) {
+    private val inputFieldCommand = object : InputField<InputControlPlayback.PlaybackCommand>(LR.string.playback_command, IR.drawable.filter_play, { command }, { setCommand(it) }) {
         override fun getPossibleValues() = MutableStateFlow(InputControlPlayback.PlaybackCommand.values().toList())
         override fun getValueDescriptionSpecific(possibleValue: InputControlPlayback.PlaybackCommand?) = possibleValue?.getDescription(context)
     }
     override val inputFields: List<InputFieldBase<*>> = listOf(
         inputFieldCommand,
-        InputField(R.string.chapter_to_skip_to, drawable.filter_bullet, InputControlPlayback.PlaybackCommand.SkipToChapter, { chapterToSkipTo }, { chapterToSkipTo = it }),
-        InputField(R.string.time_to_skip_to_seconds, drawable.filter_time, InputControlPlayback.PlaybackCommand.SkipToTime, { skipToSeconds }, { skipToSeconds = it }),
-        InputField(R.string.time_to_skip_seconds, drawable.filter_time, listOf(InputControlPlayback.PlaybackCommand.SkipForward, InputControlPlayback.PlaybackCommand.SkipBack), { skipSeconds }, { skipSeconds = it }),
-        object : InputField<Double>(R.string.playback_speed_between_values, au.com.shiftyjelly.pocketcasts.taskerplugin.R.drawable.speedometer, InputControlPlayback.PlaybackCommand.SetPlaybackSpeed, { playbackSpeed }, { playbackSpeed = it }) {
+        InputField(LR.string.chapter_to_skip_to, IR.drawable.filter_bullet, InputControlPlayback.PlaybackCommand.SkipToChapter, { chapterToSkipTo }, { chapterToSkipTo = it }),
+        InputField(LR.string.time_to_skip_to_seconds, IR.drawable.filter_time, InputControlPlayback.PlaybackCommand.SkipToTime, { skipToSeconds }, { skipToSeconds = it }),
+        InputField(LR.string.time_to_skip_seconds, IR.drawable.filter_time, listOf(InputControlPlayback.PlaybackCommand.SkipForward, InputControlPlayback.PlaybackCommand.SkipBack), { skipSeconds }, { skipSeconds = it }),
+        object : InputField<Double>(LR.string.playback_speed_between_values, R.drawable.speedometer, InputControlPlayback.PlaybackCommand.SetPlaybackSpeed, { playbackSpeed }, { playbackSpeed = it }) {
             override fun getPossibleValues() = MutableStateFlow((5..30).map { it / 10.0 })
         },
-        object : InputField<TrimMode>(R.string.trim_silence_mode, au.com.shiftyjelly.pocketcasts.taskerplugin.R.drawable.content_cut, InputControlPlayback.PlaybackCommand.SetTrimSilenceMode, { trimSilenceMode }, { trimSilenceMode = it }) {
+        object : InputField<TrimMode>(LR.string.trim_silence_mode, R.drawable.content_cut, InputControlPlayback.PlaybackCommand.SetTrimSilenceMode, { trimSilenceMode }, { trimSilenceMode = it }) {
             override fun getPossibleValues() = MutableStateFlow(TrimMode.values().toList())
             override fun getValueDescriptionSpecific(possibleValue: TrimMode?): String? {
                 if (possibleValue == null) return null
 
                 return context.getString(
                     when (possibleValue) {
-                        TrimMode.OFF -> R.string.off
-                        TrimMode.LOW -> R.string.player_effects_trim_mild
-                        TrimMode.MEDIUM -> R.string.player_effects_trim_medium
-                        TrimMode.HIGH -> R.string.player_effects_trim_mad_max
+                        TrimMode.OFF -> LR.string.off
+                        TrimMode.LOW -> LR.string.player_effects_trim_mild
+                        TrimMode.MEDIUM -> LR.string.player_effects_trim_medium
+                        TrimMode.HIGH -> LR.string.player_effects_trim_mad_max
                     }
                 )
             }
         },
-        object : InputField<Boolean>(R.string.set_volume_boost, drawable.filter_volume, InputControlPlayback.PlaybackCommand.SetVolumeBoost, { volumeBoostEnabled }, { volumeBoostEnabled = it }) {
+        object : InputField<Boolean>(LR.string.set_volume_boost, IR.drawable.filter_volume, InputControlPlayback.PlaybackCommand.SetVolumeBoost, { volumeBoostEnabled }, { volumeBoostEnabled = it }) {
             override fun getPossibleValues() = MutableStateFlow(listOf(true, false))
         }
     )
