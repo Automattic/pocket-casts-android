@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountViewModel
+import au.com.shiftyjelly.pocketcasts.compose.components.EmailPasswordFieldsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -23,29 +24,24 @@ class LogInViewModel @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
 ) : ViewModel(), CoroutineScope {
 
-    private val _logInState = MutableStateFlow(LogInState())
+    private val _logInState = MutableStateFlow(
+        LogInState(
+            signIn = ::signIn,
+            onUpdateEmail = ::updateEmail,
+            onUpdatePassword = ::updatePassword,
+        )
+    )
     val logInState: StateFlow<LogInState> = _logInState
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
     fun updateEmail(value: String) {
-        val email = value.trim()
-        _logInState.update {
-            it.copy(
-                email = email,
-                isEmailValid = AccountViewModel.isEmailValid(email)
-            )
-        }
+        _logInState.update { it.copy(email = value.trim()) }
     }
 
     fun updatePassword(value: String) {
-        _logInState.update {
-            it.copy(
-                password = value,
-                isPasswordValid = AccountViewModel.isPasswordValid(value)
-            )
-        }
+        _logInState.update { it.copy(password = value) }
     }
 
     fun signIn() {
@@ -58,7 +54,7 @@ class LogInViewModel @Inject constructor(
         _logInState.update {
             it.copy(
                 callState = LogInState.CallState.InProgress,
-                serverErrorMessage = null,
+                errorMessage = null,
             )
         }
 
@@ -74,31 +70,41 @@ class LogInViewModel @Inject constructor(
                     _logInState.update {
                         it.copy(
                             callState = LogInState.CallState.None,
-                            serverErrorMessage = result.message,
+                            errorMessage = result.message,
                         )
                     }
                 }
             }
         }
     }
-}
 
-data class LogInState(
-    val email: String = "",
-    val password: String = "",
-    val newsletter: Boolean = false,
-    val isPasswordValid: Boolean = false,
-    val isEmailValid: Boolean = false,
-    val serverErrorMessage: String? = null,
-    val callState: CallState = CallState.None
-) {
-    val enableLoginButton = isEmailValid && isPasswordValid && callState != CallState.InProgress
-    val enableTextFields = callState != CallState.InProgress
-    val hasError = serverErrorMessage != null
+    data class LogInState(
+        val email: String = "",
+        val password: String = "",
+        val errorMessage: String? = null,
+        val callState: CallState = CallState.None,
+        private val signIn: () -> Unit,
+        private val onUpdateEmail: (String) -> Unit,
+        private val onUpdatePassword: (String) -> Unit
+    ) {
+        val enableLoginButton = AccountViewModel.isEmailValid(email) &&
+            AccountViewModel.isPasswordValid(password) &&
+            callState != CallState.InProgress
 
-    enum class CallState {
-        None,
-        InProgress,
-        Successful
+        val emailPasswordState = EmailPasswordFieldsState(
+            email = email,
+            password = password,
+            enabled = callState != CallState.InProgress,
+            hasError = errorMessage != null,
+            onPasswordDone = signIn,
+            onUpdateEmail = onUpdateEmail,
+            onUpdatePassword = onUpdatePassword,
+        )
+
+        enum class CallState {
+            None,
+            InProgress,
+            Successful
+        }
     }
 }
