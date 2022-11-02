@@ -29,7 +29,7 @@ object FirebaseAnalyticsTracker {
         params.putString("list_id", listId)
         params.putString("podcast_uuid", podcastUuid)
 
-        bumpStat("discover_list_episode_play", params)
+        logEvent("discover_list_episode_play", params)
     }
 
     fun podcastEpisodeTappedFromList(listId: String, podcastUuid: String, episodeUuid: String) {
@@ -38,7 +38,7 @@ object FirebaseAnalyticsTracker {
             putString("podcast_uuid", podcastUuid)
             putString("episode_uuid", episodeUuid)
         }
-        bumpStat("discover_list_podcast_episode_tap", params)
+        logEvent("discover_list_podcast_episode_tap", params)
     }
 
     fun podcastSubscribedFromList(listId: String, podcastUuid: String) {
@@ -46,7 +46,7 @@ object FirebaseAnalyticsTracker {
         params.putString("list_id", listId)
         params.putString("podcast_uuid", podcastUuid)
 
-        bumpStat("discover_list_podcast_subscribe", params)
+        logEvent("discover_list_podcast_subscribe", params)
     }
 
     fun podcastTappedFromList(listId: String, podcastUuid: String) {
@@ -54,21 +54,21 @@ object FirebaseAnalyticsTracker {
         params.putString("list_id", listId)
         params.putString("podcast_uuid", podcastUuid)
 
-        bumpStat("discover_list_podcast_tap", params)
+        logEvent("discover_list_podcast_tap", params)
     }
 
     fun listShowAllTapped(listId: String) {
         val params = Bundle()
         params.putString("list_id", listId)
 
-        bumpStat("discover_list_show_all", params)
+        logEvent("discover_list_show_all", params)
     }
 
     fun listImpression(listId: String) {
         val params = Bundle()
         params.putString("list_id", listId)
 
-        bumpStat("discover_list_impression", params)
+        logEvent("discover_list_impression", params)
     }
 
     fun listShared(listId: String) {
@@ -258,10 +258,6 @@ object FirebaseAnalyticsTracker {
 
     fun folderCreated() {
         logEvent("folder_created")
-    }
-
-    private fun bumpStat(name: String, bundle: Bundle? = Bundle()) {
-        firebaseAnalytics.logEvent(name, bundle)
     }
 
     private fun logEvent(name: String, bundle: Bundle? = Bundle()) {

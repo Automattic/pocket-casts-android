@@ -15,11 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private val PodcastItemIconSize = 64.dp
 
 @Composable
 fun PodcastItem(
@@ -27,6 +30,7 @@ fun PodcastItem(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     tintColor: Color? = null,
+    iconSize: Dp = PodcastItemIconSize,
     subscribed: Boolean = false,
     showSubscribed: Boolean = false,
     showDivider: Boolean = true,
@@ -42,7 +46,7 @@ fun PodcastItem(
             Box(modifier = Modifier.padding(top = 4.dp, end = 12.dp, bottom = 4.dp)) {
                 PodcastImage(
                     uuid = podcast.uuid,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(iconSize)
                 )
             }
             Column(

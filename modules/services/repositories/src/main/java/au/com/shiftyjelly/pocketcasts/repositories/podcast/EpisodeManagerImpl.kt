@@ -45,6 +45,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -1070,5 +1071,6 @@ class EpisodeManagerImpl @Inject constructor(
             }
     }
 
-    override fun findRandomEpisode() = episodeDao.findRandomEpisode()
+    override fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?> =
+        episodeDao.calculateListeningTime(fromEpochMs, toEpochMs)
 }

@@ -1,3 +1,7 @@
+7.27
+-----
+
+
 7.26
 -----
 
@@ -12,6 +16,8 @@
         ([#483](https://github.com/Automattic/pocket-casts-android/pull/483)).
     *   Updated select filters title & hide podcast setting filter option when applicable
         ([#494](https://github.com/Automattic/pocket-casts-android/pull/494)).
+    *   Support Android 13 per-app language preferences
+        ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
 *   Bug Fixes:
     *   Fixed Help & Feedback buttons being hidden when using text zoom.
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
@@ -23,6 +29,10 @@
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
     *   Fixed full screen video player not closing the first time in landscape mode
         ([#464](https://github.com/Automattic/pocket-casts-android/pull/464)).
+    *   Fixed some layout issues in the EpisodeFragment
+        ([#459](https://github.com/Automattic/pocket-casts-android/pull/459)).
+    *   Fixed RTL support for notes
+        ([#514](https://github.com/Automattic/pocket-casts-android/pull/514)).
 
 7.25
 -----
