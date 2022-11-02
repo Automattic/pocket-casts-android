@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.buttons
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,19 +30,18 @@ fun OutlinedRowButton(
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
     enabled: Boolean = true,
+    border: BorderStroke = BorderStroke(1.dp, MaterialTheme.colors.onSurface),
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive01,
     @DrawableRes leadingIcon: Int? = null,
     onClick: () -> Unit
 ) {
-
-    // FIXME! should I be replacing Button with OutlinedButton instead
-
     RowButton(
         text = text,
         modifier = modifier,
         includePadding = includePadding,
         enabled = enabled,
+        border = border,
         colors = colors,
         textColor = textColor,
         leadingIcon = leadingIcon,
@@ -55,12 +55,12 @@ fun RowButton(
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
     enabled: Boolean = true,
+    border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
     @DrawableRes leadingIcon: Int? = null,
     onClick: () -> Unit
 ) {
-    // FIXME move this row??
     Box(
         modifier = modifier
             .then(if (includePadding) Modifier.padding(16.dp) else Modifier)
@@ -69,6 +69,7 @@ fun RowButton(
         Button(
             onClick = { onClick() },
             shape = RoundedCornerShape(12.dp),
+            border = border,
             modifier = Modifier.fillMaxWidth(),
             colors = colors,
             enabled = enabled
