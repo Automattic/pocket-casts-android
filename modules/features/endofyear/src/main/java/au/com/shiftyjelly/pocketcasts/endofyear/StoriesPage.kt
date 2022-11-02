@@ -59,7 +59,7 @@ private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
 
 @Composable
-fun StoriesScreen(
+fun StoriesPage(
     viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
     onShareClicked: (() -> Bitmap) -> Unit,
