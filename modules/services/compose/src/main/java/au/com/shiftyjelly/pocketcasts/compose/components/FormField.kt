@@ -43,6 +43,7 @@ fun FormField(
     onNext: () -> Unit = {},
     singleLine: Boolean = true,
     enabled: Boolean = true,
+    isError: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
@@ -54,10 +55,11 @@ fun FormField(
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(if (singleLine) it.removeNewLines() else it) },
+        isError = isError,
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            textColor = MaterialTheme.theme.colors.primaryText01,
-            placeholderColor = MaterialTheme.theme.colors.primaryText02,
-            unfocusedBorderColor = MaterialTheme.theme.colors.primaryField03,
+            textColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText01,
+            placeholderColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02,
+            unfocusedBorderColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryField03,
         ),
         enabled = enabled,
         placeholder = { Text(placeholder) },

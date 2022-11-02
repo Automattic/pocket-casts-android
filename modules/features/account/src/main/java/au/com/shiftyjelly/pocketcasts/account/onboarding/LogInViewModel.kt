@@ -94,6 +94,7 @@ data class LogInState(
 ) {
     val enableLoginButton = isEmailValid && isPasswordValid && callState != CallState.InProgress
     val enableTextFields = callState != CallState.InProgress
+    val hasError = serverErrorMessage != null
 
     enum class CallState {
         None,

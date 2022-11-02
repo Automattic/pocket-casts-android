@@ -88,11 +88,20 @@ internal fun OnboardingLoginPage(
             placeholder = stringResource(LR.string.profile_email_address),
             onValueChange = { viewModel.updateEmail(it) },
             enabled = logInState.enableTextFields,
+            isError = logInState.hasError,
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Email,
-                    contentDescription = null,
-                )
+                if (logInState.hasError) {
+                    Icon(
+                        imageVector = Icons.Outlined.Email,
+                        contentDescription = null,
+                        tint = MaterialTheme.theme.colors.support05
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Outlined.Email,
+                        contentDescription = null,
+                    )
+                }
             },
             keyboardType = KeyboardType.Email,
             capitalization = KeyboardCapitalization.None,
@@ -114,11 +123,20 @@ internal fun OnboardingLoginPage(
             enabled = logInState.enableTextFields,
             imeAction = ImeAction.Done,
             onNext = { viewModel.signIn() },
+            isError = logInState.hasError,
             leadingIcon = {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_password),
-                    contentDescription = null,
-                )
+                if (logInState.hasError) {
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_password),
+                        contentDescription = null,
+                        tint = MaterialTheme.theme.colors.support05
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_password),
+                        contentDescription = null,
+                    )
+                }
             },
             trailingIcon = {
                 val icon = if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
