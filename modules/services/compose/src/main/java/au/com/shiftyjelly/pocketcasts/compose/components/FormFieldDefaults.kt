@@ -22,7 +22,6 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -32,6 +31,13 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.removeNewLines
+
+object FormFieldDefaults {
+    val keyboardOptions = KeyboardOptions(
+        capitalization = KeyboardCapitalization.Sentences,
+        imeAction = ImeAction.Done
+    )
+}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -44,12 +50,10 @@ fun FormField(
     singleLine: Boolean = true,
     enabled: Boolean = true,
     isError: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text,
+    keyboardOptions: KeyboardOptions = FormFieldDefaults.keyboardOptions,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    capitalization: KeyboardCapitalization = KeyboardCapitalization.Sentences,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    imeAction: ImeAction = ImeAction.Done
 ) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
@@ -64,12 +68,8 @@ fun FormField(
         enabled = enabled,
         placeholder = { Text(placeholder) },
         shape = RoundedCornerShape(6.dp),
-        keyboardOptions = KeyboardOptions(
-            capitalization = capitalization,
-            keyboardType = keyboardType,
-            imeAction = imeAction,
-        ),
-        keyboardActions = KeyboardActions(onAny = { onNext() }),
+        keyboardOptions = keyboardOptions,
+        keyboardActions = KeyboardActions { onNext() },
         singleLine = singleLine,
         visualTransformation = visualTransformation,
         leadingIcon = leadingIcon,

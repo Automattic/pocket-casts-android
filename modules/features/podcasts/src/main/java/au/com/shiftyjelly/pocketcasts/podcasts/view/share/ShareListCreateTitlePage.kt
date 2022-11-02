@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.header
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormField
+import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormFieldDefaults
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
@@ -149,7 +150,9 @@ private fun TitleDescriptionFields(
             value = title,
             placeholder = stringResource(LR.string.podcasts_share_title),
             onValueChange = onTitleChange,
-            imeAction = ImeAction.Next,
+            keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
+                imeAction = ImeAction.Next,
+            ),
             onNext = { focusManager.moveFocus(FocusDirection.Down) },
             modifier = Modifier.focusRequester(focusRequester)
         )
@@ -159,7 +162,9 @@ private fun TitleDescriptionFields(
             placeholder = stringResource(LR.string.podcasts_share_description),
             onValueChange = onDescriptionChange,
             onNext = onDoneClick,
-            imeAction = ImeAction.Default,
+            keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
+                imeAction = ImeAction.Default,
+            ),
             singleLine = false
         )
         Spacer(Modifier.height(16.dp))

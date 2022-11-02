@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormField
+import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormFieldDefaults
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -103,9 +104,11 @@ internal fun OnboardingLoginPage(
                     )
                 }
             },
-            keyboardType = KeyboardType.Email,
-            capitalization = KeyboardCapitalization.None,
-            imeAction = ImeAction.Next,
+            keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
+                capitalization = KeyboardCapitalization.None,
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Email,
+            ),
             onNext = { passwordFocusRequester.requestFocus() },
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -118,10 +121,11 @@ internal fun OnboardingLoginPage(
             placeholder = stringResource(LR.string.profile_password),
             onValueChange = { viewModel.updatePassword(it) },
             visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardType = KeyboardType.Password,
-            capitalization = KeyboardCapitalization.None,
+            keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
+                keyboardType = KeyboardType.Password,
+                capitalization = KeyboardCapitalization.None,
+            ),
             enabled = logInState.enableTextFields,
-            imeAction = ImeAction.Done,
             onNext = { viewModel.signIn() },
             isError = logInState.hasError,
             leadingIcon = {
