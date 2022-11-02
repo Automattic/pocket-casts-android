@@ -51,6 +51,7 @@ class StoriesViewModel @Inject constructor(
         viewModelScope.launch {
             storiesDataSource.loadStories().stateIn(viewModelScope).collect { result ->
                 cancelTimer()
+                if (result.size != stories.value.size) resetProgressAndCurrentIndex()
                 stories.value = result
 
                 val state = if (result.isEmpty()) {
@@ -115,6 +116,11 @@ class StoriesViewModel @Inject constructor(
     private fun cancelTimer() {
         timer?.cancel()
         timer = null
+    }
+
+    private fun resetProgressAndCurrentIndex() {
+        mutableProgress.value = 0f
+        currentIndex = 0
     }
 
     override fun onCleared() {
