@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components
+package au.com.shiftyjelly.pocketcasts.compose.components
 
 import android.view.KeyEvent.ACTION_DOWN
 import androidx.compose.foundation.background

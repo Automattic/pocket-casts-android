@@ -31,11 +31,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.FormField
+import au.com.shiftyjelly.pocketcasts.compose.components.FormFieldDefaults
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.header
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormField
-import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormFieldDefaults
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 /**
