@@ -170,6 +170,7 @@ internal fun OnboardingLoginPage(
 
         TextH40(
             text = stringResource(LR.string.onboarding_forgot_password),
+            color = MaterialTheme.theme.colors.primaryText02,
             modifier = Modifier
                 .clickable { onForgotPasswordTapped() }
                 .align(Alignment.CenterHorizontally)
