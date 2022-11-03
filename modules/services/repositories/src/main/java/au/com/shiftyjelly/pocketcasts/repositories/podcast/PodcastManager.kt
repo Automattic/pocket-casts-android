@@ -136,5 +136,4 @@ interface PodcastManager {
     suspend fun findAutoAddToUpNextPodcasts(): List<Podcast>
 
     suspend fun refreshPodcastFeed(podcastUuid: String): Boolean
-    fun findRandomPodcasts(): Flow<List<Podcast>>
 }

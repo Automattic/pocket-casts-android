@@ -749,8 +749,4 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun refreshPodcastFeed(podcastUuid: String): Boolean {
         return refreshServerManager.refreshPodcastFeed(podcastUuid).isSuccessful
     }
-
-    override fun findRandomPodcasts(): Flow<List<Podcast>> {
-        return podcastDao.findRandomPodcasts()
-    }
 }
