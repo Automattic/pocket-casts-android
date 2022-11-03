@@ -11,6 +11,7 @@ import androidx.room.RawQuery
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -311,4 +312,16 @@ abstract class EpisodeDao {
 
     @Query("SELECT SUM(played_up_to) FROM episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > :fromEpochMs AND last_playback_interaction_date < :toEpochMs")
     abstract fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?>
+
+    @Query(
+        """
+        SELECT COUNT(DISTINCT podcast_id) as numberOfPodcasts, SUM(played_up_to) as totalPlayedTime, REPLACE(IFNULL(NULLIF(SUBSTR(podcasts.podcast_category, 0, INSTR(podcasts.podcast_category, char(10))), ''), podcasts.podcast_category), char(10), '') as category
+        FROM episodes
+        JOIN podcasts ON episodes.podcast_id = podcasts.uuid
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        GROUP BY category
+        ORDER BY totalPlayedTime DESC
+        """
+    )
+    abstract fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>>
 }

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,14 +42,13 @@ fun PodcastItem(
                 .padding(horizontal = 16.dp)
                 .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
         ) {
-            Box(modifier = Modifier.padding(top = 4.dp, end = 12.dp, bottom = 4.dp)) {
-                PodcastImage(
-                    uuid = podcast.uuid,
-                    modifier = Modifier.size(iconSize)
-                )
-            }
+            PodcastImage(
+                uuid = podcast.uuid,
+                modifier = modifier.size(iconSize)
+                    .padding(top = 4.dp, end = 12.dp, bottom = 4.dp)
+            )
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .padding(end = 16.dp)
                     .weight(1f)
             ) {
