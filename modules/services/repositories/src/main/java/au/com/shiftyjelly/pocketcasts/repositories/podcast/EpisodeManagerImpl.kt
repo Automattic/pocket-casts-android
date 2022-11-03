@@ -12,6 +12,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -1077,4 +1078,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>> =
         episodeDao.findListenedCategories(fromEpochMs, toEpochMs)
+
+    override fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers> =
+        episodeDao.findListenedNumbers(fromEpochMs, toEpochMs)
 }
