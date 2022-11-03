@@ -32,5 +32,4 @@ sealed class MediaNotificationControls(@StringRes val controlName: Int) {
     object PlaybackSpeed : MediaNotificationControls(LR.string.playback_speed)
 
     object Star : MediaNotificationControls(LR.string.star)
-
 }

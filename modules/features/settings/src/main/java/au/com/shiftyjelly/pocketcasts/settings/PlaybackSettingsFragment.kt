@@ -283,7 +283,7 @@ class PlaybackSettingsFragment : BaseFragment() {
 
     @Composable
     fun MediaNotificationControls(
-        saved:List<MediaNotificationControls>,
+        saved: List<MediaNotificationControls>,
         onSave: (List<MediaNotificationControls>) -> Unit
     ) = SettingCheckBoxDialogRow(
         primaryText = stringResource(LR.string.settings_media_notification_controls),
@@ -291,7 +291,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         options = MediaNotificationControls.All,
         maxOptions = MediaNotificationControls.MaxSelectedOptions,
         savedOption = saved,
-        optionToLocalisedString = {getString(mediaControlsToStringRes(it))},
+        optionToLocalisedString = { getString(mediaControlsToStringRes(it)) },
         onSave = onSave
     )
 

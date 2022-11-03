@@ -38,7 +38,6 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.lang.IllegalArgumentException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -1193,18 +1192,18 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun defaultMediaNotificationControls(): List<MediaNotificationControls> {
-        val selectedValue = MediaNotificationControls.MediaControlKeys.map { key->
+        val selectedValue = MediaNotificationControls.MediaControlKeys.map { key ->
             val defaultValue = (key == MediaNotificationControls.playback_speed_key || key == MediaNotificationControls.star_key)
-            Pair(key,getBoolean(key,defaultValue))
+            Pair(key, getBoolean(key, defaultValue))
         }
 
-        return selectedValue.filter { (_,value) -> value }.map { (key,_) ->
+        return selectedValue.filter { (_, value) -> value }.map { (key, _) ->
             when (key) {
                 MediaNotificationControls.archive_key -> MediaNotificationControls.Archive
                 MediaNotificationControls.markAsPlayed_key -> MediaNotificationControls.MarkAsPlayed
-                MediaNotificationControls.play_next_key-> MediaNotificationControls.PlayNext
+                MediaNotificationControls.play_next_key -> MediaNotificationControls.PlayNext
                 MediaNotificationControls.playback_speed_key -> MediaNotificationControls.PlaybackSpeed
-                MediaNotificationControls.star_key-> MediaNotificationControls.Star
+                MediaNotificationControls.star_key -> MediaNotificationControls.Star
                 else -> return listOf(MediaNotificationControls.PlaybackSpeed, MediaNotificationControls.Star)
             }
         }
@@ -1221,7 +1220,7 @@ class SettingsImpl @Inject constructor(
             }
 
             if (mediaNotificationControls.contains(mediaControl)) {
-                setBoolean(selectedKey,true)
+                setBoolean(selectedKey, true)
             } else {
                 setBoolean(selectedKey, false)
             }

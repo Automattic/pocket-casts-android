@@ -41,8 +41,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import java.util.*
 import okhttp3.internal.toImmutableList
+import java.util.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class DialogButtonState(
@@ -316,7 +316,6 @@ fun <T> CheckboxDialog(
                                 add(item)
                             }.toImmutableList()
                         }
-
                     }
                 )
             }
@@ -421,7 +420,7 @@ private fun RadioDialogPreview_dark() = RadioDialogPreview(Theme.ThemeType.DARK)
 private fun CheckboxDialogPreview(theme: Theme.ThemeType) {
     AppTheme(theme) {
         CheckboxDialog(
-            title = "Title", 
+            title = "Title",
             options = listOf(
                 Pair("Star", stringResource(id = LR.string.settings_media_notification_controls_title_star)),
                 Pair("Archive", stringResource(id = LR.string.settings_media_notification_controls_title_archive)),

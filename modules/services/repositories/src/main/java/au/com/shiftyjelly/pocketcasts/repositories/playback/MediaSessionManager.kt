@@ -50,7 +50,6 @@ import timber.log.Timber
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.flow.collectLatest
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 class MediaSessionManager(
@@ -337,7 +336,7 @@ class MediaSessionManager(
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
         }
 
-        settings.defaultMediaNotificationControls().forEach { mediaControl->
+        settings.defaultMediaNotificationControls().forEach { mediaControl ->
             when (mediaControl) {
                 MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
                 MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
@@ -384,7 +383,6 @@ class MediaSessionManager(
                 }
             }
         }
-
     }
 
     private fun addCustomAction(stateBuilder: PlaybackStateCompat.Builder, action: String, name: CharSequence, @DrawableRes icon: Int) {
@@ -642,7 +640,7 @@ class MediaSessionManager(
             playbackManager.getCurrentEpisode()?.let {
                 if (it is Episode) {
                     it.isArchived = true
-                    episodeManager.archive(it,playbackManager)
+                    episodeManager.archive(it, playbackManager)
                 }
             }
         }
