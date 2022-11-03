@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -100,25 +99,21 @@ fun CategoryItem(
                     .weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = modifier.padding(top = 4.dp, end = 12.dp, bottom = 4.dp)) {
-                    Image(
-                        painter = painterResource(IR.drawable.defaultartwork),
-                        contentDescription = null,
-                        modifier = modifier.size(iconSize)
-                    )
-                }
-                Row(
+                Image(
+                    painter = painterResource(IR.drawable.defaultartwork),
+                    contentDescription = null,
+                    modifier = modifier
+                        .size(iconSize)
+                        .padding(top = 4.dp, end = 12.dp, bottom = 4.dp)
+                )
+                TextP40(
+                    text = listenedCategory.category,
+                    color = tintColor,
+                    textAlign = TextAlign.Start,
                     modifier = modifier
                         .padding(end = 16.dp)
                         .weight(1f),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextP40(
-                        text = listenedCategory.category,
-                        color = tintColor,
-                        textAlign = TextAlign.Center,
-                    )
-                }
+                )
                 Column {
                     TextP40(
                         text = "${listenedCategory.numberOfPodcasts}",
@@ -136,7 +131,7 @@ fun CategoryItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun StoriesErrorViewPreview(
+private fun CategoryItemPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
