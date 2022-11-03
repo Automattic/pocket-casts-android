@@ -41,6 +41,11 @@ class EndOfYearManagerImpl @Inject constructor(
             episodeManager.findListenedNumbers(it.start, it.end)
         } ?: flowOf(ListenedNumbers())
 
+    override fun findTopPodcastsForYear(year: Int, limit: Int) =
+        getYearStartAndEndEpochMs(year)?.let {
+            episodeManager.findTopPodcasts(it.start, it.end, limit)
+        } ?: flowOf(emptyList())
+
     private fun getYearStartAndEndEpochMs(year: Int): YearStartAndEndEpochMs? {
         var yearStartAndEndEpochMs: YearStartAndEndEpochMs? = null
         try {

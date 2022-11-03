@@ -21,12 +21,12 @@ import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 
 @Composable
-fun StoryFake1View(
-    story: StoryFake1,
+fun StoryTopFivePodcastsView(
+    story: StoryTopFivePodcasts,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -55,9 +55,9 @@ fun StoryFake1View(
             modifier = modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.Center
         ) {
-            items(story.podcasts.size) { index ->
+            items(story.topPodcasts.size) { index ->
                 PodcastItem(
-                    podcast = story.podcasts[index],
+                    podcast = story.topPodcasts[index].toPodcast(),
                     iconSize = getIconSize(screenHeight, textFieldHeight, context),
                     onClick = {},
                     tintColor = story.tintColor,
@@ -71,7 +71,7 @@ fun StoryFake1View(
 fun getIconSize(
     screenHeight: Int,
     textFieldHeight: Int,
-    context: Context
+    context: Context,
 ): Dp {
     return screenHeight.pxToDp(context).dp
         .minus(32.dp + textFieldHeight.dp)
