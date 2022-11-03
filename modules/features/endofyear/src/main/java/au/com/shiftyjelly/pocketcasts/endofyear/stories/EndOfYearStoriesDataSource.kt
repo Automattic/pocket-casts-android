@@ -28,7 +28,9 @@ class EndOfYearStoriesDataSource @Inject constructor(
             }
             if (topFivePodcasts.isNotEmpty()) {
                 stories.add(StoryTopPodcast(topFivePodcasts.first()))
-                stories.add(StoryTopFivePodcasts(topFivePodcasts))
+                if (topFivePodcasts.size > 1) {
+                    stories.add(StoryTopFivePodcasts(topFivePodcasts))
+                }
             }
 
             stories
