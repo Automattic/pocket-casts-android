@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ import kotlin.coroutines.CoroutineContext
 
 class EndOfYearManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
+    private val podcastManager: PodcastManager,
 ) : EndOfYearManager, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -33,9 +35,10 @@ class EndOfYearManagerImpl @Inject constructor(
             episodeManager.findListenedNumbers(it.start, it.end)
         } ?: flowOf(ListenedNumbers())
 
+    /* Returns top podcasts ordered by number of played episodes */
     override fun findTopPodcastsForYear(year: Int, limit: Int) =
         getYearStartAndEndEpochMs(year)?.let {
-            episodeManager.findTopPodcasts(it.start, it.end, limit)
+            podcastManager.findTopPodcasts(it.start, it.end, limit)
         } ?: flowOf(emptyList())
 
     private fun getYearStartAndEndEpochMs(year: Int): YearStartAndEndEpochMs? {

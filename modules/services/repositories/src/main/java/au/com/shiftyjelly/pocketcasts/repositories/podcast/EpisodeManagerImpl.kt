@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
-import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -1082,7 +1081,4 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers> =
         episodeDao.findListenedNumbers(fromEpochMs, toEpochMs)
-
-    override fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>> =
-        episodeDao.findTopPodcasts(fromEpochMs, toEpochMs, limit)
 }

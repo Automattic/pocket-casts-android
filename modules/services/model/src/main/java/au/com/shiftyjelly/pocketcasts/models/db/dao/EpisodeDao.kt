@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
-import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -336,17 +335,4 @@ abstract class EpisodeDao {
         """
     )
     abstract fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers>
-
-    @Query(
-        """
-        SELECT podcasts.uuid, podcasts.title, podcasts.author, SUM(episodes.played_up_to) as totalPlayedTime, COUNT(episodes.uuid) as numberOfPlayedEpisodes
-        FROM episodes episodes
-        JOIN podcasts ON episodes.podcast_id = podcasts.uuid
-        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
-        GROUP BY podcast_id
-        ORDER BY numberOfPlayedEpisodes DESC
-        LIMIT :limit
-        """
-    )
-    abstract fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>>
 }
