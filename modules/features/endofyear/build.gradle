@@ -14,6 +14,7 @@ dependencies {
     implementation project(':modules:features:settings')
     // services
     implementation project(':modules:services:compose')
+    implementation project(':modules:services:images')
     implementation project(':modules:services:localization')
     implementation project(':modules:services:model')
     implementation project(':modules:services:repositories')

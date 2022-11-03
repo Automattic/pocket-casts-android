@@ -25,20 +25,29 @@ class EndOfYearManagerImpl @Inject constructor(
         return podcastManager.findRandomPodcasts()
     }
 
-    override fun getTotalListeningTimeInSecsForYear(year: Int): Flow<Long?> {
-        return try {
+    override fun getTotalListeningTimeInSecsForYear(year: Int) =
+        getYearStartAndEndEpochMs(year)?.let {
+            episodeManager.calculateListeningTime(it.start, it.end)
+        } ?: flowOf(null)
+
+    override fun findListenedCategoriesForYear(year: Int) =
+        getYearStartAndEndEpochMs(year)?.let {
+            episodeManager.findListenedCategories(it.start, it.end)
+        } ?: flowOf(emptyList())
+
+    private fun getYearStartAndEndEpochMs(year: Int): YearStartAndEndEpochMs? {
+        var yearStartAndEndEpochMs: YearStartAndEndEpochMs? = null
+        try {
             val date = LocalDate.of(year, 1, 1).atStartOfDay()
             val fromEpochTimeInMs = DateUtil.toEpochMillis(date)
             val toEpochTimeInMs = DateUtil.toEpochMillis(date.plusYears(1))
-
             if (fromEpochTimeInMs != null && toEpochTimeInMs != null) {
-                episodeManager.calculateListeningTime(fromEpochTimeInMs, toEpochTimeInMs)
-            } else {
-                flowOf(null)
+                yearStartAndEndEpochMs = YearStartAndEndEpochMs(fromEpochTimeInMs, toEpochTimeInMs)
             }
         } catch (e: DateTimeException) {
             Timber.e(e)
-            flowOf(null)
         }
+        return yearStartAndEndEpochMs
     }
+    data class YearStartAndEndEpochMs(val start: Long, val end: Long)
 }

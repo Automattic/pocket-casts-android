@@ -43,7 +43,7 @@ class StoriesFragment : BaseDialogFragment() {
             setContent {
                 AppTheme(theme.activeTheme) {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    StoriesScreen(
+                    StoriesPage(
                         viewModel = viewModel,
                         onCloseClicked = { dismiss() },
                         onShareClicked = { onCaptureBitmap ->
