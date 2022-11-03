@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -35,6 +36,11 @@ class EndOfYearManagerImpl @Inject constructor(
             episodeManager.findListenedCategories(it.start, it.end)
         } ?: flowOf(emptyList())
 
+    override fun findListenedNumbersForYear(year: Int) =
+        getYearStartAndEndEpochMs(year)?.let {
+            episodeManager.findListenedNumbers(it.start, it.end)
+        } ?: flowOf(ListenedNumbers())
+
     private fun getYearStartAndEndEpochMs(year: Int): YearStartAndEndEpochMs? {
         var yearStartAndEndEpochMs: YearStartAndEndEpochMs? = null
         try {
@@ -49,5 +55,6 @@ class EndOfYearManagerImpl @Inject constructor(
         }
         return yearStartAndEndEpochMs
     }
+
     data class YearStartAndEndEpochMs(val start: Long, val end: Long)
 }
