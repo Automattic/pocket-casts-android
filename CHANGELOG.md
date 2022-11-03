@@ -1,6 +1,7 @@
 7.27
 -----
-
+    *   Added ability to set playback effects in Tasker "Control Playback" action.
+        ([#415](https://github.com/Automattic/pocket-casts-android/pull/509)).
 
 7.26
 -----

@@ -195,6 +195,11 @@ open class PlaybackManager @Inject constructor(
         return upNextQueue.currentEpisode
     }
 
+    fun getCurrentPodcast(): Podcast? {
+        val currentEpisode = getCurrentEpisode() as? Episode ?: return null
+        return currentEpisode.podcastUuid.let { podcastManager.findPodcastByUuid(it) }
+    }
+
     private suspend fun autoLoadEpisode(autoPlay: Boolean): Playable? {
         val nextEpisode = getCurrentEpisode()
         if (nextEpisode != null) {

@@ -1,29 +1,33 @@
 package au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.config
 
 import android.app.Application
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.ViewModelBase
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playlistManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.ActionHelperPlayPlaylist
 import au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.InputPlayPlaylist
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
 class ViewModelConfigPlayPlaylist @Inject constructor(
     application: Application
 ) : ViewModelBase<InputPlayPlaylist, ActionHelperPlayPlaylist>(application), TaskerPluginConfig<InputPlayPlaylist> {
+    override val helperClass get() = ActionHelperPlayPlaylist::class.java
 
-    val titleState by lazy { MutableStateFlow(input?.title) }
-
-    var title: String? = null
-        set(value) {
-            input?.title = value
-            titleState.tryEmit(value)
+    private inner class InputField constructor(@StringRes labelResId: Int, @DrawableRes iconResId: Int, valueGetter: InputPlayPlaylist.() -> String?, valueSetter: InputPlayPlaylist.(String?) -> Unit) : InputFieldBase<String>(labelResId, iconResId, valueGetter, valueSetter) {
+        override val askFor get() = true
+        override fun getPossibleValues(): Flow<List<String>>? {
+            return context.playlistManager.findAllFlow().map { playlist -> playlist.map { it.title } }
         }
-    override val helperClass: Class<ActionHelperPlayPlaylist>
-        get() = ActionHelperPlayPlaylist::class.java
+    }
 
-    val playlists get() = context.playlistManager.observeAll()
+    override val inputFields: List<InputFieldBase<*>> = listOf(
+        InputField(R.string.filters_filter_name, au.com.shiftyjelly.pocketcasts.images.R.drawable.filter_bullet, { title }, { title = it })
+    )
 }

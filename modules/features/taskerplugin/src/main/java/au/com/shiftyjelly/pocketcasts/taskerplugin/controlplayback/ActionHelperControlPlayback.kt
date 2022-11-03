@@ -22,6 +22,9 @@ class ActionHelperControlPlayback(config: TaskerPluginConfig<InputControlPlaybac
             InputControlPlayback.PlaybackCommand.SkipToTime -> addField(R.string.time_to_skip_to_seconds, inputControlPlayback.skipToSeconds)
             InputControlPlayback.PlaybackCommand.SkipForward -> addField(R.string.skip_forward, inputControlPlayback.skipSeconds)
             InputControlPlayback.PlaybackCommand.SkipBack -> addField(R.string.skip_back, inputControlPlayback.skipSeconds)
+            InputControlPlayback.PlaybackCommand.SetPlaybackSpeed -> addField(R.string.set_playback_speed, inputControlPlayback.playbackSpeed)
+            InputControlPlayback.PlaybackCommand.SetTrimSilenceMode -> addField(R.string.set_trim_silence_mode, inputControlPlayback.trimSilenceMode)
+            InputControlPlayback.PlaybackCommand.SetVolumeBoost -> addField(R.string.set_volume_boost, inputControlPlayback.volumeBoostEnabled)
             InputControlPlayback.PlaybackCommand.PlayNextInQueue,
             InputControlPlayback.PlaybackCommand.SkipToNextChapter,
             InputControlPlayback.PlaybackCommand.SkipToPreviousChapter -> blurbBuilder.append(commandEnum.getDescription(context)) // these don't have extra arguments so just write the command name
