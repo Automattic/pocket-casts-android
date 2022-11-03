@@ -63,7 +63,7 @@ fun FolderEditPage(
                     viewModel.changeFolderName(it)
                     viewModel.saveFolderName(resources = resources)
                 },
-                onNext = { focusManager.clearFocus() },
+                onImeAction = { focusManager.clearFocus() },
                 modifier = Modifier
                     .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
             )

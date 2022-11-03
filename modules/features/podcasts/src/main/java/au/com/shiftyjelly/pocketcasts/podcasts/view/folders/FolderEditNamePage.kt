@@ -42,7 +42,7 @@ fun FolderEditNamePage(
             value = folderName,
             placeholder = stringResource(LR.string.folder_name),
             onValueChange = { viewModel.changeFolderName(it) },
-            onNext = { onNextClick() },
+            onImeAction = { onNextClick() },
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 .focusRequester(focusRequester)

@@ -153,7 +153,7 @@ private fun TitleDescriptionFields(
             keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
                 imeAction = ImeAction.Next,
             ),
-            onNext = { focusManager.moveFocus(FocusDirection.Down) },
+            onImeAction = { focusManager.moveFocus(FocusDirection.Down) },
             modifier = Modifier.focusRequester(focusRequester)
         )
         Spacer(Modifier.height(8.dp))
@@ -161,7 +161,7 @@ private fun TitleDescriptionFields(
             value = description,
             placeholder = stringResource(LR.string.podcasts_share_description),
             onValueChange = onDescriptionChange,
-            onNext = onDoneClick,
+            onImeAction = onDoneClick,
             keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
                 imeAction = ImeAction.Default,
             ),

@@ -46,7 +46,7 @@ fun FormField(
     placeholder: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onNext: () -> Unit = {},
+    onImeAction: () -> Unit = {},
     singleLine: Boolean = true,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -69,7 +69,7 @@ fun FormField(
         placeholder = { Text(placeholder) },
         shape = RoundedCornerShape(6.dp),
         keyboardOptions = keyboardOptions,
-        keyboardActions = KeyboardActions { onNext() },
+        keyboardActions = KeyboardActions { onImeAction() },
         singleLine = singleLine,
         visualTransformation = visualTransformation,
         leadingIcon = leadingIcon,
@@ -79,7 +79,7 @@ fun FormField(
             .onPreviewKeyEvent {
                 if (singleLine && it.key == Key.Enter && it.nativeKeyEvent.action == ACTION_DOWN) {
                     // the enter key for a single line field should call the next event, but for multiline fields it should be a new line.
-                    onNext()
+                    onImeAction()
                     true
                 } else if (it.key == Key.Tab && it.nativeKeyEvent.action == ACTION_DOWN) {
                     // tab should focus on the next field

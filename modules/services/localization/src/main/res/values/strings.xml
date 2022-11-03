@@ -1412,6 +1412,8 @@
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
     <string name="onboarding_get_the_newsletter">Get the newsletter</string>
     <string name="onboarding_forgot_password">Forgot password?</string>
+    <string name="onboarding_email_invalid_message">Please enter a valid email</string>
+    <string name="onboarding_password_invalid_message">Passwords must be 6 characters long</string>
 
     <!--    Tasker Plugin-->
 

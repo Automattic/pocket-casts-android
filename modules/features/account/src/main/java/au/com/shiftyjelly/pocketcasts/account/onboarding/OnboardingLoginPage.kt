@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -13,19 +14,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.LogInViewModel.LogInState
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.LogInState
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.components.EmailPasswordFields
+import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
+import au.com.shiftyjelly.pocketcasts.compose.components.Keyboard
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -39,12 +40,11 @@ internal fun OnboardingLoginPage(
     onLoginComplete: () -> Unit,
     onForgotPasswordTapped: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<LogInViewModel>()
-    val logInState by viewModel.logInState.collectAsState()
+    val viewModel = hiltViewModel<OnboardingLogInViewModel>()
+    val state by viewModel.logInState.collectAsState()
 
-    if (logInState.callState == LogInState.CallState.Successful) {
-        @OptIn(ExperimentalComposeUiApi::class)
-        LocalSoftwareKeyboardController.current?.hide()
+    if (state.callState == LogInState.CallState.Successful) {
+        Keyboard.hide()
         onLoginComplete()
         return
     }
@@ -60,12 +60,19 @@ internal fun OnboardingLoginPage(
             onNavigationClick = onBackPressed
         )
 
-        EmailPasswordFields(
-            state = logInState.emailPasswordState,
-            modifier = Modifier.padding(16.dp)
+        EmailAndPasswordFields(
+            email = state.email,
+            password = state.password,
+            showEmailError = state.showEmailError,
+            showPasswordError = state.showPasswordError,
+            enabled = state.enableTextFields,
+            onDone = viewModel::logIn,
+            onUpdateEmail = viewModel::updateEmail,
+            onUpdatePassword = viewModel::updatePassword,
+            modifier = Modifier.padding(16.dp),
         )
 
-        logInState.errorMessage?.let {
+        state.serverErrorMessage?.let {
             TextP40(
                 text = it,
                 color = MaterialTheme.theme.colors.support05,
@@ -73,7 +80,11 @@ internal fun OnboardingLoginPage(
             )
         }
 
-        Spacer(Modifier.weight(1f))
+        Spacer(
+            Modifier
+                .heightIn(min = 16.dp)
+                .weight(1f)
+        )
 
         TextH40(
             text = stringResource(LR.string.onboarding_forgot_password),
@@ -87,8 +98,8 @@ internal fun OnboardingLoginPage(
 
         RowButton(
             text = stringResource(LR.string.log_in),
-            enabled = logInState.enableLoginButton,
-            onClick = { viewModel.signIn() },
+            enabled = state.enableLogin,
+            onClick = { viewModel.logIn() },
         )
     }
 }
