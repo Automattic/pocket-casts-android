@@ -1,7 +1,11 @@
 7.27
 -----
+*   New Features:
     *   Added ability to set playback effects in Tasker "Control Playback" action.
         ([#415](https://github.com/Automattic/pocket-casts-android/pull/509)).
+
+    * Allowed customization of actions through Settings in Media Notification Control for Android 13 users.
+      ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
 
 7.26
 -----
