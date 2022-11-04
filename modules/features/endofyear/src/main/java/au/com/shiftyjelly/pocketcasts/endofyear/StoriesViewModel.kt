@@ -158,6 +158,9 @@ class StoriesViewModel @Inject constructor(
         }
     }
 
+    fun onReplayClicked() {
+    }
+
     sealed class State {
         object Loading : State()
         data class Loaded(
