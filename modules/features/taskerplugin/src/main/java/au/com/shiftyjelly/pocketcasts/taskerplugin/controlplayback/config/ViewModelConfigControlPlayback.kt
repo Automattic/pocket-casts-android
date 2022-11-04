@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class ViewModelConfigControlPlayback @Inject constructor(
     application: Application
 ) : ViewModelBase<InputControlPlayback, ActionHelperControlPlayback>(application), TaskerPluginConfig<InputControlPlayback> {
-    override val helperClass get() = ActionHelperControlPlayback::class.java
+    override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputControlPlayback>) = ActionHelperControlPlayback(pluginConfig)
 
     /**
      * A field that only appears depending on the type of the playback command. For example, the field "Time to Skip To" will only appear if the command is "Skip To Time". A field can also always appear if it doesn't depend on a command type

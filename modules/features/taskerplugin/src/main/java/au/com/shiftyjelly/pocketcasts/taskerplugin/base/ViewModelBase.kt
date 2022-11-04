@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class ViewModelBase<TInput : Any, THelper : TaskerPluginConfigHelperNoOutput<TInput, out TaskerPluginRunnerActionNoOutput<TInput>>>(application: Application) : AndroidViewModel(application), TaskerPluginConfig<TInput> {
     override val context get() = getApplication<Application>()
-    abstract val helperClass: Class<THelper>
-    private val taskerHelper by lazy { helperClass.getConstructor(TaskerPluginConfig::class.java).newInstance(this) }
+    abstract fun getNewHelper(pluginConfig: TaskerPluginConfig<TInput>): THelper
+    private val taskerHelper by lazy { getNewHelper(this) }
     protected var input: TInput? = null
 
     /**

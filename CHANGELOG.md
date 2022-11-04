@@ -2,7 +2,9 @@
 -----
 *   New Features:
     *   Added ability to set playback effects in Tasker "Control Playback" action.
-        ([#415](https://github.com/Automattic/pocket-casts-android/pull/509)).
+        ([#509](https://github.com/Automattic/pocket-casts-android/pull/509)).
+    *   Fixed crashes with Tasker plugin actions when using minified code.
+        ([#543](https://github.com/Automattic/pocket-casts-android/pull/543)).
 
     * Allowed customization of actions through Settings in Media Notification Control for Android 13 users.
       ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
@@ -12,7 +14,7 @@
 
 *   New Features:
     *   Added Tasker integration with "Play Filter" and "Control Playback" actions.
-        ([#415](https://github.com/Automattic/pocket-casts-android/pull/431)).
+        ([#431](https://github.com/Automattic/pocket-casts-android/pull/431)).
     *   Import OPML from a URL
         ([#482](https://github.com/Automattic/pocket-casts-android/pull/482)).
     *   Redesign of the fullscreen player share option
