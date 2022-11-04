@@ -1,9 +1,6 @@
 7.27
 -----
-    *   Added ability to set playback effects in Tasker "Control Playback" action.
-        ([#509](https://github.com/Automattic/pocket-casts-android/pull/509)).
-    *   Fixed crashes with Tasker plugin actions when using minified code.
-        ([#543](https://github.com/Automattic/pocket-casts-android/pull/543)).
+
 
 7.26
 -----
@@ -30,6 +27,12 @@
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
     *   Fixed full screen video player not closing the first time in landscape mode
         ([#464](https://github.com/Automattic/pocket-casts-android/pull/464)).
+    *   Added ability to set playback effects in Tasker "Control Playback" action.
+        ([#509](https://github.com/Automattic/pocket-casts-android/pull/509)).
+    *   Fixed crashes with Tasker plugin actions when using minified code.
+        ([#543](https://github.com/Automattic/pocket-casts-android/pull/543)).
+    *   Fixed auto subscribe issue.
+        ([#545](https://github.com/Automattic/pocket-casts-android/pull/545)).
 
 7.25
 -----
