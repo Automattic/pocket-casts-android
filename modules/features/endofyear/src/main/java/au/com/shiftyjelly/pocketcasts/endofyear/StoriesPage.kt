@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListeningTime
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryLongestEpisode
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopPodcast
@@ -52,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedNumbersView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListeningTimeView
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryLongestEpisodeView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopFivePodcastsView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
@@ -155,6 +157,7 @@ private fun StorySharableContent(
             is StoryListenedNumbers -> StoryListenedNumbersView(story)
             is StoryTopPodcast -> StoryTopPodcastView(story)
             is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
+            is StoryLongestEpisode -> StoryLongestEpisodeView(story)
         }
     }
 }
