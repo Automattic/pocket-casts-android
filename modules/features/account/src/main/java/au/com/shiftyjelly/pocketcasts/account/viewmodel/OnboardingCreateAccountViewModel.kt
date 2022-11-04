@@ -3,8 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionHelper
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionHelperImpl
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionState
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -111,7 +110,7 @@ data class OnboardingCreateAccountState(
     private val hasAttemptedLogIn: Boolean = false,
     val newsletter: Boolean = true,
     val serverErrorMessage: String? = null,
-) : OnboardingSubmissionHelper by OnboardingSubmissionHelperImpl(
+) : OnboardingSubmissionState(
     email = email,
     password = password,
     isCallInProgress = isCallInProgress,

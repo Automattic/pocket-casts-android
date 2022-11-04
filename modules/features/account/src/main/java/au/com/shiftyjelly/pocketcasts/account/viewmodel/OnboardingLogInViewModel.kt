@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionHelper
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionHelperImpl
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -79,7 +78,7 @@ data class LogInState(
     val serverErrorMessage: String? = null,
     val isCallInProgress: Boolean = false,
     private val hasAttemptedLogIn: Boolean = false,
-) : OnboardingSubmissionHelper by OnboardingSubmissionHelperImpl(
+) : OnboardingSubmissionState(
     email = email,
     password = password,
     isCallInProgress = isCallInProgress,
