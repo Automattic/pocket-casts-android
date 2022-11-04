@@ -44,11 +44,13 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedCategories
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryFake1View
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedCategoriesView
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedNumbersView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListeningTimeView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -148,6 +150,7 @@ private fun StorySharableContent(
             is StoryListeningTime -> StoryListeningTimeView(story)
             is StoryListenedCategories -> StoryListenedCategoriesView(story)
             is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story)
+            is StoryListenedNumbers -> StoryListenedNumbersView(story)
             is StoryFake1 -> StoryFake1View(story)
         }
     }
