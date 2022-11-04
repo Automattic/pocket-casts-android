@@ -70,6 +70,7 @@ internal fun OnboardingLoginPage(
             onDone = { viewModel.logIn(onLoginComplete) },
             onUpdateEmail = viewModel::updateEmail,
             onUpdatePassword = viewModel::updatePassword,
+            isCreatingAccount = false,
             modifier = Modifier.padding(16.dp),
         )
 

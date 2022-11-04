@@ -18,9 +18,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillNode
+import androidx.compose.ui.autofill.AutofillType
+import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalAutofill
+import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -38,14 +47,20 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+/**
+ * @property showEmailError whether to display the email field with an error state and the email error message.
+ * @property showPasswordError whether to display the password field with an error state.
+ * @property showPasswordErrorMessage whether the password error message should be shown along with the error.
+ */
 @Composable
 fun EmailAndPasswordFields(
     email: String,
     password: String,
     showEmailError: Boolean,
     showPasswordError: Boolean,
-    showPasswordErrorMessage: Boolean = showPasswordError, // whether the error message should be shown along with the error
+    showPasswordErrorMessage: Boolean = showPasswordError,
     enabled: Boolean,
+    isCreatingAccount: Boolean,
     onDone: () -> Unit,
     onUpdateEmail: (String) -> Unit,
     onUpdatePassword: (String) -> Unit,
@@ -68,6 +83,7 @@ fun EmailAndPasswordFields(
             onUpdateEmail = onUpdateEmail,
             imeAction = ImeAction.Next,
             onImeAction = { passwordFocusRequester.requestFocus() },
+            isNewEmail = isCreatingAccount,
             focusRequester = emailFocusRequester,
         )
 
@@ -84,6 +100,7 @@ fun EmailAndPasswordFields(
             imeAction = ImeAction.Done,
             onImeAction = onDone,
             focusRequester = passwordFocusRequester,
+            isNewPassword = isCreatingAccount,
             onUpdatePassword = onUpdatePassword,
         )
 
@@ -113,8 +130,15 @@ fun EmailField(
     imeAction: ImeAction = ImeAction.Next,
     onImeAction: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    isNewEmail: Boolean,
     modifier: Modifier = Modifier
 ) {
+
+    @Suppress("NAME_SHADOWING")
+    @OptIn(ExperimentalComposeUiApi::class)
+    val modifier = modifier.focusRequester(focusRequester)
+        .autofill(emailAutofill(isNewEmail), onUpdateEmail)
+
     FormField(
         value = email,
         placeholder = stringResource(LR.string.profile_email_address),
@@ -145,11 +169,17 @@ fun PasswordField(
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    isNewPassword: Boolean,
     onUpdatePassword: (String) -> Unit,
     modifier: Modifier = Modifier
 
 ) {
     var showPassword by remember { mutableStateOf(false) }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Suppress("NAME_SHADOWING")
+    val modifier = modifier.focusRequester(focusRequester)
+        .autofill(passwordAutofill(isNewPassword), onUpdatePassword)
 
     FormField(
         value = password,
@@ -181,8 +211,42 @@ fun PasswordField(
                 )
             }
         },
-        modifier = modifier.focusRequester(focusRequester)
+        modifier = modifier
     )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun emailAutofill(isNewEmail: Boolean) =
+    listOf(if (isNewEmail) AutofillType.NewUsername else AutofillType.Username)
+
+@OptIn(ExperimentalComposeUiApi::class)
+private fun passwordAutofill(isNewPassword: Boolean) =
+    listOf(if (isNewPassword) AutofillType.NewPassword else AutofillType.Password)
+
+/**
+ * From https://bryanherbst.com/2021/04/13/compose-autofill/
+ * Also see https://issuetracker.google.com/issues/176949051 for info about autofill limitations with compose
+ */
+@OptIn(ExperimentalComposeUiApi::class)
+private fun Modifier.autofill(
+    autofillTypes: List<AutofillType>,
+    onFill: ((String) -> Unit),
+) = composed {
+    val autofill = LocalAutofill.current
+    val autofillNode = AutofillNode(onFill = onFill, autofillTypes = autofillTypes)
+    LocalAutofillTree.current += autofillNode
+
+    this.onGloballyPositioned {
+        autofillNode.boundingBox = it.boundsInWindow()
+    }.onFocusChanged { focusState ->
+        autofill?.run {
+            if (focusState.isFocused) {
+                requestAutofillForNode(autofillNode)
+            } else {
+                cancelAutofillForNode(autofillNode)
+            }
+        }
+    }
 }
 
 @Preview
@@ -200,6 +264,8 @@ private fun UserPasswordFieldsPreview(
             onDone = {},
             onUpdateEmail = {},
             onUpdatePassword = {},
+            showPasswordErrorMessage = false,
+            isCreatingAccount = false,
         )
     }
 }

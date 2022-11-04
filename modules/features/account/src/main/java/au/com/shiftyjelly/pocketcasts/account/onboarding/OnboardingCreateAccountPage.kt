@@ -66,6 +66,7 @@ internal fun OnboardingCreateAccountPage(
             onDone = { viewModel.createAccount(onAccountCreated) },
             onUpdateEmail = viewModel::updateEmail,
             onUpdatePassword = viewModel::updatePassword,
+            isCreatingAccount = true,
             modifier = Modifier.padding(16.dp)
         )
 
