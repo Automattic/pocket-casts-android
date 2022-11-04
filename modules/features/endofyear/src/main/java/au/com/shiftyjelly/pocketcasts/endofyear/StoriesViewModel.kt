@@ -159,6 +159,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun onReplayClicked() {
+        skipToStoryAtIndex(0)
     }
 
     sealed class State {
