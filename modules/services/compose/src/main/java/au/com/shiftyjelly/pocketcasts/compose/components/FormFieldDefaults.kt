@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TextFieldDefaults.IconOpacity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -61,9 +62,10 @@ fun FormField(
         onValueChange = { onValueChange(if (singleLine) it.removeNewLines() else it) },
         isError = isError,
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            textColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText01,
-            placeholderColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryText02,
+            textColor = MaterialTheme.theme.colors.primaryText01,
+            placeholderColor = MaterialTheme.theme.colors.primaryText02,
             unfocusedBorderColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryField03,
+            errorTrailingIconColor = MaterialTheme.colors.onSurface.copy(alpha = IconOpacity) // Keep trailing icon the same color in error states
         ),
         enabled = enabled,
         placeholder = { Text(placeholder) },

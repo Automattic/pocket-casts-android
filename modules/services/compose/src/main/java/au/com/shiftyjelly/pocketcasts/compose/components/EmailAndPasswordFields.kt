@@ -44,7 +44,7 @@ fun EmailAndPasswordFields(
     password: String,
     showEmailError: Boolean,
     showPasswordError: Boolean,
-    showPasswordErrorMessage: Boolean = showPasswordError, // whether the error message shoudl be shown along with the error
+    showPasswordErrorMessage: Boolean = showPasswordError, // whether the error message should be shown along with the error
     enabled: Boolean,
     onDone: () -> Unit,
     onUpdateEmail: (String) -> Unit,
@@ -122,18 +122,10 @@ fun EmailField(
         enabled = enabled,
         isError = isError,
         leadingIcon = {
-            if (isError) {
-                Icon(
-                    imageVector = Icons.Outlined.Email,
-                    contentDescription = null,
-                    tint = MaterialTheme.theme.colors.support05
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Outlined.Email,
-                    contentDescription = null,
-                )
-            }
+            Icon(
+                imageVector = Icons.Outlined.Email,
+                contentDescription = null,
+            )
         },
         keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
             capitalization = KeyboardCapitalization.None,
@@ -173,18 +165,10 @@ fun PasswordField(
         onImeAction = onImeAction,
         isError = isError,
         leadingIcon = {
-            if (isError) {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_password),
-                    contentDescription = null,
-                    tint = MaterialTheme.theme.colors.support05
-                )
-            } else {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_password),
-                    contentDescription = null,
-                )
-            }
+            Icon(
+                painter = painterResource(IR.drawable.ic_password),
+                contentDescription = null,
+            )
         },
         trailingIcon = {
             val icon = if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
