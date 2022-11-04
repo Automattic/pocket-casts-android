@@ -42,18 +42,20 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake1
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListeningTime
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopListenedCategories
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
-import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryFake1View
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedNumbersView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListeningTimeView
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopFivePodcastsView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCategoriesView
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -151,7 +153,8 @@ private fun StorySharableContent(
             is StoryListenedCategories -> StoryListenedCategoriesView(story)
             is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story)
             is StoryListenedNumbers -> StoryListenedNumbersView(story)
-            is StoryFake1 -> StoryFake1View(story)
+            is StoryTopPodcast -> StoryTopPodcastView(story)
+            is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
         }
     }
 }
@@ -302,7 +305,7 @@ private fun StoriesScreenPreview(
     AppTheme(themeType) {
         StoriesView(
             state = State.Loaded(
-                currentStory = StoryFake1(listOf(Podcast())),
+                currentStory = StoryListenedNumbers(ListenedNumbers(numberOfEpisodes = 1, numberOfPodcasts = 1)),
                 segmentsData = State.Loaded.SegmentsData(
                     xStartOffsets = listOf(0.0f, 0.28f),
                     widths = listOf(0.25f, 0.75f)
