@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,9 +56,9 @@ fun StoryTopFivePodcastsView(
             modifier = modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.Center
         ) {
-            items(story.topPodcasts.size) { index ->
+            items(story.topPodcasts) { topPodcast ->
                 PodcastItem(
-                    podcast = story.topPodcasts[index].toPodcast(),
+                    podcast = topPodcast.toPodcast(),
                     iconSize = getIconSize(screenHeight, textFieldHeight, context),
                     onClick = {},
                     tintColor = story.tintColor,
