@@ -52,6 +52,7 @@ class OnboardingLogInViewModel @Inject constructor(
         }
 
         subscriptionManager.clearCachedStatus()
+
         viewModelScope.launch {
             val result = auth.signInWithEmailAndPassword(state.email, state.password, SignInSource.Onboarding)
             when (result) {

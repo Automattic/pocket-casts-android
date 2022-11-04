@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionSta
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +22,7 @@ import kotlin.coroutines.CoroutineContext
 class OnboardingCreateAccountViewModel @Inject constructor(
     private val auth: AccountAuth,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val subscriptionManager: SubscriptionManager,
     private val settings: Settings,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
@@ -57,6 +59,8 @@ class OnboardingCreateAccountViewModel @Inject constructor(
                 serverErrorMessage = null,
             )
         }
+
+        subscriptionManager.clearCachedStatus()
 
         viewModelScope.launch {
 
