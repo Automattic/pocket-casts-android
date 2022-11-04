@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionHelper
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionHelperImpl
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -24,49 +26,44 @@ class OnboardingLogInViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private val _logInState = MutableStateFlow(
-        LogInState(logIn = ::logIn)
-    )
-    val logInState: StateFlow<LogInState> = _logInState
+    private val _state = MutableStateFlow(LogInState())
+    val state: StateFlow<LogInState> = _state
 
     fun updateEmail(email: String) {
-        _logInState.update { it.copy(email = email.trim()) }
+        _state.update { it.copy(email = email.trim()) }
     }
 
     fun updatePassword(password: String) {
-        _logInState.update { it.copy(password = password) }
+        _state.update { it.copy(password = password) }
     }
 
-    fun logIn() {
-        _logInState.update { it.copy(hasAttemptedLogIn = true) }
+    fun logIn(onSuccessfulLogin: () -> Unit) {
+        _state.update { it.copy(hasAttemptedLogIn = true) }
 
-        val state = logInState.value
+        val state = state.value
         if (!state.isEmailValid || !state.isPasswordValid) {
             return
         }
 
-        val email = state.email
-        val password = state.password
-
-        _logInState.update {
+        _state.update {
             it.copy(
-                callState = LogInState.CallState.InProgress,
+                isCallInProgress = true,
                 serverErrorMessage = null,
             )
         }
 
         subscriptionManager.clearCachedStatus()
         viewModelScope.launch {
-            val result = auth.signInWithEmailAndPassword(email, password, SignInSource.Onboarding)
+            val result = auth.signInWithEmailAndPassword(state.email, state.password, SignInSource.Onboarding)
             when (result) {
                 is AccountAuth.AuthResult.Success -> {
-                    _logInState.update { it.copy(callState = LogInState.CallState.Successful) }
+                    onSuccessfulLogin()
                 }
 
                 is AccountAuth.AuthResult.Failed -> {
-                    _logInState.update {
+                    _state.update {
                         it.copy(
-                            callState = LogInState.CallState.None,
+                            isCallInProgress = false,
                             serverErrorMessage = result.message,
                         )
                     }
@@ -80,26 +77,11 @@ data class LogInState(
     val email: String = "",
     val password: String = "",
     val serverErrorMessage: String? = null,
-    val callState: CallState = CallState.None,
-    private var hasAttemptedLogIn: Boolean = false,
-    private val logIn: () -> Unit,
-) {
-    val isEmailValid = AccountViewModel.isEmailValid(email)
-    val isPasswordValid = AccountViewModel.isPasswordValid(password)
-
-    val showEmailError = hasAttemptedLogIn && !isEmailValid
-    val showPasswordError = hasAttemptedLogIn && !isPasswordValid
-
-    val enableLogin =
-        isEmailValid &&
-            isPasswordValid &&
-            callState != CallState.InProgress
-
-    val enableTextFields = callState != CallState.InProgress
-
-    enum class CallState {
-        None,
-        InProgress,
-        Successful
-    }
-}
+    val isCallInProgress: Boolean = false,
+    private val hasAttemptedLogIn: Boolean = false,
+) : OnboardingSubmissionHelper by OnboardingSubmissionHelperImpl(
+    email = email,
+    password = password,
+    isCallInProgress = isCallInProgress,
+    hasAttemptedLogIn = hasAttemptedLogIn,
+)

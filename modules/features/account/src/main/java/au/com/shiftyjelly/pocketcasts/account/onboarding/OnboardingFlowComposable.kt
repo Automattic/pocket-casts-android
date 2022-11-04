@@ -2,8 +2,10 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -16,11 +18,20 @@ fun OnboardingFlowComposable(
     AppThemeWithBackground(activeTheme) {
         val navController = rememberNavController()
 
+        val backStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = backStackEntry?.destination?.route
+
+        // Only exit the app during onboarding if we are on the first onboarding screen
+        val shouldExitAppOnBackPress = currentDestination == OnboardingNavRoute.logInOrSignUp
+
         // If the BackHandler is disabled, then the normal back pressed behavior
-        // takes over and closes the app
-        val enableBackHandler = navController.backQueue.isNotEmpty()
-        BackHandler(enabled = enableBackHandler) {
-            navController.popBackStack()
+        // takes over and exits the app
+        BackHandler(enabled = !shouldExitAppOnBackPress) {
+            val failedToPop = !navController.popBackStack()
+            if (failedToPop) {
+                // Nothing to pop from backstack, so let the user exit the onboarding flow
+                completeOnboarding()
+            }
         }
 
         NavHost(
@@ -37,13 +48,30 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.createFreeAccount) {
-                OnboardingCreateFreeAccountPage(onBackPressed = { navController.popBackStack() })
+                OnboardingCreateAccountPage(
+                    onBackPressed = { navController.popBackStack() },
+                    onAccountCreated = {
+                        navController.navigate(OnboardingNavRoute.recommendations) {
+                            // clear backstack when opening recommendations
+                            popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
             }
 
             composable(OnboardingNavRoute.logIn) {
                 OnboardingLoginPage(
                     onBackPressed = { navController.popBackStack() },
-                    onLoginComplete = { completeOnboarding() },
+                    onLoginComplete = {
+                        navController.navigate(OnboardingNavRoute.recommendations) {
+                            // clear backstack when opening recommendations
+                            popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                                inclusive = true
+                            }
+                        }
+                    },
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
             }
@@ -55,6 +83,10 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.forgotPassword) {
                 OnboardingForgotPassword(onBackPressed = { navController.popBackStack() })
             }
+
+            composable(OnboardingNavRoute.recommendations) {
+                OnboardingRecommendations()
+            }
         }
     }
 }
@@ -65,4 +97,5 @@ private object OnboardingNavRoute {
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
     const val forgotPassword = "forgot_password"
+    const val recommendations = "recommendations"
 }

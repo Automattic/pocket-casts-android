@@ -667,7 +667,7 @@
     <string name="profile_create_failed_title">Could not create account</string>
     <string name="profile_create_license">Please excuse our formality</string>
     <string name="profile_create_newsletter_summary">Receive news, app updates, themed podcast lists, interviews, and more</string>
-    <string name="profile_create_password_requirements">Must be at least 6 characters</string>
+    <string name="profile_create_password_requirements">Password must be at least 6 characters</string>
     <string name="profile_create_privacy_policy">We\'ve linked our Privacy Policy too in case you\'re interested. We\'ve tried to keep both short, to the point and included as little Legalese as possible.</string>
     <string name="profile_create_privacy_policy_title">Privacy Policy</string>
     <string name="profile_create_subscription_failed">Could not create subscription. Please try again</string>
@@ -1413,7 +1413,6 @@
     <string name="onboarding_get_the_newsletter">Get the newsletter</string>
     <string name="onboarding_forgot_password">Forgot password?</string>
     <string name="onboarding_email_invalid_message">Please enter a valid email</string>
-    <string name="onboarding_password_invalid_message">Passwords must be 6 characters long</string>
 
     <!--    Tasker Plugin-->
 

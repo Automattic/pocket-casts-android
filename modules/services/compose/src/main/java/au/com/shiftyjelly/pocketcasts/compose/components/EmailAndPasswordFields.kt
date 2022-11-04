@@ -44,6 +44,7 @@ fun EmailAndPasswordFields(
     password: String,
     showEmailError: Boolean,
     showPasswordError: Boolean,
+    showPasswordErrorMessage: Boolean = showPasswordError, // whether the error message shoudl be shown along with the error
     enabled: Boolean,
     onDone: () -> Unit,
     onUpdateEmail: (String) -> Unit,
@@ -86,8 +87,8 @@ fun EmailAndPasswordFields(
             onUpdatePassword = onUpdatePassword,
         )
 
-        if (showPasswordError) {
-            ErrorText(LR.string.onboarding_password_invalid_message)
+        if (showPasswordError && showPasswordErrorMessage) {
+            ErrorText(LR.string.profile_create_password_requirements)
         }
     }
 }
