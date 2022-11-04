@@ -15,7 +15,8 @@ class EndOfYearStoriesDataSource @Inject constructor(
             endOfYearManager.findListenedCategoriesForYear(YEAR),
             endOfYearManager.findListenedNumbersForYear(YEAR),
             endOfYearManager.findTopPodcastsForYear(YEAR, limit = 5),
-        ) { listeningTime, listenedCategories, listenedNumbers, topFivePodcasts ->
+            endOfYearManager.findLongestPlayedEpisodeForYear(YEAR)
+        ) { listeningTime, listenedCategories, listenedNumbers, topFivePodcasts, longestEpisode ->
             val stories = mutableListOf<Story>()
 
             listeningTime?.let { stories.add(StoryListeningTime(it)) }
@@ -32,6 +33,7 @@ class EndOfYearStoriesDataSource @Inject constructor(
                     stories.add(StoryTopFivePodcasts(topFivePodcasts))
                 }
             }
+            longestEpisode?.let { stories.add(StoryLongestEpisode(it)) }
 
             stories
         }
