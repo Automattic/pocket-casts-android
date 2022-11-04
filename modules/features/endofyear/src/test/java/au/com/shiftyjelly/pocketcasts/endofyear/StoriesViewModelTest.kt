@@ -95,13 +95,13 @@ class StoriesViewModelTest {
     }
 
     @Test
-    fun `when replay is clicked, then first story is shown`() = runTest {
+    fun `when replay is invoked, then first story is shown`() = runTest {
         val story3 = mock<Story>()
         val viewModel = initViewModel(listOf(story1, story2, story3))
         viewModel.skipNext()
         viewModel.skipNext() // At last story
 
-        viewModel.onReplayClicked()
+        viewModel.replay()
 
         val state = viewModel.state.value as StoriesViewModel.State.Loaded
         assertEquals(state.currentStory, story1)

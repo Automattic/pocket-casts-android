@@ -86,7 +86,7 @@ fun StoriesPage(
             onStart = { viewModel.start() },
             onCloseClicked = onCloseClicked,
             onShareClicked = onShareClicked,
-            onReplayClicked = { viewModel.onReplayClicked() }
+            onReplayClicked = { viewModel.replay() }
         )
 
         State.Loading -> StoriesLoadingView(onCloseClicked)

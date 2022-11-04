@@ -105,12 +105,33 @@ class StoriesViewModel @Inject constructor(
         cancelTimer()
     }
 
+    fun replay() {
+        skipToStoryAtIndex(0)
+    }
+
     private fun skipToStoryAtIndex(index: Int) {
         if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
         mutableState.value =
             (state.value as State.Loaded).copy(currentStory = stories.value[index])
+    }
+
+    fun onShareClicked(
+        onCaptureBitmap: () -> Bitmap,
+        context: Context,
+        showShareForFile: (File) -> Unit
+    ) {
+        pause()
+        viewModelScope.launch {
+            val savedFile = fileUtilWrapper.saveBitmapToFile(
+                onCaptureBitmap.invoke(),
+                context,
+                EOY_STORY_SAVE_FOLDER_NAME,
+                EOY_STORY_SAVE_FILE_NAME
+            )
+            savedFile?.let { showShareForFile.invoke(it) }
+        }
     }
 
     private fun cancelTimer() {
@@ -139,27 +160,6 @@ class StoriesViewModel @Inject constructor(
             0L
         }
         return (sumOfStoryLengthsTillIndex + STORY_GAP_LENGTH_MS * index) / totalLengthInMs.toFloat()
-    }
-
-    fun onShareClicked(
-        onCaptureBitmap: () -> Bitmap,
-        context: Context,
-        showShareForFile: (File) -> Unit
-    ) {
-        pause()
-        viewModelScope.launch {
-            val savedFile = fileUtilWrapper.saveBitmapToFile(
-                onCaptureBitmap.invoke(),
-                context,
-                EOY_STORY_SAVE_FOLDER_NAME,
-                EOY_STORY_SAVE_FILE_NAME
-            )
-            savedFile?.let { showShareForFile.invoke(it) }
-        }
-    }
-
-    fun onReplayClicked() {
-        skipToStoryAtIndex(0)
     }
 
     sealed class State {
