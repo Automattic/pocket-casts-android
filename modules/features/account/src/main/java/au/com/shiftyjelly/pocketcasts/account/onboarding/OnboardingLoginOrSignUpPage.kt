@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,22 +40,24 @@ internal fun OnboardingLoginOrSignUpPage(
 ) {
     Column {
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
+        Row(
+            Modifier
                 .padding(vertical = 12.dp, horizontal = 16.dp)
                 .fillMaxWidth()
         ) {
+            Spacer(Modifier.weight(1f))
+
             HorizontalLogo(
                 modifier = Modifier
-                    .align(Alignment.Center)
+                    .align(Alignment.CenterVertically)
                     .height(28.dp)
             )
 
             TextH30(
                 text = stringResource(LR.string.onboarding_not_now),
+                textAlign = TextAlign.End,
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
+                    .weight(1f)
                     .clickable { onNotNowClicked() }
             )
         }
@@ -66,9 +69,10 @@ internal fun OnboardingLoginOrSignUpPage(
                 modifier = Modifier
                     .aspectRatio(1.2f)
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .background(Color.Cyan)
+                    .background(Color.Gray)
             )
+
+            Spacer(Modifier.height(8.dp))
 
             TextH10(
                 text = stringResource(LR.string.onboarding_discover_your_next_favorite_podcast),
