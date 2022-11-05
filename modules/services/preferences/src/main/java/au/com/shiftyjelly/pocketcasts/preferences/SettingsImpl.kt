@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationChannel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
@@ -93,6 +94,7 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val defaultPodcastGroupingFlow = MutableStateFlow(defaultPodcastGrouping())
+    override val defaultMediaNotificationControlsFlow = MutableStateFlow(defaultMediaNotificationControls())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
@@ -1186,6 +1188,25 @@ class SettingsImpl @Inject constructor(
     override fun setDefaultShowArchived(value: Boolean) {
         setBoolean("default_show_archived", value)
         defaultShowArchivedFlow.update { value }
+    }
+
+    override fun defaultMediaNotificationControls(): List<MediaNotificationControls> {
+        val selectedValue = MediaNotificationControls.All.map { mediaControl ->
+            val defaultValue =
+                (mediaControl == MediaNotificationControls.PlaybackSpeed || mediaControl == MediaNotificationControls.Star)
+            Pair(mediaControl, getBoolean(mediaControl.key, defaultValue))
+        }
+
+        return selectedValue.filter { (_, value) -> value }.map { (mediaControl, _) ->
+            mediaControl
+        }
+    }
+
+    override fun setDefaultMediaNotificationControls(mediaNotificationControls: List<MediaNotificationControls>) {
+        MediaNotificationControls.All.forEach { mediaControl ->
+            setBoolean(mediaControl.key, mediaNotificationControls.contains(mediaControl))
+        }
+        defaultMediaNotificationControlsFlow.update { mediaNotificationControls }
     }
 
     override fun defaultPodcastGrouping(): PodcastGrouping {

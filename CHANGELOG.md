@@ -1,6 +1,17 @@
 7.27
 -----
 
+*   New Features:
+    *   Support Android 13 per-app language preferences
+    ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
+*   Bug Fixes:
+    *   Fixed some layout issues in the EpisodeFragment
+    ([#459](https://github.com/Automattic/pocket-casts-android/pull/459)).
+    *   Fixed RTL support for notes
+    ([#514](https://github.com/Automattic/pocket-casts-android/pull/514)).
+    *   Allowed customization of actions through Settings in Media Notification Control for Android 13 users.
+    ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
+
 
 7.26
 -----

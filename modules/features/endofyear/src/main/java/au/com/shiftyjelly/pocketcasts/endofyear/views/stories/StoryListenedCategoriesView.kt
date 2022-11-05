@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.endofyear.views
+package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,16 +8,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryFake2
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedCategories
 
 @Composable
-fun StoryFake2View(
-    story: StoryFake2,
+fun StoryListenedCategoriesView(
+    story: StoryListenedCategories,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier.padding(16.dp)) {
         TextH30(
-            text = "The longest episode you listened to was ${story.episode.title}",
+            text = "You listened to ${story.listenedCategories.count()} different categories this year",
+            textAlign = TextAlign.Center,
+            color = story.tintColor,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+        TextH30(
+            text = "Let's take a look at some of your favourites..",
             textAlign = TextAlign.Center,
             color = story.tintColor,
             modifier = modifier
