@@ -5,9 +5,11 @@
         ([#509](https://github.com/Automattic/pocket-casts-android/pull/509)).
     *   Fixed crashes with Tasker plugin actions when using minified code.
         ([#543](https://github.com/Automattic/pocket-casts-android/pull/543)).
-
-    * Allowed customization of actions through Settings in Media Notification Control for Android 13 users.
-      ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
+    *   Allowed customization of actions through Settings in Media Notification Control for Android 13 users.
+        ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
+*   Bug Fixes:
+    *   Fixed small "Go to Podcast" icon in Landscape
+        ([#547](https://github.com/Automattic/pocket-casts-android/pull/547)).
 
 7.26
 -----
