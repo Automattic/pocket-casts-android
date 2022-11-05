@@ -276,7 +276,7 @@ class MainActivity :
         }
 
         binding.onboardingFrame.setContent {
-            if (BuildConfig.ONBOARDING_ENABLED) {
+            if (BuildConfig.ONBOARDING_ENABLED && !settings.isLoggedIn()) {
                 var show by rememberSaveable { mutableStateOf(true) }
                 if (show) {
 
