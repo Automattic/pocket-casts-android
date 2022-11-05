@@ -104,7 +104,7 @@ internal fun OnboardingCreateAccountPage(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 32.dp)
             ) {
-                Column {
+                Column(Modifier.padding(end = 16.dp)) {
                     TextH30(stringResource(LR.string.onboarding_get_the_newsletter))
                     TextP60(stringResource(LR.string.profile_create_newsletter_summary))
                 }
