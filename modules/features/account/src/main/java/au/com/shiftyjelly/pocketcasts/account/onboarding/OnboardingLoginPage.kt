@@ -50,59 +50,62 @@ internal fun OnboardingLoginPage(
         onLoginComplete()
     }
 
-    Column(
-        Modifier
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState())
-    ) {
+    Column {
 
         ThemedTopAppBar(
             title = stringResource(LR.string.onboarding_welcome_back),
             onNavigationClick = onBackPressed
         )
 
-        EmailAndPasswordFields(
-            email = state.email,
-            password = state.password,
-            showEmailError = state.showEmailError,
-            showPasswordError = state.showPasswordError,
-            enabled = !state.isCallInProgress,
-            onDone = { viewModel.logIn(onLoginComplete) },
-            onUpdateEmail = viewModel::updateEmail,
-            onUpdatePassword = viewModel::updatePassword,
-            isCreatingAccount = false,
-            modifier = Modifier.padding(16.dp),
-        )
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
+        ) {
 
-        state.serverErrorMessage?.let {
-            TextP40(
-                text = it,
-                color = MaterialTheme.theme.colors.support05,
-                modifier = Modifier.padding(horizontal = 16.dp)
+            EmailAndPasswordFields(
+                email = state.email,
+                password = state.password,
+                showEmailError = state.showEmailError,
+                showPasswordError = state.showPasswordError,
+                enabled = state.enableSubmissionFields,
+                onDone = { viewModel.logIn(onLoginComplete) },
+                onUpdateEmail = viewModel::updateEmail,
+                onUpdatePassword = viewModel::updatePassword,
+                isCreatingAccount = false,
+                modifier = Modifier.padding(16.dp),
+            )
+
+            state.serverErrorMessage?.let {
+                TextP40(
+                    text = it,
+                    color = MaterialTheme.theme.colors.support05,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+
+            Spacer(
+                Modifier
+                    .heightIn(min = 16.dp)
+                    .weight(1f)
+            )
+
+            TextH40(
+                text = stringResource(LR.string.onboarding_forgot_password),
+                color = MaterialTheme.theme.colors.primaryText02,
+                modifier = Modifier
+                    .clickable { onForgotPasswordTapped() }
+                    .align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            RowButton(
+                text = stringResource(LR.string.log_in),
+                enabled = state.enableSubmissionFields,
+                onClick = { viewModel.logIn(onLoginComplete) },
             )
         }
-
-        Spacer(
-            Modifier
-                .heightIn(min = 16.dp)
-                .weight(1f)
-        )
-
-        TextH40(
-            text = stringResource(LR.string.onboarding_forgot_password),
-            color = MaterialTheme.theme.colors.primaryText02,
-            modifier = Modifier
-                .clickable { onForgotPasswordTapped() }
-                .align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        RowButton(
-            text = stringResource(LR.string.log_in),
-            enabled = state.isReadyToSubmit,
-            onClick = { viewModel.logIn(onLoginComplete) },
-        )
     }
 }
 

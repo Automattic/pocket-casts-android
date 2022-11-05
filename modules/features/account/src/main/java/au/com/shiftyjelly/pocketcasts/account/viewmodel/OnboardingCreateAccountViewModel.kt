@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingSubmissionState
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -109,14 +108,17 @@ class OnboardingCreateAccountViewModel @Inject constructor(
 
 data class OnboardingCreateAccountState(
     val email: String = "",
-    val password: String = "",
-    val isCallInProgress: Boolean = false,
     private val hasAttemptedLogIn: Boolean = false,
+    private val isCallInProgress: Boolean = false,
     val newsletter: Boolean = true,
+    val password: String = "",
     val serverErrorMessage: String? = null,
-) : OnboardingSubmissionState(
-    email = email,
-    password = password,
-    isCallInProgress = isCallInProgress,
-    hasAttemptedLogIn = hasAttemptedLogIn,
-)
+) {
+    val isEmailValid = AccountViewModel.isEmailValid(email)
+    val isPasswordValid = AccountViewModel.isPasswordValid(password)
+
+    val showEmailError = hasAttemptedLogIn && !isEmailValid
+    val showPasswordError = hasAttemptedLogIn && !isPasswordValid
+
+    val enableSubmissionFields = !isCallInProgress
+}

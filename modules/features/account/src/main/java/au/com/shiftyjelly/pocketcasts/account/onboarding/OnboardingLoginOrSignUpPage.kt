@@ -37,9 +37,8 @@ internal fun OnboardingLoginOrSignUpPage(
     onLoginClicked: () -> Unit,
     onLoginGoogleClicked: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.verticalScroll(rememberScrollState())
-    ) {
+    Column {
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -59,50 +58,55 @@ internal fun OnboardingLoginOrSignUpPage(
                     .clickable { onNotNowClicked() }
             )
         }
-        Box(
-            modifier = Modifier
-                .aspectRatio(1.2f)
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .background(Color.Cyan)
-        )
 
-        TextH10(
-            text = stringResource(LR.string.onboarding_discover_your_next_favorite_podcast),
-            modifier = Modifier
-                .padding(horizontal = 24.dp),
-            textAlign = TextAlign.Center,
-            maxLines = 2
-        )
+        Column(
+            modifier = Modifier.verticalScroll(rememberScrollState())
+        ) {
+            Box(
+                modifier = Modifier
+                    .aspectRatio(1.2f)
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+                    .background(Color.Cyan)
+            )
 
-        Spacer(Modifier.height(8.dp))
+            TextH10(
+                text = stringResource(LR.string.onboarding_discover_your_next_favorite_podcast),
+                modifier = Modifier
+                    .padding(horizontal = 24.dp),
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
 
-        TextH40(
-            text = stringResource(LR.string.onboarding_create_an_account_to),
-            modifier = Modifier.padding(horizontal = 24.dp),
-            textAlign = TextAlign.Center
-        )
+            Spacer(Modifier.height(8.dp))
 
-        Spacer(Modifier.height(8.dp))
+            TextH40(
+                text = stringResource(LR.string.onboarding_create_an_account_to),
+                modifier = Modifier.padding(horizontal = 24.dp),
+                textAlign = TextAlign.Center
+            )
 
-        OutlinedRowButton(
-            text = stringResource(LR.string.onboarding_continue_with_google),
-            leadingIcon = IR.drawable.google_g,
-            onClick = onLoginGoogleClicked
-        )
+            Spacer(Modifier.height(8.dp))
 
-        RowButton(
-            text = stringResource(LR.string.onboarding_sign_up_free),
+            OutlinedRowButton(
+                text = stringResource(LR.string.onboarding_continue_with_google),
+                leadingIcon = IR.drawable.google_g,
+                onClick = onLoginGoogleClicked
+            )
+
+            RowButton(
+                text = stringResource(LR.string.onboarding_sign_up_free),
 //            colors =  ButtonDefaults.buttonColors(
 //                backgroundColor = MaterialTheme.theme.colors.primaryText01
 //            ),
-            onClick = onSignUpFreeClicked
-        )
+                onClick = onSignUpFreeClicked
+            )
 
-        OutlinedRowButton(
-            text = stringResource(LR.string.log_in),
-            onClick = onLoginClicked
-        )
+            OutlinedRowButton(
+                text = stringResource(LR.string.log_in),
+                onClick = onLoginClicked
+            )
+        }
     }
 }
 

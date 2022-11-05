@@ -3,8 +3,11 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
@@ -56,67 +59,74 @@ internal fun OnboardingCreateAccountPage(
             onNavigationClick = onBackPressed
         )
 
-        EmailAndPasswordFields(
-            email = state.email,
-            password = state.password,
-            showEmailError = state.showEmailError,
-            showPasswordError = state.showPasswordError,
-            showPasswordErrorMessage = false,
-            enabled = !state.isCallInProgress,
-            onDone = { viewModel.createAccount(onAccountCreated) },
-            onUpdateEmail = viewModel::updateEmail,
-            onUpdatePassword = viewModel::updatePassword,
-            isCreatingAccount = true,
-            modifier = Modifier.padding(16.dp)
-        )
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState())
+        ) {
 
-        TextP40(
-            text = "• ${stringResource(LR.string.profile_create_password_requirements)}",
-            color = MaterialTheme.theme.colors.primaryText02,
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp)
-        )
+            EmailAndPasswordFields(
+                email = state.email,
+                password = state.password,
+                showEmailError = state.showEmailError,
+                showPasswordError = state.showPasswordError,
+                showPasswordErrorMessage = false,
+                enabled = state.enableSubmissionFields,
+                onDone = { viewModel.createAccount(onAccountCreated) },
+                onUpdateEmail = viewModel::updateEmail,
+                onUpdatePassword = viewModel::updatePassword,
+                isCreatingAccount = true,
+                modifier = Modifier.padding(16.dp)
+            )
 
-        state.serverErrorMessage?.let {
             TextP40(
-                text = it,
-                color = MaterialTheme.theme.colors.support05,
+                text = "• ${stringResource(LR.string.profile_create_password_requirements)}",
+                color = MaterialTheme.theme.colors.primaryText02,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp)
             )
-        }
 
-        Spacer(Modifier.weight(1f))
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(start = 16.dp, end = 32.dp)
-        ) {
-            Column {
-                TextH30(stringResource(LR.string.onboarding_get_the_newsletter))
-                TextP60(stringResource(LR.string.profile_create_newsletter_summary))
+            state.serverErrorMessage?.let {
+                TextP40(
+                    text = it,
+                    color = MaterialTheme.theme.colors.support05,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp)
+                )
             }
 
-            Switch(
-                checked = state.newsletter,
-                onCheckedChange = viewModel::updateNewsletter,
-                colors = SwitchDefaults.colors(
-                    uncheckedThumbColor = Color.Gray,
-                    uncheckedTrackColor = Color.Gray,
+            Spacer(Modifier.weight(1f))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 32.dp)
+            ) {
+                Column {
+                    TextH30(stringResource(LR.string.onboarding_get_the_newsletter))
+                    TextP60(stringResource(LR.string.profile_create_newsletter_summary))
+                }
+
+                Switch(
+                    checked = state.newsletter,
+                    onCheckedChange = viewModel::updateNewsletter,
+                    colors = SwitchDefaults.colors(
+                        uncheckedThumbColor = Color.Gray,
+                        uncheckedTrackColor = Color.Gray,
+                    )
                 )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            RowButton(
+                text = stringResource(LR.string.create_account),
+                enabled = state.enableSubmissionFields,
+                onClick = { viewModel.createAccount(onAccountCreated) },
             )
         }
-
-        Spacer(Modifier.height(16.dp))
-
-        RowButton(
-            text = stringResource(LR.string.create_account),
-            enabled = state.isReadyToSubmit,
-            onClick = { viewModel.createAccount(onAccountCreated) },
-        )
     }
 }
 
