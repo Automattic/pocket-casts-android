@@ -96,9 +96,6 @@ internal fun OnboardingLoginOrSignUpPage(
 
             RowButton(
                 text = stringResource(LR.string.onboarding_sign_up_free),
-//            colors =  ButtonDefaults.buttonColors(
-//                backgroundColor = MaterialTheme.theme.colors.primaryText01
-//            ),
                 onClick = onSignUpFreeClicked
             )
 
