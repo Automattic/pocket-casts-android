@@ -494,7 +494,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getAutoSubscribeToPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, true)
+        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
     }
 
     override fun getAutoShowPlayed(): Boolean {
