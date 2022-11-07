@@ -28,6 +28,16 @@ class EndOfYearManagerImpl @Inject constructor(
             episodeManager.countEpisodesPlayedUpto(it.start, it.end, playedUpToInSecs).transform { count -> emit(count > 0) }
         } ?: flowOf(false)
 
+    override fun hasEpisodeInteractedBefore(year: Int): Flow<Boolean> =
+        getYearStartAndEndEpochMs(year)?.let {
+            episodeManager.findEpisodeInteractedBefore(it.start).transform { episode -> emit(episode != null) }
+        } ?: flowOf(false)
+
+    override fun hasListeningHistoryEpisodesInLimitForYear(year: Int, limit: Int): Flow<Boolean> =
+        getYearStartAndEndEpochMs(year)?.let {
+            episodeManager.countEpisodesInListeningHistory(it.start, it.end).transform { count -> emit(count <= limit) }
+        } ?: flowOf(false)
+
     override fun getTotalListeningTimeInSecsForYear(year: Int) =
         getYearStartAndEndEpochMs(year)?.let {
             episodeManager.calculateListeningTime(it.start, it.end)

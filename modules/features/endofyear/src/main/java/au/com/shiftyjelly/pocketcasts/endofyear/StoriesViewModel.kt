@@ -49,25 +49,42 @@ class StoriesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storiesDataSource.loadStories().stateIn(viewModelScope).collect { result ->
-                cancelTimer()
-                if (result.size != stories.value.size) resetProgressAndCurrentIndex()
-                stories.value = result
-
-                val state = if (result.isEmpty()) {
-                    State.Error
-                } else {
-                    State.Loaded(
-                        currentStory = result[currentIndex],
-                        segmentsData = SegmentsData(
-                            xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
-                            widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
-                        )
-                    )
+            storiesDataSource.hasFullListeningHistory().stateIn(viewModelScope)
+                .collect { isFullListeningHistory ->
+                    if (!isFullListeningHistory) {
+                        storiesDataSource.syncListeningHistory().collect { success ->
+                            if (success) {
+                                loadStories()
+                            } else {
+                                mutableState.value = State.Error
+                            }
+                        }
+                    } else {
+                        loadStories()
+                    }
                 }
-                mutableState.value = state
-                if (state is State.Loaded) start()
+        }
+    }
+
+    private suspend fun loadStories() {
+        storiesDataSource.loadStories().stateIn(viewModelScope).collect { result ->
+            cancelTimer()
+            if (result.size != stories.value.size) resetProgressAndCurrentIndex()
+            stories.value = result
+
+            val state = if (result.isEmpty()) {
+                State.Error
+            } else {
+                State.Loaded(
+                    currentStory = result[currentIndex],
+                    segmentsData = SegmentsData(
+                        xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
+                        widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
+                    )
+                )
             }
+            mutableState.value = state
+            if (state is State.Loaded) start()
         }
     }
 
@@ -120,7 +137,7 @@ class StoriesViewModel @Inject constructor(
     fun onShareClicked(
         onCaptureBitmap: () -> Bitmap,
         context: Context,
-        showShareForFile: (File) -> Unit
+        showShareForFile: (File) -> Unit,
     ) {
         pause()
         viewModelScope.launch {

@@ -1088,4 +1088,10 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int> =
         episodeDao.countEpisodesPlayedUpto(fromEpochMs, toEpochMs, playedUpToInSecs)
+
+    override fun findEpisodeInteractedBefore(fromEpochMs: Long): Flow<Episode?> =
+        episodeDao.findEpisodeInteractedBefore(fromEpochMs)
+
+    override fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Flow<Int> =
+        episodeDao.findEpisodesCountInListeningHistory(fromEpochMs, toEpochMs)
 }

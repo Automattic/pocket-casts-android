@@ -358,4 +358,23 @@ abstract class EpisodeDao {
         """
     )
     abstract fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int>
+
+    @Query(
+        """
+        SELECT * 
+        FROM episodes
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date < :fromEpochMs
+        LIMIT 1
+        """
+    )
+    abstract fun findEpisodeInteractedBefore(fromEpochMs: Long): Flow<Episode?>
+
+    @Query(
+        """
+        SELECT COUNT(*) 
+        FROM episodes
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        """
+    )
+    abstract fun findEpisodesCountInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Flow<Int>
 }
