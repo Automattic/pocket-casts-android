@@ -97,6 +97,7 @@ class SettingsImpl @Inject constructor(
     override val defaultMediaNotificationControlsFlow = MutableStateFlow(defaultMediaNotificationControls())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
+    override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
 
@@ -787,6 +788,15 @@ class SettingsImpl @Inject constructor(
     override fun setKeepScreenAwake(newValue: Boolean) {
         setBoolean(Settings.PREFERENCE_KEEP_SCREEN_AWAKE, newValue)
         keepScreenAwakeFlow.update { newValue }
+    }
+
+    override fun openPlayerAutomatically(): Boolean {
+        return sharedPreferences.getBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, false)
+    }
+
+    override fun setOpenPlayerAutomatically(newValue: Boolean) {
+        setBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, newValue)
+        openPlayerAutomaticallyFlow.update { newValue }
     }
 
     override fun isPodcastAutoDownloadUnmeteredOnly(): Boolean {
