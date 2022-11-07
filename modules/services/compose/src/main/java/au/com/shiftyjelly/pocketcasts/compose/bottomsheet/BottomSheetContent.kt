@@ -10,9 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -20,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -32,9 +31,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 
-private val ContentMaxWidth = 600.dp
+private const val ContentMaxWidthDp = 600
 private val ContentPadding = 16.dp
 private val OutlinedBorder: BorderStroke
     @Composable
@@ -49,7 +50,7 @@ class BottomSheetContentState(
 ) {
     data class Content(
         val titleText: String,
-        val imageContent: @Composable () -> Unit = {},
+        val imageContent: @Composable (() -> Unit)? = null,
         val summaryText: String,
         val primaryButton: Button.Primary,
         val secondaryButton: Button.Secondary? = null,
@@ -85,10 +86,10 @@ fun BottomSheetContent(
     ) {
         Column(
             modifier = modifier
-                .widthIn(max = ContentMaxWidth)
-                .verticalScroll(rememberScrollState()),
+                .widthIn(max = ContentMaxWidthDp.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val context = LocalContext.current
             val content = state.content
 
             Pill()
@@ -99,9 +100,12 @@ fun BottomSheetContent(
 
             Spacer(modifier = modifier.height(16.dp))
 
-            state.content.imageContent.invoke()
-
-            Spacer(modifier = modifier.height(16.dp))
+            state.content.imageContent?.let { imageContent ->
+                if (context.resources.configuration.inPortrait() || Util.isTablet(context)) {
+                    imageContent.invoke()
+                    Spacer(modifier = modifier.height(16.dp))
+                }
+            }
 
             SummaryText(content)
 
