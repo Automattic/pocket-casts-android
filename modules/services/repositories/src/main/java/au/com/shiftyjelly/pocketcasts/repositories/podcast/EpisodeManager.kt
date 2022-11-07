@@ -142,4 +142,5 @@ interface EpisodeManager {
     fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>>
     fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers>
     fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): Flow<LongestEpisode?>
+    fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int>
 }

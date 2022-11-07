@@ -16,9 +16,12 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
@@ -29,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
@@ -152,6 +156,7 @@ class MainActivity :
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
     @Inject lateinit var warningsHelper: WarningsHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var storiesDataSource: StoriesDataSource
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -185,8 +190,17 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
-        if (BuildConfig.END_OF_YEAR_ENABLED && settings.getEndOfYearShowBadge2022()) {
-            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isEndOfYearStoriesEligible().collect { isEligible ->
+                    if (isEligible) {
+                        setupEndOfYearLaunchBottomSheet()
+                        if (settings.getEndOfYearShowBadge2022()) {
+                            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                        }
+                    }
+                }
+            }
         }
 
         var selectedTab = settings.selectedTab()
@@ -265,10 +279,6 @@ class MainActivity :
         handleIntent(intent, savedInstanceState)
 
         updateSystemColors()
-
-        if (BuildConfig.END_OF_YEAR_ENABLED) {
-            setupEndOfYearLaunchBottomSheet()
-        }
     }
 
     override fun onStart() {

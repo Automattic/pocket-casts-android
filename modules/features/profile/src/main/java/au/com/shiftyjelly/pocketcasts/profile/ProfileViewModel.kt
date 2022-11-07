@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -15,7 +16,13 @@ import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(val settings: Settings, val podcastManager: PodcastManager, val statsManager: StatsManager, val userManager: UserManager) : ViewModel() {
+class ProfileViewModel @Inject constructor(
+    val settings: Settings,
+    val podcastManager: PodcastManager,
+    val statsManager: StatsManager,
+    val userManager: UserManager,
+    private val storiesDataSource: StoriesDataSource,
+) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     val podcastCount: LiveData<Int> = LiveDataReactiveStreams.fromPublisher(podcastManager.observeCountSubscribed())
     val daysListenedCount: MutableLiveData<Long> = MutableLiveData()
@@ -29,6 +36,8 @@ class ProfileViewModel @Inject constructor(val settings: Settings, val podcastMa
     val refreshObservable: LiveData<RefreshState> = LiveDataReactiveStreams.fromPublisher(
         settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST)
     )
+
+    suspend fun isEndOfYearStoriesEligible() = storiesDataSource.isEligibleForStories()
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()

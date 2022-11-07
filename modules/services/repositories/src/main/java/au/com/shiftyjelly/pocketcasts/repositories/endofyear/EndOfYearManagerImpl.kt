@@ -6,7 +6,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.transform
 import timber.log.Timber
 import java.time.DateTimeException
 import java.time.LocalDate
@@ -19,6 +21,12 @@ class EndOfYearManagerImpl @Inject constructor(
 ) : EndOfYearManager, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    /* Returns whether user listened to at least one episode for more than given time for the year */
+    override fun hasEpisodesPlayedUpto(year: Int, playedUpToInSecs: Long): Flow<Boolean> =
+        getYearStartAndEndEpochMs(year)?.let {
+            episodeManager.countEpisodesPlayedUpto(it.start, it.end, playedUpToInSecs).transform { count -> emit(count > 0) }
+        } ?: flowOf(false)
 
     override fun getTotalListeningTimeInSecsForYear(year: Int) =
         getYearStartAndEndEpochMs(year)?.let {

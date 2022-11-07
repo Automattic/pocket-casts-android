@@ -17,6 +17,9 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
@@ -98,10 +102,6 @@ class ProfileFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
-
-        if (BuildConfig.END_OF_YEAR_ENABLED) {
-            binding.setupEndOfYearPromptCard()
-        }
 
         binding.btnSettings.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
@@ -156,6 +156,14 @@ class ProfileFragment : BaseFragment() {
         binding.imgBannerBackground.setOnLongClickListener {
             theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity)
             true
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isEndOfYearStoriesEligible().collect { isEligible ->
+                    binding.setupEndOfYearPromptCard(isEligible)
+                }
+            }
         }
 
         viewModel.podcastCount.observe(viewLifecycleOwner) {
@@ -223,15 +231,17 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
-    private fun FragmentProfileBinding.setupEndOfYearPromptCard() {
+    private fun FragmentProfileBinding.setupEndOfYearPromptCard(isEligible: Boolean) {
         endOfYearPromptCard.setContent {
-            AppTheme(theme.activeTheme) {
-                EndOfYearPromptCard(
-                    onClick = {
-                        StoriesFragment.newInstance()
-                            .show(childFragmentManager, "stories_dialog")
-                    }
-                )
+            if (isEligible) {
+                AppTheme(theme.activeTheme) {
+                    EndOfYearPromptCard(
+                        onClick = {
+                            StoriesFragment.newInstance()
+                                .show(childFragmentManager, "stories_dialog")
+                        }
+                    )
+                }
             }
         }
     }

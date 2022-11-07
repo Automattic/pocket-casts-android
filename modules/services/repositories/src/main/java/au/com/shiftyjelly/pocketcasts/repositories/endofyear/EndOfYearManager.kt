@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import kotlinx.coroutines.flow.Flow
 
 interface EndOfYearManager {
+    fun hasEpisodesPlayedUpto(year: Int, playedUpToInSecs: Long): Flow<Boolean>
     fun getTotalListeningTimeInSecsForYear(year: Int): Flow<Long?>
     fun findListenedCategoriesForYear(year: Int): Flow<List<ListenedCategory>>
     fun findListenedNumbersForYear(year: Int): Flow<ListenedNumbers>

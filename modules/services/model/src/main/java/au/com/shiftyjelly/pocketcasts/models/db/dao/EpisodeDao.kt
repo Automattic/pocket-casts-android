@@ -348,4 +348,14 @@ abstract class EpisodeDao {
         """
     )
     abstract fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): Flow<LongestEpisode?>
+
+    @Query(
+        """
+        SELECT COUNT(*) 
+        FROM episodes
+        WHERE played_up_to > :playedUpToInSecs 
+        AND episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        """
+    )
+    abstract fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int>
 }

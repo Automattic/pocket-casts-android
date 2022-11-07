@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -20,7 +21,8 @@ class MainActivityViewModel
 @Inject constructor(
     playbackManager: PlaybackManager,
     userManager: UserManager,
-    val settings: Settings
+    val settings: Settings,
+    private val storiesDataSource: StoriesDataSource,
 ) : ViewModel() {
 
     var isPlayerOpen: Boolean = false
@@ -48,4 +50,6 @@ class MainActivityViewModel
     fun shouldShowTrialFinished(signInState: SignInState): Boolean {
         return signInState.isExpiredTrial && !settings.getTrialFinishedSeen()
     }
+
+    suspend fun isEndOfYearStoriesEligible() = storiesDataSource.isEligibleForStories()
 }

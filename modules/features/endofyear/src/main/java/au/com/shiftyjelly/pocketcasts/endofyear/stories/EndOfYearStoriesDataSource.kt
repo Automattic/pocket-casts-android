@@ -1,14 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.stories
 
+import au.com.shiftyjelly.pocketcasts.endofyear.BuildConfig
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.transform
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class EndOfYearStoriesDataSource @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
 ) : StoriesDataSource {
+    override suspend fun isEligibleForStories(): Flow<Boolean> =
+        endOfYearManager.hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(30L))
+            .transform { emit(it && BuildConfig.END_OF_YEAR_ENABLED) }
+
     override suspend fun loadStories(): Flow<List<Story>> {
         return combine(
             endOfYearManager.getTotalListeningTimeInSecsForYear(YEAR),

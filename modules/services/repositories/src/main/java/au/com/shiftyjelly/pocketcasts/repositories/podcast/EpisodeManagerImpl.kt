@@ -1085,4 +1085,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): Flow<LongestEpisode?> =
         episodeDao.findLongestPlayedEpisode(fromEpochMs, toEpochMs)
+
+    override fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int> =
+        episodeDao.countEpisodesPlayedUpto(fromEpochMs, toEpochMs, playedUpToInSecs)
 }
