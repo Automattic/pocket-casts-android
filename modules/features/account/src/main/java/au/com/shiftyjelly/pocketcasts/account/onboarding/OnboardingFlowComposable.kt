@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
+    abortOnboarding: () -> Unit,
 ) {
     AppThemeWithBackground(activeTheme) {
         val navController = rememberNavController()
@@ -21,16 +22,17 @@ fun OnboardingFlowComposable(
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = backStackEntry?.destination?.route
 
-        // Only exit the app during onboarding if we are on the first onboarding screen
-        val shouldExitAppOnBackPress = currentDestination == OnboardingNavRoute.logInOrSignUp
-
-        // If the BackHandler is disabled, then the normal back pressed behavior
-        // takes over and exits the app
-        BackHandler(enabled = !shouldExitAppOnBackPress) {
+        BackHandler {
             val failedToPop = !navController.popBackStack()
             if (failedToPop) {
-                // Nothing to pop from backstack, so let the user exit the onboarding flow
-                completeOnboarding()
+                // The ony time the back stack will be empty and the user is aborting
+                // onboarding is from the logInOrSignUp screen
+                val abortingOnboarding = currentDestination == OnboardingNavRoute.logInOrSignUp
+                if (abortingOnboarding) {
+                    abortOnboarding()
+                } else {
+                    completeOnboarding()
+                }
             }
         }
 
