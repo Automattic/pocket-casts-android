@@ -163,21 +163,18 @@ private fun StoriesView(
         var onCaptureBitmap: (() -> Bitmap)? = null
         state.currentStory?.let { story ->
             Box(modifier = modifier.weight(weight = 1f, fill = true)) {
-                if (!story.isInteractive) {
-                    onCaptureBitmap =
-                        convertibleToBitmap(content = { StorySharableContent(story, onReplayClicked, modifier) })
-                }
-                StorySwitcher(
-                    onSkipPrevious = onSkipPrevious,
-                    onSkipNext = onSkipNext,
-                    onPause = onPause,
-                    onStart = onStart,
-                ) {
-                    if (story.isInteractive) {
-                        onCaptureBitmap =
-                            convertibleToBitmap(content = { StorySharableContent(story, onReplayClicked, modifier) })
-                    }
-                }
+                onCaptureBitmap =
+                    convertibleToBitmap(content = {
+                        StorySharableContent(
+                            story,
+                            onSkipPrevious,
+                            onSkipNext,
+                            onPause,
+                            onStart,
+                            onReplayClicked,
+                            modifier
+                        )
+                    })
                 SegmentedProgressIndicator(
                     progress = progress,
                     segmentsData = state.segmentsData,
@@ -199,26 +196,37 @@ private fun StoriesView(
 @Composable
 private fun StorySharableContent(
     story: Story,
+    onSkipPrevious: () -> Unit,
+    onSkipNext: () -> Unit,
+    onPause: () -> Unit,
+    onStart: () -> Unit,
     onReplayClicked: () -> Unit,
     modifier: Modifier,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .clip(RoundedCornerShape(StoryViewCornerSize))
-            .background(color = story.backgroundColor),
-        contentAlignment = Alignment.Center
+    StorySwitcher(
+        onSkipPrevious = onSkipPrevious,
+        onSkipNext = onSkipNext,
+        onPause = onPause,
+        onStart = onStart,
     ) {
-        when (story) {
-            is StoryIntro -> StoryIntroView(story)
-            is StoryListeningTime -> StoryListeningTimeView(story)
-            is StoryListenedCategories -> StoryListenedCategoriesView(story)
-            is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story)
-            is StoryListenedNumbers -> StoryListenedNumbersView(story)
-            is StoryTopPodcast -> StoryTopPodcastView(story)
-            is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
-            is StoryLongestEpisode -> StoryLongestEpisodeView(story)
-            is StoryEpilogue -> StoryEpilogueView(story, onReplayClicked)
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(StoryViewCornerSize))
+                .background(color = story.backgroundColor),
+            contentAlignment = Alignment.Center
+        ) {
+            when (story) {
+                is StoryIntro -> StoryIntroView(story)
+                is StoryListeningTime -> StoryListeningTimeView(story)
+                is StoryListenedCategories -> StoryListenedCategoriesView(story)
+                is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story)
+                is StoryListenedNumbers -> StoryListenedNumbersView(story)
+                is StoryTopPodcast -> StoryTopPodcastView(story)
+                is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
+                is StoryLongestEpisode -> StoryLongestEpisodeView(story)
+                is StoryEpilogue -> StoryEpilogueView(story, onReplayClicked)
+            }
         }
     }
 }
