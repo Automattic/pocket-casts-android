@@ -19,6 +19,7 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Calendar
@@ -107,6 +108,9 @@ class PlaylistManagerImpl @Inject constructor(
 
     override suspend fun findAllSuspend(): List<Playlist> {
         return playlistDao.findAllSuspend()
+    }
+    override fun findAllFlow(): Flow<List<Playlist>> {
+        return playlistDao.findAllState()
     }
 
     override fun count(): Int {

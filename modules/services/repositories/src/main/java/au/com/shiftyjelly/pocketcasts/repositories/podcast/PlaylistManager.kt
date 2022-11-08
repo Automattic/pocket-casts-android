@@ -6,10 +6,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
+import kotlinx.coroutines.flow.Flow
 
 interface PlaylistManager {
     fun findAll(): List<Playlist>
     suspend fun findAllSuspend(): List<Playlist>
+    fun findAllFlow(): Flow<List<Playlist>>
     fun observeAll(): Flowable<List<Playlist>>
 
     fun findById(id: Long): Playlist?
