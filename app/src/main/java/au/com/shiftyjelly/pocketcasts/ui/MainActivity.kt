@@ -503,6 +503,7 @@ class MainActivity :
                 StoriesPage(
                     viewModel = storiesViewModel,
                     showDialog = showDialog,
+                    theme = theme,
                     onCloseClicked = { showDialog = false },
                 )
             }

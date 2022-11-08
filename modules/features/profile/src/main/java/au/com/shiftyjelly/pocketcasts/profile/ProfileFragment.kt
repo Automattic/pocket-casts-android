@@ -246,6 +246,7 @@ class ProfileFragment : BaseFragment() {
                     StoriesPage(
                         viewModel = storiesViewModel,
                         showDialog = showDialog,
+                        theme = theme,
                         onCloseClicked = { showDialog = false },
                     )
                 }

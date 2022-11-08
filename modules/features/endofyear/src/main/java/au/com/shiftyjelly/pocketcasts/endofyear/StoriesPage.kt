@@ -1,7 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -26,6 +29,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +78,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopFivePodcas
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -93,7 +99,8 @@ fun StoriesPage(
     viewModel: StoriesViewModel,
     showDialog: Boolean,
     onCloseClicked: () -> Unit,
-    modifier: Modifier = Modifier,
+    theme: Theme,
+    modifier: Modifier = Modifier
 ) {
     if (showDialog) {
         val shareLauncher = rememberLauncherForActivityResult(
@@ -104,10 +111,15 @@ fun StoriesPage(
         }
 
         val context = LocalContext.current
+
+        val isTablet = Util.isTablet(context)
+        if (!isTablet) LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        UpdateSystemBarColors(theme)
+
         val dialogSize = remember { getDialogSize(context) }
         Dialog(
             onDismissRequest = { onCloseClicked.invoke() },
-            properties = DialogProperties(usePlatformDefaultWidth = Util.isTablet(context)),
+            properties = DialogProperties(usePlatformDefaultWidth = isTablet),
         ) {
             Box(modifier = modifier.size(dialogSize)) {
                 DialogContent(viewModel, onCloseClicked) {
@@ -402,6 +414,40 @@ private fun getDialogSize(context: Context): DpSize {
     }
 
     return DpSize(dialogWidth.dp, dialogHeight.dp)
+}
+
+@Composable
+fun LockScreenOrientation(orientation: Int) {
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
+        val originalOrientation = activity.requestedOrientation
+        activity.requestedOrientation = orientation
+        onDispose {
+            // restore original orientation when view disappears
+            activity.requestedOrientation = originalOrientation
+        }
+    }
+}
+
+@Composable
+fun UpdateSystemBarColors(theme: Theme) {
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
+        theme.updateWindowStatusBar(activity.window, StatusBarColor.Custom(android.graphics.Color.BLACK, true), activity)
+        theme.setNavigationBarColor(activity.window, true, android.graphics.Color.BLACK)
+        onDispose {
+            // restore original system colors
+            (activity as FragmentHostListener).updateSystemColors()
+        }
+    }
+}
+
+fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
 
 @Preview(showBackground = true)
