@@ -52,7 +52,7 @@ class EndOfYearStoriesDataSource @Inject constructor(
                 stories.add(StoryListenedCategories(listenedCategories))
                 stories.add(StoryTopListenedCategories(listenedCategories))
             }
-            if (listenedNumbers.numberOfEpisodes > 0 && listenedNumbers.numberOfPodcasts > 0) {
+            if (listenedNumbers.numberOfEpisodes > 1 && listenedNumbers.numberOfPodcasts > 1) {
                 stories.add(StoryListenedNumbers(listenedNumbers))
             }
             if (topFivePodcasts.isNotEmpty()) {
