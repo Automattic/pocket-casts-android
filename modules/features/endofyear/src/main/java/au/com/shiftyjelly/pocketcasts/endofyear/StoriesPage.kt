@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
@@ -41,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -81,6 +83,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
+private val StoriesViewMaxSize = 700.dp
+private const val MaxHeightPercentFactor = 0.9f
+private const val StoriesViewAspectRatioForTablet = 2f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -88,6 +93,7 @@ fun StoriesPage(
     viewModel: StoriesViewModel,
     showDialog: Boolean,
     onCloseClicked: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (showDialog) {
         val shareLauncher = rememberLauncherForActivityResult(
@@ -98,11 +104,12 @@ fun StoriesPage(
         }
 
         val context = LocalContext.current
+        val dialogSize = remember { getDialogSize(context) }
         Dialog(
             onDismissRequest = { onCloseClicked.invoke() },
             properties = DialogProperties(usePlatformDefaultWidth = Util.isTablet(context)),
         ) {
-            Box {
+            Box(modifier = modifier.size(dialogSize)) {
                 DialogContent(viewModel, onCloseClicked) {
                     viewModel.onShareClicked(it, context) { file ->
                         showShareForFile(context, file, shareLauncher)
@@ -372,6 +379,21 @@ private fun showShareForFile(
     } catch (e: Exception) {
         Timber.e(e)
     }
+}
+
+private fun getDialogSize(context: Context): DpSize {
+    val configuration = context.resources.configuration
+    val screenHeightInDp = configuration.screenHeightDp
+    val screenWidthInDp = configuration.screenWidthDp
+
+    var dialogHeight = screenHeightInDp.toFloat()
+    var dialogWidth = screenWidthInDp.toFloat()
+    if (Util.isTablet(context)) {
+        dialogHeight = (screenHeightInDp * MaxHeightPercentFactor).coerceAtMost(StoriesViewMaxSize.value)
+        dialogWidth = dialogHeight / StoriesViewAspectRatioForTablet
+    }
+
+    return DpSize(dialogWidth.dp, dialogHeight.dp)
 }
 
 @Preview(showBackground = true)
