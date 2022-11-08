@@ -1,6 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -26,15 +31,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.ShareCompat
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
@@ -63,13 +73,48 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCa
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.FileUtil
+import au.com.shiftyjelly.pocketcasts.utils.Util
+import timber.log.Timber
+import java.io.File
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun StoriesPage(
+    viewModel: StoriesViewModel,
+    showDialog: Boolean,
+    onCloseClicked: () -> Unit,
+) {
+    if (showDialog) {
+        val shareLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            /* Share activity dismissed, start paused story */
+            viewModel.start()
+        }
+
+        val context = LocalContext.current
+        Dialog(
+            onDismissRequest = { onCloseClicked.invoke() },
+            properties = DialogProperties(usePlatformDefaultWidth = Util.isTablet(context)),
+        ) {
+            Box {
+                DialogContent(viewModel, onCloseClicked) {
+                    viewModel.onShareClicked(it, context) { file ->
+                        showShareForFile(context, file, shareLauncher)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DialogContent(
     viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
     onShareClicked: (() -> Bitmap) -> Unit,
@@ -306,6 +351,26 @@ private fun StorySwitcher(
             }
     ) {
         content?.invoke()
+    }
+}
+
+private fun showShareForFile(
+    context: Context,
+    file: File,
+    shareLauncher: ActivityResultLauncher<Intent>,
+) {
+    try {
+        val uri = FileUtil.getUriForFile(context, file)
+
+        val chooserIntent = ShareCompat.IntentBuilder(context)
+            .setType("image/png")
+            .addStream(uri)
+            .setChooserTitle(LR.string.end_of_year_share_via)
+            .createChooserIntent()
+
+        shareLauncher.launch(chooserIntent)
+    } catch (e: Exception) {
+        Timber.e(e)
     }
 }
 
