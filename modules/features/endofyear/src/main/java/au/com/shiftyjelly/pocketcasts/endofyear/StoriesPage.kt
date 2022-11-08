@@ -85,7 +85,7 @@ private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
 private val StoriesViewMaxSize = 700.dp
 private const val MaxHeightPercentFactor = 0.9f
-private const val StoriesViewAspectRatioForTablet = 2f
+const val StoriesViewAspectRatioForTablet = 2f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
