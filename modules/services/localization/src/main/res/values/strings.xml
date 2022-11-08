@@ -41,6 +41,7 @@
     <string name="play_episode">Play episode</string>
     <string name="play_last">Play last</string>
     <string name="play_next">Play next</string>
+    <string name="playback_speed">Playback speed</string>
     <string name="play_now">Play now</string>
     <string name="play_on">Play on&#8230;</string>
     <string name="played">Played</string>
@@ -110,6 +111,7 @@
     <string name="please_try_again">Please try again</string>
     <string name="next">Next</string>
     <string name="select_podcasts">Select podcasts</string>
+    <string name="welcome_back">Welcome back</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -1009,6 +1011,13 @@
     <string name="settings_lock_image">lock image</string>
     <string name="settings_manage_downloads_include_starred">Include starred</string>
     <string name="settings_manage_downloads_total">Total</string>
+    <string name="settings_media_notification_controls">Media notification controls</string>
+    <string name="settings_media_notification_controls_summary">Choose two actions to be displayed in the Android 13 playback notification, Android Auto, and other places the custom media controls are available</string>
+    <string name="settings_media_notification_controls_title_archive" translatable="false">@string/archive</string>
+    <string name="settings_media_notification_controls_title_mark_as_played" translatable="false">@string/mark_as_played</string>
+    <string name="settings_media_notification_controls_title_play_next" translatable="false">@string/play_next</string>
+    <string name="settings_media_notification_controls_title_playback_speed" translatable="false">@string/playback_speed</string>
+    <string name="settings_media_notification_controls_title_star" translatable="false">@string/star</string>
     <string name="settings_no_thanks">No thanks</string>
     <string name="settings_notifications_new_episodes">New Episodes</string>
     <string name="settings_notification_actions">Actions</string>
@@ -1413,6 +1422,15 @@
     <string name="time_to_skip_seconds">Time To Skip (Seconds)</string>
     <string name="time_to_skip_to_not_valid">Time to skip to %1$s not valid</string>
     <string name="time_to_skip_not_valid">Time to skip %1$s not valid</string>
+    <string name="playback_speed_not_valid">Playback Speed %1$s not valid</string>
     <string name="pocket_casts_play_filter">Pocket Casts Play Filter</string>
     <string name="pocket_casts_control_playback">Pocket Casts Control Playback</string>
+    <string name="set_playback_speed">Set Playback Speed</string>
+    <string name="playback_speed_between_values">Playback Speed (between 0.5 and 3)</string>
+    <string name="set_trim_silence_mode">Set Trim Silence Mode</string>
+    <string name="trim_silence_mode">Trim Silence Mode</string>
+    <string name="trim_silence_mode_not_valid">Trim Silence Mode %1$s not valid</string>
+    <string name="set_volume_boost">Set Volume Boost</string>
+    <string name="volume_boost_enabled">Volume Boost Enabled</string>
+    <string name="volume_boost_enabled_not_valid">Volume Boost Enabled value must be \'true\' or \'false\', was  %1$s</string>
 </resources>
