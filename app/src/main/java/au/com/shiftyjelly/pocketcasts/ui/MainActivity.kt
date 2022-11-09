@@ -24,8 +24,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
@@ -117,6 +117,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -195,18 +197,16 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isEndOfYearStoriesEligible().collect { isEligible ->
-                    if (isEligible) {
-                        setupEndOfYearLaunchBottomSheet()
-                        if (settings.getEndOfYearShowBadge2022()) {
-                            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
-                        }
+        viewModel.isEndOfYearStoriesEligible()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { isEligible ->
+                if (isEligible) {
+                    setupEndOfYearLaunchBottomSheet()
+                    if (settings.getEndOfYearShowBadge2022()) {
+                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                     }
                 }
-            }
-        }
+            }.launchIn(lifecycleScope)
 
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(

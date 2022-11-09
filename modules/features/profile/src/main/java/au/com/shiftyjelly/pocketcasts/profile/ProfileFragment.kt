@@ -18,8 +18,8 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -50,7 +50,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
@@ -158,13 +159,11 @@ class ProfileFragment : BaseFragment() {
             true
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isEndOfYearStoriesEligible().collect { isEligible ->
-                    binding.setupEndOfYearPromptCard(isEligible)
-                }
-            }
-        }
+        viewModel.isEndOfYearStoriesEligible()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { isEligible ->
+                binding.setupEndOfYearPromptCard(isEligible)
+            }.launchIn(lifecycleScope)
 
         viewModel.podcastCount.observe(viewLifecycleOwner) {
             binding.lblPodcastCount.text = it.toString()
