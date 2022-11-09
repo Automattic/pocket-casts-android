@@ -122,7 +122,7 @@ class StoriesViewModelTest {
         verify(storiesDataSource).syncListeningHistory()
     }
 
-    private suspend fun initViewModel(mockStories: List<Story>, hasFullListeningHistory: Boolean = true): StoriesViewModel {
+    private fun initViewModel(mockStories: List<Story>, hasFullListeningHistory: Boolean = true): StoriesViewModel {
         whenever(storiesDataSource.loadStories()).thenReturn(flowOf(mockStories))
         whenever(storiesDataSource.hasFullListeningHistory()).thenReturn(flowOf(hasFullListeningHistory))
         return StoriesViewModel(
