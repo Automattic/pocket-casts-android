@@ -12,6 +12,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -26,6 +30,7 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlowComposable
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -279,6 +284,18 @@ class MainActivity :
         handleIntent(intent, savedInstanceState)
 
         updateSystemColors()
+
+        binding.onboardingFrame.setContent {
+            if (BuildConfig.ONBOARDING_ENABLED) {
+                var show by rememberSaveable { mutableStateOf(true) }
+                if (show) {
+                    OnboardingFlowComposable(
+                        activeTheme = theme.activeTheme,
+                        completeOnboarding = { show = false },
+                    )
+                }
+            }
+        }
     }
 
     override fun onStart() {

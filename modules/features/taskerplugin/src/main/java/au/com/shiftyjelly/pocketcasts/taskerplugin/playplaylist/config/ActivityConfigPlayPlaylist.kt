@@ -2,26 +2,37 @@ package au.com.shiftyjelly.pocketcasts.taskerplugin.playplaylist.config
 
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rxjava2.subscribeAsState
+import androidx.compose.ui.tooling.preview.Preview
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.ActivityConfigBase
+import au.com.shiftyjelly.pocketcasts.taskerplugin.base.ComposableTaskerInputFieldList
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.TaskerInputFieldState
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @AndroidEntryPoint
 class ActivityConfigPlayPlaylist : ActivityConfigBase<ViewModelConfigPlayPlaylist>() {
     override val viewModel: ViewModelConfigPlayPlaylist by viewModels()
+}
 
-    @Composable
-    override fun Content() {
-        ComposableConfigPlayPlaylist(
-            TaskerInputFieldState.Content(
-                viewModel.titleState.collectAsState().value,
-                au.com.shiftyjelly.pocketcasts.localization.R.string.filters_filter_name,
-                { viewModel.title = it },
-                viewModel.taskerVariables,
-                viewModel.playlists.subscribeAsState(listOf()).value.map { it.title }
+@Preview(showBackground = true)
+@Composable
+private fun ComposableConfigPlayPlaylistPreview() {
+    AppTheme(Theme.ThemeType.CLASSIC_LIGHT) {
+        ComposableTaskerInputFieldList(
+            listOf(
+                TaskerInputFieldState.Content(
+                    MutableStateFlow("New Release"),
+                    R.string.filters_filter_name,
+                    au.com.shiftyjelly.pocketcasts.images.R.drawable.filter_bullet,
+                    MutableStateFlow(true),
+                    {},
+                    listOf("%test"),
+                    MutableStateFlow(listOf("New Releases", "Up Next"))
+                )
             )
-        ) { viewModel.finishForTasker() }
+        ) {}
     }
 }
