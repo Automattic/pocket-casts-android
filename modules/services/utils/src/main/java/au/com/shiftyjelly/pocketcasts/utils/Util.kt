@@ -13,7 +13,7 @@ import android.view.accessibility.AccessibilityManager
 import java.util.Locale
 
 object Util {
-    private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 600
+    private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 570
 
     fun isCarUiMode(context: Context): Boolean {
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
