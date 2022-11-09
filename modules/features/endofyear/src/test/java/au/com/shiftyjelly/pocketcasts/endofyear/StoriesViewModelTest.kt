@@ -16,7 +16,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -106,20 +105,6 @@ class StoriesViewModelTest {
 
         val state = viewModel.state.value as StoriesViewModel.State.Loaded
         assertEquals(state.currentStory, story1)
-    }
-
-    @Test
-    fun `given full listening history present, when screen loads, then sync not performed`() = runTest {
-        initViewModel(listOf(story1), hasFullListeningHistory = true)
-
-        verify(storiesDataSource, never()).syncListeningHistory()
-    }
-
-    @Test
-    fun `given full listening history not present, when screen loads, then sync performed`() = runTest {
-        initViewModel(listOf(story1), hasFullListeningHistory = false)
-
-        verify(storiesDataSource).syncListeningHistory()
     }
 
     private fun initViewModel(mockStories: List<Story>, hasFullListeningHistory: Boolean = true): StoriesViewModel {
