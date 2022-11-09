@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface StoriesDataSource {
     fun isEligibleForStories(): Flow<Boolean>
     fun hasFullListeningHistory(): Flow<Boolean>
-    fun syncListeningHistory(): Flow<Boolean>
+    suspend fun syncListeningHistory()
     fun loadStories(): Flow<List<Story>>
 }

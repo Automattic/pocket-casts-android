@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.transform
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -34,7 +33,7 @@ class EndOfYearStoriesDataSource @Inject constructor(
         }
 
     // TODO: Update with the correct endpoint to sync history
-    override fun syncListeningHistory() = flowOf(true)
+    override suspend fun syncListeningHistory() {}
 
     override fun loadStories(): Flow<List<Story>> {
         return combine(
