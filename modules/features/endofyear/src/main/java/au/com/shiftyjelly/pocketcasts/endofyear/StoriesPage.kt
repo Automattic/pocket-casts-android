@@ -42,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryEpilogue
+import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryIntro
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListeningTime
@@ -50,6 +52,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryEpilogueView
+import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryIntroView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListenedNumbersView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryListeningTimeView
@@ -82,6 +86,7 @@ fun StoriesPage(
             onStart = { viewModel.start() },
             onCloseClicked = onCloseClicked,
             onShareClicked = onShareClicked,
+            onReplayClicked = { viewModel.replay() }
         )
 
         State.Loading -> StoriesLoadingView(onCloseClicked)
@@ -99,6 +104,7 @@ private fun StoriesView(
     onStart: () -> Unit,
     onCloseClicked: () -> Unit,
     onShareClicked: (() -> Bitmap) -> Unit,
+    onReplayClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.background(color = Color.Black)) {
@@ -107,7 +113,7 @@ private fun StoriesView(
             Box(modifier = modifier.weight(weight = 1f, fill = true)) {
                 if (!story.isInteractive) {
                     onCaptureBitmap =
-                        convertibleToBitmap(content = { StorySharableContent(story, modifier) })
+                        convertibleToBitmap(content = { StorySharableContent(story, onReplayClicked, modifier) })
                 }
                 StorySwitcher(
                     onSkipPrevious = onSkipPrevious,
@@ -117,7 +123,7 @@ private fun StoriesView(
                 ) {
                     if (story.isInteractive) {
                         onCaptureBitmap =
-                            convertibleToBitmap(content = { StorySharableContent(story, modifier) })
+                            convertibleToBitmap(content = { StorySharableContent(story, onReplayClicked, modifier) })
                     }
                 }
                 SegmentedProgressIndicator(
@@ -141,6 +147,7 @@ private fun StoriesView(
 @Composable
 private fun StorySharableContent(
     story: Story,
+    onReplayClicked: () -> Unit,
     modifier: Modifier,
 ) {
     Box(
@@ -151,6 +158,7 @@ private fun StorySharableContent(
         contentAlignment = Alignment.Center
     ) {
         when (story) {
+            is StoryIntro -> StoryIntroView(story)
             is StoryListeningTime -> StoryListeningTimeView(story)
             is StoryListenedCategories -> StoryListenedCategoriesView(story)
             is StoryTopListenedCategories -> StoryTopListenedCategoriesView(story)
@@ -158,6 +166,7 @@ private fun StorySharableContent(
             is StoryTopPodcast -> StoryTopPodcastView(story)
             is StoryTopFivePodcasts -> StoryTopFivePodcastsView(story)
             is StoryLongestEpisode -> StoryLongestEpisodeView(story)
+            is StoryEpilogue -> StoryEpilogueView(story, onReplayClicked)
         }
     }
 }
@@ -320,7 +329,8 @@ private fun StoriesScreenPreview(
             onPause = {},
             onStart = {},
             onCloseClicked = {},
-            onShareClicked = {}
+            onShareClicked = {},
+            onReplayClicked = {},
         )
     }
 }
