@@ -46,13 +46,8 @@ internal fun OnboardingCreateAccountPage(
     onAccountCreated: () -> Unit,
 ) {
 
-    LaunchedEffect(Unit) {
-        onShown()
-    }
-
-    BackHandler {
-        onBackPressed()
-    }
+    LaunchedEffect(Unit) { onShown() }
+    BackHandler { onBackPressed() }
 
     val viewModel = hiltViewModel<OnboardingCreateAccountViewModel>()
     val state by viewModel.stateFlow.collectAsState()

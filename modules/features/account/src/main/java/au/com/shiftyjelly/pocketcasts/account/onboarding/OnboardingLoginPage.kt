@@ -43,13 +43,8 @@ internal fun OnboardingLoginPage(
     onLoginComplete: () -> Unit,
     onForgotPasswordTapped: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
-        onShown()
-    }
-
-    BackHandler {
-        onBackPressed()
-    }
+    LaunchedEffect(Unit) { onShown() }
+    BackHandler { onBackPressed() }
 
     val viewModel = hiltViewModel<OnboardingLogInViewModel>()
     val state by viewModel.state.collectAsState()

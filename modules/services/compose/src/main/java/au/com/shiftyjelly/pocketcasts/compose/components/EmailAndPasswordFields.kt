@@ -157,7 +157,7 @@ fun EmailField(
             keyboardType = KeyboardType.Email,
         ),
         onImeAction = onImeAction,
-        modifier = modifier.focusRequester(focusRequester)
+        modifier = modifier
     )
 }
 
