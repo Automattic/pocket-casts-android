@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,10 +38,19 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingLoginPage(
+    onShown: () -> Unit,
     onBackPressed: () -> Unit,
     onLoginComplete: () -> Unit,
     onForgotPasswordTapped: () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        onShown()
+    }
+
+    BackHandler {
+        onBackPressed()
+    }
+
     val viewModel = hiltViewModel<OnboardingLogInViewModel>()
     val state by viewModel.state.collectAsState()
 
@@ -116,6 +127,7 @@ fun OnBoardingLoginPage_Preview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingLoginPage(
+            onShown = {},
             onBackPressed = {},
             onLoginComplete = {},
             onForgotPasswordTapped = {},

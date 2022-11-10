@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,9 +41,18 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingCreateAccountPage(
+    onShown: () -> Unit,
     onBackPressed: () -> Unit,
     onAccountCreated: () -> Unit,
 ) {
+
+    LaunchedEffect(Unit) {
+        onShown()
+    }
+
+    BackHandler {
+        onBackPressed()
+    }
 
     val viewModel = hiltViewModel<OnboardingCreateAccountViewModel>()
     val state by viewModel.stateFlow.collectAsState()
@@ -137,6 +148,7 @@ private fun OnboardingCreateAccountPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingCreateAccountPage(
+            onShown = {},
             onBackPressed = {},
             onAccountCreated = {},
         )

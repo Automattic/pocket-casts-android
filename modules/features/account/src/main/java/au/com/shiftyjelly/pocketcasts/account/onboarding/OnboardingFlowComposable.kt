@@ -67,7 +67,11 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.createFreeAccount) {
                 OnboardingCreateAccountPage(
-                    onBackPressed = { navController.popBackStack() },
+                    onShown = { analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_SHOWN) },
+                    onBackPressed = {
+                        analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_DISMISSED)
+                        navController.popBackStack()
+                    },
                     onAccountCreated = {
                         navController.navigate(OnboardingNavRoute.recommendations) {
                             // clear backstack when opening recommendations
@@ -75,13 +79,17 @@ fun OnboardingFlowComposable(
                                 inclusive = true
                             }
                         }
-                    }
+                    },
                 )
             }
 
             composable(OnboardingNavRoute.logIn) {
                 OnboardingLoginPage(
-                    onBackPressed = { navController.popBackStack() },
+                    onShown = { analyticsTracker.track(AnalyticsEvent.SIGNIN_SHOWN) },
+                    onBackPressed = {
+                        analyticsTracker.track(AnalyticsEvent.SIGNIN_DISMISSED)
+                        navController.popBackStack()
+                    },
                     onLoginComplete = {
                         navController.navigate(OnboardingNavRoute.recommendations) {
                             // clear backstack when opening recommendations
