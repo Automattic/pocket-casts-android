@@ -13,8 +13,8 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedNumbers
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
