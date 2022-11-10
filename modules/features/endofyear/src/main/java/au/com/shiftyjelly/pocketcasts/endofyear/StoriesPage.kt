@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.ShareCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
@@ -96,11 +97,11 @@ const val StoriesViewAspectRatioForTablet = 2f
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun StoriesPage(
-    viewModel: StoriesViewModel,
+    modifier: Modifier = Modifier,
+    viewModel: StoriesViewModel = viewModel(),
     showDialog: Boolean,
     onCloseClicked: () -> Unit,
     theme: Theme,
-    modifier: Modifier = Modifier
 ) {
     if (showDialog) {
         val shareLauncher = rememberLauncherForActivityResult(
@@ -116,45 +117,44 @@ fun StoriesPage(
         if (!isTablet) LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         UpdateSystemBarColors(theme)
 
+        val state: State by viewModel.state.collectAsState()
+        val progress: Float by viewModel.progress.collectAsState()
         val dialogSize = remember { getDialogSize(context) }
         Dialog(
             onDismissRequest = { onCloseClicked.invoke() },
             properties = DialogProperties(usePlatformDefaultWidth = isTablet),
         ) {
             Box(modifier = modifier.size(dialogSize)) {
-                DialogContent(viewModel, onCloseClicked) {
-                    viewModel.onShareClicked(it, context) { file ->
-                        showShareForFile(context, file, shareLauncher)
-                    }
+                when (state) {
+                    is State.Loaded -> StoriesView(
+                        state = state as State.Loaded,
+                        progress = progress,
+                        onSkipPrevious = { viewModel.skipPrevious() },
+                        onSkipNext = { viewModel.skipNext() },
+                        onPause = { viewModel.pause() },
+                        onStart = { viewModel.start() },
+                        onCloseClicked = onCloseClicked,
+                        onReplayClicked = { viewModel.start() },
+                        onShareClicked = {
+                            viewModel.onShareClicked(it, context) { file ->
+                                showShareForFile(context, file, shareLauncher)
+                            }
+                        },
+                    )
+                    State.Loading -> StoriesLoadingView(onCloseClicked)
+                    State.Error -> StoriesErrorView(onCloseClicked)
                 }
             }
         }
-    }
-}
 
-@Composable
-fun DialogContent(
-    viewModel: StoriesViewModel,
-    onCloseClicked: () -> Unit,
-    onShareClicked: (() -> Bitmap) -> Unit,
-) {
-    val state: State by viewModel.state.collectAsState()
-    val progress: Float by viewModel.progress.collectAsState()
-    when (state) {
-        is State.Loaded -> StoriesView(
-            state = state as State.Loaded,
-            progress = progress,
-            onSkipPrevious = { viewModel.skipPrevious() },
-            onSkipNext = { viewModel.skipNext() },
-            onPause = { viewModel.pause() },
-            onStart = { viewModel.start() },
-            onCloseClicked = onCloseClicked,
-            onShareClicked = onShareClicked,
-            onReplayClicked = { viewModel.replay() }
-        )
-
-        State.Loading -> StoriesLoadingView(onCloseClicked)
-        State.Error -> StoriesErrorView(onCloseClicked)
+        DisposableEffect(Unit) {
+            if (state is State.Loaded) {
+                viewModel.start()
+            }
+            onDispose {
+                viewModel.clear()
+            }
+        }
     }
 }
 
@@ -409,7 +409,8 @@ private fun getDialogSize(context: Context): DpSize {
     var dialogHeight = screenHeightInDp.toFloat()
     var dialogWidth = screenWidthInDp.toFloat()
     if (Util.isTablet(context)) {
-        dialogHeight = (screenHeightInDp * MaxHeightPercentFactor).coerceAtMost(StoriesViewMaxSize.value)
+        dialogHeight =
+            (screenHeightInDp * MaxHeightPercentFactor).coerceAtMost(StoriesViewMaxSize.value)
         dialogWidth = dialogHeight / StoriesViewAspectRatioForTablet
     }
 
@@ -435,7 +436,11 @@ fun UpdateSystemBarColors(theme: Theme) {
     val context = LocalContext.current
     DisposableEffect(Unit) {
         val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
-        theme.updateWindowStatusBar(activity.window, StatusBarColor.Custom(android.graphics.Color.BLACK, true), activity)
+        theme.updateWindowStatusBar(
+            activity.window,
+            StatusBarColor.Custom(android.graphics.Color.BLACK, true),
+            activity
+        )
         theme.setNavigationBarColor(activity.window, true, android.graphics.Color.BLACK)
         onDispose {
             // restore original system colors
@@ -458,7 +463,12 @@ private fun StoriesScreenPreview(
     AppTheme(themeType) {
         StoriesView(
             state = State.Loaded(
-                currentStory = StoryListenedNumbers(ListenedNumbers(numberOfEpisodes = 1, numberOfPodcasts = 1)),
+                currentStory = StoryListenedNumbers(
+                    ListenedNumbers(
+                        numberOfEpisodes = 1,
+                        numberOfPodcasts = 1
+                    )
+                ),
                 segmentsData = State.Loaded.SegmentsData(
                     xStartOffsets = listOf(0.0f, 0.28f),
                     widths = listOf(0.25f, 0.75f)
