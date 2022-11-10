@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.transform
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -13,7 +12,7 @@ import javax.inject.Inject
 class EndOfYearStoriesDataSource @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
 ) : StoriesDataSource {
-    override suspend fun isEligibleForStories(): Flow<Boolean> =
+    override fun isEligibleForStories(): Flow<Boolean> =
         endOfYearManager.hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN))
             .transform { emit(it && BuildConfig.END_OF_YEAR_ENABLED) }
 
@@ -25,7 +24,7 @@ class EndOfYearStoriesDataSource @Inject constructor(
      If this is not true, we check for the total number of items of
      this year. If the number is less than or equal 100, we assume they
      have the full history. */
-    override suspend fun hasFullListeningHistory(): Flow<Boolean> =
+    override fun hasFullListeningHistory(): Flow<Boolean> =
         combine(
             endOfYearManager.hasEpisodeInteractedBefore(YEAR),
             endOfYearManager.hasListeningHistoryEpisodesInLimitForYear(YEAR, limit = LISTENING_HISTORY_LIMIT),
@@ -34,9 +33,9 @@ class EndOfYearStoriesDataSource @Inject constructor(
         }
 
     // TODO: Update with the correct endpoint to sync history
-    override suspend fun syncListeningHistory() = flowOf(true)
+    override suspend fun syncListeningHistory() {}
 
-    override suspend fun loadStories(): Flow<List<Story>> {
+    override fun loadStories(): Flow<List<Story>> {
         return combine(
             endOfYearManager.getTotalListeningTimeInSecsForYear(YEAR),
             endOfYearManager.findListenedCategoriesForYear(YEAR),

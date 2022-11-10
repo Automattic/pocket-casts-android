@@ -52,16 +52,9 @@ class StoriesViewModel @Inject constructor(
             storiesDataSource.hasFullListeningHistory().stateIn(viewModelScope)
                 .collect { isFullListeningHistory ->
                     if (!isFullListeningHistory) {
-                        storiesDataSource.syncListeningHistory().collect { success ->
-                            if (success) {
-                                loadStories()
-                            } else {
-                                mutableState.value = State.Error
-                            }
-                        }
-                    } else {
-                        loadStories()
+                        // TODO: Integrate listening history sync endpoint
                     }
+                    loadStories()
                 }
         }
     }
