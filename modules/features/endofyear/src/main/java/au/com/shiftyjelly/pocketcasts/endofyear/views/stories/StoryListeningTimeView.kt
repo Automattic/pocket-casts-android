@@ -17,10 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -33,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
+import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -40,9 +38,6 @@ import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private const val PodcastCoverRotationAngle = -30f
-private const val PodcastCoverSkew = 0.45f
 
 @Composable
 fun StoryListeningTimeView(
@@ -130,35 +125,18 @@ private fun PodcastCoverRow(
     val context = LocalContext.current
     val currentLocalView = LocalView.current
     val coverWidth = (currentLocalView.width.pxToDp(context).dp - 15.dp) / 3
-    val translateBy = 20.dpToPx(context)
+    val translateBy = 20.dpToPx(context).toFloat()
     Row(
         modifier
-            .graphicsLayer(
-                rotationZ = PodcastCoverRotationAngle
-            )
-            .drawWithContent {
-                withTransform(
-                    transformBlock = {
-                        val transformMatrix = Matrix()
-                        transformMatrix.values[Matrix.SkewX] = PodcastCoverSkew
-                        transform(transformMatrix)
-                    }
-                ) {
-                    this@drawWithContent.drawContent()
-                }
-            }
-            .graphicsLayer(
-                translationX = -translateBy.toFloat()
-            )
-
+            .transformPodcastCover()
+            .graphicsLayer(translationX = -translateBy)
     ) {
         story.podcasts.forEach { podcast ->
             Row {
                 PodcastImage(
                     uuid = podcast.uuid,
                     dropShadow = false,
-                    modifier = modifier
-                        .size(coverWidth)
+                    modifier = modifier.size(coverWidth)
                 )
                 Spacer(modifier = modifier.width(5.dp))
             }
