@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -53,15 +51,11 @@ fun StoryListeningTimeView(
 ) {
     val context = LocalContext.current
 
-    val timeText = remember {
-        StatsHelper.secondsToFriendlyString(story.listeningTimeInSecs, context.resources)
-    }
-    val funnyText = remember {
-        FunnyTimeConverter().timeSecsToFunnyText(
-            story.listeningTimeInSecs,
-            context.resources
-        )
-    }
+    val timeText = StatsHelper.secondsToFriendlyString(story.listeningTimeInSecs, context.resources)
+    val funnyText = FunnyTimeConverter().timeSecsToFunnyText(
+        story.listeningTimeInSecs,
+        context.resources
+    )
 
     val backgroundColor = if (story.podcasts.isEmpty()) {
         Podcast().getTintColor(false)
@@ -135,9 +129,8 @@ private fun PodcastCoverRow(
 ) {
     val context = LocalContext.current
     val currentLocalView = LocalView.current
-    val coverWidth = remember { (currentLocalView.width.pxToDp(context).dp - 15.dp) / 3 }
-    val translateBy = remember { 20.dpToPx(context) }
-    val transformMatrix = remember { mutableStateOf(Matrix()) }
+    val coverWidth = (currentLocalView.width.pxToDp(context).dp - 15.dp) / 3
+    val translateBy = 20.dpToPx(context)
     Row(
         modifier
             .graphicsLayer(
@@ -146,8 +139,9 @@ private fun PodcastCoverRow(
             .drawWithContent {
                 withTransform(
                     transformBlock = {
-                        transformMatrix.value.values[Matrix.SkewX] = PodcastCoverSkew
-                        transform(transformMatrix.value)
+                        val transformMatrix = Matrix()
+                        transformMatrix.values[Matrix.SkewX] = PodcastCoverSkew
+                        transform(transformMatrix)
                     }
                 ) {
                     this@drawWithContent.drawContent()

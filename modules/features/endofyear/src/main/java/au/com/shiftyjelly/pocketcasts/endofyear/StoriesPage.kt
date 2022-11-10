@@ -9,7 +9,6 @@ import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -58,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
+import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryEpilogueView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryIntroView
@@ -84,6 +84,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import java.io.File
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -118,7 +120,6 @@ fun StoriesPage(
         UpdateSystemBarColors(theme)
 
         val state: State by viewModel.state.collectAsState()
-        val progress: Float by viewModel.progress.collectAsState()
         val dialogSize = remember { getDialogSize(context) }
         Dialog(
             onDismissRequest = { onCloseClicked.invoke() },
@@ -128,7 +129,7 @@ fun StoriesPage(
                 when (state) {
                     is State.Loaded -> StoriesView(
                         state = state as State.Loaded,
-                        progress = progress,
+                        progress = viewModel.progress,
                         onSkipPrevious = { viewModel.skipPrevious() },
                         onSkipNext = { viewModel.skipNext() },
                         onPause = { viewModel.pause() },
@@ -161,7 +162,7 @@ fun StoriesPage(
 @Composable
 private fun StoriesView(
     state: State.Loaded,
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    progress: StateFlow<Float>,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
     onPause: () -> Unit,
@@ -188,7 +189,7 @@ private fun StoriesView(
                         )
                     })
                 SegmentedProgressIndicator(
-                    progress = progress,
+                    progressFlow = progress,
                     segmentsData = state.segmentsData,
                     modifier = modifier
                         .padding(8.dp)
@@ -474,7 +475,7 @@ private fun StoriesScreenPreview(
                     widths = listOf(0.25f, 0.75f)
                 )
             ),
-            progress = 0.75f,
+            progress = MutableStateFlow(0.75f),
             onSkipPrevious = {},
             onSkipNext = {},
             onPause = {},
