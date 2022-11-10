@@ -6,7 +6,8 @@ import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,7 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class StoriesViewModel @Inject constructor(
-    private val storiesDataSource: StoriesDataSource,
+    private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow<State>(State.Loading)
@@ -49,7 +50,7 @@ class StoriesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storiesDataSource.hasFullListeningHistory().stateIn(viewModelScope)
+            endOfYearManager.hasFullListeningHistory().stateIn(viewModelScope)
                 .collect { isFullListeningHistory ->
                     if (!isFullListeningHistory) {
                         // TODO: Integrate listening history sync endpoint
@@ -60,7 +61,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     private suspend fun loadStories() {
-        storiesDataSource.loadStories().stateIn(viewModelScope).collect { result ->
+        endOfYearManager.loadStories().stateIn(viewModelScope).collect { result ->
             cancelTimer()
             if (result.size != stories.value.size) resetProgressAndCurrentIndex()
             stories.value = result

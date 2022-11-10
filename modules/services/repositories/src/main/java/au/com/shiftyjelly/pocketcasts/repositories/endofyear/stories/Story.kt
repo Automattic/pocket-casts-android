@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.endofyear.stories
+package au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories
 
 import androidx.compose.ui.graphics.Color
 import au.com.shiftyjelly.pocketcasts.utils.seconds
