@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
@@ -15,6 +17,7 @@ fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
     abortOnboarding: () -> Unit,
+    analyticsTracker: AnalyticsTrackerWrapper
 ) {
     AppThemeWithBackground(activeTheme) {
         val navController = rememberNavController()
@@ -42,10 +45,23 @@ fun OnboardingFlowComposable(
         ) {
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
-                    onNotNowClicked = completeOnboarding,
-                    onSignUpFreeClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
-                    onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
-                    onLoginGoogleClicked = { navController.navigate(OnboardingNavRoute.logInGoogle) }
+                    onNotNowClicked = {
+                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED)
+                        completeOnboarding()
+                    },
+                    onSignUpFreeClicked = {
+                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.createAccount)
+                        navController.navigate(OnboardingNavRoute.createFreeAccount)
+                    },
+                    onLoginClicked = {
+                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.signIn)
+                        navController.navigate(OnboardingNavRoute.logIn)
+                    },
+                    onContinueWithGoogleClicked = {
+                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.continueWithGoogle)
+                        navController.navigate(OnboardingNavRoute.logInGoogle)
+                    },
+                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN) }
                 )
             }
 
@@ -90,6 +106,15 @@ fun OnboardingFlowComposable(
                 OnboardingRecommendations()
             }
         }
+    }
+}
+
+private object AnalyticsProp {
+    object ButtonTapped {
+        private const val button = "button"
+        val signIn = mapOf(button to "sign_in")
+        val createAccount = mapOf(button to "create_account")
+        val continueWithGoogle = mapOf(button to "continue_with_google")
     }
 }
 

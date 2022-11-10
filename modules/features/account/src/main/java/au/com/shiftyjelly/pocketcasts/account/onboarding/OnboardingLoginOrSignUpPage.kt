@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,8 +37,14 @@ internal fun OnboardingLoginOrSignUpPage(
     onNotNowClicked: () -> Unit,
     onSignUpFreeClicked: () -> Unit,
     onLoginClicked: () -> Unit,
-    onLoginGoogleClicked: () -> Unit
+    onContinueWithGoogleClicked: () -> Unit,
+    onShown: () -> Unit
 ) {
+
+    LaunchedEffect(Unit) {
+        onShown()
+    }
+
     Column {
 
         Row(
@@ -95,7 +102,7 @@ internal fun OnboardingLoginOrSignUpPage(
             OutlinedRowButton(
                 text = stringResource(LR.string.onboarding_continue_with_google),
                 leadingIcon = IR.drawable.google_g,
-                onClick = onLoginGoogleClicked
+                onClick = onContinueWithGoogleClicked
             )
 
             RowButton(
@@ -119,7 +126,8 @@ private fun Preview() {
             onNotNowClicked = {},
             onSignUpFreeClicked = {},
             onLoginClicked = {},
-            onLoginGoogleClicked = {}
+            onContinueWithGoogleClicked = {},
+            onShown = {}
         )
     }
 }
