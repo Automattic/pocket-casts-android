@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Matrix
@@ -27,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -118,8 +120,10 @@ private fun FunnyText(
         text = funnyText,
         textAlign = TextAlign.Center,
         color = story.tintColor,
+        fontWeight = FontWeight.Bold,
         modifier = modifier
             .fillMaxWidth()
+            .alpha(0.8f)
             .padding(top = 24.dp, start = 40.dp, end = 40.dp)
     )
 }
