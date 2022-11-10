@@ -10,6 +10,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -27,7 +31,8 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -70,6 +75,8 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileViewModel by viewModels()
+    private val storiesViewModel: StoriesViewModel by viewModels()
+
     private var binding: FragmentProfileBinding? = null
     private val sections = listOf(
         SettingsAdapter.Item(LR.string.profile_navigation_stats, R.drawable.ic_stats, StatsFragment::class.java),
@@ -233,11 +240,19 @@ class ProfileFragment : BaseFragment() {
     private fun FragmentProfileBinding.setupEndOfYearPromptCard(isEligible: Boolean) {
         endOfYearPromptCard.setContent {
             if (isEligible) {
+                var showDialog by rememberSaveable { mutableStateOf(false) }
+                if (showDialog) {
+                    StoriesPage(
+                        viewModel = storiesViewModel,
+                        showDialog = showDialog,
+                        theme = theme,
+                        onCloseClicked = { showDialog = false },
+                    )
+                }
                 AppTheme(theme.activeTheme) {
                     EndOfYearPromptCard(
                         onClick = {
-                            StoriesFragment.newInstance()
-                                .show(childFragmentManager, "stories_dialog")
+                            showDialog = true
                         }
                     )
                 }
