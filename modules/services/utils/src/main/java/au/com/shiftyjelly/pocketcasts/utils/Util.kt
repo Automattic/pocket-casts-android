@@ -13,6 +13,7 @@ import android.view.accessibility.AccessibilityManager
 import java.util.Locale
 
 object Util {
+    private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 600
 
     fun isCarUiMode(context: Context): Boolean {
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
@@ -28,6 +29,10 @@ object Util {
         }.metaData
         return appInfo?.getBoolean("pocketcasts_automotive", false) == true
     }
+
+    fun isTablet(context: Context) =
+        !isAutomotive(context) &&
+            context.resources.configuration.smallestScreenWidthDp > MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET
 
     fun isTalkbackOn(context: Context): Boolean {
         val am = context.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager?
