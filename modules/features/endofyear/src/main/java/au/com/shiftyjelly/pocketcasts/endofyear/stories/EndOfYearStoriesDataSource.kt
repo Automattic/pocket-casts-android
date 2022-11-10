@@ -40,13 +40,13 @@ class EndOfYearStoriesDataSource @Inject constructor(
             endOfYearManager.getTotalListeningTimeInSecsForYear(YEAR),
             endOfYearManager.findListenedCategoriesForYear(YEAR),
             endOfYearManager.findListenedNumbersForYear(YEAR),
-            endOfYearManager.findTopPodcastsForYear(YEAR, limit = 5),
+            endOfYearManager.findTopPodcastsForYear(YEAR, limit = 10),
             endOfYearManager.findLongestPlayedEpisodeForYear(YEAR)
-        ) { listeningTime, listenedCategories, listenedNumbers, topFivePodcasts, longestEpisode ->
+        ) { listeningTime, listenedCategories, listenedNumbers, topPodcasts, longestEpisode ->
             val stories = mutableListOf<Story>()
 
             stories.add(StoryIntro())
-            listeningTime?.let { stories.add(StoryListeningTime(it)) }
+            listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
             if (listenedCategories.isNotEmpty()) {
                 stories.add(StoryListenedCategories(listenedCategories))
                 stories.add(StoryTopListenedCategories(listenedCategories))
@@ -54,10 +54,10 @@ class EndOfYearStoriesDataSource @Inject constructor(
             if (listenedNumbers.numberOfEpisodes > 1 && listenedNumbers.numberOfPodcasts > 1) {
                 stories.add(StoryListenedNumbers(listenedNumbers))
             }
-            if (topFivePodcasts.isNotEmpty()) {
-                stories.add(StoryTopPodcast(topFivePodcasts.first()))
-                if (topFivePodcasts.size > 1) {
-                    stories.add(StoryTopFivePodcasts(topFivePodcasts))
+            if (topPodcasts.isNotEmpty()) {
+                stories.add(StoryTopPodcast(topPodcasts.first()))
+                if (topPodcasts.size > 1) {
+                    stories.add(StoryTopFivePodcasts(topPodcasts.take(5)))
                 }
             }
             longestEpisode?.let { stories.add(StoryLongestEpisode(it)) }

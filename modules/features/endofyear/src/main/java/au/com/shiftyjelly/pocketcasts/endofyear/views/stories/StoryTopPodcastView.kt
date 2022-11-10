@@ -73,6 +73,7 @@ private fun StoryTopPodcastViewPreview(
                         uuid = "1",
                         title = "Title",
                         author = "Author",
+                        tintColorForLightBg = 0,
                         numberOfPlayedEpisodes = 1,
                         totalPlayedTime = 0.0,
                     )

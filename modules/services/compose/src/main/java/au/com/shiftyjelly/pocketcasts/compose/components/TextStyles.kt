@@ -89,7 +89,8 @@ fun TextP40(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    fontWeight: FontWeight? = null,
 ) {
     Text(
         text = text,
@@ -99,6 +100,7 @@ fun TextP40(
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
+        fontWeight = fontWeight,
         modifier = modifier
     )
 }
