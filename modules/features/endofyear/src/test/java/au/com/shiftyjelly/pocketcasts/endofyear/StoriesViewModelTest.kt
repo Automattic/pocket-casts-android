@@ -107,8 +107,9 @@ class StoriesViewModelTest {
         assertEquals(state.currentStory, story1)
     }
 
-    private suspend fun initViewModel(mockStories: List<Story>): StoriesViewModel {
+    private fun initViewModel(mockStories: List<Story>, hasFullListeningHistory: Boolean = true): StoriesViewModel {
         whenever(storiesDataSource.loadStories()).thenReturn(flowOf(mockStories))
+        whenever(storiesDataSource.hasFullListeningHistory()).thenReturn(flowOf(hasFullListeningHistory))
         return StoriesViewModel(
             storiesDataSource = storiesDataSource,
             fileUtilWrapper = fileUtilWrapper

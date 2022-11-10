@@ -20,9 +20,12 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
@@ -34,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesDataSource
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
@@ -113,6 +117,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -157,6 +163,7 @@ class MainActivity :
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
     @Inject lateinit var warningsHelper: WarningsHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var storiesDataSource: StoriesDataSource
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -190,9 +197,16 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
-        if (BuildConfig.END_OF_YEAR_ENABLED && settings.getEndOfYearShowBadge2022()) {
-            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
-        }
+        viewModel.isEndOfYearStoriesEligible()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { isEligible ->
+                if (isEligible) {
+                    setupEndOfYearLaunchBottomSheet()
+                    if (settings.getEndOfYearShowBadge2022()) {
+                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                    }
+                }
+            }.launchIn(lifecycleScope)
 
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(
@@ -270,10 +284,6 @@ class MainActivity :
         handleIntent(intent, savedInstanceState)
 
         updateSystemColors()
-
-        if (BuildConfig.END_OF_YEAR_ENABLED) {
-            setupEndOfYearLaunchBottomSheet()
-        }
 
         binding.onboardingFrame.setContent {
             if (BuildConfig.ONBOARDING_ENABLED) {

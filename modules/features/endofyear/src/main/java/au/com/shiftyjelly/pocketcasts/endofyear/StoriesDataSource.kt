@@ -4,5 +4,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
 import kotlinx.coroutines.flow.Flow
 
 interface StoriesDataSource {
-    suspend fun loadStories(): Flow<List<Story>>
+    fun isEligibleForStories(): Flow<Boolean>
+    fun hasFullListeningHistory(): Flow<Boolean>
+    suspend fun syncListeningHistory()
+    fun loadStories(): Flow<List<Story>>
 }
