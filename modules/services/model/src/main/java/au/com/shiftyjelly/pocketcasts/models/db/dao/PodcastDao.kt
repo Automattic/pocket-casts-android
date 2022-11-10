@@ -348,7 +348,7 @@ abstract class PodcastDao {
 
     @Query(
         """
-        SELECT podcasts.uuid, podcasts.title, podcasts.author, SUM(episodes.played_up_to) as totalPlayedTime, COUNT(episodes.uuid) as numberOfPlayedEpisodes
+        SELECT podcasts.uuid, podcasts.title, podcasts.author, podcasts.primary_color as tintColorForLightBg, SUM(episodes.played_up_to) as totalPlayedTime, COUNT(episodes.uuid) as numberOfPlayedEpisodes
         FROM episodes
         JOIN podcasts ON episodes.podcast_id = podcasts.uuid
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
