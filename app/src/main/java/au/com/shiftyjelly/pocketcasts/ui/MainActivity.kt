@@ -12,13 +12,20 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
@@ -32,7 +39,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
@@ -111,6 +119,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -160,6 +170,7 @@ class MainActivity :
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
 
     private val viewModel: MainActivityViewModel by viewModels()
+    private val storiesViewModel: StoriesViewModel by viewModels()
     private val disposables = CompositeDisposable()
     private var videoPlayerShown: Boolean = false
     private var overrideNextRefreshTimer: Boolean = false
@@ -193,9 +204,16 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
-        if (BuildConfig.END_OF_YEAR_ENABLED && settings.getEndOfYearShowBadge2022()) {
-            binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
-        }
+        viewModel.isEndOfYearStoriesEligible()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { isEligible ->
+                if (isEligible) {
+                    setupEndOfYearLaunchBottomSheet()
+                    if (settings.getEndOfYearShowBadge2022()) {
+                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                    }
+                }
+            }.launchIn(lifecycleScope)
 
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(
@@ -493,11 +511,19 @@ class MainActivity :
 
     private fun setupEndOfYearLaunchBottomSheet() {
         binding.modalBottomSheet.setContent {
-            AppTheme(themeType = theme.activeTheme) {
+            var showDialog by rememberSaveable { mutableStateOf(false) }
+            if (showDialog) {
+                StoriesPage(
+                    viewModel = storiesViewModel,
+                    showDialog = showDialog,
+                    theme = theme,
+                    onCloseClicked = { showDialog = false },
+                )
+            }
+            AppTheme(theme.activeTheme) {
                 EndOfYearLaunchBottomSheet(
                     onClick = {
-                        StoriesFragment.newInstance()
-                            .show(supportFragmentManager, "stories_dialog")
+                        showDialog = true
                     }
                 )
             }

@@ -1393,6 +1393,7 @@
     <!-- End of Year -->
 
     <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
+    <string name="end_of_year_launch_modal_image_title">Year in Podcasts</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
     <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
@@ -1401,6 +1402,51 @@
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_listening_time">In 2022, you spent %1$s listening to podcasts.</string>
     <string name="end_of_year_replay">Replay</string>
+    <string name="end_of_year_story_intro_title">Let\'s celebrate your year of listening…</string>
+    <!-- Text that appears when someone shares the listened to story to Twitter, for example. %1$s is a placeholder for the amount of time. -->
+    <string name="end_of_year_story_listened_to_share_text">I spent %1$s listening to podcasts in 2022</string>
+    <!-- String telling the user how much podcast categories they listened to podcasts in 2022, %1$d is a placeholder for the number of categories. -->
+    <string name="end_of_year_story_listened_to_categories">You listened to %1$d different categories this year</string>
+    <!-- String prompting the user for the next story to check the most listened categories. -->
+    <string name="end_of_year_story_listened_to_categories_subtitle">Let\'s take a look at some of your favorites…</string>
+    <!-- Text that appears when someone shares the listened categories to story to Twitter, for example. %1$d is a placeholder for the number of categories. -->
+    <string name="end_of_year_story_listened_to_categories_share_text">I listened to %1$d different categories in 2022</string>
+    <!-- String telling the user how much podcasts and episodes they listened to this year, %1$d is a placeholder for the number of podcasts and %2$d is a placeholder fo the number of episodes. -->
+    <string name="end_of_year_story_listened_to_numbers">You listened to %1$d different podcasts and %2$d episodes</string>
+    <!-- Subtitle for the story containing number of podcasts and episodes played this year. Segway for the next story. -->
+    <string name="end_of_year_story_listened_to_numbers_subtitle">But there was one that you kept coming back to…</string>
+    <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. -->
+    <string name="end_of_year_story_listened_to_numbers_share_text">I listened to %1$d different podcasts and %2$d episodes in 2022</string>
+    <!-- Title for the story that display the most listened podcast by the user this year. %1$s is a placeholder for the podcast title and %2$s is a placeholder for the author. -->
+    <string name="end_of_year_story_top_podcast">Your top podcast was %1$s by %2$s</string>
+    <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$d is a placeholder for the number of episodes and %2$s is a placeholder for the listened time. -->
+    <string name="end_of_year_story_top_podcast_subtitle">You listened to %1$d episodes for a total of %2$s</string>
+    <!-- Text that appear when someone share the top podcast of the year story to Twitter. %1$s is the URL to the podcast. -->
+    <string name="end_of_year_story_top_podcast_share_text">My favorite podcast of 2022! %1$s</string>
+    <!-- Title for the story showing the top podcasts for the user in the current year. -->
+    <string name="end_of_year_story_top_podcasts">Your Top Podcasts</string>
+    <!-- Text that appear when someone share the top 5 podcasts of the year story to Twitter. %1$s is a link to the list of the top podcasts. -->
+    <string name="end_of_year_story_top_podcasts_share_text">My top podcasts of the year! %1$s</string>
+    <!-- Title of a list of podcasts created containing the user's top 5 podcasts of 2022. -->
+    <string name="end_of_year_story_top_podcasts_list_title">My top podcasts of 2022</string>
+    <!-- Title for the story showing the longest episode listened for the user in the current year. %1$s is a placeholder for the episode title and %2$s is a placeholder for the podcast title. -->
+    <string name="end_of_year_story_longest_episode">The longest episode you listened to was %1$s from the podcast %2$s</string>
+    <!-- Subtitle for the story showing the longest episode listened for the user in the current year. %1$s is a placeholder for the episode length. -->
+    <string name="end_of_year_story_longest_episode_duration">This episode was %1$s long</string>
+    <!-- Text that appear when someone share the longest episode they listened to story to Twitter. %1$s is the URL to the episode. -->
+    <string name="end_of_year_story_longest_episode_share_text">The longest episode I listened to in 2022 %1$s</string>
+    <!-- Title for the epilogue story -->
+    <string name="end_of_year_story_epilogue_title">Thank you for letting Pocket Casts be a part of your listening experience in 2022</string>
+    <!-- Subtitle for the epilogue story -->
+    <string name="end_of_year_story_epilogue_subtitle">Don\'t forget to share with your friends and give a shout out to your favorite podcast creators</string>
+    <!-- Title of the top categories story. -->
+    <string name="end_of_year_story_top_categories">Your Top Categories</string>
+    <!-- Text that appear when someone share the top categories story to Twitter. -->
+    <string name="end_of_year_story_top_categories_share_text">My most listened to podcast categories</string>
+    <!-- Description to why the user needs to create an account to see their end of year stats. -->
+    <string name="end_of_year_create_account_to_see">Save your podcasts in the cloud, get your end of year review and sync your progress with other devices.</string>
+    <!-- When loading the End of Year stats stories fails. -->
+    <string name="end_of_year_stories_failed">Failed to load stories.</string>
 
     <!-- Onboarding -->
 

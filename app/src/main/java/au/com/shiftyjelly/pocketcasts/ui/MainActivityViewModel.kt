@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -20,7 +21,8 @@ class MainActivityViewModel
 @Inject constructor(
     playbackManager: PlaybackManager,
     userManager: UserManager,
-    val settings: Settings
+    val settings: Settings,
+    private val endOfYearManager: EndOfYearManager
 ) : ViewModel() {
 
     var isPlayerOpen: Boolean = false
@@ -48,4 +50,6 @@ class MainActivityViewModel
     fun shouldShowTrialFinished(signInState: SignInState): Boolean {
         return signInState.isExpiredTrial && !settings.getTrialFinishedSeen()
     }
+
+    fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 }

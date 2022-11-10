@@ -10,6 +10,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -17,6 +21,9 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +31,8 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -47,6 +55,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
@@ -65,6 +75,8 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileViewModel by viewModels()
+    private val storiesViewModel: StoriesViewModel by viewModels()
+
     private var binding: FragmentProfileBinding? = null
     private val sections = listOf(
         SettingsAdapter.Item(LR.string.profile_navigation_stats, R.drawable.ic_stats, StatsFragment::class.java),
@@ -98,10 +110,6 @@ class ProfileFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
-
-        if (BuildConfig.END_OF_YEAR_ENABLED) {
-            binding.setupEndOfYearPromptCard()
-        }
 
         binding.btnSettings.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
@@ -157,6 +165,12 @@ class ProfileFragment : BaseFragment() {
             theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity)
             true
         }
+
+        viewModel.isEndOfYearStoriesEligible()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { isEligible ->
+                binding.setupEndOfYearPromptCard(isEligible)
+            }.launchIn(lifecycleScope)
 
         viewModel.podcastCount.observe(viewLifecycleOwner) {
             binding.lblPodcastCount.text = it.toString()
@@ -223,15 +237,25 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
-    private fun FragmentProfileBinding.setupEndOfYearPromptCard() {
+    private fun FragmentProfileBinding.setupEndOfYearPromptCard(isEligible: Boolean) {
         endOfYearPromptCard.setContent {
-            AppTheme(theme.activeTheme) {
-                EndOfYearPromptCard(
-                    onClick = {
-                        StoriesFragment.newInstance()
-                            .show(childFragmentManager, "stories_dialog")
-                    }
-                )
+            if (isEligible) {
+                var showDialog by rememberSaveable { mutableStateOf(false) }
+                if (showDialog) {
+                    StoriesPage(
+                        viewModel = storiesViewModel,
+                        showDialog = showDialog,
+                        theme = theme,
+                        onCloseClicked = { showDialog = false },
+                    )
+                }
+                AppTheme(theme.activeTheme) {
+                    EndOfYearPromptCard(
+                        onClick = {
+                            showDialog = true
+                        }
+                    )
+                }
             }
         }
     }

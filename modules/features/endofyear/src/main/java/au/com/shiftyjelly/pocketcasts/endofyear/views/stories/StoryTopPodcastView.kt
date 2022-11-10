@@ -19,8 +19,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
@@ -73,6 +73,7 @@ private fun StoryTopPodcastViewPreview(
                         uuid = "1",
                         title = "Title",
                         author = "Author",
+                        tintColorForLightBg = 0,
                         numberOfPlayedEpisodes = 1,
                         totalPlayedTime = 0.0,
                     )

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +30,7 @@ class StoriesViewModelTest {
     private lateinit var fileUtilWrapper: FileUtilWrapper
 
     @Mock
-    private lateinit var storiesDataSource: StoriesDataSource
+    private lateinit var endOfYearManager: EndOfYearManager
 
     @Before
     fun setUp() {
@@ -56,7 +57,7 @@ class StoriesViewModelTest {
     fun `when vm starts, then stories are loaded`() = runTest {
         initViewModel(emptyList())
 
-        verify(storiesDataSource).loadStories()
+        verify(endOfYearManager).loadStories()
     }
 
     @Test
@@ -107,10 +108,11 @@ class StoriesViewModelTest {
         assertEquals(state.currentStory, story1)
     }
 
-    private suspend fun initViewModel(mockStories: List<Story>): StoriesViewModel {
-        whenever(storiesDataSource.loadStories()).thenReturn(flowOf(mockStories))
+    private fun initViewModel(mockStories: List<Story>, hasFullListeningHistory: Boolean = true): StoriesViewModel {
+        whenever(endOfYearManager.loadStories()).thenReturn(flowOf(mockStories))
+        whenever(endOfYearManager.hasFullListeningHistory()).thenReturn(flowOf(hasFullListeningHistory))
         return StoriesViewModel(
-            storiesDataSource = storiesDataSource,
+            endOfYearManager = endOfYearManager,
             fileUtilWrapper = fileUtilWrapper
         )
     }

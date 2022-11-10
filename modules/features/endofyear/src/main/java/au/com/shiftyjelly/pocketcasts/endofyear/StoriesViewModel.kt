@@ -6,7 +6,8 @@ import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,7 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class StoriesViewModel @Inject constructor(
-    private val storiesDataSource: StoriesDataSource,
+    private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow<State>(State.Loading)
@@ -49,25 +50,35 @@ class StoriesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            storiesDataSource.loadStories().stateIn(viewModelScope).collect { result ->
-                cancelTimer()
-                if (result.size != stories.value.size) resetProgressAndCurrentIndex()
-                stories.value = result
-
-                val state = if (result.isEmpty()) {
-                    State.Error
-                } else {
-                    State.Loaded(
-                        currentStory = result[currentIndex],
-                        segmentsData = SegmentsData(
-                            xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
-                            widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
-                        )
-                    )
+            endOfYearManager.hasFullListeningHistory().stateIn(viewModelScope)
+                .collect { isFullListeningHistory ->
+                    if (!isFullListeningHistory) {
+                        // TODO: Integrate listening history sync endpoint
+                    }
+                    loadStories()
                 }
-                mutableState.value = state
-                if (state is State.Loaded) start()
+        }
+    }
+
+    private suspend fun loadStories() {
+        endOfYearManager.loadStories().stateIn(viewModelScope).collect { result ->
+            cancelTimer()
+            if (result.size != stories.value.size) resetProgressAndCurrentIndex()
+            stories.value = result
+
+            val state = if (result.isEmpty()) {
+                State.Error
+            } else {
+                State.Loaded(
+                    currentStory = result[currentIndex],
+                    segmentsData = SegmentsData(
+                        xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
+                        widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
+                    )
+                )
             }
+            mutableState.value = state
+            if (state is State.Loaded) start()
         }
     }
 
@@ -120,7 +131,7 @@ class StoriesViewModel @Inject constructor(
     fun onShareClicked(
         onCaptureBitmap: () -> Bitmap,
         context: Context,
-        showShareForFile: (File) -> Unit
+        showShareForFile: (File) -> Unit,
     ) {
         pause()
         viewModelScope.launch {

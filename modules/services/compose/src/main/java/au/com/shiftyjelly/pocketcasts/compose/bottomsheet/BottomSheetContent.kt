@@ -1,42 +1,56 @@
 package au.com.shiftyjelly.pocketcasts.compose.bottomsheet
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 
-private val outlinedBorder: BorderStroke
+private const val ContentMaxWidthDp = 600
+private val ContentPadding = 16.dp
+private val OutlinedBorder: BorderStroke
     @Composable
-    get() = BorderStroke(2.dp, MaterialTheme.colors.primary)
+    get() = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryText01)
+
+private val PillSize = DpSize(width = 56.dp, height = 4.dp)
+private val PillCornerRadius = 10.dp
+private const val PillAlpha = 0.2f
 
 class BottomSheetContentState(
     val content: Content,
 ) {
     data class Content(
         val titleText: String,
+        val imageContent: @Composable (() -> Unit)? = null,
         val summaryText: String,
         val primaryButton: Button.Primary,
         val secondaryButton: Button.Secondary? = null,
@@ -62,63 +76,119 @@ class BottomSheetContentState(
 fun BottomSheetContent(
     state: BottomSheetContentState,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentWidth(unbounded = false)
-            .wrapContentHeight(unbounded = true)
-            .padding(24.dp)
+            .padding(ContentPadding),
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier
+                .widthIn(max = ContentMaxWidthDp.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val context = LocalContext.current
             val content = state.content
 
-            Spacer(modifier = modifier.height(16.dp))
+            Pill()
 
-            TextH40(
-                text = content.titleText,
-                color = MaterialTheme.theme.colors.primaryText01,
-            )
+            Spacer(modifier = modifier.height(32.dp))
 
-            Spacer(modifier = modifier.height(16.dp))
-
-            TextP50(
-                text = content.summaryText,
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.theme.colors.primaryText02,
-                textAlign = TextAlign.Center
-            )
+            TitleText(content)
 
             Spacer(modifier = modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    onDismiss.invoke()
-                    content.primaryButton.onClick.invoke()
+            state.content.imageContent?.let { imageContent ->
+                if (context.resources.configuration.inPortrait() || Util.isTablet(context)) {
+                    imageContent.invoke()
+                    Spacer(modifier = modifier.height(16.dp))
                 }
-            ) {
-                Text(text = content.primaryButton.label)
             }
 
-            Spacer(modifier = modifier.height(8.dp))
+            SummaryText(content)
+
+            Spacer(modifier = modifier.height(16.dp))
+
+            ConfirmButton(onDismiss, content.primaryButton)
+
+            Spacer(modifier = modifier.height(16.dp))
 
             if (content.secondaryButton != null) {
-                OutlinedButton(
-                    border = outlinedBorder,
-                    onClick = {
-                        onDismiss.invoke()
-                        content.secondaryButton.onClick?.invoke()
-                    }
-                ) {
-                    Text(text = content.secondaryButton.label)
-                }
+                DismissButton(onDismiss, content.secondaryButton)
             }
         }
     }
+}
+
+@Composable
+fun Pill(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .size(PillSize)
+            .clip(RoundedCornerShape(PillCornerRadius))
+            .alpha(PillAlpha)
+            .background(MaterialTheme.theme.colors.primaryText02)
+    )
+}
+
+@Composable
+private fun TitleText(content: BottomSheetContentState.Content) {
+    TextH20(
+        text = content.titleText,
+        color = MaterialTheme.theme.colors.primaryText01,
+    )
+}
+
+@Composable
+private fun SummaryText(content: BottomSheetContentState.Content) {
+    TextH50(
+        text = content.summaryText,
+        color = MaterialTheme.theme.colors.primaryText02,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun ConfirmButton(
+    onDismiss: () -> Unit,
+    primaryButton: BottomSheetContentState.Content.Button.Primary,
+) {
+    RowButton(
+        text = primaryButton.label,
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.theme.colors.primaryText01,
+            contentColor = MaterialTheme.theme.colors.primaryInteractive02
+        ),
+        includePadding = false,
+        onClick = {
+            onDismiss.invoke()
+            primaryButton.onClick.invoke()
+        }
+    )
+}
+
+@Composable
+private fun DismissButton(
+    onDismiss: () -> Unit,
+    secondaryButton: BottomSheetContentState.Content.Button.Secondary,
+) {
+    RowOutlinedButton(
+        text = secondaryButton.label,
+        border = OutlinedBorder,
+        colors = ButtonDefaults.outlinedButtonColors(
+            backgroundColor = MaterialTheme.theme.colors.primaryUi01,
+            contentColor = MaterialTheme.theme.colors.primaryText01,
+        ),
+        includePadding = false,
+        onClick = {
+            onDismiss.invoke()
+            secondaryButton.onClick?.invoke()
+        }
+    )
 }
 
 @Preview(showBackground = true)

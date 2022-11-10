@@ -110,7 +110,8 @@ fun TextP40(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    fontWeight: FontWeight? = null,
 ) {
     Text(
         text = text,
@@ -120,6 +121,7 @@ fun TextP40(
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
+        fontWeight = fontWeight,
         modifier = modifier
     )
 }
@@ -211,6 +213,7 @@ fun TextP60(
 fun TextH70(
     text: String,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
     maxLines: Int = Int.MAX_VALUE
 ) {
@@ -223,7 +226,8 @@ fun TextH70(
         letterSpacing = 0.25.sp,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier
+        modifier = modifier,
+        textAlign = textAlign,
     )
 }
 
