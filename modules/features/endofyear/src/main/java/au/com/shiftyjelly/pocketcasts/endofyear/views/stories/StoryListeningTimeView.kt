@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -67,7 +68,9 @@ fun StoryListeningTimeView(
             .background(color = Color(backgroundColor))
             .verticalScroll(rememberScrollState())
     ) {
-        Spacer(modifier = modifier.weight(1f))
+        Spacer(modifier = modifier.height(40.dp))
+
+        Spacer(modifier = modifier.weight(.75f))
 
         Title(timeText, story, modifier)
 
@@ -79,7 +82,9 @@ fun StoryListeningTimeView(
 
         Spacer(modifier = modifier.weight(1f))
 
-        Logo(modifier)
+        Logo()
+
+        Spacer(modifier = modifier.height(40.dp))
     }
 }
 
@@ -145,10 +150,9 @@ private fun PodcastCoverRow(
 }
 
 @Composable
-private fun Logo(modifier: Modifier) {
+fun Logo() {
     Image(
         painter = painterResource(R.drawable.logo_white),
         contentDescription = null,
-        modifier = modifier.padding(bottom = 40.dp)
     )
 }
