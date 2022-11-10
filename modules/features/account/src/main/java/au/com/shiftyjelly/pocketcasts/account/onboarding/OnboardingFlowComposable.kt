@@ -107,7 +107,13 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.forgotPassword) {
-                OnboardingForgotPassword(onBackPressed = { navController.popBackStack() })
+                OnboardingForgotPassword(
+                    onShown = { analyticsTracker.track(AnalyticsEvent.FORGOT_PASSWORD_SHOWN) },
+                    onBackPressed = {
+                        analyticsTracker.track(AnalyticsEvent.FORGOT_PASSWORD_DISMISSED)
+                        navController.popBackStack()
+                    }
+                )
             }
 
             composable(OnboardingNavRoute.recommendations) {
