@@ -47,7 +47,7 @@ class HistoryManager @Inject constructor(
                 if (episode != null) {
                     if ((episode.lastPlaybackInteraction ?: 0) < interactionDate) {
                         episode.lastPlaybackInteraction = interactionDate
-                        episode.lastPlaybackInteractionSyncStatus = 1
+                        episode.lastPlaybackInteractionSyncStatus = Episode.LAST_PLAYBACK_INTERACTION_SYNCED
                         episodeManager.update(episode)
                     }
                 } else if (podcast != null) {

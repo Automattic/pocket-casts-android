@@ -363,7 +363,7 @@ abstract class EpisodeDao {
         """
         SELECT * 
         FROM episodes
-        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date < :fromEpochMs
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date < :fromEpochMs AND episodes.last_playback_interaction_date != 0
         LIMIT 1
         """
     )

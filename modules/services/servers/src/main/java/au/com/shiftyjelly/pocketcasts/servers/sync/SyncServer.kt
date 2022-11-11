@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import io.reactivex.Single
 import okhttp3.RequestBody
@@ -50,8 +51,8 @@ interface SyncServer {
     @POST("/history/sync")
     fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): Single<HistorySyncResponse>
 
-    @POST("/history/sync")
-    suspend fun historyYearSync(@Header("Authorization") authorization: String, @Body request: HistoryYearSyncRequest): HistorySyncResponse
+    @POST("/history/year")
+    suspend fun historyYear(@Header("Authorization") authorization: String, @Body request: HistoryYearSyncRequest): HistoryYearResponse
 
     @POST("/sync/update_episode")
     fun episodeProgressSync(@Header("Authorization") authorization: String, @Body request: EpisodeSyncRequest): Single<Void>
