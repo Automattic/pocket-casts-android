@@ -7,8 +7,15 @@ data class TopPodcast(
     val title: String,
     val author: String,
     val tintColorForLightBg: Int,
+    val tintColorForDarkBg: Int,
     val numberOfPlayedEpisodes: Int,
     val totalPlayedTime: Double,
 ) {
-    fun toPodcast() = Podcast(uuid = uuid, title = title, author = author, tintColorForLightBg = tintColorForLightBg)
+    fun toPodcast() = Podcast(
+        uuid = uuid,
+        title = title,
+        author = author,
+        tintColorForLightBg = tintColorForLightBg,
+        tintColorForDarkBg = tintColorForDarkBg
+    )
 }
