@@ -11,6 +11,9 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -45,6 +48,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -1070,5 +1074,24 @@ class EpisodeManagerImpl @Inject constructor(
             }
     }
 
-    override fun findRandomEpisode() = episodeDao.findRandomEpisode()
+    override fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?> =
+        episodeDao.calculateListeningTime(fromEpochMs, toEpochMs)
+
+    override fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>> =
+        episodeDao.findListenedCategories(fromEpochMs, toEpochMs)
+
+    override fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers> =
+        episodeDao.findListenedNumbers(fromEpochMs, toEpochMs)
+
+    override fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): Flow<LongestEpisode?> =
+        episodeDao.findLongestPlayedEpisode(fromEpochMs, toEpochMs)
+
+    override fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int> =
+        episodeDao.countEpisodesPlayedUpto(fromEpochMs, toEpochMs, playedUpToInSecs)
+
+    override fun findEpisodeInteractedBefore(fromEpochMs: Long): Flow<Episode?> =
+        episodeDao.findEpisodeInteractedBefore(fromEpochMs)
+
+    override fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Flow<Int> =
+        episodeDao.findEpisodesCountInListeningHistory(fromEpochMs, toEpochMs)
 }

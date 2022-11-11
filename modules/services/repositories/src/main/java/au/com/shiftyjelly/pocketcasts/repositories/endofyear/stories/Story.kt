@@ -1,10 +1,10 @@
-package au.com.shiftyjelly.pocketcasts.endofyear.stories
+package au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories
 
 import androidx.compose.ui.graphics.Color
 import au.com.shiftyjelly.pocketcasts.utils.seconds
 
 abstract class Story {
     open val storyLength: Long = 2.seconds()
-    abstract val backgroundColor: Color
+    open val backgroundColor: Color = Color.Black
     val tintColor: Color = Color.White
 }
