@@ -9,7 +9,6 @@ import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -51,12 +50,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.ShareCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
+import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryEpilogueView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryIntroView
@@ -83,6 +84,8 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import java.io.File
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -96,72 +99,67 @@ const val StoriesViewAspectRatioForTablet = 2f
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun StoriesPage(
-    viewModel: StoriesViewModel,
-    showDialog: Boolean,
+    modifier: Modifier = Modifier,
+    viewModel: StoriesViewModel = viewModel(),
     onCloseClicked: () -> Unit,
     theme: Theme,
-    modifier: Modifier = Modifier
 ) {
-    if (showDialog) {
-        val shareLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            /* Share activity dismissed, start paused story */
-            viewModel.start()
-        }
+    val shareLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        /* Share activity dismissed, start paused story */
+        viewModel.start()
+    }
 
-        val context = LocalContext.current
+    val context = LocalContext.current
 
-        val isTablet = Util.isTablet(context)
-        if (!isTablet) LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-        UpdateSystemBarColors(theme)
+    val isTablet = Util.isTablet(context)
+    if (!isTablet) LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+    UpdateSystemBarColors(theme)
 
-        val dialogSize = remember { getDialogSize(context) }
-        Dialog(
-            onDismissRequest = { onCloseClicked.invoke() },
-            properties = DialogProperties(usePlatformDefaultWidth = isTablet),
-        ) {
-            Box(modifier = modifier.size(dialogSize)) {
-                DialogContent(viewModel, onCloseClicked) {
-                    viewModel.onShareClicked(it, context) { file ->
-                        showShareForFile(context, file, shareLauncher)
-                    }
-                }
+    val state: State by viewModel.state.collectAsState()
+    val dialogSize = remember { getDialogSize(context) }
+    Dialog(
+        onDismissRequest = { onCloseClicked.invoke() },
+        properties = DialogProperties(usePlatformDefaultWidth = isTablet),
+    ) {
+        Box(modifier = modifier.size(dialogSize)) {
+            when (state) {
+                is State.Loaded -> StoriesView(
+                    state = state as State.Loaded,
+                    progress = viewModel.progress,
+                    onSkipPrevious = { viewModel.skipPrevious() },
+                    onSkipNext = { viewModel.skipNext() },
+                    onPause = { viewModel.pause() },
+                    onStart = { viewModel.start() },
+                    onCloseClicked = onCloseClicked,
+                    onReplayClicked = { viewModel.start() },
+                    onShareClicked = {
+                        viewModel.onShareClicked(it, context) { file ->
+                            showShareForFile(context, file, shareLauncher)
+                        }
+                    },
+                )
+                State.Loading -> StoriesLoadingView(onCloseClicked)
+                State.Error -> StoriesErrorView(onCloseClicked)
             }
         }
     }
-}
 
-@Composable
-fun DialogContent(
-    viewModel: StoriesViewModel,
-    onCloseClicked: () -> Unit,
-    onShareClicked: (() -> Bitmap) -> Unit,
-) {
-    val state: State by viewModel.state.collectAsState()
-    val progress: Float by viewModel.progress.collectAsState()
-    when (state) {
-        is State.Loaded -> StoriesView(
-            state = state as State.Loaded,
-            progress = progress,
-            onSkipPrevious = { viewModel.skipPrevious() },
-            onSkipNext = { viewModel.skipNext() },
-            onPause = { viewModel.pause() },
-            onStart = { viewModel.start() },
-            onCloseClicked = onCloseClicked,
-            onShareClicked = onShareClicked,
-            onReplayClicked = { viewModel.replay() }
-        )
-
-        State.Loading -> StoriesLoadingView(onCloseClicked)
-        State.Error -> StoriesErrorView(onCloseClicked)
+    DisposableEffect(Unit) {
+        if (state is State.Loaded) {
+            viewModel.start()
+        }
+        onDispose {
+            viewModel.clear()
+        }
     }
 }
 
 @Composable
 private fun StoriesView(
     state: State.Loaded,
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    progress: StateFlow<Float>,
     onSkipPrevious: () -> Unit,
     onSkipNext: () -> Unit,
     onPause: () -> Unit,
@@ -188,7 +186,7 @@ private fun StoriesView(
                         )
                     })
                 SegmentedProgressIndicator(
-                    progress = progress,
+                    progressFlow = progress,
                     segmentsData = state.segmentsData,
                     modifier = modifier
                         .padding(8.dp)
@@ -409,7 +407,8 @@ private fun getDialogSize(context: Context): DpSize {
     var dialogHeight = screenHeightInDp.toFloat()
     var dialogWidth = screenWidthInDp.toFloat()
     if (Util.isTablet(context)) {
-        dialogHeight = (screenHeightInDp * MaxHeightPercentFactor).coerceAtMost(StoriesViewMaxSize.value)
+        dialogHeight =
+            (screenHeightInDp * MaxHeightPercentFactor).coerceAtMost(StoriesViewMaxSize.value)
         dialogWidth = dialogHeight / StoriesViewAspectRatioForTablet
     }
 
@@ -435,7 +434,11 @@ fun UpdateSystemBarColors(theme: Theme) {
     val context = LocalContext.current
     DisposableEffect(Unit) {
         val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
-        theme.updateWindowStatusBar(activity.window, StatusBarColor.Custom(android.graphics.Color.BLACK, true), activity)
+        theme.updateWindowStatusBar(
+            activity.window,
+            StatusBarColor.Custom(android.graphics.Color.BLACK, true),
+            activity
+        )
         theme.setNavigationBarColor(activity.window, true, android.graphics.Color.BLACK)
         onDispose {
             // restore original system colors
@@ -458,13 +461,18 @@ private fun StoriesScreenPreview(
     AppTheme(themeType) {
         StoriesView(
             state = State.Loaded(
-                currentStory = StoryListenedNumbers(ListenedNumbers(numberOfEpisodes = 1, numberOfPodcasts = 1)),
+                currentStory = StoryListenedNumbers(
+                    ListenedNumbers(
+                        numberOfEpisodes = 1,
+                        numberOfPodcasts = 1
+                    )
+                ),
                 segmentsData = State.Loaded.SegmentsData(
                     xStartOffsets = listOf(0.0f, 0.28f),
                     widths = listOf(0.25f, 0.75f)
                 )
             ),
-            progress = 0.75f,
+            progress = MutableStateFlow(0.75f),
             onSkipPrevious = {},
             onSkipNext = {},
             onPause = {},

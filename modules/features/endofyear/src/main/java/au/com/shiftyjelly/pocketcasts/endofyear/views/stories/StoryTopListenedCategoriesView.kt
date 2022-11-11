@@ -118,7 +118,9 @@ private fun CategoryItemPreview(
                 listenedCategory = ListenedCategory(
                     numberOfPodcasts = 2,
                     totalPlayedTime = 1L,
-                    category = "News"
+                    category = "News",
+                    mostListenedPodcastId = "",
+                    mostListenedPodcastTintColor = 0
                 ),
                 position = 0,
                 tintColor = Color.White,
