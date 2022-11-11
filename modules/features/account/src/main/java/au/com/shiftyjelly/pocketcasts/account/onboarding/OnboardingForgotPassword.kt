@@ -7,12 +7,12 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun OnboardingCreateFreeAccountPage(
-    onBackPressed: () -> Unit
+fun OnboardingForgotPassword(
+    onBackPressed: () -> Unit,
 ) {
     Column {
         ThemedTopAppBar(
-            title = stringResource(LR.string.create_account),
+            title = stringResource(LR.string.profile_reset_password),
             onNavigationClick = onBackPressed
         )
     }

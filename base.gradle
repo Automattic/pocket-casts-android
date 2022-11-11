@@ -191,14 +191,15 @@ dependencies {
     implementation androidLibs.guava
     implementation androidLibs.flexbox
     implementation androidLibs.composeActivity
-    implementation androidLibs.composeUi
-    implementation androidLibs.composeUiToolingPreview
-    implementation androidLibs.composeMaterial
     implementation androidLibs.composeAnimation
-    implementation androidLibs.composeViewModel
+    implementation androidLibs.composeIcons
     implementation androidLibs.composeLiveData
+    implementation androidLibs.composeMaterial
     implementation androidLibs.composeNavigation
     implementation androidLibs.composeRx
+    implementation androidLibs.composeUi
+    implementation androidLibs.composeUiToolingPreview
+    implementation androidLibs.composeViewModel
 
     implementation libs.kotlinCoroutines
     implementation libs.kotlinCoroutinesAndroid
@@ -230,6 +231,7 @@ dependencies {
     implementation libs.materialProgressBar
     implementation libs.hiltAndroid
     implementation libs.hiltWorkManager
+    implementation libs.hiltNavigationCompose
     implementation libs.accompanistFlowLayout
     implementation platform(libs.sentryBom)
     implementation libs.sentry
