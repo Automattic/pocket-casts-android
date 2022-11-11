@@ -155,9 +155,16 @@ class StoriesViewModel @Inject constructor(
         currentIndex = 0
     }
 
+    fun clear() {
+        if (mutableState.value is State.Loaded) {
+            skipToStoryAtIndex(0)
+        }
+        cancelTimer()
+    }
+
     override fun onCleared() {
         super.onCleared()
-        cancelTimer()
+        clear()
     }
 
     private fun Float.roundOff() = (this * 100.0).roundToInt()
