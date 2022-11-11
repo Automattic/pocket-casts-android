@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.R
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -56,11 +57,9 @@ fun StoryIntroView(
 
         Spacer(modifier = modifier.weight(1f))
 
-        Image(
-            painter = painterResource(R.drawable.logo_white),
-            contentDescription = null,
-            modifier = modifier.padding(bottom = 40.dp)
-        )
+        PodcastLogoWhite()
+
+        Spacer(modifier = modifier.padding(bottom = 40.dp))
     }
 }
 

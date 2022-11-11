@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,12 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
@@ -65,7 +63,7 @@ fun StoryListeningTimeView(
 
         Spacer(modifier = modifier.weight(1f))
 
-        Logo()
+        PodcastLogoWhite()
 
         Spacer(modifier = modifier.height(40.dp))
     }
@@ -121,12 +119,4 @@ private fun PodcastCoverRow(
             }
         }
     }
-}
-
-@Composable
-fun Logo() {
-    Image(
-        painter = painterResource(R.drawable.logo_white),
-        contentDescription = null,
-    )
 }

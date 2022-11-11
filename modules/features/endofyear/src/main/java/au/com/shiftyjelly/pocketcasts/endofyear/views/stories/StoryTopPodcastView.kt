@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.RectangleCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
@@ -62,7 +63,7 @@ fun StoryTopPodcastView(
 
         Spacer(modifier = modifier.weight(0.8f))
 
-        Logo()
+        PodcastLogoWhite()
 
         Spacer(modifier = modifier.height(40.dp))
     }
