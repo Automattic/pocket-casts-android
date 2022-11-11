@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -24,9 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.util.PodcastCoverBig
 import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -89,12 +88,7 @@ private fun PodcastCoverStack(
                     .graphicsLayer(translationX = -translateBy.toFloat())
             ) {
                 val podcastIndex = index.coerceAtMost(story.listenedCategories.size - 1)
-                PodcastImage(
-                    uuid = story.listenedCategories[podcastIndex].mostListenedPodcastId,
-                    dropShadow = false,
-                    cornerSize = 8.dp,
-                    modifier = modifier.size(coverWidth)
-                )
+                PodcastCoverBig(uuid = story.listenedCategories[podcastIndex].mostListenedPodcastId, coverWidth = coverWidth)
             }
         }
     }

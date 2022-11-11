@@ -9,11 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,11 +22,11 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.util.PodcastCoverBig
+import au.com.shiftyjelly.pocketcasts.endofyear.util.RectangleCover
 import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
@@ -92,22 +89,25 @@ private fun PodcastCoverStack(
                     .transformPodcastCover()
                     .graphicsLayer(translationX = -translateBy.toFloat())
             ) {
-                when (index) {
-                    0 -> PodcastImage(
-                        uuid = story.topPodcast.uuid,
-                        cornerSize = 8.dp,
-                        modifier = modifier.size(coverWidth)
-                    )
+                with(story.topPodcast) {
+                    when (index) {
+                        0 -> PodcastCoverBig(uuid = uuid, coverWidth = coverWidth)
 
-                    1 -> {
-                        val backgroundColor =
-                            Color(story.topPodcast.toPodcast().getTintColor(false))
-                        CoverRectangle(coverWidth = coverWidth, backgroundColor = backgroundColor)
-                    }
+                        1 -> {
+                            val backgroundColor = Color(toPodcast().getTintColor(false))
+                            RectangleCover(
+                                coverWidth = coverWidth,
+                                backgroundColor = backgroundColor
+                            )
+                        }
 
-                    2 -> {
-                        val backgroundColor = Color(story.topPodcast.toPodcast().getTintColor(true))
-                        CoverRectangle(coverWidth = coverWidth, backgroundColor = backgroundColor)
+                        2 -> {
+                            val backgroundColor = Color(toPodcast().getTintColor(true))
+                            RectangleCover(
+                                coverWidth = coverWidth,
+                                backgroundColor = backgroundColor
+                            )
+                        }
                     }
                 }
             }
@@ -157,23 +157,4 @@ private fun SecondaryText(
             .alpha(0.8f)
             .padding(horizontal = 40.dp)
     )
-}
-
-@Composable
-fun CoverRectangle(
-    coverWidth: Dp,
-    backgroundColor: Color,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier.size(coverWidth)
-    ) {
-        val elevation = 4.dp
-        Card(
-            elevation = elevation,
-            shape = RoundedCornerShape(8.dp),
-            backgroundColor = backgroundColor,
-            modifier = modifier.fillMaxSize()
-        ) {}
-    }
 }
