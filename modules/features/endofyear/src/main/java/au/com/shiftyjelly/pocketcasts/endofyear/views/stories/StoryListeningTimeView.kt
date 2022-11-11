@@ -29,8 +29,9 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
-import au.com.shiftyjelly.pocketcasts.endofyear.util.PodcastCoverSmall
-import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
+import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
@@ -132,7 +133,11 @@ private fun PodcastCoverRow(
         listOf(1, 0, 2).forEach { index ->
             val podcastIndex = index.coerceAtMost(story.podcasts.size - 1)
             Row {
-                PodcastCoverSmall(uuid = story.podcasts[podcastIndex].uuid, coverWidth = coverWidth)
+                PodcastCover(
+                    uuid = story.podcasts[podcastIndex].uuid,
+                    coverWidth = coverWidth,
+                    coverType = PodcastCoverType.SMALL
+                )
                 Spacer(modifier = modifier.width(5.dp))
             }
         }

@@ -25,9 +25,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.endofyear.util.PodcastCoverBig
-import au.com.shiftyjelly.pocketcasts.endofyear.util.RectangleCover
-import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
+import au.com.shiftyjelly.pocketcasts.endofyear.components.RectangleCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -91,8 +92,11 @@ private fun PodcastCoverStack(
             ) {
                 with(story.topPodcast) {
                     when (index) {
-                        0 -> PodcastCoverBig(uuid = uuid, coverWidth = coverWidth)
-
+                        0 -> PodcastCover(
+                            uuid = uuid,
+                            coverWidth = coverWidth,
+                            coverType = PodcastCoverType.BIG
+                        )
                         1 -> {
                             val backgroundColor = Color(toPodcast().getTintColor(false))
                             RectangleCover(
@@ -100,7 +104,6 @@ private fun PodcastCoverStack(
                                 backgroundColor = backgroundColor
                             )
                         }
-
                         2 -> {
                             val backgroundColor = Color(toPodcast().getTintColor(true))
                             RectangleCover(

@@ -25,8 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.endofyear.util.PodcastCoverBig
-import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
+import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -88,7 +89,11 @@ private fun PodcastCoverStack(
                     .graphicsLayer(translationX = -translateBy.toFloat())
             ) {
                 val podcastIndex = index.coerceAtMost(story.listenedCategories.size - 1)
-                PodcastCoverBig(uuid = story.listenedCategories[podcastIndex].mostListenedPodcastId, coverWidth = coverWidth)
+                PodcastCover(
+                    uuid = story.listenedCategories[podcastIndex].mostListenedPodcastId,
+                    coverWidth = coverWidth,
+                    coverType = PodcastCoverType.BIG
+                )
             }
         }
     }
