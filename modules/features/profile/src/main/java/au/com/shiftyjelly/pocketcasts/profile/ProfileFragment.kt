@@ -241,7 +241,6 @@ class ProfileFragment : BaseFragment() {
                 var showDialog by rememberSaveable { mutableStateOf(false) }
                 if (showDialog) {
                     StoriesPage(
-                        showDialog = true,
                         theme = theme,
                         onCloseClicked = { showDialog = false },
                     )

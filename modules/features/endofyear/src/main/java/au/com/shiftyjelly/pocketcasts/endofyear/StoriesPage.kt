@@ -101,60 +101,57 @@ const val StoriesViewAspectRatioForTablet = 2f
 fun StoriesPage(
     modifier: Modifier = Modifier,
     viewModel: StoriesViewModel = viewModel(),
-    showDialog: Boolean,
     onCloseClicked: () -> Unit,
     theme: Theme,
 ) {
-    if (showDialog) {
-        val shareLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) {
-            /* Share activity dismissed, start paused story */
+    val shareLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        /* Share activity dismissed, start paused story */
+        viewModel.start()
+    }
+
+    val context = LocalContext.current
+
+    val isTablet = Util.isTablet(context)
+    if (!isTablet) LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+    UpdateSystemBarColors(theme)
+
+    val state: State by viewModel.state.collectAsState()
+    val dialogSize = remember { getDialogSize(context) }
+    Dialog(
+        onDismissRequest = { onCloseClicked.invoke() },
+        properties = DialogProperties(usePlatformDefaultWidth = isTablet),
+    ) {
+        Box(modifier = modifier.size(dialogSize)) {
+            when (state) {
+                is State.Loaded -> StoriesView(
+                    state = state as State.Loaded,
+                    progress = viewModel.progress,
+                    onSkipPrevious = { viewModel.skipPrevious() },
+                    onSkipNext = { viewModel.skipNext() },
+                    onPause = { viewModel.pause() },
+                    onStart = { viewModel.start() },
+                    onCloseClicked = onCloseClicked,
+                    onReplayClicked = { viewModel.start() },
+                    onShareClicked = {
+                        viewModel.onShareClicked(it, context) { file ->
+                            showShareForFile(context, file, shareLauncher)
+                        }
+                    },
+                )
+                State.Loading -> StoriesLoadingView(onCloseClicked)
+                State.Error -> StoriesErrorView(onCloseClicked)
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        if (state is State.Loaded) {
             viewModel.start()
         }
-
-        val context = LocalContext.current
-
-        val isTablet = Util.isTablet(context)
-        if (!isTablet) LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-        UpdateSystemBarColors(theme)
-
-        val state: State by viewModel.state.collectAsState()
-        val dialogSize = remember { getDialogSize(context) }
-        Dialog(
-            onDismissRequest = { onCloseClicked.invoke() },
-            properties = DialogProperties(usePlatformDefaultWidth = isTablet),
-        ) {
-            Box(modifier = modifier.size(dialogSize)) {
-                when (state) {
-                    is State.Loaded -> StoriesView(
-                        state = state as State.Loaded,
-                        progress = viewModel.progress,
-                        onSkipPrevious = { viewModel.skipPrevious() },
-                        onSkipNext = { viewModel.skipNext() },
-                        onPause = { viewModel.pause() },
-                        onStart = { viewModel.start() },
-                        onCloseClicked = onCloseClicked,
-                        onReplayClicked = { viewModel.start() },
-                        onShareClicked = {
-                            viewModel.onShareClicked(it, context) { file ->
-                                showShareForFile(context, file, shareLauncher)
-                            }
-                        },
-                    )
-                    State.Loading -> StoriesLoadingView(onCloseClicked)
-                    State.Error -> StoriesErrorView(onCloseClicked)
-                }
-            }
-        }
-
-        DisposableEffect(Unit) {
-            if (state is State.Loaded) {
-                viewModel.start()
-            }
-            onDispose {
-                viewModel.clear()
-            }
+        onDispose {
+            viewModel.clear()
         }
     }
 }
