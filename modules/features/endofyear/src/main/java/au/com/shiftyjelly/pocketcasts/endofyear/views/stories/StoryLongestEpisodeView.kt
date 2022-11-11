@@ -1,82 +1,159 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Surface
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.util.PodcastCoverBig
+import au.com.shiftyjelly.pocketcasts.endofyear.util.RectangleCover
+import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLongestEpisode
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 
 @Composable
 fun StoryLongestEpisodeView(
     story: StoryLongestEpisode,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val timeText = remember {
-        StatsHelper.secondsToFriendlyString(
-            story.longestEpisode.duration.toLong(),
-            context.resources
-        )
-    }
+    val backgroundColor = story.longestEpisode.toPodcast().getTintColor(false)
+
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color(backgroundColor))
+            .verticalScroll(rememberScrollState())
     ) {
-        PodcastImage(
-            uuid = story.longestEpisode.podcastUuid,
-            modifier = modifier
-                .size(200.dp)
-                .padding(top = 4.dp, end = 12.dp, bottom = 4.dp)
-        )
-        TextH30(
-            text = "The longest episode you listened to was ${story.longestEpisode.title} from the podcast ${story.longestEpisode.podcastTitle}",
-            color = story.tintColor,
-            textAlign = TextAlign.Center,
-            modifier = modifier.padding(16.dp)
-        )
-        TextP50(
-            text = "This episode was $timeText long",
-            color = story.tintColor,
-            textAlign = TextAlign.Center,
-            modifier = modifier.padding(16.dp)
-        )
+        Spacer(modifier = modifier.height(40.dp))
+
+        Spacer(modifier = modifier.weight(0.7f))
+
+        PodcastCoverStack(story)
+
+        Spacer(modifier = modifier.weight(0.3f))
+
+        PrimaryText(story)
+
+        Spacer(modifier = modifier.weight(0.25f))
+
+        SecondaryText(story)
+
+        Spacer(modifier = modifier.weight(0.8f))
+
+        Logo()
+
+        Spacer(modifier = modifier.height(40.dp))
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun StoryLongestEpisodePreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+private fun PodcastCoverStack(
+    story: StoryLongestEpisode,
+    modifier: Modifier = Modifier,
 ) {
-    AppTheme(themeType) {
-        Surface(color = Color.Black) {
-            StoryLongestEpisodeView(
-                story = StoryLongestEpisode(
-                    longestEpisode = LongestEpisode(
-                        title = "Episode Title",
-                        duration = 100.0,
-                        podcastUuid = "1",
-                        podcastTitle = "Podcast Title",
-                    )
-                ),
-            )
+    val context = LocalContext.current
+    val currentLocalView = LocalView.current
+    val coverWidth = (currentLocalView.width.pxToDp(context).dp) / 2.5f
+    val translateBy = (coverWidth.value * .2).toInt().dpToPx(context)
+
+    Box {
+        (0..2).reversed().forEach { index ->
+            Box(
+                modifier = modifier
+                    .padding(top = (index * (coverWidth.value * .25)).dp)
+                    .transformPodcastCover()
+                    .graphicsLayer(translationX = -translateBy.toFloat())
+            ) {
+                with(story.longestEpisode) {
+                    when (index) {
+                        0 -> PodcastCoverBig(uuid = podcastUuid, coverWidth = coverWidth)
+
+                        1 -> {
+                            val backgroundColor = Color(toPodcast().getTintColor(false))
+                            RectangleCover(
+                                coverWidth = coverWidth,
+                                backgroundColor = backgroundColor
+                            )
+                        }
+
+                        2 -> {
+                            val backgroundColor = Color(toPodcast().getTintColor(true))
+                            RectangleCover(
+                                coverWidth = coverWidth,
+                                backgroundColor = backgroundColor
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun PrimaryText(
+    story: StoryLongestEpisode,
+    modifier: Modifier = Modifier,
+) {
+    TextH20(
+        text = stringResource(
+            id = R.string.end_of_year_story_longest_episode,
+            story.longestEpisode.title, story.longestEpisode.podcastTitle
+        ),
+        textAlign = TextAlign.Center,
+        color = story.tintColor,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp)
+    )
+}
+
+@Composable
+private fun SecondaryText(
+    story: StoryLongestEpisode,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val timeText = StatsHelper.secondsToFriendlyString(
+        story.longestEpisode.duration.toLong(),
+        context.resources
+    )
+    TextP40(
+        text = stringResource(
+            id = R.string.end_of_year_story_longest_episode_duration,
+            timeText
+        ),
+        textAlign = TextAlign.Center,
+        color = story.tintColor,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier
+            .fillMaxWidth()
+            .alpha(0.8f)
+            .padding(horizontal = 40.dp)
+    )
 }
