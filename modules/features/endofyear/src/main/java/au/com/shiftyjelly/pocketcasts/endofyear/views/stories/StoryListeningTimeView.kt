@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -25,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
@@ -37,14 +36,12 @@ fun StoryListeningTimeView(
     story: StoryListeningTime,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = story.podcasts[0].toPodcast().getTintColor(false)
-
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color(backgroundColor))
+            .podcastDynamicBackground(story.podcasts[0].toPodcast())
             .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = modifier.height(40.dp))

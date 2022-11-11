@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.components.RectangleCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLongestEpisode
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -37,14 +37,12 @@ fun StoryLongestEpisodeView(
     story: StoryLongestEpisode,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = story.longestEpisode.toPodcast().getTintColor(false)
-
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color(backgroundColor))
+            .podcastDynamicBackground(story.longestEpisode.toPodcast())
             .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = modifier.height(40.dp))
