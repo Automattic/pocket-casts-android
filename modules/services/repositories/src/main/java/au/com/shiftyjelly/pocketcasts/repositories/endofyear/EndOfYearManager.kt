@@ -9,11 +9,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface EndOfYearManager {
     fun isEligibleForStories(): Flow<Boolean>
-    fun hasFullListeningHistory(): Flow<Boolean>
+    suspend fun downloadListeningHistory()
     fun loadStories(): Flow<List<Story>>
     fun hasEpisodesPlayedUpto(year: Int, playedUpToInSecs: Long): Flow<Boolean>
-    fun hasEpisodeInteractedBefore(year: Int): Flow<Boolean>
-    fun hasListeningHistoryEpisodesInLimitForYear(year: Int, limit: Int): Flow<Boolean>
     fun getTotalListeningTimeInSecsForYear(year: Int): Flow<Long?>
     fun findListenedCategoriesForYear(year: Int): Flow<List<ListenedCategory>>
     fun findListenedNumbersForYear(year: Int): Flow<ListenedNumbers>

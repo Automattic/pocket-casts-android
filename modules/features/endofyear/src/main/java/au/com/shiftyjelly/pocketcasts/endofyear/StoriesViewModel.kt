@@ -26,6 +26,7 @@ class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
 ) : ViewModel() {
+
     private val mutableState = MutableStateFlow<State>(State.Loading)
     val state: StateFlow<State> = mutableState
 
@@ -50,17 +51,12 @@ class StoriesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            endOfYearManager.hasFullListeningHistory().stateIn(viewModelScope)
-                .collect { isFullListeningHistory ->
-                    if (!isFullListeningHistory) {
-                        // TODO: Integrate listening history sync endpoint
-                    }
-                    loadStories()
-                }
+            loadStories()
         }
     }
 
     private suspend fun loadStories() {
+        endOfYearManager.downloadListeningHistory()
         endOfYearManager.loadStories().stateIn(viewModelScope).collect { result ->
             cancelTimer()
             if (result.size != stories.value.size) resetProgressAndCurrentIndex()

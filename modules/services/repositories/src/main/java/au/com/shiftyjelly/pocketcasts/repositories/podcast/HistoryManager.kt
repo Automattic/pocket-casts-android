@@ -1,0 +1,89 @@
+package au.com.shiftyjelly.pocketcasts.repositories.podcast
+
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.rx2.awaitSingleOrNull
+import kotlinx.coroutines.withContext
+import java.util.Date
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+
+class HistoryManager @Inject constructor(
+    private val podcastManager: PodcastManager,
+    private val episodeManager: EpisodeManager,
+    private val settings: Settings,
+) : CoroutineScope {
+
+    companion object {
+        const val ACTION_ADD = 1
+        const val ACTION_DELETE = 2
+    }
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Default
+
+    /**
+     * Read the server listening history response.
+     * @param response The server response.
+     * @param updateServerModified Set to true when this is latest listening history, rather than part of the user's history.
+     */
+    suspend fun processServerResponse(response: HistorySyncResponse, updateServerModified: Boolean) = withContext(Dispatchers.IO) {
+        if (!response.hasChanged(0) || response.changes.isNullOrEmpty()) {
+            return@withContext
+        }
+
+        val changes = response.changes ?: return@withContext
+        for (change in changes) {
+            val interactionDate = change.modifiedAt.toLong()
+
+            val episodeUuid = change.episode ?: continue
+            val episode = episodeManager.findByUuid(episodeUuid)
+            if (change.action == ACTION_ADD) {
+                val podcast = change.podcast
+                if (episode != null) {
+                    if ((episode.lastPlaybackInteraction ?: 0) < interactionDate) {
+                        episode.lastPlaybackInteraction = interactionDate
+                        episode.lastPlaybackInteractionSyncStatus = 1
+                        episodeManager.update(episode)
+                    }
+                } else if (podcast != null) {
+                    // Add missing podcast and episode
+                    podcastManager.findOrDownloadPodcastRx(podcast).toMaybe().onErrorComplete().awaitSingleOrNull()
+
+                    val skeleton = Episode(
+                        uuid = episodeUuid,
+                        podcastUuid = podcast,
+                        title = change.title ?: "",
+                        publishedDate = change.published?.parseIsoDate() ?: Date(),
+                        downloadUrl = change.url
+                    )
+                    val missingEpisode = episodeManager.downloadMissingEpisode(
+                        episodeUuid,
+                        podcast,
+                        skeleton,
+                        podcastManager,
+                        false
+                    ).awaitSingleOrNull()
+                    if (missingEpisode != null && missingEpisode is Episode) {
+                        missingEpisode.lastPlaybackInteraction = interactionDate
+                        episodeManager.update(missingEpisode)
+                    }
+                }
+            } else if (change.action == ACTION_DELETE) {
+                if (episode != null) {
+                    episode.lastPlaybackInteraction = 0
+                    episode.lastPlaybackInteractionSyncStatus = 1
+                    episodeManager.update(episode)
+                }
+            }
+        }
+
+        if (updateServerModified) {
+            settings.setHistoryServerModified(response.serverModified)
+        }
+    }
+}

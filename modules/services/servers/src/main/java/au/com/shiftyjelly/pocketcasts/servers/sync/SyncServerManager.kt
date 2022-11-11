@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerRetrofit
+import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.BackpressureStrategy
@@ -148,6 +149,18 @@ open class SyncServerManager @Inject constructor(
     fun historySync(request: HistorySyncRequest): Single<HistorySyncResponse> {
         return getCacheTokenOrLogin<HistorySyncResponse> { token ->
             server.historySync(addBearer(token), request)
+        }
+    }
+
+    /**
+     * Retrieve listening history for a year.
+     * @param year The year to get the user's listening history from.
+     * @param count When true only returns a count instead of the full list of episodes.
+     */
+    suspend fun historyYearSync(year: Int, count: Boolean): HistorySyncResponse {
+        return getCacheTokenOrLoginSuspend { token ->
+            val request = HistoryYearSyncRequest(count = count, year = year)
+            server.historyYearSync(addBearer(token), request)
         }
     }
 

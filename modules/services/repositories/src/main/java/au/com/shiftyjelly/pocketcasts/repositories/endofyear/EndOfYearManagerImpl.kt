@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
@@ -13,7 +14,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFiv
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +34,9 @@ import kotlin.coroutines.CoroutineContext
 class EndOfYearManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
+    private val syncServerManager: SyncServerManager,
+    private val historyManager: HistoryManager,
+    private val settings: Settings,
 ) : EndOfYearManager, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -39,21 +45,27 @@ class EndOfYearManagerImpl @Inject constructor(
         hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN))
             .transform { emit(it && BuildConfig.END_OF_YEAR_ENABLED) }
 
-    /* Check if the user has the full listening history or not.
-     This is not 100% accurate. In order to determine if the user
-     has the full history we check for their latest episode listened.
-     If this episode was interacted in 2021 or before, we assume they
-     have the full history.
-     If this is not true, we check for the total number of items of
-     this year. If the number is less than or equal 100, we assume they
-     have the full history. */
-    override fun hasFullListeningHistory(): Flow<Boolean> =
-        combine(
-            hasEpisodeInteractedBefore(YEAR),
-            hasListeningHistoryEpisodesInLimitForYear(YEAR, limit = LISTENING_HISTORY_LIMIT),
-        ) { hasEpisodeInteractedBefore, hasListeningHistoryEpisodesInLimitForYear ->
-            hasEpisodeInteractedBefore || hasListeningHistoryEpisodesInLimitForYear
+    /**
+     * Download the year's listening history.
+     */
+    override suspend fun downloadListeningHistory() {
+        if (!settings.isLoggedIn()) {
+            return
         }
+        // check for an episode interacted with before this year and assume they have the full listening history if they exist
+        if (hasEpisodeInteractedBefore(YEAR)) {
+            return
+        }
+        // only download the count to check if we are missing history episodes
+        val response = syncServerManager.historyYearSync(year = YEAR, count = true)
+        val serverCount = response.changesCount
+        val localCount = countEpisodesInListeningHistory(YEAR)
+        if (serverCount > localCount) {
+            // sync the listening history
+            val responseWithEpisodes = syncServerManager.historyYearSync(year = YEAR, count = false)
+            historyManager.processServerResponse(response = responseWithEpisodes, updateServerModified = false)
+        }
+    }
 
     override fun loadStories(): Flow<List<Story>> {
         return combine(
@@ -93,15 +105,15 @@ class EndOfYearManagerImpl @Inject constructor(
             episodeManager.countEpisodesPlayedUpto(it.start, it.end, playedUpToInSecs).transform { count -> emit(count > 0) }
         } ?: flowOf(false)
 
-    override fun hasEpisodeInteractedBefore(year: Int): Flow<Boolean> =
-        getYearStartAndEndEpochMs(year)?.let {
-            episodeManager.findEpisodeInteractedBefore(it.start).transform { episode -> emit(episode != null) }
-        } ?: flowOf(false)
+    private suspend fun hasEpisodeInteractedBefore(year: Int): Boolean {
+        val start = getYearStartAndEndEpochMs(year)?.start ?: return false
+        return episodeManager.findEpisodeInteractedBefore(start) != null
+    }
 
-    override fun hasListeningHistoryEpisodesInLimitForYear(year: Int, limit: Int): Flow<Boolean> =
-        getYearStartAndEndEpochMs(year)?.let {
-            episodeManager.countEpisodesInListeningHistory(it.start, it.end).transform { count -> emit(count <= limit) }
-        } ?: flowOf(false)
+    private suspend fun countEpisodesInListeningHistory(year: Int): Int {
+        val yearStartAndEnd = getYearStartAndEndEpochMs(year) ?: return 0
+        return episodeManager.countEpisodesInListeningHistory(yearStartAndEnd.start, yearStartAndEnd.end)
+    }
 
     override fun getTotalListeningTimeInSecsForYear(year: Int) =
         getYearStartAndEndEpochMs(year)?.let {
