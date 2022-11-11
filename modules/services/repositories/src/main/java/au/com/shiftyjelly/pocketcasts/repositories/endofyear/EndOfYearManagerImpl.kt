@@ -25,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.transform
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
@@ -71,6 +72,7 @@ class EndOfYearManagerImpl @Inject constructor(
         val countResponse = syncServerManager.historyYear(year = YEAR, count = true)
         val serverCount = countResponse.count ?: 0
         val localCount = countEpisodeInteractionsInYear()
+        Timber.i("End of Year: Server listening history. server: ${countResponse.count} local: $localCount")
         if (serverCount > localCount) {
             // sync the year's listening history
             val response = syncServerManager.historyYear(year = YEAR, count = false)
