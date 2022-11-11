@@ -7,30 +7,25 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
@@ -44,14 +39,6 @@ fun StoryListeningTimeView(
     story: StoryListeningTime,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-
-    val timeText = StatsHelper.secondsToFriendlyString(story.listeningTimeInSecs, context.resources)
-    val funnyText = FunnyTimeConverter().timeSecsToFunnyText(
-        story.listeningTimeInSecs,
-        context.resources
-    )
-
     val backgroundColor = story.podcasts[0].toPodcast().getTintColor(false)
 
     Column(
@@ -66,9 +53,11 @@ fun StoryListeningTimeView(
 
         Spacer(modifier = modifier.weight(.75f))
 
-        Title(timeText, story, modifier)
+        PrimaryText(story, modifier)
 
-        FunnyText(funnyText, story, modifier)
+        Spacer(modifier = modifier.weight(0.25f))
+
+        SecondaryText(story, modifier)
 
         Spacer(modifier = modifier.weight(1f))
 
@@ -83,37 +72,27 @@ fun StoryListeningTimeView(
 }
 
 @Composable
-private fun Title(
-    timeText: String,
+private fun PrimaryText(
     story: StoryListeningTime,
     modifier: Modifier,
 ) {
-    TextH20(
-        text = stringResource(LR.string.end_of_year_listening_time, timeText),
-        textAlign = TextAlign.Center,
-        color = story.tintColor,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 40.dp, end = 40.dp)
-    )
+    val context = LocalContext.current
+    val timeText = StatsHelper.secondsToFriendlyString(story.listeningTimeInSecs, context.resources)
+    val text = stringResource(LR.string.end_of_year_listening_time, timeText)
+    StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
 
 @Composable
-private fun FunnyText(
-    funnyText: String,
+private fun SecondaryText(
     story: StoryListeningTime,
     modifier: Modifier,
 ) {
-    TextP40(
-        text = funnyText,
-        textAlign = TextAlign.Center,
-        color = story.tintColor,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
-            .fillMaxWidth()
-            .alpha(0.8f)
-            .padding(top = 24.dp, start = 40.dp, end = 40.dp)
+    val context = LocalContext.current
+    val funnyText = FunnyTimeConverter().timeSecsToFunnyText(
+        story.listeningTimeInSecs,
+        context.resources
     )
+    StorySecondaryText(text = funnyText, color = story.tintColor, modifier = modifier)
 }
 
 @Composable

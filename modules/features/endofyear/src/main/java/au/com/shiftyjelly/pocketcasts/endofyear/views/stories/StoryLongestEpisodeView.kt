@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -14,20 +13,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
 import au.com.shiftyjelly.pocketcasts.endofyear.components.RectangleCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLongestEpisode
@@ -97,6 +93,7 @@ private fun PodcastCoverStack(
                             coverWidth = coverWidth,
                             coverType = PodcastCoverType.BIG
                         )
+
                         1 -> {
                             val backgroundColor = Color(toPodcast().getTintColor(false))
                             RectangleCover(
@@ -104,6 +101,7 @@ private fun PodcastCoverStack(
                                 backgroundColor = backgroundColor
                             )
                         }
+
                         2 -> {
                             val backgroundColor = Color(toPodcast().getTintColor(true))
                             RectangleCover(
@@ -123,17 +121,11 @@ private fun PrimaryText(
     story: StoryLongestEpisode,
     modifier: Modifier = Modifier,
 ) {
-    TextH20(
-        text = stringResource(
-            id = R.string.end_of_year_story_longest_episode,
-            story.longestEpisode.title, story.longestEpisode.podcastTitle
-        ),
-        textAlign = TextAlign.Center,
-        color = story.tintColor,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 40.dp)
+    val text = stringResource(
+        id = R.string.end_of_year_story_longest_episode,
+        story.longestEpisode.title, story.longestEpisode.podcastTitle
     )
+    StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
 
 @Composable
@@ -146,17 +138,9 @@ private fun SecondaryText(
         story.longestEpisode.duration.toLong(),
         context.resources
     )
-    TextP40(
-        text = stringResource(
-            id = R.string.end_of_year_story_longest_episode_duration,
-            timeText
-        ),
-        textAlign = TextAlign.Center,
-        color = story.tintColor,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
-            .fillMaxWidth()
-            .alpha(0.8f)
-            .padding(horizontal = 40.dp)
+    val text = stringResource(
+        id = R.string.end_of_year_story_longest_episode_duration,
+        timeText
     )
+    StorySecondaryText(text = text, color = story.tintColor, modifier = modifier)
 }
