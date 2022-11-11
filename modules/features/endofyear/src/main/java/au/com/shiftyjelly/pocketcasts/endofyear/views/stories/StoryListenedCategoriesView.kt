@@ -28,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListenedCategories
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -39,13 +38,7 @@ fun StoryListenedCategoriesView(
     story: StoryListenedCategories,
     modifier: Modifier = Modifier,
 ) {
-    val backgroundColor = if (story.listenedCategories.isEmpty()) {
-        Podcast().getTintColor(false)
-    } else {
-        // Get the middle podcast
-        story.listenedCategories.take(2).last().toPodcast()
-            .getTintColor(false)
-    }
+    val backgroundColor = story.listenedCategories[0].toPodcast().getTintColor(false)
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -88,16 +81,18 @@ private fun PodcastCoverStack(
     val translateBy = (coverWidth.value * .2).toInt().dpToPx(context)
 
     Box {
-        for (index in (0..story.listenedCategories.lastIndex).reversed()) {
+        (0..2).reversed().forEach { index ->
             Box(
                 modifier = modifier
                     .padding(top = (index * (coverWidth.value * .25)).dp)
                     .transformPodcastCover()
                     .graphicsLayer(translationX = -translateBy.toFloat())
             ) {
+                val podcastIndex = index.coerceAtMost(story.listenedCategories.size - 1)
                 PodcastImage(
-                    uuid = story.listenedCategories[index].mostListenedPodcastId,
+                    uuid = story.listenedCategories[podcastIndex].mostListenedPodcastId,
                     dropShadow = false,
+                    cornerSize = 8.dp,
                     modifier = modifier.size(coverWidth)
                 )
             }

@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
@@ -53,13 +52,8 @@ fun StoryListeningTimeView(
         context.resources
     )
 
-    val backgroundColor = if (story.podcasts.isEmpty()) {
-        Podcast().getTintColor(false)
-    } else {
-        // Get the middle podcast
-        story.podcasts.take(2).last().toPodcast()
-            .getTintColor(false)
-    }
+    val backgroundColor = story.podcasts[0].toPodcast().getTintColor(false)
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,10 +130,11 @@ private fun PodcastCoverRow(
             .transformPodcastCover()
             .graphicsLayer(translationX = -translateBy)
     ) {
-        story.podcasts.forEach { podcast ->
+        listOf(1, 0, 2).forEach { index ->
+            val podcastIndex = index.coerceAtMost(story.podcasts.size - 1)
             Row {
                 PodcastImage(
-                    uuid = podcast.uuid,
+                    uuid = story.podcasts[podcastIndex].uuid,
                     dropShadow = false,
                     modifier = modifier.size(coverWidth)
                 )
