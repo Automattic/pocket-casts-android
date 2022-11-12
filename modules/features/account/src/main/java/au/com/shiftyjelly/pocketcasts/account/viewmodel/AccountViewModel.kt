@@ -17,11 +17,13 @@ abstract class AccountViewModel : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    fun isEmailValid(value: String?): Boolean {
-        return value != null && Patterns.EMAIL_ADDRESS.matcher(value).matches()
-    }
+    companion object {
+        fun isEmailValid(value: String?): Boolean {
+            return value != null && Patterns.EMAIL_ADDRESS.matcher(value).matches()
+        }
 
-    fun isPasswordValid(value: String?): Boolean {
-        return value != null && value.length >= 6
+        fun isPasswordValid(value: String?): Boolean {
+            return value != null && value.length >= 6
+        }
     }
 }

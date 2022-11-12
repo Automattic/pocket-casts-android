@@ -6,13 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -27,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -98,11 +97,12 @@ private fun PodcastCoverRow(
     val context = LocalContext.current
     val currentLocalView = LocalView.current
     val coverWidth = (currentLocalView.width.pxToDp(context).dp - 15.dp) / 3
-    val translateBy = 20.dpToPx(context).toFloat()
+    val translateBy = 60.dp
     Row(
         modifier
+            .height(coverWidth * 2.3f)
             .transformPodcastCover()
-            .graphicsLayer(translationX = -translateBy)
+            .offset(x = -translateBy, y = 75.dp)
     ) {
         listOf(1, 0, 2).forEach { index ->
             val podcastIndex = index.coerceAtMost(story.podcasts.size - 1)
