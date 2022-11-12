@@ -1459,6 +1459,9 @@
     <string name="onboarding_get_the_newsletter">Get the newsletter</string>
     <string name="onboarding_forgot_password">Forgot password?</string>
     <string name="onboarding_email_invalid_message">Please enter a valid email</string>
+    <string name="onboarding_recommendations_find_favorite_podcasts">Find your favorite podcasts</string>
+    <string name="onboarding_recommendations_make_pocket_casts_yours">Make Pocket Casts yours by selecting your favorite podcasts or import them from another podcast player. You can always do this later.</string>
+    <string name="onboarding_recommendations_import">Import</string>
 
     <!--    Tasker Plugin-->
 

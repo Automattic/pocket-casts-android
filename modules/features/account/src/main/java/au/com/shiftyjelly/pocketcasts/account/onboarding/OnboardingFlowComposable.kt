@@ -118,7 +118,30 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.recommendations) {
-                OnboardingRecommendations()
+                OnboardingRecommendations(
+                    onShown = {
+                        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN)
+                    },
+                    onBackPressed = {
+                        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
+                        navController.popBackStack()
+                    },
+                    onComplete = {
+                        // TODO analytics
+                        navController.navigate(OnboardingNavRoute.plusFeatures)
+                    }
+                )
+            }
+
+            composable(OnboardingNavRoute.plusFeatures) {
+                OnboardingPlusFeatures(
+                    onShown = {
+                        // TODO analytics
+                    },
+                    onBackPressed = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
@@ -140,4 +163,5 @@ private object OnboardingNavRoute {
     const val logInGoogle = "log_in_google"
     const val forgotPassword = "forgot_password"
     const val recommendations = "recommendations"
+    const val plusFeatures = "upgrade_features"
 }
