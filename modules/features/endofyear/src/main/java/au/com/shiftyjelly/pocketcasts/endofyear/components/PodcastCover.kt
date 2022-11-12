@@ -23,8 +23,8 @@ private const val PodcastCoverSkew = 0.45f
 fun PodcastCover(
     uuid: String,
     coverWidth: Dp,
-    coverType: PodcastCoverType,
     modifier: Modifier = Modifier,
+    coverType: PodcastCoverType = PodcastCoverType.SMALL,
 ) {
     PodcastImage(
         uuid = uuid,
