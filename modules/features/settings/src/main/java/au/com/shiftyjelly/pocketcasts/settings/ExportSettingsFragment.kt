@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -43,6 +44,14 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("importPodcasts")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             showOpmlFilePicker()
             true
+        }
+
+        findPreference<EditTextPreference>("importPodcastsByUrl")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+            val url = newValue.toString()
+            if (url.isNotBlank()) {
+                OpmlImportTask.run(url, requireActivity())
+            }
+            false
         }
 
         findPreference<Preference>("exportSendEmail")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {

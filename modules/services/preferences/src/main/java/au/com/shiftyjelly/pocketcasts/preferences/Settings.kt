@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -25,6 +26,7 @@ interface Settings {
         const val SERVER_SHORT_URL = BuildConfig.SERVER_SHORT_URL
         const val SERVER_LIST_URL = BuildConfig.SERVER_LIST_URL
         const val SERVER_LIST_HOST = BuildConfig.SERVER_LIST_HOST
+        const val WP_COM_API_URL = "https://public-api.wordpress.com"
 
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
@@ -206,6 +208,32 @@ interface Settings {
         fun toIndex(): Int = options.indexOf(this)
     }
 
+    sealed class MediaNotificationControls(@StringRes val controlName: Int, val key: String) {
+
+        companion object {
+            val All
+                get() = listOf(Archive, MarkAsPlayed, PlayNext, PlaybackSpeed, Star)
+
+            const val MaxSelectedOptions = 2
+
+            private const val ARCHIVE_KEY = "default_media_control_archive"
+            private const val MARK_AS_PLAYED_KEY = "default_media_control_mark_as_played"
+            private const val PLAY_NEXT_KEY = "default_media_control_play_next_key"
+            private const val PLAYBACK_SPEED_KEY = "default_media_control_playback_speed_key"
+            private const val STAR_KEY = "default_media_control_star_key"
+        }
+
+        object Archive : MediaNotificationControls(LR.string.archive, ARCHIVE_KEY)
+
+        object MarkAsPlayed : MediaNotificationControls(LR.string.mark_as_played, MARK_AS_PLAYED_KEY)
+
+        object PlayNext : MediaNotificationControls(LR.string.play_next, PLAY_NEXT_KEY)
+
+        object PlaybackSpeed : MediaNotificationControls(LR.string.playback_speed, PLAYBACK_SPEED_KEY)
+
+        object Star : MediaNotificationControls(LR.string.star, STAR_KEY)
+    }
+
     sealed class AutoArchiveInactive(val timeSeconds: Int) {
         object Never : AutoArchiveInactive(-1)
         object Hours24 : AutoArchiveInactive(24 * 60 * 60)
@@ -257,6 +285,7 @@ interface Settings {
     val autoAddUpNextLimit: Observable<Int>
 
     val defaultPodcastGroupingFlow: StateFlow<PodcastGrouping>
+    val defaultMediaNotificationControlsFlow: StateFlow<List<MediaNotificationControls>>
     val defaultShowArchivedFlow: StateFlow<Boolean>
     val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
     val keepScreenAwakeFlow: StateFlow<Boolean>
@@ -519,6 +548,8 @@ interface Settings {
     fun getAutoPlayNextEpisodeOnEmpty(): Boolean
     fun defaultShowArchived(): Boolean
     fun setDefaultShowArchived(value: Boolean)
+    fun defaultMediaNotificationControls(): List<MediaNotificationControls>
+    fun setDefaultMediaNotificationControls(mediaNotificationControls: List<MediaNotificationControls>)
     fun setMultiSelectItems(items: List<Int>)
     fun getMultiSelectItems(): List<Int>
     fun setLastPauseTime(date: Date)
@@ -551,4 +582,7 @@ interface Settings {
 
     fun setLinkCrashReportsToUser(value: Boolean)
     fun getLinkCrashReportsToUser(): Boolean
+
+    fun setEndOfYearShowBadge2022(value: Boolean)
+    fun getEndOfYearShowBadge2022(): Boolean
 }

@@ -14,7 +14,7 @@ fun <T> tryOrNull(handleError: ((Throwable) -> T?)? = null, block: () -> T?): T?
 
 val screenSize
     @Composable
-    get() :DpSize {
+    get(): DpSize {
         val configuration = LocalConfiguration.current
 
         val screenHeight = configuration.screenHeightDp.dp

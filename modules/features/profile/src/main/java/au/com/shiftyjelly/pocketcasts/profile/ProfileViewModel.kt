@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -15,7 +16,13 @@ import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(val settings: Settings, val podcastManager: PodcastManager, val statsManager: StatsManager, val userManager: UserManager) : ViewModel() {
+class ProfileViewModel @Inject constructor(
+    val settings: Settings,
+    val podcastManager: PodcastManager,
+    val statsManager: StatsManager,
+    val userManager: UserManager,
+    private val endOfYearManager: EndOfYearManager
+) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     val podcastCount: LiveData<Int> = LiveDataReactiveStreams.fromPublisher(podcastManager.observeCountSubscribed())
     val daysListenedCount: MutableLiveData<Long> = MutableLiveData()
@@ -29,6 +36,8 @@ class ProfileViewModel @Inject constructor(val settings: Settings, val podcastMa
     val refreshObservable: LiveData<RefreshState> = LiveDataReactiveStreams.fromPublisher(
         settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST)
     )
+
+    fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()

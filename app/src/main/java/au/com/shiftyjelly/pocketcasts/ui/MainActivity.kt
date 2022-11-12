@@ -12,28 +12,35 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.BottomSheetContentState
-import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.BottomSheetContentState.Content.Button
-import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.ModalBottomSheet
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
+import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -60,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
+import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
@@ -110,6 +118,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -122,6 +132,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 import com.google.android.material.R as MR
 
 private const val SAVEDSTATE_PLAYER_OPEN = "player_open"
+private const val SAVEDSTATE_MINIPLAYER_SHOWN = "miniplayer_shown"
 
 @AndroidEntryPoint
 class MainActivity :
@@ -182,9 +193,25 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
 
+        // TODO check settings to determine if onboarding has already been completed
+        if (BuildConfig.ONBOARDING_ENABLED && !settings.isLoggedIn()) {
+            openOnboardingFlow()
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        viewModel.isEndOfYearStoriesEligible()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { isEligible ->
+                if (isEligible) {
+                    setupEndOfYearLaunchBottomSheet()
+                    if (settings.getEndOfYearShowBadge2022()) {
+                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                    }
+                }
+            }.launchIn(lifecycleScope)
 
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(
@@ -217,7 +244,10 @@ class MainActivity :
             activity = this
         )
 
-        setupPlayerViews()
+        val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
+        binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
+
+        setupPlayerViews(showMiniPlayerImmediately)
 
         if (savedInstanceState != null) {
             val videoComingToPortrait =
@@ -243,7 +273,11 @@ class MainActivity :
                             VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
-                            VR.id.navigation_profile -> FirebaseAnalyticsTracker.navigatedToProfile()
+                            VR.id.navigation_profile -> {
+                                binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+                                settings.setEndOfYearShowBadge2022(false)
+                                FirebaseAnalyticsTracker.navigatedToProfile()
+                            }
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -261,12 +295,27 @@ class MainActivity :
         }
     }
 
+    private fun openOnboardingFlow() {
+        registerForActivityResult(OnboardingActivityContract()) { result ->
+            when (result) {
+                OnboardingFinish.CompletedOnboarding -> {
+                    // TODO persist that onboarding has been completed
+                }
+                OnboardingFinish.AbortedOnboarding -> {
+                    finish()
+                }
+                null -> {
+                    Timber.e("Unexpected null result from onboarding activity")
+                }
+            }
+        }.launch(Intent(this, OnboardingActivity::class.java))
+    }
+
     override fun onStart() {
         super.onStart()
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if (!videoPlayerShown && playbackManager.getCurrentEpisode()?.isVideo == true && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
                 openFullscreenViewPlayer()
-                videoPlayerShown = true
             } else {
                 videoPlayerShown = false
             }
@@ -274,6 +323,7 @@ class MainActivity :
     }
 
     private fun openFullscreenViewPlayer() {
+        videoPlayerShown = true
         startActivity(VideoActivity.buildIntent(context = this))
     }
 
@@ -285,8 +335,8 @@ class MainActivity :
         }
 
         refreshApp()
-
         addLineView()
+        BumpStatsTask.scheduleToRun(this)
     }
 
     override fun onPause() {
@@ -307,6 +357,7 @@ class MainActivity :
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(SAVEDSTATE_PLAYER_OPEN, binding.playerBottomSheet.isPlayerOpen)
+        outState.putBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, binding.playerBottomSheet.isShown)
     }
 
     override fun overrideNextRefreshTimer() {
@@ -458,23 +509,18 @@ class MainActivity :
 
     private fun setupEndOfYearLaunchBottomSheet() {
         binding.modalBottomSheet.setContent {
-            AppTheme(themeType = theme.activeTheme) {
-                ModalBottomSheet(
-                    showOnLoad = true,
-                    content = BottomSheetContentState.Content(
-                        titleText = stringResource(LR.string.end_of_year_launch_modal_title),
-                        summaryText = stringResource(LR.string.end_of_year_launch_modal_summary),
-                        primaryButton = Button.Primary(
-                            label = stringResource(LR.string.end_of_year_launch_modal_primary_button_title),
-                            onClick = {
-                                StoriesFragment.newInstance()
-                                    .show(supportFragmentManager, "stories_dialog")
-                            }
-                        ),
-                        secondaryButton = Button.Secondary(
-                            label = stringResource(LR.string.end_of_year_launch_modal_secondary_button_title),
-                        ),
-                    )
+            var showDialog by rememberSaveable { mutableStateOf(false) }
+            if (showDialog) {
+                StoriesPage(
+                    theme = theme,
+                    onCloseClicked = { showDialog = false },
+                )
+            }
+            AppTheme(theme.activeTheme) {
+                EndOfYearLaunchBottomSheet(
+                    onClick = {
+                        showDialog = true
+                    }
                 )
             }
         }
@@ -482,7 +528,7 @@ class MainActivity :
 
     @OptIn(DelicateCoroutinesApi::class)
     @Suppress("DEPRECATION")
-    private fun setupPlayerViews() {
+    private fun setupPlayerViews(showMiniPlayerImmediately: Boolean) {
         binding.playerBottomSheet.listener = this
 
         viewModel.playbackState.observe(this) { state ->
@@ -520,7 +566,11 @@ class MainActivity :
                 .toFlowable(BackpressureStrategy.LATEST)
         observeUpNext = LiveDataReactiveStreams.fromPublisher(upNextQueueObservable)
         observeUpNext.observe(this) { upNext ->
-            binding.playerBottomSheet.setUpNext(upNext, theme)
+            binding.playerBottomSheet.setUpNext(
+                upNext = upNext,
+                theme = theme,
+                shouldAnimateOnAttach = !showMiniPlayerImmediately
+            )
         }
 
         viewModel.signInState.observe(this) { signinState ->

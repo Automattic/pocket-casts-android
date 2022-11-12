@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.content.Context
 import android.content.res.Resources
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
@@ -40,8 +39,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -389,20 +386,18 @@ class PlayerViewModel @Inject constructor(
         playbackManager.skipForward(playbackSource = playbackSource)
     }
 
-    fun longSkipForwardOptionsDialog(): OptionsDialog {
-        var optionsDialogBuilder = OptionsDialog().setForceDarkTheme(true)
-        optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.mark_played) {
-            playbackManager.upNextQueue.currentEpisode?.let {
-                markAsPlayedConfirmed(it)
-            }
+    fun onMarkAsPlayedClick() {
+        playbackManager.upNextQueue.currentEpisode?.let {
+            markAsPlayedConfirmed(it)
         }
-        if (playbackManager.upNextQueue.queueEpisodes.isNotEmpty()) {
-            optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.next_episode) {
-                playbackManager.playNextInQueue(playbackSource = playbackSource)
-            }
-        }
+    }
 
-        return optionsDialogBuilder
+    fun hasNextEpisode(): Boolean {
+        return playbackManager.upNextQueue.queueEpisodes.isNotEmpty()
+    }
+
+    fun onNextEpisodeClick() {
+        playbackManager.playNextInQueue(playbackSource = playbackSource)
     }
 
     private fun markAsPlayedConfirmed(episode: Playable) {
@@ -460,24 +455,6 @@ class PlayerViewModel @Inject constructor(
 
     fun seekToMs(seekTimeMs: Int, seekComplete: () -> Unit) {
         playbackManager.seekToTimeMs(seekTimeMs, seekComplete)
-    }
-
-    fun shareDialog(context: Context?, fragmentManager: FragmentManager): ShareDialog? {
-        val contextFound = context ?: return null
-        val podcast = this.podcast ?: return null
-        val episode = this.episode ?: return null
-
-        return if (episode is Episode) {
-            ShareDialog(
-                podcast = podcast,
-                episode = episode,
-                fragmentManager = fragmentManager,
-                context = contextFound,
-                forceDarkTheme = true
-            )
-        } else {
-            null
-        }
     }
 
     override fun onCleared() {

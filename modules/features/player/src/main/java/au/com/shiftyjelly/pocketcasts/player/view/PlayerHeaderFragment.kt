@@ -436,7 +436,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onSkipForwardLongPress() {
-        viewModel.longSkipForwardOptionsDialog().show(parentFragmentManager, "longpressoptions")
+        LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
     }
 
     override fun onEffectsClick() {
@@ -446,7 +446,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onSleepClick() {
         trackShelfAction(ShelfItem.Sleep.analyticsValue)
-        SleepFragment().show(parentFragmentManager, "effects_sheet")
+        SleepFragment().show(parentFragmentManager, "sleep_sheet")
     }
 
     override fun onStarClick() {
@@ -456,7 +456,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onShareClick() {
         trackShelfAction(ShelfItem.Share.analyticsValue)
-        viewModel.shareDialog(context, childFragmentManager)?.show()
+        ShareFragment().show(parentFragmentManager, "share_sheet")
     }
 
     private fun showPodcast() {

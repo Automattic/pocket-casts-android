@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationChannel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
@@ -68,6 +69,7 @@ class SettingsImpl @Inject constructor(
         private const val SEND_USAGE_STATS_KEY = "SendUsageStatsKey"
         private const val SEND_CRASH_REPORTS_KEY = "SendCrashReportsKey"
         private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
+        private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
     }
 
     private var languageCode: String? = null
@@ -92,6 +94,7 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val defaultPodcastGroupingFlow = MutableStateFlow(defaultPodcastGrouping())
+    override val defaultMediaNotificationControlsFlow = MutableStateFlow(defaultMediaNotificationControls())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
@@ -491,7 +494,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getAutoSubscribeToPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, true)
+        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
     }
 
     override fun getAutoShowPlayed(): Boolean {
@@ -1187,6 +1190,25 @@ class SettingsImpl @Inject constructor(
         defaultShowArchivedFlow.update { value }
     }
 
+    override fun defaultMediaNotificationControls(): List<MediaNotificationControls> {
+        val selectedValue = MediaNotificationControls.All.map { mediaControl ->
+            val defaultValue =
+                (mediaControl == MediaNotificationControls.PlaybackSpeed || mediaControl == MediaNotificationControls.Star)
+            Pair(mediaControl, getBoolean(mediaControl.key, defaultValue))
+        }
+
+        return selectedValue.filter { (_, value) -> value }.map { (mediaControl, _) ->
+            mediaControl
+        }
+    }
+
+    override fun setDefaultMediaNotificationControls(mediaNotificationControls: List<MediaNotificationControls>) {
+        MediaNotificationControls.All.forEach { mediaControl ->
+            setBoolean(mediaControl.key, mediaNotificationControls.contains(mediaControl))
+        }
+        defaultMediaNotificationControlsFlow.update { mediaNotificationControls }
+    }
+
     override fun defaultPodcastGrouping(): PodcastGrouping {
         val index = getInt("default_podcast_grouping", 0)
         return PodcastGrouping.All.getOrNull(index) ?: PodcastGrouping.None
@@ -1445,4 +1467,11 @@ class SettingsImpl @Inject constructor(
 
     override fun getLinkCrashReportsToUser(): Boolean =
         getBoolean(LINK_CRASH_REPORTS_TO_USER_KEY, false)
+
+    override fun setEndOfYearShowBadge2022(value: Boolean) {
+        setBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, value)
+    }
+
+    override fun getEndOfYearShowBadge2022(): Boolean =
+        getBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, true)
 }

@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
@@ -103,11 +104,23 @@ class MediaSessionManager(
 
     fun startObserving() {
         observePlaybackState()
+        observeMediaNotificationControls()
         playbackManager.upNextQueue.changesObservable
             .observeOn(Schedulers.io())
             .doOnNext { updateUpNext(it) }
             .subscribeBy(onError = { Timber.e(it) })
             .addTo(disposables)
+    }
+
+    private fun observeMediaNotificationControls() {
+        launch {
+            settings.defaultMediaNotificationControlsFlow.collect {
+                withContext(Dispatchers.Main) {
+                    val playbackStateCompat = getPlaybackStateCompat(playbackManager.playbackStateRelay.blockingFirst(), currentEpisode = playbackManager.getCurrentEpisode())
+                    updatePlaybackState(playbackStateCompat)
+                }
+            }
+        }
     }
 
     private fun connect() {
@@ -323,45 +336,53 @@ class MediaSessionManager(
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
         }
 
-        if (playbackManager.isAudioEffectsAvailable()) {
-            val currentSpeed = playbackState.playbackSpeed
-            val drawableId = when {
-                currentSpeed <= 1 -> IR.drawable.auto_1x
-                currentSpeed == 1.1 -> IR.drawable.auto_1_1x
-                currentSpeed == 1.2 -> IR.drawable.auto_1_2x
-                currentSpeed == 1.3 -> IR.drawable.auto_1_3x
-                currentSpeed == 1.4 -> IR.drawable.auto_1_4x
-                currentSpeed == 1.5 -> IR.drawable.auto_1_5x
-                currentSpeed == 1.6 -> IR.drawable.auto_1_6x
-                currentSpeed == 1.7 -> IR.drawable.auto_1_7x
-                currentSpeed == 1.8 -> IR.drawable.auto_1_8x
-                currentSpeed == 1.9 -> IR.drawable.auto_1_9x
-                currentSpeed == 2.0 -> IR.drawable.auto_2x
-                currentSpeed == 2.1 -> IR.drawable.auto_2_1x
-                currentSpeed == 2.2 -> IR.drawable.auto_2_2x
-                currentSpeed == 2.3 -> IR.drawable.auto_2_3x
-                currentSpeed == 2.4 -> IR.drawable.auto_2_4x
-                currentSpeed == 2.5 -> IR.drawable.auto_2_5x
-                currentSpeed == 2.6 -> IR.drawable.auto_2_6x
-                currentSpeed == 2.7 -> IR.drawable.auto_2_7x
-                currentSpeed == 2.8 -> IR.drawable.auto_2_8x
-                currentSpeed == 2.9 -> IR.drawable.auto_2_9x
-                currentSpeed == 3.0 -> IR.drawable.auto_3x
-                else -> IR.drawable.auto_1x
+        settings.defaultMediaNotificationControls().forEach { mediaControl ->
+            when (mediaControl) {
+                MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
+                MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
+                MediaNotificationControls.PlayNext -> addCustomAction(stateBuilder, APP_ACTION_PLAY_NEXT, "Play next", com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next)
+                MediaNotificationControls.PlaybackSpeed -> {
+                    if (playbackManager.isAudioEffectsAvailable()) {
+                        val currentSpeed = playbackState.playbackSpeed
+                        val drawableId = when {
+                            currentSpeed <= 1 -> IR.drawable.auto_1x
+                            currentSpeed == 1.1 -> IR.drawable.auto_1_1x
+                            currentSpeed == 1.2 -> IR.drawable.auto_1_2x
+                            currentSpeed == 1.3 -> IR.drawable.auto_1_3x
+                            currentSpeed == 1.4 -> IR.drawable.auto_1_4x
+                            currentSpeed == 1.5 -> IR.drawable.auto_1_5x
+                            currentSpeed == 1.6 -> IR.drawable.auto_1_6x
+                            currentSpeed == 1.7 -> IR.drawable.auto_1_7x
+                            currentSpeed == 1.8 -> IR.drawable.auto_1_8x
+                            currentSpeed == 1.9 -> IR.drawable.auto_1_9x
+                            currentSpeed == 2.0 -> IR.drawable.auto_2x
+                            currentSpeed == 2.1 -> IR.drawable.auto_2_1x
+                            currentSpeed == 2.2 -> IR.drawable.auto_2_2x
+                            currentSpeed == 2.3 -> IR.drawable.auto_2_3x
+                            currentSpeed == 2.4 -> IR.drawable.auto_2_4x
+                            currentSpeed == 2.5 -> IR.drawable.auto_2_5x
+                            currentSpeed == 2.6 -> IR.drawable.auto_2_6x
+                            currentSpeed == 2.7 -> IR.drawable.auto_2_7x
+                            currentSpeed == 2.8 -> IR.drawable.auto_2_8x
+                            currentSpeed == 2.9 -> IR.drawable.auto_2_9x
+                            currentSpeed == 3.0 -> IR.drawable.auto_3x
+                            else -> IR.drawable.auto_1x
+                        }
+
+                        stateBuilder.addCustomAction(APP_ACTION_CHANGE_SPEED, "Change speed", drawableId)
+                    }
+                }
+                MediaNotificationControls.Star -> {
+                    if (currentEpisode is Episode) {
+                        if (currentEpisode.isStarred) {
+                            addCustomAction(stateBuilder, APP_ACTION_UNSTAR, "Unstar", IR.drawable.auto_starred)
+                        } else {
+                            addCustomAction(stateBuilder, APP_ACTION_STAR, "Star", IR.drawable.auto_star)
+                        }
+                    }
+                }
             }
-
-            stateBuilder.addCustomAction(APP_ACTION_CHANGE_SPEED, "Change speed", drawableId)
         }
-
-        if (currentEpisode is Episode) {
-            if (currentEpisode.isStarred) {
-                addCustomAction(stateBuilder, APP_ACTION_UNSTAR, "Unstar", IR.drawable.auto_starred)
-            } else {
-                addCustomAction(stateBuilder, APP_ACTION_STAR, "Star", IR.drawable.auto_star)
-            }
-        }
-
-        addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
     }
 
     private fun addCustomAction(stateBuilder: PlaybackStateCompat.Builder, action: String, name: CharSequence, @DrawableRes icon: Int) {
@@ -530,6 +551,8 @@ class MediaSessionManager(
                 APP_ACTION_STAR -> starEpisode()
                 APP_ACTION_UNSTAR -> unstarEpisode()
                 APP_ACTION_CHANGE_SPEED -> changePlaybackSpeed()
+                APP_ACTION_ARCHIVE -> archive()
+                APP_ACTION_PLAY_NEXT -> playbackManager.playNextInQueue()
             }
         }
 
@@ -609,6 +632,17 @@ class MediaSessionManager(
             effects.playbackSpeed = newSpeed
             effects.saveToGlobalSettings(settings)
             playbackManager.updatePlayerEffects(effects = effects)
+        }
+    }
+
+    private fun archive() {
+        launch {
+            playbackManager.getCurrentEpisode()?.let {
+                if (it is Episode) {
+                    it.isArchived = true
+                    episodeManager.archive(it, playbackManager)
+                }
+            }
         }
     }
 
@@ -731,6 +765,8 @@ private const val APP_ACTION_SKIP_BACK = "jumpBack"
 private const val APP_ACTION_SKIP_FWD = "jumpFwd"
 private const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
 private const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
+private const val APP_ACTION_ARCHIVE = "archive"
+private const val APP_ACTION_PLAY_NEXT = "playNext"
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")

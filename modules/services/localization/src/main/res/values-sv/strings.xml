@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-10 07:49:26+0000
+Translation-Revision-Date: 2022-10-25 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">Inte nu</string>
+	<string name="end_of_year_launch_modal_primary_button_title">Visa mitt 2022</string>
+	<string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
+	<string name="end_of_year_launch_modal_title">Ditt podcastår</string>
+	<string name="settings_app_icon_halloween">Halloween</string>
+	<string name="settings_show_played_summary">Avsnitt som du har spelat klart kommer fortfarande att visas</string>
+	<string name="settings_show_played">Visa spelade avsnitt</string>
+	<string name="settings_privacy_crash_link_summary">Tillåt oss att länka ditt Pocket Casts-konto till kraschrapporter.</string>
+	<string name="settings_privacy_crash_link">Länka ditt konto till krascher</string>
+	<string name="settings_privacy_crash_summary">Tillåt oss att samla in kraschrapporter.</string>
+	<string name="settings_privacy_crash">Kraschrapporter</string>
+	<string name="settings_privacy_analytics_summary">Tillåt oss att samla in analyser.</string>
+	<string name="settings_privacy_analytics">Analyser</string>
+	<string name="settings_privacy_summary">Att tillåta oss att samla in analyser och kraschrapporter hjälper oss att bygga en bättre app. Vi förstår om du föredrar att inte dela denna information.</string>
+	<string name="settings_title_privacy">Integritet</string>
+	<string name="profile_privacy_policy_read">Läs integritetspolicy</string>
+	<string name="token_refresh_sign_in_error_description">Det uppstod ett problem och du har blivit utloggad. Tryck här för att logga in igen.</string>
+	<string name="token_refresh_sign_in_error_title">Inloggningsfel</string>
 	<string name="settings_downloads_clean_up_summary">Är du säker på att du vill ta bort dessa nedladdade filer?</string>
 	<string name="settings_storage_section_heading_mobile_data">Mobildata</string>
 	<string name="settings_storage_section_heading_usage">Användning</string>

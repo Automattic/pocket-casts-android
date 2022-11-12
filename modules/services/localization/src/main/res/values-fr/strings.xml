@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-09-13 16:54:03+0000
+Translation-Revision-Date: 2022-10-26 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+	<string name="end_of_year_launch_modal_secondary_button_title">Pas maintenant</string>
+	<string name="end_of_year_launch_modal_primary_button_title">Voir mon année 2022</string>
+	<string name="end_of_year_launch_modal_summary">Retrouvez vos meilleurs podcasts, catégories, statistiques d’écoute, et plus encore. Partagez du contenu avec vos amis et remerciez vos créateurs favoris !</string>
+	<string name="end_of_year_launch_modal_title">Votre année en podcasts</string>
+	<string name="settings_app_icon_halloween">Halloween</string>
+	<string name="settings_show_played_summary">Les épisodes que vous avez terminé de lire continueront à s’afficher</string>
+	<string name="settings_show_played">Voir les épisodes lus</string>
+	<string name="settings_privacy_crash_link_summary">Permettez-nous d\'associer votre compte Pocket Casts aux rapports d\'incident.</string>
+	<string name="settings_privacy_crash_link">Associez votre compte aux incidents</string>
+	<string name="settings_privacy_crash_summary">Permettez-nous de collecter des rapports d\'incident.</string>
+	<string name="settings_privacy_crash">Rapports d\'incident</string>
+	<string name="settings_privacy_analytics_summary">Permettez-nous de collecter des statistiques.</string>
+	<string name="settings_privacy_analytics">Statistiques</string>
+	<string name="settings_privacy_summary">En nous autorisant à collecter des statistiques et des rapports d\'incident, vous nous permettez de créer une meilleure application. Nous comprendrions toutefois que vous préfériez ne pas partager ces informations.</string>
+	<string name="settings_title_privacy">Confidentialité</string>
+	<string name="profile_privacy_policy_read">Lire notre politique de confidentialité</string>
+	<string name="token_refresh_sign_in_error_description">Un problème s\'est produit, et vous avez été déconnecté(e). Appuyez ici pour vous reconnecter.</string>
+	<string name="token_refresh_sign_in_error_title">Erreur de connexion</string>
 	<string name="settings_downloads_clean_up_summary">Voulez-vous vraiment supprimer ces fichiers téléchargés ?</string>
 	<string name="settings_storage_section_heading_mobile_data">Données mobiles</string>
 	<string name="settings_storage_section_heading_usage">Utilisation</string>

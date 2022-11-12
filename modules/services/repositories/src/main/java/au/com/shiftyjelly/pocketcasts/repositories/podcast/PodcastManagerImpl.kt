@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -749,4 +750,7 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun refreshPodcastFeed(podcastUuid: String): Boolean {
         return refreshServerManager.refreshPodcastFeed(podcastUuid).isSuccessful
     }
+
+    override fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>> =
+        podcastDao.findTopPodcasts(fromEpochMs, toEpochMs, limit)
 }

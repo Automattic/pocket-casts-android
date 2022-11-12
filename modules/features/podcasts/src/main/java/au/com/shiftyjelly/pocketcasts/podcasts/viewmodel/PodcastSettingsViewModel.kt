@@ -36,6 +36,7 @@ class PodcastSettingsViewModel @Inject constructor(
     var podcastUuid: String? = null
     lateinit var podcast: LiveData<Podcast>
     lateinit var includedFilters: LiveData<List<Playlist>>
+    lateinit var availableFilters: LiveData<List<Playlist>>
 
     val globalSettings = LiveDataReactiveStreams.fromPublisher(
         settings.autoAddUpNextLimit.toFlowable(BackpressureStrategy.LATEST)
@@ -50,6 +51,11 @@ class PodcastSettingsViewModel @Inject constructor(
             it.filter { filter -> filter.podcastUuidList.contains(uuid) }
         }
         includedFilters = LiveDataReactiveStreams.fromPublisher(filters)
+
+        val availablePodcastFilters = playlistManager.observeAll().map {
+            it.filter { filter -> !filter.allPodcasts }
+        }
+        availableFilters = LiveDataReactiveStreams.fromPublisher(availablePodcastFilters)
     }
 
     fun isAutoAddToUpNextOn(): Boolean {
