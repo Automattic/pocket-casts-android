@@ -81,7 +81,7 @@ fun OnboardingRecommendations(
         Spacer(Modifier.weight(1f))
 
         RowButton(
-            text = stringResource(LR.string.onboarding_not_now),
+            text = stringResource(LR.string.not_now),
             includePadding = false,
             onClick = onComplete,
         )
