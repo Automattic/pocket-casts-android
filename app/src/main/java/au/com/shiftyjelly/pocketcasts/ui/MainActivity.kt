@@ -289,10 +289,6 @@ class MainActivity :
         handleIntent(intent, savedInstanceState)
 
         updateSystemColors()
-
-        if (BuildConfig.END_OF_YEAR_ENABLED) {
-            setupEndOfYearLaunchBottomSheet()
-        }
     }
 
     private fun openOnboardingFlow() {
