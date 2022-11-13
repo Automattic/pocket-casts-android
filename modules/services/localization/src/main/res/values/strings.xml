@@ -55,6 +55,7 @@
     <string name="select_all_below">Select all below</string>
     <string name="share_podcast">Share podcast</string>
     <string name="show_archived">Show archived</string>
+    <string name="log_in">Log in</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
@@ -111,7 +112,6 @@
     <string name="please_try_again">Please try again</string>
     <string name="next">Next</string>
     <string name="select_podcasts">Select podcasts</string>
-    <string name="welcome_back">Welcome back</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -667,7 +667,7 @@
     <string name="profile_create_failed_title">Could not create account</string>
     <string name="profile_create_license">Please excuse our formality</string>
     <string name="profile_create_newsletter_summary">Receive news, app updates, themed podcast lists, interviews, and more</string>
-    <string name="profile_create_password_requirements">Must be at least 6 characters</string>
+    <string name="profile_create_password_requirements">Password must be at least 6 characters</string>
     <string name="profile_create_privacy_policy">We\'ve linked our Privacy Policy too in case you\'re interested. We\'ve tried to keep both short, to the point and included as little Legalese as possible.</string>
     <string name="profile_create_privacy_policy_title">Privacy Policy</string>
     <string name="profile_create_subscription_failed">Could not create subscription. Please try again</string>
@@ -1447,6 +1447,18 @@
     <string name="end_of_year_create_account_to_see">Save your podcasts in the cloud, get your end of year review and sync your progress with other devices.</string>
     <!-- When loading the End of Year stats stories fails. -->
     <string name="end_of_year_stories_failed">Failed to load stories.</string>
+
+    <!-- Onboarding -->
+
+    <string name="onboarding_welcome_back">Welcome back</string>
+    <string name="onboarding_not_now">Not now</string>
+    <string name="onboarding_sign_up_free">Sign up free</string>
+    <string name="onboarding_continue_with_google">Continue with Google</string>
+    <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
+    <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
+    <string name="onboarding_get_the_newsletter">Get the newsletter</string>
+    <string name="onboarding_forgot_password">Forgot password?</string>
+    <string name="onboarding_email_invalid_message">Please enter a valid email</string>
 
     <!--    Tasker Plugin-->
 
