@@ -154,15 +154,16 @@ project.ext {
             navigationUi: "androidx.navigation:navigation-ui-ktx:$versionNavigation",
             viewPager: "androidx.viewpager2:viewpager2:1.0.0",
             composeActivity: "androidx.activity:activity-compose:1.5.1",
+            composeAnimation: "androidx.compose.animation:animation:$versionCompose",
+            composeIcons: "androidx.compose.material:material-icons-extended:$versionCompose",
+            composeLiveData: "androidx.compose.runtime:runtime-livedata:$versionCompose",
+            composeMaterial: "androidx.compose.material:material:$versionCompose",
+            composeNavigation: "androidx.navigation:navigation-compose:$versionNavigation",
             composeUi: "androidx.compose.ui:ui:$versionCompose",
             composeUiTestManifest: "androidx.compose.ui:ui-test-manifest:$versionCompose",
             composeUiTestJunit: "androidx.compose.ui:ui-test-junit4:$versionCompose",
             composeUiTooling: "androidx.compose.ui:ui-tooling:$versionCompose",
             composeUiToolingPreview: "androidx.compose.ui:ui-tooling-preview:$versionCompose",
-            composeMaterial: "androidx.compose.material:material:$versionCompose",
-            composeAnimation: "androidx.compose.animation:animation:$versionCompose",
-            composeLiveData: "androidx.compose.runtime:runtime-livedata:$versionCompose",
-            composeNavigation: "androidx.navigation:navigation-compose:$versionNavigation",
             composeRx: "androidx.compose.runtime:runtime-rxjava2:$versionCompose",
             composeViewModel: "androidx.lifecycle:lifecycle-viewmodel-compose:$versionLifecycle",
             guava: 'com.google.guava:guava:27.1-android' // Required to fix conflict between versions in exoplayer and workmanager
@@ -212,6 +213,7 @@ project.ext {
             hiltDaggerCompiler: "com.google.dagger:hilt-compiler:$versionHilt",
             hiltCompiler: "androidx.hilt:hilt-compiler:1.0.0",
             hiltWorkManager: "androidx.hilt:hilt-work:1.0.0",
+            hiltNavigationCompose: "androidx.hilt:hilt-navigation-compose:1.0.0",
             // Lottie
             lottie: "com.airbnb.android:lottie:5.2.0",
             // JUnit

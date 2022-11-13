@@ -274,6 +274,7 @@ class CreateAccountViewModel
 
 enum class NewsletterSource(val analyticsValue: String) {
     ACCOUNT_UPDATED("account_updated"),
+    ACCOUNT_CREATED("account_created"),
     PROFILE("profile")
 }
 

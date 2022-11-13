@@ -1,18 +1,20 @@
-package au.com.shiftyjelly.pocketcasts.endofyear
+package au.com.shiftyjelly.pocketcasts.endofyear.views
 
-import androidx.annotation.FloatRange
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
+import kotlinx.coroutines.flow.StateFlow
 
 private val StrokeWidth = 2.dp
 private val SegmentHeight = StrokeWidth
@@ -20,12 +22,13 @@ private const val IndicatorBackgroundOpacity = 0.5f
 
 @Composable
 fun SegmentedProgressIndicator(
-    @FloatRange(from = 0.0, to = 1.0) progress: Float,
+    progressFlow: StateFlow<Float>,
     modifier: Modifier = Modifier,
     color: Color = Color.White,
     backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity),
     segmentsData: SegmentsData,
 ) {
+    val progress by progressFlow.collectAsState()
     Canvas(
         modifier
             .progressSemantics(progress)
