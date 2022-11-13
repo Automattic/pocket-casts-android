@@ -304,7 +304,7 @@ private fun StoriesErrorView(
     StoriesEmptyView(
         content = {
             TextP50(
-                text = "Failed to load stories.", // TODO: replace hardcoded text
+                text = stringResource(id = LR.string.end_of_year_stories_failed),
                 color = Color.White,
             )
         },
