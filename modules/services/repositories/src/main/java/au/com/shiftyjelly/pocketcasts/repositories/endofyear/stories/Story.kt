@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import au.com.shiftyjelly.pocketcasts.utils.seconds
 
 abstract class Story {
-    open val storyLength: Long = 2.seconds()
+    open val storyLength: Long = 5.seconds()
     open val backgroundColor: Color = Color.Black
     val tintColor: Color = Color.White
 }

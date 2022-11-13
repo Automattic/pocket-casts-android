@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.addOnTextChanged
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -179,7 +180,7 @@ class ChangePwdFragment : BaseFragment() {
         binding.btnConfirm.alpha = if (allMatch) 1.0f else 0.2f
 
         val tintColor = context.getThemeColor(UR.attr.primary_interactive_01)
-        val passwordDrawable = context.getTintedDrawable(R.drawable.ic_password, tintColor)
+        val passwordDrawable = context.getTintedDrawable(IR.drawable.ic_password, tintColor)
         val iconSize = 32.dpToPx(context)
         passwordDrawable?.setBounds(0, 0, iconSize, iconSize)
 

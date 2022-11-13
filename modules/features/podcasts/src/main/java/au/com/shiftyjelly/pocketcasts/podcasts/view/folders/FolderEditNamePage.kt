@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
-import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -42,7 +42,7 @@ fun FolderEditNamePage(
             value = folderName,
             placeholder = stringResource(LR.string.folder_name),
             onValueChange = { viewModel.changeFolderName(it) },
-            onNext = { onNextClick() },
+            onImeAction = { onNextClick() },
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
                 .focusRequester(focusRequester)

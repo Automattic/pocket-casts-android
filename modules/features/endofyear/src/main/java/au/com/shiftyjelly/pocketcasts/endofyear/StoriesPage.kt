@@ -133,7 +133,7 @@ fun StoriesPage(
                     onPause = { viewModel.pause() },
                     onStart = { viewModel.start() },
                     onCloseClicked = onCloseClicked,
-                    onReplayClicked = { viewModel.start() },
+                    onReplayClicked = { viewModel.replay() },
                     onShareClicked = {
                         viewModel.onShareClicked(it, context) { file ->
                             showShareForFile(context, file, shareLauncher)
