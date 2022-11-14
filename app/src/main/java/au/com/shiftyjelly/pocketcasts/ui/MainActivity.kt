@@ -547,6 +547,10 @@ class MainActivity :
                 updateNavAndStatusColors(true, state.podcast)
             }
 
+            if (viewModel.lastPlaybackState != null && (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) && settings.openPlayerAutomatically()) {
+                binding.playerBottomSheet.openPlayer()
+            }
+
             updatePlaybackState(state)
 
             viewModel.lastPlaybackState = state
