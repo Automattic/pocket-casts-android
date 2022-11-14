@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.endofyear.ShareableAssetProvider.ShareTextData
+import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
@@ -26,7 +26,7 @@ import kotlin.math.roundToInt
 class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
-    private val shareableAssetProvider: ShareableAssetProvider,
+    private val shareableTextProvider: ShareableTextProvider,
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Loading)
@@ -146,7 +146,7 @@ class StoriesViewModel @Inject constructor(
             val currentState = (state.value as State.Loaded)
             mutableState.value = currentState.copy(preparingShareText = true)
 
-            val shareTextData = shareableAssetProvider.getShareableDataForStory(story)
+            val shareTextData = shareableTextProvider.getShareableDataForStory(story)
             mutableState.value = currentState.copy(preparingShareText = false)
 
             savedFile?.let { showShareForFile.invoke(it, shareTextData) }

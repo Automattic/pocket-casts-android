@@ -15,7 +15,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class ShareableAssetProvider @Inject constructor(
+class ShareableTextProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val listServerManager: ListServerManager,
 ) {

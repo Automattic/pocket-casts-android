@@ -56,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
@@ -401,7 +402,7 @@ private fun showShareForFile(
     context: Context,
     file: File,
     shareLauncher: ActivityResultLauncher<Intent>,
-    shareTextData: ShareableAssetProvider.ShareTextData,
+    shareTextData: ShareTextData,
 ) {
     try {
         val uri = FileUtil.getUriForFile(context, file)

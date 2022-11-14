@@ -113,7 +113,7 @@ class StoriesViewModelTest {
         return StoriesViewModel(
             endOfYearManager = endOfYearManager,
             fileUtilWrapper = fileUtilWrapper,
-            shareableAssetProvider = mock()
+            shareableTextProvider = mock()
         )
     }
 }
