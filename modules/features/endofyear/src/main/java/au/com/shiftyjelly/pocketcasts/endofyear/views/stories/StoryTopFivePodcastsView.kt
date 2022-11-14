@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,10 +22,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
@@ -72,12 +71,10 @@ private fun Title(
     modifier: Modifier = Modifier,
 ) {
     val text = stringResource(R.string.end_of_year_story_top_podcasts)
-    Text(
+    TextH30(
         text = text,
         textAlign = TextAlign.Center,
         color = story.tintColor,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.SemiBold,
         modifier = modifier
             .padding(horizontal = 40.dp)
             .fillMaxWidth()
