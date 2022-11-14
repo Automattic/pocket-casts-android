@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPod
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
+import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -28,11 +29,16 @@ class ShareableTextProvider @Inject constructor(
         val text = getText(story)
         val shareableLink: String = when (story) {
             is StoryTopFivePodcasts -> {
-                listServerManager.createPodcastList(
-                    title = getText(story),
-                    description = "",
-                    podcasts = story.topPodcasts.map { it.toPodcast() }
-                ) ?: shortURL
+                try {
+                    listServerManager.createPodcastList(
+                        title = getText(story),
+                        description = "",
+                        podcasts = story.topPodcasts.map { it.toPodcast() }
+                    ) ?: shortURL
+                } catch (ex: Exception) {
+                    Timber.e(ex)
+                    shortURL
+                }
             }
             is StoryTopPodcast -> {
                 "$shortURL/podcast/${story.topPodcast.uuid}"
