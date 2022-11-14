@@ -26,12 +26,15 @@ class ShareableTextProvider @Inject constructor(
     suspend fun getShareableDataForStory(
         story: Story,
     ): ShareTextData {
-        val text = getText(story)
+        var showShortURLAtEnd = false
         val shareableLink: String = when (story) {
             is StoryTopFivePodcasts -> {
                 try {
                     listServerManager.createPodcastList(
-                        title = getText(story),
+                        title = context.resources.getString(
+                            LR.string.end_of_year_story_top_podcasts_share_text,
+                            ""
+                        ),
                         description = "",
                         podcasts = story.topPodcasts.map { it.toPodcast() }
                     ) ?: shortURL
@@ -46,17 +49,22 @@ class ShareableTextProvider @Inject constructor(
             is StoryLongestEpisode -> {
                 "$shortURL/episode/${story.longestEpisode.uuid}"
             }
-            else -> shortURL
+            else -> {
+                showShortURLAtEnd = true
+                shortURL
+            }
         }
+        val textWithLink = getTextWithLink(story, shareableLink)
         return ShareTextData(
-            text = text,
-            link = shareableLink,
-            hashTags = hashtags
+            textWithLink = textWithLink,
+            hashTags = hashtags,
+            showShortURLAtEnd = showShortURLAtEnd
         )
     }
 
-    private fun getText(
+    private fun getTextWithLink(
         story: Story,
+        shareableLink: String
     ): String {
         val resources = context.resources
         return when (story) {
@@ -87,21 +95,21 @@ class ShareableTextProvider @Inject constructor(
             is StoryTopPodcast -> {
                 resources.getString(
                     LR.string.end_of_year_story_top_podcast_share_text,
-                    story.topPodcast.title
+                    shareableLink
                 )
             }
 
             is StoryTopFivePodcasts -> {
                 resources.getString(
                     LR.string.end_of_year_story_top_podcasts_share_text,
-                    story.topPodcasts[0].title
+                    shareableLink
                 )
             }
 
             is StoryLongestEpisode -> {
                 resources.getString(
                     LR.string.end_of_year_story_longest_episode_share_text,
-                    story.longestEpisode.title
+                    shareableLink
                 )
             }
 
@@ -110,8 +118,8 @@ class ShareableTextProvider @Inject constructor(
     }
 
     data class ShareTextData(
-        val text: String,
+        val textWithLink: String,
         val hashTags: String,
-        val link: String,
+        val showShortURLAtEnd: Boolean
     )
 }

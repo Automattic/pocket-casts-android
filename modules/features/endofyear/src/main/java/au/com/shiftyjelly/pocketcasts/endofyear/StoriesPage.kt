@@ -70,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopFivePodcas
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
@@ -406,7 +407,10 @@ private fun showShareForFile(
 ) {
     try {
         val uri = FileUtil.getUriForFile(context, file)
-        val shareText = "${shareTextData.text} ${shareTextData.hashTags} ${shareTextData.link}"
+        var shareText = "${shareTextData.textWithLink} ${shareTextData.hashTags}"
+        if (shareTextData.showShortURLAtEnd) {
+            shareText += " ${Settings.SERVER_SHORT_URL}"
+        }
 
         val chooserIntent = ShareCompat.IntentBuilder(context)
             .setType("image/png")
