@@ -127,10 +127,11 @@ fun PodcastItem(
                 modifier = modifier
                     .padding(start = 14.dp)
             ) {
-                TextH20(
+                TextH30(
                     text = podcast.title,
                     color = tintColor,
                     maxLines = 2,
+                    fontWeight = FontWeight.Bold,
                     modifier = modifier
                         .padding(bottom = 3.dp)
                 )
