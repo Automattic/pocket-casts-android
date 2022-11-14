@@ -4,10 +4,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
+import io.reactivex.Maybe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -43,31 +45,38 @@ class HistoryManager @Inject constructor(
             val episodeUuid = change.episode ?: continue
             val episode = episodeManager.findByUuid(episodeUuid)
             if (change.action == ACTION_ADD) {
-                val podcast = change.podcast
+                val podcastUuid = change.podcast
                 if (episode != null) {
                     if ((episode.lastPlaybackInteraction ?: 0) < interactionDate) {
                         episode.lastPlaybackInteraction = interactionDate
                         episode.lastPlaybackInteractionSyncStatus = Episode.LAST_PLAYBACK_INTERACTION_SYNCED
                         episodeManager.update(episode)
                     }
-                } else if (podcast != null) {
+                } else if (podcastUuid != null) {
                     // Add missing podcast and episode
-                    podcastManager.findOrDownloadPodcastRx(podcast).toMaybe().onErrorComplete().awaitSingleOrNull()
+                    podcastManager.findOrDownloadPodcastRx(podcastUuid)
+                        .toMaybe()
+                        .doOnError { exception -> Timber.e(exception, "Failed to download missing podcast $podcastUuid") }
+                        .onErrorComplete()
+                        .awaitSingleOrNull()
 
                     val skeleton = Episode(
                         uuid = episodeUuid,
-                        podcastUuid = podcast,
+                        podcastUuid = podcastUuid,
                         title = change.title ?: "",
                         publishedDate = change.published?.parseIsoDate() ?: Date(),
                         downloadUrl = change.url
                     )
                     val missingEpisode = episodeManager.downloadMissingEpisode(
                         episodeUuid,
-                        podcast,
+                        podcastUuid,
                         skeleton,
                         podcastManager,
                         false
-                    ).awaitSingleOrNull()
+                    )
+                        .doOnError { exception -> Timber.e(exception, "Failed to download missing episode $episodeUuid for podcast $podcastUuid") }
+                        .onErrorResumeNext(Maybe.empty())
+                        .awaitSingleOrNull()
                     if (missingEpisode != null && missingEpisode is Episode) {
                         missingEpisode.lastPlaybackInteraction = interactionDate
                         episodeManager.update(missingEpisode)
