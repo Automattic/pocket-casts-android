@@ -159,6 +159,7 @@ class AccountActivity : AppCompatActivity() {
                 }
                 source?.let { mapOf(SOURCE_KEY to source) }
             }
+            R.id.accountFragment -> mapOf(SOURCE_KEY to ACCOUNT_PROP_VALUE)
             else -> null
         } ?: emptyMap()
         analyticsEvent?.let { analyticsTracker.track(it, properties) }
@@ -177,7 +178,13 @@ class AccountActivity : AppCompatActivity() {
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED
             else -> null
         }
-        analyticsEvent?.let { analyticsTracker.track(it) }
+
+        val properties = when (id) {
+            R.id.accountFragment -> mapOf(SOURCE_KEY to ACCOUNT_PROP_VALUE)
+            else -> emptyMap()
+        }
+
+        analyticsEvent?.let { analyticsTracker.track(it, properties) }
     }
 
     companion object {
@@ -202,6 +209,7 @@ class AccountActivity : AppCompatActivity() {
         }
         private const val PRODUCT_KEY = "product"
         private const val SOURCE_KEY = "source"
+        private const val ACCOUNT_PROP_VALUE = "account"
         const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
         const val PROMO_CODE_RETURN_DESCRIPTION = "account_activity.promo_code_return_description"

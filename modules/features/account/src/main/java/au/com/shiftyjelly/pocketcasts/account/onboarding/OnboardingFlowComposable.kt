@@ -46,7 +46,7 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
                     onNotNowClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED)
+                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, AnalyticsProp.source)
                         completeOnboarding()
                     },
                     onSignUpFreeClicked = {
@@ -61,7 +61,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.continueWithGoogle)
                         navController.navigate(OnboardingNavRoute.logInGoogle)
                     },
-                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN) }
+                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN, AnalyticsProp.source) }
                 )
             }
 
@@ -107,7 +107,14 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.forgotPassword) {
-                OnboardingForgotPassword(onBackPressed = { navController.popBackStack() })
+                OnboardingForgotPasswordPage(
+                    onShown = { analyticsTracker.track(AnalyticsEvent.FORGOT_PASSWORD_SHOWN) },
+                    onBackPressed = {
+                        analyticsTracker.track(AnalyticsEvent.FORGOT_PASSWORD_DISMISSED)
+                        navController.popBackStack()
+                    },
+                    onCompleted = completeOnboarding,
+                )
             }
 
             composable(OnboardingNavRoute.recommendations) {
@@ -120,10 +127,11 @@ fun OnboardingFlowComposable(
 private object AnalyticsProp {
     object ButtonTapped {
         private const val button = "button"
-        val signIn = mapOf(button to "sign_in")
-        val createAccount = mapOf(button to "create_account")
-        val continueWithGoogle = mapOf(button to "continue_with_google")
+        val signIn = source + mapOf(button to "sign_in")
+        val createAccount = source + mapOf(button to "create_account")
+        val continueWithGoogle = source + mapOf(button to "continue_with_google")
     }
+    val source = mapOf("source" to "onboarding")
 }
 
 private object OnboardingNavRoute {
