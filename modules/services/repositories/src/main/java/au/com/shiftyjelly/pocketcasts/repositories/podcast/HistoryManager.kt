@@ -5,14 +5,14 @@ import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import io.reactivex.Maybe
+import java.util.Date
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.Date
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class HistoryManager @Inject constructor(
     private val podcastManager: PodcastManager,
@@ -57,7 +57,7 @@ class HistoryManager @Inject constructor(
                     podcastManager.findOrDownloadPodcastRx(podcastUuid)
                         .toMaybe()
                         .doOnError { exception -> Timber.e(exception, "Failed to download missing podcast $podcastUuid") }
-                        .onErrorComplete()
+                        .onErrorResumeNext(Maybe.empty())
                         .awaitSingleOrNull()
 
                     val skeleton = Episode(
