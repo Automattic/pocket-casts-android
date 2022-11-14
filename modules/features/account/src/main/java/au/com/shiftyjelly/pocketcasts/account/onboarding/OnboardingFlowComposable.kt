@@ -134,7 +134,7 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.plusFeatures) {
-                OnboardingPlusFeatures(
+                OnboardingPlusFeaturesPage(
                     onShown = {
                         // TODO analytics
                     },
