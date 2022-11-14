@@ -465,7 +465,8 @@ private fun StoriesScreenPreview(
                     ListenedNumbers(
                         numberOfEpisodes = 1,
                         numberOfPodcasts = 1
-                    )
+                    ),
+                    topPodcasts = emptyList()
                 ),
                 segmentsData = State.Loaded.SegmentsData(
                     xStartOffsets = listOf(0.0f, 0.28f),
