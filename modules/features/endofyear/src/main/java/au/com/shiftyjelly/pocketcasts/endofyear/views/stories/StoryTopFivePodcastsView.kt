@@ -108,9 +108,10 @@ fun PodcastItem(
             .fillMaxWidth()
             .padding(horizontal = 40.dp)
     ) {
-        TextH20(
+        TextH30(
             text = "${position + 1}.",
             color = tintColor,
+            fontWeight = FontWeight.Normal,
             modifier = modifier.padding(end = 14.dp)
         )
         Row(
