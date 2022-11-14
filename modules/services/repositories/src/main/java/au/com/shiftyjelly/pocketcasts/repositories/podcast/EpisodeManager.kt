@@ -143,6 +143,6 @@ interface EpisodeManager {
     fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers>
     fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): Flow<LongestEpisode?>
     fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int>
-    fun findEpisodeInteractedBefore(fromEpochMs: Long): Flow<Episode?>
-    fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Flow<Int>
+    suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): Episode?
+    suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
 }
