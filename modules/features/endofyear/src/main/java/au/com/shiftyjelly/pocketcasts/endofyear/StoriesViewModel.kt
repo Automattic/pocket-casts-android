@@ -192,7 +192,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     companion object {
-        private const val STORY_GAP_LENGTH_MS = 100L
+        private const val STORY_GAP_LENGTH_MS = 500L
         private const val PROGRESS_START_VALUE = 0f
         private const val PROGRESS_END_VALUE = 1f
         private const val PROGRESS_UPDATE_INTERVAL_MS = 10L

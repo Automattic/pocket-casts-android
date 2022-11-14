@@ -30,7 +30,9 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlowComposable
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -191,6 +193,11 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
 
+        // TODO check settings to determine if onboarding has already been completed
+        if (BuildConfig.ONBOARDING_ENABLED && !settings.isLoggedIn()) {
+            openOnboardingFlow()
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
@@ -283,17 +290,25 @@ class MainActivity :
 
         updateSystemColors()
 
-        binding.onboardingFrame.setContent {
-            if (BuildConfig.ONBOARDING_ENABLED) {
-                var show by rememberSaveable { mutableStateOf(true) }
-                if (show) {
-                    OnboardingFlowComposable(
-                        activeTheme = theme.activeTheme,
-                        completeOnboarding = { show = false },
-                    )
+        if (BuildConfig.END_OF_YEAR_ENABLED) {
+            setupEndOfYearLaunchBottomSheet()
+        }
+    }
+
+    private fun openOnboardingFlow() {
+        registerForActivityResult(OnboardingActivityContract()) { result ->
+            when (result) {
+                OnboardingFinish.CompletedOnboarding -> {
+                    // TODO persist that onboarding has been completed
+                }
+                OnboardingFinish.AbortedOnboarding -> {
+                    finish()
+                }
+                null -> {
+                    Timber.e("Unexpected null result from onboarding activity")
                 }
             }
-        }
+        }.launch(Intent(this, OnboardingActivity::class.java))
     }
 
     override fun onStart() {
