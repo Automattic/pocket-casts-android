@@ -86,6 +86,7 @@ interface Settings {
         const val PREFERENCE_ALLOW_OTHER_APPS_ACCESS = "allowOtherAppsAccess"
         const val PREFERENCE_HIDE_SYNC_SETUP_MENU = "hideSyncSetupMenu"
         const val PREFERENCE_KEEP_SCREEN_AWAKE = "keepScreenAwake4"
+        const val PREFERENCE_OPEN_PLAYER_AUTOMATICALLY = "openPlayerAutomatically"
         const val PREFERENCE_SHOW_NOTE_IMAGES_ON = "showNotesImagesOn"
         const val PREFERENCE_SELECTED_FILTER = "selectedFilter"
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
@@ -289,6 +290,7 @@ interface Settings {
     val defaultShowArchivedFlow: StateFlow<Boolean>
     val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
     val keepScreenAwakeFlow: StateFlow<Boolean>
+    val openPlayerAutomaticallyFlow: StateFlow<Boolean>
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
 
     fun getVersion(): String
@@ -400,6 +402,9 @@ interface Settings {
 
     fun keepScreenAwake(): Boolean
     fun setKeepScreenAwake(newValue: Boolean)
+
+    fun openPlayerAutomatically(): Boolean
+    fun setOpenPlayerAutomatically(newValue: Boolean)
 
     fun isPodcastAutoDownloadUnmeteredOnly(): Boolean
     fun isPodcastAutoDownloadPowerOnly(): Boolean

@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -105,9 +104,10 @@ fun PodcastItem(
             .fillMaxWidth()
             .padding(horizontal = 40.dp)
     ) {
-        TextH20(
+        TextH30(
             text = "${position + 1}.",
             color = tintColor,
+            fontWeight = FontWeight.Normal,
             modifier = modifier.padding(end = 14.dp)
         )
         Row(
@@ -124,10 +124,11 @@ fun PodcastItem(
                 modifier = modifier
                     .padding(start = 14.dp)
             ) {
-                TextH20(
+                TextH30(
                     text = podcast.title,
                     color = tintColor,
                     maxLines = 2,
+                    fontWeight = FontWeight.Bold,
                     modifier = modifier
                         .padding(bottom = 3.dp)
                 )

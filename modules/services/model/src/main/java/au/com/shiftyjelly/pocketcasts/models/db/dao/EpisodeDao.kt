@@ -363,11 +363,11 @@ abstract class EpisodeDao {
         """
         SELECT * 
         FROM episodes
-        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date < :fromEpochMs
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date < :fromEpochMs AND episodes.last_playback_interaction_date != 0
         LIMIT 1
         """
     )
-    abstract fun findEpisodeInteractedBefore(fromEpochMs: Long): Flow<Episode?>
+    abstract suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): Episode?
 
     @Query(
         """
@@ -376,5 +376,5 @@ abstract class EpisodeDao {
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
         """
     )
-    abstract fun findEpisodesCountInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Flow<Int>
+    abstract suspend fun findEpisodesCountInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
 }

@@ -83,7 +83,7 @@ fun EmailAndPasswordFields(
             onUpdateEmail = onUpdateEmail,
             imeAction = ImeAction.Next,
             onImeAction = { passwordFocusRequester.requestFocus() },
-            isNewEmail = isCreatingAccount,
+            isCreatingAccount = isCreatingAccount,
             focusRequester = emailFocusRequester,
         )
 
@@ -100,7 +100,7 @@ fun EmailAndPasswordFields(
             imeAction = ImeAction.Done,
             onImeAction = onDone,
             focusRequester = passwordFocusRequester,
-            isNewPassword = isCreatingAccount,
+            isCreatingAccount = isCreatingAccount,
             onUpdatePassword = onUpdatePassword,
         )
 
@@ -130,14 +130,14 @@ fun EmailField(
     imeAction: ImeAction = ImeAction.Next,
     onImeAction: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() },
-    isNewEmail: Boolean,
+    isCreatingAccount: Boolean,
     modifier: Modifier = Modifier
 ) {
 
     @Suppress("NAME_SHADOWING")
     @OptIn(ExperimentalComposeUiApi::class)
     val modifier = modifier.focusRequester(focusRequester)
-        .autofill(emailAutofill(isNewEmail), onUpdateEmail)
+        .autofill(emailAutofill(isCreatingAccount), onUpdateEmail)
 
     FormField(
         value = email,
@@ -169,7 +169,7 @@ fun PasswordField(
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() },
-    isNewPassword: Boolean,
+    isCreatingAccount: Boolean,
     onUpdatePassword: (String) -> Unit,
     modifier: Modifier = Modifier
 
@@ -179,7 +179,7 @@ fun PasswordField(
     @OptIn(ExperimentalComposeUiApi::class)
     @Suppress("NAME_SHADOWING")
     val modifier = modifier.focusRequester(focusRequester)
-        .autofill(passwordAutofill(isNewPassword), onUpdatePassword)
+        .autofill(passwordAutofill(isCreatingAccount), onUpdatePassword)
 
     FormField(
         value = password,

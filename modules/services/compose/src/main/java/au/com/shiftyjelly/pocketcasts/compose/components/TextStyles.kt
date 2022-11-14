@@ -68,6 +68,7 @@ fun TextH30(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    fontWeight: FontWeight? = null,
     maxLines: Int = Int.MAX_VALUE
 ) {
     Text(
@@ -76,7 +77,7 @@ fun TextH30(
         fontSize = 18.sp,
         lineHeight = 21.sp,
         textAlign = textAlign,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = fontWeight ?: FontWeight.SemiBold,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
@@ -215,14 +216,14 @@ fun TextH70(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
-    fontWeight: FontWeight? = null,
+    fontWeight: FontWeight = FontWeight(500),
     maxLines: Int = Int.MAX_VALUE
 ) {
     Text(
         text = text,
         color = color,
         fontSize = 12.sp,
-        fontWeight = fontWeight ?: FontWeight(500),
+        fontWeight = fontWeight,
         lineHeight = 14.sp,
         letterSpacing = 0.25.sp,
         maxLines = maxLines,
