@@ -317,7 +317,7 @@ abstract class EpisodeDao {
 
     @Query(
         """
-        SELECT COUNT(DISTINCT podcast_id) as numberOfPodcasts, SUM(played_up_to) as totalPlayedTime, REPLACE(IFNULL(NULLIF(SUBSTR(podcasts.podcast_category, 0, INSTR(podcasts.podcast_category, char(10))), ''), podcasts.podcast_category), char(10), '') as category
+        SELECT COUNT(DISTINCT podcast_id) as numberOfPodcasts, SUM(played_up_to) as totalPlayedTime, REPLACE(IFNULL(NULLIF(SUBSTR(podcasts.podcast_category, 0, INSTR(podcasts.podcast_category, char(10))), ''), podcasts.podcast_category), char(10), '') as category, podcasts.uuid as mostListenedPodcastId, podcasts.primary_color as mostListenedPodcastTintColor
         FROM episodes
         JOIN podcasts ON episodes.podcast_id = podcasts.uuid
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
@@ -339,7 +339,7 @@ abstract class EpisodeDao {
 
     @Query(
         """
-        SELECT episodes.title, episodes.duration, podcasts.uuid as podcastUuid, podcasts.title as podcastTitle
+        SELECT episodes.title, episodes.duration, podcasts.uuid as podcastUuid, podcasts.title as podcastTitle, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg
         FROM episodes
         JOIN podcasts ON episodes.podcast_id = podcasts.uuid
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs

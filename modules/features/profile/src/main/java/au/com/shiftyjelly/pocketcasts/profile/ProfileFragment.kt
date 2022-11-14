@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -75,7 +74,6 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileViewModel by viewModels()
-    private val storiesViewModel: StoriesViewModel by viewModels()
 
     private var binding: FragmentProfileBinding? = null
     private val sections = listOf(
@@ -243,8 +241,6 @@ class ProfileFragment : BaseFragment() {
                 var showDialog by rememberSaveable { mutableStateOf(false) }
                 if (showDialog) {
                     StoriesPage(
-                        viewModel = storiesViewModel,
-                        showDialog = showDialog,
                         theme = theme,
                         onCloseClicked = { showDialog = false },
                     )

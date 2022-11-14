@@ -155,9 +155,16 @@ class StoriesViewModel @Inject constructor(
         currentIndex = 0
     }
 
+    fun clear() {
+        if (mutableState.value is State.Loaded) {
+            skipToStoryAtIndex(0)
+        }
+        cancelTimer()
+    }
+
     override fun onCleared() {
         super.onCleared()
-        cancelTimer()
+        clear()
     }
 
     private fun Float.roundOff() = (this * 100.0).roundToInt()
@@ -189,7 +196,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     companion object {
-        private const val STORY_GAP_LENGTH_MS = 100L
+        private const val STORY_GAP_LENGTH_MS = 500L
         private const val PROGRESS_START_VALUE = 0f
         private const val PROGRESS_END_VALUE = 1f
         private const val PROGRESS_UPDATE_INTERVAL_MS = 10L
