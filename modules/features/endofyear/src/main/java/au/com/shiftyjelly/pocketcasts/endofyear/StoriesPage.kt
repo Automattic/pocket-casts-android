@@ -126,21 +126,29 @@ fun StoriesPage(
     ) {
         Box(modifier = modifier.size(dialogSize)) {
             when (state) {
-                is State.Loaded -> StoriesView(
-                    state = state as State.Loaded,
-                    progress = viewModel.progress,
-                    onSkipPrevious = { viewModel.skipPrevious() },
-                    onSkipNext = { viewModel.skipNext() },
-                    onPause = { viewModel.pause() },
-                    onStart = { viewModel.start() },
-                    onCloseClicked = onCloseClicked,
-                    onReplayClicked = { viewModel.replay() },
-                    onShareClicked = {
-                        viewModel.onShareClicked(it, context) { file ->
-                            showShareForFile(context, file, shareLauncher)
-                        }
-                    },
-                )
+                is State.Loaded -> {
+                    StoriesView(
+                        state = state as State.Loaded,
+                        progress = viewModel.progress,
+                        onSkipPrevious = { viewModel.skipPrevious() },
+                        onSkipNext = { viewModel.skipNext() },
+                        onPause = { viewModel.pause() },
+                        onStart = { viewModel.start() },
+                        onCloseClicked = onCloseClicked,
+                        onReplayClicked = { viewModel.replay() },
+                        onShareClicked = {
+                            val currentStory = requireNotNull((state as State.Loaded).currentStory)
+                            viewModel.onShareClicked(it, currentStory, context) { file, shareTextData ->
+                                showShareForFile(
+                                    context,
+                                    file,
+                                    shareLauncher,
+                                    shareTextData
+                                )
+                            }
+                        },
+                    )
+                }
                 State.Loading -> StoriesLoadingView(onCloseClicked)
                 State.Error -> StoriesErrorView(onCloseClicked)
             }
@@ -193,6 +201,9 @@ private fun StoriesView(
                         .padding(8.dp)
                         .fillMaxWidth(),
                 )
+                if (state.preparingShareText) {
+                    LoadingOverContentView()
+                }
                 CloseButtonView(onCloseClicked)
             }
         }
@@ -201,6 +212,13 @@ private fun StoriesView(
                 onClick = { onShareClicked.invoke(it) }
             )
         }
+    }
+}
+
+@Composable
+private fun LoadingOverContentView() {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(color = Color.White)
     }
 }
 
@@ -383,13 +401,16 @@ private fun showShareForFile(
     context: Context,
     file: File,
     shareLauncher: ActivityResultLauncher<Intent>,
+    shareTextData: ShareableAssetProvider.ShareTextData,
 ) {
     try {
         val uri = FileUtil.getUriForFile(context, file)
+        val shareText = "${shareTextData.text} ${shareTextData.hashTags} ${shareTextData.link}"
 
         val chooserIntent = ShareCompat.IntentBuilder(context)
             .setType("image/png")
             .addStream(uri)
+            .setText(shareText)
             .setChooserTitle(LR.string.end_of_year_share_via)
             .createChooserIntent()
 

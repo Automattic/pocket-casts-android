@@ -112,7 +112,8 @@ class StoriesViewModelTest {
         whenever(endOfYearManager.loadStories()).thenReturn(flowOf(mockStories))
         return StoriesViewModel(
             endOfYearManager = endOfYearManager,
-            fileUtilWrapper = fileUtilWrapper
+            fileUtilWrapper = fileUtilWrapper,
+            shareableAssetProvider = mock()
         )
     }
 }

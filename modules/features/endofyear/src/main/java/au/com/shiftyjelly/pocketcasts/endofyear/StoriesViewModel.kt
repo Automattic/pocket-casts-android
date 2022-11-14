@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.endofyear.ShareableAssetProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
@@ -25,6 +26,7 @@ import kotlin.math.roundToInt
 class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
+    private val shareableAssetProvider: ShareableAssetProvider,
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Loading)
@@ -128,8 +130,9 @@ class StoriesViewModel @Inject constructor(
 
     fun onShareClicked(
         onCaptureBitmap: () -> Bitmap,
+        story: Story,
         context: Context,
-        showShareForFile: (File) -> Unit,
+        showShareForFile: (File, ShareTextData) -> Unit,
     ) {
         pause()
         viewModelScope.launch {
@@ -139,7 +142,14 @@ class StoriesViewModel @Inject constructor(
                 EOY_STORY_SAVE_FOLDER_NAME,
                 EOY_STORY_SAVE_FILE_NAME
             )
-            savedFile?.let { showShareForFile.invoke(it) }
+
+            val currentState = (state.value as State.Loaded)
+            mutableState.value = currentState.copy(preparingShareText = true)
+
+            val shareTextData = shareableAssetProvider.getShareableDataForStory(story)
+            mutableState.value = currentState.copy(preparingShareText = false)
+
+            savedFile?.let { showShareForFile.invoke(it, shareTextData) }
         }
     }
 
@@ -183,6 +193,7 @@ class StoriesViewModel @Inject constructor(
         data class Loaded(
             val currentStory: Story?,
             val segmentsData: SegmentsData,
+            val preparingShareText: Boolean = false,
         ) : State() {
             data class SegmentsData(
                 val widths: List<Float> = emptyList(),
