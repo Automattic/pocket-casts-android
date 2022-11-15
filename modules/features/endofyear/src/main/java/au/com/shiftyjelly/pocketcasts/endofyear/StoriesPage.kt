@@ -94,6 +94,7 @@ private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
 private val StoriesViewMaxSize = 700.dp
 private const val MaxHeightPercentFactor = 0.9f
+private const val LongPressThresholdTimeInMs = 150
 const val StoriesViewAspectRatioForTablet = 2f
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -303,7 +304,7 @@ private fun StoriesErrorView(
     StoriesEmptyView(
         content = {
             TextP50(
-                text = "Failed to load stories.", // TODO: replace hardcoded text
+                text = stringResource(id = LR.string.end_of_year_stories_failed),
                 color = Color.White,
             )
         },
@@ -343,7 +344,6 @@ private fun StorySwitcher(
     content: (@Composable () -> Unit)?,
 ) {
     var screenWidth by remember { mutableStateOf(1) }
-    var isPaused by remember { mutableStateOf(false) }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -352,24 +352,24 @@ private fun StorySwitcher(
             }
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onTap = {
-                        if (!isPaused) {
-                            if (it.x > screenWidth / 2) {
-                                onSkipNext()
-                            } else {
-                                onSkipPrevious()
-                            }
-                        }
-                    },
-                    onLongPress = {
-                        isPaused = true
-                        onPause()
-                    },
                     onPress = {
-                        awaitRelease()
-                        if (isPaused) {
+                        val pressStartTime = System.currentTimeMillis()
+                        onPause()
+                        val isReleased = tryAwaitRelease()
+                        if (isReleased) {
+                            val pressEndTime = System.currentTimeMillis()
+                            val diffPressTime = pressEndTime - pressStartTime
+                            if (diffPressTime < LongPressThresholdTimeInMs) {
+                                if (it.x > screenWidth / 2) {
+                                    onSkipNext()
+                                } else {
+                                    onSkipPrevious()
+                                }
+                            } else {
+                                onStart()
+                            }
+                        } else {
                             onStart()
-                            isPaused = false
                         }
                     }
                 )

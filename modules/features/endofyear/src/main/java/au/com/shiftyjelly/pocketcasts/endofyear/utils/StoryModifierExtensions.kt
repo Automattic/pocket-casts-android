@@ -9,6 +9,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 
 fun Modifier.podcastDynamicBackground(podcast: Podcast) =
+    dynamicBackground(Color(podcast.getTintColor(false)))
+
+fun Modifier.dynamicBackground(color: Color) =
     graphicsLayer {
         /*
         https://rb.gy/iju6fn
@@ -20,7 +23,7 @@ fun Modifier.podcastDynamicBackground(podcast: Podcast) =
             Color.Black,
             Color(0x80000000), // 50% Black
         )
-        drawRect(color = Color(podcast.getTintColor(false)))
+        drawRect(color = color)
         drawRect(
             brush = Brush.verticalGradient(
                 colors,

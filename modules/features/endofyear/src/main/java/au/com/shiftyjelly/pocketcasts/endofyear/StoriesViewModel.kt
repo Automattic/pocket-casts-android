@@ -79,6 +79,8 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun start() {
+        if (timer != null) clear()
+
         val currentState = state.value as State.Loaded
         val progressFraction =
             (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat())
