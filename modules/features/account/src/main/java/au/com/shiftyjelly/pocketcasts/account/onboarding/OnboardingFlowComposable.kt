@@ -135,12 +135,13 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.plusFeatures) {
                 OnboardingPlusFeaturesPage(
-                    onShown = {
-                        // TODO analytics
-                    },
+                    onShown = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_SHOWN) },
                     onBackPressed = {
+                        analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_DISMISSED)
                         navController.popBackStack()
-                    }
+                    },
+                    onUpgradePressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED) },
+                    onNotNowPressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_NOT_NOW_TAPPED) }
                 )
             }
         }

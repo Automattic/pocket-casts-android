@@ -76,6 +76,8 @@ private val background = Color(0xFF121212)
 @Composable
 fun OnboardingPlusFeaturesPage(
     onShown: () -> Unit,
+    onUpgradePressed: () -> Unit,
+    onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
 
@@ -126,7 +128,7 @@ fun OnboardingPlusFeaturesPage(
 
             PlusRowButton(
                 text = stringResource(LR.string.onboarding_upgrade_unlock_all_features),
-                onClick = { /* TODO */ },
+                onClick = onUpgradePressed,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
 
@@ -134,7 +136,7 @@ fun OnboardingPlusFeaturesPage(
 
             PlusOutlinedRowButton(
                 text = stringResource(LR.string.not_now),
-                onClick = { /* TODO */ },
+                onClick = onNotNowPressed,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
 
@@ -427,5 +429,7 @@ private fun OnboardingPlusFeaturesPreview() {
     OnboardingPlusFeaturesPage(
         onShown = {},
         onBackPressed = {},
+        onUpgradePressed = {},
+        onNotNowPressed = {},
     )
 }
