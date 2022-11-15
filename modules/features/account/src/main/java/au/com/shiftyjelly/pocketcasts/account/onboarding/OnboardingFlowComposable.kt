@@ -17,8 +17,7 @@ fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
     abortOnboarding: () -> Unit,
-    analyticsTracker: AnalyticsTrackerWrapper,
-    showContinueWithGoogleButton: Boolean
+    analyticsTracker: AnalyticsTrackerWrapper
 ) {
     AppThemeWithBackground(activeTheme) {
         val navController = rememberNavController()
@@ -62,8 +61,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.continueWithGoogle)
                         navController.navigate(OnboardingNavRoute.logInGoogle)
                     },
-                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN, AnalyticsProp.source) },
-                    showContinueWithGoogleButton = showContinueWithGoogleButton
+                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN, AnalyticsProp.source) }
                 )
             }
 
