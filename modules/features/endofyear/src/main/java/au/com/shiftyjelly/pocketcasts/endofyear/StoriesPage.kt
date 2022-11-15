@@ -39,6 +39,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -253,7 +254,7 @@ private fun ShareButton(
                 backgroundColor = Color.Transparent,
                 contentColor = Color.White,
             ),
-        iconImage = Icons.Default.Share,
+        textIcon = rememberVectorPainter(Icons.Default.Share),
         onClick = {
             onClick.invoke()
         }
