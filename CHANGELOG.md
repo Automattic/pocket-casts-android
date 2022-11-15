@@ -1,6 +1,6 @@
 7.28
     *   Added new Tasker "Query Podcasts", "Query Podcast Episodes", "Query Filter", "Query Filter Episodes" and "Add To Up Next" actions.
-        ([#509](https://github.com/Automattic/pocket-casts-android/pull/509)).
+        ([#509](https://github.com/Automattic/pocket-casts-android/pull/583)).
 
 7.27
 -----
