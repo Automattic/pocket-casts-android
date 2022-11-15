@@ -34,6 +34,7 @@ class AccountFragment : BaseFragment() {
         private const val BUTTON = "button"
         private const val SIGN_IN = "sign_in"
         private const val CREATE_ACCOUNT = "create_account"
+        private val ACCOUNT_SOURCE = mapOf("source" to "account")
         fun newInstance() = AccountFragment()
     }
 
@@ -81,13 +82,16 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnClose?.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED)
+            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, ACCOUNT_SOURCE)
             FirebaseAnalyticsTracker.closeAccountMissingClicked()
             activity?.finish()
         }
 
         binding.btnCreate.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(BUTTON to CREATE_ACCOUNT))
+            analyticsTracker.track(
+                AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+                ACCOUNT_SOURCE + mapOf(BUTTON to CREATE_ACCOUNT)
+            )
             FirebaseAnalyticsTracker.createAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 if (Util.isCarUiMode(view.context) || accountViewModel.supporterInstance) { // We can't sign up to plus on cars so skip that step
@@ -99,7 +103,10 @@ class AccountFragment : BaseFragment() {
         }
 
         binding.btnSignIn.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, mapOf(BUTTON to SIGN_IN))
+            analyticsTracker.track(
+                AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+                ACCOUNT_SOURCE + mapOf(BUTTON to SIGN_IN)
+            )
             FirebaseAnalyticsTracker.signInAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
                 view.findNavController().navigate(R.id.action_accountFragment_to_signInFragment)

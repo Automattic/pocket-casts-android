@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import androidx.lifecycle.LiveData
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -135,6 +138,11 @@ interface EpisodeManager {
     suspend fun updatePlaybackInteractionDate(episode: Playable?)
     suspend fun deleteEpisodeFiles(episodes: List<Episode>, playbackManager: PlaybackManager)
     suspend fun findStaleDownloads(): List<Episode>
-
-    fun findRandomEpisode(): Flow<Episode?>
+    fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?>
+    fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>>
+    fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers>
+    fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): Flow<LongestEpisode?>
+    fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int>
+    suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): Episode?
+    suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
 }
