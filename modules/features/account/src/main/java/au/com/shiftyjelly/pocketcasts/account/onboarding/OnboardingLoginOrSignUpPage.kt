@@ -47,7 +47,8 @@ internal fun OnboardingLoginOrSignUpPage(
     onSignUpFreeClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     onContinueWithGoogleClicked: () -> Unit,
-    onShown: () -> Unit
+    onShown: () -> Unit,
+    showContinueWithGoogleButton: Boolean
 ) {
 
     LaunchedEffect(Unit) {
@@ -106,9 +107,12 @@ internal fun OnboardingLoginOrSignUpPage(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(Modifier.height(8.dp))
-
-            ContinueWithGoogleButton(onClick = onContinueWithGoogleClicked)
+            if (showContinueWithGoogleButton) {
+                Spacer(Modifier.height(8.dp))
+                ContinueWithGoogleButton(onClick = onContinueWithGoogleClicked)
+            } else {
+                Spacer(Modifier.height(32.dp))
+            }
             SignUpButton(onClick = onSignUpFreeClicked)
             LogInButton(onClick = onLoginClicked)
         }
@@ -174,7 +178,8 @@ private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProv
             onSignUpFreeClicked = {},
             onLoginClicked = {},
             onContinueWithGoogleClicked = {},
-            onShown = {}
+            onShown = {},
+            showContinueWithGoogleButton = true
         )
     }
 }

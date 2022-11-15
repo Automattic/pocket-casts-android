@@ -5,9 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import au.com.shiftyjelly.pocketcasts.account.BuildConfig
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
+import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -19,6 +22,9 @@ class OnboardingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val showContinueWithGoogleButton = BuildConfig.SINGLE_SIGN_ON_ENABLED && GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(this)
+
         setContent {
             OnboardingFlowComposable(
                 activeTheme = theme.activeTheme,
@@ -28,7 +34,8 @@ class OnboardingActivity : AppCompatActivity() {
                 abortOnboarding = {
                     finishWithResult(OnboardingFinish.AbortedOnboarding)
                 },
-                analyticsTracker = analyticsTracker
+                analyticsTracker = analyticsTracker,
+                showContinueWithGoogleButton = showContinueWithGoogleButton
             )
         }
     }
