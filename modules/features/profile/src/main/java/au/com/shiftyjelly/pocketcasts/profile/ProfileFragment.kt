@@ -11,8 +11,6 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -31,7 +29,7 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -238,17 +236,11 @@ class ProfileFragment : BaseFragment() {
     private fun FragmentProfileBinding.setupEndOfYearPromptCard(isEligible: Boolean) {
         endOfYearPromptCard.setContent {
             if (isEligible) {
-                var showDialog by rememberSaveable { mutableStateOf(false) }
-                if (showDialog) {
-                    StoriesPage(
-                        theme = theme,
-                        onCloseClicked = { showDialog = false },
-                    )
-                }
                 AppTheme(theme.activeTheme) {
                     EndOfYearPromptCard(
                         onClick = {
-                            showDialog = true
+                            StoriesFragment.newInstance()
+                                .show(childFragmentManager, "stories_dialog")
                         }
                     )
                 }

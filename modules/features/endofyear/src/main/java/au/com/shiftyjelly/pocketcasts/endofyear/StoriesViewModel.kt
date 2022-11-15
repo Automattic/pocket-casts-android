@@ -81,8 +81,6 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun start() {
-        if (timer != null) clear()
-
         val currentState = state.value as State.Loaded
         val progressFraction =
             (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat())
@@ -130,11 +128,12 @@ class StoriesViewModel @Inject constructor(
 
     fun onShareClicked(
         onCaptureBitmap: () -> Bitmap,
-        story: Story,
         context: Context,
         showShareForFile: (File, ShareTextData) -> Unit,
     ) {
         pause()
+        val currentState = (state.value as State.Loaded)
+        val story = requireNotNull(currentState.currentStory)
         viewModelScope.launch {
             val savedFile = fileUtilWrapper.saveBitmapToFile(
                 onCaptureBitmap.invoke(),
@@ -143,7 +142,6 @@ class StoriesViewModel @Inject constructor(
                 EOY_STORY_SAVE_FILE_NAME
             )
 
-            val currentState = (state.value as State.Loaded)
             mutableState.value = currentState.copy(preparingShareText = true)
 
             val shareTextData = shareableTextProvider.getShareableDataForStory(story)
@@ -163,7 +161,7 @@ class StoriesViewModel @Inject constructor(
         currentIndex = 0
     }
 
-    fun clear() {
+    private fun clear() {
         if (mutableState.value is State.Loaded) {
             skipToStoryAtIndex(0)
         }

@@ -1,10 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -28,14 +25,12 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -47,8 +42,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.ShareCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -81,8 +74,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLonges
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopFivePodcasts
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPodcast
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -99,13 +90,11 @@ private const val MaxHeightPercentFactor = 0.9f
 private const val LongPressThresholdTimeInMs = 150
 const val StoriesViewAspectRatioForTablet = 2f
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun StoriesPage(
     modifier: Modifier = Modifier,
-    viewModel: StoriesViewModel = viewModel(),
+    viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
-    theme: Theme,
 ) {
     val shareLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -116,53 +105,34 @@ fun StoriesPage(
 
     val context = LocalContext.current
 
-    val isTablet = Util.isTablet(context)
-    if (!isTablet) LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-    UpdateSystemBarColors(theme)
-
     val state: State by viewModel.state.collectAsState()
     val dialogSize = remember { getDialogSize(context) }
-    Dialog(
-        onDismissRequest = { onCloseClicked.invoke() },
-        properties = DialogProperties(usePlatformDefaultWidth = isTablet),
-    ) {
-        Box(modifier = modifier.size(dialogSize)) {
-            when (state) {
-                is State.Loaded -> {
-                    StoriesView(
-                        state = state as State.Loaded,
-                        progress = viewModel.progress,
-                        onSkipPrevious = { viewModel.skipPrevious() },
-                        onSkipNext = { viewModel.skipNext() },
-                        onPause = { viewModel.pause() },
-                        onStart = { viewModel.start() },
-                        onCloseClicked = onCloseClicked,
-                        onReplayClicked = { viewModel.replay() },
-                        onShareClicked = {
-                            val currentStory = requireNotNull((state as State.Loaded).currentStory)
-                            viewModel.onShareClicked(it, currentStory, context) { file, shareTextData ->
-                                showShareForFile(
-                                    context,
-                                    file,
-                                    shareLauncher,
-                                    shareTextData
-                                )
-                            }
-                        },
-                    )
-                }
-                State.Loading -> StoriesLoadingView(onCloseClicked)
-                State.Error -> StoriesErrorView(onCloseClicked)
+    Box(modifier = modifier.size(dialogSize)) {
+        when (state) {
+            is State.Loaded -> {
+                StoriesView(
+                    state = state as State.Loaded,
+                    progress = viewModel.progress,
+                    onSkipPrevious = { viewModel.skipPrevious() },
+                    onSkipNext = { viewModel.skipNext() },
+                    onPause = { viewModel.pause() },
+                    onStart = { viewModel.start() },
+                    onCloseClicked = onCloseClicked,
+                    onReplayClicked = { viewModel.replay() },
+                    onShareClicked = {
+                        viewModel.onShareClicked(it, context) { file, shareTextData ->
+                            showShareForFile(
+                                context,
+                                file,
+                                shareLauncher,
+                                shareTextData
+                            )
+                        }
+                    },
+                )
             }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        if (state is State.Loaded) {
-            viewModel.start()
-        }
-        onDispose {
-            viewModel.clear()
+            State.Loading -> StoriesLoadingView(onCloseClicked)
+            State.Error -> StoriesErrorView(onCloseClicked)
         }
     }
 }
@@ -439,44 +409,6 @@ private fun getDialogSize(context: Context): DpSize {
     }
 
     return DpSize(dialogWidth.dp, dialogHeight.dp)
-}
-
-@Composable
-fun LockScreenOrientation(orientation: Int) {
-    val context = LocalContext.current
-    DisposableEffect(Unit) {
-        val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
-        val originalOrientation = activity.requestedOrientation
-        activity.requestedOrientation = orientation
-        onDispose {
-            // restore original orientation when view disappears
-            activity.requestedOrientation = originalOrientation
-        }
-    }
-}
-
-@Composable
-fun UpdateSystemBarColors(theme: Theme) {
-    val context = LocalContext.current
-    DisposableEffect(Unit) {
-        val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
-        theme.updateWindowStatusBar(
-            activity.window,
-            StatusBarColor.Custom(android.graphics.Color.BLACK, true),
-            activity
-        )
-        theme.setNavigationBarColor(activity.window, true, android.graphics.Color.BLACK)
-        onDispose {
-            // restore original system colors
-            (activity as FragmentHostListener).updateSystemColors()
-        }
-    }
-}
-
-fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
 }
 
 @Preview(showBackground = true)
