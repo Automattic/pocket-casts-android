@@ -91,63 +91,69 @@ fun OnboardingPlusFeaturesPage(
     LaunchedEffect(Unit) { onShown() }
     BackHandler { onBackPressed() }
 
-    Background()
-
-    Column(Modifier.verticalScroll(rememberScrollState())) {
-
-        Spacer(Modifier.height(8.dp))
-        NavigationIconButton(
-            onNavigationClick = onBackPressed,
-            iconColor = Color.White,
-            modifier = Modifier
-                .height(48.dp)
-                .width(48.dp)
-        )
-
-        Spacer(Modifier.height(12.dp))
+    Box(
+        Modifier
+            .verticalScroll(rememberScrollState())
+            .background(background)
+    ) {
+        Background()
 
         Column {
 
-            IconRow(Modifier.padding(horizontal = 24.dp))
-
-            Spacer(Modifier.height(36.dp))
-
-            TextH10(
-                text = stringResource(LR.string.onboarding_upgrade_everything_you_love_about_pocket_casts_plus),
-                color = Color.White,
-                modifier = Modifier.padding(horizontal = 24.dp),
+            Spacer(Modifier.height(8.dp))
+            NavigationIconButton(
+                onNavigationClick = onBackPressed,
+                iconColor = Color.White,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(48.dp)
             )
 
             Spacer(Modifier.height(12.dp))
 
-            TextP40(
-                text = stringResource(LR.string.onboarding_upgrade_exclusive_features_and_options),
-                color = Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.padding(horizontal = 24.dp),
-            )
+            Column {
 
-            Spacer(Modifier.height(58.dp))
+                IconRow(Modifier.padding(horizontal = 24.dp))
 
-            FeatureRow(scrollAutomatically = state.scrollAutomatically)
+                Spacer(Modifier.height(36.dp))
 
-            Spacer(Modifier.weight(1f))
-            Spacer(Modifier.height(36.dp))
+                TextH10(
+                    text = stringResource(LR.string.onboarding_upgrade_everything_you_love_about_pocket_casts_plus),
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                )
 
-            PlusRowButton(
-                text = stringResource(LR.string.onboarding_upgrade_unlock_all_features),
-                onClick = onUpgradePressed,
-                modifier = Modifier.padding(horizontal = 24.dp),
-            )
+                Spacer(Modifier.height(12.dp))
 
-            Spacer(Modifier.height(16.dp))
+                TextP40(
+                    text = stringResource(LR.string.onboarding_upgrade_exclusive_features_and_options),
+                    color = Color.White.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                )
 
-            PlusOutlinedRowButton(
-                text = stringResource(LR.string.not_now),
-                onClick = onNotNowPressed,
-                modifier = Modifier.padding(horizontal = 24.dp),
-            )
+                Spacer(Modifier.height(58.dp))
 
-            Spacer(Modifier.height(16.dp))
+                FeatureRow(scrollAutomatically = state.scrollAutomatically)
+
+                Spacer(Modifier.weight(1f))
+                Spacer(Modifier.height(36.dp))
+
+                PlusRowButton(
+                    text = stringResource(LR.string.onboarding_upgrade_unlock_all_features),
+                    onClick = onUpgradePressed,
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                PlusOutlinedRowButton(
+                    text = stringResource(LR.string.not_now),
+                    onClick = onNotNowPressed,
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                )
+
+                Spacer(Modifier.height(16.dp))
+            }
         }
     }
 }
@@ -313,9 +319,11 @@ private fun Background() {
     // Blur only works on Android >=12
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
+        val height = LocalConfiguration.current.screenHeightDp
         Canvas(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(height.dp) // not using fillMaxHeight because that caused issues in vertically scrollable views
                 .blur(150.dp)
         ) {
 
