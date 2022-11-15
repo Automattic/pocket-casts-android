@@ -43,7 +43,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
@@ -51,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.waitForUpInitial
 import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryEpilogueView
@@ -343,10 +343,10 @@ private fun StorySwitcher(
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
-                        val pressStartTime = System.currentTimeMillis()
-                        onPause()
-                        val isReleased = tryAwaitRelease()
-                        if (isReleased) {
+                        awaitPointerEventScope {
+                            val pressStartTime = System.currentTimeMillis()
+                            onPause()
+                            waitForUpInitial()
                             val pressEndTime = System.currentTimeMillis()
                             val diffPressTime = pressEndTime - pressStartTime
                             if (diffPressTime < LongPressThresholdTimeInMs) {
@@ -358,8 +358,6 @@ private fun StorySwitcher(
                             } else {
                                 onStart()
                             }
-                        } else {
-                            onStart()
                         }
                     }
                 )
