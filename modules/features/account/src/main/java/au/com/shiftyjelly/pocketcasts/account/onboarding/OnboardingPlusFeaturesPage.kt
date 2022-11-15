@@ -26,8 +26,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +35,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,21 +52,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import kotlinx.coroutines.delay
+import java.lang.Long.max
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -80,6 +84,9 @@ fun OnboardingPlusFeaturesPage(
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
+
+    val viewModel = hiltViewModel<OnboardingPlusFeaturesViewModel>()
+    val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) { onShown() }
     BackHandler { onBackPressed() }
@@ -121,7 +128,7 @@ fun OnboardingPlusFeaturesPage(
 
             Spacer(Modifier.height(58.dp))
 
-            FeatureRow()
+            FeatureRow(scrollAutomatically = state.scrollAutomatically)
 
             Spacer(Modifier.weight(1f))
             Spacer(Modifier.height(36.dp))
@@ -165,17 +172,28 @@ private fun IconRow(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun FeatureRow() {
-    val state = rememberLazyListState()
-    LaunchedEffect(Unit) {
-        autoScroll(state)
+private fun FeatureRow(scrollAutomatically: Boolean) {
+
+    // Not using rememberLazyListState() because we want to reset
+    // the scroll state on orientation changes so that the hardcoded column
+    // is redisplayed, which insures the height is correctly calculated. For that
+    // reason, we want to use remember, not rememberSaveable.
+    val state = remember { LazyListState() }
+
+    val localConfiguration = LocalConfiguration.current
+    LaunchedEffect(scrollAutomatically) {
+        if (scrollAutomatically) {
+            // This seems to get a good scroll speed across multiple devices
+            val scrollDelay = max(1L, (1000L - localConfiguration.densityDpi) / 125)
+            autoScroll(scrollDelay, state)
+        }
     }
     var height by remember { mutableStateOf<Dp?>(null) }
     val density = LocalDensity.current
     LazyRow(
         state = state,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        userScrollEnabled = false,
+        userScrollEnabled = !scrollAutomatically,
         modifier = height?.let { Modifier.height(it) } ?: Modifier
     ) {
 
@@ -198,13 +216,15 @@ private fun FeatureRow() {
             }
         }
 
-        val contentArray = FeatureItemContent.values()
-        items(
-            count = 200, // Big number that users should never get to
-            contentType = { it % contentArray.size },
-        ) { n ->
-            val content = contentArray[n % contentArray.size]
-            FeatureItem(content)
+        if (scrollAutomatically) {
+            val contentArray = FeatureItemContent.values()
+            items(
+                count = 200, // Big number that users should never get to
+                contentType = { it % contentArray.size },
+            ) { n ->
+                val content = contentArray[n % contentArray.size]
+                FeatureItem(content)
+            }
         }
     }
 }
@@ -217,6 +237,7 @@ private fun FeatureItem(
     val shape = RoundedCornerShape(16.dp)
     Column(
         modifier = modifier
+            .semantics(mergeDescendants = true) {}
             .border(
                 width = 1.dp,
                 color = Color(0xFF383839),
@@ -400,7 +421,8 @@ private fun PlusOutlinedRowButton(
 
 // Based on https://stackoverflow.com/a/71344813/1910286
 private tailrec suspend fun autoScroll(
-    lazyListState: LazyListState
+    scrollDelay: Long,
+    lazyListState: LazyListState,
 ) {
     val scrollAmount = lazyListState.scrollBy(1f)
     if (scrollAmount == 0f) {
@@ -409,8 +431,8 @@ private tailrec suspend fun autoScroll(
         // getting to the end of the list, so it should be very rare.
         lazyListState.scrollToItem(0)
     }
-    delay(4)
-    autoScroll(lazyListState)
+    delay(scrollDelay)
+    autoScroll(scrollDelay, lazyListState)
 }
 
 // From https://stackoverflow.com/a/71376469/1910286
