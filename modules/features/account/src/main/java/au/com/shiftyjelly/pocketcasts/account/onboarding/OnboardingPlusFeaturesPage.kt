@@ -7,24 +7,26 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +37,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -46,10 +52,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.R
@@ -159,12 +168,39 @@ private fun FeatureRow() {
     LaunchedEffect(Unit) {
         autoScroll(state)
     }
+    var height by remember { mutableStateOf<Dp?>(null) }
+    val density = LocalDensity.current
     LazyRow(
         state = state,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
+        userScrollEnabled = false,
+        modifier = height?.let { Modifier.height(it) } ?: Modifier
     ) {
+
+        item {
+            // This row is needed to determine the height of the tallest list item,
+            // which is then used to keep the size of the LazyRow constant regardless
+            // of the height of the items it is displaying at a given time. If
+            // IntrinsicSize.Max could work with LazyRows, we wouldn't need to do this.
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .height(IntrinsicSize.Max)
+                    .onSizeChanged {
+                        height = density.run { it.height.toDp() }
+                    }
+            ) {
+                FeatureItemContent.values().forEach {
+                    FeatureItem(it)
+                }
+            }
+        }
+
         val contentArray = FeatureItemContent.values()
-        items(Int.MAX_VALUE) { n ->
+        items(
+            count = 200, // Big number that users should never get to
+            contentType = { it % contentArray.size },
+        ) { n ->
             val content = contentArray[n % contentArray.size]
             FeatureItem(content)
         }
@@ -181,7 +217,7 @@ private fun FeatureItem(
         modifier = modifier
             .border(
                 width = 1.dp,
-                color = Color(0xFF383839), // FIXME use resource??
+                color = Color(0xFF383839),
                 shape = shape,
             )
             .background(
@@ -191,7 +227,8 @@ private fun FeatureItem(
                 ),
                 shape = shape,
             )
-            .size(width = 156.dp, height = 180.dp)
+            .width(156.dp)
+            .fillMaxHeight()
             .padding(all = 16.dp)
     ) {
 
@@ -202,10 +239,14 @@ private fun FeatureItem(
             modifier = Modifier.size(32.dp)
         )
         Spacer(Modifier.height(8.dp))
-        TextH40(stringResource(content.title))
+        TextH40(
+            text = stringResource(content.title),
+            color = Color.White,
+        )
         Spacer(Modifier.height(4.dp))
         TextP60(
             text = stringResource(content.text),
+            color = Color.White,
             modifier = Modifier.alpha(0.72f),
         )
     }
@@ -355,15 +396,18 @@ private fun PlusOutlinedRowButton(
     }
 }
 
-// From https://stackoverflow.com/a/71344813/1910286
+// Based on https://stackoverflow.com/a/71344813/1910286
 private tailrec suspend fun autoScroll(
     lazyListState: LazyListState
 ) {
-    lazyListState.scroll(MutatePriority.PreventUserInput) {
-        scrollBy(1f)
+    val scrollAmount = lazyListState.scrollBy(1f)
+    if (scrollAmount == 0f) {
+        // If we can't scroll, we're at the end, so jump to the beginning.
+        // This will be an abrupt jump, but users shouldn't really ever be
+        // getting to the end of the list, so it should be very rare.
+        lazyListState.scrollToItem(0)
     }
-    delay(5)
-
+    delay(4)
     autoScroll(lazyListState)
 }
 
