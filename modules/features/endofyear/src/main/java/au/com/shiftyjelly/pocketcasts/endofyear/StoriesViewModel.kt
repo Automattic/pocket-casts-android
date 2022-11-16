@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
@@ -27,6 +29,7 @@ class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
     private val shareableTextProvider: ShareableTextProvider,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Loading)
@@ -115,6 +118,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun replay() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED)
         skipToStoryAtIndex(0)
     }
 
