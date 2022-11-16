@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -115,50 +114,34 @@ internal fun OnboardingLoginOrSignUpPage(
     }
 }
 
-private val continueWithGoogleBorder: BorderStroke
-    @Composable
-    get() = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryInteractive03)
-
-private val continueWithGoogleColors: ButtonColors
-    @Composable
-    get() = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01)
-
 @Composable
 private fun ContinueWithGoogleButton(onClick: () -> Unit) {
     RowOutlinedButton(
         text = stringResource(LR.string.onboarding_continue_with_google),
         leadingIcon = painterResource(IR.drawable.google_g),
         tintIcon = false,
-        border = continueWithGoogleBorder,
-        colors = continueWithGoogleColors,
+        border = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryInteractive03),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01),
         onClick = onClick
     )
 }
-
-private val signUpColors: ButtonColors
-    @Composable
-    get() = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.primaryText01, contentColor = MaterialTheme.theme.colors.primaryUi01)
 
 @Composable
 private fun SignUpButton(onClick: () -> Unit) {
     RowButton(
         text = stringResource(LR.string.onboarding_sign_up_free),
-        colors = signUpColors,
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.primaryText01, contentColor = MaterialTheme.theme.colors.primaryUi01),
         includePadding = false,
         onClick = onClick,
         modifier = Modifier.padding(horizontal = 16.dp)
     )
 }
 
-private val logInColors: ButtonColors
-    @Composable
-    get() = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01)
-
 @Composable
 private fun LogInButton(onClick: () -> Unit) {
     RowTextButton(
         text = stringResource(LR.string.log_in),
-        colors = logInColors,
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01),
         includePadding = false,
         onClick = onClick,
         modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
