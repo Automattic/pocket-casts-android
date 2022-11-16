@@ -37,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,15 +50,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -194,43 +190,38 @@ private fun FeatureRow(scrollAutomatically: Boolean) {
             autoScroll(scrollDelay, state)
         }
     }
-    var height by remember { mutableStateOf<Dp?>(null) }
-    val density = LocalDensity.current
     LazyRow(
         state = state,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         userScrollEnabled = !scrollAutomatically,
-        modifier = height?.let { Modifier.height(it) } ?: Modifier
     ) {
-
-        item {
-            // This row is needed to determine the height of the tallest list item,
-            // which is then used to keep the size of the LazyRow constant regardless
-            // of the height of the items it is displaying at a given time. If
-            // IntrinsicSize.Max could work with LazyRows, we wouldn't need to do this.
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .height(IntrinsicSize.Max)
-                    .onSizeChanged {
-                        height = density.run { it.height.toDp() }
-                    }
-            ) {
-                FeatureItemContent.values().forEach {
-                    FeatureItem(it)
-                }
+        if (scrollAutomatically) {
+            items(Int.MAX_VALUE) {
+                // Nesting a Row of FeatureItems inside the LazyRow because a Row can use IntrinsidSize.Max
+                // to determine the height of the tallest list item and keep a consistent
+                // height, regardless of which items are visible. This ensures that the
+                // LazyRow as a whole always has a single, consistent height that does not
+                // change as items scroll into/out-of view. If IntrinsicSize.Max could work
+                // with LazyRows, we wouldn't need to nest Rows in the LazyRow.
+                FeatureItems()
+            }
+        } else {
+            item {
+                FeatureItems()
             }
         }
+    }
+}
 
-        if (scrollAutomatically) {
-            val contentArray = FeatureItemContent.values()
-            items(
-                count = 200, // Big number that users should never get to
-                contentType = { it % contentArray.size },
-            ) { n ->
-                val content = contentArray[n % contentArray.size]
-                FeatureItem(content)
-            }
+@Composable
+private fun FeatureItems() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .height(IntrinsicSize.Max)
+    ) {
+        FeatureItemContent.values().forEach {
+            FeatureItem(it)
         }
     }
 }
