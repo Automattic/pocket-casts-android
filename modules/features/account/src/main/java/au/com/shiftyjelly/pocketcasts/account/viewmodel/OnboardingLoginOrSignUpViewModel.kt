@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingLoginOrSignUpViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext context: Context
 ) : ViewModel() {
 
     val showContinueWithGoogleButton = BuildConfig.SINGLE_SIGN_ON_ENABLED && GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(context)
