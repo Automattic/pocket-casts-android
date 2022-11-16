@@ -70,6 +70,8 @@ class StoriesViewModel @Inject constructor(
             val state = if (result.isEmpty()) {
                 State.Error
             } else {
+                val currentStory = result[currentIndex]
+                analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHOWN, mapOf(AnalyticsProp.story to currentStory.identifier))
                 State.Loaded(
                     currentStory = result[currentIndex],
                     segmentsData = SegmentsData(
@@ -126,8 +128,9 @@ class StoriesViewModel @Inject constructor(
         if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
-        mutableState.value =
-            (state.value as State.Loaded).copy(currentStory = stories.value[index])
+        val currentStory = stories.value[index]
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHOWN, mapOf(AnalyticsProp.story to currentStory.identifier))
+        mutableState.value = (state.value as State.Loaded).copy(currentStory = currentStory)
     }
 
     fun onShareClicked(
