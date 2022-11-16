@@ -6,4 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 class StoryListenedNumbers(
     val listenedNumbers: ListenedNumbers,
     val topPodcasts: List<TopPodcast>,
-) : Story()
+) : Story() {
+    override val identifier: String = "number_of_podcasts_and_episodes_listened"
+}

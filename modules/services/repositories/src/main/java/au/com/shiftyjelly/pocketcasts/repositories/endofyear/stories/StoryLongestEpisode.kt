@@ -4,4 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 
 class StoryLongestEpisode(
     val longestEpisode: LongestEpisode,
-) : Story()
+) : Story() {
+    override val identifier: String = "longest_episode"
+}

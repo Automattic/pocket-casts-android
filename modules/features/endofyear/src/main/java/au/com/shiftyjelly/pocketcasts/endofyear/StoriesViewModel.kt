@@ -138,6 +138,7 @@ class StoriesViewModel @Inject constructor(
         pause()
         val currentState = (state.value as State.Loaded)
         val story = requireNotNull(currentState.currentStory)
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHARE, mapOf(AnalyticsProp.story to story.identifier))
         viewModelScope.launch {
             val savedFile = fileUtilWrapper.saveBitmapToFile(
                 onCaptureBitmap.invoke(),
@@ -197,6 +198,10 @@ class StoriesViewModel @Inject constructor(
         }
 
         object Error : State()
+    }
+
+    private object AnalyticsProp {
+        const val story = "story"
     }
 
     companion object {
