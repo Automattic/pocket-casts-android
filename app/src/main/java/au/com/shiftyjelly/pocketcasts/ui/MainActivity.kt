@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
@@ -505,7 +506,7 @@ class MainActivity :
             AppTheme(theme.activeTheme) {
                 EndOfYearLaunchBottomSheet(
                     onClick = {
-                        StoriesFragment.newInstance()
+                        StoriesFragment.newInstance(StoriesSource.MODAL)
                             .show(supportFragmentManager, "stories_dialog")
                     }
                 )

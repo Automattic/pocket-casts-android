@@ -10,8 +10,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -30,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -239,7 +238,7 @@ class ProfileFragment : BaseFragment() {
                 AppTheme(theme.activeTheme) {
                     EndOfYearPromptCard(
                         onClick = {
-                            StoriesFragment.newInstance()
+                            StoriesFragment.newInstance(StoriesSource.PROFILE)
                                 .show(childFragmentManager, "stories_dialog")
                         }
                     )
