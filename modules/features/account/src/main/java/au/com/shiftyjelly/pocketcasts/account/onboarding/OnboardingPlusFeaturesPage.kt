@@ -64,7 +64,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesVi
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import kotlinx.coroutines.delay
 import java.lang.Long.max
@@ -121,7 +121,7 @@ fun OnboardingPlusFeaturesPage(
 
                 Spacer(Modifier.height(12.dp))
 
-                TextP40(
+                TextP30(
                     text = stringResource(LR.string.onboarding_upgrade_exclusive_features_and_options),
                     color = Color.White.copy(alpha = 0.8f),
                     modifier = Modifier.padding(horizontal = 24.dp),

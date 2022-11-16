@@ -84,6 +84,28 @@ fun TextH30(
 }
 
 @Composable
+fun TextP30(
+    text: String,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign? = null,
+    color: Color = MaterialTheme.theme.colors.primaryText01,
+    maxLines: Int = Int.MAX_VALUE,
+    fontWeight: FontWeight? = FontWeight.Medium,
+) {
+    Text(
+        text = text,
+        color = color,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        textAlign = textAlign,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        fontWeight = fontWeight,
+        modifier = modifier
+    )
+}
+
+@Composable
 fun TextH40(
     text: String,
     modifier: Modifier = Modifier,
@@ -270,8 +292,10 @@ fun TextStylesDarkPreview() {
 @Composable
 private fun TextStylesPreview() {
     Column {
+        TextH10("H10")
         TextH20("H20")
         TextH30("H30")
+        TextP30("P30")
         TextH40("H40")
         TextP40("P40")
         TextP50("P50")
