@@ -14,7 +14,7 @@ class ActionRunnerQueryPodcasts : TaskerPluginRunnerAction<InputQueryPodcasts, A
     override fun run(context: Context, input: TaskerInput<InputQueryPodcasts>): TaskerPluginResult<Array<OutputQueryPodcasts>> {
         val podcastManager = context.podcastManager
         val output = podcastManager.findSubscribed().filter { it.isSubscribed }.map {
-            OutputQueryPodcasts(it.uuid, it.title.formattedForTasker, it.author.formattedForTasker, it.podcastUrl, it.thumbnailUrl ?: PodcastImage.getArtworkUrl(480,it.uuid), it.podcastCategory.formattedForTasker, it.addedDate?.formattedForTasker, it.latestEpisodeDate?.formattedForTasker)
+            OutputQueryPodcasts(it.uuid, it.title.formattedForTasker, it.author.formattedForTasker, it.podcastUrl, it.thumbnailUrl ?: PodcastImage.getArtworkUrl(480, it.uuid), it.podcastCategory.formattedForTasker, it.addedDate?.formattedForTasker, it.latestEpisodeDate?.formattedForTasker)
         }.toTypedArray()
         return TaskerPluginResultSucess(output)
     }

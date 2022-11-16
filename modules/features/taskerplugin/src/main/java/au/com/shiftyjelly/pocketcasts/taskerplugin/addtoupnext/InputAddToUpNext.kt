@@ -13,7 +13,7 @@ class InputAddToUpNext @JvmOverloads constructor(
     @field:TaskerInputField("add_mode", labelResIdName = "add_mode") var addMode: String? = null,
     @field:TaskerInputField("start_playing", labelResIdName = "start_playing") var startPlaying: String? = null
 ) {
-    enum class AddMode(@StringRes val descriptionResId: Int) { Current(R.string.current),Next(R.string.next), Last(R.string.last) }
+    enum class AddMode(@StringRes val descriptionResId: Int) { Current(R.string.current), Next(R.string.next), Last(R.string.last) }
     enum class ClearMode(@StringRes val descriptionResId: Int) { DontClear(R.string.dont_clear), ClearUpNext(R.string.clear_up_next), ClearAll(R.string.clear_all) }
 
     val addModeEnum get() = tryOrNull { addMode?.let { AddMode.valueOf(it) } }

@@ -41,9 +41,9 @@ class ActionRunnerAddToUpNext : TaskerPluginRunnerActionNoOutput<InputAddToUpNex
             null, InputAddToUpNext.AddMode.Last -> episodesToPlay.addAll(episodesFromInput)
         }
 
-        if(regularInput.startPlaying?.toBooleanStrictOrNull() == true){
+        if (regularInput.startPlaying?.toBooleanStrictOrNull() == true) {
             playbackManager.playEpisodes(episodesToPlay, PlaybackManager.PlaybackSource.TASKER)
-        }else{
+        } else {
             upNextQueue.changeList(episodesToPlay)
         }
         return TaskerPluginResultSucess()

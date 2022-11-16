@@ -25,4 +25,4 @@ val screenSize
     }
 
 val Date.formattedForTasker get() = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this)
-val String.formattedForTasker get() = replace(",","")
+val String.formattedForTasker get() = replace(",", "")
