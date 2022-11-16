@@ -8,7 +8,9 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
@@ -17,11 +19,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ModalBottomSheet(
-    showOnLoad: Boolean = false,
+    onExpanded: () -> Unit,
     content: BottomSheetContentState.Content,
 ) {
     val sheetState = rememberModalBottomSheetState(
-        initialValue = if (showOnLoad) ModalBottomSheetValue.Expanded else ModalBottomSheetValue.Hidden,
+        initialValue = ModalBottomSheetValue.Hidden,
     )
     val coroutineScope = rememberCoroutineScope()
 
@@ -43,11 +45,30 @@ fun ModalBottomSheet(
         scrimColor = Color.Black.copy(alpha = .25f),
         content = {}
     )
+
+    LaunchedEffect(Unit) {
+        if (!sheetState.isVisible) {
+            displayBottomSheet(coroutineScope, sheetState)
+        }
+        snapshotFlow { sheetState.currentValue }
+            .collect {
+                if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
+                    onExpanded.invoke()
+                }
+            }
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 fun hideBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
     coroutineScope.launch {
         sheetState.hide()
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+fun displayBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
+    coroutineScope.launch {
+        sheetState.show()
     }
 }

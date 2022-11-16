@@ -203,7 +203,6 @@ class MainActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { isEligible ->
                 if (isEligible) {
-                    analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
                     setupEndOfYearLaunchBottomSheet()
                     if (settings.getEndOfYearShowBadge2022()) {
                         binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
@@ -508,6 +507,9 @@ class MainActivity :
                     onClick = {
                         StoriesFragment.newInstance(StoriesSource.MODAL)
                             .show(supportFragmentManager, "stories_dialog")
+                    },
+                    onExpanded = {
+                        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
                     }
                 )
             }
