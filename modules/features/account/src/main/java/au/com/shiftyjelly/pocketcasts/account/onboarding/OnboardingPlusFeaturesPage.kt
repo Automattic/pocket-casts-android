@@ -196,7 +196,7 @@ private fun FeatureRow(scrollAutomatically: Boolean) {
         userScrollEnabled = !scrollAutomatically,
     ) {
         if (scrollAutomatically) {
-            items(Int.MAX_VALUE) {
+            items(500) { // arbitrary large number that users will probably never hit
                 // Nesting a Row of FeatureItems inside the LazyRow because a Row can use IntrinsidSize.Max
                 // to determine the height of the tallest list item and keep a consistent
                 // height, regardless of which items are visible. This ensures that the
