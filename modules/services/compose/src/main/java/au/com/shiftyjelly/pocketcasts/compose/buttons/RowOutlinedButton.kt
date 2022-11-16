@@ -78,6 +78,7 @@ fun RowOutlinedButton(
                     TextH30(
                         text = text,
                         color = colors.contentColor(enabled = true).value,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier.padding(6.dp)
                     )
                 }
