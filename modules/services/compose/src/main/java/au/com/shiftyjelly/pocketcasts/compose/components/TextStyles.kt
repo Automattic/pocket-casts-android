@@ -7,6 +7,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -14,11 +15,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Locale
+
+private val Float.nonScaledSp
+    @Composable
+    get() = (this / LocalDensity.current.fontScale).sp
+
+private val Int.nonScaledSp
+    @Composable
+    get() = (this / LocalDensity.current.fontScale).sp
 
 @Composable
 fun TextH10(
@@ -69,13 +79,15 @@ fun TextH30(
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
     fontWeight: FontWeight? = null,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    disableScale: Boolean = false,
+    fontSize: TextUnit = 18.sp
 ) {
     Text(
         text = text,
         color = color,
-        fontSize = 18.sp,
-        lineHeight = 21.sp,
+        fontSize = if (disableScale) fontSize.value.nonScaledSp else fontSize,
+        lineHeight = if (disableScale) 21.nonScaledSp else 21.sp,
         textAlign = textAlign,
         fontWeight = fontWeight ?: FontWeight.SemiBold,
         maxLines = maxLines,
@@ -90,14 +102,16 @@ fun TextH40(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    fontWeight: FontWeight = FontWeight.Medium,
+    disableScale: Boolean = false
 ) {
     Text(
         text = text,
         color = color,
-        fontSize = 15.sp,
-        fontWeight = FontWeight.Medium,
-        lineHeight = 21.sp,
+        fontSize = if (disableScale) 15.nonScaledSp else 15.sp,
+        fontWeight = fontWeight,
+        lineHeight = if (disableScale) 21.nonScaledSp else 21.sp,
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
@@ -217,15 +231,16 @@ fun TextH70(
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
     fontWeight: FontWeight = FontWeight(500),
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    disableScale: Boolean = false
 ) {
     Text(
         text = text,
         color = color,
-        fontSize = 12.sp,
+        fontSize = if (disableScale) 12.nonScaledSp else 12.sp,
         fontWeight = fontWeight,
-        lineHeight = 14.sp,
-        letterSpacing = 0.25.sp,
+        lineHeight = if (disableScale) 14.nonScaledSp else 14.sp,
+        letterSpacing = if (disableScale) .25f.nonScaledSp else .25.sp,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier,
