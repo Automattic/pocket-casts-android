@@ -140,7 +140,7 @@ class StoriesViewModel @Inject constructor(
         showShareForFile: (File, ShareTextData) -> Unit,
     ) {
         pause()
-        val currentState = (state.value as State.Loaded)
+        val currentState = state.value as State.Loaded
         val story = requireNotNull(currentState.currentStory)
         analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHARE, mapOf(AnalyticsProp.story to story.identifier))
         viewModelScope.launch {
@@ -204,8 +204,20 @@ class StoriesViewModel @Inject constructor(
         object Error : State()
     }
 
+    fun trackStoryShared() {
+        val currentState = state.value as? State.Loaded
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
+            mapOf(
+                AnalyticsProp.activity to (shareableTextProvider.chosenActivity ?: ""),
+                AnalyticsProp.story to (currentState?.currentStory ?: "")
+            )
+        )
+    }
+
     private object AnalyticsProp {
         const val story = "story"
+        const val activity = "activity"
     }
 
     companion object {

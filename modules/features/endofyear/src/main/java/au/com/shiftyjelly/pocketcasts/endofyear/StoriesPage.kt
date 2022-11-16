@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -102,6 +103,9 @@ fun StoriesPage(
         ActivityResultContracts.StartActivityForResult()
     ) {
         /* Share activity dismissed, start paused story */
+        if (it.resultCode == Activity.RESULT_OK) {
+            viewModel.trackStoryShared()
+        }
         viewModel.start()
     }
 

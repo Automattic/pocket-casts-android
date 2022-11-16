@@ -14,12 +14,15 @@ import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@Singleton
 class ShareableTextProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val listServerManager: ListServerManager,
 ) {
+    var chosenActivity: String? = null
     private var shortURL: String = Settings.SERVER_SHORT_URL
     private val hashtags = listOf("pocketcasts", "endofyear2022").joinToString(" ") { "#$it" }
 
