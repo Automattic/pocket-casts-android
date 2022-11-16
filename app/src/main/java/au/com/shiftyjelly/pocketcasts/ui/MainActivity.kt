@@ -202,6 +202,7 @@ class MainActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { isEligible ->
                 if (isEligible) {
+                    analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
                     setupEndOfYearLaunchBottomSheet()
                     if (settings.getEndOfYearShowBadge2022()) {
                         binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
