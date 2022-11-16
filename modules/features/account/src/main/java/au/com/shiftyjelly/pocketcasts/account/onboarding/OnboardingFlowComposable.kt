@@ -124,7 +124,7 @@ fun OnboardingFlowComposable(
                     },
                     onBackPressed = {
                         analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
-                        navController.popBackStack()
+                        completeOnboarding()
                     },
                     onComplete = {
                         // TODO analytics
