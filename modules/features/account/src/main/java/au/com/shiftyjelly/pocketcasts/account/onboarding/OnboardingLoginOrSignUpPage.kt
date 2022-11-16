@@ -26,6 +26,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
@@ -46,7 +49,8 @@ internal fun OnboardingLoginOrSignUpPage(
     onSignUpFreeClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     onContinueWithGoogleClicked: () -> Unit,
-    onShown: () -> Unit
+    onShown: () -> Unit,
+    viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel()
 ) {
 
     LaunchedEffect(Unit) {
@@ -105,9 +109,12 @@ internal fun OnboardingLoginOrSignUpPage(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(Modifier.height(8.dp))
-
-            ContinueWithGoogleButton(onClick = onContinueWithGoogleClicked)
+            if (viewModel.showContinueWithGoogleButton) {
+                Spacer(Modifier.height(8.dp))
+                ContinueWithGoogleButton(onClick = onContinueWithGoogleClicked)
+            } else {
+                Spacer(Modifier.height(32.dp))
+            }
             SignUpButton(onClick = onSignUpFreeClicked)
             LogInButton(onClick = onLoginClicked)
         }
