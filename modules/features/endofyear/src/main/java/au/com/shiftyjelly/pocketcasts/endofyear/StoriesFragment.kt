@@ -51,7 +51,10 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                     analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_SHOWN, mapOf(AnalyticsProp.source to source.value))
                     StoriesPage(
                         viewModel = viewModel,
-                        onCloseClicked = { dismiss() },
+                        onCloseClicked = {
+                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED, AnalyticsProp.StoriesDismissed.closeButton)
+                            dismiss()
+                        },
                     )
                 }
             }
@@ -60,6 +63,9 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
 
     private object AnalyticsProp {
         const val source = "source"
+        object StoriesDismissed {
+            val closeButton = mapOf(source to "close_button")
+        }
     }
 
     enum class StoriesSource(val value: String) {
