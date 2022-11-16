@@ -17,8 +17,10 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class StoriesFragment : BaseAppCompatDialogFragment() {
     private val viewModel: StoriesViewModel by viewModels()
     override val statusBarColor: StatusBarColor
