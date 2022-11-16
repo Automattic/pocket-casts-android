@@ -73,7 +73,7 @@ internal fun OnboardingLoginOrSignUpPage(
             )
 
             TextH30(
-                text = stringResource(LR.string.onboarding_not_now),
+                text = stringResource(LR.string.not_now),
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .weight(1f)
