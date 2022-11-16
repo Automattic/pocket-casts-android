@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
 import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
@@ -70,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopFivePodcas
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopListenedCategoriesView
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryTopPodcastView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
@@ -127,21 +129,29 @@ fun StoriesPage(
     ) {
         Box(modifier = modifier.size(dialogSize)) {
             when (state) {
-                is State.Loaded -> StoriesView(
-                    state = state as State.Loaded,
-                    progress = viewModel.progress,
-                    onSkipPrevious = { viewModel.skipPrevious() },
-                    onSkipNext = { viewModel.skipNext() },
-                    onPause = { viewModel.pause() },
-                    onStart = { viewModel.start() },
-                    onCloseClicked = onCloseClicked,
-                    onReplayClicked = { viewModel.replay() },
-                    onShareClicked = {
-                        viewModel.onShareClicked(it, context) { file ->
-                            showShareForFile(context, file, shareLauncher)
-                        }
-                    },
-                )
+                is State.Loaded -> {
+                    StoriesView(
+                        state = state as State.Loaded,
+                        progress = viewModel.progress,
+                        onSkipPrevious = { viewModel.skipPrevious() },
+                        onSkipNext = { viewModel.skipNext() },
+                        onPause = { viewModel.pause() },
+                        onStart = { viewModel.start() },
+                        onCloseClicked = onCloseClicked,
+                        onReplayClicked = { viewModel.replay() },
+                        onShareClicked = {
+                            val currentStory = requireNotNull((state as State.Loaded).currentStory)
+                            viewModel.onShareClicked(it, currentStory, context) { file, shareTextData ->
+                                showShareForFile(
+                                    context,
+                                    file,
+                                    shareLauncher,
+                                    shareTextData
+                                )
+                            }
+                        },
+                    )
+                }
                 State.Loading -> StoriesLoadingView(onCloseClicked)
                 State.Error -> StoriesErrorView(onCloseClicked)
             }
@@ -194,6 +204,9 @@ private fun StoriesView(
                         .padding(8.dp)
                         .fillMaxWidth(),
                 )
+                if (state.preparingShareText) {
+                    LoadingOverContentView()
+                }
                 CloseButtonView(onCloseClicked)
             }
         }
@@ -202,6 +215,13 @@ private fun StoriesView(
                 onClick = { onShareClicked.invoke(it) }
             )
         }
+    }
+}
+
+@Composable
+private fun LoadingOverContentView() {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(color = Color.White)
     }
 }
 
@@ -384,13 +404,19 @@ private fun showShareForFile(
     context: Context,
     file: File,
     shareLauncher: ActivityResultLauncher<Intent>,
+    shareTextData: ShareTextData,
 ) {
     try {
         val uri = FileUtil.getUriForFile(context, file)
+        var shareText = "${shareTextData.textWithLink} ${shareTextData.hashTags}"
+        if (shareTextData.showShortURLAtEnd) {
+            shareText += " ${Settings.SERVER_SHORT_URL}"
+        }
 
         val chooserIntent = ShareCompat.IntentBuilder(context)
             .setType("image/png")
             .addStream(uri)
+            .setText(shareText)
             .setChooserTitle(LR.string.end_of_year_share_via)
             .createChooserIntent()
 

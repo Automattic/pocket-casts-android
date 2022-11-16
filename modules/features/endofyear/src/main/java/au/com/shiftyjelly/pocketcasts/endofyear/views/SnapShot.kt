@@ -14,6 +14,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewAspectRatioForTablet
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.deviceAspectRatio
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 
 /* Returns a callback to get bitmap for the passed composable.
 The composable is converted to ComposeView and laid out into AndroidView otherwise an illegal state exception is thrown:
@@ -37,10 +38,12 @@ fun convertibleToBitmap(
     )
 
     return {
+        val height = composeView.width * getAspectRatioForBitmap(context)
+        val availableHeight = height - 50.dpToPx(context) // Reduce approx share button height
         createBitmapFromView(
             view = composeView,
             width = composeView.width,
-            height = (composeView.width * getAspectRatioForBitmap(context)).toInt()
+            height = availableHeight.toInt()
         )
     }
 }
