@@ -1450,7 +1450,9 @@
     <string name="clear_up_next">Clear Up Next</string>
     <string name="clear_all">Clear All</string>
     <string name="add_mode">Add Mode</string>
+    <string name="start_playing">Start Playing</string>
     <string name="last">Last</string>
+    <string name="current">Current</string>
     <string name="download_url">Download URL</string>
     <string name="playing_status">Playing Status</string>
     <string name="playing_status_explained">0 = Not Played; 1 = In Progress; 2 = Completed</string>

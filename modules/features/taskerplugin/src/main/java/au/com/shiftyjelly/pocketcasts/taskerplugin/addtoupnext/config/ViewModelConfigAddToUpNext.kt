@@ -20,5 +20,6 @@ class ViewModelConfigAddToUpNext @Inject constructor(
         InputFieldString(R.string.episode_ids, RD.drawable.ic_upnext, { episodeIds }, { episodeIds = it }),
         InputFieldEnum<InputAddToUpNext.AddMode>(R.string.add_mode, RD.drawable.ic_upnext_playlast, { addMode }, { addMode = it }, { it?.descriptionResId }),
         InputFieldEnum<InputAddToUpNext.ClearMode>(R.string.clear_before_adding, RD.drawable.ic_upnext_remove, { clearMode }, { clearMode = it }, { it?.descriptionResId }),
+        InputFieldBoolean(R.string.start_playing, RD.drawable.ic_play_all, { startPlaying }, { startPlaying = it }),
     )
 }

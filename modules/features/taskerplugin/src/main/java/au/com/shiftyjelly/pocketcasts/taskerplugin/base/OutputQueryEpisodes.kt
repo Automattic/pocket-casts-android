@@ -14,5 +14,5 @@ class OutputQueryEpisodes(
     @get:TaskerOutputVariable("${OUTPUT_PREFIX}duration", labelResIdName = "filters_duration") var duration: Double?,
     @get:TaskerOutputVariable("${OUTPUT_PREFIX}played_percentage", labelResIdName = "played_percentage") var playedPercentage: Int?,
 ) {
-    constructor(episode: Episode) : this(episode.uuid, episode.title, episode.downloadUrl, episode.playingStatus.ordinal, episode.publishedDate.formattedForTasker, episode.duration, episode.playedPercentage)
+    constructor(episode: Episode) : this(episode.uuid, episode.title.formattedForTasker, episode.downloadUrl, episode.playingStatus.ordinal, episode.publishedDate.formattedForTasker, episode.duration, episode.playedPercentage)
 }
