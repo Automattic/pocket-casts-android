@@ -116,6 +116,7 @@ fun StoriesPage(
     Box(modifier = modifier.size(dialogSize)) {
         when (state) {
             is State.Loaded -> {
+                viewModel.trackStoryShown()
                 StoriesView(
                     state = state as State.Loaded,
                     progress = viewModel.progress,
