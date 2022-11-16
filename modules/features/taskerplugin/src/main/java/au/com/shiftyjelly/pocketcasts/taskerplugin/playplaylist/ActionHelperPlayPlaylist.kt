@@ -10,8 +10,6 @@ class ActionHelperPlayPlaylist(config: TaskerPluginConfig<InputPlayPlaylist>) : 
         blurbBuilder.append("${context.getString(au.com.shiftyjelly.pocketcasts.localization.R.string.filters_filter_name)}: ${input.regular.title}")
     }
 
-    override val addDefaultStringBlurb: Boolean
-        get() = false
-    override val inputClass: Class<InputPlayPlaylist>
-        get() = InputPlayPlaylist::class.java
+    override val addDefaultStringBlurb get() = false
+    override val inputClass get() = InputPlayPlaylist::class.java
 }

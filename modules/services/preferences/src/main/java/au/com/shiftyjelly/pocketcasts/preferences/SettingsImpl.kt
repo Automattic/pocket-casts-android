@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationChannel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
@@ -93,8 +94,10 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val defaultPodcastGroupingFlow = MutableStateFlow(defaultPodcastGrouping())
+    override val defaultMediaNotificationControlsFlow = MutableStateFlow(defaultMediaNotificationControls())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
+    override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
 
@@ -492,7 +495,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getAutoSubscribeToPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, true)
+        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
     }
 
     override fun getAutoShowPlayed(): Boolean {
@@ -785,6 +788,15 @@ class SettingsImpl @Inject constructor(
     override fun setKeepScreenAwake(newValue: Boolean) {
         setBoolean(Settings.PREFERENCE_KEEP_SCREEN_AWAKE, newValue)
         keepScreenAwakeFlow.update { newValue }
+    }
+
+    override fun openPlayerAutomatically(): Boolean {
+        return sharedPreferences.getBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, false)
+    }
+
+    override fun setOpenPlayerAutomatically(newValue: Boolean) {
+        setBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, newValue)
+        openPlayerAutomaticallyFlow.update { newValue }
     }
 
     override fun isPodcastAutoDownloadUnmeteredOnly(): Boolean {
@@ -1186,6 +1198,25 @@ class SettingsImpl @Inject constructor(
     override fun setDefaultShowArchived(value: Boolean) {
         setBoolean("default_show_archived", value)
         defaultShowArchivedFlow.update { value }
+    }
+
+    override fun defaultMediaNotificationControls(): List<MediaNotificationControls> {
+        val selectedValue = MediaNotificationControls.All.map { mediaControl ->
+            val defaultValue =
+                (mediaControl == MediaNotificationControls.PlaybackSpeed || mediaControl == MediaNotificationControls.Star)
+            Pair(mediaControl, getBoolean(mediaControl.key, defaultValue))
+        }
+
+        return selectedValue.filter { (_, value) -> value }.map { (mediaControl, _) ->
+            mediaControl
+        }
+    }
+
+    override fun setDefaultMediaNotificationControls(mediaNotificationControls: List<MediaNotificationControls>) {
+        MediaNotificationControls.All.forEach { mediaControl ->
+            setBoolean(mediaControl.key, mediaNotificationControls.contains(mediaControl))
+        }
+        defaultMediaNotificationControlsFlow.update { mediaNotificationControls }
     }
 
     override fun defaultPodcastGrouping(): PodcastGrouping {

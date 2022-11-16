@@ -10,6 +10,7 @@ import androidx.room.Update
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import io.reactivex.Flowable
 import io.reactivex.Maybe
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class PlaylistDao {
@@ -22,6 +23,9 @@ abstract class PlaylistDao {
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract suspend fun findAllSuspend(): List<Playlist>
+
+    @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
+    abstract fun findAllState(): Flow<List<Playlist>>
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract fun observeAll(): Flowable<List<Playlist>>

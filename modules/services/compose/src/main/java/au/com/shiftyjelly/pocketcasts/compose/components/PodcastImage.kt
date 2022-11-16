@@ -19,10 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute.uuid
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import coil.compose.AsyncImagePainter
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 
 fun podcastImageCornerSize(width: Dp): Dp {
@@ -40,10 +38,11 @@ fun PodcastImage(
     title: String = "", // also used as the image's content description
     showTitle: Boolean = false,
     roundCorners: Boolean = true,
-    dropShadow: Boolean = true
+    dropShadow: Boolean = true,
+    cornerSize: Dp? = null,
 ) {
     BoxWithConstraints(modifier = modifier) {
-        val corners = if (roundCorners) podcastImageCornerSize(maxWidth) else null
+        val corners = if (roundCorners) cornerSize ?: podcastImageCornerSize(maxWidth) else null
         if (dropShadow) {
             val elevation = when {
                 maxWidth <= 50.dp -> 1.dp

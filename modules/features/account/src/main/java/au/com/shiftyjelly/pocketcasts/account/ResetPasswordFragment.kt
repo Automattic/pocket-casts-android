@@ -109,7 +109,7 @@ class ResetPasswordFragment : BaseFragment() {
         val context = binding.root.context
 
         val emailColor = context.getThemeColor(UR.attr.primary_interactive_01)
-        val emailDrawable = context.getTintedDrawable(R.drawable.ic_mail, emailColor)
+        val emailDrawable = context.getTintedDrawable(IR.drawable.ic_mail, emailColor)
         val tickColor = context.getThemeColor(UR.attr.support_02)
         val tickDrawable = if (!invalidEmail)context.getTintedDrawable(IR.drawable.ic_tick_circle, tickColor) else null
         val max = 64

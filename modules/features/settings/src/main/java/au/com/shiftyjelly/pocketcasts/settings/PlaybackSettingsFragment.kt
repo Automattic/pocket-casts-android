@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -39,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingCheckBoxDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
@@ -47,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -133,6 +136,15 @@ class PlaybackSettingsFragment : BaseFragment() {
                             showSetAllArchiveDialog(it)
                         }
                     )
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        MediaNotificationControls(
+                            saved = settings.defaultMediaNotificationControlsFlow.collectAsState().value,
+                            onSave = {
+                                settings.setDefaultMediaNotificationControls(it)
+                            }
+                        )
+                    }
                 }
 
                 SettingSection(heading = stringResource(LR.string.settings_general_player)) {
@@ -158,6 +170,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                     KeepScreenAwake(
                         saved = settings.keepScreenAwakeFlow.collectAsState().value,
                         onSave = settings::setKeepScreenAwake
+                    )
+
+                    OpenPlayerAutomatically(
+                        saved = settings.openPlayerAutomaticallyFlow.collectAsState().value,
+                        onSave = settings::setOpenPlayerAutomatically
                     )
 
                     IntelligentPlaybackResumption(
@@ -273,6 +290,20 @@ class PlaybackSettingsFragment : BaseFragment() {
     )
 
     @Composable
+    fun MediaNotificationControls(
+        saved: List<MediaNotificationControls>,
+        onSave: (List<MediaNotificationControls>) -> Unit
+    ) = SettingCheckBoxDialogRow(
+        primaryText = stringResource(LR.string.settings_media_notification_controls),
+        secondaryText = stringResource(LR.string.settings_media_notification_controls_summary),
+        options = MediaNotificationControls.All,
+        maxOptions = MediaNotificationControls.MaxSelectedOptions,
+        savedOption = saved,
+        optionToLocalisedString = { getString(it.controlName) },
+        onSave = onSave
+    )
+
+    @Composable
     private fun SkipTime(
         primaryText: String,
         saved: Int,
@@ -372,6 +403,15 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_keep_screen_awake),
             secondaryText = stringResource(LR.string.settings_keep_screen_awake_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+        )
+
+    @Composable
+    private fun OpenPlayerAutomatically(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(id = LR.string.settings_open_player_automatically),
+            secondaryText = stringResource(id = LR.string.settings_open_player_automatically_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )

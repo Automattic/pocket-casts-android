@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.taskerplugin.base
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,14 +38,19 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class TaskerInputFieldState<T>(val content: Content<T>) {
     data class Content<T> constructor(
-        val value: String?,
+        val value: StateFlow<String?>,
         @StringRes val labelResId: Int,
+        @DrawableRes val iconResId: Int,
+        val shouldShow: StateFlow<Boolean>,
         val onTextChange: (String) -> Unit,
         val taskerVariables: List<String>,
-        val possibleItems: List<T>? = null,
+        val possibleItems: Flow<List<T>>? = null,
         val itemToString: (T?) -> String = { it?.toString() ?: "" },
         val itemContent: @Composable (T) -> Unit = { Text(text = itemToString(it)) }
     )
@@ -68,18 +75,26 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
     Box {
 
         Row {
-            val possibleItems = content.possibleItems
+            val possibleItems = content.possibleItems?.collectAsState(initial = null)?.value
 
             val hasSuggestedItems = !possibleItems.isNullOrEmpty()
             val hasTaskerVariables = content.taskerVariables.isNotEmpty()
             OutlinedTextField(
                 modifier = Modifier.weight(1f),
-                value = content.value ?: "",
+                value = content.value.collectAsState().value ?: "",
                 label = { Text(text = stringResource(id = content.labelResId)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { finishSelecting() }),
                 onValueChange = {
                     content.onTextChange(it)
+                },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(content.iconResId),
+                        contentDescription = stringResource(content.labelResId),
+                        tint = MaterialTheme.theme.colors.primaryIcon01,
+                        modifier = Modifier.padding(end = 16.dp, start = 16.dp)
+                    )
                 },
                 trailingIcon = if (!hasSuggestedItems && !hasTaskerVariables) null else {
                     {
@@ -151,9 +166,12 @@ private fun ComposableTaskerInputFieldPreview() {
     AppTheme(Theme.ThemeType.CLASSIC_LIGHT) {
         ComposableTaskerInputField(
             TaskerInputFieldState.Content(
-                "some value", R.string.archive, {},
+                MutableStateFlow("some value"), R.string.archive,
+                au.com.shiftyjelly.pocketcasts.images.R.drawable.widget_play,
+                MutableStateFlow(true),
+                {},
                 listOf("%test"),
-                listOf("Hi", "Hello")
+                MutableStateFlow(listOf("Hi", "Hello"))
             )
         )
     }
@@ -172,7 +190,9 @@ fun ComposableTaskerInputFieldList(
         LazyColumn {
             fieldContents.forEach { content ->
                 item {
-                    ComposableTaskerInputField(content)
+                    if (content.shouldShow.collectAsState().value) {
+                        ComposableTaskerInputField(content)
+                    }
                 }
             }
         }

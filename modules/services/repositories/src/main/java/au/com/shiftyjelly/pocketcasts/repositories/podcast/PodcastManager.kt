@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -136,5 +137,6 @@ interface PodcastManager {
     suspend fun findAutoAddToUpNextPodcasts(): List<Podcast>
 
     suspend fun refreshPodcastFeed(podcastUuid: String): Boolean
-    fun findRandomPodcasts(): Flow<List<Podcast>>
+
+    fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>>
 }
