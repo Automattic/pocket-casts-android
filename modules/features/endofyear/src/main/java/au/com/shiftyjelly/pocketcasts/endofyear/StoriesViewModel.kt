@@ -68,6 +68,7 @@ class StoriesViewModel @Inject constructor(
             stories.value = result
 
             val state = if (result.isEmpty()) {
+                analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
                 State.Error
             } else {
                 val currentStory = result[currentIndex]
