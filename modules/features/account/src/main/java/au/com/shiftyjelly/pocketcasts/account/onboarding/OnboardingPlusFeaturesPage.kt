@@ -272,7 +272,7 @@ private fun FeatureItem(
     }
 }
 
-enum class FeatureItemContent(
+private enum class FeatureItemContent(
     @DrawableRes val image: Int,
     @StringRes val title: Int,
     @StringRes val text: Int,
@@ -283,12 +283,12 @@ enum class FeatureItemContent(
         text = LR.string.onboarding_plus_feature_desktop_apps_text,
     ),
     Folders(
-        image = IR.drawable.ic_folder,
+        image = IR.drawable.folder,
         title = LR.string.onboarding_plus_feature_folders_title,
         text = LR.string.onboarding_plus_feature_folders_text,
     ),
     CloudStorage(
-        image = IR.drawable.ic_cloud,
+        image = IR.drawable.cloud_storage,
         title = LR.string.onboarding_plus_feature_cloud_storage_title,
         text = LR.string.onboarding_plus_feature_cloud_storage_text,
     ),
@@ -298,7 +298,7 @@ enum class FeatureItemContent(
         text = LR.string.onboarding_plus_feature_hide_ads_text,
     ),
     ThemesIcons(
-        image = IR.drawable.whatsnew_theme,
+        image = IR.drawable.themes_icons,
         title = LR.string.onboarding_plus_feature_themes_icons_title,
         text = LR.string.onboarding_plus_feature_themes_icons_text,
     ),
