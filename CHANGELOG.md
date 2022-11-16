@@ -1,3 +1,7 @@
+7.28
+-----
+
+
 7.27
 -----
 
@@ -13,6 +17,8 @@
         ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
     *   Fixed small "Go to Podcast" icon in Landscape
         ([#547](https://github.com/Automattic/pocket-casts-android/pull/547)).
+    *   Added option to open player automatically when user start playing podcast.
+        ([#23](https://github.com/Automattic/pocket-casts-android/pull/550))
 
 7.26
 -----

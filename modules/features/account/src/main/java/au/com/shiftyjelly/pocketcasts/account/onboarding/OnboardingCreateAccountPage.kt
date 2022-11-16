@@ -87,7 +87,11 @@ internal fun OnboardingCreateAccountPage(
 
             TextP40(
                 text = "• ${stringResource(LR.string.profile_create_password_requirements)}",
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = if (state.showPasswordError) {
+                    MaterialTheme.theme.colors.support05
+                } else {
+                    MaterialTheme.theme.colors.primaryText02
+                },
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(bottom = 16.dp)

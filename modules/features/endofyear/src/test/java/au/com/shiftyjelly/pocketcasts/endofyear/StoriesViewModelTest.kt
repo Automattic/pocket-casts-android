@@ -108,12 +108,12 @@ class StoriesViewModelTest {
         assertEquals(state.currentStory, story1)
     }
 
-    private fun initViewModel(mockStories: List<Story>, hasFullListeningHistory: Boolean = true): StoriesViewModel {
+    private fun initViewModel(mockStories: List<Story>): StoriesViewModel {
         whenever(endOfYearManager.loadStories()).thenReturn(flowOf(mockStories))
-        whenever(endOfYearManager.hasFullListeningHistory()).thenReturn(flowOf(hasFullListeningHistory))
         return StoriesViewModel(
             endOfYearManager = endOfYearManager,
-            fileUtilWrapper = fileUtilWrapper
+            fileUtilWrapper = fileUtilWrapper,
+            shareableTextProvider = mock()
         )
     }
 }

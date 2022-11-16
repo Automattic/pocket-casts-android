@@ -40,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
@@ -170,7 +169,6 @@ class MainActivity :
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
 
     private val viewModel: MainActivityViewModel by viewModels()
-    private val storiesViewModel: StoriesViewModel by viewModels()
     private val disposables = CompositeDisposable()
     private var videoPlayerShown: Boolean = false
     private var overrideNextRefreshTimer: Boolean = false
@@ -291,10 +289,6 @@ class MainActivity :
         handleIntent(intent, savedInstanceState)
 
         updateSystemColors()
-
-        if (BuildConfig.END_OF_YEAR_ENABLED) {
-            setupEndOfYearLaunchBottomSheet()
-        }
     }
 
     private fun openOnboardingFlow() {
@@ -514,8 +508,6 @@ class MainActivity :
             var showDialog by rememberSaveable { mutableStateOf(false) }
             if (showDialog) {
                 StoriesPage(
-                    viewModel = storiesViewModel,
-                    showDialog = showDialog,
                     theme = theme,
                     onCloseClicked = { showDialog = false },
                 )
@@ -553,6 +545,10 @@ class MainActivity :
 
             if (viewModel.isPlayerOpen && viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid) {
                 updateNavAndStatusColors(true, state.podcast)
+            }
+
+            if (viewModel.lastPlaybackState != null && (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) && settings.openPlayerAutomatically()) {
+                binding.playerBottomSheet.openPlayer()
             }
 
             updatePlaybackState(state)

@@ -1035,6 +1035,8 @@
     <string name="settings_notification_vibrate_new_episodes">New episodes</string>
     <string name="settings_notification_vibrate_in_silent">Only in silent mode</string>
     <string name="settings_notification_vibrate_never">New episodes</string>
+    <string name="settings_open_player_automatically">Open Player Automatically</string>
+    <string name="settings_open_player_automatically_summary">If on, the full-screen player will open when you start playing a podcast episode.</string>
     <string name="settings_playback_resumption">Intelligent playback resumption</string>
     <string name="settings_playback_resumption_summary">If on, Pocket Casts will go back a little in episodes you resume so you can catch up more comfortably.</string>
     <string name="settings_podcast_artwork">Podcast Artwork</string>

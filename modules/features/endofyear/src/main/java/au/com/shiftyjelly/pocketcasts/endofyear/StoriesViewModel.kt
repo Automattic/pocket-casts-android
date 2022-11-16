@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
@@ -25,7 +26,9 @@ import kotlin.math.roundToInt
 class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
+    private val shareableTextProvider: ShareableTextProvider,
 ) : ViewModel() {
+
     private val mutableState = MutableStateFlow<State>(State.Loading)
     val state: StateFlow<State> = mutableState
 
@@ -50,17 +53,12 @@ class StoriesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            endOfYearManager.hasFullListeningHistory().stateIn(viewModelScope)
-                .collect { isFullListeningHistory ->
-                    if (!isFullListeningHistory) {
-                        // TODO: Integrate listening history sync endpoint
-                    }
-                    loadStories()
-                }
+            loadStories()
         }
     }
 
     private suspend fun loadStories() {
+        endOfYearManager.downloadListeningHistory()
         endOfYearManager.loadStories().stateIn(viewModelScope).collect { result ->
             cancelTimer()
             if (result.size != stories.value.size) resetProgressAndCurrentIndex()
@@ -83,6 +81,8 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun start() {
+        if (timer != null) clear()
+
         val currentState = state.value as State.Loaded
         val progressFraction =
             (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat())
@@ -130,8 +130,9 @@ class StoriesViewModel @Inject constructor(
 
     fun onShareClicked(
         onCaptureBitmap: () -> Bitmap,
+        story: Story,
         context: Context,
-        showShareForFile: (File) -> Unit,
+        showShareForFile: (File, ShareTextData) -> Unit,
     ) {
         pause()
         viewModelScope.launch {
@@ -141,7 +142,14 @@ class StoriesViewModel @Inject constructor(
                 EOY_STORY_SAVE_FOLDER_NAME,
                 EOY_STORY_SAVE_FILE_NAME
             )
-            savedFile?.let { showShareForFile.invoke(it) }
+
+            val currentState = (state.value as State.Loaded)
+            mutableState.value = currentState.copy(preparingShareText = true)
+
+            val shareTextData = shareableTextProvider.getShareableDataForStory(story)
+            mutableState.value = currentState.copy(preparingShareText = false)
+
+            savedFile?.let { showShareForFile.invoke(it, shareTextData) }
         }
     }
 
@@ -155,9 +163,16 @@ class StoriesViewModel @Inject constructor(
         currentIndex = 0
     }
 
+    fun clear() {
+        if (mutableState.value is State.Loaded) {
+            skipToStoryAtIndex(0)
+        }
+        cancelTimer()
+    }
+
     override fun onCleared() {
         super.onCleared()
-        cancelTimer()
+        clear()
     }
 
     private fun Float.roundOff() = (this * 100.0).roundToInt()
@@ -178,6 +193,7 @@ class StoriesViewModel @Inject constructor(
         data class Loaded(
             val currentStory: Story?,
             val segmentsData: SegmentsData,
+            val preparingShareText: Boolean = false,
         ) : State() {
             data class SegmentsData(
                 val widths: List<Float> = emptyList(),
@@ -189,7 +205,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     companion object {
-        private const val STORY_GAP_LENGTH_MS = 100L
+        private const val STORY_GAP_LENGTH_MS = 500L
         private const val PROGRESS_START_VALUE = 0f
         private const val PROGRESS_END_VALUE = 1f
         private const val PROGRESS_UPDATE_INTERVAL_MS = 10L
