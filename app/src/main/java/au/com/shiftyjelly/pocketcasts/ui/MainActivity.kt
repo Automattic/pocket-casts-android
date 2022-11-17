@@ -12,19 +12,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
@@ -39,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
@@ -118,8 +112,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -202,16 +194,15 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
-        viewModel.isEndOfYearStoriesEligible()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { isEligible ->
-                if (isEligible) {
-                    setupEndOfYearLaunchBottomSheet()
-                    if (settings.getEndOfYearShowBadge2022()) {
-                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
-                    }
+        lifecycleScope.launchWhenCreated {
+            val isEligible = viewModel.isEndOfYearStoriesEligible()
+            if (isEligible) {
+                setupEndOfYearLaunchBottomSheet()
+                if (settings.getEndOfYearShowBadge2022()) {
+                    binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                 }
-            }.launchIn(lifecycleScope)
+            }
+        }
 
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(
@@ -505,17 +496,11 @@ class MainActivity :
 
     private fun setupEndOfYearLaunchBottomSheet() {
         binding.modalBottomSheet.setContent {
-            var showDialog by rememberSaveable { mutableStateOf(false) }
-            if (showDialog) {
-                StoriesPage(
-                    theme = theme,
-                    onCloseClicked = { showDialog = false },
-                )
-            }
             AppTheme(theme.activeTheme) {
                 EndOfYearLaunchBottomSheet(
                     onClick = {
-                        showDialog = true
+                        StoriesFragment.newInstance()
+                            .show(supportFragmentManager, "stories_dialog")
                     }
                 )
             }

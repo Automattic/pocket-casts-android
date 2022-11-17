@@ -166,6 +166,7 @@ project.ext {
             composeUiToolingPreview: "androidx.compose.ui:ui-tooling-preview:$versionCompose",
             composeRx: "androidx.compose.runtime:runtime-rxjava2:$versionCompose",
             composeViewModel: "androidx.lifecycle:lifecycle-viewmodel-compose:$versionLifecycle",
+            composeUiUtil: "androidx.compose.ui:ui-util:$versionCompose",
             guava: 'com.google.guava:guava:27.1-android' // Required to fix conflict between versions in exoplayer and workmanager
     ]
 

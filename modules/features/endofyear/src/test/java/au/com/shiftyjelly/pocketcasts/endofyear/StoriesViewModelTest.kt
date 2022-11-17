@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -108,8 +107,8 @@ class StoriesViewModelTest {
         assertEquals(state.currentStory, story1)
     }
 
-    private fun initViewModel(mockStories: List<Story>): StoriesViewModel {
-        whenever(endOfYearManager.loadStories()).thenReturn(flowOf(mockStories))
+    private suspend fun initViewModel(mockStories: List<Story>): StoriesViewModel {
+        whenever(endOfYearManager.loadStories()).thenReturn(mockStories)
         return StoriesViewModel(
             endOfYearManager = endOfYearManager,
             fileUtilWrapper = fileUtilWrapper,

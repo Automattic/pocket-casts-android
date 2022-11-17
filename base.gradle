@@ -201,6 +201,7 @@ dependencies {
     implementation androidLibs.composeUi
     implementation androidLibs.composeUiToolingPreview
     implementation androidLibs.composeViewModel
+    implementation androidLibs.composeUiUtil
 
     implementation libs.kotlinCoroutines
     implementation libs.kotlinCoroutinesAndroid

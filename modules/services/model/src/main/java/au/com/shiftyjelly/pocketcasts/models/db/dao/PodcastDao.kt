@@ -357,5 +357,5 @@ abstract class PodcastDao {
         LIMIT :limit
         """
     )
-    abstract fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>>
+    abstract suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 }

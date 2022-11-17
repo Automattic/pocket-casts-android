@@ -138,5 +138,5 @@ interface PodcastManager {
 
     suspend fun refreshPodcastFeed(podcastUuid: String): Boolean
 
-    fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>>
+    suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 }
