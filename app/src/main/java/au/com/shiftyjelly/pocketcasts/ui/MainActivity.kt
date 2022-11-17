@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
@@ -503,7 +504,7 @@ class MainActivity :
                 EndOfYearLaunchBottomSheet(
                     shouldShow = shouldShow,
                     onClick = {
-                        showStoriesOrAccount()
+                        showStoriesOrAccount(StoriesSource.MODAL.value)
                     },
                     onExpanded = {
                         analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
@@ -515,9 +516,9 @@ class MainActivity :
         }
     }
 
-    override fun showStoriesOrAccount() {
+    override fun showStoriesOrAccount(source: String) {
         if (viewModel.isSignedIn || !settings.endOfYearRequireLogin()) {
-            showStories()
+            showStories(StoriesSource.fromString(source))
         } else {
             viewModel.waitingForSignInToShowStories = true
             val intent = Intent(this, AccountActivity::class.java)
@@ -525,8 +526,8 @@ class MainActivity :
         }
     }
 
-    private fun showStories() {
-        StoriesFragment.newInstance()
+    private fun showStories(source: StoriesSource) {
+        StoriesFragment.newInstance(source)
             .show(supportFragmentManager, "stories_dialog")
     }
 
@@ -586,7 +587,7 @@ class MainActivity :
 
             if (signinState.isSignedIn) {
                 if (viewModel.waitingForSignInToShowStories) {
-                    showStories()
+                    showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
                 } else if (!settings.getEndOfYearModalHasBeenShown()) {
                     viewModel.updateStoriesModalShowState(true)

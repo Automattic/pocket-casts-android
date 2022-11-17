@@ -74,6 +74,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
     enum class StoriesSource(val value: String) {
         MODAL("modal"),
         PROFILE("profile"),
+        USER_LOGIN("user_login"),
         UNKNOWN("unknown");
         companion object {
             fun fromString(source: String?) =
