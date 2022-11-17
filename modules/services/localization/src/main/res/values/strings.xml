@@ -1477,6 +1477,11 @@
     <string name="onboarding_plus_feature_hide_ads_text">Ad-free experience which gives you more of what you love and less of what you don\'t.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_themes_icons_text">Fly your true colors. Exclusive icons and themes for the Plus club only.</string>
+    <string name="onboarding_plus_become_a_plus_member">Become a Plus member and unlock all Pocket Casts features</string>
+    <string name="onboarding_plus_continuing_agrees_to">By continuing, you agree to our %1$s and %2$s.</string>
+    <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
+    <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
+    <string name="onboarding_plus_start_free_trial_and_subscribe">Start Free Trial &amp; Subscribe</string>
 
     <!--    Tasker Plugin-->
 

@@ -101,7 +101,7 @@ private fun RowOutlinedImage(image: Painter?, colors: ButtonColors, tintIcon: Bo
 
 @Preview(showBackground = true)
 @Composable
-fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         Column {
             RowOutlinedButton(

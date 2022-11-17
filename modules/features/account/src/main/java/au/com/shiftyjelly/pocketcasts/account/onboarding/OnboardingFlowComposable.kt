@@ -134,7 +134,7 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.plusFeatures) {
-                OnboardingPlusFeaturesPage(
+                OnboardingPlusFeaturesFlow(
                     onShown = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_SHOWN) },
                     onBackPressed = {
                         analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_DISMISSED)

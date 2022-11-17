@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import android.os.Build
-import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -29,37 +26,29 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -74,18 +63,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private val background = Color(0xFF121212)
 
 @Composable
-fun OnboardingPlusFeaturesPage(
+internal fun OnboardingPlusPage(
     onShown: () -> Unit,
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<OnboardingPlusFeaturesViewModel>()
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) { onShown() }
-    BackHandler { onBackPressed() }
 
     Box(
         Modifier
@@ -353,71 +340,6 @@ private fun Background() {
     }
 }
 
-private val plusGradientBrush = Brush.horizontalGradient(
-    0f to Color(0xFFFED745),
-    1f to Color(0xFFFEB525),
-)
-
-@Composable
-private fun PlusRowButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(all = 0.dp), // Remove content padding
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-    ) {
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .background(plusGradientBrush)
-        ) {
-            Text(
-                text = text,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .padding(6.dp)
-                    // add extra 8.dp extra padding to offset removal of button padding (see ButtonDefaults.ButtonVerticalPadding)
-                    .padding(8.dp)
-                    .align(Alignment.Center),
-                textAlign = TextAlign.Center,
-                color = Color.Black
-            )
-        }
-    }
-}
-
-@Composable
-private fun PlusOutlinedRowButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(2.dp, plusGradientBrush),
-        modifier = modifier.fillMaxWidth(),
-        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent),
-    ) {
-        Box(Modifier.fillMaxWidth()) {
-            Text(
-                text = text,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .align(Alignment.Center)
-                    .textBrush(plusGradientBrush)
-            )
-        }
-    }
-}
-
 // Based on https://stackoverflow.com/a/71344813/1910286
 private tailrec suspend fun autoScroll(
     scrollDelay: Long,
@@ -434,20 +356,10 @@ private tailrec suspend fun autoScroll(
     autoScroll(scrollDelay, lazyListState)
 }
 
-// From https://stackoverflow.com/a/71376469/1910286
-private fun Modifier.textBrush(brush: Brush) = this
-    .graphicsLayer(alpha = 0.99f)
-    .drawWithCache {
-        onDrawWithContent {
-            drawContent()
-            drawRect(brush, blendMode = BlendMode.SrcAtop)
-        }
-    }
-
 @Preview
 @Composable
 private fun OnboardingPlusFeaturesPreview() {
-    OnboardingPlusFeaturesPage(
+    OnboardingPlusPage(
         onShown = {},
         onBackPressed = {},
         onUpgradePressed = {},
