@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -12,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
@@ -27,6 +30,7 @@ class MainActivityViewModel
 
     var isPlayerOpen: Boolean = false
     var lastPlaybackState: PlaybackState? = null
+    val shouldShowStoriesModal = MutableStateFlow(true)
 
     private val playbackStateRx = playbackManager.playbackStateRelay
         .doOnNext {
@@ -52,4 +56,9 @@ class MainActivityViewModel
     }
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
+    fun updateStoriesModalShowState(show: Boolean) {
+        viewModelScope.launch {
+            shouldShowStoriesModal.value = show && isEndOfYearStoriesEligible()
+        }
+    }
 }

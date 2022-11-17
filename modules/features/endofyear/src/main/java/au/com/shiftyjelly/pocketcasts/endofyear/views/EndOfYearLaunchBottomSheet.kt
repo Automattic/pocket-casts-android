@@ -40,10 +40,13 @@ private val ImageContentCoverBottomPadding = 8.dp
 @Composable
 fun EndOfYearLaunchBottomSheet(
     modifier: Modifier = Modifier,
+    shouldShow: Boolean = true,
     onClick: () -> Unit,
+    onExpanded: () -> Unit,
 ) {
     ModalBottomSheet(
-        showOnLoad = true,
+        shouldShow = shouldShow,
+        onExpanded = onExpanded,
         content = BottomSheetContentState.Content(
             titleText = stringResource(LR.string.end_of_year_launch_modal_title),
             imageContent = { ImageContent(modifier) },

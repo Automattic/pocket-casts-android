@@ -12,6 +12,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -197,7 +199,7 @@ class MainActivity :
         lifecycleScope.launchWhenCreated {
             val isEligible = viewModel.isEndOfYearStoriesEligible()
             if (isEligible) {
-                setupEndOfYearLaunchBottomSheet()
+                showEndOfYearLaunchBottomSheet()
                 if (settings.getEndOfYearShowBadge2022()) {
                     binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                 }
@@ -494,13 +496,18 @@ class MainActivity :
         showBottomSheet(UpNextFragment.newInstance(source = source))
     }
 
-    private fun setupEndOfYearLaunchBottomSheet() {
+    private fun showEndOfYearLaunchBottomSheet() {
         binding.modalBottomSheet.setContent {
             AppTheme(theme.activeTheme) {
+                val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
                 EndOfYearLaunchBottomSheet(
+                    shouldShow = shouldShow,
                     onClick = {
                         StoriesFragment.newInstance()
                             .show(supportFragmentManager, "stories_dialog")
+                    },
+                    onExpanded = {
+                        viewModel.updateStoriesModalShowState(false)
                     }
                 )
             }
@@ -560,6 +567,10 @@ class MainActivity :
 
         viewModel.signInState.observe(this) { signinState ->
             val status = (signinState as? SignInState.SignedIn)?.subscriptionStatus
+
+            if (signinState.isSignedIn) {
+                viewModel.updateStoriesModalShowState(true)
+            }
 
             if (signinState.isSignedInAsPlus) {
                 status?.let {
