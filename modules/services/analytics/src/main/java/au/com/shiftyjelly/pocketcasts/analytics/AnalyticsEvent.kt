@@ -296,4 +296,24 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DETAIL_DISMISSED("episode_detail_dismissed"),
     EPISODE_DETAIL_PODCAST_NAME_TAPPED("episode_detail_podcast_name_tapped"),
     EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED("episode_detail_show_notes_link_tapped"),
+
+    /* Recommendations */
+    RECOMMENDATIONS_SHOWN("recommendations_shown"),
+    RECOMMENDATIONS_DISMISSED("recommendations_dismissed"),
+
+    /* Onboarding upgrade */
+    ONBOARDING_UPGRADE_SHOWN("onboarding_upgrade_shown"),
+    ONBOARDING_UPGRADE_DISMISSED("onboarding_upgrade_dismissed"),
+    ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED("onboarding_upgrade_unlock_all_features_tapped"),
+    ONBOARDING_UPGRADE_NOT_NOW_TAPPED("onboarding_upgrade_not_now_tapped"),
+
+    /* End of Year */
+    END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),
+    END_OF_YEAR_STORIES_SHOWN("end_of_year_stories_shown"),
+    END_OF_YEAR_STORIES_DISMISSED("end_of_year_stories_dismissed"),
+    END_OF_YEAR_STORIES_FAILED_TO_LOAD("end_of_year_stories_failed_to_load"),
+    END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED("end_of_year_story_replay_button_tapped"),
+    END_OF_YEAR_STORY_SHOWN("end_of_year_story_shown"),
+    END_OF_YEAR_STORY_SHARE("end_of_year_story_share"),
+    END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
 }

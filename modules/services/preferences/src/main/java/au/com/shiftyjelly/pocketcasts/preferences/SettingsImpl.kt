@@ -70,6 +70,7 @@ class SettingsImpl @Inject constructor(
         private const val SEND_CRASH_REPORTS_KEY = "SendCrashReportsKey"
         private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
+        private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
     }
 
     private var languageCode: String? = null
@@ -1484,4 +1485,15 @@ class SettingsImpl @Inject constructor(
 
     override fun getEndOfYearShowBadge2022(): Boolean =
         getBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, true)
+
+    override fun setEndOfYearModalHasBeenShown(value: Boolean) {
+        setBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, value)
+    }
+
+    override fun getEndOfYearModalHasBeenShown(): Boolean =
+        getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, true)
+
+    override fun endOfYearRequireLogin(): Boolean {
+        return BuildConfig.END_OF_YEAR_REQUIRE_LOGIN
+    }
 }

@@ -140,4 +140,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     override fun isUpNextShowing(): Boolean {
         return false
     }
+
+    override fun showStoriesOrAccount(source: String) {
+    }
 }

@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
@@ -26,6 +28,7 @@ class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
     private val shareableTextProvider: ShareableTextProvider,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Loading)
@@ -34,9 +37,9 @@ class StoriesViewModel @Inject constructor(
     private val mutableProgress = MutableStateFlow(0f)
     val progress: StateFlow<Float> = mutableProgress
 
-    private val stories = MutableStateFlow(emptyList<Story>())
+    private val stories = mutableListOf<Story>()
     private val numOfStories: Int
-        get() = stories.value.size
+        get() = stories.size
 
     private var currentIndex: Int = 0
     private val nextIndex
@@ -44,7 +47,7 @@ class StoriesViewModel @Inject constructor(
     private val totalLengthInMs
         get() = storyLengthsInMs.sum() + gapLengthsInMs
     private val storyLengthsInMs: List<Long>
-        get() = stories.value.map { it.storyLength }
+        get() = stories.map { it.storyLength }
     private val gapLengthsInMs: Long
         get() = STORY_GAP_LENGTH_MS * numOfStories.minus(1).coerceAtLeast(0)
 
@@ -57,21 +60,25 @@ class StoriesViewModel @Inject constructor(
     }
 
     private suspend fun loadStories() {
-        endOfYearManager.downloadListeningHistory()
-        stories.value = endOfYearManager.loadStories()
-        val state = if (stories.value.isEmpty()) {
-            State.Error
-        } else {
-            State.Loaded(
-                currentStory = stories.value[currentIndex],
-                segmentsData = SegmentsData(
-                    xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
-                    widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
+        try {
+            endOfYearManager.downloadListeningHistory()
+            stories.addAll(endOfYearManager.loadStories())
+            val state = if (stories.isEmpty()) {
+                State.Error
+            } else {
+                State.Loaded(
+                    currentStory = stories[currentIndex],
+                    segmentsData = SegmentsData(
+                        xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
+                        widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
+                    )
                 )
-            )
+            }
+            mutableState.value = state
+            if (state is State.Loaded) start()
+        } catch (e: Exception) {
+            mutableState.value = State.Error
         }
-        mutableState.value = state
-        if (state is State.Loaded) start()
     }
 
     fun start() {
@@ -87,7 +94,7 @@ class StoriesViewModel @Inject constructor(
             if (newProgress.roundOff() == getXStartOffsetAtIndex(nextIndex).roundOff()) {
                 currentIndex = nextIndex
                 mutableState.value =
-                    currentState.copy(currentStory = stories.value[currentIndex])
+                    currentState.copy(currentStory = stories[currentIndex])
             }
 
             mutableProgress.value = newProgress
@@ -109,6 +116,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun replay() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED)
         skipToStoryAtIndex(0)
     }
 
@@ -116,8 +124,7 @@ class StoriesViewModel @Inject constructor(
         if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
-        mutableState.value =
-            (state.value as State.Loaded).copy(currentStory = stories.value[index])
+        mutableState.value = (state.value as State.Loaded).copy(currentStory = stories[index])
     }
 
     fun onShareClicked(
@@ -126,8 +133,9 @@ class StoriesViewModel @Inject constructor(
         showShareForFile: (File, ShareTextData) -> Unit,
     ) {
         pause()
-        val currentState = (state.value as State.Loaded)
+        val currentState = state.value as State.Loaded
         val story = requireNotNull(currentState.currentStory)
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHARE, AnalyticsProp.storyShare(story.identifier))
         viewModelScope.launch {
             val savedFile = fileUtilWrapper.saveBitmapToFile(
                 onCaptureBitmap.invoke(),
@@ -182,6 +190,38 @@ class StoriesViewModel @Inject constructor(
         }
 
         object Error : State()
+    }
+
+    fun trackStoryShown() {
+        val currentState = state.value as State.Loaded
+        val currentStory = requireNotNull(currentState.currentStory)
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORY_SHOWN,
+            AnalyticsProp.storyShown(currentStory.identifier)
+        )
+    }
+
+    fun trackStoryShared() {
+        val currentState = state.value as? State.Loaded
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
+            AnalyticsProp.storyShared(
+                currentState?.currentStory?.identifier ?: "",
+                shareableTextProvider.chosenActivity ?: ""
+            )
+        )
+    }
+
+    fun trackStoryFailedToLoad() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
+    }
+
+    private object AnalyticsProp {
+        private const val story = "story"
+        private const val activity = "activity"
+        fun storyShown(storyId: String) = mapOf(story to storyId)
+        fun storyShare(storyId: String) = mapOf(story to storyId)
+        fun storyShared(storyId: String, activityId: String) = mapOf(story to storyId, activity to activityId)
     }
 
     companion object {
