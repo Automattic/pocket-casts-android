@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -110,26 +111,21 @@ private fun ReplayButton(
 ) {
     Button(
         onClick = { onClick() },
-        elevation = ButtonDefaults.elevation(
-            defaultElevation = 0.dp,
-            pressedElevation = 0.dp,
-            hoveredElevation = 0.dp,
-            focusedElevation = 0.dp,
-        ),
+        shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults
             .buttonColors(
-                backgroundColor = Color.Transparent,
-                contentColor = Color.Transparent
+                backgroundColor = Color.White,
+                contentColor = Color.White
             ),
     ) {
         Icon(
             imageVector = Icons.Default.Refresh,
             contentDescription = null,
-            tint = Color.White
+            tint = Color.Black
         )
         TextP40(
             text = stringResource(id = LR.string.end_of_year_replay),
-            color = Color.White,
+            color = Color.Black,
             modifier = modifier.padding(2.dp)
         )
     }
