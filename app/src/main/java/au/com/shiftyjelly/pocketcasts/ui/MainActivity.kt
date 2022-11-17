@@ -506,6 +506,7 @@ class MainActivity :
                         showStoriesOrAccount()
                     },
                     onExpanded = {
+                        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
                         settings.setEndOfYearModalHasBeenShown(true)
                         viewModel.updateStoriesModalShowState(false)
                     }
