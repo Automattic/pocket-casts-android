@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,12 +27,11 @@ import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.dynamicBackground
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val HeartImageSize = 72.dp
-private const val BackgroundColor = 0xFFFDDC68
+private const val BackgroundColor = 0xFF1A1A1A
 
 @Composable
 fun StoryEpilogueView(
@@ -44,7 +44,7 @@ fun StoryEpilogueView(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .dynamicBackground(Color(BackgroundColor))
+            .background(Color(BackgroundColor))
             .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = modifier.height(40.dp))
