@@ -237,7 +237,7 @@ fun TextH70(
     Text(
         text = text,
         color = color,
-        fontSize = 12.sp,
+        fontSize = if (disableScale) 12.nonScaledSp else 12.sp,
         fontWeight = fontWeight,
         lineHeight = if (disableScale) 14.nonScaledSp else 14.sp,
         letterSpacing = if (disableScale) .25f.nonScaledSp else .25.sp,
