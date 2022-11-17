@@ -8,15 +8,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 
-private const val Black50 = 0x80000000
+private const val Black60 = 0x99000000
 
 fun Modifier.podcastDynamicBackground(podcast: Podcast) =
     dynamicBackground(Color(podcast.getTintColor(false)))
 
 fun Modifier.dynamicBackground(
     baseColor: Color,
-    colorStops: List<Color> = listOf(Color.Black, Color(Black50)),
-    direction: FadeDirection = FadeDirection.BottomToTop,
+    colorStops: List<Color> = listOf(Color.Black, Color(Black60)),
+    direction: FadeDirection = FadeDirection.TopToBottom,
 ) =
     graphicsLayer {
         /*
