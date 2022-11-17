@@ -9,15 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-
-private const val PodcastCoverRotationAngle = -30f
-private const val PodcastCoverSkew = 0.45f
 
 @Composable
 fun PodcastCover(
@@ -57,17 +52,15 @@ fun RectangleCover(
 }
 
 fun Modifier.transformPodcastCover() =
-    graphicsLayer(rotationZ = PodcastCoverRotationAngle)
-        .drawWithContent {
-            withTransform({
-                val transformMatrix = Matrix()
-                transformMatrix.values[Matrix.SkewX] = PodcastCoverSkew
-                transform(transformMatrix)
-            }
-            ) {
-                this@drawWithContent.drawContent()
-            }
+    drawWithContent {
+        withTransform({
+            scale(1f, .6f)
+            rotate(-45f)
+            scale(1.25f, 1.25f)
+        }) {
+            this@drawWithContent.drawContent()
         }
+    }
 
 enum class PodcastCoverType {
     SMALL,
