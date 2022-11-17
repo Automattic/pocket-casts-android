@@ -141,6 +141,6 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
         return false
     }
 
-    override fun showStoriesOrAccount() {
+    override fun showStoriesOrAccount(source: String) {
     }
 }

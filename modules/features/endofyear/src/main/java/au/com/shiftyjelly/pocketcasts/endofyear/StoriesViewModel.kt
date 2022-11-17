@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
@@ -26,6 +28,7 @@ class StoriesViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager,
     private val fileUtilWrapper: FileUtilWrapper,
     private val shareableTextProvider: ShareableTextProvider,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
     private val mutableState = MutableStateFlow<State>(State.Loading)
@@ -113,6 +116,7 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun replay() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED)
         skipToStoryAtIndex(0)
     }
 
@@ -120,8 +124,7 @@ class StoriesViewModel @Inject constructor(
         if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
-        mutableState.value =
-            (state.value as State.Loaded).copy(currentStory = stories[index])
+        mutableState.value = (state.value as State.Loaded).copy(currentStory = stories[index])
     }
 
     fun onShareClicked(
@@ -130,8 +133,9 @@ class StoriesViewModel @Inject constructor(
         showShareForFile: (File, ShareTextData) -> Unit,
     ) {
         pause()
-        val currentState = (state.value as State.Loaded)
+        val currentState = state.value as State.Loaded
         val story = requireNotNull(currentState.currentStory)
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHARE, AnalyticsProp.storyShare(story.identifier))
         viewModelScope.launch {
             val savedFile = fileUtilWrapper.saveBitmapToFile(
                 onCaptureBitmap.invoke(),
@@ -186,6 +190,38 @@ class StoriesViewModel @Inject constructor(
         }
 
         object Error : State()
+    }
+
+    fun trackStoryShown() {
+        val currentState = state.value as State.Loaded
+        val currentStory = requireNotNull(currentState.currentStory)
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORY_SHOWN,
+            AnalyticsProp.storyShown(currentStory.identifier)
+        )
+    }
+
+    fun trackStoryShared() {
+        val currentState = state.value as? State.Loaded
+        analyticsTracker.track(
+            AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
+            AnalyticsProp.storyShared(
+                currentState?.currentStory?.identifier ?: "",
+                shareableTextProvider.chosenActivity ?: ""
+            )
+        )
+    }
+
+    fun trackStoryFailedToLoad() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
+    }
+
+    private object AnalyticsProp {
+        private const val story = "story"
+        private const val activity = "activity"
+        fun storyShown(storyId: String) = mapOf(story to storyId)
+        fun storyShare(storyId: String) = mapOf(story to storyId)
+        fun storyShared(storyId: String, activityId: String) = mapOf(story to storyId, activity to activityId)
     }
 
     companion object {

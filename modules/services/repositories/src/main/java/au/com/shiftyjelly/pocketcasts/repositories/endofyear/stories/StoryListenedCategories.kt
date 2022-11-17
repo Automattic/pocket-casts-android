@@ -4,4 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 
 class StoryListenedCategories(
     val listenedCategories: List<ListenedCategory>
-) : Story()
+) : Story() {
+    override val identifier: String = "listened_categories"
+}

@@ -1,8 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.app.Activity
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -101,6 +104,9 @@ fun StoriesPage(
         ActivityResultContracts.StartActivityForResult()
     ) {
         /* Share activity dismissed, start paused story */
+        if (it.resultCode == Activity.RESULT_OK) {
+            viewModel.trackStoryShared()
+        }
         viewModel.start()
     }
 
@@ -111,6 +117,7 @@ fun StoriesPage(
     Box(modifier = modifier.size(dialogSize)) {
         when (state) {
             is State.Loaded -> {
+                viewModel.trackStoryShown()
                 StoriesView(
                     state = state as State.Loaded,
                     progress = viewModel.progress,
@@ -121,10 +128,12 @@ fun StoriesPage(
                     onCloseClicked = onCloseClicked,
                     onReplayClicked = { viewModel.replay() },
                     onShareClicked = {
+                        val currentStory = requireNotNull((state as State.Loaded).currentStory)
                         viewModel.onShareClicked(it, context) { file, shareTextData ->
                             showShareForFile(
                                 context,
                                 file,
+                                currentStory.identifier,
                                 shareLauncher,
                                 shareTextData
                             )
@@ -133,7 +142,10 @@ fun StoriesPage(
                 )
             }
             State.Loading -> StoriesLoadingView(onCloseClicked)
-            State.Error -> StoriesErrorView(onCloseClicked)
+            State.Error -> {
+                viewModel.trackStoryFailedToLoad()
+                StoriesErrorView(onCloseClicked)
+            }
         }
     }
 }
@@ -375,6 +387,7 @@ private fun StorySwitcher(
 private fun showShareForFile(
     context: Context,
     file: File,
+    storyIdentifier: String,
     shareLauncher: ActivityResultLauncher<Intent>,
     shareTextData: ShareTextData,
 ) {
@@ -385,13 +398,26 @@ private fun showShareForFile(
             shareText += " ${Settings.SERVER_SHORT_URL}"
         }
 
-        val chooserIntent = ShareCompat.IntentBuilder(context)
+        val shareIntent = ShareCompat.IntentBuilder(context)
             .setType("image/png")
             .addStream(uri)
             .setText(shareText)
             .setChooserTitle(LR.string.end_of_year_share_via)
-            .createChooserIntent()
+            .intent
 
+        val pendingIntent = PendingIntent.getBroadcast(
+            context, 0,
+            Intent(context, ShareResultReceiver::class.java).apply {
+                putExtra(ShareResultReceiver.EXTRA_STORY_ID, storyIdentifier)
+            },
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+        )
+
+        val chooserIntent = Intent.createChooser(shareIntent, null, pendingIntent.intentSender)
         shareLauncher.launch(chooserIntent)
     } catch (e: Exception) {
         Timber.e(e)
