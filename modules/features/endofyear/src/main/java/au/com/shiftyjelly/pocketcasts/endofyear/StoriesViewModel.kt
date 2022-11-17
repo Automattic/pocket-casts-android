@@ -15,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -38,9 +37,9 @@ class StoriesViewModel @Inject constructor(
     private val mutableProgress = MutableStateFlow(0f)
     val progress: StateFlow<Float> = mutableProgress
 
-    private val stories = MutableStateFlow(emptyList<Story>())
+    private val stories = mutableListOf<Story>()
     private val numOfStories: Int
-        get() = stories.value.size
+        get() = stories.size
 
     private var currentIndex: Int = 0
     private val nextIndex
@@ -48,7 +47,7 @@ class StoriesViewModel @Inject constructor(
     private val totalLengthInMs
         get() = storyLengthsInMs.sum() + gapLengthsInMs
     private val storyLengthsInMs: List<Long>
-        get() = stories.value.map { it.storyLength }
+        get() = stories.map { it.storyLength }
     private val gapLengthsInMs: Long
         get() = STORY_GAP_LENGTH_MS * numOfStories.minus(1).coerceAtLeast(0)
 
@@ -61,18 +60,15 @@ class StoriesViewModel @Inject constructor(
     }
 
     private suspend fun loadStories() {
-        endOfYearManager.downloadListeningHistory()
-        endOfYearManager.loadStories().stateIn(viewModelScope).collect { result ->
-            cancelTimer()
-            if (result.size != stories.value.size) resetProgressAndCurrentIndex()
-            stories.value = result
-
-            val state = if (result.isEmpty()) {
+        try {
+            endOfYearManager.downloadListeningHistory()
+            stories.addAll(endOfYearManager.loadStories())
+            val state = if (stories.isEmpty()) {
                 analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
                 State.Error
             } else {
                 State.Loaded(
-                    currentStory = result[currentIndex],
+                    currentStory = stories[currentIndex],
                     segmentsData = SegmentsData(
                         xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
                         widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
@@ -81,6 +77,8 @@ class StoriesViewModel @Inject constructor(
             }
             mutableState.value = state
             if (state is State.Loaded) start()
+        } catch (e: Exception) {
+            mutableState.value = State.Error
         }
     }
 
@@ -97,7 +95,7 @@ class StoriesViewModel @Inject constructor(
             if (newProgress.roundOff() == getXStartOffsetAtIndex(nextIndex).roundOff()) {
                 currentIndex = nextIndex
                 mutableState.value =
-                    currentState.copy(currentStory = stories.value[currentIndex])
+                    currentState.copy(currentStory = stories[currentIndex])
             }
 
             mutableProgress.value = newProgress
@@ -127,7 +125,7 @@ class StoriesViewModel @Inject constructor(
         if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
-        mutableState.value = (state.value as State.Loaded).copy(currentStory = stories.value[index])
+        mutableState.value = (state.value as State.Loaded).copy(currentStory = stories[index])
     }
 
     fun onShareClicked(

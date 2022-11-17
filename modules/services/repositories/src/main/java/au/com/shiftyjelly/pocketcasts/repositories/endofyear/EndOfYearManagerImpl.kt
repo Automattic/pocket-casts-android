@@ -22,9 +22,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.transform
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
@@ -53,9 +50,9 @@ class EndOfYearManagerImpl @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    override fun isEligibleForStories(): Flow<Boolean> =
-        hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN))
-            .transform { emit(it && BuildConfig.END_OF_YEAR_ENABLED) }
+    override suspend fun isEligibleForStories(): Boolean =
+        hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN)) &&
+            BuildConfig.END_OF_YEAR_ENABLED
 
     /**
      * Download the year's listening history.
@@ -84,42 +81,38 @@ class EndOfYearManagerImpl @Inject constructor(
         }
     }
 
-    override fun loadStories(): Flow<List<Story>> {
-        return combine(
-            getTotalListeningTimeInSecsForYear(YEAR),
-            findListenedCategoriesForYear(YEAR),
-            findListenedNumbersForYear(YEAR),
-            findTopPodcastsForYear(YEAR, limit = 10),
-            findLongestPlayedEpisodeForYear(YEAR)
-        ) { listeningTime, listenedCategories, listenedNumbers, topPodcasts, longestEpisode ->
-            val stories = mutableListOf<Story>()
+    override suspend fun loadStories(): List<Story> {
+        val listeningTime = getTotalListeningTimeInSecsForYear(YEAR)
+        val listenedCategories = findListenedCategoriesForYear(YEAR)
+        val listenedNumbers = findListenedNumbersForYear(YEAR)
+        val topPodcasts = findTopPodcastsForYear(YEAR, limit = 10)
+        val longestEpisode = findLongestPlayedEpisodeForYear(YEAR)
+        val stories = mutableListOf<Story>()
 
-            stories.add(StoryIntro())
-            listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
-            if (listenedCategories.isNotEmpty()) {
-                stories.add(StoryListenedCategories(listenedCategories))
-                stories.add(StoryTopListenedCategories(listenedCategories))
-            }
-            if (listenedNumbers.numberOfEpisodes > 1 && listenedNumbers.numberOfPodcasts > 1) {
-                stories.add(StoryListenedNumbers(listenedNumbers, topPodcasts))
-            }
-            if (topPodcasts.isNotEmpty()) {
-                stories.add(StoryTopPodcast(topPodcasts.first()))
-                if (topPodcasts.size > 1) {
-                    stories.add(StoryTopFivePodcasts(topPodcasts.take(5)))
-                }
-            }
-            longestEpisode?.let { stories.add(StoryLongestEpisode(it)) }
-            stories.add(StoryEpilogue())
-
-            stories
+        stories.add(StoryIntro())
+        listeningTime?.let { stories.add(StoryListeningTime(it, topPodcasts.takeLast(3))) }
+        if (listenedCategories.isNotEmpty()) {
+            stories.add(StoryListenedCategories(listenedCategories))
+            stories.add(StoryTopListenedCategories(listenedCategories))
         }
+        if (listenedNumbers.numberOfEpisodes > 1 && listenedNumbers.numberOfPodcasts > 1) {
+            stories.add(StoryListenedNumbers(listenedNumbers, topPodcasts))
+        }
+        if (topPodcasts.isNotEmpty()) {
+            stories.add(StoryTopPodcast(topPodcasts.first()))
+            if (topPodcasts.size > 1) {
+                stories.add(StoryTopFivePodcasts(topPodcasts.take(5)))
+            }
+        }
+        longestEpisode?.let { stories.add(StoryLongestEpisode(it)) }
+        stories.add(StoryEpilogue())
+
+        return stories
     }
 
     /* Returns whether user listened to at least one episode for more than given time for the year */
-    override fun hasEpisodesPlayedUpto(year: Int, playedUpToInSecs: Long): Flow<Boolean> {
-        return episodeManager.countEpisodesPlayedUpto(yearStart, yearEnd, playedUpToInSecs)
-            .transform { count -> emit(count > 0) }
+    override suspend fun hasEpisodesPlayedUpto(year: Int, playedUpToInSecs: Long): Boolean {
+        return episodeManager.countEpisodesPlayedUpto(yearStart, yearEnd, playedUpToInSecs) > 0
     }
 
     private suspend fun anyEpisodeInteractionBeforeYear(): Boolean {
@@ -130,25 +123,25 @@ class EndOfYearManagerImpl @Inject constructor(
         return episodeManager.countEpisodesInListeningHistory(yearStart, yearEnd)
     }
 
-    override fun getTotalListeningTimeInSecsForYear(year: Int): Flow<Long?> {
+    override suspend fun getTotalListeningTimeInSecsForYear(year: Int): Long? {
         return episodeManager.calculateListeningTime(yearStart, yearEnd)
     }
 
-    override fun findListenedCategoriesForYear(year: Int): Flow<List<ListenedCategory>> {
+    override suspend fun findListenedCategoriesForYear(year: Int): List<ListenedCategory> {
         return episodeManager.findListenedCategories(yearStart, yearEnd)
     }
 
-    override fun findListenedNumbersForYear(year: Int): Flow<ListenedNumbers> {
+    override suspend fun findListenedNumbersForYear(year: Int): ListenedNumbers {
         return episodeManager.findListenedNumbers(yearStart, yearEnd)
     }
 
     /* Returns top podcasts ordered by number of played episodes. If there's a tie on number of played episodes,
     played time is checked. */
-    override fun findTopPodcastsForYear(year: Int, limit: Int): Flow<List<TopPodcast>> {
+    override suspend fun findTopPodcastsForYear(year: Int, limit: Int): List<TopPodcast> {
         return podcastManager.findTopPodcasts(yearStart, yearEnd, limit)
     }
 
-    override fun findLongestPlayedEpisodeForYear(year: Int): Flow<LongestEpisode?> {
+    override suspend fun findLongestPlayedEpisodeForYear(year: Int): LongestEpisode? {
         return episodeManager.findLongestPlayedEpisode(yearStart, yearEnd)
     }
 }

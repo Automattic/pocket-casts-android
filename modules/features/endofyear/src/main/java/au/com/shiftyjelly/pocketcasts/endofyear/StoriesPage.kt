@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -53,7 +54,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.waitForUpInitial
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.waitForUpOrCancelInitial
 import au.com.shiftyjelly.pocketcasts.endofyear.views.SegmentedProgressIndicator
 import au.com.shiftyjelly.pocketcasts.endofyear.views.convertibleToBitmap
 import au.com.shiftyjelly.pocketcasts.endofyear.views.stories.StoryEpilogueView
@@ -90,7 +91,7 @@ private val ShareButtonStrokeWidth = 2.dp
 private val StoryViewCornerSize = 10.dp
 private val StoriesViewMaxSize = 700.dp
 private const val MaxHeightPercentFactor = 0.9f
-private const val LongPressThresholdTimeInMs = 150
+private const val LongPressThresholdTimeInMs = 175
 const val StoriesViewAspectRatioForTablet = 2f
 
 @Composable
@@ -253,7 +254,7 @@ private fun ShareButton(
                 backgroundColor = Color.Transparent,
                 contentColor = Color.White,
             ),
-        iconImage = Icons.Default.Share,
+        textIcon = rememberVectorPainter(Icons.Default.Share),
         onClick = {
             onClick.invoke()
         }
@@ -355,17 +356,21 @@ private fun StorySwitcher(
                         awaitPointerEventScope {
                             val pressStartTime = System.currentTimeMillis()
                             onPause()
-                            waitForUpInitial()
-                            val pressEndTime = System.currentTimeMillis()
-                            val diffPressTime = pressEndTime - pressStartTime
-                            if (diffPressTime < LongPressThresholdTimeInMs) {
-                                if (it.x > screenWidth / 2) {
-                                    onSkipNext()
-                                } else {
-                                    onSkipPrevious()
-                                }
-                            } else {
+                            val upOrCancel = waitForUpOrCancelInitial()
+                            if (upOrCancel == null) {
                                 onStart()
+                            } else {
+                                val pressEndTime = System.currentTimeMillis()
+                                val diffPressTime = pressEndTime - pressStartTime
+                                if (diffPressTime < LongPressThresholdTimeInMs) {
+                                    if (it.x > screenWidth / 2) {
+                                        onSkipNext()
+                                    } else {
+                                        onSkipPrevious()
+                                    }
+                                } else {
+                                    onStart()
+                                }
                             }
                         }
                     }

@@ -58,13 +58,12 @@ fun CategoryPillar(
         Title(
             text = title,
             modifier = Modifier
-                .padding(bottom = 0.dp)
-                .width(width)
+                .width(width * 1.2f)
         )
         Duration(
             text = duration,
             modifier = Modifier
-                .width(width)
+                .width(width * 1.2f)
                 .alpha(0.8f)
                 .padding(bottom = 30.dp)
         )

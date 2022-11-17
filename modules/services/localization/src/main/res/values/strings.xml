@@ -1453,7 +1453,7 @@
     <!-- Onboarding -->
 
     <string name="onboarding_welcome_back">Welcome back</string>
-    <string name="onboarding_not_now">Not now</string>
+    <string name="not_now">Not now</string>
     <string name="onboarding_sign_up_free">Sign up free</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
@@ -1461,6 +1461,22 @@
     <string name="onboarding_get_the_newsletter">Get the newsletter</string>
     <string name="onboarding_forgot_password">Forgot password?</string>
     <string name="onboarding_email_invalid_message">Please enter a valid email</string>
+    <string name="onboarding_recommendations_find_favorite_podcasts">Find your favorite podcasts</string>
+    <string name="onboarding_recommendations_make_pocket_casts_yours">Make Pocket Casts yours by selecting your favorite podcasts or import them from another podcast player. You can always do this later.</string>
+    <string name="onboarding_recommendations_import">Import</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket Casts, plus more</string>
+    <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customization options</string>
+    <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
+    <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
+    <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
+    <string name="onboarding_plus_feature_folders_title">Folders</string>
+    <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">10GB Cloud Storage</string>
+    <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
+    <string name="onboarding_plus_feature_hide_ads_title">Hide Ads</string>
+    <string name="onboarding_plus_feature_hide_ads_text">Ad-free experience which gives you more of what you love and less of what you don\'t.</string>
+    <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
+    <string name="onboarding_plus_feature_themes_icons_text">Fly your true colors. Exclusive icons and themes for the Plus club only.</string>
 
     <!--    Tasker Plugin-->
 

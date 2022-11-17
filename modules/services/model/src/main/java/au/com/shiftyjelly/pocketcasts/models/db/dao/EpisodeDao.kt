@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 @Dao
@@ -313,7 +312,7 @@ abstract class EpisodeDao {
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
     @Query("SELECT SUM(played_up_to) FROM episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > :fromEpochMs AND last_playback_interaction_date < :toEpochMs")
-    abstract fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?>
+    abstract suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?
 
     @Query(
         """
@@ -325,7 +324,7 @@ abstract class EpisodeDao {
         ORDER BY totalPlayedTime DESC
         """
     )
-    abstract fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>>
+    abstract suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
 
     @Query(
         """
@@ -335,7 +334,7 @@ abstract class EpisodeDao {
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
         """
     )
-    abstract fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers>
+    abstract suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers
 
     @Query(
         """
@@ -347,7 +346,7 @@ abstract class EpisodeDao {
         LIMIT 1
         """
     )
-    abstract fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): Flow<LongestEpisode?>
+    abstract suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
 
     @Query(
         """
@@ -357,7 +356,7 @@ abstract class EpisodeDao {
         AND episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
         """
     )
-    abstract fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int>
+    abstract suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
 
     @Query(
         """
