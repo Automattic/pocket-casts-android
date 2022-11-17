@@ -64,7 +64,6 @@ class StoriesViewModel @Inject constructor(
             endOfYearManager.downloadListeningHistory()
             stories.addAll(endOfYearManager.loadStories())
             val state = if (stories.isEmpty()) {
-                analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
                 State.Error
             } else {
                 State.Loaded(
@@ -136,7 +135,7 @@ class StoriesViewModel @Inject constructor(
         pause()
         val currentState = state.value as State.Loaded
         val story = requireNotNull(currentState.currentStory)
-        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHARE, mapOf(AnalyticsProp.story to story.identifier))
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_SHARE, AnalyticsProp.storyShare(story.identifier))
         viewModelScope.launch {
             val savedFile = fileUtilWrapper.saveBitmapToFile(
                 onCaptureBitmap.invoke(),
@@ -157,11 +156,6 @@ class StoriesViewModel @Inject constructor(
     private fun cancelTimer() {
         timer?.cancel()
         timer = null
-    }
-
-    private fun resetProgressAndCurrentIndex() {
-        mutableProgress.value = 0f
-        currentIndex = 0
     }
 
     override fun onCleared() {
@@ -203,7 +197,7 @@ class StoriesViewModel @Inject constructor(
         val currentStory = requireNotNull(currentState.currentStory)
         analyticsTracker.track(
             AnalyticsEvent.END_OF_YEAR_STORY_SHOWN,
-            mapOf(AnalyticsProp.story to currentStory.identifier)
+            AnalyticsProp.storyShown(currentStory.identifier)
         )
     }
 
@@ -211,16 +205,23 @@ class StoriesViewModel @Inject constructor(
         val currentState = state.value as? State.Loaded
         analyticsTracker.track(
             AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
-            mapOf(
-                AnalyticsProp.activity to (shareableTextProvider.chosenActivity ?: ""),
-                AnalyticsProp.story to (currentState?.currentStory ?: "")
+            AnalyticsProp.storyShared(
+                currentState?.currentStory?.identifier ?: "",
+                shareableTextProvider.chosenActivity ?: ""
             )
         )
     }
 
+    fun trackStoryFailedToLoad() {
+        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_FAILED_TO_LOAD)
+    }
+
     private object AnalyticsProp {
-        const val story = "story"
-        const val activity = "activity"
+        private const val story = "story"
+        private const val activity = "activity"
+        fun storyShown(storyId: String) = mapOf(story to storyId)
+        fun storyShare(storyId: String) = mapOf(story to storyId)
+        fun storyShared(storyId: String, activityId: String) = mapOf(story to storyId, activity to activityId)
     }
 
     companion object {

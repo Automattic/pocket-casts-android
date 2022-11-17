@@ -142,7 +142,10 @@ fun StoriesPage(
                 )
             }
             State.Loading -> StoriesLoadingView(onCloseClicked)
-            State.Error -> StoriesErrorView(onCloseClicked)
+            State.Error -> {
+                viewModel.trackStoryFailedToLoad()
+                StoriesErrorView(onCloseClicked)
+            }
         }
     }
 }
