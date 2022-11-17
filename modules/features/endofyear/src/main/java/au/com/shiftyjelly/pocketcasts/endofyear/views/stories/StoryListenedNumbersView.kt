@@ -76,7 +76,7 @@ private fun PodcastCoverStack(
     Box(
         modifier = modifier
             .size(availableWidth)
-            .padding(start = availableWidth * .41f, top = availableWidth * .09f)
+            .padding(start = availableWidth * .55f, top = availableWidth * .09f)
             .transformPodcastCover()
     ) {
         PodcastCover(

@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -29,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryLongestEpisode
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 
 @Composable
@@ -75,15 +73,13 @@ private fun PodcastCoverStack(
     val context = LocalContext.current
     val currentLocalView = LocalView.current
     val coverWidth = (currentLocalView.width.pxToDp(context).dp) / 2.5f
-    val translateBy = (coverWidth.value * .2).toInt().dpToPx(context)
 
     Box {
         (0..2).reversed().forEach { index ->
             Box(
                 modifier = modifier
-                    .padding(top = (index * (coverWidth.value * .25)).dp)
+                    .padding(top = (index * (coverWidth.value * .17)).dp)
                     .transformPodcastCover()
-                    .graphicsLayer(translationX = -translateBy.toFloat())
             ) {
                 with(story.longestEpisode) {
                     when (index) {

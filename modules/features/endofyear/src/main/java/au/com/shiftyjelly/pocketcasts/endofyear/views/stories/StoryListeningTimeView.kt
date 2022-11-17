@@ -1,18 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -53,11 +54,11 @@ fun StoryListeningTimeView(
 
         SecondaryText(story, modifier)
 
-        Spacer(modifier = modifier.weight(1f))
+        Spacer(modifier = modifier.weight(0.25f))
 
         PodcastCoverRow(story, modifier)
 
-        Spacer(modifier = modifier.weight(1f))
+        Spacer(modifier = modifier.weight(.5f))
 
         PodcastLogoWhite()
 
@@ -97,22 +98,25 @@ private fun PodcastCoverRow(
     val context = LocalContext.current
     val currentLocalView = LocalView.current
     val coverWidth = (currentLocalView.width.pxToDp(context).dp - 15.dp) / 3
-    val translateBy = 60.dp
-    Row(
-        modifier
-            .height(coverWidth * 2.3f)
-            .transformPodcastCover()
-            .offset(x = -translateBy, y = 75.dp)
+    Box(
+        modifier = modifier
+            .graphicsLayer { translationY = coverWidth.toPx() / 1.75f }
+            .height(coverWidth * 2.2f)
     ) {
-        listOf(1, 0, 2).forEach { index ->
-            val podcastIndex = index.coerceAtMost(story.podcasts.size - 1)
-            Row {
-                PodcastCover(
-                    uuid = story.podcasts[podcastIndex].uuid,
-                    coverWidth = coverWidth,
-                    coverType = PodcastCoverType.SMALL
-                )
-                Spacer(modifier = modifier.width(5.dp))
+        Row(
+            modifier
+                .transformPodcastCover()
+        ) {
+            listOf(1, 0, 2).forEach { index ->
+                val podcastIndex = index.coerceAtMost(story.podcasts.size - 1)
+                Row {
+                    PodcastCover(
+                        uuid = story.podcasts[podcastIndex].uuid,
+                        coverWidth = coverWidth,
+                        coverType = PodcastCoverType.SMALL
+                    )
+                    Spacer(modifier = modifier.width(5.dp))
+                }
             }
         }
     }
