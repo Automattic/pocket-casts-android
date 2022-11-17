@@ -590,4 +590,8 @@ interface Settings {
 
     fun setEndOfYearShowBadge2022(value: Boolean)
     fun getEndOfYearShowBadge2022(): Boolean
+
+    fun setEndOfYearModalHasBeenShown(value: Boolean)
+    fun getEndOfYearModalHasBeenShown(): Boolean
+    fun endOfYearRequireLogin(): Boolean
 }

@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -232,8 +231,7 @@ class ProfileFragment : BaseFragment() {
                 AppTheme(theme.activeTheme) {
                     EndOfYearPromptCard(
                         onClick = {
-                            StoriesFragment.newInstance()
-                                .show(childFragmentManager, "stories_dialog")
+                            (activity as? FragmentHostListener)?.showStoriesOrAccount()
                         }
                     )
                 }

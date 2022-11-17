@@ -39,7 +39,7 @@ class EndOfYearManagerImpl @Inject constructor(
 
     companion object {
         private const val YEAR = 2022
-        private const val EPISODE_MINIMUM_PLAYED_TIME_IN_MIN = 30L
+        private const val EPISODE_MINIMUM_PLAYED_TIME_IN_MIN = 5L
     }
 
     private val yearStart = epochAtStartOfYear(YEAR)

@@ -12,6 +12,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -197,7 +199,7 @@ class MainActivity :
         lifecycleScope.launchWhenCreated {
             val isEligible = viewModel.isEndOfYearStoriesEligible()
             if (isEligible) {
-                setupEndOfYearLaunchBottomSheet()
+                showEndOfYearLaunchBottomSheet()
                 if (settings.getEndOfYearShowBadge2022()) {
                     binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                 }
@@ -494,17 +496,37 @@ class MainActivity :
         showBottomSheet(UpNextFragment.newInstance(source = source))
     }
 
-    private fun setupEndOfYearLaunchBottomSheet() {
+    private fun showEndOfYearLaunchBottomSheet() {
         binding.modalBottomSheet.setContent {
             AppTheme(theme.activeTheme) {
+                val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
                 EndOfYearLaunchBottomSheet(
+                    shouldShow = shouldShow,
                     onClick = {
-                        StoriesFragment.newInstance()
-                            .show(supportFragmentManager, "stories_dialog")
+                        showStoriesOrAccount()
+                    },
+                    onExpanded = {
+                        settings.setEndOfYearModalHasBeenShown(true)
+                        viewModel.updateStoriesModalShowState(false)
                     }
                 )
             }
         }
+    }
+
+    override fun showStoriesOrAccount() {
+        if (viewModel.isSignedIn || !settings.endOfYearRequireLogin()) {
+            showStories()
+        } else {
+            viewModel.waitingForSignInToShowStories = true
+            val intent = Intent(this, AccountActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun showStories() {
+        StoriesFragment.newInstance()
+            .show(supportFragmentManager, "stories_dialog")
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -560,6 +582,17 @@ class MainActivity :
 
         viewModel.signInState.observe(this) { signinState ->
             val status = (signinState as? SignInState.SignedIn)?.subscriptionStatus
+
+            if (signinState.isSignedIn) {
+                if (viewModel.waitingForSignInToShowStories) {
+                    showStories()
+                    viewModel.waitingForSignInToShowStories = false
+                } else if (!settings.getEndOfYearModalHasBeenShown()) {
+                    viewModel.updateStoriesModalShowState(true)
+                }
+            } else {
+                settings.setEndOfYearModalHasBeenShown(false)
+            }
 
             if (signinState.isSignedInAsPlus) {
                 status?.let {
