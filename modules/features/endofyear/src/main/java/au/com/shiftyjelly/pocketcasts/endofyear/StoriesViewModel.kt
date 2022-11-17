@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -59,25 +58,20 @@ class StoriesViewModel @Inject constructor(
 
     private suspend fun loadStories() {
         endOfYearManager.downloadListeningHistory()
-        endOfYearManager.loadStories().stateIn(viewModelScope).collect { result ->
-            cancelTimer()
-            if (result.size != stories.value.size) resetProgressAndCurrentIndex()
-            stories.value = result
-
-            val state = if (result.isEmpty()) {
-                State.Error
-            } else {
-                State.Loaded(
-                    currentStory = result[currentIndex],
-                    segmentsData = SegmentsData(
-                        xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
-                        widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
-                    )
+        stories.value = endOfYearManager.loadStories()
+        val state = if (stories.value.isEmpty()) {
+            State.Error
+        } else {
+            State.Loaded(
+                currentStory = stories.value[currentIndex],
+                segmentsData = SegmentsData(
+                    xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
+                    widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
                 )
-            }
-            mutableState.value = state
-            if (state is State.Loaded) start()
+            )
         }
+        mutableState.value = state
+        if (state is State.Loaded) start()
     }
 
     fun start() {
@@ -154,11 +148,6 @@ class StoriesViewModel @Inject constructor(
     private fun cancelTimer() {
         timer?.cancel()
         timer = null
-    }
-
-    private fun resetProgressAndCurrentIndex() {
-        mutableProgress.value = 0f
-        currentIndex = 0
     }
 
     override fun onCleared() {

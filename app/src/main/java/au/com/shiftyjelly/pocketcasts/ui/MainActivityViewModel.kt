@@ -51,5 +51,5 @@ class MainActivityViewModel
         return signInState.isExpiredTrial && !settings.getTrialFinishedSeen()
     }
 
-    fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
+    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 }

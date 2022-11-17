@@ -751,6 +751,6 @@ class PodcastManagerImpl @Inject constructor(
         return refreshServerManager.refreshPodcastFeed(podcastUuid).isSuccessful
     }
 
-    override fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>> =
+    override suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast> =
         podcastDao.findTopPodcasts(fromEpochMs, toEpochMs, limit)
 }
