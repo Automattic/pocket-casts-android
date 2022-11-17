@@ -31,6 +31,7 @@ class MainActivityViewModel
     var isPlayerOpen: Boolean = false
     var lastPlaybackState: PlaybackState? = null
     val shouldShowStoriesModal = MutableStateFlow(true)
+    var waitingForSignInToShowStories = false
 
     private val playbackStateRx = playbackManager.playbackStateRelay
         .doOnNext {
@@ -40,6 +41,8 @@ class MainActivityViewModel
     val playbackState = LiveDataReactiveStreams.fromPublisher(playbackStateRx)
 
     val signInState: LiveData<SignInState> = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    val isSignedIn: Boolean
+        get() = signInState.value?.isSignedIn ?: false
 
     fun shouldShowCancelled(subscriptionStatus: SubscriptionStatus): Boolean {
         val plusStatus = (subscriptionStatus as? SubscriptionStatus.Plus) ?: return false

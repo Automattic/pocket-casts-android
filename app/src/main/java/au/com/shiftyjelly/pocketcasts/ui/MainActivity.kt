@@ -503,15 +503,30 @@ class MainActivity :
                 EndOfYearLaunchBottomSheet(
                     shouldShow = shouldShow,
                     onClick = {
-                        StoriesFragment.newInstance()
-                            .show(supportFragmentManager, "stories_dialog")
+                        showStoriesOrAccount()
                     },
                     onExpanded = {
+                        settings.setEndOfYearModalHasBeenShown(true)
                         viewModel.updateStoriesModalShowState(false)
                     }
                 )
             }
         }
+    }
+
+    override fun showStoriesOrAccount() {
+        if (viewModel.isSignedIn || !settings.endOfYearRequireLogin()) {
+            showStories()
+        } else {
+            viewModel.waitingForSignInToShowStories = true
+            val intent = Intent(this, AccountActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun showStories() {
+        StoriesFragment.newInstance()
+            .show(supportFragmentManager, "stories_dialog")
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -569,7 +584,14 @@ class MainActivity :
             val status = (signinState as? SignInState.SignedIn)?.subscriptionStatus
 
             if (signinState.isSignedIn) {
-                viewModel.updateStoriesModalShowState(true)
+                if (viewModel.waitingForSignInToShowStories) {
+                    showStories()
+                    viewModel.waitingForSignInToShowStories = false
+                } else if (!settings.getEndOfYearModalHasBeenShown()) {
+                    viewModel.updateStoriesModalShowState(true)
+                }
+            } else {
+                settings.setEndOfYearModalHasBeenShown(false)
             }
 
             if (signinState.isSignedInAsPlus) {

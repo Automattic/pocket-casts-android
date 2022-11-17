@@ -29,6 +29,7 @@ android {
 
         // Feature Flags
         buildConfigField "boolean", "END_OF_YEAR_ENABLED", "false"
+        buildConfigField "boolean", "END_OF_YEAR_REQUIRE_LOGIN", "true"
         buildConfigField "boolean", "ONBOARDING_ENABLED", "false"
 
         testInstrumentationRunner project.testInstrumentationRunner
