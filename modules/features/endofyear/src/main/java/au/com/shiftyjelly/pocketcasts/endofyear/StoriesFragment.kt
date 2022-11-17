@@ -50,7 +50,7 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
             setContent {
                 AppTheme(theme.activeTheme) {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-                    analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_SHOWN, mapOf(AnalyticsProp.source to source.value))
+                    analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_SHOWN, AnalyticsProp.storiesShown(source))
                     StoriesPage(
                         viewModel = viewModel,
                         onCloseClicked = {
@@ -64,10 +64,11 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
     }
 
     private object AnalyticsProp {
-        const val source = "source"
+        private const val source = "source"
         object StoriesDismissed {
             val closeButton = mapOf(source to "close_button")
         }
+        fun storiesShown(storiesSource: StoriesSource) = mapOf(source to storiesSource.value)
     }
 
     enum class StoriesSource(val value: String) {
