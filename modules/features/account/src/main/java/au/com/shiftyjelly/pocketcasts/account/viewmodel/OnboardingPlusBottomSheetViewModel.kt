@@ -64,7 +64,10 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
         when (current) {
             is Loaded -> {
                 _state.update {
-                    current.copy(selectedSubscription = subscription)
+                    current.copy(
+                        selectedSubscription = subscription,
+                        purchaseFailed = false,
+                    )
                 }
             }
             else -> {
@@ -115,7 +118,11 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
         return if (defaultSelected == null) {
             NoSubscriptions
         } else {
-            Loaded(subscriptions, defaultSelected)
+            Loaded(
+                subscriptions = subscriptions,
+                selectedSubscription = defaultSelected,
+                purchaseFailed = false,
+            )
         }
     }
 }
