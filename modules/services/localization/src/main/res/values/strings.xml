@@ -1397,7 +1397,7 @@
     <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
     <string name="end_of_year_launch_modal_image_title">Year in Podcasts</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
-    <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
+    <string name="end_of_year_launch_modal_primary_button_title">View My 2022</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
     <string name="end_of_year_prompt_card_title" translatable="false">@string/end_of_year_launch_modal_title</string>
     <string name="end_of_year_prompt_card_summary">See your top podcasts, categories, listening stats and more.</string>
