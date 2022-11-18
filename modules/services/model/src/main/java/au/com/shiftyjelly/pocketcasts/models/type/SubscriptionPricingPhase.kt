@@ -6,8 +6,14 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYea
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.time.temporal.ChronoUnit
 
 sealed interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
+    val chronoUnit: ChronoUnit
+
     // 14 days free
     fun numFree(res: Resources): String =
         res.getString(R.string.profile_amount_free, periodValuePlural(res))
@@ -15,6 +21,11 @@ sealed interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
     // 14 day free trial
     fun numPeriodFreeTrial(res: Resources): String =
         res.getString(R.string.plus_trial_duration_free_trial, periodValueSingular(res))
+
+    fun trialEnd(): String {
+        val end = chronoUnit.addTo(ZonedDateTime.now(), periodValue.toLong())
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(end)
+    }
 }
 
 sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
@@ -55,6 +66,7 @@ sealed interface SubscriptionPricingPhase {
         private val period: Period
     ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
         override val periodValue = period.years
+        override val chronoUnit = ChronoUnit.YEARS
         override val periodRes = R.string.plus_year
         override val perPeriod = R.string.profile_per_year
         override val renews = R.string.plus_renews_automatically_yearly
@@ -77,6 +89,7 @@ sealed interface SubscriptionPricingPhase {
 
         override val periodRes = R.string.plus_month
         override val periodValue = period.months
+        override val chronoUnit = ChronoUnit.MONTHS
         override val perPeriod = R.string.profile_per_month
         override val renews = R.string.plus_renews_automatically_monthly
         override val hint = null
@@ -97,6 +110,7 @@ sealed interface SubscriptionPricingPhase {
     ) : TrialSubscriptionPricingPhase {
         override val periodRes = R.string.plus_day
         override val periodValue = period.days
+        override val chronoUnit = ChronoUnit.DAYS
 
         init {
             if (phaseType() != Type.TRIAL) {

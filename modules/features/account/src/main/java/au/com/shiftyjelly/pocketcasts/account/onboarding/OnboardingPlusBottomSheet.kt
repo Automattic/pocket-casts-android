@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import android.content.res.Resources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
@@ -42,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -75,12 +77,6 @@ fun OnboardingPlusBottomSheet() {
             if (currentPeriod != null) {
                 savedPeriod = currentPeriod
             }
-
-            val animationSpec = tween<IntSize>(
-                durationMillis = 600,
-                easing = EaseInOut
-            )
-
             Spacer(Modifier.height(16.dp))
             AnimatedVisibility(
                 visible = currentPeriod != null,
@@ -135,13 +131,21 @@ fun OnboardingPlusBottomSheet() {
                 }
             }
 
+            val currentRecurringAfterString = state.selectedSubscription.trialPricingPhase?.let { recurringAfterString(it, resources) }
+            var savedRecurringAfterString by remember { mutableStateOf("") }
+            if (currentRecurringAfterString != null) {
+                savedRecurringAfterString = currentRecurringAfterString
+            }
             AnimatedVisibility(
-                visible = currentPeriod != null,
+                visible = currentRecurringAfterString != null,
                 enter = expandVertically(animationSpec),
                 exit = shrinkVertically(animationSpec),
             ) {
                 TextP60(
-                    text = "PLACEHOLDER $savedPeriod (PLACEHOLDER)",
+                    text = stringResource(
+                        LR.string.onboarding_plus_recurring_after_free_trial,
+                        savedRecurringAfterString
+                    ),
                     color = Color.White,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 16.dp)
@@ -193,3 +197,13 @@ fun OnboardingPlusBottomSheet() {
         )
     }
 }
+
+private val animationSpec = tween<IntSize>(
+    durationMillis = 600,
+    easing = EaseInOut
+)
+
+private fun recurringAfterString(
+    trialSubscriptionPricingPhase: TrialSubscriptionPricingPhase,
+    res: Resources
+) = "${trialSubscriptionPricingPhase.numPeriodFreeTrial(res)} (${trialSubscriptionPricingPhase.trialEnd()})"

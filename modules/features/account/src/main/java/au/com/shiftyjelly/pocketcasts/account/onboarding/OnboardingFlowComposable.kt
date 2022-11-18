@@ -142,7 +142,6 @@ fun OnboardingFlowComposable(
                     },
                     onUpgradePressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED) },
                     onNotNowPressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_NOT_NOW_TAPPED) },
-                    onCompletePlus = { /* TODO */ }
                 )
             }
         }
