@@ -63,8 +63,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private val background = Color(0xFF121212)
 
 @Composable
-internal fun OnboardingPlusPage(
-    onShown: () -> Unit,
+internal fun OnboardingPlusFeaturesPage(
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
@@ -73,7 +72,25 @@ internal fun OnboardingPlusPage(
     val viewModel = hiltViewModel<OnboardingPlusFeaturesViewModel>()
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) { onShown() }
+    @Suppress("NAME_SHADOWING")
+    val onUpgradePressed = {
+        viewModel.onUpgradePressed()
+        onUpgradePressed()
+    }
+
+    @Suppress("NAME_SHADOWING")
+    val onNotNowPressed = {
+        viewModel.onNotNowPressed()
+        onNotNowPressed()
+    }
+
+    @Suppress("NAME_SHADOWING")
+    val onBackPressed = {
+        viewModel.onBackPressed()
+        onBackPressed()
+    }
+
+    LaunchedEffect(Unit) { viewModel.onShown() }
 
     Box(
         Modifier
@@ -86,7 +103,10 @@ internal fun OnboardingPlusPage(
 
             Spacer(Modifier.height(8.dp))
             NavigationIconButton(
-                onNavigationClick = onBackPressed,
+                onNavigationClick = {
+                    viewModel.onBackPressed()
+                    onBackPressed()
+                },
                 iconColor = Color.White,
                 modifier = Modifier
                     .height(48.dp)
@@ -362,8 +382,7 @@ private tailrec suspend fun autoScroll(
 @Preview
 @Composable
 private fun OnboardingPlusFeaturesPreview() {
-    OnboardingPlusPage(
-        onShown = {},
+    OnboardingPlusFeaturesPage(
         onBackPressed = {},
         onUpgradePressed = {},
         onNotNowPressed = {},

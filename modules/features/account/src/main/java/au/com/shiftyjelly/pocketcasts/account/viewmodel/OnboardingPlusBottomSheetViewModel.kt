@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.Loaded
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.Loading
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.NoSubscriptions
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
@@ -22,11 +23,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingPlusBottomSheetViewModel @Inject constructor(
-    private val subscriptionManager: SubscriptionManager
+    private val subscriptionManager: SubscriptionManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<OnboardingPlusBottomSheetState>(Loading)
@@ -102,7 +105,13 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
                     is PurchaseEvent.Failure -> {
                         _state.update { loadedState.copy(purchaseFailed = true) }
                     }
-                    null -> {}
+                    null -> {
+                        Timber.e("Purchase event was null. This should never happen.")
+                    }
+                }
+
+                if (purchaseEvent != null) {
+                    CreateAccountViewModel.trackPurchaseEvent(subscription, purchaseEvent, analyticsTracker)
                 }
             }
             subscriptionManager.launchBillingFlow(

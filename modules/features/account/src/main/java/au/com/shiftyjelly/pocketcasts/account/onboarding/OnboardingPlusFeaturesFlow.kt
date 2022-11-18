@@ -41,8 +41,6 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnboardingPlusFeaturesFlow(
-    onShown: () -> Unit,
-    onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
     onComplete: () -> Unit,
@@ -73,13 +71,11 @@ fun OnboardingPlusFeaturesFlow(
         sheetState = sheetState,
         scrimColor = Color.Black.copy(alpha = 0.5f),
         content = @Composable {
-            OnboardingPlusPage(
-                onShown = onShown,
+            OnboardingPlusFeaturesPage(
                 onUpgradePressed = {
                     coroutineScope.launch {
                         sheetState.show()
                     }
-                    onUpgradePressed()
                 },
                 onNotNowPressed = onNotNowPressed,
                 onBackPressed = onBackPressed,
