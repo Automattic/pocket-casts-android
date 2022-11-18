@@ -71,13 +71,16 @@ internal fun OnboardingLoginOrSignUpPage(
                     .height(28.dp)
             )
 
-            TextH30(
-                text = stringResource(LR.string.not_now),
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { onNotNowClicked() }
-            )
+            Box(Modifier.weight(1f)) {
+                TextH30(
+                    text = stringResource(LR.string.not_now),
+                    textAlign = TextAlign.End,
+                    modifier = Modifier
+                        .clickable { onNotNowClicked() }
+                        .padding(all = 4.dp)
+                        .align(Alignment.CenterEnd)
+                )
+            }
         }
 
         Column(
