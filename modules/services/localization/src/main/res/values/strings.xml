@@ -1403,18 +1403,21 @@
     <string name="end_of_year_prompt_card_summary">See your top podcasts, categories, listening stats and more.</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_listening_time">In 2022, you spent %1$s listening to podcasts.</string>
+    <string name="end_of_year_listening_time_english_only" translatable="false">In 2022, you spent \n%1$s\n listening to podcasts.</string>
     <string name="end_of_year_replay">Replay</string>
     <string name="end_of_year_story_intro_title">Let\'s celebrate your year of listening…</string>
     <!-- Text that appears when someone shares the listened to story to Twitter, for example. %1$s is a placeholder for the amount of time. -->
     <string name="end_of_year_story_listened_to_share_text">I spent %1$s listening to podcasts in 2022</string>
     <!-- String telling the user how much podcast categories they listened to podcasts in 2022, %1$d is a placeholder for the number of categories. -->
     <string name="end_of_year_story_listened_to_categories">You listened to %1$d different categories this year</string>
+    <string name="end_of_year_story_listened_to_categories_english_only" translatable="false">You listened to\n%1$d different categories\nthis year</string>
     <!-- String prompting the user for the next story to check the most listened categories. -->
     <string name="end_of_year_story_listened_to_categories_subtitle">Let\'s take a look at some of your favorites…</string>
     <!-- Text that appears when someone shares the listened categories to story to Twitter, for example. %1$d is a placeholder for the number of categories. -->
     <string name="end_of_year_story_listened_to_categories_share_text">I listened to %1$d different categories in 2022</string>
     <!-- String telling the user how much podcasts and episodes they listened to this year, %1$d is a placeholder for the number of podcasts and %2$d is a placeholder fo the number of episodes. -->
     <string name="end_of_year_story_listened_to_numbers">You listened to %1$d different podcasts and %2$d episodes</string>
+    <string name="end_of_year_story_listened_to_numbers_english_only" translatable="false">You listened to \n %1$d different podcasts \n and %2$d episodes</string>
     <!-- Subtitle for the story containing number of podcasts and episodes played this year. Segway for the next story. -->
     <string name="end_of_year_story_listened_to_numbers_subtitle">But there was one that you kept coming back to…</string>
     <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. -->

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
@@ -94,8 +95,14 @@ private fun PrimaryText(
     story: StoryListenedCategories,
     modifier: Modifier = Modifier,
 ) {
+    val language = Locale.current.language
+    val textResId = if (language == "en") {
+        LR.string.end_of_year_story_listened_to_categories_english_only
+    } else {
+        LR.string.end_of_year_story_listened_to_categories
+    }
     val text = stringResource(
-        id = LR.string.end_of_year_story_listened_to_categories,
+        id = textResId,
         story.listenedCategories.count()
     )
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)

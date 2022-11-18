@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
@@ -72,8 +73,14 @@ private fun PrimaryText(
     modifier: Modifier,
 ) {
     val context = LocalContext.current
+    val language = Locale.current.language
     val timeText = StatsHelper.secondsToFriendlyString(story.listeningTimeInSecs, context.resources)
-    val text = stringResource(LR.string.end_of_year_listening_time, timeText)
+    val textResId = if (language == "en") {
+        LR.string.end_of_year_listening_time_english_only
+    } else {
+        LR.string.end_of_year_listening_time
+    }
+    val text = stringResource(textResId, timeText)
     StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
 
