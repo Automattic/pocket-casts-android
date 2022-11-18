@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.db.helper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 
 data class ListenedCategory(
+    val episodeId: String,
     val numberOfPodcasts: Int,
     val totalPlayedTime: Long,
     val category: String,
