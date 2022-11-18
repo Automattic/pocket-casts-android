@@ -1,13 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
-import io.reactivex.Maybe
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.rx2.awaitSingleOrNull
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Date
@@ -39,6 +42,22 @@ class HistoryManager @Inject constructor(
         }
 
         val changes = response.changes ?: return@withContext
+
+        // add the missing podcasts
+        val podcastUuids = changes
+            .mapNotNull { change -> change.podcast }
+            .toSet()
+        val databasePodcastUuids = podcastManager.findPodcastUuids().toHashSet()
+        val missingPodcastUuids = podcastUuids.minus(databasePodcastUuids)
+        Observable.fromIterable(missingPodcastUuids)
+            .observeOn(Schedulers.io())
+            .flatMap({ podcastUuid -> podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false).toObservable() }, true, 5)
+            .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
+            .toList()
+            .await()
+
+        val skeletonEpisodes = mutableListOf<Episode>()
+
         for (change in changes) {
             val interactionDate = change.modifiedAt.toLong()
 
@@ -52,35 +71,17 @@ class HistoryManager @Inject constructor(
                         episode.lastPlaybackInteractionSyncStatus = Episode.LAST_PLAYBACK_INTERACTION_SYNCED
                         episodeManager.update(episode)
                     }
-                } else if (podcastUuid != null) {
-                    // Add missing podcast and episode
-                    podcastManager.findOrDownloadPodcastRx(podcastUuid)
-                        .toMaybe()
-                        .doOnError { exception -> Timber.e(exception, "Failed to download missing podcast $podcastUuid") }
-                        .onErrorResumeNext(Maybe.empty())
-                        .awaitSingleOrNull()
-
+                } else if (podcastUuid != null && podcastUuid != UserEpisodePodcastSubstitute.uuid) {
                     val skeleton = Episode(
                         uuid = episodeUuid,
                         podcastUuid = podcastUuid,
                         title = change.title ?: "",
                         publishedDate = change.published?.parseIsoDate() ?: Date(),
-                        downloadUrl = change.url
+                        downloadUrl = change.url,
+                        lastPlaybackInteraction = interactionDate
                     )
-                    val missingEpisode = episodeManager.downloadMissingEpisode(
-                        episodeUuid,
-                        podcastUuid,
-                        skeleton,
-                        podcastManager,
-                        false
-                    )
-                        .doOnError { exception -> Timber.e(exception, "Failed to download missing episode $episodeUuid for podcast $podcastUuid") }
-                        .onErrorResumeNext(Maybe.empty())
-                        .awaitSingleOrNull()
-                    if (missingEpisode != null && missingEpisode is Episode) {
-                        missingEpisode.lastPlaybackInteraction = interactionDate
-                        episodeManager.update(missingEpisode)
-                    }
+                    Timber.i("HistoryManager adding episode: ${skeleton.uuid} podcast: ${skeleton.podcastUuid} title: ${skeleton.title}")
+                    skeletonEpisodes.add(skeleton)
                 }
             } else if (change.action == ACTION_DELETE) {
                 if (episode != null) {
@@ -90,6 +91,8 @@ class HistoryManager @Inject constructor(
                 }
             }
         }
+
+        episodeManager.insert(skeletonEpisodes)
 
         if (updateServerModified) {
             settings.setHistoryServerModified(response.serverModified)

@@ -22,6 +22,9 @@ import java.util.Date
 @Dao
 abstract class PodcastDao {
 
+    @Query("SELECT uuid FROM podcasts")
+    abstract suspend fun findAllUuids(): List<String>
+
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY LOWER(title) ASC")
     abstract fun findSubscribed(): List<Podcast>
 

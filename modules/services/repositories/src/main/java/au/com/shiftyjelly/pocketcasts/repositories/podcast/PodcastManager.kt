@@ -50,6 +50,7 @@ interface PodcastManager {
     fun findPodcastsAutodownload(): List<Podcast>
 
     fun exists(podcastUuid: String): Boolean
+    suspend fun findPodcastUuids(): List<String>
 
     /** Add methods  */
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean)
@@ -59,6 +60,7 @@ interface PodcastManager {
     fun isSubscribingToPodcasts(): Boolean
     fun getSubscribedPodcastUuids(): Single<List<String>>
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
+    fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast>
 
     fun addFolderPodcast(podcast: Podcast)
 
