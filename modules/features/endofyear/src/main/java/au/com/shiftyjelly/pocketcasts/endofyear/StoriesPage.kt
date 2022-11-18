@@ -166,7 +166,11 @@ private fun StoriesView(
     Column(modifier = modifier.background(color = Color.Black)) {
         var onCaptureBitmap: (() -> Bitmap)? = null
         state.currentStory?.let { story ->
-            Box(modifier = modifier.weight(weight = 1f, fill = true)) {
+            Box(
+                modifier = modifier
+                    .weight(weight = 1f, fill = true)
+                    .clip(RoundedCornerShape(StoryViewCornerSize))
+            ) {
                 onCaptureBitmap =
                     convertibleToBitmap(content = {
                         StorySharableContent(
@@ -226,7 +230,6 @@ private fun StorySharableContent(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(StoryViewCornerSize))
                 .background(color = story.backgroundColor),
             contentAlignment = Alignment.Center
         ) {
