@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class StoriesFragment : BaseAppCompatDialogFragment() {
@@ -30,6 +32,12 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
 
     @Inject
     lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.attributes?.windowAnimations = UR.style.WindowAnimationSlideTransition
+        return dialog
+    }
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstance: Bundle?) {
