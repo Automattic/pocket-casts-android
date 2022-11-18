@@ -1438,7 +1438,7 @@
     <!-- Text that appear when someone share the longest episode they listened to story to Twitter. %1$s is the URL to the episode. -->
     <string name="end_of_year_story_longest_episode_share_text">The longest episode I listened to in 2022 %1$s</string>
     <!-- Title for the epilogue story -->
-    <string name="end_of_year_story_epilogue_title">Thank you for letting Pocket Casts be a part of your listening experience in 2022</string>
+    <string name="end_of_year_story_epilogue_title">Thank you for letting Pocket&#160;Casts be a part of your listening experience in 2022</string>
     <!-- Subtitle for the epilogue story -->
     <string name="end_of_year_story_epilogue_subtitle">Don\'t forget to share with your friends and give a shout out to your favorite podcast creators</string>
     <!-- Title of the top categories story. -->
