@@ -134,7 +134,7 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.plusFeatures) {
-                OnboardingPlusFeaturesFlow(
+                OnboardingPlusUpgradeFlow(
                     onBackPressed = { navController.popBackStack() },
                     onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
                     onComplete = { navController.navigate(OnboardingNavRoute.welcome) },

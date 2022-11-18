@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OnboardingPlusFeaturesFlow(
+fun OnboardingPlusUpgradeFlow(
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
     onComplete: () -> Unit,
