@@ -70,6 +70,7 @@ fun OnboardingPlusFeaturesFlow(
     ModalBottomSheetLayout(
         sheetState = sheetState,
         scrimColor = Color.Black.copy(alpha = 0.5f),
+        sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         content = @Composable {
             OnboardingPlusFeaturesPage(
                 onUpgradePressed = {
