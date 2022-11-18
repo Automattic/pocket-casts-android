@@ -6,12 +6,15 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomShee
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.Loading
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.NoSubscriptions
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,6 +28,12 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<OnboardingPlusBottomSheetState>(Loading)
     val state: StateFlow<OnboardingPlusBottomSheetState> = _state
+        .map {
+            // If selected subscription has trialPricingPhase, update mostRecentlySelectedTrialPhase
+            (it as? Loaded)?.selectedSubscription?.trialPricingPhase?.let { trialPhase ->
+                it.copy(mostRecentlySelectedTrialPhase = trialPhase)
+            } ?: it
+        }.stateIn(viewModelScope, SharingStarted.Lazily, _state.value)
 
     init {
         viewModelScope.launch {
@@ -51,7 +60,9 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
         val current = state.value
         when (current) {
             is Loaded -> {
-                _state.update { current.copy(selectedSubscription = subscription) }
+                _state.update {
+                    current.copy(selectedSubscription = subscription)
+                }
             }
             else -> {
                 LogBuffer.e(
@@ -62,7 +73,7 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
         }
     }
 
-    fun stateFromList(subscriptions: List<Subscription>): OnboardingPlusBottomSheetState {
+    private fun stateFromList(subscriptions: List<Subscription>): OnboardingPlusBottomSheetState {
         val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions)
         return if (defaultSelected == null) {
             NoSubscriptions
@@ -77,8 +88,13 @@ sealed class OnboardingPlusBottomSheetState {
     object NoSubscriptions : OnboardingPlusBottomSheetState()
     data class Loaded constructor(
         val subscriptions: List<Subscription>, // This list should never be empty
-        val selectedSubscription: Subscription
+        val selectedSubscription: Subscription,
+        // Need to retain the most recently selected trial phase so that information is still available as
+        // it animates out of view after a subscription without a trial phase is selected
+        val mostRecentlySelectedTrialPhase: TrialSubscriptionPricingPhase? = null,
     ) : OnboardingPlusBottomSheetState() {
+        val showTrialInfo = selectedSubscription.trialPricingPhase != null
+
         init {
             if (subscriptions.isEmpty()) {
                 LogBuffer.e(

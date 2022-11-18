@@ -18,8 +18,6 @@ import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,15 +69,9 @@ fun OnboardingPlusBottomSheet() {
         )
 
         if (state is OnboardingPlusBottomSheetState.Loaded) {
-            var savedPeriod by remember { mutableStateOf("") }
-            val currentPeriod = state.selectedSubscription.trialPricingPhase
-                ?.numPeriodFreeTrial(resources)
-            if (currentPeriod != null) {
-                savedPeriod = currentPeriod
-            }
             Spacer(Modifier.height(16.dp))
             AnimatedVisibility(
-                visible = currentPeriod != null,
+                visible = state.showTrialInfo,
                 enter = expandVertically(
                     expandFrom = Alignment.Top,
                     animationSpec = animationSpec,
@@ -97,16 +89,22 @@ fun OnboardingPlusBottomSheet() {
                             shape = RoundedCornerShape(4.dp)
                         )
                 ) {
-                    TextP60(
-                        text = savedPeriod.uppercase(Locale.getDefault()),
-                        color = Color.Black,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(
-                            horizontal = 12.dp,
-                            vertical = 4.dp
-                        ),
-                    )
+                    state
+                        .mostRecentlySelectedTrialPhase
+                        ?.numPeriodFreeTrial(resources)
+                        ?.uppercase(Locale.getDefault())
+                        ?.let { text ->
+                            TextP60(
+                                text = text,
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(
+                                    horizontal = 12.dp,
+                                    vertical = 4.dp
+                                ),
+                            )
+                        }
                 }
             }
 
@@ -131,25 +129,23 @@ fun OnboardingPlusBottomSheet() {
                 }
             }
 
-            val currentRecurringAfterString = state.selectedSubscription.trialPricingPhase?.let { recurringAfterString(it, resources) }
-            var savedRecurringAfterString by remember { mutableStateOf("") }
-            if (currentRecurringAfterString != null) {
-                savedRecurringAfterString = currentRecurringAfterString
-            }
             AnimatedVisibility(
-                visible = currentRecurringAfterString != null,
+                visible = state.showTrialInfo,
                 enter = expandVertically(animationSpec),
                 exit = shrinkVertically(animationSpec),
             ) {
-                TextP60(
-                    text = stringResource(
+                state.mostRecentlySelectedTrialPhase?.let { trialPhase ->
+                    val text = stringResource(
                         LR.string.onboarding_plus_recurring_after_free_trial,
-                        savedRecurringAfterString
-                    ),
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
+                        recurringAfterString(trialPhase, resources)
+                    )
+                    TextP60(
+                        text = text,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                }
             }
         }
 
