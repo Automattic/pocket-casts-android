@@ -316,10 +316,13 @@ abstract class EpisodeDao {
 
     @Query(
         """
-        SELECT COUNT(DISTINCT podcast_id) as numberOfPodcasts, SUM(played_up_to) as totalPlayedTime, REPLACE(IFNULL(NULLIF(SUBSTR(podcasts.podcast_category, 0, INSTR(podcasts.podcast_category, char(10))), ''), podcasts.podcast_category), char(10), '') as category, podcasts.uuid as mostListenedPodcastId, podcasts.primary_color as mostListenedPodcastTintColor
+        SELECT COUNT(DISTINCT podcast_id) as numberOfPodcasts, SUM(played_up_to) as totalPlayedTime, 
+        SUBSTR(TRIM(podcasts.podcast_category),1,INSTR(trim(podcasts.podcast_category)||char(10),char(10))-1) as category,
+        podcasts.uuid as mostListenedPodcastId, podcasts.primary_color as mostListenedPodcastTintColor
         FROM episodes
         JOIN podcasts ON episodes.podcast_id = podcasts.uuid
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        AND category IS NOT NULL and category != ''
         GROUP BY category
         ORDER BY totalPlayedTime DESC
         """
