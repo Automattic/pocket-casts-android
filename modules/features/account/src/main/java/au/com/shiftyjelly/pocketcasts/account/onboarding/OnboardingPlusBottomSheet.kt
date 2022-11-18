@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import android.content.res.Resources
+import android.view.ViewTreeObserver
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
@@ -16,20 +17,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.PlusRowButton
@@ -52,6 +55,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun OnboardingPlusBottomSheet(
     onComplete: () -> Unit,
 ) {
+
+    // The keyboard sometimes gets opened when returning from the Google payment flow.
+    // This is keeps it closed while on this screen.
+    KeepKeyboardClosed()
 
     val viewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
     val state = viewModel.state.collectAsState().value
@@ -223,6 +230,27 @@ fun OnboardingPlusBottomSheet(
                 ),
             )
         )
+    }
+}
+
+@Composable
+private fun KeepKeyboardClosed() {
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val listener = ViewTreeObserver.OnGlobalLayoutListener {
+            val isKeyboardOpen = ViewCompat.getRootWindowInsets(view)
+                ?.isVisible(WindowInsetsCompat.Type.ime()) ?: true
+            if (isKeyboardOpen) {
+                UiUtil.hideKeyboard(view)
+            }
+        }
+
+        with(view.viewTreeObserver) {
+            addOnGlobalLayoutListener(listener)
+            onDispose {
+                removeOnGlobalLayoutListener(listener)
+            }
+        }
     }
 }
 
