@@ -43,11 +43,16 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
+import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun OnboardingPlusBottomSheet() {
+fun OnboardingPlusBottomSheet(
+    onComplete: () -> Unit,
+) {
+
     val viewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
     val state = viewModel.state.collectAsState().value
     val subscriptions = (state as? OnboardingPlusBottomSheetState.Loaded)?.subscriptions
@@ -147,6 +152,25 @@ fun OnboardingPlusBottomSheet() {
                     )
                 }
             }
+
+            AnimatedVisibility(
+                visible = state.purchaseFailed,
+                enter = expandVertically(
+                    expandFrom = Alignment.Top,
+                    animationSpec = animationSpec,
+                ),
+                exit = shrinkVertically(
+                    shrinkTowards = Alignment.Top,
+                    animationSpec = animationSpec,
+                ),
+            ) {
+                TextP60(
+                    text = stringResource(LR.string.profile_create_subscription_failed),
+                    color = Color.Red,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
         }
 
         Divider(
@@ -157,9 +181,17 @@ fun OnboardingPlusBottomSheet() {
                 .alpha(0.24f)
         )
 
+        val context = LocalContext.current
         PlusRowButton(
             text = stringResource(LR.string.onboarding_plus_start_free_trial_and_subscribe),
-            onClick = {},
+            onClick = {
+                context.getActivity()?.let { activity ->
+                    viewModel.onClickSubscribe(
+                        activity = activity,
+                        onComplete = onComplete,
+                    )
+                }
+            },
         )
 
         Spacer(Modifier.height(16.dp))

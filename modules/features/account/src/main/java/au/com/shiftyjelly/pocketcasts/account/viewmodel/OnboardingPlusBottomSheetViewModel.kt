@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.Loaded
@@ -8,12 +9,14 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomShee
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -73,6 +76,40 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
         }
     }
 
+    fun onClickSubscribe(
+        activity: Activity,
+        onComplete: () -> Unit,
+    ) {
+        (state.value as? Loaded)?.let { loadedState ->
+            _state.update { loadedState.copy(purchaseFailed = false) }
+            val subscription = loadedState.selectedSubscription
+            viewModelScope.launch {
+                val purchaseEvent = subscriptionManager
+                    .observePurchaseEvents()
+                    .asFlow()
+                    .firstOrNull()
+
+                when (purchaseEvent) {
+                    PurchaseEvent.Success -> {
+                        onComplete()
+                    }
+                    is PurchaseEvent.Cancelled -> {
+                        // User cancelled subscription creation. Do nothing.
+                    }
+                    is PurchaseEvent.Failure -> {
+                        _state.update { loadedState.copy(purchaseFailed = true) }
+                    }
+                    null -> {}
+                }
+            }
+            subscriptionManager.launchBillingFlow(
+                activity,
+                subscription.productDetails,
+                subscription.offerToken
+            )
+        }
+    }
+
     private fun stateFromList(subscriptions: List<Subscription>): OnboardingPlusBottomSheetState {
         val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions)
         return if (defaultSelected == null) {
@@ -92,6 +129,7 @@ sealed class OnboardingPlusBottomSheetState {
         // Need to retain the most recently selected trial phase so that information is still available as
         // it animates out of view after a subscription without a trial phase is selected
         val mostRecentlySelectedTrialPhase: TrialSubscriptionPricingPhase? = null,
+        val purchaseFailed: Boolean = false
     ) : OnboardingPlusBottomSheetState() {
         val showTrialInfo = selectedSubscription.trialPricingPhase != null
 

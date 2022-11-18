@@ -141,7 +141,16 @@ fun OnboardingFlowComposable(
                         navController.popBackStack()
                     },
                     onUpgradePressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED) },
-                    onNotNowPressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_NOT_NOW_TAPPED) },
+                    onNotNowPressed = {
+                        analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_NOT_NOW_TAPPED)
+                        navController.navigate(OnboardingNavRoute.welcome)
+                    },
+                    onComplete = { navController.navigate(OnboardingNavRoute.welcome) },
+                )
+            }
+            composable(OnboardingNavRoute.welcome) {
+                OnboardingWelcomePage(
+                    onContinue = completeOnboarding,
                 )
             }
         }
@@ -166,4 +175,5 @@ private object OnboardingNavRoute {
     const val forgotPassword = "forgot_password"
     const val recommendations = "recommendations"
     const val plusFeatures = "upgrade_features"
+    const val welcome = "welcome"
 }

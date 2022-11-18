@@ -45,6 +45,7 @@ fun OnboardingPlusFeaturesFlow(
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
+    onComplete: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
@@ -86,7 +87,7 @@ fun OnboardingPlusFeaturesFlow(
             )
         },
         sheetContent = {
-            OnboardingPlusBottomSheet()
+            OnboardingPlusBottomSheet(onComplete = onComplete)
         },
     )
 }
