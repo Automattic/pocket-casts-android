@@ -14,11 +14,11 @@ import java.time.temporal.ChronoUnit
 sealed interface TrialSubscriptionPricingPhase : SubscriptionPricingPhase {
     val chronoUnit: ChronoUnit
 
-    // 14 days free
-    fun numFree(res: Resources): String =
+    // i.e., 14 days free
+    fun numPeriodFree(res: Resources): String =
         res.getString(R.string.profile_amount_free, periodValuePlural(res))
 
-    // 14 day free trial
+    // i.e., 14 day free trial
     fun numPeriodFreeTrial(res: Resources): String =
         res.getString(R.string.plus_trial_duration_free_trial, periodValueSingular(res))
 
