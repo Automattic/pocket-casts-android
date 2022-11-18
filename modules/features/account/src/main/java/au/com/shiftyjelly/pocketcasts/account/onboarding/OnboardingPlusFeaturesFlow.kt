@@ -7,15 +7,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,10 +27,16 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetViewModel
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -36,7 +45,12 @@ fun OnboardingPlusFeaturesFlow(
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
+    onCompletePlus: () -> Unit
 ) {
+
+    val viewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
+    val state = viewModel.state.collectAsState().value
+    val hasSubscriptions = state is OnboardingPlusBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
 
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
@@ -68,7 +82,8 @@ fun OnboardingPlusFeaturesFlow(
                     onUpgradePressed()
                 },
                 onNotNowPressed = onNotNowPressed,
-                onBackPressed = onBackPressed
+                onBackPressed = onBackPressed,
+                canUpgrade = hasSubscriptions,
             )
         },
         sheetContent = {
@@ -120,6 +135,7 @@ object OnboardingPlusFeatures {
     fun PlusOutlinedRowButton(
         text: String,
         onClick: () -> Unit,
+        selectedCheckMark: Boolean = false,
         modifier: Modifier = Modifier,
     ) {
         Button(
@@ -128,19 +144,58 @@ object OnboardingPlusFeatures {
             border = BorderStroke(2.dp, plusGradientBrush),
             elevation = null,
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent),
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
         ) {
-            Box(Modifier.fillMaxWidth()) {
-                Text(
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                TextH30(
                     text = text,
-                    fontSize = 18.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(6.dp)
+                        .padding(top = 6.dp, bottom = 6.dp, start = 6.dp, end = 24.dp)
                         .align(Alignment.Center)
                         .textBrush(plusGradientBrush)
                 )
+                if (selectedCheckMark) {
+                    Icon(
+                        painter = painterResource(IR.drawable.plus_check),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .textBrush(plusGradientBrush)
+                            .align(Alignment.CenterEnd)
+                            .width(24.dp)
+                    )
+                }
             }
+        }
+    }
+
+    @Composable
+    fun UnselectedPlusOutlinedRowButton(
+        text: String,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+    ) {
+        val unselectedColor = Color.White.copy(alpha = 0.4f)
+        Button(
+            onClick = onClick,
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(2.dp, unselectedColor),
+            elevation = null,
+            colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent),
+            modifier = modifier
+        ) {
+            TextH30(
+                text = text,
+                textAlign = TextAlign.Center,
+                color = unselectedColor,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(6.dp)
+            )
         }
     }
 

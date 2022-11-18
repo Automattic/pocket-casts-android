@@ -68,6 +68,7 @@ internal fun OnboardingPlusPage(
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
+    canUpgrade: Boolean
 ) {
     val viewModel = hiltViewModel<OnboardingPlusFeaturesViewModel>()
     val state by viewModel.state.collectAsState()
@@ -121,11 +122,13 @@ internal fun OnboardingPlusPage(
                 Spacer(Modifier.weight(1f))
                 Spacer(Modifier.height(36.dp))
 
-                PlusRowButton(
-                    text = stringResource(LR.string.onboarding_upgrade_unlock_all_features),
-                    onClick = onUpgradePressed,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
+                if (canUpgrade) {
+                    PlusRowButton(
+                        text = stringResource(LR.string.onboarding_upgrade_unlock_all_features),
+                        onClick = onUpgradePressed,
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                    )
+                }
 
                 Spacer(Modifier.height(16.dp))
 
@@ -364,5 +367,6 @@ private fun OnboardingPlusFeaturesPreview() {
         onBackPressed = {},
         onUpgradePressed = {},
         onNotNowPressed = {},
+        canUpgrade = true,
     )
 }

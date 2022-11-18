@@ -886,6 +886,7 @@
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_lifetime_member">Lifetime Member</string>
     <string name="plus_trial_duration_free">%s FREE</string>
+    <string name="plus_trial_duration_free_trial">%s free trial</string>
     <string name="plus_per_month">%s per month</string>
     <string name="plus_per_year">%s per year</string>
     <string name="plus_slash_month">%s / month</string>
