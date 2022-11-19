@@ -87,18 +87,21 @@ class StoriesViewModel @Inject constructor(
             (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat())
                 .coerceAtMost(PROGRESS_END_VALUE)
 
+        timer?.cancel()
         timer = fixedRateTimer(period = PROGRESS_UPDATE_INTERVAL_MS) {
-            val newProgress = (progress.value + progressFraction)
-                .coerceIn(PROGRESS_START_VALUE, PROGRESS_END_VALUE)
+            viewModelScope.launch {
+                val newProgress = (progress.value + progressFraction)
+                    .coerceIn(PROGRESS_START_VALUE, PROGRESS_END_VALUE)
 
-            if (newProgress.roundOff() == getXStartOffsetAtIndex(nextIndex).roundOff()) {
-                currentIndex = nextIndex
-                mutableState.value =
-                    currentState.copy(currentStory = stories[currentIndex])
+                if (newProgress.roundOff() == getXStartOffsetAtIndex(nextIndex).roundOff()) {
+                    currentIndex = nextIndex
+                    mutableState.value =
+                        currentState.copy(currentStory = stories[currentIndex])
+                }
+
+                mutableProgress.value = newProgress
+                if (newProgress == PROGRESS_END_VALUE) cancelTimer()
             }
-
-            mutableProgress.value = newProgress
-            if (newProgress == PROGRESS_END_VALUE) cancelTimer()
         }
     }
 
