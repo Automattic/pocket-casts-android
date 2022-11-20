@@ -150,6 +150,7 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
                     onContinue = completeOnboarding,
+                    isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                 )
             }
         }

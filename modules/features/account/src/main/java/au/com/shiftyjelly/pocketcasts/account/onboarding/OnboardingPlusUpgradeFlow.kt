@@ -22,11 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -154,14 +152,14 @@ object OnboardingPlusFeatures {
                     modifier = Modifier
                         .padding(top = 6.dp, bottom = 6.dp, start = 6.dp, end = 24.dp)
                         .align(Alignment.Center)
-                        .textBrush(plusGradientBrush)
+                        .brush(plusGradientBrush)
                 )
                 if (selectedCheckMark) {
                     Icon(
                         painter = painterResource(IR.drawable.plus_check),
                         contentDescription = null,
                         modifier = Modifier
-                            .textBrush(plusGradientBrush)
+                            .brush(plusGradientBrush)
                             .align(Alignment.CenterEnd)
                             .width(24.dp)
                     )
@@ -195,14 +193,4 @@ object OnboardingPlusFeatures {
             )
         }
     }
-
-    // From https://stackoverflow.com/a/71376469/1910286
-    private fun Modifier.textBrush(brush: Brush) = this
-        .graphicsLayer(alpha = 0.99f)
-        .drawWithCache {
-            onDrawWithContent {
-                drawContent()
-                drawRect(brush, blendMode = BlendMode.SrcAtop)
-            }
-        }
 }

@@ -1484,6 +1484,8 @@
     <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start Free Trial &amp; Subscribe</string>
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
+    <string name="onboarding_welcome_get_you_listening">Welcome, now let\'s get you listening!</string>
+    <string name="onboarding_welcome_get_you_listening_plus">Thank you, now let\'s get you listening!</string>
 
     <!--    Tasker Plugin-->
 
