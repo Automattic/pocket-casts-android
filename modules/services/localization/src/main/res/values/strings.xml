@@ -1451,7 +1451,7 @@
     <!-- Description to why the user needs to create an account to see their end of year stats. -->
     <string name="end_of_year_create_account_to_see">Save your podcasts in the cloud, get your end of year review and sync your progress with other devices.</string>
     <!-- When loading the End of Year stats stories fails. -->
-    <string name="end_of_year_stories_failed">Failed to load stories.</string>
+    <string name="end_of_year_stories_failed">Unable to load your end of year stories, check your internet connection.</string>
 
     <!-- Onboarding -->
 

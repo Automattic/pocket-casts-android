@@ -65,6 +65,9 @@ class StoriesFragment : BaseAppCompatDialogFragment() {
                             analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED, AnalyticsProp.StoriesDismissed.closeButton)
                             dismiss()
                         },
+                        onRetryClicked = {
+                            viewModel.onRetryClicked()
+                        }
                     )
                 }
             }

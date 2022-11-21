@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -43,6 +44,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpSize
@@ -51,7 +53,8 @@ import androidx.core.app.ShareCompat
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextData
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State
@@ -100,6 +103,7 @@ fun StoriesPage(
     modifier: Modifier = Modifier,
     viewModel: StoriesViewModel,
     onCloseClicked: () -> Unit,
+    onRetryClicked: () -> Unit,
 ) {
     val shareLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -148,7 +152,7 @@ fun StoriesPage(
             )
             State.Error -> {
                 viewModel.trackStoryFailedToLoad()
-                StoriesErrorView(onCloseClicked)
+                StoriesErrorView(onCloseClicked, onRetryClicked)
             }
         }
     }
@@ -318,14 +322,35 @@ private fun StoriesLoadingView(
 @Composable
 private fun StoriesErrorView(
     onCloseClicked: () -> Unit,
+    onRetryClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     StoriesEmptyView(
         content = {
-            TextP50(
-                text = stringResource(id = LR.string.end_of_year_stories_failed),
-                color = Color.White,
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                TextH30(
+                    text = stringResource(id = LR.string.end_of_year_stories_failed),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    modifier = modifier.padding(horizontal = 40.dp)
+                )
+                Button(
+                    onClick = { onRetryClicked.invoke() },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults
+                        .buttonColors(
+                            backgroundColor = Color.White,
+                        ),
+                    modifier = modifier.padding(top = 20.dp),
+                ) {
+                    TextP40(
+                        text = stringResource(id = LR.string.retry),
+                        color = Color.Black,
+                    )
+                }
+            }
         },
         onCloseClicked = onCloseClicked,
         modifier = modifier
@@ -508,7 +533,8 @@ private fun StoriesErrorViewPreview(
 ) {
     AppTheme(themeType) {
         StoriesErrorView(
-            onCloseClicked = {}
+            onCloseClicked = {},
+            onRetryClicked = {},
         )
     }
 }
