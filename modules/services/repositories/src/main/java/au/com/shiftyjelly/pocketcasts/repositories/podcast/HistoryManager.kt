@@ -35,7 +35,7 @@ class HistoryManager @Inject constructor(
      * @param response The server response.
      * @param updateServerModified Set to true when this is latest listening history, rather than part of the user's history.
      */
-    suspend fun processServerResponse(response: HistorySyncResponse, updateServerModified: Boolean) = withContext(Dispatchers.IO) {
+    suspend fun processServerResponse(response: HistorySyncResponse, updateServerModified: Boolean, onProgressChanged: ((Float) -> Unit)? = null) = withContext(Dispatchers.IO) {
         if (!response.hasChanged(0) || response.changes.isNullOrEmpty()) {
             return@withContext
         }
@@ -48,10 +48,18 @@ class HistoryManager @Inject constructor(
             .toSet()
         val databaseSubscribedPodcastUuids = podcastManager.findSubscribedUuids().toHashSet()
         val missingPodcastUuids = podcastUuids.minus(databaseSubscribedPodcastUuids)
+
+        val total = missingPodcastUuids.size.toFloat()
+        var progress = 0
+
         Observable.fromIterable(missingPodcastUuids)
             .observeOn(Schedulers.io())
             .flatMap({ podcastUuid -> podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false).toObservable() }, true, 5)
             .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
+            .doOnNext {
+                progress += 1
+                onProgressChanged?.invoke(progress / total)
+            }
             .toList()
             .await()
 

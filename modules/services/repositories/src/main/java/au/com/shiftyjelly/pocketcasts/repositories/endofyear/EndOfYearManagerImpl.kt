@@ -57,7 +57,7 @@ class EndOfYearManagerImpl @Inject constructor(
     /**
      * Download the year's listening history.
      */
-    override suspend fun downloadListeningHistory() {
+    override suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit) {
         if (!settings.isLoggedIn()) {
             return
         }
@@ -67,17 +67,24 @@ class EndOfYearManagerImpl @Inject constructor(
         }
         // only download the count to check if we are missing history episodes
         val countResponse = syncServerManager.historyYear(year = YEAR, count = true)
+        onProgressChanged(0.1f)
         val serverCount = countResponse.count ?: 0
         val localCount = countEpisodeInteractionsInYear()
         Timber.i("End of Year: Server listening history. server: ${countResponse.count} local: $localCount")
         if (serverCount > localCount) {
             // sync the year's listening history
             val response = syncServerManager.historyYear(year = YEAR, count = false)
+            onProgressChanged(0.2f)
             val history = response.history ?: return
             historyManager.processServerResponse(
                 response = history,
-                updateServerModified = false
+                updateServerModified = false,
+                onProgressChanged = {
+                    onProgressChanged(0.2f + (it * 0.8f))
+                },
             )
+        } else {
+            onProgressChanged(1f)
         }
     }
 

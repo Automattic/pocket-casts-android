@@ -33,7 +33,7 @@ class StoriesViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
-    private val mutableState = MutableStateFlow<State>(State.Loading)
+    private val mutableState = MutableStateFlow<State>(State.Loading())
     val state: StateFlow<State> = mutableState
 
     private val mutableProgress = MutableStateFlow(0f)
@@ -63,7 +63,10 @@ class StoriesViewModel @Inject constructor(
 
     private suspend fun loadStories() {
         try {
-            endOfYearManager.downloadListeningHistory()
+            val onProgressChanged: (Float) -> Unit = { progress ->
+                mutableState.value = State.Loading(progress)
+            }
+            endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
             stories.addAll(endOfYearManager.loadStories())
             val state = if (stories.isEmpty()) {
                 State.Error
@@ -181,7 +184,9 @@ class StoriesViewModel @Inject constructor(
     }
 
     sealed class State {
-        object Loading : State()
+        data class Loading(
+            val progress: Float = 0f
+        ) : State()
         data class Loaded(
             val currentStory: Story?,
             val segmentsData: SegmentsData,
