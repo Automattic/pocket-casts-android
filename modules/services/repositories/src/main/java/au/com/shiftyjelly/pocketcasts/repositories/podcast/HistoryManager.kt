@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
@@ -57,8 +58,14 @@ class HistoryManager @Inject constructor(
         // add the podcasts five at a time
         Observable.fromIterable(missingPodcastUuids)
             .observeOn(Schedulers.io())
-            .flatMap({ podcastUuid -> podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false).toObservable() }, true, ADD_PODCAST_CONCURRENCY)
-            .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
+            .flatMap(
+                { podcastUuid ->
+                    podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false)
+                        .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
+                        .onErrorReturn { Podcast(uuid = podcastUuid) }
+                        .toObservable()
+                }, true, ADD_PODCAST_CONCURRENCY
+            )
             .doOnNext {
                 progress += 1
                 onProgressChanged?.invoke(progress / total)
