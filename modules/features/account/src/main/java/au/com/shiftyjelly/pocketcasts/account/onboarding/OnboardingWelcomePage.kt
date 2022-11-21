@@ -50,9 +50,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingWelcomePage(
+    isSignedInAsPlus: Boolean,
     onContinue: () -> Unit,
     onContinueToDiscover: () -> Unit,
-    isSignedInAsPlus: Boolean,
+    onBackPressed: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<OnboardingWelcomeViewModel>()
@@ -71,7 +72,7 @@ fun OnboardingWelcomePage(
     }
 
     BackHandler {
-        onContinue()
+        onBackPressed()
     }
 
     Column(Modifier.padding(horizontal = 24.dp)) {
@@ -252,6 +253,7 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
         OnboardingWelcomePage(
             onContinue = {},
             onContinueToDiscover = {},
+            onBackPressed = {},
             isSignedInAsPlus = false
         )
     }
@@ -264,6 +266,7 @@ private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParam
         OnboardingWelcomePage(
             onContinue = {},
             onContinueToDiscover = {},
+            onBackPressed = {},
             isSignedInAsPlus = true,
         )
     }

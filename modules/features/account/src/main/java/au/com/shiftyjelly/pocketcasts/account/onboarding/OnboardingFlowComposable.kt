@@ -145,14 +145,22 @@ fun OnboardingFlowComposable(
                 OnboardingPlusUpgradeFlow(
                     onBackPressed = { navController.popBackStack() },
                     onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
-                    onComplete = { navController.navigate(OnboardingNavRoute.welcome) },
+                    onCompleteUpgrade = {
+                        navController.navigate(OnboardingNavRoute.welcome) {
+                            // Don't allow navigation back to the upgrade screen after the user upgrades
+                            popUpTo(OnboardingNavRoute.plusUpgrade) {
+                                inclusive = true
+                            }
+                        }
+                    },
                 )
             }
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
+                    isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                     onContinue = completeOnboarding,
                     onContinueToDiscover = completeOnboardingToDiscover,
-                    isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
+                    onBackPressed = { navController.popBackStack() },
                 )
             }
         }

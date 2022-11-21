@@ -41,7 +41,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 fun OnboardingPlusUpgradeFlow(
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
-    onComplete: () -> Unit,
+    onCompleteUpgrade: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
@@ -82,7 +82,7 @@ fun OnboardingPlusUpgradeFlow(
             )
         },
         sheetContent = {
-            OnboardingPlusBottomSheet(onComplete = onComplete)
+            OnboardingPlusBottomSheet(onCompleteUpgrade = onCompleteUpgrade)
         },
     )
 }
