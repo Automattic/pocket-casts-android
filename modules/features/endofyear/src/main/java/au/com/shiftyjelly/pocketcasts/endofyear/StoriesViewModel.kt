@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.Se
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -77,6 +79,8 @@ class StoriesViewModel @Inject constructor(
             mutableState.value = state
             if (state is State.Loaded) start()
         } catch (e: Exception) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to load end of year stories.")
+            SentryHelper.recordException(message = "Failed to load end of year stories.", throwable = e)
             mutableState.value = State.Error
         }
     }

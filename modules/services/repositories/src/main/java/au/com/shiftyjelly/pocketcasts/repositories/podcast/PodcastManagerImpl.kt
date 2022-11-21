@@ -339,8 +339,8 @@ class PodcastManagerImpl @Inject constructor(
         return false
     }
 
-    override suspend fun findPodcastUuids(): List<String> {
-        return podcastDao.findAllUuids()
+    override suspend fun findSubscribedUuids(): List<String> {
+        return podcastDao.findSubscribedUuids()
     }
 
     override fun findPodcastByUuid(uuid: String): Podcast? {

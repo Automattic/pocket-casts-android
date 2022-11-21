@@ -12,7 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -47,8 +46,8 @@ class HistoryManager @Inject constructor(
         val podcastUuids = changes
             .mapNotNull { change -> change.podcast }
             .toSet()
-        val databasePodcastUuids = podcastManager.findPodcastUuids().toHashSet()
-        val missingPodcastUuids = podcastUuids.minus(databasePodcastUuids)
+        val databaseSubscribedPodcastUuids = podcastManager.findSubscribedUuids().toHashSet()
+        val missingPodcastUuids = podcastUuids.minus(databaseSubscribedPodcastUuids)
         Observable.fromIterable(missingPodcastUuids)
             .observeOn(Schedulers.io())
             .flatMap({ podcastUuid -> podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false).toObservable() }, true, 5)
@@ -80,7 +79,6 @@ class HistoryManager @Inject constructor(
                         downloadUrl = change.url,
                         lastPlaybackInteraction = interactionDate
                     )
-                    Timber.i("HistoryManager adding episode: ${skeleton.uuid} podcast: ${skeleton.podcastUuid} title: ${skeleton.title}")
                     skeletonEpisodes.add(skeleton)
                 }
             } else if (change.action == ACTION_DELETE) {

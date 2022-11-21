@@ -1066,6 +1066,7 @@ class EpisodeManagerImpl @Inject constructor(
                     observePlayableByUuid(episodeUuid).firstElement()
                 } else {
                     podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
+                        Timber.i("HistoryManager downloadMissingEpisode episode found? ${response.episodes.firstOrNull() != null}")
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
                         add(episode, downloadMetaData = downloadMetaData)
                         podcastManager.findPodcastByUuidRx(podcastUuid).zipWith(findByUuidRx(episodeUuid))
