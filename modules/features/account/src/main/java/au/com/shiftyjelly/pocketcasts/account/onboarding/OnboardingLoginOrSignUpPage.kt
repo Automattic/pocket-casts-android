@@ -45,7 +45,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun OnboardingLoginOrSignUpPage(
     onNotNowClicked: () -> Unit,
-    onSignUpFreeClicked: () -> Unit,
+    onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     onContinueWithGoogleClicked: () -> Unit,
     onShown: () -> Unit,
@@ -117,7 +117,7 @@ internal fun OnboardingLoginOrSignUpPage(
             } else {
                 Spacer(Modifier.height(32.dp))
             }
-            SignUpButton(onClick = onSignUpFreeClicked)
+            SignUpButton(onClick = onSignUpClicked)
             LogInButton(onClick = onLoginClicked)
         }
     }
@@ -138,7 +138,7 @@ private fun ContinueWithGoogleButton(onClick: () -> Unit) {
 @Composable
 private fun SignUpButton(onClick: () -> Unit) {
     RowButton(
-        text = stringResource(LR.string.onboarding_sign_up_free),
+        text = stringResource(LR.string.onboarding_sign_up),
         colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.primaryText01, contentColor = MaterialTheme.theme.colors.primaryUi01),
         includePadding = false,
         onClick = onClick,
@@ -149,7 +149,7 @@ private fun SignUpButton(onClick: () -> Unit) {
 @Composable
 private fun LogInButton(onClick: () -> Unit) {
     RowTextButton(
-        text = stringResource(LR.string.log_in),
+        text = stringResource(LR.string.onboarding_log_in),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01),
         includePadding = false,
         onClick = onClick,
@@ -163,7 +163,7 @@ private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProv
     AppThemeWithBackground(themeType) {
         OnboardingLoginOrSignUpPage(
             onNotNowClicked = {},
-            onSignUpFreeClicked = {},
+            onSignUpClicked = {},
             onLoginClicked = {},
             onContinueWithGoogleClicked = {},
             onShown = {}

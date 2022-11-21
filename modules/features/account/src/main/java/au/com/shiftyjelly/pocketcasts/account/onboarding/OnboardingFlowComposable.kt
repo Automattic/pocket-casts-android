@@ -52,7 +52,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, AnalyticsProp.source)
                         completeOnboarding()
                     },
-                    onSignUpFreeClicked = {
+                    onSignUpClicked = {
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.createAccount)
                         navController.navigate(OnboardingNavRoute.createFreeAccount)
                     },

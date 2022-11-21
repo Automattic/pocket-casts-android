@@ -55,7 +55,6 @@
     <string name="select_all_below">Select all below</string>
     <string name="share_podcast">Share podcast</string>
     <string name="show_archived">Show archived</string>
-    <string name="log_in">Log in</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
@@ -1453,9 +1452,11 @@
 
     <!-- Onboarding -->
 
-    <string name="onboarding_welcome_back">Welcome back</string>
-    <string name="not_now">Not now</string>
-    <string name="onboarding_sign_up_free">Sign up free</string>
+    <string name="onboarding_welcome_back">Welcome Back</string>
+    <string name="not_now">Not Now</string>
+    <string name="onboarding_log_in">Log in</string>
+    <string name="onboarding_create_account">Create Account</string>
+    <string name="onboarding_sign_up">Sign Up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
@@ -1467,7 +1468,7 @@
     <string name="onboarding_recommendations_import">Import</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket Casts, plus more</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customization options</string>
-    <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
+    <string name="onboarding_upgrade_unlock_all_features">Unlock All Features</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
     <string name="onboarding_plus_feature_folders_title">Folders</string>
