@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingWelcomePage(
     onContinue: () -> Unit,
+    onContinueToDiscover: () -> Unit,
     isSignedInAsPlus: Boolean,
 ) {
 
@@ -61,6 +62,12 @@ fun OnboardingWelcomePage(
     val onContinue = {
         viewModel.persistNewsletterSelection()
         onContinue()
+    }
+
+    @Suppress("NAME_SHADOWING")
+    val onContinueToDiscover = {
+        viewModel.persistNewsletterSelection()
+        onContinueToDiscover()
     }
 
     BackHandler {
@@ -94,7 +101,7 @@ fun OnboardingWelcomePage(
             descriptionRes = LR.string.onboarding_welcome_recommendations_text,
             actionRes = LR.string.onboarding_welcome_recommendations_button,
             iconRes = IR.drawable.circle_star,
-            onClick = onContinue
+            onClick = onContinueToDiscover
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -244,6 +251,7 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
     AppThemeWithBackground(themeType) {
         OnboardingWelcomePage(
             onContinue = {},
+            onContinueToDiscover = {},
             isSignedInAsPlus = false
         )
     }
@@ -255,7 +263,8 @@ private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParam
     AppThemeWithBackground(themeType) {
         OnboardingWelcomePage(
             onContinue = {},
-            isSignedInAsPlus = true
+            onContinueToDiscover = {},
+            isSignedInAsPlus = true,
         )
     }
 }

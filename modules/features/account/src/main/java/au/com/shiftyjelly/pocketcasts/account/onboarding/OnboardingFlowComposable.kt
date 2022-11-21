@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
+    completeOnboardingToDiscover: () -> Unit,
     abortOnboarding: () -> Unit,
     analyticsTracker: AnalyticsTrackerWrapper,
     signInState: SignInState?
@@ -150,6 +151,7 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
                     onContinue = completeOnboarding,
+                    onContinueToDiscover = completeOnboardingToDiscover,
                     isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                 )
             }
