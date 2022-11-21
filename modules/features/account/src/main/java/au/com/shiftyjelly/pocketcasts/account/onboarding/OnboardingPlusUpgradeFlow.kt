@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -133,6 +135,7 @@ object OnboardingPlusFeatures {
         text: String,
         onClick: () -> Unit,
         selectedCheckMark: Boolean = false,
+        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
         modifier: Modifier = Modifier,
     ) {
         Button(
@@ -140,6 +143,7 @@ object OnboardingPlusFeatures {
             shape = RoundedCornerShape(12.dp),
             border = BorderStroke(2.dp, plusGradientBrush),
             elevation = null,
+            interactionSource = interactionSource,
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent),
             modifier = modifier,
         ) {
@@ -174,6 +178,7 @@ object OnboardingPlusFeatures {
     fun UnselectedPlusOutlinedRowButton(
         text: String,
         onClick: () -> Unit,
+        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
         modifier: Modifier = Modifier,
     ) {
         val unselectedColor = Color.White.copy(alpha = 0.4f)
@@ -182,6 +187,7 @@ object OnboardingPlusFeatures {
             shape = RoundedCornerShape(12.dp),
             border = BorderStroke(2.dp, unselectedColor),
             elevation = null,
+            interactionSource = interactionSource,
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent),
             modifier = modifier
         ) {
