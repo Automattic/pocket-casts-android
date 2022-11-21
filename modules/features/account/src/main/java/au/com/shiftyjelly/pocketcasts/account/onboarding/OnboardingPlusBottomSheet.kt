@@ -132,7 +132,7 @@ fun OnboardingPlusBottomSheet(
                     // Have to remember the interaction source here instead of inside the RowButtons
                     // because otherwise the interaction sources get misapplied to the wrong button
                     // as the user changes selections.
-                    val interactionSource = remember { MutableInteractionSource() }
+                    val interactionSource = remember(subscription) { MutableInteractionSource() }
 
                     if (subscription == state.selectedSubscription) {
                         PlusOutlinedRowButton(
