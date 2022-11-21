@@ -93,14 +93,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SIGNIN_DISMISSED)
                         navController.popBackStack()
                     },
-                    onLoginComplete = {
-                        navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack after login
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                                inclusive = true
-                            }
-                        }
-                    },
+                    onLoginComplete = completeOnboarding,
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
             }
