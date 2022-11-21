@@ -39,9 +39,9 @@ class StoriesViewModel @Inject constructor(
     private val mutableProgress = MutableStateFlow(0f)
     val progress: StateFlow<Float> = mutableProgress
 
-    private val stories = mutableListOf<Story>()
+    private val stories = MutableStateFlow(emptyList<Story>())
     private val numOfStories: Int
-        get() = stories.size
+        get() = stories.value.size
 
     private var currentIndex: Int = 0
     private val nextIndex
@@ -49,7 +49,7 @@ class StoriesViewModel @Inject constructor(
     private val totalLengthInMs
         get() = storyLengthsInMs.sum() + gapLengthsInMs
     private val storyLengthsInMs: List<Long>
-        get() = stories.map { it.storyLength }
+        get() = stories.value.map { it.storyLength }
     private val gapLengthsInMs: Long
         get() = STORY_GAP_LENGTH_MS * numOfStories.minus(1).coerceAtLeast(0)
 
@@ -67,12 +67,12 @@ class StoriesViewModel @Inject constructor(
                 mutableState.value = State.Loading(progress)
             }
             endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
-            stories.addAll(endOfYearManager.loadStories())
-            val state = if (stories.isEmpty()) {
+            stories.value = endOfYearManager.loadStories()
+            val state = if (stories.value.isEmpty()) {
                 State.Error
             } else {
                 State.Loaded(
-                    currentStory = stories[currentIndex],
+                    currentStory = stories.value[currentIndex],
                     segmentsData = SegmentsData(
                         xStartOffsets = List(numOfStories) { getXStartOffsetAtIndex(it) },
                         widths = storyLengthsInMs.map { it / totalLengthInMs.toFloat() },
@@ -104,7 +104,7 @@ class StoriesViewModel @Inject constructor(
                 if (newProgress.roundOff() == getXStartOffsetAtIndex(nextIndex).roundOff()) {
                     currentIndex = nextIndex
                     mutableState.value =
-                        currentState.copy(currentStory = stories[currentIndex])
+                        currentState.copy(currentStory = stories.value[currentIndex])
                 }
 
                 mutableProgress.value = newProgress
@@ -135,7 +135,13 @@ class StoriesViewModel @Inject constructor(
         if (timer == null) start()
         mutableProgress.value = getXStartOffsetAtIndex(index)
         currentIndex = index
-        mutableState.value = (state.value as State.Loaded).copy(currentStory = stories[index])
+        mutableState.value = (state.value as State.Loaded).copy(currentStory = stories.value[index])
+    }
+
+    fun onRetryClicked() {
+        viewModelScope.launch {
+            loadStories()
+        }
     }
 
     fun onShareClicked(
