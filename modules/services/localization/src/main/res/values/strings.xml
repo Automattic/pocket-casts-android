@@ -1486,6 +1486,9 @@
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
     <string name="onboarding_welcome_get_you_listening">Welcome, now let\'s get you listening!</string>
     <string name="onboarding_welcome_get_you_listening_plus">Thank you, now let\'s get you listening!</string>
+    <string name="onboarding_welcome_recommendations_title">Discover something new</string>
+    <string name="onboarding_welcome_recommendations_text">Find under-the-radar and trending podcasts in our hand-curated Discover page.</string>
+    <string name="onboarding_welcome_recommendations_button">Find My Next Podcast</string>
 
     <!--    Tasker Plugin-->
 
