@@ -1491,7 +1491,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getEndOfYearModalHasBeenShown(): Boolean =
-        getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, true)
+        getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, false)
 
     override fun endOfYearRequireLogin(): Boolean {
         return BuildConfig.END_OF_YEAR_REQUIRE_LOGIN

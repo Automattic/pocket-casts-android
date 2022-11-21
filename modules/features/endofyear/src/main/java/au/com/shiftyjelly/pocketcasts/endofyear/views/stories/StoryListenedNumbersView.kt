@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
@@ -76,7 +77,7 @@ private fun PodcastCoverStack(
     Box(
         modifier = modifier
             .size(availableWidth)
-            .padding(start = availableWidth * .41f, top = availableWidth * .09f)
+            .padding(start = availableWidth * .55f, top = availableWidth * .09f)
             .transformPodcastCover()
     ) {
         PodcastCover(
@@ -127,8 +128,14 @@ private fun PrimaryText(
     story: StoryListenedNumbers,
     modifier: Modifier = Modifier,
 ) {
+    val language = Locale.current.language
+    val titleResId = if (language == "en") {
+        R.string.end_of_year_story_listened_to_numbers_english_only
+    } else {
+        R.string.end_of_year_story_listened_to_numbers
+    }
     val text = stringResource(
-        id = R.string.end_of_year_story_listened_to_numbers,
+        id = titleResId,
         story.listenedNumbers.numberOfPodcasts,
         story.listenedNumbers.numberOfEpisodes
     )

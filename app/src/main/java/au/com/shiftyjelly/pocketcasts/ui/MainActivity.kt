@@ -268,8 +268,10 @@ class MainActivity :
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
                             VR.id.navigation_profile -> {
-                                binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-                                settings.setEndOfYearShowBadge2022(false)
+                                if (settings.getEndOfYearModalHasBeenShown()) {
+                                    binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+                                    settings.setEndOfYearShowBadge2022(false)
+                                }
                                 FirebaseAnalyticsTracker.navigatedToProfile()
                             }
                         }

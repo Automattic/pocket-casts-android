@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -26,12 +28,11 @@ import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.utils.dynamicBackground
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val HeartImageSize = 72.dp
-private const val BackgroundColor = 0xFFFDDC68
+private const val BackgroundColor = 0xFF1A1A1A
 
 @Composable
 fun StoryEpilogueView(
@@ -44,7 +45,7 @@ fun StoryEpilogueView(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .dynamicBackground(Color(BackgroundColor))
+            .background(Color(BackgroundColor))
             .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = modifier.height(40.dp))
@@ -110,26 +111,21 @@ private fun ReplayButton(
 ) {
     Button(
         onClick = { onClick() },
-        elevation = ButtonDefaults.elevation(
-            defaultElevation = 0.dp,
-            pressedElevation = 0.dp,
-            hoveredElevation = 0.dp,
-            focusedElevation = 0.dp,
-        ),
+        shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults
             .buttonColors(
-                backgroundColor = Color.Transparent,
-                contentColor = Color.Transparent
+                backgroundColor = Color.White,
+                contentColor = Color.White
             ),
     ) {
         Icon(
             imageVector = Icons.Default.Refresh,
             contentDescription = null,
-            tint = Color.White
+            tint = Color.Black
         )
         TextP40(
             text = stringResource(id = LR.string.end_of_year_replay),
-            color = Color.White,
+            color = Color.Black,
             modifier = modifier.padding(2.dp)
         )
     }
