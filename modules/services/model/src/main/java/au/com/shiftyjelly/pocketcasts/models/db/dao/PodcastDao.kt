@@ -34,6 +34,9 @@ abstract class PodcastDao {
     @Query("SELECT * FROM podcasts WHERE subscribed = 1")
     abstract suspend fun findSubscribedNoOrder(): List<Podcast>
 
+    @Query("SELECT uuid FROM podcasts WHERE subscribed = 1")
+    abstract suspend fun findSubscribedUuids(): List<String>
+
     @Query("SELECT * FROM podcasts WHERE subscribed = 0")
     abstract fun findUnsubscribed(): List<Podcast>
 

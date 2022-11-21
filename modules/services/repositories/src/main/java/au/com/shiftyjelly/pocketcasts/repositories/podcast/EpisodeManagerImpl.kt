@@ -916,6 +916,12 @@ class EpisodeManagerImpl @Inject constructor(
         return addedEpisodes
     }
 
+    override fun insert(episodes: List<Episode>) {
+        if (episodes.isNotEmpty()) {
+            episodeDao.insertAll(episodes)
+        }
+    }
+
     override fun findEpisodesToSync(): List<Episode> {
         return episodeDao.findEpisodesToSync()
     }

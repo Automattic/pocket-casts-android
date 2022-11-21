@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 
 interface EndOfYearManager {
     suspend fun isEligibleForStories(): Boolean
-    suspend fun downloadListeningHistory()
+    suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit)
     suspend fun loadStories(): List<Story>
     suspend fun hasEpisodesPlayedUpto(year: Int, playedUpToInSecs: Long): Boolean
     suspend fun getTotalListeningTimeInSecsForYear(year: Int): Long?

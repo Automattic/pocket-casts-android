@@ -61,6 +61,7 @@ interface EpisodeManager {
     /** Add methods  */
     fun add(episode: Episode, downloadMetaData: Boolean): Boolean
     fun add(episodes: List<Episode>, podcastUuid: String, downloadMetaData: Boolean): List<Episode>
+    fun insert(episodes: List<Episode>)
 
     /** Update methods  */
     fun update(episode: Episode?)

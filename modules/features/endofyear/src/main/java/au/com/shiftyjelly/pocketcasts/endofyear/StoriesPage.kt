@@ -25,6 +25,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
@@ -141,7 +142,10 @@ fun StoriesPage(
                     },
                 )
             }
-            State.Loading -> StoriesLoadingView(onCloseClicked)
+            is State.Loading -> StoriesLoadingView(
+                progress = (state as State.Loading).progress,
+                onCloseClicked = onCloseClicked
+            )
             State.Error -> {
                 viewModel.trackStoryFailedToLoad()
                 StoriesErrorView(onCloseClicked)
@@ -292,11 +296,20 @@ private fun CloseButtonView(
 
 @Composable
 private fun StoriesLoadingView(
+    progress: Float,
     onCloseClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     StoriesEmptyView(
-        content = { CircularProgressIndicator(color = Color.White) },
+        content = {
+            LinearProgressIndicator(
+                progress = progress,
+                color = Color.White,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            )
+        },
         onCloseClicked = onCloseClicked,
         modifier = modifier
     )
@@ -482,6 +495,7 @@ private fun StoriesLoadingViewPreview(
 ) {
     AppTheme(themeType) {
         StoriesLoadingView(
+            progress = 0.5f,
             onCloseClicked = {}
         )
     }

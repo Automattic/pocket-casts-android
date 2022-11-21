@@ -1,15 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
-import io.reactivex.Maybe
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.rx2.awaitSingleOrNull
+import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -23,6 +26,7 @@ class HistoryManager @Inject constructor(
     companion object {
         const val ACTION_ADD = 1
         const val ACTION_DELETE = 2
+        const val ADD_PODCAST_CONCURRENCY = 5
     }
 
     override val coroutineContext: CoroutineContext
@@ -33,12 +37,44 @@ class HistoryManager @Inject constructor(
      * @param response The server response.
      * @param updateServerModified Set to true when this is latest listening history, rather than part of the user's history.
      */
-    suspend fun processServerResponse(response: HistorySyncResponse, updateServerModified: Boolean) = withContext(Dispatchers.IO) {
+    suspend fun processServerResponse(response: HistorySyncResponse, updateServerModified: Boolean, onProgressChanged: ((Float) -> Unit)? = null) = withContext(Dispatchers.IO) {
         if (!response.hasChanged(0) || response.changes.isNullOrEmpty()) {
             return@withContext
         }
 
         val changes = response.changes ?: return@withContext
+
+        // all the podcasts that need to be in the database
+        val podcastUuids = changes
+            .mapNotNull { change -> change.podcast }
+            .toSet()
+        val databaseSubscribedPodcastUuids = podcastManager.findSubscribedUuids().toHashSet()
+        // add the missing podcasts or update the podcast it already unsubscribed in the database
+        val missingPodcastUuids = podcastUuids.minus(databaseSubscribedPodcastUuids)
+
+        val total = missingPodcastUuids.size.toFloat()
+        var progress = 0
+
+        // add the podcasts five at a time
+        Observable.fromIterable(missingPodcastUuids)
+            .observeOn(Schedulers.io())
+            .flatMap(
+                { podcastUuid ->
+                    podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false)
+                        .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
+                        .onErrorReturn { Podcast(uuid = podcastUuid) }
+                        .toObservable()
+                }, true, ADD_PODCAST_CONCURRENCY
+            )
+            .doOnNext {
+                progress += 1
+                onProgressChanged?.invoke(progress / total)
+            }
+            .toList()
+            .await()
+
+        val skeletonEpisodes = mutableListOf<Episode>()
+
         for (change in changes) {
             val interactionDate = change.modifiedAt.toLong()
 
@@ -52,35 +88,17 @@ class HistoryManager @Inject constructor(
                         episode.lastPlaybackInteractionSyncStatus = Episode.LAST_PLAYBACK_INTERACTION_SYNCED
                         episodeManager.update(episode)
                     }
-                } else if (podcastUuid != null) {
-                    // Add missing podcast and episode
-                    podcastManager.findOrDownloadPodcastRx(podcastUuid)
-                        .toMaybe()
-                        .doOnError { exception -> Timber.e(exception, "Failed to download missing podcast $podcastUuid") }
-                        .onErrorResumeNext(Maybe.empty())
-                        .awaitSingleOrNull()
-
+                } else if (podcastUuid != null && podcastUuid != UserEpisodePodcastSubstitute.uuid) {
+                    // add episodes which on longer exist in a podcast so they show up in listening history
                     val skeleton = Episode(
                         uuid = episodeUuid,
                         podcastUuid = podcastUuid,
                         title = change.title ?: "",
                         publishedDate = change.published?.parseIsoDate() ?: Date(),
-                        downloadUrl = change.url
+                        downloadUrl = change.url,
+                        lastPlaybackInteraction = interactionDate
                     )
-                    val missingEpisode = episodeManager.downloadMissingEpisode(
-                        episodeUuid,
-                        podcastUuid,
-                        skeleton,
-                        podcastManager,
-                        false
-                    )
-                        .doOnError { exception -> Timber.e(exception, "Failed to download missing episode $episodeUuid for podcast $podcastUuid") }
-                        .onErrorResumeNext(Maybe.empty())
-                        .awaitSingleOrNull()
-                    if (missingEpisode != null && missingEpisode is Episode) {
-                        missingEpisode.lastPlaybackInteraction = interactionDate
-                        episodeManager.update(missingEpisode)
-                    }
+                    skeletonEpisodes.add(skeleton)
                 }
             } else if (change.action == ACTION_DELETE) {
                 if (episode != null) {
@@ -90,6 +108,8 @@ class HistoryManager @Inject constructor(
                 }
             }
         }
+
+        episodeManager.insert(skeletonEpisodes)
 
         if (updateServerModified) {
             settings.setHistoryServerModified(response.serverModified)

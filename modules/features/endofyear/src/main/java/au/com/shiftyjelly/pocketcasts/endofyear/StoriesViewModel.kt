@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.Se
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +33,7 @@ class StoriesViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
-    private val mutableState = MutableStateFlow<State>(State.Loading)
+    private val mutableState = MutableStateFlow<State>(State.Loading())
     val state: StateFlow<State> = mutableState
 
     private val mutableProgress = MutableStateFlow(0f)
@@ -61,7 +63,10 @@ class StoriesViewModel @Inject constructor(
 
     private suspend fun loadStories() {
         try {
-            endOfYearManager.downloadListeningHistory()
+            val onProgressChanged: (Float) -> Unit = { progress ->
+                mutableState.value = State.Loading(progress)
+            }
+            endOfYearManager.downloadListeningHistory(onProgressChanged = onProgressChanged)
             stories.addAll(endOfYearManager.loadStories())
             val state = if (stories.isEmpty()) {
                 State.Error
@@ -76,7 +81,10 @@ class StoriesViewModel @Inject constructor(
             }
             mutableState.value = state
             if (state is State.Loaded) start()
-        } catch (e: Exception) {
+        } catch (ex: Exception) {
+            val message = "Failed to load end of year stories."
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, message)
+            SentryHelper.recordException(message, ex)
             mutableState.value = State.Error
         }
     }
@@ -180,7 +188,9 @@ class StoriesViewModel @Inject constructor(
     }
 
     sealed class State {
-        object Loading : State()
+        data class Loading(
+            val progress: Float = 0f
+        ) : State()
         data class Loaded(
             val currentStory: Story?,
             val segmentsData: SegmentsData,

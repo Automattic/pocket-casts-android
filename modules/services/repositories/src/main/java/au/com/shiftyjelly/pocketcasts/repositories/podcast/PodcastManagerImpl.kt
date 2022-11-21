@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
+import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute.uuid
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -117,7 +118,7 @@ class PodcastManagerImpl @Inject constructor(
      * Do this now rather than adding it to a queue.
      */
     override fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean): Single<Podcast> {
-        return subscribeManager.addPodcast(podcastUuid, sync, subscribed = true)
+        return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true)
     }
 
     /**
@@ -127,6 +128,10 @@ class PodcastManagerImpl @Inject constructor(
         return findPodcastByUuidRx(podcastUuid)
             .switchIfEmpty(subscribeManager.addPodcast(podcastUuid, sync = false, subscribed = false).toMaybe())
             .toSingle()
+    }
+
+    override fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast> {
+        return subscribeManager.addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed)
     }
 
     override fun isSubscribingToPodcast(podcastUuid: String): Boolean {
@@ -332,6 +337,10 @@ class PodcastManagerImpl @Inject constructor(
         }
 
         return false
+    }
+
+    override suspend fun findSubscribedUuids(): List<String> {
+        return podcastDao.findSubscribedUuids()
     }
 
     override fun findPodcastByUuid(uuid: String): Podcast? {

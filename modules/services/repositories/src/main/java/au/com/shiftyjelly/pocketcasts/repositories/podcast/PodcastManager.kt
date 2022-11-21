@@ -39,6 +39,7 @@ interface PodcastManager {
     fun findPodcastsInFolderSingle(folderUuid: String): Single<List<Podcast>>
     suspend fun findPodcastsNotInFolder(): List<Podcast>
     fun observePodcastsInFolderOrderByUserChoice(folder: Folder): Flowable<List<Podcast>>
+    suspend fun findSubscribedUuids(): List<String>
 
     fun observePodcastsOrderByLatestEpisode(): Flowable<List<Podcast>>
     fun observeSubscribed(): Flowable<List<Podcast>>
@@ -59,6 +60,7 @@ interface PodcastManager {
     fun isSubscribingToPodcasts(): Boolean
     fun getSubscribedPodcastUuids(): Single<List<String>>
     fun isSubscribingToPodcast(podcastUuid: String): Boolean
+    fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast>
 
     fun addFolderPodcast(podcast: Podcast)
 
