@@ -76,7 +76,7 @@ fun OnboardingFlowComposable(
                     },
                     onAccountCreated = {
                         navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack when opening recommendations
+                            // clear backstack after account is created
                             popUpTo(OnboardingNavRoute.logInOrSignUp) {
                                 inclusive = true
                             }
@@ -94,7 +94,7 @@ fun OnboardingFlowComposable(
                     },
                     onLoginComplete = {
                         navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack when opening recommendations
+                            // clear backstack after login
                             popUpTo(OnboardingNavRoute.logInOrSignUp) {
                                 inclusive = true
                             }
