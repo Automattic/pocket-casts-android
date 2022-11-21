@@ -25,6 +25,7 @@ class HistoryManager @Inject constructor(
     companion object {
         const val ACTION_ADD = 1
         const val ACTION_DELETE = 2
+        const val ADD_PODCAST_CONCURRENCY = 5
     }
 
     override val coroutineContext: CoroutineContext
@@ -42,19 +43,21 @@ class HistoryManager @Inject constructor(
 
         val changes = response.changes ?: return@withContext
 
-        // add the missing podcasts
+        // all the podcasts that need to be in the database
         val podcastUuids = changes
             .mapNotNull { change -> change.podcast }
             .toSet()
         val databaseSubscribedPodcastUuids = podcastManager.findSubscribedUuids().toHashSet()
+        // add the missing podcasts or update the podcast it already unsubscribed in the database
         val missingPodcastUuids = podcastUuids.minus(databaseSubscribedPodcastUuids)
 
         val total = missingPodcastUuids.size.toFloat()
         var progress = 0
 
+        // add the podcasts five at a time
         Observable.fromIterable(missingPodcastUuids)
             .observeOn(Schedulers.io())
-            .flatMap({ podcastUuid -> podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false).toObservable() }, true, 5)
+            .flatMap({ podcastUuid -> podcastManager.addPodcast(podcastUuid = podcastUuid, sync = false, subscribed = false).toObservable() }, true, ADD_PODCAST_CONCURRENCY)
             .doOnError { throwable -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "History manager could not add podcast") }
             .doOnNext {
                 progress += 1
@@ -79,6 +82,7 @@ class HistoryManager @Inject constructor(
                         episodeManager.update(episode)
                     }
                 } else if (podcastUuid != null && podcastUuid != UserEpisodePodcastSubstitute.uuid) {
+                    // add episodes which on longer exist in a podcast so they show up in listening history
                     val skeleton = Episode(
                         uuid = episodeUuid,
                         podcastUuid = podcastUuid,

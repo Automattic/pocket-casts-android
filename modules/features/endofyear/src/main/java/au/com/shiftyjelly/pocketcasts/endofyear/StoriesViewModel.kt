@@ -81,9 +81,10 @@ class StoriesViewModel @Inject constructor(
             }
             mutableState.value = state
             if (state is State.Loaded) start()
-        } catch (e: Exception) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to load end of year stories.")
-            SentryHelper.recordException(message = "Failed to load end of year stories.", throwable = e)
+        } catch (ex: Exception) {
+            val message = "Failed to load end of year stories."
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, message)
+            SentryHelper.recordException(message, ex)
             mutableState.value = State.Error
         }
     }
