@@ -141,7 +141,7 @@ object OnboardingPlusFeatures {
             border = BorderStroke(2.dp, plusGradientBrush),
             elevation = null,
             colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent),
-            modifier = modifier
+            modifier = modifier,
         ) {
 
             Box(

@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
@@ -120,10 +122,12 @@ fun OnboardingPlusBottomSheet(
                 }
             }
 
-            Column(
+            // Using LazyColumn instead of Column to avoid issue where unselected button that was not
+            // being tapped would sometimes display the on-touch ripple effect
+            LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                subscriptions.forEach { subscription ->
+                items(subscriptions) { subscription ->
                     if (subscription == state.selectedSubscription) {
                         PlusOutlinedRowButton(
                             text = subscription.recurringPricingPhase.pricePerPeriod(resources),
@@ -132,9 +136,7 @@ fun OnboardingPlusBottomSheet(
                         )
                     } else {
                         UnselectedPlusOutlinedRowButton(
-                            text = subscription.recurringPricingPhase.pricePerPeriod(
-                                resources
-                            ),
+                            text = subscription.recurringPricingPhase.pricePerPeriod(resources),
                             onClick = { viewModel.updateSelectedSubscription(subscription) }
                         )
                     }
