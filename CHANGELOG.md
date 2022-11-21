@@ -6,7 +6,9 @@
 -----
 
 *   New Features:
-    *   Support Android 13 per-app language preferences
+    * Add End of Year stats
+        ([#410](https://github.com/Automattic/pocket-casts-android/issues/410)).  
+    * Support Android 13 per-app language preferences
         ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
 *   Bug Fixes:
     *   Fixed some layout issues in the EpisodeFragment
