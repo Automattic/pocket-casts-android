@@ -28,7 +28,6 @@ android {
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
 
         // Feature Flags
-        buildConfigField "boolean", "END_OF_YEAR_ENABLED", "false"
         buildConfigField "boolean", "END_OF_YEAR_REQUIRE_LOGIN", "true"
         buildConfigField "boolean", "ONBOARDING_ENABLED", "false"
         buildConfigField "boolean", "SINGLE_SIGN_ON_ENABLED", "false"
