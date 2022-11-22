@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -75,6 +76,23 @@ fun OnboardingWelcomePage(
         onBackPressed()
     }
 
+    Content(
+        isSignedInAsPlus = isSignedInAsPlus,
+        onContinueToDiscover = onContinueToDiscover,
+        state = state,
+        onContinue = onContinue,
+        onNewsletterCheckedChanged = viewModel::updateNewsletter
+    )
+}
+
+@Composable
+private fun Content(
+    isSignedInAsPlus: Boolean,
+    onContinueToDiscover: () -> Unit,
+    state: OnboardingWelcomeState,
+    onContinue: () -> Unit,
+    onNewsletterCheckedChanged: (Boolean) -> Unit
+) {
     Column(Modifier.padding(horizontal = 24.dp)) {
         Spacer(modifier = Modifier.weight(1f))
 
@@ -109,7 +127,7 @@ fun OnboardingWelcomePage(
 
         NewsletterSwitch(
             checked = state.newsletter,
-            onCheckedChange = viewModel::updateNewsletter
+            onCheckedChange = onNewsletterCheckedChanged
         )
 
         Spacer(Modifier.height(16.dp))
@@ -263,11 +281,14 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
 @Composable
 private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
-        OnboardingWelcomePage(
+        Content(
             onContinue = {},
             onContinueToDiscover = {},
-            onBackPressed = {},
             isSignedInAsPlus = true,
+            state = OnboardingWelcomeState(
+                newsletter = false
+            ),
+            onNewsletterCheckedChanged = {},
         )
     }
 }
