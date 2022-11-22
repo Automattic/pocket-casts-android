@@ -172,7 +172,7 @@ private fun CardSection(
                     Spacer(Modifier.height(4.dp))
                     TextP60(
                         text = stringResource(descriptionRes),
-                        color = MaterialTheme.theme.colors.secondaryText02,
+                        color = MaterialTheme.theme.colors.primaryText02,
                     )
                 }
 
