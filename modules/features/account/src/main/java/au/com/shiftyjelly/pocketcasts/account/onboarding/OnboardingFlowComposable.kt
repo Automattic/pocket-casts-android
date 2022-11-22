@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
@@ -17,7 +18,8 @@ fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
     abortOnboarding: () -> Unit,
-    analyticsTracker: AnalyticsTrackerWrapper
+    analyticsTracker: AnalyticsTrackerWrapper,
+    signInState: SignInState?
 ) {
     AppThemeWithBackground(activeTheme) {
         val navController = rememberNavController()
@@ -124,24 +126,30 @@ fun OnboardingFlowComposable(
                     },
                     onBackPressed = {
                         analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
-                        navController.popBackStack()
+                        completeOnboarding()
                     },
                     onComplete = {
-                        // TODO analytics
-                        navController.navigate(OnboardingNavRoute.plusFeatures)
+                        navController.navigate(
+                            if (signInState?.isSignedInAsPlus == false) {
+                                OnboardingNavRoute.plusUpgrade
+                            } else {
+                                OnboardingNavRoute.welcome
+                            }
+                        )
                     }
                 )
             }
 
-            composable(OnboardingNavRoute.plusFeatures) {
-                OnboardingPlusFeaturesPage(
-                    onShown = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_SHOWN) },
-                    onBackPressed = {
-                        analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_DISMISSED)
-                        navController.popBackStack()
-                    },
-                    onUpgradePressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED) },
-                    onNotNowPressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_NOT_NOW_TAPPED) }
+            composable(OnboardingNavRoute.plusUpgrade) {
+                OnboardingPlusUpgradeFlow(
+                    onBackPressed = { navController.popBackStack() },
+                    onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
+                    onComplete = { navController.navigate(OnboardingNavRoute.welcome) },
+                )
+            }
+            composable(OnboardingNavRoute.welcome) {
+                OnboardingWelcomePage(
+                    onContinue = completeOnboarding,
                 )
             }
         }
@@ -165,5 +173,6 @@ private object OnboardingNavRoute {
     const val logInGoogle = "log_in_google"
     const val forgotPassword = "forgot_password"
     const val recommendations = "recommendations"
-    const val plusFeatures = "upgrade_features"
+    const val plusUpgrade = "upgrade_upgrade"
+    const val welcome = "welcome"
 }

@@ -27,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -72,13 +71,16 @@ internal fun OnboardingLoginOrSignUpPage(
                     .height(28.dp)
             )
 
-            TextH30(
-                text = stringResource(LR.string.not_now),
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable { onNotNowClicked() }
-            )
+            Box(Modifier.weight(1f)) {
+                TextH30(
+                    text = stringResource(LR.string.not_now),
+                    textAlign = TextAlign.End,
+                    modifier = Modifier
+                        .clickable { onNotNowClicked() }
+                        .padding(all = 4.dp)
+                        .align(Alignment.CenterEnd)
+                )
+            }
         }
 
         Column(
