@@ -58,7 +58,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingPlusBottomSheet(
-    onComplete: () -> Unit,
+    onCompleteUpgrade: () -> Unit,
 ) {
 
     // The keyboard sometimes gets opened when returning from the Google payment flow.
@@ -214,7 +214,7 @@ fun OnboardingPlusBottomSheet(
                 context.getActivity()?.let { activity ->
                     viewModel.onClickSubscribe(
                         activity = activity,
-                        onComplete = onComplete,
+                        onComplete = onCompleteUpgrade,
                     )
                 }
             },

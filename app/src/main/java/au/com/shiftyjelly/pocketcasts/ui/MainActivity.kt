@@ -290,8 +290,12 @@ class MainActivity :
     private fun openOnboardingFlow() {
         registerForActivityResult(OnboardingActivityContract()) { result ->
             when (result) {
-                OnboardingFinish.CompletedOnboarding -> {
+                OnboardingFinish.Completed -> {
                     // TODO persist that onboarding has been completed
+                }
+                OnboardingFinish.CompletedGoToDiscover -> {
+                    // TODO persist that onboarding has been completed
+                    openTab(VR.id.navigation_discover)
                 }
                 OnboardingFinish.AbortedOnboarding -> {
                     finish()

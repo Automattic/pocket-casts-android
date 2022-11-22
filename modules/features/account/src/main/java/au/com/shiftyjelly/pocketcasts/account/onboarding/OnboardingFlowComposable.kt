@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
+    completeOnboardingToDiscover: () -> Unit,
     abortOnboarding: () -> Unit,
     analyticsTracker: AnalyticsTrackerWrapper,
     signInState: SignInState?
@@ -51,7 +52,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, AnalyticsProp.source)
                         completeOnboarding()
                     },
-                    onSignUpFreeClicked = {
+                    onSignUpClicked = {
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.createAccount)
                         navController.navigate(OnboardingNavRoute.createFreeAccount)
                     },
@@ -76,7 +77,7 @@ fun OnboardingFlowComposable(
                     },
                     onAccountCreated = {
                         navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack when opening recommendations
+                            // clear backstack after account is created
                             popUpTo(OnboardingNavRoute.logInOrSignUp) {
                                 inclusive = true
                             }
@@ -92,14 +93,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SIGNIN_DISMISSED)
                         navController.popBackStack()
                     },
-                    onLoginComplete = {
-                        navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack when opening recommendations
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                                inclusive = true
-                            }
-                        }
-                    },
+                    onLoginComplete = completeOnboarding,
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
             }
@@ -144,12 +138,22 @@ fun OnboardingFlowComposable(
                 OnboardingPlusUpgradeFlow(
                     onBackPressed = { navController.popBackStack() },
                     onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
-                    onComplete = { navController.navigate(OnboardingNavRoute.welcome) },
+                    onCompleteUpgrade = {
+                        navController.navigate(OnboardingNavRoute.welcome) {
+                            // Don't allow navigation back to the upgrade screen after the user upgrades
+                            popUpTo(OnboardingNavRoute.plusUpgrade) {
+                                inclusive = true
+                            }
+                        }
+                    },
                 )
             }
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
+                    isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                     onContinue = completeOnboarding,
+                    onContinueToDiscover = completeOnboardingToDiscover,
+                    onBackPressed = { navController.popBackStack() },
                 )
             }
         }

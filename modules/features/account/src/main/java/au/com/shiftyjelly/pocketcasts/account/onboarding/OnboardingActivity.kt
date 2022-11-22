@@ -29,12 +29,9 @@ class OnboardingActivity : AppCompatActivity() {
 
             OnboardingFlowComposable(
                 activeTheme = theme.activeTheme,
-                completeOnboarding = {
-                    finishWithResult(OnboardingFinish.CompletedOnboarding)
-                },
-                abortOnboarding = {
-                    finishWithResult(OnboardingFinish.AbortedOnboarding)
-                },
+                completeOnboarding = { finishWithResult(OnboardingFinish.Completed) },
+                completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.CompletedGoToDiscover) },
+                abortOnboarding = { finishWithResult(OnboardingFinish.AbortedOnboarding) },
                 analyticsTracker = analyticsTracker,
                 signInState = signInState,
             )
