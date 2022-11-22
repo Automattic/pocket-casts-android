@@ -189,7 +189,10 @@ class MainActivity :
         theme.setupThemeForConfig(this, resources.configuration)
 
         // TODO check settings to determine if onboarding has already been completed
-        if (BuildConfig.ONBOARDING_ENABLED && !settings.isLoggedIn()) {
+        val showOnboarding = BuildConfig.ONBOARDING_ENABLED &&
+            !settings.getHasCompletedOnboarding() &&
+            !settings.isLoggedIn()
+        if (showOnboarding) {
             openOnboardingFlow()
         }
 
@@ -291,10 +294,10 @@ class MainActivity :
         registerForActivityResult(OnboardingActivityContract()) { result ->
             when (result) {
                 OnboardingFinish.Completed -> {
-                    // TODO persist that onboarding has been completed
+                    settings.setHasCompletedOnboarding()
                 }
                 OnboardingFinish.CompletedGoToDiscover -> {
-                    // TODO persist that onboarding has been completed
+                    settings.setHasCompletedOnboarding()
                     openTab(VR.id.navigation_discover)
                 }
                 OnboardingFinish.AbortedOnboarding -> {
