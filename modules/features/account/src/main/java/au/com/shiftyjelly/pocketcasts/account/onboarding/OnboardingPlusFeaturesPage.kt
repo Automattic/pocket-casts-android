@@ -103,10 +103,7 @@ internal fun OnboardingPlusFeaturesPage(
 
             Spacer(Modifier.height(8.dp))
             NavigationIconButton(
-                onNavigationClick = {
-                    viewModel.onBackPressed()
-                    onBackPressed()
-                },
+                onNavigationClick = onBackPressed,
                 iconColor = Color.White,
                 modifier = Modifier
                     .height(48.dp)
