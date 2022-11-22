@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetViewModel
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -79,6 +80,10 @@ fun OnboardingPlusBottomSheet(
             .padding(top = 20.dp, bottom = 40.dp)
             .verticalScroll(rememberScrollState())
     ) {
+
+        Pill()
+
+        Spacer(Modifier.height(32.dp))
         TextH20(
             text = stringResource(LR.string.onboarding_plus_become_a_plus_member),
             textAlign = TextAlign.Center,
