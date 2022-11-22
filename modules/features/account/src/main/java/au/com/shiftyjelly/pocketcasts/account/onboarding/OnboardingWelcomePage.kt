@@ -38,8 +38,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
@@ -103,7 +102,7 @@ private fun Content(
         }
 
         Spacer(Modifier.height(8.dp))
-        TextH20(
+        TextH10(
             text = stringResource(
                 if (isSignedInAsPlus) {
                     LR.string.onboarding_welcome_get_you_listening_plus
@@ -171,7 +170,10 @@ private fun CardSection(
                 ) {
                     TextH40(stringResource(titleRes))
                     Spacer(Modifier.height(4.dp))
-                    TextP60(stringResource(descriptionRes))
+                    TextP60(
+                        text = stringResource(descriptionRes),
+                        color = MaterialTheme.theme.colors.secondaryText02,
+                    )
                 }
 
                 Spacer(Modifier.width(8.dp))
@@ -189,6 +191,7 @@ private fun CardSection(
             )
             TextH40(
                 text = stringResource(actionRes),
+                color = MaterialTheme.theme.colors.primaryInteractive01,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
@@ -209,8 +212,11 @@ private fun NewsletterSwitch(
                 .padding(end = 16.dp)
                 .weight(1f)
         ) {
-            TextH30(stringResource(LR.string.onboarding_get_the_newsletter))
-            TextP60(stringResource(LR.string.profile_create_newsletter_summary))
+            TextH40(stringResource(LR.string.onboarding_get_the_newsletter))
+            TextP60(
+                text = stringResource(LR.string.profile_create_newsletter_summary),
+                color = MaterialTheme.theme.colors.primaryText02,
+            )
         }
 
         Switch(
