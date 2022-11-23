@@ -51,6 +51,10 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         searchHandler.updateSearchQuery(searchQuery)
     }
 
+    fun queryImmediately() {
+        searchHandler.updateSearchQuery(state.value.searchQuery, immediate = true)
+    }
+
     init {
         searchHandler.setOnlySearchRemote(true)
         viewModelScope.launch {

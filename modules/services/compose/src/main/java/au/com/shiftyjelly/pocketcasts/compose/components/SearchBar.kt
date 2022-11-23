@@ -42,6 +42,7 @@ fun SearchBar(
     text: String,
     onTextChanged: (String) -> Unit,
     placeholder: String = stringResource(LR.string.search_podcasts),
+    onSearch: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -63,7 +64,12 @@ fun SearchBar(
         ),
         shape = RoundedCornerShape(10.dp),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                onSearch()
+                focusManager.clearFocus()
+            }
+        ),
         maxLines = 1,
         leadingIcon = {
             Icon(

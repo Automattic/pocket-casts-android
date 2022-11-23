@@ -30,8 +30,8 @@ class SearchHandler @Inject constructor(
     val settings: Settings,
     folderManager: FolderManager
 ) {
-    private val searchQuery = BehaviorRelay.create<String>().apply {
-        accept("")
+    private val searchQuery = BehaviorRelay.create<Query>().apply {
+        accept(Query(""))
     }
 
     private val loadingObservable = BehaviorRelay.create<Boolean>().apply {
@@ -44,7 +44,7 @@ class SearchHandler @Inject constructor(
 
     private val localResults = Observable
         .combineLatest(searchQuery, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->
-            Pair(if (onlySearchRemoteObservable) "" else searchQuery, signInState)
+            Pair(if (onlySearchRemoteObservable) "" else searchQuery.string, signInState)
         }
         .subscribeOn(Schedulers.io())
         .switchMap { (query, signInState) ->
@@ -96,8 +96,17 @@ class SearchHandler @Inject constructor(
 
     private val serverSearchResults = searchQuery
         .subscribeOn(Schedulers.io())
-        .map { it.trim() }
-        .debounce { if (it.isEmpty()) Observable.empty() else Observable.timer(settings.getPodcastSearchDebounceMs(), TimeUnit.MILLISECONDS) }
+        .map { it.copy(string = it.string.trim()) }
+        .debounce {
+            val debounceQuery = it.string.isNotEmpty() && !it.immediate
+            if (debounceQuery) {
+                val debounceMs = settings.getPodcastSearchDebounceMs()
+                Observable.timer(debounceMs, TimeUnit.MILLISECONDS)
+            } else {
+                Observable.empty()
+            }
+        }
+        .map { it.string }
         .switchMap {
             if (it.length <= 1) {
                 Observable.just(PodcastSearch())
@@ -112,7 +121,7 @@ class SearchHandler @Inject constructor(
         .doOnNext { loadingObservable.accept(false) }
 
     private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localResults, serverSearchResults, loading ->
-        if (searchTerm.isBlank()) {
+        if (searchTerm.string.isBlank()) {
             SearchState.Results(list = emptyList(), loading = loading, error = null)
         } else {
             // set if the podcast is subscribed so we can show a tick
@@ -139,11 +148,13 @@ class SearchHandler @Inject constructor(
     val searchResults: LiveData<SearchState> = LiveDataReactiveStreams.fromPublisher(searchFlowable)
     val loading: LiveData<Boolean> = LiveDataReactiveStreams.fromPublisher(loadingObservable.toFlowable(BackpressureStrategy.LATEST))
 
-    fun updateSearchQuery(query: String) {
-        searchQuery.accept(query)
+    fun updateSearchQuery(query: String, immediate: Boolean = false) {
+        searchQuery.accept(Query(query, immediate))
     }
 
     fun setOnlySearchRemote(remote: Boolean) {
         onlySearchRemoteObservable.accept(remote)
     }
+
+    private data class Query(val string: String, val immediate: Boolean = false)
 }

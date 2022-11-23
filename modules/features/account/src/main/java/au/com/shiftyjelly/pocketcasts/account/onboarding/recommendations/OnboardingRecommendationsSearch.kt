@@ -58,6 +58,7 @@ fun OnboardingRecommendationsSearch(
             text = state.searchQuery,
             placeholder = stringResource(LR.string.search),
             onTextChanged = viewModel::updateSearchQuery,
+            onSearch = { viewModel.queryImmediately() },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -69,7 +70,6 @@ fun OnboardingRecommendationsSearch(
             Divider(color = MaterialTheme.theme.colors.secondaryUi02)
             if (state.loading && state.results.isNotEmpty()) {
                 // Provide a subtle loading indicator when results are displayed, but being updated
-
                 LinearProgressIndicator(
                     color = MaterialTheme.theme.colors.secondaryUi01,
                     backgroundColor = MaterialTheme.theme.colors.secondaryUi02,
