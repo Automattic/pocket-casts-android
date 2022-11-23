@@ -1,7 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import android.view.KeyEvent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,6 +22,11 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,14 +38,20 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun SearchBar(text: String, onTextChanged: (String) -> Unit, modifier: Modifier = Modifier) {
+fun SearchBar(
+    text: String,
+    onTextChanged: (String) -> Unit,
+    placeholder: String = stringResource(LR.string.search_podcasts),
+    onSearch: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
         value = text,
         onValueChange = {
             onTextChanged(it.removeNewLines())
         },
-        placeholder = { Text(stringResource(LR.string.search_podcasts)) },
+        placeholder = { Text(placeholder) },
         colors = TextFieldDefaults.outlinedTextFieldColors(
             cursorColor = MaterialTheme.theme.colors.primaryText02,
             textColor = MaterialTheme.theme.colors.primaryText01,
@@ -50,7 +64,12 @@ fun SearchBar(text: String, onTextChanged: (String) -> Unit, modifier: Modifier 
         ),
         shape = RoundedCornerShape(10.dp),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                onSearch()
+                focusManager.clearFocus()
+            }
+        ),
         maxLines = 1,
         leadingIcon = {
             Icon(
@@ -83,6 +102,38 @@ fun SearchBar(text: String, onTextChanged: (String) -> Unit, modifier: Modifier 
             }
         }
     )
+}
+
+@Composable
+fun SearchBarButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .clearAndSetSemantics {
+                role = Role.Button
+                contentDescription = text
+                onClick {
+                    onClick()
+                    true
+                }
+            }
+    ) {
+        SearchBar(
+            text = "",
+            placeholder = text,
+            onTextChanged = {},
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Box(
+            Modifier
+                .matchParentSize() // cover SearchBar
+                .clickable { onClick() } // handle click events
+        )
+    }
 }
 
 @Preview(showBackground = true)

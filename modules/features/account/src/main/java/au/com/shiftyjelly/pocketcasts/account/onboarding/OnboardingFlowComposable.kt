@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -76,7 +77,7 @@ fun OnboardingFlowComposable(
                         navController.popBackStack()
                     },
                     onAccountCreated = {
-                        navController.navigate(OnboardingNavRoute.recommendations) {
+                        navController.navigate(OnboardingNavRoute.recommendationsFlow) {
                             // clear backstack after account is created
                             popUpTo(OnboardingNavRoute.logInOrSignUp) {
                                 inclusive = true
@@ -113,8 +114,8 @@ fun OnboardingFlowComposable(
                 )
             }
 
-            composable(OnboardingNavRoute.recommendations) {
-                OnboardingRecommendations(
+            composable(OnboardingNavRoute.recommendationsFlow) {
+                OnboardingRecommendationsFlow(
                     onShown = {
                         analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN)
                     },
@@ -176,7 +177,7 @@ private object OnboardingNavRoute {
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
     const val forgotPassword = "forgot_password"
-    const val recommendations = "recommendations"
+    const val recommendationsFlow = "recommendationsFlow"
     const val plusUpgrade = "upgrade_upgrade"
     const val welcome = "welcome"
 }
