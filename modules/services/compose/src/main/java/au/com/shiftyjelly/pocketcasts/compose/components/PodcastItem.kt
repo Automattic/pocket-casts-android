@@ -39,8 +39,8 @@ fun PodcastItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
                 .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
+                .padding(horizontal = 16.dp)
         ) {
             PodcastImage(
                 uuid = podcast.uuid,
