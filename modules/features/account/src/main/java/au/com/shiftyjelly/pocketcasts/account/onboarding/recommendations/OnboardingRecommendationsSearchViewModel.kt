@@ -46,15 +46,6 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         val isSubscribed: Boolean,
     )
 
-    fun updateSearchQuery(searchQuery: String) {
-        _state.value = state.value.copy(searchQuery = searchQuery)
-        searchHandler.updateSearchQuery(searchQuery)
-    }
-
-    fun queryImmediately() {
-        searchHandler.updateSearchQuery(state.value.searchQuery, immediate = true)
-    }
-
     init {
         searchHandler.setOnlySearchRemote(true)
         viewModelScope.launch {
@@ -99,6 +90,15 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                 _state.value = it
             }
         }
+    }
+
+    fun updateSearchQuery(searchQuery: String) {
+        _state.value = state.value.copy(searchQuery = searchQuery)
+        searchHandler.updateSearchQuery(searchQuery)
+    }
+
+    fun queryImmediately() {
+        searchHandler.updateSearchQuery(state.value.searchQuery, immediate = true)
     }
 
     fun toggleSubscribed(podcastResult: PodcastResult) {
