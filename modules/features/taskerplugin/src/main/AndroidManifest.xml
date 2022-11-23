@@ -66,5 +66,14 @@
             <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
         </intent-filter>
     </activity>
+    <activity
+        android:name=".queryUpNext.config.ActivityConfigQueryUpNext"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/pocket_casts_query_up_next_episodes">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
 </application>
 </manifest>

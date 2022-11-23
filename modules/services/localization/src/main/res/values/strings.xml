@@ -1429,6 +1429,7 @@
     <string name="pocket_casts_add_to_up_next">Pocket Casts Add To Up Next</string>
     <string name="pocket_casts_query_filters">Pocket Casts Query Filters</string>
     <string name="pocket_casts_query_filter_episodes">Pocket Casts Query Filter Episodes</string>
+    <string name="pocket_casts_query_up_next_episodes">Pocket Casts Query Up Next Episodes</string>
     <string name="set_playback_speed">Set Playback Speed</string>
     <string name="playback_speed_between_values">Playback Speed (between 0.5 and 3)</string>
     <string name="set_trim_silence_mode">Set Trim Silence Mode</string>

@@ -27,9 +27,7 @@ class ActionRunnerAddToUpNext : TaskerPluginRunnerActionNoOutput<InputAddToUpNex
         val playbackManager = context.playbackManager
 
         val upNextQueue = playbackManager.upNextQueue
-        val currentEpisodes = upNextQueue.queueEpisodes.toMutableList()
-        upNextQueue.currentEpisode?.let { currentEpisodes.add(0, it) }
-
+        val currentEpisodes = upNextQueue.allEpisodes
         val episodesToPlay = when (regularInput.clearModeEnum) {
             InputAddToUpNext.ClearMode.ClearUpNext -> currentEpisodes.take(1)
             InputAddToUpNext.ClearMode.ClearAll -> listOf()
