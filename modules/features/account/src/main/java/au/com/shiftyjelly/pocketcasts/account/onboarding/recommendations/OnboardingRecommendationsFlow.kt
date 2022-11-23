@@ -30,7 +30,7 @@ fun OnboardingRecommendationsFlow(
             )
         }
         composable(OnboardingRecommendationsNavRoute.search) {
-            OnboardingRecommendationsSearch(
+            OnboardingRecommendationsSearchPage(
                 onBackPressed = { navController.popBackStack() },
             )
         }

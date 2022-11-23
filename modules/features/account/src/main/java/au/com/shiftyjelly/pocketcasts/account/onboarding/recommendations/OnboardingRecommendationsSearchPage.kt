@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun OnboardingRecommendationsSearch(
+fun OnboardingRecommendationsSearchPage(
     onBackPressed: () -> Unit,
 ) {
     val viewModel = hiltViewModel<OnboardingRecommendationsSearchViewModel>()
@@ -90,6 +90,7 @@ fun OnboardingRecommendationsSearch(
                         podcast = it.podcast,
                         subscribed = it.isSubscribed,
                         showSubscribed = true,
+                        showPlusIfUnsubscribed = true,
                         onClick = { viewModel.toggleSubscribed(it) },
                     )
                 }
