@@ -188,7 +188,6 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
 
-        // TODO check settings to determine if onboarding has already been completed
         val showOnboarding = BuildConfig.ONBOARDING_ENABLED &&
             !settings.getHasCompletedOnboarding() &&
             !settings.isLoggedIn()
