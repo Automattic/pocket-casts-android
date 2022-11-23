@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -113,7 +115,7 @@ internal fun OnboardingLoginOrSignUpPage(
 
             if (viewModel.showContinueWithGoogleButton) {
                 Spacer(Modifier.height(8.dp))
-                ContinueWithGoogleButton(onClick = onContinueWithGoogleClicked)
+                ContinueWithGoogleButton(viewModel = viewModel, onClick = onContinueWithGoogleClicked)
             } else {
                 Spacer(Modifier.height(32.dp))
             }
@@ -124,14 +126,45 @@ internal fun OnboardingLoginOrSignUpPage(
 }
 
 @Composable
-private fun ContinueWithGoogleButton(onClick: () -> Unit) {
+private fun ContinueWithGoogleButton(viewModel: OnboardingLoginOrSignUpViewModel, onClick: () -> Unit) {
+    // request Google Legacy Sign-In and process the result
+    val googleLegacySignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        viewModel.onGoogleLegacySignInResult(
+            result = result,
+            onSuccess = { onClick() }
+        )
+    }
+    // request Google On Tap Sign-In and process the result
+    val googleOneTapSignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        viewModel.onGoogleOneTapSignInResult(
+            result = result,
+            onSuccess = { onClick() },
+            onError = {
+                viewModel.startGoogleLegacySignIn(
+                    onSuccess = { request -> googleLegacySignInLauncher.launch(request) }
+                )
+            }
+        )
+    }
+
+    val onSignInClick = {
+        viewModel.startGoogleOneTapSignIn(
+            onSuccess = { request -> googleOneTapSignInLauncher.launch(request) },
+            onError = {
+                viewModel.startGoogleLegacySignIn(
+                    onSuccess = { request -> googleLegacySignInLauncher.launch(request) }
+                )
+            }
+        )
+    }
+
     RowOutlinedButton(
         text = stringResource(LR.string.onboarding_continue_with_google),
         leadingIcon = painterResource(IR.drawable.google_g),
         tintIcon = false,
         border = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryInteractive03),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01),
-        onClick = onClick
+        onClick = onSignInClick
     )
 }
 

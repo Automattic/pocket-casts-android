@@ -31,6 +31,8 @@ interface Settings {
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
 
+        const val GOOGLE_SIGN_IN_SERVER_CLIENT_ID = BuildConfig.GOOGLE_SIGN_IN_SERVER_CLIENT_ID
+
         const val INFO_LEARN_MORE_URL = "https://www.pocketcasts.com/plus/"
         const val INFO_TOS_URL = "https://support.pocketcasts.com/article/terms-of-use-overview/"
         const val INFO_PRIVACY_URL = "https://support.pocketcasts.com/article/privacy-policy/"

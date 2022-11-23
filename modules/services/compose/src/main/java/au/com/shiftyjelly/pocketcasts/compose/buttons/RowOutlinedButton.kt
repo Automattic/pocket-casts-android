@@ -110,7 +110,7 @@ private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProv
                 onClick = {}
             )
             RowOutlinedButton(
-                text = "Continue with Google",
+                text = "Sign in with Google",
                 leadingIcon = painterResource(R.drawable.google_g),
                 tintIcon = false,
                 onClick = {}
