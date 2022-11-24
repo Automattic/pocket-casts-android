@@ -62,7 +62,6 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
                 onSuccess(intentRequest)
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
-                // try the legacy Google Sign-In
                 onError()
             }
         }
