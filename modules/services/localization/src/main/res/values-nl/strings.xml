@@ -1,11 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-10-25 15:54:03+0000
+Translation-Revision-Date: 2022-11-23 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+	<string name="onboarding_plus_feature_themes_icons_text">Toon je ware aard. Exclusieve pictogrammen en thema\'s voor Plus-abonnees.</string>
+	<string name="onboarding_plus_feature_themes_icons_title">Thema\'s en pictogrammen</string>
+	<string name="onboarding_plus_feature_hide_ads_text">Een advertentievrije ervaring die je meer biedt van wat je leuk vindt en minder van wat je niet leuk vindt.</string>
+	<string name="onboarding_plus_feature_hide_ads_title">Advertenties verbergen</string>
+	<string name="onboarding_plus_feature_cloud_storage_text">Wanneer je je bestanden naar een cloudopslag uploadt, zijn ze overal beschikbaar.</string>
+	<string name="onboarding_plus_feature_cloud_storage_title">10 GB cloudopslag</string>
+	<string name="onboarding_plus_feature_folders_text">Organiseer je podcasts in mappen en synchroniseer ze op al je apparaten.</string>
+	<string name="onboarding_plus_feature_folders_title">Mappen</string>
+	<string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
+	<string name="onboarding_plus_feature_desktop_apps_title">Desktop-apps</string>
+	<string name="onboarding_upgrade_exclusive_features_and_options">Krijg toegang tot exclusieve functies en aanpassingsmogelijkheden</string>
+	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles wat je geweldig vindt aan Pocket Casts en meer</string>
+	<string name="onboarding_recommendations_import">Importeren</string>
+	<string name="onboarding_recommendations_make_pocket_casts_yours">Pas Pocket Casts aan je voorkeuren aan door je favoriete podcasts te selecteren of ze te importeren vanuit een andere podcast-speler. Je kunt dit later altijd nog doen.</string>
+	<string name="onboarding_recommendations_find_favorite_podcasts">Vind je favoriete podcasts</string>
+	<string name="settings_open_player_automatically_summary">Indien dit is ingeschakeld, zal de speler automatisch openen op volledige schermgrootte wanneer je een podcast-aflevering afspeelt.</string>
+	<string name="settings_open_player_automatically">Speler automatisch openen</string>
+	<string name="onboarding_email_invalid_message">Voer een geldig e-mailadres in</string>
+	<string name="onboarding_forgot_password">Wachtwoord vergeten?</string>
+	<string name="onboarding_get_the_newsletter">Meld je aan voor de nieuwsbrief</string>
+	<string name="onboarding_create_an_account_to">Maak een account aan om je luisterervaring te synchroniseren op al je apparaten.</string>
+	<string name="onboarding_discover_your_next_favorite_podcast">Ontdek je volgende nieuwe favoriete podcast</string>
+	<string name="onboarding_continue_with_google">Doorgaan met Google</string>
+	<string name="onboarding_welcome_back">Welkom terug</string>
+	<string name="end_of_year_create_account_to_see">Sla je podcasts op in de cloud, krijg je beoordeling aan het einde van het jaar en synchroniseer je voortgang met andere apparaten.</string>
+	<string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
+	<string name="end_of_year_story_top_categories">Je beste categorieën</string>
+	<string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
+	<string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in 2022 %1$s</string>
+	<string name="end_of_year_story_longest_episode_duration">Deze aflevering duurde %1$s</string>
+	<string name="end_of_year_story_longest_episode">De langste aflevering die je hebt geluisterd was %1$s van de podcast %2$s</string>
+	<string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van 2022</string>
+	<string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
+	<string name="end_of_year_story_top_podcasts">Je beste podcasts</string>
+	<string name="end_of_year_story_top_podcast_share_text">Mijn favoriete podcast van 2022! %1$s</string>
+	<string name="end_of_year_story_top_podcast_subtitle">Je hebt in totaal %2$s geluisterd naar %1$d afleveringen</string>
+	<string name="end_of_year_story_top_podcast">Je beste podcast was %1$s van %2$s</string>
+	<string name="end_of_year_story_listened_to_numbers_share_text">Ik heb in 2022 naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
+	<string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde...</string>
+	<string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
+	<string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2022 naar %1$d verschillende categorieën geluisterd</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">Laten we eens kijken naar je favorieten…</string>
+	<string name="end_of_year_story_listened_to_categories">Je hebt dit jaar naar %1$d verschillende categorieën geluisterd</string>
+	<string name="end_of_year_story_listened_to_share_text">In 2022 heb je %1$s naar podcasts geluisterd</string>
+	<string name="end_of_year_story_intro_title">Laten we je luisterjaar vieren…</string>
+	<string name="end_of_year_launch_modal_image_title">Jaar in podcasts</string>
+	<string name="end_of_year_replay">Herhalen</string>
+	<string name="settings_media_notification_controls_summary">Kies twee acties om weer te geven in de Android 13 afspeelmelding, Android Auto en andere locaties waar aangepaste mediabedieningen beschikbaar zijn</string>
+	<string name="settings_media_notification_controls">Meldingen mediabedieningen</string>
+	<string name="playback_speed">Afspeelsnelheid</string>
+	<string name="volume_boost_enabled_not_valid">Waarde volumeboost ingeschakeld moet \'true\' (waar) of \'false\' (onwaar) zijn, maar was  %1$s</string>
+	<string name="volume_boost_enabled">Volumeboost ingeschakeld</string>
+	<string name="set_volume_boost">Volumeboost instellen</string>
+	<string name="trim_silence_mode_not_valid">Modus dempen wegfilteren %1$s niet geldig</string>
+	<string name="trim_silence_mode">Modus dempen wegfilteren</string>
+	<string name="set_trim_silence_mode">Modus dempen wegfilteren instellen</string>
+	<string name="playback_speed_between_values">Afspeelsnelheid (tussen 0,5 en 3)</string>
+	<string name="set_playback_speed">Afspeelsnelheid instellen</string>
+	<string name="playback_speed_not_valid">Afspeelsnelheid %1$s niet geldig</string>
+	<string name="end_of_year_listening_time">In 2022 heb je %1$s naar podcasts geluisterd.</string>
+	<string name="profile_account_upgraded">Accountupgrade uitgevoerd</string>
+	<string name="pocket_casts_control_playback">Bedieningselement voor afspelen Pocket Casts</string>
+	<string name="pocket_casts_play_filter">Filter afspelen Pocket Casts</string>
+	<string name="time_to_skip_not_valid">Tijd om door te spoelen %1$s niet geldig</string>
+	<string name="time_to_skip_seconds">Tijd om door te spoelen (seconden)</string>
+	<string name="end_of_year_prompt_card_summary">Bekijk je beste podcasts, categorieën, luisterstatistieken en meer.</string>
+	<string name="settings_select_filters">Filters selecteren</string>
+	<string name="settings_import_url_summary">Importeer je podcasts vanuit een OPML-bestand met een URL.</string>
+	<string name="settings_import_url">Op URL</string>
+	<string name="time_to_skip_to_not_valid">Tijd om naar door te spoelen %1$s niet geldig</string>
+	<string name="time_to_skip_to_seconds">Tijd om naar door te spoelen (seconden)</string>
+	<string name="skip_to_time">Doorspoelen naar-tijd</string>
+	<string name="play_next_in_queue">Volgende in wachtrij afspelen</string>
+	<string name="skip_to_chapter">Doorspoelen naar hoofdstuk</string>
+	<string name="skip_to_previous_chapter">Terugspoelen naar vorig hoofdstuk</string>
+	<string name="skip_to_next_chapter">Doorspoelen naar volgend hoofdstuk</string>
+	<string name="tasker_variables">Variabelen Tasker</string>
+	<string name="chapter_to_skip_to_not_valid">Hoofdstuk om naar door te spoelen %1$s niet geldig</string>
+	<string name="chapter_to_skip_to">Hoofdstuk om naar door te spoelen</string>
+	<string name="playback_command">Opdracht afspelen</string>
+	<string name="command_x_not_valid">Opdracht %1$s niet geldig</string>
+	<string name="must_provide_command_name">Je moet een opdrachtnaam opgeven</string>
+	<string name="no_episodes_in_filter_x">Geen afleveringen in filter %1$s</string>
+	<string name="filter_x_not_found">Filter %1$s niet gevonden</string>
+	<string name="must_provide_filter_name">Je moet een filternaam opgeven</string>
 	<string name="end_of_year_launch_modal_secondary_button_title">Niet nu</string>
 	<string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
 	<string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
@@ -741,7 +826,7 @@ Language: nl
 	<string name="profile_create_subscription_failed">Kan geen abonnement aanmaken. Probeer het nog eens</string>
 	<string name="profile_create_privacy_policy_title">Privacybeleid</string>
 	<string name="profile_create_privacy_policy">We hebben ook een koppeling toegevoegd naar ons Privacybeleid voor het geval je daarin geïnteresseerd bent. We hebben geprobeerd ze kort en bondig te houden en zo weinig mogelijk juridische taal gebruikt.</string>
-	<string name="profile_create_password_requirements">Moet ten minste 6 tekens bevatten</string>
+	<string name="profile_create_password_requirements">Wachtwoord moet bestaan uit ten minste 6 tekens</string>
 	<string name="profile_create_newsletter_summary">Ontvang nieuws, app-updates, thematische podcastlijsten, interviews en meer</string>
 	<string name="profile_create_license">Sorry dat we zo formeel zijn</string>
 	<string name="profile_create_failed">Kon geen account aanmaken. Probeer het nog eens</string>

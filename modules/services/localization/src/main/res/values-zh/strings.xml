@@ -1,11 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-10-26 09:54:23+0000
+Translation-Revision-Date: 2022-11-22 21:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+	<string name="onboarding_plus_feature_themes_icons_text">选择您的真实颜色。 仅面向 Plus 俱乐部的专属图标和主题。</string>
+	<string name="onboarding_plus_feature_themes_icons_title">主题和图标</string>
+	<string name="onboarding_plus_feature_hide_ads_text">无广告体验，提供更多您喜欢的内容，并减少您不喜欢内容。</string>
+	<string name="onboarding_plus_feature_hide_ads_title">隐藏广告</string>
+	<string name="onboarding_plus_feature_cloud_storage_text">将文件上传到云存储空间，在任何地方都能访问这些文件。</string>
+	<string name="onboarding_plus_feature_cloud_storage_title">10GB 云存储空间</string>
+	<string name="onboarding_plus_feature_folders_text">将播客整理到文件夹中，让它们在所有设备中保持同步。</string>
+	<string name="onboarding_plus_feature_folders_title">文件夹</string>
+	<string name="onboarding_plus_feature_desktop_apps_text">借助我们的 Windows、macOS 和 Web 应用程序，在更多位置收听播客。</string>
+	<string name="onboarding_plus_feature_desktop_apps_title">桌面应用程序</string>
+	<string name="onboarding_upgrade_unlock_all_features">解锁所有功能</string>
+	<string name="onboarding_upgrade_exclusive_features_and_options">访问专享功能和定制选项</string>
+	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">您喜欢的 Pocket Casts 的一切，还有更多内容</string>
+	<string name="onboarding_recommendations_import">导入</string>
+	<string name="onboarding_recommendations_make_pocket_casts_yours">选择您喜欢的播客，或从其他播客播放器导入播客，定制您的 Pocket Casts。 您可以稍后完成此操作。</string>
+	<string name="onboarding_recommendations_find_favorite_podcasts">查找您喜欢的播客</string>
+	<string name="not_now">现在不行</string>
+	<string name="settings_open_player_automatically_summary">如果开启，当您开始播放播客剧集时，系统会打开全屏播放器。</string>
+	<string name="settings_open_player_automatically">自动打开播放器</string>
+	<string name="onboarding_email_invalid_message">请输入有效的电子邮件地址</string>
+	<string name="onboarding_forgot_password">忘记密码？</string>
+	<string name="onboarding_get_the_newsletter">获取时事通讯</string>
+	<string name="onboarding_create_an_account_to">创建账户，以在您的所有设备上同步收听体验。</string>
+	<string name="onboarding_discover_your_next_favorite_podcast">发现下一个您喜欢的播客</string>
+	<string name="onboarding_continue_with_google">继续使用 Google</string>
+	<string name="onboarding_welcome_back">欢迎回来</string>
+	<string name="end_of_year_create_account_to_see">将您的博客保存到云端，获得年终回顾，并与其他设备同步您的进度。</string>
+	<string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
+	<string name="end_of_year_story_top_categories">您的热门分类</string>
+	<string name="end_of_year_story_epilogue_subtitle">不要忘记分享给朋友，告诉他们您最喜欢的播客创作者</string>
+	<string name="end_of_year_story_longest_episode_share_text">2022 年我收听时间最长的剧集 %1$s</string>
+	<string name="end_of_year_story_longest_episode_duration">本剧集时长为 %1$s</string>
+	<string name="end_of_year_story_longest_episode">您收听时间最长的剧集为来自播客 %2$s 的 %1$s</string>
+	<string name="end_of_year_story_top_podcasts_list_title">我的 2022 年热门播客</string>
+	<string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
+	<string name="end_of_year_story_top_podcasts">您的热门播客</string>
+	<string name="end_of_year_story_top_podcast_share_text">2022 年我最喜欢的播客！ %1$s</string>
+	<string name="end_of_year_story_top_podcast_subtitle">您收听了 %1$d 部剧集，共 %2$s 部</string>
+	<string name="end_of_year_story_top_podcast">您的热门播客由 %2$s %1$s</string>
+	<string name="end_of_year_story_listened_to_numbers_share_text">我在 2022 年收听了 %1$d 个不同的播客和 %2$d 部剧集</string>
+	<string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常回顾的播客…</string>
+	<string name="end_of_year_story_listened_to_numbers">您收听了 %1$d 个不同的播客和 %2$d 部剧集</string>
+	<string name="end_of_year_story_listened_to_categories_share_text">我在 2022 年收听了 %1$d 种不同的分类</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">我们来看看您最喜欢的内容…</string>
+	<string name="end_of_year_story_listened_to_categories">您今年收听了 %1$d 种不同的分类</string>
+	<string name="end_of_year_story_listened_to_share_text">2022 年，我收听播客的时间为 %1$s</string>
+	<string name="end_of_year_story_intro_title">我们来庆祝您的收听之年…</string>
+	<string name="end_of_year_launch_modal_image_title">年度播客盘点</string>
+	<string name="end_of_year_replay">重播</string>
+	<string name="settings_media_notification_controls_summary">选择两个要在 Android 13 播放通知、Android Auto 和其他可使用自定义媒体控件的地方显示的操作</string>
+	<string name="settings_media_notification_controls">媒体通知控件</string>
+	<string name="playback_speed">播放速度</string>
+	<string name="volume_boost_enabled_not_valid">“已启用音量增强”值必须为“true”或“false”，为  %1$s</string>
+	<string name="volume_boost_enabled">已启用音量增强</string>
+	<string name="set_volume_boost">设置音量增强</string>
+	<string name="trim_silence_mode_not_valid">剪裁静音模式 %1$s 无效</string>
+	<string name="trim_silence_mode">剪裁静音模式</string>
+	<string name="set_trim_silence_mode">设置剪裁静音模式</string>
+	<string name="playback_speed_between_values">播放速度（0.5 到 3 之间）</string>
+	<string name="set_playback_speed">设置播放速度</string>
+	<string name="playback_speed_not_valid">播放速度 %1$s 无效</string>
+	<string name="end_of_year_listening_time">2022 年，您收听播客的时间为 %1$s</string>
+	<string name="profile_account_upgraded">账户已升级</string>
+	<string name="pocket_casts_control_playback">Pocket Casts 控制播放</string>
+	<string name="pocket_casts_play_filter">Pocket Casts 播放过滤器</string>
+	<string name="time_to_skip_not_valid">时间跳至 %1$s 无效</string>
+	<string name="time_to_skip_seconds">跳至的时间（秒）</string>
+	<string name="end_of_year_prompt_card_summary">查看您的热门播客、分类、收听统计数据等。</string>
+	<string name="settings_select_filters">选择过滤器</string>
+	<string name="settings_import_url_summary">使用 URL 从 OPML 文件导入播客。</string>
+	<string name="settings_import_url">通过 URL</string>
+	<string name="time_to_skip_to_not_valid">将时间跳至 %1$s 无效</string>
+	<string name="time_to_skip_to_seconds">跳至的时间（秒）</string>
+	<string name="skip_to_time">跳至时间</string>
+	<string name="play_next_in_queue">播放队列中的下一个</string>
+	<string name="skip_to_chapter">跳至章节</string>
+	<string name="skip_to_previous_chapter">跳至上一章</string>
+	<string name="skip_to_next_chapter">跳至下一章</string>
+	<string name="tasker_variables">Tasker 变量</string>
+	<string name="chapter_to_skip_to_not_valid">章节跳至 %1$s 无效</string>
+	<string name="chapter_to_skip_to">章节跳至</string>
+	<string name="playback_command">播放命令</string>
+	<string name="command_x_not_valid">命令 %1$s 无效</string>
+	<string name="must_provide_command_name">必须提供命令名称</string>
+	<string name="no_episodes_in_filter_x">过滤器 %1$s 中无剧集</string>
+	<string name="filter_x_not_found">未找到过滤器 %1$s</string>
+	<string name="must_provide_filter_name">必须提供过滤器名称</string>
 	<string name="end_of_year_launch_modal_secondary_button_title">不用了</string>
 	<string name="end_of_year_launch_modal_primary_button_title">查看我的 2022 年度盘点</string>
 	<string name="end_of_year_launch_modal_summary">查看您的热门播客、分类、收听统计数据等。 分享给朋友，告诉他们您最喜欢的创作者！</string>
@@ -741,7 +828,7 @@ Language: zh_CN
 	<string name="profile_create_subscription_failed">无法创建订阅。 请重试</string>
 	<string name="profile_create_privacy_policy_title">隐私政策</string>
 	<string name="profile_create_privacy_policy">我们还链接了我们的隐私政策，您可在需要时查看。 我们尽力做到简明扼要，尽量少用法律术语。</string>
-	<string name="profile_create_password_requirements">必须至少为 6 个字符</string>
+	<string name="profile_create_password_requirements">密码不得少于 6 个字符</string>
 	<string name="profile_create_newsletter_summary">接收新闻、应用程序更新、主题播客列表、访谈等</string>
 	<string name="profile_create_license">请原谅我们例行公事</string>
 	<string name="profile_create_failed">无法创建账户。 请重试</string>

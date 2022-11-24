@@ -1,11 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-10-26 13:54:03+0000
+Translation-Revision-Date: 2022-11-24 10:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+	<string name="onboarding_plus_feature_themes_icons_text">Farbe bekennen. Exklusive Icons und Themes nur für Plus-Abonnenten.</string>
+	<string name="onboarding_plus_feature_themes_icons_title">Themes und Icons</string>
+	<string name="onboarding_plus_feature_hide_ads_text">Werbefreies Erlebnis – für mehr Inhalte, die du magst, und weniger Ablenkung</string>
+	<string name="onboarding_plus_feature_hide_ads_title">Werbung ausblenden</string>
+	<string name="onboarding_plus_feature_cloud_storage_text">Lade deine Dateien in den Cloud-Speicher. Dann kannst du von überall aus darauf zugreifen.</string>
+	<string name="onboarding_plus_feature_cloud_storage_title">10 GB Cloud-Speicher</string>
+	<string name="onboarding_plus_feature_folders_text">Verwalte deine Podcasts in Ordnern und halte sie auf all deinen Geräten synchron.</string>
+	<string name="onboarding_plus_feature_folders_title">Ordner</string>
+	<string name="onboarding_plus_feature_desktop_apps_text">Mit unseren Windows-, macOS- und Web-Apps kannst du deine Inhalte auf beliebigen Geräten anhören.</string>
+	<string name="onboarding_plus_feature_desktop_apps_title">Desktop-Apps</string>
+	<string name="onboarding_upgrade_unlock_all_features">Alle Funktionen nutzen</string>
+	<string name="onboarding_upgrade_exclusive_features_and_options">Erhalte Zugriff auf exklusive Funktionen und Anpassungsoptionen</string>
+	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles, was du an Pocket Casts liebst, und noch viel mehr</string>
+	<string name="onboarding_recommendations_import">Importieren</string>
+	<string name="onboarding_recommendations_make_pocket_casts_yours">Wähle deine Lieblings-Podcasts aus oder importiere sie aus einem anderen Podcast Player und gestalte Pocket Casts ganz individuell. Das kannst du auch jederzeit später erledigen.</string>
+	<string name="onboarding_recommendations_find_favorite_podcasts">Suche deine Lieblings-Podcasts</string>
+	<string name="not_now">Jetzt nicht</string>
+	<string name="settings_open_player_automatically_summary">Bei Aktivierung dieser Option wird der Player im Vollbildmodus geöffnet, wenn du eine Podcast-Folge abspielst.</string>
+	<string name="settings_open_player_automatically">Player automatisch öffnen</string>
+	<string name="onboarding_email_invalid_message">Bitte gib eine gültige E-Mail-Adresse ein</string>
+	<string name="onboarding_forgot_password">Passwort vergessen?</string>
+	<string name="onboarding_get_the_newsletter">Sichere dir den Newsletter</string>
+	<string name="onboarding_create_an_account_to">Erstelle ein Konto, um dein Audioerlebnis auf all deinen Geräten zu synchronisieren.</string>
+	<string name="onboarding_discover_your_next_favorite_podcast">Entdecke deinen nächsten Lieblings-Podcast</string>
+	<string name="onboarding_continue_with_google">Weiter mit Google</string>
+	<string name="onboarding_welcome_back">Willkommen zurück</string>
+	<string name="end_of_year_create_account_to_see">Speichere deine Podcasts in der Cloud, erhalte deinen Rückblick zum Jahresende und synchronisiere deinen Fortschritt mit anderen Geräten.</string>
+	<string name="end_of_year_story_top_categories_share_text">Meine am häufigsten gehörten Podcast-Kategorien</string>
+	<string name="end_of_year_story_top_categories">Deine Top-Kategorien</string>
+	<string name="end_of_year_story_epilogue_subtitle">Vergiss nicht, sie mit deinen Freunden zu teilen und deine bevorzugten Podcast-Ersteller dankend zu erwähnen</string>
+	<string name="end_of_year_story_longest_episode_share_text">Die längste Folge, die ich mir im Jahr 2022 angehört habe (%1$s)</string>
+	<string name="end_of_year_story_longest_episode_duration">Diese Folge dauerte %1$s</string>
+	<string name="end_of_year_story_longest_episode">Die längste von dir angehörte Folge war %1$s aus dem Podcast %2$s</string>
+	<string name="end_of_year_story_top_podcasts_list_title">Meine Top-Podcasts 2022</string>
+	<string name="end_of_year_story_top_podcasts_share_text">Meine Top-Podcasts des Jahres! %1$s</string>
+	<string name="end_of_year_story_top_podcasts">Deine Top-Podcasts</string>
+	<string name="end_of_year_story_top_podcast_share_text">Mein Lieblings-Podcast 2022! %1$s</string>
+	<string name="end_of_year_story_top_podcast_subtitle">Du hast dir %1$d Folgen mit einer Gesamtdauer von %2$s angehört</string>
+	<string name="end_of_year_story_top_podcast">Dein Lieblings-Podcast war %1$s von %2$s</string>
+	<string name="end_of_year_story_listened_to_numbers_share_text">Ich habe mir im Jahr 2022 %1$d verschiedene Podcasts und %2$d Folgen angehört</string>
+	<string name="end_of_year_story_listened_to_numbers_subtitle">Aber es gab einen, der dir besonders gut gefallen hat …</string>
+	<string name="end_of_year_story_listened_to_numbers">Du hast dir %1$d verschiedene Podcasts und %2$d Folgen angehört</string>
+	<string name="end_of_year_story_listened_to_categories_share_text">Ich hab mir im Jahr 2022 %1$d unterschiedliche Kategorien angehört</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">Sehen wir uns einige deiner Favoriten an …</string>
+	<string name="end_of_year_story_listened_to_categories">Du hast dir in diesem Jahr %1$d unterschiedliche Kategorien angehört</string>
+	<string name="end_of_year_story_listened_to_share_text">Ich habe 2022 %1$s mit dem Hören von Podcasts verbracht</string>
+	<string name="end_of_year_story_intro_title">Feiern wir dein Audiojahr …</string>
+	<string name="end_of_year_launch_modal_image_title">Das Jahr in Podcasts</string>
+	<string name="end_of_year_replay">Erneut abspielen</string>
+	<string name="settings_media_notification_controls_summary">Wähle zwei Aktionen, die in der Wiedergabe-Benachrichtigung von Android 13, Android Auto und anderen Orten angezeigt werden sollen, in denen die individuellen Mediensteuerelemente verfügbar sind.</string>
+	<string name="settings_media_notification_controls">Benachrichtigungskontrollen für Medien</string>
+	<string name="playback_speed">Wiedergabegeschwindigkeit</string>
+	<string name="volume_boost_enabled_not_valid">Der Wert für „Lautstärke-Booster aktiviert“ muss „wahr“ oder „falsch“ sein, war jedoch  %1$s</string>
+	<string name="volume_boost_enabled">Lautstärke-Booster aktiviert</string>
+	<string name="set_volume_boost">Lautstärke-Booster einstellen</string>
+	<string name="trim_silence_mode_not_valid">Modus %1$s zum Ausschneiden von stillen Passagen nicht gültig</string>
+	<string name="trim_silence_mode">Modus zum Ausschneiden von stillen Passagen</string>
+	<string name="set_trim_silence_mode">Modus zum Ausschneiden von stillen Passagen einstellen</string>
+	<string name="playback_speed_between_values">Wiedergabegeschwindigkeit (zwischen 0,5 und 3)</string>
+	<string name="set_playback_speed">Wiedergabegeschwindigkeit einstellen</string>
+	<string name="playback_speed_not_valid">Wiedergabegeschwindigkeit %1$s nicht gültig</string>
+	<string name="end_of_year_listening_time">2022 hast du %1$s mit dem Anhören von Podcasts verbracht</string>
+	<string name="profile_account_upgraded">Konto aktualisiert</string>
+	<string name="pocket_casts_control_playback">Pocket Casts-Wiedergabe-Steuerung</string>
+	<string name="pocket_casts_play_filter">Pocket Casts-Abspiel-Filter</string>
+	<string name="time_to_skip_not_valid">Zeitpunkt, auf den du springen möchtest (%1$s), ist nicht gültig</string>
+	<string name="time_to_skip_seconds">Zeitpunkt, auf den du springen möchtest (Sekunden)</string>
+	<string name="end_of_year_prompt_card_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an.</string>
+	<string name="settings_select_filters">Filter auswählen</string>
+	<string name="settings_import_url_summary">Importiere deine Podcasts von einer OPML-Datei mithilfe einer URL.</string>
+	<string name="settings_import_url">Durch URL</string>
+	<string name="time_to_skip_to_not_valid">Zeitpunkt, auf den du springen möchtest (%1$s), ist nicht gültig</string>
+	<string name="time_to_skip_to_seconds">Zeitpunkt, auf den du springen möchtest (Sekunden)</string>
+	<string name="skip_to_time">Zu Zeitpunkt springen</string>
+	<string name="play_next_in_queue">Nächsten Titel in der Warteschlange abspielen</string>
+	<string name="skip_to_chapter">Zu Kapitel springen</string>
+	<string name="skip_to_previous_chapter">Zum vorherigen Kapitel springen</string>
+	<string name="skip_to_next_chapter">Zum nächsten Kapitel springen</string>
+	<string name="tasker_variables">Tasker-Variablen</string>
+	<string name="chapter_to_skip_to_not_valid">Kapitel zum Springen auf %1$s nicht gültig</string>
+	<string name="chapter_to_skip_to">Kapitel, zu dem du springen möchtest</string>
+	<string name="playback_command">Wiedergabe-Befehl</string>
+	<string name="command_x_not_valid">Befehl %1$s nicht gültig</string>
+	<string name="must_provide_command_name">Befehlsname erforderlich</string>
+	<string name="no_episodes_in_filter_x">Keine Folgen in Filter %1$s</string>
+	<string name="filter_x_not_found">Filter %1$s nicht gefunden</string>
+	<string name="must_provide_filter_name">Filtername erforderlich</string>
 	<string name="end_of_year_launch_modal_secondary_button_title">Nicht jetzt</string>
 	<string name="end_of_year_launch_modal_primary_button_title">Mein Jahr 2022 anzeigen</string>
 	<string name="end_of_year_launch_modal_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an. Teile es mit Freunden und nenne deine bevorzugten Ersteller!</string>
@@ -741,7 +828,7 @@ Language: de
 	<string name="profile_create_subscription_failed">Abonnement konnte nicht erstellt werden. Versuche es bitte noch einmal</string>
 	<string name="profile_create_privacy_policy_title">Datenschutzerklärung</string>
 	<string name="profile_create_privacy_policy">Wir haben auch unsere Datenschutzerklärung verlinkt, falls sie dich interessiert. Wir haben versucht, beides kurz und bündig zu halten und so wenig Fachchinesisch wie möglich zu verwenden.</string>
-	<string name="profile_create_password_requirements">Muss mindestens 6 Zeichen lang sein</string>
+	<string name="profile_create_password_requirements">Das Passwort muss mindestens 6 Zeichen lang sein</string>
 	<string name="profile_create_newsletter_summary">Erhalte Neuigkeiten, App-Updates, Podcast-Listen zu verschiedenen Themen, Interviews und mehr.</string>
 	<string name="profile_create_license">Entschuldige bitte</string>
 	<string name="profile_create_failed">Wir konnten kein Konto erstellen. Versuche es bitte noch einmal</string>
