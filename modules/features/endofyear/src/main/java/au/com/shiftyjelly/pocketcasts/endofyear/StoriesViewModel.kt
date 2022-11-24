@@ -144,6 +144,7 @@ class StoriesViewModel @Inject constructor(
 
     fun onRetryClicked() {
         viewModelScope.launch {
+            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED)
             loadStories()
         }
     }
