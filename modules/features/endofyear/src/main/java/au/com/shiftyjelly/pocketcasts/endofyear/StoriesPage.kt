@@ -207,7 +207,7 @@ private fun StoriesView(
         }
         requireNotNull(onCaptureBitmap).let {
             ShareButton(
-                onClick = { onShareClicked.invoke(it) },
+                onClick = { if (state.showShare) { onShareClicked.invoke(it) } },
                 modifier = modifier.alpha(if (state.showShare) 1f else 0f)
             )
         }
