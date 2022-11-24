@@ -71,23 +71,22 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     /**
      * Try to sign in with the legacy Google Sign-In.
      */
-    suspend fun startGoogleLegacySignIn(onSuccess: (IntentSenderRequest) -> Unit) {
-        val lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(context)
-        val idToken = lastSignedInAccount?.idToken
-        val email = lastSignedInAccount?.email
-        if (idToken == null || email == null) {
-            try {
-                val request = GetSignInIntentRequest.builder()
-                    .setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
-                    .build()
+    suspend fun startGoogleLegacySignIn(onSuccess: (IntentSenderRequest) -> Unit, onError: () -> Unit) {
+        try {
+            val lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(context)
+            val idToken = lastSignedInAccount?.idToken
+            val email = lastSignedInAccount?.email
+            if (idToken == null || email == null) {
+                val request = GetSignInIntentRequest.builder().setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID).build()
                 val signInIntent = Identity.getSignInClient(context).getSignInIntent(request).await()
                 val intentSenderRequest = IntentSenderRequest.Builder(signInIntent.intentSender).build()
                 onSuccess(intentSenderRequest)
-            } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google Legacy")
+            } else {
+                signInWithGoogleToken(email = email, idToken = idToken)
             }
-        } else {
-            signInWithGoogleToken(email = email, idToken = idToken)
+        } catch (ex: Exception) {
+            LogBuffer.e(LogBuffer.TAG_CRASH, ex, "Unable to sign in with legacy Google Sign-In")
+            onError()
         }
     }
 
@@ -117,13 +116,14 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     /**
      * Handle the response from the legacy Google Sign-In intent.
      */
-    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: () -> Unit) {
+    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: () -> Unit, onError: () -> Unit) {
         viewModelScope.launch {
             try {
                 onGoogleSignInResult(result)
                 onSuccess()
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to get sign in credentials from Google Legacy result.")
+                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to get sign in credentials from legacy Google Sign-In result.")
+                onError()
             }
         }
     }
@@ -135,7 +135,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
         signInWithGoogleToken(email = email, idToken = idToken)
     }
 
-    private suspend fun signInWithGoogleToken(email: String, idToken: String) {
+    private fun signInWithGoogleToken(email: String, idToken: String) {
         Timber.i("signInWithGoogleToken idToken: $idToken email: $email")
         // Todo send the Google ID token to the server, this will be done in a future change
         // accountAuth.signInWithGoogleToken(email = email, idToken = idToken)
