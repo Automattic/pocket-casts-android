@@ -356,7 +356,7 @@ abstract class PodcastDao {
         JOIN podcasts ON episodes.podcast_id = podcasts.uuid
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
         GROUP BY podcast_id
-        ORDER BY numberOfPlayedEpisodes DESC, totalPlayedTime DESC
+        ORDER BY totalPlayedTime DESC, numberOfPlayedEpisodes DESC
         LIMIT :limit
         """
     )
