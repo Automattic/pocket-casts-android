@@ -19,12 +19,12 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCoverType
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCoverType
+import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper

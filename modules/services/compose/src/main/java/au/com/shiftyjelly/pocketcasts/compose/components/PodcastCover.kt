@@ -1,10 +1,11 @@
-package au.com.shiftyjelly.pocketcasts.endofyear.components
+package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -12,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 
 @Composable
 fun PodcastCover(
@@ -31,8 +31,8 @@ fun PodcastCover(
 @Composable
 fun RectangleCover(
     coverWidth: Dp,
-    backgroundColor: Color,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colors.surface,
 ) {
     Box(
         modifier = modifier.size(coverWidth)
