@@ -690,7 +690,6 @@ Language: nb_NO
 	<string name="profile_create_subscription_failed">Kunne ikke opprette abonnement. Prøv på nytt</string>
 	<string name="profile_create_privacy_policy_title">Retningslinjer for personvern</string>
 	<string name="profile_create_privacy_policy">Vi har oppgitt en kobling til retningslinjene for personvern, hvis du er interessert. Vi har prøvd å fatte oss i korthet og gå rett på sak med så lite juridisk tekst som mulig.</string>
-	<string name="profile_create_password_requirements">Må være minst 6 tegn</string>
 	<string name="profile_create_newsletter_summary">Få nyheter, appoppdateringer, tematiserte podcast-lister , intervjuer og mer.</string>
 	<string name="profile_create_license">Vi beklager at vi fremstår som formelle</string>
 	<string name="profile_create_failed">Kunne ikke opprette konto. Prøv på nytt</string>

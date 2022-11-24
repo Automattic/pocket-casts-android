@@ -1,11 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-10-25 12:54:03+0000
+Translation-Revision-Date: 2022-11-23 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+	<string name="settings_open_player_automatically_summary">Om alternativet är aktiverat öppnas spelaren i fullskärmsläge när du börjar spela upp ett podcastavsnitt.</string>
+	<string name="settings_open_player_automatically">Öppna spelaren automatiskt</string>
+	<string name="onboarding_email_invalid_message">Ange en giltig e-post</string>
+	<string name="onboarding_forgot_password">Glömt lösenord?</string>
+	<string name="onboarding_get_the_newsletter">Skaffa nyhetsbrevet</string>
+	<string name="onboarding_create_an_account_to">Skapa ett konto för att synkronisera din lyssningsupplevelse på alla dina enheter.</string>
+	<string name="onboarding_discover_your_next_favorite_podcast">Upptäck din nästa favoritpodcast</string>
+	<string name="onboarding_continue_with_google">Fortsätt med Google</string>
+	<string name="onboarding_welcome_back">Välkommen tillbaka</string>
+	<string name="end_of_year_create_account_to_see">Spara dina podcasts i molnet, få din årsslutsöversikt och synkronisera ditt lyssningsförlopp med andra enheter.</string>
+	<string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
+	<string name="end_of_year_story_top_categories">Dina favoritkategorier</string>
+	<string name="end_of_year_story_epilogue_subtitle">Glöm inte att dela med dina vänner och att berätta om dina favoritpodcastkreatörer</string>
+	<string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under 2022 %1$s</string>
+	<string name="end_of_year_story_longest_episode_duration">Avsnittet var %1$s långt</string>
+	<string name="end_of_year_story_longest_episode">Det längsta avsnittet du lyssnade på var %1$s från podcasten %2$s</string>
+	<string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts 2022</string>
+	<string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
+	<string name="end_of_year_story_top_podcasts">Dina favoritpodcasts</string>
+	<string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast 2022. %1$s</string>
+	<string name="end_of_year_story_top_podcast_subtitle">Du lyssnade på %1$d avsnitt i sammanlagt %2$s</string>
+	<string name="end_of_year_story_top_podcast">Din favoritpodcast var %1$s av %2$s</string>
+	<string name="end_of_year_story_listened_to_numbers_share_text">Jag lyssnade på %1$d olika podcasts och %2$d avsnitt under 2022</string>
+	<string name="end_of_year_story_listened_to_numbers_subtitle">Men det fanns ett avsnitt som du fortsatte att komma tillbaka till ...</string>
+	<string name="end_of_year_story_listened_to_numbers">Du lyssnade på %1$d olika podcasts och %2$d avsnitt</string>
+	<string name="end_of_year_story_listened_to_categories_share_text">Jag lyssnade på %1$d olika kategorier under 2022</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">Låt oss ta en titt på några av dina favoriter …</string>
+	<string name="end_of_year_story_listened_to_categories">Du lyssnade på %1$d olika kategorier i år</string>
+	<string name="end_of_year_story_listened_to_share_text">Jag lyssnade på podcasts i %1$s under 2022</string>
+	<string name="end_of_year_story_intro_title">Låt oss fira ditt lyssningsår ...</string>
+	<string name="end_of_year_launch_modal_image_title">Podcastår</string>
+	<string name="end_of_year_replay">Spela upp igen</string>
+	<string name="settings_media_notification_controls_summary">Välj två åtgärder som ska visas i Android 13-uppspelningsaviseringen, Android Auto och på andra platser där de anpassade mediakontrollerna är tillgängliga</string>
+	<string name="settings_media_notification_controls">Mediaaviseringskontroller</string>
+	<string name="playback_speed">Uppspelningshastighet</string>
+	<string name="volume_boost_enabled_not_valid">Volymökning aktiverad-värdet måste vara \"true\" eller \"false\", men var  %1$s</string>
+	<string name="volume_boost_enabled">Volymökning aktiverad</string>
+	<string name="set_volume_boost">Ställ in Volymökning</string>
+	<string name="trim_silence_mode_not_valid">Trimma tystnad-läget %1$s är inte giltigt</string>
+	<string name="trim_silence_mode">Trimma tystnad-läge</string>
+	<string name="set_trim_silence_mode">Ställ in Trimma tystnad-läge</string>
+	<string name="playback_speed_between_values">Uppspelningshastighet (mellan 0,5 och 3)</string>
+	<string name="set_playback_speed">Ställ in Uppspelningshastighet</string>
+	<string name="playback_speed_not_valid">Uppspelningshastigheten %1$s är inte giltig</string>
+	<string name="end_of_year_listening_time">Under 2022 lyssnade du på podcasts i %1$s </string>
+	<string name="profile_account_upgraded">Kontot har uppgraderats</string>
+	<string name="pocket_casts_control_playback">Uppspelningskontroller för Pocket Casts</string>
+	<string name="pocket_casts_play_filter">Uppspelningsfilter för Pocket Casts</string>
+	<string name="time_to_skip_not_valid">Ogiltig tidpunkt att hoppa över: %1$s</string>
+	<string name="time_to_skip_seconds">Tidpunkt att hoppa över (sekunder)</string>
+	<string name="end_of_year_prompt_card_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera.</string>
+	<string name="settings_select_filters">Välj filter</string>
+	<string name="settings_import_url_summary">Importera dina podcasts från en OPML-fil med hjälp av en URL.</string>
+	<string name="settings_import_url">Efter URL</string>
+	<string name="time_to_skip_to_not_valid">Ogiltig tidpunkt att hoppa till: %1$s</string>
+	<string name="time_to_skip_to_seconds">Tidpunkt att hoppa till (sekunder)</string>
+	<string name="skip_to_time">Hoppa till tidpunkt</string>
+	<string name="play_next_in_queue">Spela upp nästa i kö</string>
+	<string name="skip_to_chapter">Hoppa till kapitel</string>
+	<string name="skip_to_previous_chapter">Hoppa till föregående kapitel</string>
+	<string name="skip_to_next_chapter">Hoppa till nästa kapitel</string>
+	<string name="tasker_variables">Tasker-variabler</string>
+	<string name="chapter_to_skip_to_not_valid">Ogiltigt kapitel att hoppa till: %1$s</string>
+	<string name="chapter_to_skip_to">Kapitel att hoppa till</string>
+	<string name="playback_command">Uppspelningskommando</string>
+	<string name="command_x_not_valid">Ogiltigt kommando: %1$s</string>
+	<string name="must_provide_command_name">Kommandonamn måste anges</string>
+	<string name="no_episodes_in_filter_x">Inga avsnitt i filtret %1$s</string>
+	<string name="filter_x_not_found">Filtret %1$s hittades inte</string>
+	<string name="must_provide_filter_name">Filternamn måste anges</string>
 	<string name="end_of_year_launch_modal_secondary_button_title">Inte nu</string>
 	<string name="end_of_year_launch_modal_primary_button_title">Visa mitt 2022</string>
 	<string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
@@ -741,7 +811,7 @@ Language: sv_SE
 	<string name="profile_create_subscription_failed">Det gick inte att skapa en prenumeration. Vänligen försök igen</string>
 	<string name="profile_create_privacy_policy_title">Integritetspolicy</string>
 	<string name="profile_create_privacy_policy">Vi har inkluderat en länk till vår sekretesspolicy också, om du skulle vara intresserad. Vi har försökt att hålla båda dokumenten korta, rakt på sak och med så lite juridikspråk som möjligt.</string>
-	<string name="profile_create_password_requirements">Måste innehålla minst 6 tecken</string>
+	<string name="profile_create_password_requirements">Lösenord måste innehålla minst 6 tecken</string>
 	<string name="profile_create_newsletter_summary">Få nyheter, app-uppdateringar, temabaserade podcastlistor, intervjuer med mera.</string>
 	<string name="profile_create_license">Ursäkta vår formalitet</string>
 	<string name="profile_create_failed">Det gick inte att skapa ett konto. Vänligen försök igen</string>
