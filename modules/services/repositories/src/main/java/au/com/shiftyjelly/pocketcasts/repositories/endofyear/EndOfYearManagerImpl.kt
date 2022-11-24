@@ -140,8 +140,7 @@ class EndOfYearManagerImpl @Inject constructor(
         return episodeManager.findListenedNumbers(yearStart, yearEnd)
     }
 
-    /* Returns top podcasts ordered by number of played episodes. If there's a tie on number of played episodes,
-    played time is checked. */
+    /* Returns top podcasts ordered by total played time. If there's a tie on total played time, check number of played episodes. */
     override suspend fun findTopPodcastsForYear(year: Int, limit: Int): List<TopPodcast> {
         return podcastManager.findTopPodcasts(yearStart, yearEnd, limit)
     }
