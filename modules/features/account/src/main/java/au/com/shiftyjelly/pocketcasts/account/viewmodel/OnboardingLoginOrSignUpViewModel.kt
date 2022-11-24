@@ -73,6 +73,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
      */
     suspend fun startGoogleLegacySignIn(onSuccess: (IntentSenderRequest) -> Unit, onError: () -> Unit) {
         try {
+            Timber.i("Using legacy Google Sign-In")
             val lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(context)
             val idToken = lastSignedInAccount?.idToken
             val email = lastSignedInAccount?.email
