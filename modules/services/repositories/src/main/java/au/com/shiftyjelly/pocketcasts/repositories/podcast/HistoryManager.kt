@@ -1,11 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -13,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
-import java.util.Date
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -88,17 +86,8 @@ class HistoryManager @Inject constructor(
                         episode.lastPlaybackInteractionSyncStatus = Episode.LAST_PLAYBACK_INTERACTION_SYNCED
                         episodeManager.update(episode)
                     }
-                } else if (podcastUuid != null && podcastUuid != UserEpisodePodcastSubstitute.uuid) {
-                    // add episodes which on longer exist in a podcast so they show up in listening history
-                    val skeleton = Episode(
-                        uuid = episodeUuid,
-                        podcastUuid = podcastUuid,
-                        title = change.title ?: "",
-                        publishedDate = change.published?.parseIsoDate() ?: Date(),
-                        downloadUrl = change.url,
-                        lastPlaybackInteraction = interactionDate
-                    )
-                    skeletonEpisodes.add(skeleton)
+                } else if (podcastUuid != null) {
+                    Timber.i("Listening history episode no longer exists. Episode: $episodeUuid podcast: $podcastUuid")
                 }
             } else if (change.action == ACTION_DELETE) {
                 if (episode != null) {

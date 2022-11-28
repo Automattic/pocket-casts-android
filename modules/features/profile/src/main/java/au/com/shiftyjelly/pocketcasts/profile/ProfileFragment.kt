@@ -232,6 +232,7 @@ class ProfileFragment : BaseFragment() {
                 AppTheme(theme.activeTheme) {
                     EndOfYearPromptCard(
                         onClick = {
+                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
                             (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
                         }
                     )

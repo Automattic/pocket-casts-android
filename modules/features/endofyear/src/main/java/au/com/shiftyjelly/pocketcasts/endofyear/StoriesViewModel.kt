@@ -11,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.ShareableTextProvider.ShareTextD
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesViewModel.State.Loaded.SegmentsData
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -90,6 +92,8 @@ class StoriesViewModel @Inject constructor(
     }
 
     fun start() {
+        if (state.value !is State.Loaded) return
+
         val currentState = state.value as State.Loaded
         val progressFraction =
             (PROGRESS_UPDATE_INTERVAL_MS / totalLengthInMs.toFloat())
@@ -140,6 +144,7 @@ class StoriesViewModel @Inject constructor(
 
     fun onRetryClicked() {
         viewModelScope.launch {
+            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED)
             loadStories()
         }
     }
@@ -202,6 +207,8 @@ class StoriesViewModel @Inject constructor(
             val segmentsData: SegmentsData,
             val preparingShareText: Boolean = false,
         ) : State() {
+            val showShare: Boolean
+                get() = currentStory !is StoryIntro && currentStory !is StoryEpilogue
             data class SegmentsData(
                 val widths: List<Float> = emptyList(),
                 val xStartOffsets: List<Float> = emptyList(),

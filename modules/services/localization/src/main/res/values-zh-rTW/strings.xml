@@ -1,11 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-10-25 09:54:03+0000
+Translation-Revision-Date: 2022-11-22 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+	<string name="onboarding_plus_feature_themes_icons_text">展現你最真實的色彩。 僅供 Plus 社群使用的獨家圖示和主題。</string>
+	<string name="onboarding_plus_feature_themes_icons_title">佈景主題和圖示</string>
+	<string name="onboarding_plus_feature_hide_ads_text">不含廣告體驗提供你更多喜歡的內容，並減少不喜歡的內容。</string>
+	<string name="onboarding_plus_feature_hide_ads_title">隱藏廣告</string>
+	<string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
+	<string name="onboarding_plus_feature_cloud_storage_title">10 GB 雲端儲存空間</string>
+	<string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並在所有裝置間同步。</string>
+	<string name="onboarding_plus_feature_folders_title">資料夾</string>
+	<string name="onboarding_plus_feature_desktop_apps_text">透過我們的 Windows、macOS 和網頁應用程式，在更多地方收聽。</string>
+	<string name="onboarding_plus_feature_desktop_apps_title">桌面應用程式</string>
+	<string name="onboarding_upgrade_unlock_all_features">解鎖所有功能</string>
+	<string name="onboarding_upgrade_exclusive_features_and_options">使用獨家功能和自訂選項</string>
+	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">包含所有你喜愛的 Pocket Casts 功能，以及更多好康</string>
+	<string name="onboarding_recommendations_import">匯入</string>
+	<string name="onboarding_recommendations_make_pocket_casts_yours">選取你最愛的 Podcast，或從其他 Podcast 播放器匯入，打造你專屬的 Pocket Casts。 你可以稍後進行。</string>
+	<string name="onboarding_recommendations_find_favorite_podcasts">尋找你最愛的 Podcast</string>
+	<string name="not_now">現在不要</string>
+	<string name="settings_open_player_automatically_summary">如果開啟，全螢幕播放器會在開始播放一集 Podcast 時開啟。</string>
+	<string name="settings_open_player_automatically">自動開啟播放器</string>
+	<string name="onboarding_email_invalid_message">請輸入有效的電子郵件</string>
+	<string name="onboarding_forgot_password">忘記密碼？</string>
+	<string name="onboarding_get_the_newsletter">取得電子報</string>
+	<string name="onboarding_create_an_account_to">建立帳號即可在所有裝置上同步你的收聽體驗。</string>
+	<string name="onboarding_discover_your_next_favorite_podcast">探索下一個最愛的 Podcast 節目</string>
+	<string name="onboarding_continue_with_google">繼續使用 Google</string>
+	<string name="onboarding_welcome_back">歡迎回來</string>
+	<string name="end_of_year_create_account_to_see">將你的 Podcast 儲存在雲端、查看年末回顧，並與其他裝置同步進度。</string>
+	<string name="end_of_year_story_top_categories_share_text">我最常收聽的 Podcast 分類</string>
+	<string name="end_of_year_story_top_categories">你最愛的分類</string>
+	<string name="end_of_year_story_epilogue_subtitle">別忘了與朋友分享，並向你最喜愛的 Podcast 創作者致意</string>
+	<string name="end_of_year_story_longest_episode_share_text">我在 2022 年 %1$s 收聽時間最長的一集</string>
+	<string name="end_of_year_story_longest_episode_duration">這集長達 %1$s</string>
+	<string name="end_of_year_story_longest_episode">你收聽時間最長的一集為 Podcast「%2$s」的「%1$s」</string>
+	<string name="end_of_year_story_top_podcasts_list_title">2022 年我最愛的 Podcast</string>
+	<string name="end_of_year_story_top_podcasts_share_text">本年度我最愛的 Podcast！ %1$s</string>
+	<string name="end_of_year_story_top_podcasts">你最愛的 Podcast</string>
+	<string name="end_of_year_story_top_podcast_share_text">2022 年我最愛的 Podcast！ %1$s</string>
+	<string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集，總共 %2$s</string>
+	<string name="end_of_year_story_top_podcast">你最愛的 Podcast 是 %2$s 的「%1$s」</string>
+	<string name="end_of_year_story_listened_to_numbers_share_text">我在 2022 年收聽了 %1$d 個不同 Podcast 節目和 %2$d 集內容</string>
+	<string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
+	<string name="end_of_year_story_listened_to_numbers">你收聽了 %1$d 個不同 Podcast 節目和 %2$d 集內容</string>
+	<string name="end_of_year_story_listened_to_categories_share_text">我在 2022 年收聽了 %1$d 個不同分類</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">來看看你最愛的內容…</string>
+	<string name="end_of_year_story_listened_to_categories">你今年收聽了 %1$d 個不同分類</string>
+	<string name="end_of_year_story_listened_to_share_text">我在 2022 年花了 %1$s 收聽 Podcast</string>
+	<string name="end_of_year_story_intro_title">來慶祝你收聽節目的這一年…</string>
+	<string name="end_of_year_launch_modal_image_title">Podcast 年度回顧</string>
+	<string name="end_of_year_replay">重播</string>
+	<string name="settings_media_notification_controls_summary">選擇兩個動作，顯示在 Android 13 播放通知、Android Auto 和其他可使用自訂媒體控制項的地方</string>
+	<string name="settings_media_notification_controls">媒體通知控制項</string>
+	<string name="playback_speed">播放速度</string>
+	<string name="volume_boost_enabled_not_valid">「已啟用音量增強」的值必須為「true」或「false」，先前為  %1$s</string>
+	<string name="volume_boost_enabled">已啟用音量增強</string>
+	<string name="set_volume_boost">設定音量增強</string>
+	<string name="trim_silence_mode_not_valid">修剪無聲模式 %1$s 無效</string>
+	<string name="trim_silence_mode">修剪無聲模式</string>
+	<string name="set_trim_silence_mode">設定修剪無聲模式</string>
+	<string name="playback_speed_between_values">播放速度 (介於 0.5 到 3 倍之間)</string>
+	<string name="set_playback_speed">設定播放速度</string>
+	<string name="playback_speed_not_valid">播放速度 %1$s 無效</string>
+	<string name="end_of_year_listening_time">你 2022 年花了 %1$s 收聽 Podcast。</string>
+	<string name="profile_account_upgraded">帳號已升級</string>
+	<string name="pocket_casts_control_playback">Pocket Casts 控制播放</string>
+	<string name="pocket_casts_play_filter">Pocket Casts 播放篩選條件</string>
+	<string name="time_to_skip_not_valid">跳過時間「%1$s」無效</string>
+	<string name="time_to_skip_seconds">跳過時間 (秒)</string>
+	<string name="end_of_year_prompt_card_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。</string>
+	<string name="settings_select_filters">選取篩選條件</string>
+	<string name="settings_import_url_summary">使用 URL 從 OPML 檔案匯入你的 Podcast。</string>
+	<string name="settings_import_url">依 URL</string>
+	<string name="time_to_skip_to_not_valid">跳到時間「%1$s」無效</string>
+	<string name="time_to_skip_to_seconds">跳到時間 (秒)</string>
+	<string name="skip_to_time">跳到時間</string>
+	<string name="play_next_in_queue">播放佇列中的下一集</string>
+	<string name="skip_to_chapter">跳到段落</string>
+	<string name="skip_to_previous_chapter">跳到上一段</string>
+	<string name="skip_to_next_chapter">跳到下一段</string>
+	<string name="tasker_variables">Tasker 變數</string>
+	<string name="chapter_to_skip_to_not_valid">跳到段落「%1$s」無效</string>
+	<string name="chapter_to_skip_to">跳到段落</string>
+	<string name="playback_command">播放指令</string>
+	<string name="command_x_not_valid">指令「%1$s」無效</string>
+	<string name="must_provide_command_name">必須提供指令名稱</string>
+	<string name="no_episodes_in_filter_x">篩選條件「%1$s」中無集數</string>
+	<string name="filter_x_not_found">找不到篩選條件「%1$s」</string>
+	<string name="must_provide_filter_name">必須提供篩選條件名稱</string>
 	<string name="end_of_year_launch_modal_secondary_button_title">現在不要</string>
 	<string name="end_of_year_launch_modal_primary_button_title">檢視我的 2022 年</string>
 	<string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。 與朋友分享，並向你最喜愛的創作者表達敬意！</string>
@@ -741,7 +828,7 @@ Language: zh_TW
 	<string name="profile_create_subscription_failed">無法建立訂閱。 請再試一次</string>
 	<string name="profile_create_privacy_policy_title">隱私權政策</string>
 	<string name="profile_create_privacy_policy">隨附隱私權政策連結供你參閱。 條款與政策內容已盡可能簡明扼要，並減少法律用語。</string>
-	<string name="profile_create_password_requirements">必須至少有 6 個字元</string>
+	<string name="profile_create_password_requirements">密碼至少要有 6 個字元</string>
 	<string name="profile_create_newsletter_summary">接收最新消息、應用程式更新、佈景主題 Podcast 清單、訪談等內容。</string>
 	<string name="profile_create_license">這是我們的例行程序，請見諒</string>
 	<string name="profile_create_failed">無法建立帳號。 請再試一次</string>

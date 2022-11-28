@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +22,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -32,15 +31,10 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun OnboardingRecommendations(
-    onShown: () -> Unit,
-    onBackPressed: () -> Unit,
+fun OnboardingRecommendationsStartPage(
+    onSearch: () -> Unit,
     onComplete: () -> Unit,
 ) {
-
-    LaunchedEffect(Unit) { onShown() }
-    BackHandler { onBackPressed() }
-
     Column(
         Modifier
             .fillMaxHeight()
@@ -64,6 +58,12 @@ fun OnboardingRecommendations(
 
         TextP40(
             text = stringResource(LR.string.onboarding_recommendations_make_pocket_casts_yours),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        SearchBarButton(
+            text = stringResource(LR.string.search),
+            onClick = onSearch,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -94,9 +94,8 @@ private fun Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        OnboardingRecommendations(
-            onShown = {},
-            onBackPressed = {},
+        OnboardingRecommendationsStartPage(
+            onSearch = {},
             onComplete = {},
         )
     }

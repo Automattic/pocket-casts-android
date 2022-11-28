@@ -1,11 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-10-26 11:54:03+0000
+Translation-Revision-Date: 2022-11-22 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+	<string name="onboarding_plus_feature_themes_icons_text">Affichez vos véritables couleurs. Des icônes et des thèmes exclusifs pour le club Plus uniquement.</string>
+	<string name="onboarding_plus_feature_themes_icons_title">Thèmes et icônes</string>
+	<string name="onboarding_plus_feature_hide_ads_text">Une expérience sans publicité qui vous permet de profiter encore plus de ce que vous aimez et qui évite ce qui ne vous intéresse pas.</string>
+	<string name="onboarding_plus_feature_hide_ads_title">Masquer les annonces</string>
+	<string name="onboarding_plus_feature_cloud_storage_text">Chargez vos fichiers dans le stockage Cloud afin de pouvoir y accéder n’importe où.</string>
+	<string name="onboarding_plus_feature_cloud_storage_title">10 Go de stockage Cloud</string>
+	<string name="onboarding_plus_feature_folders_text">Organisez vos podcasts dans des dossiers et synchronisez-les sur tous vos appareils.</string>
+	<string name="onboarding_plus_feature_folders_title">Dossiers</string>
+	<string name="onboarding_plus_feature_desktop_apps_text">Écoutez vos podcasts partout grâce à nos applications Windows, macOS et Web.</string>
+	<string name="onboarding_plus_feature_desktop_apps_title">Applications de bureau</string>
+	<string name="onboarding_upgrade_unlock_all_features">Profiter de toutes les fonctionnalités</string>
+	<string name="onboarding_upgrade_exclusive_features_and_options">Accéder à des options de personnalisation et des fonctionnalités exclusives</string>
+	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Tout ce que vous aimez à propos de Pocket Casts, et bien plus encore</string>
+	<string name="onboarding_recommendations_import">Importer</string>
+	<string name="onboarding_recommendations_make_pocket_casts_yours">Personnalisez Pocket Casts en sélectionnant vos podcasts préférés ou en les important à partir d’un autre lecteur de podcast. Vous pouvez toujours le faire plus tard.</string>
+	<string name="onboarding_recommendations_find_favorite_podcasts">Rechercher vos podcasts préférés</string>
+	<string name="not_now">Pas maintenant</string>
+	<string name="settings_open_player_automatically_summary">S’il est activé, le lecteur en mode plein écran s’ouvrira lorsque vous lancerez la lecture d’un épisode de podcast.</string>
+	<string name="settings_open_player_automatically">Ouvrir le lecteur automatiquement</string>
+	<string name="onboarding_email_invalid_message">Veuillez saisir une adresse e-mail valide</string>
+	<string name="onboarding_forgot_password">Mot de passe oublié ?</string>
+	<string name="onboarding_get_the_newsletter">Obtenir la newsletter</string>
+	<string name="onboarding_create_an_account_to">Créez un compte pour synchroniser votre expérience d\'écoute sur tous vos appareils.</string>
+	<string name="onboarding_discover_your_next_favorite_podcast">Découvrir votre prochain podcast préféré</string>
+	<string name="onboarding_continue_with_google">Continuer avec Google</string>
+	<string name="onboarding_welcome_back">Bon retour</string>
+	<string name="end_of_year_create_account_to_see">Enregistrez vos podcasts dans le cloud, obtenez votre bilan de fin d’année et synchronisez votre progression avec d’autres appareils.</string>
+	<string name="end_of_year_story_top_categories_share_text">Mes catégories de podcasts les plus écoutés</string>
+	<string name="end_of_year_story_top_categories">Vos meilleures catégories</string>
+	<string name="end_of_year_story_epilogue_subtitle">N’oubliez pas de partager avec vos amis et de mettre en lumière vos créateurs de podcasts préférés.</string>
+	<string name="end_of_year_story_longest_episode_share_text">L\'épisode le plus long que j\'ai écouté en 2022 %1$s</string>
+	<string name="end_of_year_story_longest_episode_duration">La durée de cet épisode était de %1$s</string>
+	<string name="end_of_year_story_longest_episode">L’épisode le plus long que vous avez écouté durait %1$s et provient du podcast %2$s</string>
+	<string name="end_of_year_story_top_podcasts_list_title">Mes meilleurs podcasts de 2022</string>
+	<string name="end_of_year_story_top_podcasts_share_text">Mes meilleurs podcasts de l\'année ! %1$s</string>
+	<string name="end_of_year_story_top_podcasts">Vos meilleurs podcasts</string>
+	<string name="end_of_year_story_top_podcast_share_text">Mon podcast préféré de 2022 ! %1$s</string>
+	<string name="end_of_year_story_top_podcast_subtitle">Vous avez écouté %1$d épisodes pour une durée totale de %2$s</string>
+	<string name="end_of_year_story_top_podcast">Votre meilleur podcast était %1$s de %2$s</string>
+	<string name="end_of_year_story_listened_to_numbers_share_text">J\'ai écouté %1$d podcasts différents et %2$d épisodes en 2022</string>
+	<string name="end_of_year_story_listened_to_numbers_subtitle">Vous avez écouté plusieurs fois un même podcast…</string>
+	<string name="end_of_year_story_listened_to_numbers">Vous avez écouté %1$d podcasts différents et %2$d épisodes</string>
+	<string name="end_of_year_story_listened_to_categories_share_text">J\'ai écouté %1$d catégories différentes en 2022</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">Découvrez certains de vos podcasts préférés…</string>
+	<string name="end_of_year_story_listened_to_categories">Cette année, vous avez écouté %1$d catégories différentes</string>
+	<string name="end_of_year_story_listened_to_share_text">En 2022, j\'ai passé %1$s à écouter des podcasts</string>
+	<string name="end_of_year_story_intro_title">Célébrez votre année d’écoute…</string>
+	<string name="end_of_year_launch_modal_image_title">Votre année en podcasts</string>
+	<string name="end_of_year_replay">Reprendre la lecture</string>
+	<string name="settings_media_notification_controls_summary">Choisissez deux actions à afficher dans la notification de lecture d’Android 13, d’Android Auto et d’autres plates-formes où les commandes médias personnalisées sont disponibles.</string>
+	<string name="settings_media_notification_controls">Contrôles de notification des médias</string>
+	<string name="playback_speed">Vitesse de lecture</string>
+	<string name="volume_boost_enabled_not_valid">La valeur de l’augmentation du volume activée, qui doit être « true » ou « false », était  %1$s</string>
+	<string name="volume_boost_enabled">Augmentation du volume activée</string>
+	<string name="set_volume_boost">Activer l’augmentation du volume</string>
+	<string name="trim_silence_mode_not_valid">Mode Coupure des silences %1$s non valide</string>
+	<string name="trim_silence_mode">Mode Coupure des silences</string>
+	<string name="set_trim_silence_mode">Activer le mode Coupure des silences</string>
+	<string name="playback_speed_between_values">Vitesse de lecture (entre 0,5 et 3)</string>
+	<string name="set_playback_speed">Activer la vitesse de lecture</string>
+	<string name="playback_speed_not_valid">Vitesse de lecture %1$s non valide</string>
+	<string name="end_of_year_listening_time">En 2022, vous avez passé %1$s à écouter des podcasts.</string>
+	<string name="profile_account_upgraded">Compte mis à niveau</string>
+	<string name="pocket_casts_control_playback">Contrôle de la lecture des Pocket Casts</string>
+	<string name="pocket_casts_play_filter">Filtre de lecture des Pocket Casts</string>
+	<string name="time_to_skip_not_valid">Séquence à passer (%1$s) non valide</string>
+	<string name="time_to_skip_seconds">Séquence à passer (secondes)</string>
+	<string name="end_of_year_prompt_card_summary">Retrouvez vos meilleurs podcasts, catégories, statistiques d’écoute, et plus encore.</string>
+	<string name="settings_select_filters">Sélectionner les filtres</string>
+	<string name="settings_import_url_summary">Importez vos podcasts à partir d’un fichier OPML en utilisant une URL.</string>
+	<string name="settings_import_url">Par URL</string>
+	<string name="time_to_skip_to_not_valid">Séquence à laquelle passer (%1$s) non valide</string>
+	<string name="time_to_skip_to_seconds">Séquence à laquelle passer (secondes)</string>
+	<string name="skip_to_time">Passer à la séquence</string>
+	<string name="play_next_in_queue">Lire l’élément suivant de la file d’attente</string>
+	<string name="skip_to_chapter">Passer au chapitre</string>
+	<string name="skip_to_previous_chapter">Passer au chapitre précédent</string>
+	<string name="skip_to_next_chapter">Passer au chapitre suivant</string>
+	<string name="tasker_variables">Variantes Tasker</string>
+	<string name="chapter_to_skip_to_not_valid">Chapitre auquel passer (%1$s) non valide</string>
+	<string name="chapter_to_skip_to">Chapitre auquel passer</string>
+	<string name="playback_command">Commande de lecture</string>
+	<string name="command_x_not_valid">Commande %1$s non valide</string>
+	<string name="must_provide_command_name">Nom de commande obligatoire</string>
+	<string name="no_episodes_in_filter_x">Aucun épisode pour le filtre %1$s</string>
+	<string name="filter_x_not_found">Filtre %1$s introuvable</string>
+	<string name="must_provide_filter_name">Nom du filtre obligatoire</string>
 	<string name="end_of_year_launch_modal_secondary_button_title">Pas maintenant</string>
 	<string name="end_of_year_launch_modal_primary_button_title">Voir mon année 2022</string>
 	<string name="end_of_year_launch_modal_summary">Retrouvez vos meilleurs podcasts, catégories, statistiques d’écoute, et plus encore. Partagez du contenu avec vos amis et remerciez vos créateurs favoris !</string>
@@ -741,7 +828,7 @@ Language: fr
 	<string name="profile_create_subscription_failed">Impossible de créer l’abonnement. Veuillez réessayer</string>
 	<string name="profile_create_privacy_policy_title">Politique de confidentialité</string>
 	<string name="profile_create_privacy_policy">Nous avons également ajouté un lien vers notre Politique de confidentialité si vous souhaitez la consulter. Nous avons essayé d’être brefs, concis et d’inclure le moins de jargon juridique possible.</string>
-	<string name="profile_create_password_requirements">Doit comporter au moins 6 caractères</string>
+	<string name="profile_create_password_requirements">Le mot de passe doit comporter au moins 6 caractères</string>
 	<string name="profile_create_newsletter_summary">Recevez des actualités, des mises à jour d’applications, des listes de podcasts thématiques, des interviews et plus encore</string>
 	<string name="profile_create_license">Veuillez excuser notre formalité</string>
 	<string name="profile_create_failed">Impossible de créer le compte. Veuillez réessayer</string>

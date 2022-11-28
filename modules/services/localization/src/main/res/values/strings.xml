@@ -1493,6 +1493,7 @@
     <string name="onboarding_welcome_recommendations_title">Discover something new</string>
     <string name="onboarding_welcome_recommendations_text">Find under-the-radar and trending podcasts in our hand-curated Discover page.</string>
     <string name="onboarding_welcome_recommendations_button">Find My Next Podcast</string>
+    <string name="onboarding_find_podcasts">Find Podcasts</string>
 
     <!--    Tasker Plugin-->
 

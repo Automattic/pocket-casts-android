@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-07-22 10:54:03+0000
+Translation-Revision-Date: 2022-11-12 02:10:08+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
@@ -690,7 +690,6 @@ Language: ar
 	<string name="profile_create_subscription_failed">يتعذر إنشاء حساب. يرجى المحاولة مجددًا</string>
 	<string name="profile_create_privacy_policy_title">سياسة الخصوصية</string>
 	<string name="profile_create_privacy_policy">لقد وضعنا سياسة الخصوصية الخاصة بنا كذلك في رابط إذا كنت مهتمًا. لقد حاولنا أن نجعل كلاهما قصيرًا وواضحًا وقمنا بتضمين أقل قدر ممكن من المصطلحات القانونية.</string>
-	<string name="profile_create_password_requirements">يجب ألا يقلا عن 6 أحرف</string>
 	<string name="profile_create_newsletter_summary">يمكنك تلقي الأخبار، وتحديثات التطبيق وقوائم بث صوتي مُنسَّقة ومقابلات والمزيد</string>
 	<string name="profile_create_license">يرجى عذرنا على إجرائاتنا الرسمية</string>
 	<string name="profile_create_failed">تعذر إنشاء حساب. يرجى المحاولة مجددًا</string>
