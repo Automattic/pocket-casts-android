@@ -1,18 +1,19 @@
-package au.com.shiftyjelly.pocketcasts.endofyear.components
+package au.com.shiftyjelly.pocketcasts.compose.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 
 @Composable
 fun PodcastCover(
@@ -31,23 +32,32 @@ fun PodcastCover(
 @Composable
 fun RectangleCover(
     coverWidth: Dp,
-    backgroundColor: Color,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colors.surface,
+    @DrawableRes imageResId: Int? = null,
 ) {
-    Box(
+    val elevation = when {
+        coverWidth <= 50.dp -> 1.dp
+        coverWidth <= 200.dp -> 2.dp
+        else -> 4.dp
+    }
+    val cornerRadiusSize = when {
+        coverWidth <= 50.dp -> 2.dp
+        coverWidth <= 200.dp -> 4.dp
+        else -> 8.dp
+    }
+    Card(
+        elevation = elevation,
+        shape = RoundedCornerShape(cornerRadiusSize),
+        backgroundColor = backgroundColor,
         modifier = modifier.size(coverWidth)
     ) {
-        val elevation = when {
-            coverWidth <= 50.dp -> 1.dp
-            coverWidth <= 200.dp -> 2.dp
-            else -> 4.dp
+        imageResId?.let {
+            Image(
+                painter = painterResource(it),
+                contentDescription = null,
+            )
         }
-        Card(
-            elevation = elevation,
-            shape = RoundedCornerShape(8.dp),
-            backgroundColor = backgroundColor,
-            modifier = modifier.fillMaxSize()
-        ) {}
     }
 }
 
