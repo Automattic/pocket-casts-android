@@ -63,7 +63,7 @@ fun StoryListeningTimeView(
 
         PodcastLogoWhite()
 
-        Spacer(modifier = modifier.height(40.dp))
+        Spacer(modifier = modifier.height(30.dp))
     }
 }
 
