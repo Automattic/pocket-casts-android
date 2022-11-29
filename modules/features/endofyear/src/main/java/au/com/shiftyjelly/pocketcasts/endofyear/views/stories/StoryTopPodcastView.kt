@@ -72,7 +72,7 @@ private fun PodcastCoverStack(
 ) {
     val context = LocalContext.current
     val currentLocalView = LocalView.current
-    val coverWidth = (currentLocalView.width.pxToDp(context).dp) / 2.5f
+    val coverWidth = (currentLocalView.width.pxToDp(context).dp) / 2.2f
 
     Box {
         (0..2).reversed().forEach { index ->
