@@ -19,8 +19,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCoverType
 import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
@@ -120,7 +120,7 @@ private fun PodcastCoverRow(
                     PodcastCover(
                         uuid = story.podcasts[podcastIndex].uuid,
                         coverWidth = coverWidth,
-                        coverType = PodcastCoverType.SMALL
+                        coverSize = CoverSize.SMALL
                     )
                     Spacer(modifier = modifier.width(5.dp))
                 }

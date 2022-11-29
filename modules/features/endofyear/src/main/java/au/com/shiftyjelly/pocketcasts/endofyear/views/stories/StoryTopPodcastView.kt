@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCoverType
 import au.com.shiftyjelly.pocketcasts.compose.components.RectangleCover
 import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
@@ -86,7 +86,7 @@ private fun PodcastCoverStack(
                         0 -> PodcastCover(
                             uuid = uuid,
                             coverWidth = coverWidth,
-                            coverType = PodcastCoverType.BIG
+                            coverSize = CoverSize.BIG
                         )
 
                         1 -> {
