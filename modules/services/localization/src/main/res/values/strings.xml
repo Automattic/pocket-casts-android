@@ -1406,6 +1406,7 @@
     <string name="end_of_year_listening_time_english_only" translatable="false">In 2022, you spent\n%1$s\nlistening to podcasts.</string>
     <string name="end_of_year_replay">Replay</string>
     <string name="end_of_year_story_intro_title">Let’s celebrate your year of listening!</string>
+    <string name="end_of_year_story_intro_title_english_only" translatable="false">Let’s celebrate your year\nof listening!</string>
     <!-- Text that appears when someone shares the listened to story to Twitter, for example. %1$s is a placeholder for the amount of time. -->
     <string name="end_of_year_story_listened_to_share_text">I spent %1$s listening to podcasts in 2022</string>
     <!-- String telling the user how much podcast categories they listened to podcasts in 2022, %1$d is a placeholder for the number of categories. -->
