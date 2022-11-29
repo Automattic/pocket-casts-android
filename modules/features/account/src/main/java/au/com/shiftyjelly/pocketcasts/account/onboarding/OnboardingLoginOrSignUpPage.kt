@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -123,7 +126,8 @@ internal fun OnboardingLoginOrSignUpPage(
             Spacer(Modifier.weight(1f))
 
             if (viewModel.showContinueWithGoogleButton) {
-                ContinueWithGoogleButton(onClick = onContinueWithGoogleClicked)
+                Spacer(Modifier.height(8.dp))
+                ContinueWithGoogleButton(viewModel = viewModel, onClick = onContinueWithGoogleClicked)
             } else {
                 Spacer(Modifier.height(32.dp))
             }
@@ -168,15 +172,61 @@ private fun Artwork(googleSignInShown: Boolean) {
     }
 }
 
+/**
+ * Let the user sign into Pocket Casts with their Google account.
+ * The One Tap for Android library is used. Sign in doesn't work when no Google accounts are set up on the device. In this case, fallback to the legacy Google Sign-In for Android.
+ */
 @Composable
-private fun ContinueWithGoogleButton(onClick: () -> Unit) {
+private fun ContinueWithGoogleButton(viewModel: OnboardingLoginOrSignUpViewModel, onClick: () -> Unit) {
+    val context = LocalContext.current
+    val errorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
+
+    val showError = {
+        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+    }
+
+    // request legacy Google Sign-In and process the result
+    val googleLegacySignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        viewModel.onGoogleLegacySignInResult(
+            result = result,
+            onSuccess = onClick,
+            onError = showError
+        )
+    }
+
+    // request Google One Tap Sign-In and process the result
+    val googleOneTapSignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        viewModel.onGoogleOneTapSignInResult(
+            result = result,
+            onSuccess = onClick,
+            onError = {
+                viewModel.startGoogleLegacySignIn(
+                    onSuccess = { request -> googleLegacySignInLauncher.launch(request) },
+                    onError = showError
+                )
+            }
+        )
+    }
+
+    val onSignInClick = {
+        viewModel.startGoogleOneTapSignIn(
+            onSuccess = { request -> googleOneTapSignInLauncher.launch(request) },
+            onError = {
+                viewModel.startGoogleLegacySignIn(
+                    onSuccess = { request -> googleLegacySignInLauncher.launch(request) },
+                    onError = showError
+                )
+            }
+        )
+    }
+
     RowOutlinedButton(
         text = stringResource(LR.string.onboarding_continue_with_google),
         leadingIcon = painterResource(IR.drawable.google_g),
         tintIcon = false,
         border = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryInteractive03),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.theme.colors.primaryText01),
-        onClick = onClick
+        onClick = onSignInClick
     )
 }
 

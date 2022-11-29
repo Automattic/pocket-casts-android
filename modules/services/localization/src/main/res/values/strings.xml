@@ -1459,8 +1459,9 @@
     <string name="not_now">Not Now</string>
     <string name="onboarding_log_in">Log in</string>
     <string name="onboarding_create_account">Create Account</string>
-    <string name="onboarding_sign_up">Sign Up</string>
+    <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
+    <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
     <string name="onboarding_get_the_newsletter">Get the newsletter</string>
