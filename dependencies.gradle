@@ -75,6 +75,7 @@ project.ext {
     settingsEncryptSecret = secretProperties.getProperty("pocketcastsSettingsEncryptSecret", "")
     sharingServerSecret = secretProperties.getProperty("pocketcastsSharingServerSecret", "")
     pocketcastsSentryDsn = secretProperties.getProperty("pocketcastsSentryDsn", "")
+    googleSignInServerClientId = secretProperties.getProperty("googleSignInServerClientId", "")
 
     // Library versions
     versionBillingClient = '5.0.0'
