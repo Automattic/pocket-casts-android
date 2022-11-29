@@ -73,7 +73,7 @@ private fun PodcastCoverStack(
     val context = LocalContext.current
     val currentLocalView = LocalView.current
     val screenWidth = currentLocalView.width.pxToDp(context).dp
-    val availableWidth = screenWidth * .74f
+    val availableWidth = screenWidth * .8f
     Box(
         modifier = modifier
             .size(availableWidth)
