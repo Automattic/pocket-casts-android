@@ -26,6 +26,15 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
 
     open val statusBarColor: StatusBarColor? = StatusBarColor.Light
 
+    private var isBeingDragged = false
+    private val dismissCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+        override fun onStateChanged(bottomSheet: View, newState: Int) {}
+
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            isBeingDragged = true
+        }
+    }
+
     @Inject lateinit var theme: Theme
 
     override val coroutineContext: CoroutineContext
@@ -47,14 +56,38 @@ open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
         view.doOnLayout {
             ensureExpanded()
         }
+
+        isBeingDragged = false
+        addDismissCallback()
+    }
+
+    private fun addDismissCallback() {
+        val dialog = dialog as BottomSheetDialog
+        (dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout?)?.let { bottomSheet ->
+            val behavior = BottomSheetBehavior.from(bottomSheet)
+            behavior.addBottomSheetCallback(dismissCallback)
+        }
+    }
+
+    private fun removeDismissCallback() {
+        val dialog = dialog as BottomSheetDialog
+        (dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout?)?.let { bottomSheet ->
+            val behavior = BottomSheetBehavior.from(bottomSheet)
+            behavior.removeBottomSheetCallback(dismissCallback)
+        }
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
+        removeDismissCallback()
         (activity as? FragmentHostListener)?.updateStatusBar()
     }
 
     fun ensureExpanded() {
+        // skip this when the user is dragging the bottomsheet
+        // as it causes the bottomsheet flicker to the expanded state
+        if (isBeingDragged) return
+
         val dialog = dialog as BottomSheetDialog
         (dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as FrameLayout?)?.let { bottomSheet ->
             val behavior = BottomSheetBehavior.from(bottomSheet)
