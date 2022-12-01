@@ -61,7 +61,7 @@ fun StoryListenedNumbersView(
 
         PodcastLogoWhite()
 
-        Spacer(modifier = modifier.height(30.dp))
+        Spacer(modifier = modifier.height(40.dp))
     }
 }
 
@@ -73,11 +73,11 @@ private fun PodcastCoverStack(
     val context = LocalContext.current
     val currentLocalView = LocalView.current
     val screenWidth = currentLocalView.width.pxToDp(context).dp
-    val availableWidth = screenWidth * .8f
+    val availableWidth = screenWidth * .74f
     Box(
         modifier = modifier
             .size(availableWidth)
-            .padding(start = availableWidth * .55f, top = availableWidth * .01f)
+            .padding(start = availableWidth * .55f, top = availableWidth * .09f)
             .transformPodcastCover()
     ) {
         PodcastCover(
@@ -91,7 +91,7 @@ private fun PodcastCoverStack(
             coverWidth = availableWidth * .23f,
             uuid = topPodcasts.atSafeIndex(4).uuid,
             modifier = modifier
-                .offset(x = -availableWidth / 2.3f, y = availableWidth / 2.5f)
+                .offset(x = -availableWidth / 2f, y = availableWidth / 2.3f)
         )
 
         PodcastCover(

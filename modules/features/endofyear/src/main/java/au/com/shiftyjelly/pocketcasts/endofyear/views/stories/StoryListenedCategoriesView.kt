@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCoverType
 import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
@@ -59,7 +59,7 @@ fun StoryListenedCategoriesView(
 
         PodcastLogoWhite()
 
-        Spacer(modifier = modifier.height(30.dp))
+        Spacer(modifier = modifier.height(40.dp))
     }
 }
 
@@ -70,7 +70,7 @@ private fun PodcastCoverStack(
 ) {
     val context = LocalContext.current
     val currentLocalView = LocalView.current
-    val coverWidth = (currentLocalView.width.pxToDp(context).dp) / 2.2f
+    val coverWidth = (currentLocalView.width.pxToDp(context).dp) / 2.5f
 
     Box {
         (0..2).reversed().forEach { index ->
@@ -83,7 +83,7 @@ private fun PodcastCoverStack(
                 PodcastCover(
                     uuid = story.listenedCategories[podcastIndex].mostListenedPodcastId,
                     coverWidth = coverWidth,
-                    coverSize = CoverSize.BIG
+                    coverType = PodcastCoverType.BIG
                 )
             }
         }

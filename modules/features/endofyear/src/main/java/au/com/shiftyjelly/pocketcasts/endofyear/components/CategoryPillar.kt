@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -14,8 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.drawscope.withTransform
@@ -33,15 +30,14 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.endofyear.R
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.FadeDirection
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.dynamicBackground
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 
 private const val PillarRotationAngle = -30f
 private const val PillarTextSkew = 0.5f
 private const val PillarTopAspectRatio = .58f
-private val PillarBaseColor = Color(0xFFFE7E61)
-private val Black24 = Color(0x3D000000)
-private val PillarGradientStartColor = Color(0xFFFE7E61)
-private val PillarGradientEndColor = Color(0x003C1F5D)
+private val PillarColor = Color(0xFFFE7E61)
 
 @Composable
 fun CategoryPillar(
@@ -118,22 +114,17 @@ private fun Pillar(
     val pillarTopAspectRatio = PillarTopAspectRatio
     val pillarTopHeight = width * pillarTopAspectRatio
     Box {
-        Row {
-            Box(
-                modifier = modifier
-                    .width(width / 2f)
-                    .height(height)
-                    .padding(top = pillarTopHeight / 2)
-                    .leftPillarBackground()
-            )
-            Box(
-                modifier = modifier
-                    .width(width / 2f)
-                    .height(height)
-                    .padding(top = pillarTopHeight / 2)
-                    .rightPillarBackground()
-            )
-        }
+        Box(
+            modifier = modifier
+                .width(width)
+                .height(height)
+                .padding(top = pillarTopHeight / 2)
+                .dynamicBackground(
+                    baseColor = PillarColor,
+                    colorStops = listOf(Color.Black, Color.Transparent),
+                    direction = FadeDirection.TopToBottom
+                )
+        )
         Box {
             Image(
                 painter = painterResource(R.drawable.rectangle),
@@ -173,41 +164,3 @@ private fun Pillar(
         }
     }
 }
-
-fun Modifier.leftPillarBackground() =
-    graphicsLayer {
-        alpha = 0.99f
-    }.drawWithContent {
-        drawRect(color = PillarBaseColor)
-        drawRect(
-            brush = Brush.verticalGradient(
-                listOf(Black24, Color.Black),
-                startY = Float.POSITIVE_INFINITY,
-                endY = 0f,
-            ),
-            blendMode = BlendMode.DstIn
-        )
-        drawRect(
-            brush = Brush.verticalGradient(
-                listOf(PillarGradientStartColor, PillarGradientEndColor),
-                startY = 0f,
-                endY = Float.POSITIVE_INFINITY,
-            ),
-            blendMode = BlendMode.DstIn
-        )
-    }
-
-fun Modifier.rightPillarBackground() =
-    graphicsLayer {
-        alpha = 0.99f
-    }.drawWithContent {
-        drawRect(color = PillarBaseColor)
-        drawRect(
-            brush = Brush.verticalGradient(
-                listOf(PillarGradientStartColor, PillarGradientEndColor),
-                startY = 0f,
-                endY = Float.POSITIVE_INFINITY,
-            ),
-            blendMode = BlendMode.DstIn
-        )
-    }
