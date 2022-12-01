@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
@@ -75,7 +76,7 @@ fun StoryEpilogueView(
 
         Spacer(modifier = modifier.weight(1f))
 
-        PodcastLogo()
+        PodcastLogoWhite()
 
         Spacer(modifier = modifier.height(30.dp))
     }
@@ -147,12 +148,4 @@ private fun ReplayButton(
             modifier = modifier.padding(2.dp)
         )
     }
-}
-
-@Composable
-fun PodcastLogo() {
-    Image(
-        painter = painterResource(R.drawable.logo_red),
-        contentDescription = null,
-    )
 }
