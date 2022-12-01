@@ -57,13 +57,16 @@ fun TextH20(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.theme.colors.primaryText01,
     maxLines: Int = Int.MAX_VALUE,
-    textAlign: TextAlign? = null
+    textAlign: TextAlign? = null,
+    disableScale: Boolean = false,
+    fontSize: TextUnit = 22.sp,
+    lineHeight: TextUnit = 30.sp,
 ) {
     Text(
         text = text,
         color = color,
-        fontSize = 22.sp,
-        lineHeight = 30.sp,
+        fontSize = if (disableScale) fontSize.value.nonScaledSp else fontSize,
+        lineHeight = if (disableScale) lineHeight.value.nonScaledSp else lineHeight.value.sp,
         fontWeight = FontWeight.Bold,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
@@ -81,13 +84,14 @@ fun TextH30(
     fontWeight: FontWeight? = null,
     maxLines: Int = Int.MAX_VALUE,
     disableScale: Boolean = false,
-    fontSize: TextUnit = 18.sp
+    fontSize: TextUnit = 18.sp,
+    lineHeight: TextUnit = 21.sp,
 ) {
     Text(
         text = text,
         color = color,
         fontSize = if (disableScale) fontSize.value.nonScaledSp else fontSize,
-        lineHeight = if (disableScale) 21.nonScaledSp else 21.sp,
+        lineHeight = if (disableScale) lineHeight.value.nonScaledSp else lineHeight.value.sp,
         textAlign = textAlign,
         fontWeight = fontWeight ?: FontWeight.SemiBold,
         maxLines = maxLines,
@@ -148,13 +152,16 @@ fun TextP40(
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
     maxLines: Int = Int.MAX_VALUE,
+    disableScale: Boolean = false,
     fontWeight: FontWeight? = null,
+    fontSize: TextUnit = 16.sp,
+    lineHeight: TextUnit = 22.sp,
 ) {
     Text(
         text = text,
         color = color,
-        fontSize = 16.sp,
-        lineHeight = 22.sp,
+        fontSize = if (disableScale) fontSize.value.nonScaledSp else fontSize,
+        lineHeight = if (disableScale) lineHeight.value.nonScaledSp else lineHeight,
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,

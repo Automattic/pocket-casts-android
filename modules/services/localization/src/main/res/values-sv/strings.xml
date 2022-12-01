@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-23 09:54:03+0000
+Translation-Revision-Date: 2022-11-25 19:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+	<string name="onboarding_plus_feature_themes_icons_text">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>
+	<string name="onboarding_plus_feature_themes_icons_title">Teman och ikoner</string>
+	<string name="onboarding_plus_feature_hide_ads_text">Annonsfri upplevelse som ger dig mer av det du gillar och mindre av det du inte gillar.</string>
+	<string name="onboarding_plus_feature_hide_ads_title">Dölj annonser</string>
+	<string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>
+	<string name="onboarding_plus_feature_cloud_storage_title">10 GB molnlagring</string>
+	<string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
+	<string name="onboarding_plus_feature_folders_title">Mappar</string>
+	<string name="onboarding_plus_feature_desktop_apps_text">Lyssna på fler med våra Windows-, macOS- och webbappar.</string>
+	<string name="onboarding_plus_feature_desktop_apps_title">Dator-appar</string>
+	<string name="onboarding_upgrade_exclusive_features_and_options">Få tillgång till exklusiva funktioner och anpassningsalternativ</string>
+	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Allt du älskar med Pocket Casts och mer därtill</string>
+	<string name="onboarding_recommendations_import">Importera</string>
+	<string name="onboarding_recommendations_make_pocket_casts_yours">Gör Pocket Casts till ditt genom att välja dina favoritpodcasts eller importera dem från en annan podcastspelare. Du kan alltid göra detta senare.</string>
+	<string name="onboarding_recommendations_find_favorite_podcasts">Hitta dina favoritpodcasts</string>
 	<string name="settings_open_player_automatically_summary">Om alternativet är aktiverat öppnas spelaren i fullskärmsläge när du börjar spela upp ett podcastavsnitt.</string>
 	<string name="settings_open_player_automatically">Öppna spelaren automatiskt</string>
 	<string name="onboarding_email_invalid_message">Ange en giltig e-post</string>

@@ -1405,14 +1405,15 @@
     <string name="end_of_year_listening_time">In 2022, you spent %1$s listening to podcasts.</string>
     <string name="end_of_year_listening_time_english_only" translatable="false">In 2022, you spent\n%1$s\nlistening to podcasts.</string>
     <string name="end_of_year_replay">Replay</string>
-    <string name="end_of_year_story_intro_title">Let\'s celebrate your year of listening…</string>
+    <string name="end_of_year_story_intro_title">Let’s celebrate your year of listening!</string>
+    <string name="end_of_year_story_intro_title_english_only" translatable="false">Let’s celebrate your year\nof listening!</string>
     <!-- Text that appears when someone shares the listened to story to Twitter, for example. %1$s is a placeholder for the amount of time. -->
     <string name="end_of_year_story_listened_to_share_text">I spent %1$s listening to podcasts in 2022</string>
     <!-- String telling the user how much podcast categories they listened to podcasts in 2022, %1$d is a placeholder for the number of categories. -->
     <string name="end_of_year_story_listened_to_categories">You listened to %1$d different categories this year</string>
     <string name="end_of_year_story_listened_to_categories_english_only" translatable="false">You listened to\n%1$d different categories\nthis year</string>
     <!-- String prompting the user for the next story to check the most listened categories. -->
-    <string name="end_of_year_story_listened_to_categories_subtitle">Let\'s take a look at some of your favorites…</string>
+    <string name="end_of_year_story_listened_to_categories_subtitle">Let’s take a look at some of your favorites…</string>
     <!-- Text that appears when someone shares the listened categories to story to Twitter, for example. %1$d is a placeholder for the number of categories. -->
     <string name="end_of_year_story_listened_to_categories_share_text">I listened to %1$d different categories in 2022</string>
     <!-- String telling the user how much podcasts and episodes they listened to this year, %1$d is a placeholder for the number of podcasts and %2$d is a placeholder fo the number of episodes. -->
@@ -1443,7 +1444,7 @@
     <!-- Title for the epilogue story -->
     <string name="end_of_year_story_epilogue_title">Thank you for letting Pocket&#160;Casts be a part of your listening experience in 2022</string>
     <!-- Subtitle for the epilogue story -->
-    <string name="end_of_year_story_epilogue_subtitle">Don\'t forget to share with your friends and give a shout out to your favorite podcast creators</string>
+    <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favorite podcast creators</string>
     <!-- Title of the top categories story. -->
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
     <!-- Text that appear when someone share the top categories story to Twitter. -->

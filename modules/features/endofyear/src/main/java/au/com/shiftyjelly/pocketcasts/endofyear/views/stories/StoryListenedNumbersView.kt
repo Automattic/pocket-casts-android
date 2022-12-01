@@ -19,11 +19,11 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastCover
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
+import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
-import au.com.shiftyjelly.pocketcasts.endofyear.components.transformPodcastCover
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
@@ -61,7 +61,7 @@ fun StoryListenedNumbersView(
 
         PodcastLogoWhite()
 
-        Spacer(modifier = modifier.height(40.dp))
+        Spacer(modifier = modifier.height(30.dp))
     }
 }
 
@@ -73,11 +73,11 @@ private fun PodcastCoverStack(
     val context = LocalContext.current
     val currentLocalView = LocalView.current
     val screenWidth = currentLocalView.width.pxToDp(context).dp
-    val availableWidth = screenWidth * .74f
+    val availableWidth = screenWidth * .8f
     Box(
         modifier = modifier
             .size(availableWidth)
-            .padding(start = availableWidth * .55f, top = availableWidth * .09f)
+            .padding(start = availableWidth * .55f, top = availableWidth * .01f)
             .transformPodcastCover()
     ) {
         PodcastCover(
@@ -91,7 +91,7 @@ private fun PodcastCoverStack(
             coverWidth = availableWidth * .23f,
             uuid = topPodcasts.atSafeIndex(4).uuid,
             modifier = modifier
-                .offset(x = -availableWidth / 2f, y = availableWidth / 2.3f)
+                .offset(x = -availableWidth / 2.3f, y = availableWidth / 2.5f)
         )
 
         PodcastCover(

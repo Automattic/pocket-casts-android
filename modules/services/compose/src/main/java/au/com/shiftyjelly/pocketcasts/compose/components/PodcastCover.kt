@@ -1,29 +1,31 @@
-package au.com.shiftyjelly.pocketcasts.endofyear.components
+package au.com.shiftyjelly.pocketcasts.compose.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 
 @Composable
 fun PodcastCover(
     uuid: String,
     coverWidth: Dp,
     modifier: Modifier = Modifier,
-    coverType: PodcastCoverType = PodcastCoverType.SMALL,
+    coverSize: CoverSize = CoverSize.SMALL,
 ) {
     PodcastImage(
         uuid = uuid,
-        cornerSize = if (coverType == PodcastCoverType.SMALL) 4.dp else 8.dp,
+        elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp,
+        cornerSize = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp,
         modifier = modifier.size(coverWidth)
     )
 }
@@ -31,23 +33,25 @@ fun PodcastCover(
 @Composable
 fun RectangleCover(
     coverWidth: Dp,
-    backgroundColor: Color,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colors.surface,
+    @DrawableRes imageResId: Int? = null,
+    coverSize: CoverSize = CoverSize.BIG,
 ) {
-    Box(
+    val elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
+    val cornerRadiusSize = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
+    Card(
+        elevation = elevation,
+        shape = RoundedCornerShape(cornerRadiusSize),
+        backgroundColor = backgroundColor,
         modifier = modifier.size(coverWidth)
     ) {
-        val elevation = when {
-            coverWidth <= 50.dp -> 1.dp
-            coverWidth <= 200.dp -> 2.dp
-            else -> 4.dp
+        imageResId?.let {
+            Image(
+                painter = painterResource(it),
+                contentDescription = null,
+            )
         }
-        Card(
-            elevation = elevation,
-            shape = RoundedCornerShape(8.dp),
-            backgroundColor = backgroundColor,
-            modifier = modifier.fillMaxSize()
-        ) {}
     }
 }
 
@@ -62,7 +66,7 @@ fun Modifier.transformPodcastCover() =
         }
     }
 
-enum class PodcastCoverType {
+enum class CoverSize {
     SMALL,
     BIG
 }
