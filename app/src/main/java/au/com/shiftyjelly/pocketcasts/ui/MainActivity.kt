@@ -600,8 +600,6 @@ class MainActivity :
                 } else if (!settings.getEndOfYearModalHasBeenShown()) {
                     viewModel.updateStoriesModalShowState(true)
                 }
-            } else {
-                settings.setEndOfYearModalHasBeenShown(false)
             }
 
             if (signinState.isSignedInAsPlus) {
