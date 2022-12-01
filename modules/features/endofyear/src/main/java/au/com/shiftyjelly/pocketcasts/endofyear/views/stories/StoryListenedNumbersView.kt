@@ -77,7 +77,7 @@ private fun PodcastCoverStack(
     Box(
         modifier = modifier
             .size(availableWidth)
-            .padding(start = availableWidth * .55f, top = availableWidth * .09f)
+            .padding(start = availableWidth * .55f, top = availableWidth * .01f)
             .transformPodcastCover()
     ) {
         PodcastCover(
@@ -91,7 +91,7 @@ private fun PodcastCoverStack(
             coverWidth = availableWidth * .23f,
             uuid = topPodcasts.atSafeIndex(4).uuid,
             modifier = modifier
-                .offset(x = -availableWidth / 2f, y = availableWidth / 2.3f)
+                .offset(x = -availableWidth / 2.3f, y = availableWidth / 2.5f)
         )
 
         PodcastCover(
