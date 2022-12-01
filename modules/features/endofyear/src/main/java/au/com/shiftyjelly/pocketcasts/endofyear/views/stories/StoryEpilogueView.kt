@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -145,6 +146,7 @@ private fun ReplayButton(
         TextP40(
             text = stringResource(id = LR.string.end_of_year_replay),
             color = Color.Black,
+            disableScale = disableScale(),
             modifier = modifier.padding(2.dp)
         )
     }
