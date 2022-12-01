@@ -40,17 +40,18 @@ fun PodcastImage(
     roundCorners: Boolean = true,
     dropShadow: Boolean = true,
     cornerSize: Dp? = null,
+    elevation: Dp? = null,
 ) {
     BoxWithConstraints(modifier = modifier) {
         val corners = if (roundCorners) cornerSize ?: podcastImageCornerSize(maxWidth) else null
         if (dropShadow) {
-            val elevation = when {
+            val finalElevation = elevation ?: when {
                 maxWidth <= 50.dp -> 1.dp
                 maxWidth <= 200.dp -> 2.dp
                 else -> 4.dp
             }
             Card(
-                elevation = elevation,
+                elevation = finalElevation,
                 shape = if (corners == null) RectangleShape else RoundedCornerShape(corners),
                 backgroundColor = Color.Transparent,
                 modifier = Modifier.fillMaxSize()

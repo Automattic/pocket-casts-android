@@ -1,7 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +23,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
 import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -52,7 +61,7 @@ fun StoryEpilogueView(
 
         Spacer(modifier = modifier.weight(1f))
 
-        HeartImage()
+        PulsatingHeart()
 
         Spacer(modifier = modifier.weight(0.34f))
 
@@ -70,20 +79,31 @@ fun StoryEpilogueView(
 
         PodcastLogoWhite()
 
-        Spacer(modifier = modifier.height(40.dp))
+        Spacer(modifier = modifier.height(30.dp))
     }
 }
 
 @Composable
-private fun HeartImage(
+private fun PulsatingHeart(
     modifier: Modifier = Modifier,
 ) {
-    Image(
-        painter = painterResource(id = R.drawable.heart),
-        contentDescription = null,
-        modifier = modifier
-            .size(HeartImageSize)
+    val infiniteTransition = rememberInfiniteTransition()
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            repeatMode = RepeatMode.Reverse
+        )
     )
+    Box(modifier = Modifier.scale(scale)) {
+        Image(
+            painter = painterResource(id = R.drawable.heart),
+            contentDescription = null,
+            modifier = modifier
+                .size(HeartImageSize)
+        )
+    }
 }
 
 @Composable
@@ -126,6 +146,7 @@ private fun ReplayButton(
         TextP40(
             text = stringResource(id = LR.string.end_of_year_replay),
             color = Color.Black,
+            disableScale = disableScale(),
             modifier = modifier.padding(2.dp)
         )
     }
