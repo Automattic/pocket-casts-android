@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.endofyear.components.CategoryPillar
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
-import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.dynamicBackground
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopListenedCategories
@@ -57,7 +56,7 @@ fun StoryTopListenedCategoriesView(
 
         PodcastLogoWhite()
 
-        Spacer(modifier = modifier.height(30.dp))
+        Spacer(modifier = modifier.height(40.dp))
     }
 }
 
@@ -71,7 +70,6 @@ private fun Title(
         text = text,
         textAlign = TextAlign.Center,
         color = story.tintColor,
-        disableScale = disableScale(),
         modifier = modifier
             .padding(horizontal = 40.dp)
             .fillMaxWidth()

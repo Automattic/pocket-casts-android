@@ -20,12 +20,11 @@ fun PodcastCover(
     uuid: String,
     coverWidth: Dp,
     modifier: Modifier = Modifier,
-    coverSize: CoverSize = CoverSize.SMALL,
+    coverType: PodcastCoverType = PodcastCoverType.SMALL,
 ) {
     PodcastImage(
         uuid = uuid,
-        elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp,
-        cornerSize = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp,
+        cornerSize = if (coverType == PodcastCoverType.SMALL) 4.dp else 8.dp,
         modifier = modifier.size(coverWidth)
     )
 }
@@ -36,10 +35,17 @@ fun RectangleCover(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.surface,
     @DrawableRes imageResId: Int? = null,
-    coverSize: CoverSize = CoverSize.BIG,
 ) {
-    val elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
-    val cornerRadiusSize = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
+    val elevation = when {
+        coverWidth <= 50.dp -> 1.dp
+        coverWidth <= 200.dp -> 2.dp
+        else -> 4.dp
+    }
+    val cornerRadiusSize = when {
+        coverWidth <= 50.dp -> 2.dp
+        coverWidth <= 200.dp -> 4.dp
+        else -> 8.dp
+    }
     Card(
         elevation = elevation,
         shape = RoundedCornerShape(cornerRadiusSize),
@@ -66,7 +72,7 @@ fun Modifier.transformPodcastCover() =
         }
     }
 
-enum class CoverSize {
+enum class PodcastCoverType {
     SMALL,
     BIG
 }

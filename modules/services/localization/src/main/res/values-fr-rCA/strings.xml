@@ -6,23 +6,6 @@ Generator: GlotPress/2.4.0-alpha
 Language: fr_CA
 -->
 <resources>
-	<string name="onboarding_find_podcasts">Trouver des podcasts</string>
-	<string name="onboarding_welcome_recommendations_button">Trouver mon prochain podcast</string>
-	<string name="onboarding_welcome_recommendations_text">Découvrez des podcasts tendance et d’autres passés inaperçus sur notre page des découvertes sélectionnées avec soin.</string>
-	<string name="onboarding_welcome_recommendations_title">Découvrir quelque chose de nouveau</string>
-	<string name="onboarding_welcome_get_you_listening_plus">Merci. Maintenant, commencez à écouter du contenu !</string>
-	<string name="onboarding_welcome_get_you_listening">Merci. Maintenant, commencez à écouter du contenu !</string>
-	<string name="onboarding_plus_recurring_after_free_trial">Les paiements récurrents commenceront après que vous %s</string>
-	<string name="onboarding_plus_start_free_trial_and_subscribe">Commencer l’essai gratuit et s’abonner</string>
-	<string name="onboarding_plus_terms_and_conditions">Conditions générales</string>
-	<string name="onboarding_plus_privacy_policy">Politique de confidentialité</string>
-	<string name="onboarding_plus_continuing_agrees_to">En poursuivant, vous acceptez nos %1$s et notre %2$s.</string>
-	<string name="onboarding_plus_become_a_plus_member">Devenir un membre Plus et profiter de toutes les fonctionnalités de Pocket Casts</string>
-	<string name="onboarding_sign_up">S’inscrire</string>
-	<string name="onboarding_create_account">Créer un compte</string>
-	<string name="onboarding_log_in">Se connecter</string>
-	<string name="plus_trial_duration_free_trial">Essai gratuit %s</string>
-	<string name="end_of_year_stories_failed">Impossible de charger vos stories de fin d’année. Vérifiez votre connexion Internet.</string>
 	<string name="onboarding_plus_feature_themes_icons_text">Affichez vos véritables couleurs. Des icônes et des thèmes exclusifs pour le club Plus uniquement.</string>
 	<string name="onboarding_plus_feature_themes_icons_title">Thèmes et icônes</string>
 	<string name="onboarding_plus_feature_hide_ads_text">Une expérience sans publicité qui vous permet de profiter encore plus de ce que vous aimez et qui évite ce qui ne vous intéresse pas.</string>
@@ -53,7 +36,6 @@ Language: fr_CA
 	<string name="end_of_year_story_top_categories_share_text">Mes catégories de podcasts les plus écoutés</string>
 	<string name="end_of_year_story_top_categories">Vos meilleures catégories</string>
 	<string name="end_of_year_story_epilogue_subtitle">N’oubliez pas de partager avec vos amis et de mettre en lumière vos créateurs de podcasts préférés.</string>
-	<string name="end_of_year_story_epilogue_title">Merci d’avoir utilisé Pocket Casts pour écouter vos podcasts en 2022.</string>
 	<string name="end_of_year_story_longest_episode_share_text">L\'épisode le plus long que j\'ai écouté en 2022 %1$s</string>
 	<string name="end_of_year_story_longest_episode_duration">La durée de cet épisode était de %1$s</string>
 	<string name="end_of_year_story_longest_episode">L’épisode le plus long que vous avez écouté durait %1$s et provient du podcast %2$s</string>

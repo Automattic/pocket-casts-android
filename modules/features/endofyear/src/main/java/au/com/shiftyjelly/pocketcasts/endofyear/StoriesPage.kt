@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -203,13 +204,12 @@ private fun StoriesView(
                 }
                 CloseButtonView(onCloseClicked)
             }
-            if (state.currentStory.shareable) {
-                requireNotNull(onCaptureBitmap).let {
-                    ShareButton(
-                        onClick = { onShareClicked.invoke(it) },
-                    )
-                }
-            }
+        }
+        requireNotNull(onCaptureBitmap).let {
+            ShareButton(
+                onClick = { if (state.showShare) { onShareClicked.invoke(it) } },
+                modifier = modifier.alpha(if (state.showShare) 1f else 0f)
+            )
         }
     }
 }
@@ -261,7 +261,7 @@ private fun StorySharableContent(
 @Composable
 private fun ShareButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
 ) {
     RowOutlinedButton(
         text = stringResource(id = LR.string.share),

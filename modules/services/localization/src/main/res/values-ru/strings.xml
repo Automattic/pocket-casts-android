@@ -1,28 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-28 12:54:04+0000
+Translation-Revision-Date: 2022-11-23 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
-	<string name="onboarding_find_podcasts">Поиск подкастов</string>
-	<string name="onboarding_welcome_recommendations_button">Найти следующий подкаст</string>
-	<string name="onboarding_welcome_recommendations_text">На странице поиска мы собрали для вас набирающие обороты и уже популярные подкасты.</string>
-	<string name="onboarding_welcome_recommendations_title">Найдите для себя что-то новое</string>
-	<string name="onboarding_welcome_get_you_listening_plus">Спасибо. А теперь давайте что-нибудь послушаем!</string>
-	<string name="onboarding_welcome_get_you_listening">Добро пожаловать. Давайте что-нибудь послушаем!</string>
-	<string name="onboarding_plus_recurring_after_free_trial">Регулярные платежи начнут списываться, когда вы %s</string>
-	<string name="onboarding_plus_start_free_trial_and_subscribe">Начать бесплатный пробный период и подписаться</string>
-	<string name="onboarding_plus_terms_and_conditions">Условия предоставления услуг</string>
-	<string name="onboarding_plus_privacy_policy">Политику конфиденциальности</string>
-	<string name="onboarding_plus_continuing_agrees_to">Продолжая, вы принимаете %1$s и %2$s.</string>
-	<string name="onboarding_plus_become_a_plus_member">Станьте пользователем Plus и получите доступ ко всем возможностям Pocket Casts</string>
-	<string name="onboarding_sign_up">Регистрация</string>
-	<string name="onboarding_create_account">Создать учётную запись</string>
-	<string name="onboarding_log_in">Войти</string>
-	<string name="plus_trial_duration_free_trial">Бесплатный пробный период %s</string>
-	<string name="end_of_year_stories_failed">Не удаётся загрузить итоги года, проверьте подключение к Интернету</string>
 	<string name="onboarding_plus_feature_themes_icons_text">Покажите себя во всей красе. Эксклюзивные темы и значки только для членов клуба Plus.</string>
 	<string name="onboarding_plus_feature_themes_icons_title">Темы и значки</string>
 	<string name="onboarding_plus_feature_hide_ads_text">Без рекламы у вас будет больше того, что вам нравится, и меньше того, что вам не нравится.</string>
@@ -53,7 +36,6 @@ Language: ru
 	<string name="end_of_year_story_top_categories_share_text">Рубрики подкастов, которые я слушаю чаще всего</string>
 	<string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
 	<string name="end_of_year_story_epilogue_subtitle">Не забудьте поделиться с друзьями и рассказать о любимых подкастерах</string>
-	<string name="end_of_year_story_epilogue_title">Благодарим за использование Pocket Casts в 2022 году</string>
 	<string name="end_of_year_story_longest_episode_share_text">Самый продолжительный выпуск, прослушанный мною в 2022 году: %1$s</string>
 	<string name="end_of_year_story_longest_episode_duration">Этот выпуск длился %1$s</string>
 	<string name="end_of_year_story_longest_episode">Самым длинным выпуском, который вы слушали, был эпизод %1$s подкаста %2$s</string>
