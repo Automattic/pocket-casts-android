@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
+import au.com.shiftyjelly.pocketcasts.endofyear.components.disableScale
 import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -74,6 +75,7 @@ private fun Title(
         text = text,
         textAlign = TextAlign.Center,
         color = story.tintColor,
+        disableScale = disableScale(),
         modifier = modifier
             .padding(horizontal = 40.dp)
             .fillMaxWidth()
@@ -108,6 +110,7 @@ fun PodcastItem(
             text = "${position + 1}.",
             color = tintColor,
             fontWeight = FontWeight.Normal,
+            disableScale = disableScale(),
             modifier = modifier.padding(end = 14.dp)
         )
         Row(
@@ -129,6 +132,7 @@ fun PodcastItem(
                     color = tintColor,
                     maxLines = 2,
                     fontWeight = FontWeight.Bold,
+                    disableScale = disableScale(),
                     modifier = modifier
                         .padding(bottom = 3.dp)
                 )
@@ -137,6 +141,7 @@ fun PodcastItem(
                     color = tintColor,
                     maxLines = 1,
                     fontWeight = FontWeight.Bold,
+                    disableScale = disableScale(),
                     modifier = modifier.alpha(0.8f)
                 )
             }
