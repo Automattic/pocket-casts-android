@@ -62,7 +62,7 @@ fun ModalBottomSheet(
 }
 
 @OptIn(ExperimentalMaterialApi::class)
-fun hideBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
+private fun hideBottomSheet(coroutineScope: CoroutineScope, sheetState: ModalBottomSheetState) {
     coroutineScope.launch {
         sheetState.hide()
     }

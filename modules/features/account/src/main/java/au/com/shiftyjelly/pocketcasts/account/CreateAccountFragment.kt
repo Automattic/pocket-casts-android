@@ -105,7 +105,7 @@ class CreateAccountFragment : BaseFragment() {
                                         val res = LocalContext.current.resources
                                         val primaryText = stringResource(
                                             LR.string.plus_trial_duration_free,
-                                            subscription.trialPricingPhase.periodValue(res)
+                                            subscription.trialPricingPhase.periodValuePlural(res)
                                         )
                                         ProductAmountView(
                                             primaryText = primaryText,

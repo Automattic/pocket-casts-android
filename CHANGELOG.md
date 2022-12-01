@@ -1,6 +1,14 @@
-7.28
+7.29
 -----
 
+
+7.28
+-----
+*   Bug Fixes:
+    *   Fixed effects bottomsheet flickering to the expanded state while being dragged
+        ([#575](https://github.com/Automattic/pocket-casts-android/pull/575)).
+    *   Fixed miniplayer play icon animation on theme change
+        ([#527](https://github.com/Automattic/pocket-casts-android/pull/527)).
 
 7.27
 -----

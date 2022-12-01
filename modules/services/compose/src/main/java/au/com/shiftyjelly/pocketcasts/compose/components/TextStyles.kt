@@ -199,6 +199,7 @@ fun TextP50(
     maxLines: Int? = null,
     style: TextStyle? = null,
     textAlign: TextAlign? = null,
+    fontWeight: FontWeight? = null,
 ) {
     TextP50(
         text = AnnotatedString(text),
@@ -207,6 +208,7 @@ fun TextP50(
         maxLines = maxLines,
         style = style,
         textAlign = textAlign,
+        fontWeight = fontWeight,
     )
 }
 
@@ -218,6 +220,7 @@ fun TextP50(
     maxLines: Int? = null,
     style: TextStyle? = null,
     textAlign: TextAlign? = null,
+    fontWeight: FontWeight? = null,
 ) {
     Text(
         text = text,
@@ -228,6 +231,7 @@ fun TextP50(
         overflow = TextOverflow.Ellipsis,
         style = style ?: LocalTextStyle.current,
         textAlign = textAlign,
+        fontWeight = fontWeight,
         modifier = modifier
     )
 }
@@ -238,7 +242,8 @@ fun TextP60(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.theme.colors.primaryText01,
     textAlign: TextAlign? = null,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    fontWeight: FontWeight? = null,
 ) {
     Text(
         text = text,
@@ -249,6 +254,7 @@ fun TextP60(
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
+        fontWeight = fontWeight,
         modifier = modifier
     )
 }

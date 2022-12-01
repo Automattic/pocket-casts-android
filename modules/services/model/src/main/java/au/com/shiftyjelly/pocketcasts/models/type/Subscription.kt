@@ -37,7 +37,7 @@ sealed interface Subscription {
             }
             return res.getString(
                 stringRes,
-                trialPricingPhase.periodValue(res),
+                trialPricingPhase.periodValuePlural(res),
                 recurringPricingPhase.formattedPrice
             )
         }

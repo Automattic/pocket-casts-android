@@ -116,7 +116,7 @@ class AccountDetailsFragment : BaseFragment() {
                                             subscription.recurringPricingPhase.pricePerPeriod(resources)
                                         )
                                         is Subscription.WithTrial -> UserUpgradeViewData.WithTrial(
-                                            numFree = subscription.trialPricingPhase.numFree(resources),
+                                            numFree = subscription.trialPricingPhase.numPeriodFree(resources),
                                             thenPriceSlashPeriod = subscription.recurringPricingPhase.thenPriceSlashPeriod(resources),
                                         )
                                     },
