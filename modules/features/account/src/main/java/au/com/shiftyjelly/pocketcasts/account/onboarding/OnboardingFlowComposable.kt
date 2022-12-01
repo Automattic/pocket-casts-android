@@ -7,17 +7,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
+    completeOnboardingToDiscover: () -> Unit,
     abortOnboarding: () -> Unit,
-    analyticsTracker: AnalyticsTrackerWrapper
+    analyticsTracker: AnalyticsTrackerWrapper,
+    signInState: SignInState?
 ) {
     AppThemeWithBackground(activeTheme) {
         val navController = rememberNavController()
@@ -49,7 +53,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, AnalyticsProp.source)
                         completeOnboarding()
                     },
-                    onSignUpFreeClicked = {
+                    onSignUpClicked = {
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.createAccount)
                         navController.navigate(OnboardingNavRoute.createFreeAccount)
                     },
@@ -73,8 +77,8 @@ fun OnboardingFlowComposable(
                         navController.popBackStack()
                     },
                     onAccountCreated = {
-                        navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack when opening recommendations
+                        navController.navigate(OnboardingNavRoute.recommendationsFlow) {
+                            // clear backstack after account is created
                             popUpTo(OnboardingNavRoute.logInOrSignUp) {
                                 inclusive = true
                             }
@@ -90,14 +94,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SIGNIN_DISMISSED)
                         navController.popBackStack()
                     },
-                    onLoginComplete = {
-                        navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack when opening recommendations
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                                inclusive = true
-                            }
-                        }
-                    },
+                    onLoginComplete = completeOnboarding,
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
             }
@@ -117,31 +114,47 @@ fun OnboardingFlowComposable(
                 )
             }
 
-            composable(OnboardingNavRoute.recommendations) {
-                OnboardingRecommendations(
+            composable(OnboardingNavRoute.recommendationsFlow) {
+                OnboardingRecommendationsFlow(
                     onShown = {
                         analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN)
                     },
                     onBackPressed = {
                         analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
-                        navController.popBackStack()
+                        completeOnboarding()
                     },
                     onComplete = {
-                        // TODO analytics
-                        navController.navigate(OnboardingNavRoute.plusFeatures)
+                        navController.navigate(
+                            if (signInState?.isSignedInAsPlus == false) {
+                                OnboardingNavRoute.plusUpgrade
+                            } else {
+                                OnboardingNavRoute.welcome
+                            }
+                        )
                     }
                 )
             }
 
-            composable(OnboardingNavRoute.plusFeatures) {
-                OnboardingPlusFeaturesPage(
-                    onShown = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_SHOWN) },
-                    onBackPressed = {
-                        analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_DISMISSED)
-                        navController.popBackStack()
+            composable(OnboardingNavRoute.plusUpgrade) {
+                OnboardingPlusUpgradeFlow(
+                    onBackPressed = { navController.popBackStack() },
+                    onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
+                    onCompleteUpgrade = {
+                        navController.navigate(OnboardingNavRoute.welcome) {
+                            // Don't allow navigation back to the upgrade screen after the user upgrades
+                            popUpTo(OnboardingNavRoute.plusUpgrade) {
+                                inclusive = true
+                            }
+                        }
                     },
-                    onUpgradePressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED) },
-                    onNotNowPressed = { analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_NOT_NOW_TAPPED) }
+                )
+            }
+            composable(OnboardingNavRoute.welcome) {
+                OnboardingWelcomePage(
+                    isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
+                    onContinue = completeOnboarding,
+                    onContinueToDiscover = completeOnboardingToDiscover,
+                    onBackPressed = { navController.popBackStack() },
                 )
             }
         }
@@ -164,6 +177,7 @@ private object OnboardingNavRoute {
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
     const val forgotPassword = "forgot_password"
-    const val recommendations = "recommendations"
-    const val plusFeatures = "upgrade_features"
+    const val recommendationsFlow = "recommendationsFlow"
+    const val plusUpgrade = "upgrade_upgrade"
+    const val welcome = "welcome"
 }

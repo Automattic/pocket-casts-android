@@ -107,7 +107,7 @@ internal fun OnboardingLoginPage(
             Spacer(Modifier.height(16.dp))
 
             RowButton(
-                text = stringResource(LR.string.log_in),
+                text = stringResource(LR.string.onboarding_log_in),
                 enabled = state.enableSubmissionFields,
                 onClick = { viewModel.logIn(onLoginComplete) },
             )

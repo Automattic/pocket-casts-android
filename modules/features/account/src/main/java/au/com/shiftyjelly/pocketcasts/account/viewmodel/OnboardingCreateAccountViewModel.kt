@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -40,10 +39,6 @@ class OnboardingCreateAccountViewModel @Inject constructor(
         _stateFlow.update { it.copy(password = password) }
     }
 
-    fun updateNewsletter(isChecked: Boolean) {
-        _stateFlow.update { it.copy(newsletter = isChecked) }
-    }
-
     fun createAccount(onAccountCreated: () -> Unit) {
         _stateFlow.update { it.copy(hasAttemptedLogIn = true) }
 
@@ -69,7 +64,6 @@ class OnboardingCreateAccountViewModel @Inject constructor(
                 is AccountAuth.AuthResult.Success -> {
                     analyticsTracker.refreshMetadata()
                     onAccountCreated()
-                    persistNewsletterSelection()
                 }
 
                 is AccountAuth.AuthResult.Failed -> {
@@ -83,34 +77,12 @@ class OnboardingCreateAccountViewModel @Inject constructor(
             }
         }
     }
-
-    private fun persistNewsletterSelection() {
-        val newsletter = stateFlow.value.newsletter
-        analyticsTracker.track(
-            AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
-            mapOf(
-                AnalyticsProp.SOURCE to NewsletterSource.ACCOUNT_CREATED.analyticsValue,
-                AnalyticsProp.ENABLED to newsletter
-            )
-        )
-
-        settings.setMarketingOptIn(newsletter)
-        settings.setMarketingOptInNeedsSync(true)
-    }
-
-    companion object {
-        private object AnalyticsProp {
-            const val SOURCE = "source"
-            const val ENABLED = "enabled"
-        }
-    }
 }
 
 data class OnboardingCreateAccountState(
     val email: String = "",
     private val hasAttemptedLogIn: Boolean = false,
     private val isCallInProgress: Boolean = false,
-    val newsletter: Boolean = true,
     val password: String = "",
     val serverErrorMessage: String? = null,
 ) {

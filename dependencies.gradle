@@ -75,6 +75,7 @@ project.ext {
     settingsEncryptSecret = secretProperties.getProperty("pocketcastsSettingsEncryptSecret", "")
     sharingServerSecret = secretProperties.getProperty("pocketcastsSharingServerSecret", "")
     pocketcastsSentryDsn = secretProperties.getProperty("pocketcastsSentryDsn", "")
+    googleSignInServerClientId = secretProperties.getProperty("googleSignInServerClientId", "")
 
     // Library versions
     versionBillingClient = '5.0.0'
@@ -100,6 +101,7 @@ project.ext {
 
     androidLibs = [
             appCompat: "androidx.appcompat:appcompat:1.5.0",
+            auth: "com.google.android.gms:play-services-auth:20.4.0",
             mediarouter: "androidx.mediarouter:mediarouter:1.3.1",
             palette: "androidx.palette:palette:1.0.0",
             recyclerview: "androidx.recyclerview:recyclerview:1.2.1",
@@ -174,8 +176,10 @@ project.ext {
             kotlin: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
             kotlinCoroutines: "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versionKotlinCoroutines",
             kotlinCoroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versionKotlinCoroutines",
+            kotlinCoroutinesPlayServices: "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$versionKotlinCoroutines",
             kotlinCoroutinesRx: "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$versionKotlinCoroutines",
             kotlinCoroutinesTest: "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versionKotlinCoroutines",
+
             // Retrofit
             retrofit: "com.squareup.retrofit2:retrofit:$versionRetrofit",
             retrofitMoshi: "com.squareup.retrofit2:converter-moshi:$versionRetrofit",
