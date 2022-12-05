@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -32,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContr
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
@@ -202,7 +202,9 @@ class MainActivity :
         lifecycleScope.launchWhenCreated {
             val isEligible = viewModel.isEndOfYearStoriesEligible()
             if (isEligible) {
-                showEndOfYearLaunchBottomSheet()
+                if (!settings.getEndOfYearModalHasBeenShown()) {
+                    setupEndOfYearLaunchBottomSheet()
+                }
                 if (settings.getEndOfYearShowBadge2022()) {
                     binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                 }
@@ -505,23 +507,28 @@ class MainActivity :
         showBottomSheet(UpNextFragment.newInstance(source = source))
     }
 
-    private fun showEndOfYearLaunchBottomSheet() {
-        binding.modalBottomSheet.setContent {
-            AppTheme(theme.activeTheme) {
-                val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
-                EndOfYearLaunchBottomSheet(
-                    shouldShow = shouldShow,
-                    onClick = {
-                        showStoriesOrAccount(StoriesSource.MODAL.value)
-                    },
-                    onExpanded = {
-                        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
-                        settings.setEndOfYearModalHasBeenShown(true)
-                        viewModel.updateStoriesModalShowState(false)
-                    }
-                )
+    private fun setupEndOfYearLaunchBottomSheet() {
+        val viewGroup = binding.modalBottomSheet
+        viewGroup.removeAllViews()
+        viewGroup.addView(
+            ComposeView(viewGroup.context).apply {
+                setContent {
+                    val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
+                    EndOfYearLaunchBottomSheet(
+                        parent = viewGroup,
+                        shouldShow = shouldShow,
+                        onClick = {
+                            showStoriesOrAccount(StoriesSource.MODAL.value)
+                        },
+                        onExpanded = {
+                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
+                            settings.setEndOfYearModalHasBeenShown(true)
+                            viewModel.updateStoriesModalShowState(false)
+                        }
+                    )
+                }
             }
-        }
+        )
     }
 
     override fun showStoriesOrAccount(source: String) {
@@ -599,6 +606,7 @@ class MainActivity :
                     viewModel.waitingForSignInToShowStories = false
                 } else if (!settings.getEndOfYearModalHasBeenShown()) {
                     viewModel.updateStoriesModalShowState(true)
+                    setupEndOfYearLaunchBottomSheet()
                 }
             }
 
