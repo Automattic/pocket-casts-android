@@ -1496,6 +1496,9 @@
     <string name="onboarding_welcome_recommendations_text">Find under-the-radar and trending podcasts in our hand-curated Discover page.</string>
     <string name="onboarding_welcome_recommendations_button">Find My Next Podcast</string>
     <string name="onboarding_find_podcasts">Find Podcasts</string>
+    <string name="onboarding_import_podcasts_title">Import your podcasts</string>
+    <string name="onboarding_import_podcasts_text">Coming from another app? Bring your podcasts with you.</string>
+    <string name="onboarding_import_podcasts_button">Import Podcasts</string>
 
     <!--    Tasker Plugin-->
 

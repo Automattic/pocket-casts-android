@@ -53,6 +53,7 @@ fun OnboardingWelcomePage(
     isSignedInAsPlus: Boolean,
     onContinue: () -> Unit,
     onContinueToDiscover: () -> Unit,
+    onImportTapped: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
 
@@ -78,6 +79,7 @@ fun OnboardingWelcomePage(
     Content(
         isSignedInAsPlus = isSignedInAsPlus,
         onContinueToDiscover = onContinueToDiscover,
+        onImportTapped = onImportTapped,
         state = state,
         onContinue = onContinue,
         onNewsletterCheckedChanged = viewModel::updateNewsletter
@@ -88,9 +90,10 @@ fun OnboardingWelcomePage(
 private fun Content(
     isSignedInAsPlus: Boolean,
     onContinueToDiscover: () -> Unit,
+    onImportTapped: () -> Unit,
     state: OnboardingWelcomeState,
     onContinue: () -> Unit,
-    onNewsletterCheckedChanged: (Boolean) -> Unit
+    onNewsletterCheckedChanged: (Boolean) -> Unit,
 ) {
     Column(Modifier.padding(horizontal = 24.dp)) {
         Spacer(modifier = Modifier.weight(1f))
@@ -111,6 +114,15 @@ private fun Content(
                 }
             ),
             modifier = Modifier.padding(end = 8.dp)
+        )
+
+        Spacer(Modifier.height(24.dp))
+        CardSection(
+            titleRes = LR.string.onboarding_import_podcasts_title,
+            descriptionRes = LR.string.onboarding_import_podcasts_text,
+            actionRes = LR.string.onboarding_import_podcasts_button,
+            iconRes = IR.drawable.pc_bw_import,
+            onClick = onImportTapped
         )
 
         Spacer(Modifier.height(24.dp))
@@ -277,6 +289,7 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
         OnboardingWelcomePage(
             onContinue = {},
             onContinueToDiscover = {},
+            onImportTapped = {},
             onBackPressed = {},
             isSignedInAsPlus = false
         )
@@ -288,12 +301,13 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
 private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         Content(
-            onContinue = {},
-            onContinueToDiscover = {},
             isSignedInAsPlus = true,
+            onContinueToDiscover = {},
+            onImportTapped = {},
             state = OnboardingWelcomeState(
                 newsletter = false
             ),
+            onContinue = {},
             onNewsletterCheckedChanged = {},
         )
     }
