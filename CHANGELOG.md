@@ -1,6 +1,8 @@
 7.29
 -----
-
+*   Bug Fixes:
+    *   Fix unable to permanently change "Skip back time" setting
+        ([#632](https://github.com/Automattic/pocket-casts-android/pull/632)).
 
 7.28
 -----
