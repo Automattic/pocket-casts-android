@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +34,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingRecommendationsStartPage(
+    onShown: () -> Unit,
     onSearch: () -> Unit,
+    onBackPressed: () -> Unit,
     onComplete: () -> Unit,
 ) {
+
+    LaunchedEffect(Unit) { onShown() }
+    BackHandler { onBackPressed() }
+
     Column(
         Modifier
             .fillMaxHeight()
@@ -96,6 +104,8 @@ private fun Preview(
     AppThemeWithBackground(themeType) {
         OnboardingRecommendationsStartPage(
             onSearch = {},
+            onShown = {},
+            onBackPressed = {},
             onComplete = {},
         )
     }

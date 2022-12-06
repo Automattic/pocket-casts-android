@@ -1,42 +1,41 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.compose.NavHost
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingRecommendationsStartPage
 
-@Composable
-fun OnboardingRecommendationsFlow(
-    onShown: () -> Unit,
-    onBackPressed: () -> Unit,
-    onComplete: () -> Unit,
-) {
+object OnboardingRecommendationsFlow {
 
-    LaunchedEffect(Unit) { onShown() }
-    BackHandler { onBackPressed() }
+    const val route = "onboardingRecommendationsFlow"
 
-    val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = OnboardingRecommendationsNavRoute.start
+    private const val start = "start"
+    private const val search = "search"
+
+    fun NavGraphBuilder.onboardingRecommendationsFlowGraph(
+        onShown: () -> Unit,
+        onBackPressed: () -> Unit,
+        onComplete: () -> Unit,
+        navController: NavController,
     ) {
-        composable(OnboardingRecommendationsNavRoute.start) {
-            OnboardingRecommendationsStartPage(
-                onSearch = { navController.navigate(OnboardingRecommendationsNavRoute.search) },
-                onComplete = onComplete,
-            )
-        }
-        composable(OnboardingRecommendationsNavRoute.search) {
-            OnboardingRecommendationsSearchPage(
-                onBackPressed = { navController.popBackStack() },
-            )
+        navigation(
+            route = this@OnboardingRecommendationsFlow.route,
+            startDestination = start
+        ) {
+            composable(start) {
+                OnboardingRecommendationsStartPage(
+                    onShown = onShown,
+                    onSearch = { navController.navigate(search) },
+                    onBackPressed = onBackPressed,
+                    onComplete = onComplete,
+                )
+            }
+            composable(search) {
+                OnboardingRecommendationsSearchPage(
+                    onBackPressed = { navController.popBackStack() },
+                )
+            }
         }
     }
-}
-private object OnboardingRecommendationsNavRoute {
-    const val start = "start"
-    const val search = "search"
 }
