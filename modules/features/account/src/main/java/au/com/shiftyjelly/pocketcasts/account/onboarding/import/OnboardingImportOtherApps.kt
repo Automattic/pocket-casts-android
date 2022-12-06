@@ -14,16 +14,16 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun OnboardingImportCastbox(
-    onBackPressed: () -> Unit
+fun OnboardingImportOtherApps(
+    onBackPressed: () -> Unit,
 ) {
     Column {
 
@@ -34,42 +34,35 @@ fun OnboardingImportCastbox(
         Column(Modifier.padding(horizontal = 24.dp)) {
 
             Image(
-                painter = painterResource(IR.drawable.castbox),
+                painter = painterResource(IR.drawable.other_apps),
                 contentDescription = null,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
-            TextH10(stringResource(LR.string.onboarding_import_from_castbox))
+            TextH10(stringResource(LR.string.onboarding_import_from_other_apps))
+
+            Spacer(Modifier.height(16.dp))
+            TextP40(stringResource(LR.string.onboarding_can_import_from_opml))
 
             Spacer(Modifier.height(16.dp))
             NumberedList(
-                stringResource(LR.string.onboarding_import_from_castbox_step_1),
-                stringResource(LR.string.onboarding_import_from_castbox_step_2),
-                stringResource(LR.string.onboarding_import_from_castbox_step_3),
-                stringResource(LR.string.onboarding_import_from_castbox_step_4),
-                stringResource(LR.string.onboarding_import_from_castbox_step_5),
-                stringResource(LR.string.onboarding_import_from_castbox_step_6),
-                stringResource(LR.string.onboarding_import_from_castbox_step_7),
+                stringResource(LR.string.onboarding_import_from_other_apps_step_1),
+                stringResource(LR.string.onboarding_import_from_other_apps_step_2),
+                stringResource(LR.string.onboarding_import_from_other_apps_step_3),
             )
         }
-
         Spacer(Modifier.weight(1f))
-
-        RowButton(
-            text = stringResource(LR.string.onboarding_import_from_castbox_open),
-            onClick = {},
-        )
     }
 }
 
 @Preview
 @Composable
-fun OnboardingImportCastboxPreview(
+private fun OnboardingImportOtherAppsPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        OnboardingImportCastbox(
-            onBackPressed = {}
+        OnboardingImportOtherApps(
+            onBackPressed = {},
         )
     }
 }
