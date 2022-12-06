@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.import
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -65,13 +66,15 @@ fun NumberedList(vararg texts: String) {
             // Number
             TextP40(
                 text = "${index + 1}.",
-                modifier = Modifier.constrainAs(numberRef) {
-                    top.linkTo(
-                        anchor = if (index == 0) parent.top else textRefs[index - 1].bottom,
-                        margin = if (index == 0) 0.dp else 12.dp
-                    )
-                    start.linkTo(parent.start)
-                }
+                modifier = Modifier
+                    .clearAndSetSemantics {} // ignore for accessibility
+                    .constrainAs(numberRef) {
+                        top.linkTo(
+                            anchor = if (index == 0) parent.top else textRefs[index - 1].bottom,
+                            margin = if (index == 0) 0.dp else 12.dp
+                        )
+                        start.linkTo(parent.start)
+                    }
             )
 
             // Indented text
