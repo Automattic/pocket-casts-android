@@ -1508,12 +1508,10 @@
     <string name="onboarding_import_from_castbox_step_3">Tap “Settings”.</string>
     <string name="onboarding_import_from_castbox_step_4">Scroll down to \“OPML Export\” and tap it.</string>
     <string name="onboarding_import_from_castbox_step_5">@string/onboarding_import_from_other_apps_step_2</string>
-    <string name="onboarding_import_from_castbox_step_6">@string/onboarding_import_from_other_apps_step_3</string>
     <string name="onboarding_import_from_castbox_open">Open Castbox&#8230;</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts can import podcasts from OPML files, so if your current app can export an OPML file, you can follow these steps:</string>
     <string name="onboarding_import_from_other_apps_step_1">Find the other app\’s export option and export an OPML file.</string>
-    <string name="onboarding_import_from_other_apps_step_2">Use your phone\’s \“Share\” menu to send the file to Pocket Casts.</string>
-    <string name="onboarding_import_from_other_apps_step_3">Alternatively, import the file from Pocket Casts\’ \“Import &amp; export OPML\” settings menu.</string>
+    <string name="onboarding_import_from_other_apps_step_2">Use your phone\’s \“Share\” menu to send the file to Pocket Casts. Alternatively, import the file from Pocket Casts\’ \“Import &amp; export OPML\” settings menu.</string>
 
     <!--    Tasker Plugin-->
 

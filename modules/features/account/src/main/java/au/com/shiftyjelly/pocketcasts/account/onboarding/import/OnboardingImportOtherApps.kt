@@ -48,7 +48,6 @@ fun OnboardingImportOtherApps(
             NumberedList(
                 stringResource(LR.string.onboarding_import_from_other_apps_step_1),
                 stringResource(LR.string.onboarding_import_from_other_apps_step_2),
-                stringResource(LR.string.onboarding_import_from_other_apps_step_3),
             )
         }
         Spacer(Modifier.weight(1f))
