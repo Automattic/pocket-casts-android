@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.account.onboarding
+package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import android.content.res.Resources
 import android.view.ViewTreeObserver
@@ -38,10 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.PlusRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.UnselectedPlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.plusGradientBrush
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.UnselectedPlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill

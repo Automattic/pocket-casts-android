@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.account.onboarding
+package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import android.os.Build
 import androidx.annotation.DrawableRes
@@ -47,8 +47,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingPlusFeatures.PlusRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
