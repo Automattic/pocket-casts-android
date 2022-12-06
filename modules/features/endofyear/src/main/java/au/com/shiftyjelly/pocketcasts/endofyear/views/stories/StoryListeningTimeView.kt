@@ -1,41 +1,34 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views.stories
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.endofyear.R
-import au.com.shiftyjelly.pocketcasts.endofyear.util.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.compose.components.CoverSize
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
+import au.com.shiftyjelly.pocketcasts.compose.components.transformPodcastCover
+import au.com.shiftyjelly.pocketcasts.endofyear.components.PodcastLogoWhite
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StoryPrimaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.components.StorySecondaryText
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.podcastDynamicBackground
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryListeningTime
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsHelper
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -44,76 +37,64 @@ fun StoryListeningTimeView(
     story: StoryListeningTime,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-
-    val timeText = StatsHelper.secondsToFriendlyString(story.listeningTimeInSecs, context.resources)
-    val funnyText = FunnyTimeConverter().timeSecsToFunnyText(
-        story.listeningTimeInSecs,
-        context.resources
-    )
-
-    val backgroundColor = story.podcasts[0].toPodcast().getTintColor(false)
-
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .background(color = Color(backgroundColor))
+            .podcastDynamicBackground(story.podcasts[0].toPodcast())
             .verticalScroll(rememberScrollState())
     ) {
         Spacer(modifier = modifier.height(40.dp))
 
         Spacer(modifier = modifier.weight(.75f))
 
-        Title(timeText, story, modifier)
+        PrimaryText(story, modifier)
 
-        FunnyText(funnyText, story, modifier)
+        Spacer(modifier = modifier.weight(0.25f))
 
-        Spacer(modifier = modifier.weight(1f))
+        SecondaryText(story, modifier)
+
+        Spacer(modifier = modifier.weight(0.25f))
 
         PodcastCoverRow(story, modifier)
 
-        Spacer(modifier = modifier.weight(1f))
+        Spacer(modifier = modifier.weight(.5f))
 
-        Logo()
+        PodcastLogoWhite()
 
-        Spacer(modifier = modifier.height(40.dp))
+        Spacer(modifier = modifier.height(30.dp))
     }
 }
 
 @Composable
-private fun Title(
-    timeText: String,
+private fun PrimaryText(
     story: StoryListeningTime,
     modifier: Modifier,
 ) {
-    TextH20(
-        text = stringResource(LR.string.end_of_year_listening_time, timeText),
-        textAlign = TextAlign.Center,
-        color = story.tintColor,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 40.dp, end = 40.dp)
-    )
+    val context = LocalContext.current
+    val language = Locale.current.language
+    val timeText = StatsHelper.secondsToFriendlyString(story.listeningTimeInSecs, context.resources)
+    val textResId = if (language == "en") {
+        LR.string.end_of_year_listening_time_english_only
+    } else {
+        LR.string.end_of_year_listening_time
+    }
+    val text = stringResource(textResId, timeText)
+    StoryPrimaryText(text = text, color = story.tintColor, modifier = modifier)
 }
 
 @Composable
-private fun FunnyText(
-    funnyText: String,
+private fun SecondaryText(
     story: StoryListeningTime,
     modifier: Modifier,
 ) {
-    TextP40(
-        text = funnyText,
-        textAlign = TextAlign.Center,
-        color = story.tintColor,
-        fontWeight = FontWeight.Bold,
-        modifier = modifier
-            .fillMaxWidth()
-            .alpha(0.8f)
-            .padding(top = 24.dp, start = 40.dp, end = 40.dp)
+    val context = LocalContext.current
+    val funnyText = FunnyTimeConverter().timeSecsToFunnyText(
+        story.listeningTimeInSecs,
+        context.resources
     )
+    StorySecondaryText(text = funnyText, color = story.tintColor, modifier = modifier)
 }
 
 @Composable
@@ -124,30 +105,26 @@ private fun PodcastCoverRow(
     val context = LocalContext.current
     val currentLocalView = LocalView.current
     val coverWidth = (currentLocalView.width.pxToDp(context).dp - 15.dp) / 3
-    val translateBy = 20.dpToPx(context).toFloat()
-    Row(
-        modifier
-            .transformPodcastCover()
-            .graphicsLayer(translationX = -translateBy)
+    Box(
+        modifier = modifier
+            .graphicsLayer { translationY = coverWidth.toPx() / 1.75f }
+            .height(coverWidth * 2.2f)
     ) {
-        listOf(1, 0, 2).forEach { index ->
-            val podcastIndex = index.coerceAtMost(story.podcasts.size - 1)
-            Row {
-                PodcastImage(
-                    uuid = story.podcasts[podcastIndex].uuid,
-                    dropShadow = false,
-                    modifier = modifier.size(coverWidth)
-                )
-                Spacer(modifier = modifier.width(5.dp))
+        Row(
+            modifier
+                .transformPodcastCover()
+        ) {
+            listOf(1, 0, 2).forEach { index ->
+                val podcastIndex = index.coerceAtMost(story.podcasts.size - 1)
+                Row {
+                    PodcastCover(
+                        uuid = story.podcasts[podcastIndex].uuid,
+                        coverWidth = coverWidth,
+                        coverSize = CoverSize.SMALL
+                    )
+                    Spacer(modifier = modifier.width(5.dp))
+                }
             }
         }
     }
-}
-
-@Composable
-fun Logo() {
-    Image(
-        painter = painterResource(R.drawable.logo_white),
-        contentDescription = null,
-    )
 }

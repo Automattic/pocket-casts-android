@@ -55,7 +55,6 @@
     <string name="select_all_below">Select all below</string>
     <string name="share_podcast">Share podcast</string>
     <string name="show_archived">Show archived</string>
-    <string name="log_in">Log in</string>
     <string name="sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
@@ -886,6 +885,7 @@
     <string name="plus_learn_more_button">Learn More</string>
     <string name="plus_lifetime_member">Lifetime Member</string>
     <string name="plus_trial_duration_free">%s FREE</string>
+    <string name="plus_trial_duration_free_trial">%s free trial</string>
     <string name="plus_per_month">%s per month</string>
     <string name="plus_per_year">%s per year</string>
     <string name="plus_slash_month">%s / month</string>
@@ -1035,6 +1035,8 @@
     <string name="settings_notification_vibrate_new_episodes">New episodes</string>
     <string name="settings_notification_vibrate_in_silent">Only in silent mode</string>
     <string name="settings_notification_vibrate_never">New episodes</string>
+    <string name="settings_open_player_automatically">Open Player Automatically</string>
+    <string name="settings_open_player_automatically_summary">If on, the full-screen player will open when you start playing a podcast episode.</string>
     <string name="settings_playback_resumption">Intelligent playback resumption</string>
     <string name="settings_playback_resumption_summary">If on, Pocket Casts will go back a little in episodes you resume so you can catch up more comfortably.</string>
     <string name="settings_podcast_artwork">Podcast Artwork</string>
@@ -1395,24 +1397,28 @@
     <string name="end_of_year_launch_modal_title">Your Year in Podcasts</string>
     <string name="end_of_year_launch_modal_image_title">Year in Podcasts</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
-    <string name="end_of_year_launch_modal_primary_button_title">View my 2022</string>
+    <string name="end_of_year_launch_modal_primary_button_title">View My 2022</string>
     <string name="end_of_year_launch_modal_secondary_button_title">Not Now</string>
     <string name="end_of_year_prompt_card_title" translatable="false">@string/end_of_year_launch_modal_title</string>
     <string name="end_of_year_prompt_card_summary">See your top podcasts, categories, listening stats and more.</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_listening_time">In 2022, you spent %1$s listening to podcasts.</string>
+    <string name="end_of_year_listening_time_english_only" translatable="false">In 2022, you spent\n%1$s\nlistening to podcasts.</string>
     <string name="end_of_year_replay">Replay</string>
-    <string name="end_of_year_story_intro_title">Let\'s celebrate your year of listening…</string>
+    <string name="end_of_year_story_intro_title">Let’s celebrate your year of listening!</string>
+    <string name="end_of_year_story_intro_title_english_only" translatable="false">Let’s celebrate your year\nof listening!</string>
     <!-- Text that appears when someone shares the listened to story to Twitter, for example. %1$s is a placeholder for the amount of time. -->
     <string name="end_of_year_story_listened_to_share_text">I spent %1$s listening to podcasts in 2022</string>
     <!-- String telling the user how much podcast categories they listened to podcasts in 2022, %1$d is a placeholder for the number of categories. -->
     <string name="end_of_year_story_listened_to_categories">You listened to %1$d different categories this year</string>
+    <string name="end_of_year_story_listened_to_categories_english_only" translatable="false">You listened to\n%1$d different categories\nthis year</string>
     <!-- String prompting the user for the next story to check the most listened categories. -->
-    <string name="end_of_year_story_listened_to_categories_subtitle">Let\'s take a look at some of your favorites…</string>
+    <string name="end_of_year_story_listened_to_categories_subtitle">Let’s take a look at some of your favorites…</string>
     <!-- Text that appears when someone shares the listened categories to story to Twitter, for example. %1$d is a placeholder for the number of categories. -->
     <string name="end_of_year_story_listened_to_categories_share_text">I listened to %1$d different categories in 2022</string>
     <!-- String telling the user how much podcasts and episodes they listened to this year, %1$d is a placeholder for the number of podcasts and %2$d is a placeholder fo the number of episodes. -->
     <string name="end_of_year_story_listened_to_numbers">You listened to %1$d different podcasts and %2$d episodes</string>
+    <string name="end_of_year_story_listened_to_numbers_english_only" translatable="false">You listened to\n%1$d different podcasts\nand %2$d episodes</string>
     <!-- Subtitle for the story containing number of podcasts and episodes played this year. Segway for the next story. -->
     <string name="end_of_year_story_listened_to_numbers_subtitle">But there was one that you kept coming back to…</string>
     <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. -->
@@ -1436,9 +1442,9 @@
     <!-- Text that appear when someone share the longest episode they listened to story to Twitter. %1$s is the URL to the episode. -->
     <string name="end_of_year_story_longest_episode_share_text">The longest episode I listened to in 2022 %1$s</string>
     <!-- Title for the epilogue story -->
-    <string name="end_of_year_story_epilogue_title">Thank you for letting Pocket Casts be a part of your listening experience in 2022</string>
+    <string name="end_of_year_story_epilogue_title">Thank you for letting Pocket&#160;Casts be a part of your listening experience in 2022</string>
     <!-- Subtitle for the epilogue story -->
-    <string name="end_of_year_story_epilogue_subtitle">Don\'t forget to share with your friends and give a shout out to your favorite podcast creators</string>
+    <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favorite podcast creators</string>
     <!-- Title of the top categories story. -->
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
     <!-- Text that appear when someone share the top categories story to Twitter. -->
@@ -1446,19 +1452,50 @@
     <!-- Description to why the user needs to create an account to see their end of year stats. -->
     <string name="end_of_year_create_account_to_see">Save your podcasts in the cloud, get your end of year review and sync your progress with other devices.</string>
     <!-- When loading the End of Year stats stories fails. -->
-    <string name="end_of_year_stories_failed">Failed to load stories.</string>
+    <string name="end_of_year_stories_failed">Unable to load your end of year stories, check your internet connection.</string>
 
     <!-- Onboarding -->
 
-    <string name="onboarding_welcome_back">Welcome back</string>
-    <string name="onboarding_not_now">Not now</string>
-    <string name="onboarding_sign_up_free">Sign up free</string>
+    <string name="onboarding_welcome_back">Welcome Back</string>
+    <string name="not_now">Not Now</string>
+    <string name="onboarding_log_in">Log in</string>
+    <string name="onboarding_create_account">Create Account</string>
+    <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
+    <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
     <string name="onboarding_get_the_newsletter">Get the newsletter</string>
     <string name="onboarding_forgot_password">Forgot password?</string>
     <string name="onboarding_email_invalid_message">Please enter a valid email</string>
+    <string name="onboarding_recommendations_find_favorite_podcasts">Find your favorite podcasts</string>
+    <string name="onboarding_recommendations_make_pocket_casts_yours">Make Pocket Casts yours by selecting your favorite podcasts or import them from another podcast player. You can always do this later.</string>
+    <string name="onboarding_recommendations_import">Import</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket Casts, plus more</string>
+    <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customization options</string>
+    <string name="onboarding_upgrade_unlock_all_features">Unlock All Features</string>
+    <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
+    <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
+    <string name="onboarding_plus_feature_folders_title">Folders</string>
+    <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
+    <string name="onboarding_plus_feature_cloud_storage_title">10GB Cloud Storage</string>
+    <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
+    <string name="onboarding_plus_feature_hide_ads_title">Hide Ads</string>
+    <string name="onboarding_plus_feature_hide_ads_text">Ad-free experience which gives you more of what you love and less of what you don\'t.</string>
+    <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
+    <string name="onboarding_plus_feature_themes_icons_text">Fly your true colors. Exclusive icons and themes for the Plus club only.</string>
+    <string name="onboarding_plus_become_a_plus_member">Become a Plus member and unlock all Pocket&#160;Casts features</string>
+    <string name="onboarding_plus_continuing_agrees_to">By continuing, you agree to our %1$s and %2$s.</string>
+    <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
+    <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
+    <string name="onboarding_plus_start_free_trial_and_subscribe">Start Free Trial &amp; Subscribe</string>
+    <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
+    <string name="onboarding_welcome_get_you_listening">Welcome, now let\'s get you listening!</string>
+    <string name="onboarding_welcome_get_you_listening_plus">Thank you, now let\'s get you listening!</string>
+    <string name="onboarding_welcome_recommendations_title">Discover something new</string>
+    <string name="onboarding_welcome_recommendations_text">Find under-the-radar and trending podcasts in our hand-curated Discover page.</string>
+    <string name="onboarding_welcome_recommendations_button">Find My Next Podcast</string>
+    <string name="onboarding_find_podcasts">Find Podcasts</string>
 
     <!--    Tasker Plugin-->
 

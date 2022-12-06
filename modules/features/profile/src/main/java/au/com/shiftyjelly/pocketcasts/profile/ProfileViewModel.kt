@@ -37,7 +37,7 @@ class ProfileViewModel @Inject constructor(
         settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST)
     )
 
-    fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
+    suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 
     fun clearFailedRefresh() {
         val lastSuccess = settings.getLastSuccessRefreshState()

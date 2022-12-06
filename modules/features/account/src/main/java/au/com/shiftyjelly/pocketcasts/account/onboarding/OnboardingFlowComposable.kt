@@ -7,17 +7,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun OnboardingFlowComposable(
     activeTheme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
+    completeOnboardingToDiscover: () -> Unit,
     abortOnboarding: () -> Unit,
-    analyticsTracker: AnalyticsTrackerWrapper
+    analyticsTracker: AnalyticsTrackerWrapper,
+    signInState: SignInState?
 ) {
     AppThemeWithBackground(activeTheme) {
         val navController = rememberNavController()
@@ -46,10 +50,10 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
                     onNotNowClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED)
+                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, AnalyticsProp.source)
                         completeOnboarding()
                     },
-                    onSignUpFreeClicked = {
+                    onSignUpClicked = {
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.createAccount)
                         navController.navigate(OnboardingNavRoute.createFreeAccount)
                     },
@@ -61,7 +65,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.continueWithGoogle)
                         navController.navigate(OnboardingNavRoute.logInGoogle)
                     },
-                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN) }
+                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN, AnalyticsProp.source) }
                 )
             }
 
@@ -73,8 +77,8 @@ fun OnboardingFlowComposable(
                         navController.popBackStack()
                     },
                     onAccountCreated = {
-                        navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack when opening recommendations
+                        navController.navigate(OnboardingNavRoute.recommendationsFlow) {
+                            // clear backstack after account is created
                             popUpTo(OnboardingNavRoute.logInOrSignUp) {
                                 inclusive = true
                             }
@@ -90,14 +94,7 @@ fun OnboardingFlowComposable(
                         analyticsTracker.track(AnalyticsEvent.SIGNIN_DISMISSED)
                         navController.popBackStack()
                     },
-                    onLoginComplete = {
-                        navController.navigate(OnboardingNavRoute.recommendations) {
-                            // clear backstack when opening recommendations
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                                inclusive = true
-                            }
-                        }
-                    },
+                    onLoginComplete = completeOnboarding,
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
             }
@@ -107,11 +104,58 @@ fun OnboardingFlowComposable(
             }
 
             composable(OnboardingNavRoute.forgotPassword) {
-                OnboardingForgotPassword(onBackPressed = { navController.popBackStack() })
+                OnboardingForgotPasswordPage(
+                    onShown = { analyticsTracker.track(AnalyticsEvent.FORGOT_PASSWORD_SHOWN) },
+                    onBackPressed = {
+                        analyticsTracker.track(AnalyticsEvent.FORGOT_PASSWORD_DISMISSED)
+                        navController.popBackStack()
+                    },
+                    onCompleted = completeOnboarding,
+                )
             }
 
-            composable(OnboardingNavRoute.recommendations) {
-                OnboardingRecommendations()
+            composable(OnboardingNavRoute.recommendationsFlow) {
+                OnboardingRecommendationsFlow(
+                    onShown = {
+                        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN)
+                    },
+                    onBackPressed = {
+                        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
+                        completeOnboarding()
+                    },
+                    onComplete = {
+                        navController.navigate(
+                            if (signInState?.isSignedInAsPlus == false) {
+                                OnboardingNavRoute.plusUpgrade
+                            } else {
+                                OnboardingNavRoute.welcome
+                            }
+                        )
+                    }
+                )
+            }
+
+            composable(OnboardingNavRoute.plusUpgrade) {
+                OnboardingPlusUpgradeFlow(
+                    onBackPressed = { navController.popBackStack() },
+                    onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
+                    onCompleteUpgrade = {
+                        navController.navigate(OnboardingNavRoute.welcome) {
+                            // Don't allow navigation back to the upgrade screen after the user upgrades
+                            popUpTo(OnboardingNavRoute.plusUpgrade) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                )
+            }
+            composable(OnboardingNavRoute.welcome) {
+                OnboardingWelcomePage(
+                    isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
+                    onContinue = completeOnboarding,
+                    onContinueToDiscover = completeOnboardingToDiscover,
+                    onBackPressed = { navController.popBackStack() },
+                )
             }
         }
     }
@@ -120,10 +164,11 @@ fun OnboardingFlowComposable(
 private object AnalyticsProp {
     object ButtonTapped {
         private const val button = "button"
-        val signIn = mapOf(button to "sign_in")
-        val createAccount = mapOf(button to "create_account")
-        val continueWithGoogle = mapOf(button to "continue_with_google")
+        val signIn = source + mapOf(button to "sign_in")
+        val createAccount = source + mapOf(button to "create_account")
+        val continueWithGoogle = source + mapOf(button to "continue_with_google")
     }
+    val source = mapOf("source" to "onboarding")
 }
 
 private object OnboardingNavRoute {
@@ -132,5 +177,7 @@ private object OnboardingNavRoute {
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
     const val forgotPassword = "forgot_password"
-    const val recommendations = "recommendations"
+    const val recommendationsFlow = "recommendationsFlow"
+    const val plusUpgrade = "upgrade_upgrade"
+    const val welcome = "welcome"
 }

@@ -31,6 +31,8 @@ interface Settings {
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
 
+        const val GOOGLE_SIGN_IN_SERVER_CLIENT_ID = BuildConfig.GOOGLE_SIGN_IN_SERVER_CLIENT_ID
+
         const val INFO_LEARN_MORE_URL = "https://www.pocketcasts.com/plus/"
         const val INFO_TOS_URL = "https://support.pocketcasts.com/article/terms-of-use-overview/"
         const val INFO_PRIVACY_URL = "https://support.pocketcasts.com/article/privacy-policy/"
@@ -86,6 +88,7 @@ interface Settings {
         const val PREFERENCE_ALLOW_OTHER_APPS_ACCESS = "allowOtherAppsAccess"
         const val PREFERENCE_HIDE_SYNC_SETUP_MENU = "hideSyncSetupMenu"
         const val PREFERENCE_KEEP_SCREEN_AWAKE = "keepScreenAwake4"
+        const val PREFERENCE_OPEN_PLAYER_AUTOMATICALLY = "openPlayerAutomatically"
         const val PREFERENCE_SHOW_NOTE_IMAGES_ON = "showNotesImagesOn"
         const val PREFERENCE_SELECTED_FILTER = "selectedFilter"
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
@@ -289,6 +292,7 @@ interface Settings {
     val defaultShowArchivedFlow: StateFlow<Boolean>
     val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
     val keepScreenAwakeFlow: StateFlow<Boolean>
+    val openPlayerAutomaticallyFlow: StateFlow<Boolean>
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
 
     fun getVersion(): String
@@ -400,6 +404,9 @@ interface Settings {
 
     fun keepScreenAwake(): Boolean
     fun setKeepScreenAwake(newValue: Boolean)
+
+    fun openPlayerAutomatically(): Boolean
+    fun setOpenPlayerAutomatically(newValue: Boolean)
 
     fun isPodcastAutoDownloadUnmeteredOnly(): Boolean
     fun isPodcastAutoDownloadPowerOnly(): Boolean
@@ -585,4 +592,11 @@ interface Settings {
 
     fun setEndOfYearShowBadge2022(value: Boolean)
     fun getEndOfYearShowBadge2022(): Boolean
+
+    fun setEndOfYearModalHasBeenShown(value: Boolean)
+    fun getEndOfYearModalHasBeenShown(): Boolean
+    fun endOfYearRequireLogin(): Boolean
+
+    fun getHasCompletedOnboarding(): Boolean
+    fun setHasCompletedOnboarding()
 }

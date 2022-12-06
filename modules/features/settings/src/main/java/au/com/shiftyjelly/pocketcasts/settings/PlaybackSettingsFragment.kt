@@ -172,6 +172,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                         onSave = settings::setKeepScreenAwake
                     )
 
+                    OpenPlayerAutomatically(
+                        saved = settings.openPlayerAutomaticallyFlow.collectAsState().value,
+                        onSave = settings::setOpenPlayerAutomatically
+                    )
+
                     IntelligentPlaybackResumption(
                         saved = settings.intelligentPlaybackResumptionFlow.collectAsState().value,
                         onSave = settings::setIntelligentPlaybackResumption
@@ -398,6 +403,15 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_keep_screen_awake),
             secondaryText = stringResource(LR.string.settings_keep_screen_awake_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+        )
+
+    @Composable
+    private fun OpenPlayerAutomatically(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(id = LR.string.settings_open_player_automatically),
+            secondaryText = stringResource(id = LR.string.settings_open_player_automatically_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )

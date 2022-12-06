@@ -1,8 +1,22 @@
+7.29
+-----
+
+
+7.28
+-----
+*   Bug Fixes:
+    *   Fixed effects bottomsheet flickering to the expanded state while being dragged
+        ([#575](https://github.com/Automattic/pocket-casts-android/pull/575)).
+    *   Fixed miniplayer play icon animation on theme change
+        ([#527](https://github.com/Automattic/pocket-casts-android/pull/527)).
+
 7.27
 -----
 
 *   New Features:
-    *   Support Android 13 per-app language preferences
+    * Add End of Year stats
+        ([#410](https://github.com/Automattic/pocket-casts-android/issues/410)).  
+    * Support Android 13 per-app language preferences
         ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
 *   Bug Fixes:
     *   Fixed some layout issues in the EpisodeFragment
@@ -13,6 +27,8 @@
         ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
     *   Fixed small "Go to Podcast" icon in Landscape
         ([#547](https://github.com/Automattic/pocket-casts-android/pull/547)).
+    *   Added option to open player automatically when user start playing podcast.
+        ([#23](https://github.com/Automattic/pocket-casts-android/pull/550))
 
 7.26
 -----

@@ -3,21 +3,19 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
+import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.Worker
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncChange
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
-import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.switchInvalidForNow
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -35,8 +33,9 @@ class SyncHistoryTask @AssistedInject constructor(
     var episodeManager: EpisodeManager,
     var serverManager: SyncServerManager,
     var podcastManager: PodcastManager,
-    var settings: Settings
-) : Worker(context, params) {
+    var settings: Settings,
+    private val historyManager: HistoryManager,
+) : CoroutineWorker(context, params) {
 
     companion object {
         fun scheduleToRun(context: Context) {
@@ -48,12 +47,13 @@ class SyncHistoryTask @AssistedInject constructor(
                 .setConstraints(constraints)
                 .build()
 
-            WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
+            WorkManager.getInstance(context)
+                .enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
             LogBuffer.i(TAG, "Sync history task scheduled")
         }
     }
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         LogBuffer.i(TAG, "Sync history running")
 
         val episodes = episodeManager.findEpisodesForHistorySync()
@@ -96,7 +96,10 @@ class SyncHistoryTask @AssistedInject constructor(
                 .blockingGet()
 
             if (response != null) {
-                readResponse(response)
+                historyManager.processServerResponse(
+                    response = response,
+                    updateServerModified = true
+                )
 
                 // Clear history if they have cleared it on the server
                 if (response.lastCleared > 0) {
@@ -117,47 +120,5 @@ class SyncHistoryTask @AssistedInject constructor(
         }
 
         return Result.success()
-    }
-
-    fun readResponse(response: HistorySyncResponse) {
-        if (!response.hasChanged(0) || response.changes.isNullOrEmpty()) {
-            return
-        }
-
-        val changes = response.changes
-        changes?.chunked(1000)?.first()?.forEach { change ->
-            val interactionDate = change.modifiedAt.toLong()
-
-            val episodeUuid = change.episode ?: return@forEach
-            val episode = episodeManager.findByUuid(episodeUuid)
-            if (change.action == 1) { // Add
-                val podcast = change.podcast
-                if (episode != null) {
-                    if ((episode.lastPlaybackInteraction ?: 0) < interactionDate) {
-                        episode.lastPlaybackInteraction = interactionDate
-                        episode.lastPlaybackInteractionSyncStatus = 1
-                        episodeManager.update(episode)
-                    }
-                } else if (podcast != null) {
-                    // Add missing podcast and episode
-                    podcastManager.findOrDownloadPodcastRx(podcast).toMaybe().onErrorComplete().blockingGet()
-
-                    val skeleton = Episode(uuid = episodeUuid, podcastUuid = podcast, title = change.title ?: "", publishedDate = change.published?.parseIsoDate() ?: Date(), downloadUrl = change.url)
-                    val missingEpisode = episodeManager.downloadMissingEpisode(episodeUuid, podcast, skeleton, podcastManager, false).blockingGet()
-                    if (missingEpisode != null && missingEpisode is Episode) {
-                        missingEpisode.lastPlaybackInteraction = interactionDate
-                        episodeManager.update(missingEpisode)
-                    }
-                }
-            } else if (change.action == 2) { // Delete
-                if (episode != null) {
-                    episode.lastPlaybackInteraction = 0
-                    episode.lastPlaybackInteractionSyncStatus = 1
-                    episodeManager.update(episode)
-                }
-            }
-        }
-
-        settings.setHistoryServerModified(response.serverModified)
     }
 }

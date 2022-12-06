@@ -34,6 +34,9 @@ abstract class PodcastDao {
     @Query("SELECT * FROM podcasts WHERE subscribed = 1")
     abstract suspend fun findSubscribedNoOrder(): List<Podcast>
 
+    @Query("SELECT uuid FROM podcasts WHERE subscribed = 1")
+    abstract suspend fun findSubscribedUuids(): List<String>
+
     @Query("SELECT * FROM podcasts WHERE subscribed = 0")
     abstract fun findUnsubscribed(): List<Podcast>
 
@@ -348,14 +351,14 @@ abstract class PodcastDao {
 
     @Query(
         """
-        SELECT podcasts.uuid, podcasts.title, podcasts.author, podcasts.primary_color as tintColorForLightBg, SUM(episodes.played_up_to) as totalPlayedTime, COUNT(episodes.uuid) as numberOfPlayedEpisodes
+        SELECT DISTINCT episodes.uuid as episodeId, podcasts.uuid, podcasts.title, podcasts.author, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg, SUM(episodes.played_up_to) as totalPlayedTime, COUNT(episodes.uuid) as numberOfPlayedEpisodes
         FROM episodes
         JOIN podcasts ON episodes.podcast_id = podcasts.uuid
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
         GROUP BY podcast_id
-        ORDER BY numberOfPlayedEpisodes DESC, totalPlayedTime DESC
+        ORDER BY totalPlayedTime DESC, numberOfPlayedEpisodes DESC
         LIMIT :limit
         """
     )
-    abstract fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>>
+    abstract suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
 }

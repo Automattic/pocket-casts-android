@@ -15,7 +15,6 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 interface EpisodeManager {
@@ -62,6 +61,7 @@ interface EpisodeManager {
     /** Add methods  */
     fun add(episode: Episode, downloadMetaData: Boolean): Boolean
     fun add(episodes: List<Episode>, podcastUuid: String, downloadMetaData: Boolean): List<Episode>
+    fun insert(episodes: List<Episode>)
 
     /** Update methods  */
     fun update(episode: Episode?)
@@ -138,11 +138,11 @@ interface EpisodeManager {
     suspend fun updatePlaybackInteractionDate(episode: Playable?)
     suspend fun deleteEpisodeFiles(episodes: List<Episode>, playbackManager: PlaybackManager)
     suspend fun findStaleDownloads(): List<Episode>
-    fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?>
-    fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>>
-    fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers>
-    fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): Flow<LongestEpisode?>
-    fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Flow<Int>
-    fun findEpisodeInteractedBefore(fromEpochMs: Long): Flow<Episode?>
-    fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Flow<Int>
+    suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?
+    suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
+    suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers
+    suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
+    suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
+    suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): Episode?
+    suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
 }

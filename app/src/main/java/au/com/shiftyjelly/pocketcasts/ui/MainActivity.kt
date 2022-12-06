@@ -12,19 +12,15 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
@@ -39,7 +35,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesPage
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
@@ -118,8 +115,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -193,8 +188,10 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
 
-        // TODO check settings to determine if onboarding has already been completed
-        if (BuildConfig.ONBOARDING_ENABLED && !settings.isLoggedIn()) {
+        val showOnboarding = BuildConfig.ONBOARDING_ENABLED &&
+            !settings.getHasCompletedOnboarding() &&
+            !settings.isLoggedIn()
+        if (showOnboarding) {
             openOnboardingFlow()
         }
 
@@ -202,16 +199,15 @@ class MainActivity :
         val view = binding.root
         setContentView(view)
 
-        viewModel.isEndOfYearStoriesEligible()
-            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-            .onEach { isEligible ->
-                if (isEligible) {
-                    setupEndOfYearLaunchBottomSheet()
-                    if (settings.getEndOfYearShowBadge2022()) {
-                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
-                    }
+        lifecycleScope.launchWhenCreated {
+            val isEligible = viewModel.isEndOfYearStoriesEligible()
+            if (isEligible) {
+                showEndOfYearLaunchBottomSheet()
+                if (settings.getEndOfYearShowBadge2022()) {
+                    binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                 }
-            }.launchIn(lifecycleScope)
+            }
+        }
 
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(
@@ -274,8 +270,10 @@ class MainActivity :
                             VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
                             VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
                             VR.id.navigation_profile -> {
-                                binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-                                settings.setEndOfYearShowBadge2022(false)
+                                if (settings.getEndOfYearModalHasBeenShown()) {
+                                    binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+                                    settings.setEndOfYearShowBadge2022(false)
+                                }
                                 FirebaseAnalyticsTracker.navigatedToProfile()
                             }
                         }
@@ -289,17 +287,17 @@ class MainActivity :
         handleIntent(intent, savedInstanceState)
 
         updateSystemColors()
-
-        if (BuildConfig.END_OF_YEAR_ENABLED) {
-            setupEndOfYearLaunchBottomSheet()
-        }
     }
 
     private fun openOnboardingFlow() {
         registerForActivityResult(OnboardingActivityContract()) { result ->
             when (result) {
-                OnboardingFinish.CompletedOnboarding -> {
-                    // TODO persist that onboarding has been completed
+                OnboardingFinish.Completed -> {
+                    settings.setHasCompletedOnboarding()
+                }
+                OnboardingFinish.CompletedGoToDiscover -> {
+                    settings.setHasCompletedOnboarding()
+                    openTab(VR.id.navigation_discover)
                 }
                 OnboardingFinish.AbortedOnboarding -> {
                     finish()
@@ -507,23 +505,38 @@ class MainActivity :
         showBottomSheet(UpNextFragment.newInstance(source = source))
     }
 
-    private fun setupEndOfYearLaunchBottomSheet() {
+    private fun showEndOfYearLaunchBottomSheet() {
         binding.modalBottomSheet.setContent {
-            var showDialog by rememberSaveable { mutableStateOf(false) }
-            if (showDialog) {
-                StoriesPage(
-                    theme = theme,
-                    onCloseClicked = { showDialog = false },
-                )
-            }
             AppTheme(theme.activeTheme) {
+                val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
                 EndOfYearLaunchBottomSheet(
+                    shouldShow = shouldShow,
                     onClick = {
-                        showDialog = true
+                        showStoriesOrAccount(StoriesSource.MODAL.value)
+                    },
+                    onExpanded = {
+                        analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
+                        settings.setEndOfYearModalHasBeenShown(true)
+                        viewModel.updateStoriesModalShowState(false)
                     }
                 )
             }
         }
+    }
+
+    override fun showStoriesOrAccount(source: String) {
+        if (viewModel.isSignedIn || !settings.endOfYearRequireLogin()) {
+            showStories(StoriesSource.fromString(source))
+        } else {
+            viewModel.waitingForSignInToShowStories = true
+            val intent = Intent(this, AccountActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun showStories(source: StoriesSource) {
+        StoriesFragment.newInstance(source)
+            .show(supportFragmentManager, "stories_dialog")
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -551,6 +564,10 @@ class MainActivity :
                 updateNavAndStatusColors(true, state.podcast)
             }
 
+            if (viewModel.lastPlaybackState != null && (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) && settings.openPlayerAutomatically()) {
+                binding.playerBottomSheet.openPlayer()
+            }
+
             updatePlaybackState(state)
 
             viewModel.lastPlaybackState = state
@@ -575,6 +592,15 @@ class MainActivity :
 
         viewModel.signInState.observe(this) { signinState ->
             val status = (signinState as? SignInState.SignedIn)?.subscriptionStatus
+
+            if (signinState.isSignedIn) {
+                if (viewModel.waitingForSignInToShowStories) {
+                    showStories(StoriesSource.USER_LOGIN)
+                    viewModel.waitingForSignInToShowStories = false
+                } else if (!settings.getEndOfYearModalHasBeenShown()) {
+                    viewModel.updateStoriesModalShowState(true)
+                }
+            }
 
             if (signinState.isSignedInAsPlus) {
                 status?.let {

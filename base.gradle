@@ -26,10 +26,12 @@ android {
         buildConfigField 'String', 'VERSION_NAME', "\"${project.versionName}\""
         buildConfigField "String", "SETTINGS_ENCRYPT_SECRET", "\"${project.settingsEncryptSecret}\""
         buildConfigField "String", "SHARING_SERVER_SECRET", "\"${project.sharingServerSecret}\""
+        buildConfigField "String", "GOOGLE_SIGN_IN_SERVER_CLIENT_ID", "\"${project.googleSignInServerClientId}\""
 
         // Feature Flags
-        buildConfigField "boolean", "END_OF_YEAR_ENABLED", "false"
+        buildConfigField "boolean", "END_OF_YEAR_REQUIRE_LOGIN", "true"
         buildConfigField "boolean", "ONBOARDING_ENABLED", "false"
+        buildConfigField "boolean", "SINGLE_SIGN_ON_ENABLED", "false"
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
@@ -156,6 +158,7 @@ dependencies {
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
 
     implementation androidLibs.appCompat
+    implementation androidLibs.auth
     implementation androidLibs.ktx
     implementation androidLibs.ktxFragment
     implementation androidLibs.ktxPreference
@@ -200,9 +203,11 @@ dependencies {
     implementation androidLibs.composeUi
     implementation androidLibs.composeUiToolingPreview
     implementation androidLibs.composeViewModel
+    implementation androidLibs.composeUiUtil
 
     implementation libs.kotlinCoroutines
     implementation libs.kotlinCoroutinesAndroid
+    implementation libs.kotlinCoroutinesPlayServices
     implementation libs.kotlinCoroutinesRx
     implementation libs.deviceNames
     implementation libs.exoplayerCore

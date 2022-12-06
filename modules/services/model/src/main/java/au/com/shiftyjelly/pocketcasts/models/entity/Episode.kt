@@ -53,7 +53,7 @@ data class Episode(
     // Removed but leaving the column until we definitely aren't using it again
     @ColumnInfo(name = "cleanTitle") var cleanTitle: String? = title,
     @ColumnInfo(name = "last_playback_interaction_date") var lastPlaybackInteraction: Long? = null,
-    @ColumnInfo(name = "last_playback_interaction_sync_status") var lastPlaybackInteractionSyncStatus: Long = 1,
+    @ColumnInfo(name = "last_playback_interaction_sync_status") var lastPlaybackInteractionSyncStatus: Long = LAST_PLAYBACK_INTERACTION_SYNCED,
     @ColumnInfo(name = "exclude_from_episode_limit") var excludeFromEpisodeLimit: Boolean = false,
     @ColumnInfo(name = "download_task_id") override var downloadTaskId: String? = null,
     @ColumnInfo(name = "last_archive_interaction_date") var lastArchiveInteraction: Long? = null
@@ -111,6 +111,9 @@ data class Episode(
         const val THUMBNAIL_STATUS_UNKNOWN = 0
         const val THUMBNAIL_STATUS_EMBEDDED_AVAILABLE = 1
         const val THUMBNAIL_STATUS_EMBEDDED_NOT_AVAILABLE = 2
+
+        const val LAST_PLAYBACK_INTERACTION_NOT_SYNCED = 0L
+        const val LAST_PLAYBACK_INTERACTION_SYNCED = 1L
 
         private const val MIN_BYTES_FOR_PLAYBACK_DURING_DOWNLOAD: Long = 15360
 

@@ -1,11 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-10-26 09:54:23+0000
+Translation-Revision-Date: 2022-11-22 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+	<string name="onboarding_plus_feature_themes_icons_text">あなたの個性を表現しましょう。 Plus クラブ限定の特別なアイコンとテーマ。</string>
+	<string name="onboarding_plus_feature_themes_icons_title">テーマとアイコン</string>
+	<string name="onboarding_plus_feature_hide_ads_text">広告非表示の操作環境では気に入ったコンテンツを増やし、気に入らないコンテンツは減らすことができます。</string>
+	<string name="onboarding_plus_feature_hide_ads_title">広告を非表示</string>
+	<string name="onboarding_plus_feature_cloud_storage_text">ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
+	<string name="onboarding_plus_feature_cloud_storage_title">10GB のクラウドストレージ</string>
+	<string name="onboarding_plus_feature_folders_text">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
+	<string name="onboarding_plus_feature_folders_title">フォルダー</string>
+	<string name="onboarding_plus_feature_desktop_apps_text">Pocket Casts の Windows 版、macOS 版、ウェブ版アプリでさらに多くの場所で聞きましょう。</string>
+	<string name="onboarding_plus_feature_desktop_apps_title">デスクトップアプリ</string>
+	<string name="onboarding_upgrade_unlock_all_features">すべての機能のロックを解除</string>
+	<string name="onboarding_upgrade_exclusive_features_and_options">限定機能とカスタマイズオプションへのアクセス権を取得しましょう</string>
+	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">お気に入りの Pocket Casts の機能に加え、さらなる機能を利用できます</string>
+	<string name="onboarding_recommendations_import">インポート</string>
+	<string name="onboarding_recommendations_make_pocket_casts_yours">お気に入りのポッドキャストを選択するか、別のポッドキャストプレイヤーからインポートして、Pocket Casts を自分のものにしましょう。 この操作は後でいつでも実行できます。</string>
+	<string name="onboarding_recommendations_find_favorite_podcasts">お気に入りのポッドキャストを見つける</string>
+	<string name="not_now">後で</string>
+	<string name="settings_open_player_automatically_summary">オンの場合、ポッドキャストのエピソードの再生を開始すると、フルスクリーンプレイヤーが開きます。</string>
+	<string name="settings_open_player_automatically">プレーヤーを自動的に開く</string>
+	<string name="onboarding_email_invalid_message">有効なメールアドレスを入力してください</string>
+	<string name="onboarding_forgot_password">パスワードをお忘れですか？</string>
+	<string name="onboarding_get_the_newsletter">ニュースレターをチェック</string>
+	<string name="onboarding_create_an_account_to">アカウントを作成すると、すべての端末で視聴内容を同期させることができます。</string>
+	<string name="onboarding_discover_your_next_favorite_podcast">次のお気に入りのポッドキャストを見つける</string>
+	<string name="onboarding_continue_with_google">Google で続ける</string>
+	<string name="onboarding_welcome_back">おかえりなさい</string>
+	<string name="end_of_year_create_account_to_see">ポッドキャストをクラウドに保存して、年末レビューを取得し、他の端末と進捗を同期します。</string>
+	<string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
+	<string name="end_of_year_story_top_categories">トップカテゴリー</string>
+	<string name="end_of_year_story_epilogue_subtitle">友達と共有したりお気に入りのポッドキャストクリエイターにエールを送ったりしましょう</string>
+	<string name="end_of_year_story_longest_episode_share_text">2022年に聴いた最長のエピソード: %1$s</string>
+	<string name="end_of_year_story_longest_episode_duration">このエピソードの時間は%1$sです</string>
+	<string name="end_of_year_story_longest_episode">お聴きになった最長のエピソードは、ポッドキャスト %2$s の %1$s のエピソードでした</string>
+	<string name="end_of_year_story_top_podcasts_list_title">2022年に再生数が多かったポッドキャスト</string>
+	<string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
+	<string name="end_of_year_story_top_podcasts">人気のポッドキャスト</string>
+	<string name="end_of_year_story_top_podcast_share_text">2022年のお気に入りのポッドキャストはこちら ! %1$s</string>
+	<string name="end_of_year_story_top_podcast_subtitle">%1$d話のエピソードで合計%2$s聴きました</string>
+	<string name="end_of_year_story_top_podcast">一番再生したポッドキャストは %2$s による %1$s でした</string>
+	<string name="end_of_year_story_listened_to_numbers_share_text">2022年は%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
+	<string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
+	<string name="end_of_year_story_listened_to_numbers">%1$d個のポッドキャストで%2$d話のエピソードを聴きました</string>
+	<string name="end_of_year_story_listened_to_categories_share_text">2022年は%1$d個のカテゴリーを聴きました</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">お気に入りをいくつか振り返りましょう…</string>
+	<string name="end_of_year_story_listened_to_categories">今年、%1$d個のカテゴリーを聴きました</string>
+	<string name="end_of_year_story_listened_to_share_text">2022年、ポッドキャストを聴いた時間は合計%1$s時間です</string>
+	<string name="end_of_year_story_intro_title">今年聴いたポッドキャストを振り返ってみましょう…</string>
+	<string name="end_of_year_launch_modal_image_title">ポッドキャストで振り返る1年</string>
+	<string name="end_of_year_replay">再生</string>
+	<string name="settings_media_notification_controls_summary">Android 13の再生通知、Android Auto、その他のカスタムメディアコントロールを使用できる場所に表示するアクションを2つ選択します</string>
+	<string name="settings_media_notification_controls">メディア通知コントロール</string>
+	<string name="playback_speed">再生速度</string>
+	<string name="volume_boost_enabled_not_valid">「ボリュームブーストを有効化」の値は \'true\' または \'false\' である必要があります、 %1$s でした</string>
+	<string name="volume_boost_enabled">ボリュームブーストを有効化</string>
+	<string name="set_volume_boost">ボリュームブーストを設定</string>
+	<string name="trim_silence_mode_not_valid">無音時間のカットモード %1$s は有効ではありません</string>
+	<string name="trim_silence_mode">無音時間のカットモード</string>
+	<string name="set_trim_silence_mode">無音時間のカットモードを設定</string>
+	<string name="playback_speed_between_values">再生速度 (0.5～3)</string>
+	<string name="set_playback_speed">再生速度を設定</string>
+	<string name="playback_speed_not_valid">再生速度 %1$s は有効ではありません</string>
+	<string name="end_of_year_listening_time">2022年、ポッドキャストを聴いた時間は合計%1$s時間です</string>
+	<string name="profile_account_upgraded">アカウントはアップグレードされました</string>
+	<string name="pocket_casts_control_playback">Pocket Casts プレイバックコントロール</string>
+	<string name="pocket_casts_play_filter">Pocket Casts 再生フィルター</string>
+	<string name="time_to_skip_not_valid">スキップ先の時間%1$sが無効です</string>
+	<string name="time_to_skip_seconds">スキップ先の時間 (秒)</string>
+	<string name="end_of_year_prompt_card_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。</string>
+	<string name="settings_select_filters">フィルターを選択する</string>
+	<string name="settings_import_url_summary">URL を使用して OPML ファイルからポッドキャストをインポートします。</string>
+	<string name="settings_import_url">URL を使用</string>
+	<string name="time_to_skip_to_not_valid">スキップ先の時間%1$sが無効です</string>
+	<string name="time_to_skip_to_seconds">スキップ先の時間 (秒)</string>
+	<string name="skip_to_time">時間にスキップ</string>
+	<string name="play_next_in_queue">待機リストで次を再生</string>
+	<string name="skip_to_chapter">チャプターにスキップ</string>
+	<string name="skip_to_previous_chapter">前のチャプターにスキップ</string>
+	<string name="skip_to_next_chapter">次のチャプターにスキップ</string>
+	<string name="tasker_variables">Tasker の変数</string>
+	<string name="chapter_to_skip_to_not_valid">スキップ先のチャプター%1$sが無効です</string>
+	<string name="chapter_to_skip_to">スキップ先のチャプター</string>
+	<string name="playback_command">再生コマンド</string>
+	<string name="command_x_not_valid">コマンド %1$s が無効です</string>
+	<string name="must_provide_command_name">コマンド名を指定する必要があります</string>
+	<string name="no_episodes_in_filter_x">フィルター %1$s にエピソードはありません</string>
+	<string name="filter_x_not_found">フィルター %1$s は見つかりません</string>
+	<string name="must_provide_filter_name">フィルター名を指定する必要があります</string>
 	<string name="end_of_year_launch_modal_secondary_button_title">後で</string>
 	<string name="end_of_year_launch_modal_primary_button_title">私の2022年をプレビュー</string>
 	<string name="end_of_year_launch_modal_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。 友達と共有したり、お気に入りのクリエイターにエールを送ったりしましょう。</string>
@@ -741,7 +828,7 @@ Language: ja_JP
 	<string name="profile_create_subscription_failed">サブスクリプションを作成できませんでした。 もう一度お試しください</string>
 	<string name="profile_create_privacy_policy_title">プライバシーポリシー</string>
 	<string name="profile_create_privacy_policy">ご興味がある方のためにプライバシーポリシーのリンクもご用意しました。 どちらもなるべくコンパクトかつわかりやすくなるようにし、法律用語も最小限に抑えてあります。</string>
-	<string name="profile_create_password_requirements">6文字以上にしてください</string>
+	<string name="profile_create_password_requirements">6文字以上のパスワードを選んでください</string>
 	<string name="profile_create_newsletter_summary">ニュースやアプリの更新、特定のテーマを取り上げたポッドキャストリスト、インタビューなどをお楽しみください</string>
 	<string name="profile_create_license">ご面倒をおかけしますがよろしくお願いいたします。</string>
 	<string name="profile_create_failed">アカウントを作成できませんでした。 もう一度お試しください</string>

@@ -70,6 +70,8 @@ class SettingsImpl @Inject constructor(
         private const val SEND_CRASH_REPORTS_KEY = "SendCrashReportsKey"
         private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
+        private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
+        private const val COMPLETED_ONBOARDING_KEY = "CompletedOnboardingKey"
     }
 
     private var languageCode: String? = null
@@ -97,6 +99,7 @@ class SettingsImpl @Inject constructor(
     override val defaultMediaNotificationControlsFlow = MutableStateFlow(defaultMediaNotificationControls())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
+    override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
 
@@ -789,6 +792,15 @@ class SettingsImpl @Inject constructor(
         keepScreenAwakeFlow.update { newValue }
     }
 
+    override fun openPlayerAutomatically(): Boolean {
+        return sharedPreferences.getBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, false)
+    }
+
+    override fun setOpenPlayerAutomatically(newValue: Boolean) {
+        setBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, newValue)
+        openPlayerAutomaticallyFlow.update { newValue }
+    }
+
     override fun isPodcastAutoDownloadUnmeteredOnly(): Boolean {
         return sharedPreferences.getBoolean(Settings.PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED, true)
     }
@@ -1474,4 +1486,21 @@ class SettingsImpl @Inject constructor(
 
     override fun getEndOfYearShowBadge2022(): Boolean =
         getBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, true)
+
+    override fun setEndOfYearModalHasBeenShown(value: Boolean) {
+        setBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, value)
+    }
+
+    override fun getEndOfYearModalHasBeenShown(): Boolean =
+        getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, false)
+
+    override fun endOfYearRequireLogin(): Boolean {
+        return BuildConfig.END_OF_YEAR_REQUIRE_LOGIN
+    }
+
+    override fun getHasCompletedOnboarding() = getBoolean(COMPLETED_ONBOARDING_KEY, false)
+
+    override fun setHasCompletedOnboarding() {
+        setBoolean(COMPLETED_ONBOARDING_KEY, true)
+    }
 }
