@@ -7,39 +7,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.navigation.compose.NavHost
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 
-@Composable
-fun OnboardingImportFlow(
-    onBackPressed: () -> Unit,
-) {
+object OnboardingImportFlow {
 
-    val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = OnboardingImportNavRoute.start
-    ) {
-        composable(OnboardingImportNavRoute.start) {
-            OnboardingImportStartPage(
-                onCastboxClicked = { navController.navigate(OnboardingImportNavRoute.castbox) },
-                onOtherAppsClicked = { navController.navigate(OnboardingImportNavRoute.otherApps) },
-                onBackPressed = { navController.popBackStack() },
-            )
-        }
+    const val route = "onboardingImportFlow"
 
-        composable(OnboardingImportNavRoute.castbox) {
-            OnboardingImportCastbox(
-                onBackPressed = { /* TODO */ },
-            )
-        }
+    private const val start = "start"
+    private const val castbox = "castbox"
+    private const val otherApps = "otherApps"
 
-        composable(OnboardingImportNavRoute.otherApps) {
-            OnboardingImportOtherApps(
-                onBackPressed = { /* TODO */ },
-            )
+    fun NavGraphBuilder.importFlowGraph(navController: NavController) {
+        navigation(
+            route = this@OnboardingImportFlow.route,
+            startDestination = start,
+        ) {
+            composable(start) {
+                OnboardingImportStartPage(
+                    onCastboxClicked = { navController.navigate(castbox) },
+                    onOtherAppsClicked = { navController.navigate(otherApps) },
+                    onBackPressed = { navController.popBackStack() },
+                )
+            }
+
+            composable(castbox) {
+                OnboardingImportCastbox(
+                    onBackPressed = { /* TODO */ },
+                )
+            }
+
+            composable(otherApps) {
+                OnboardingImportOtherApps(
+                    onBackPressed = { /* TODO */ },
+                )
+            }
         }
     }
 }
@@ -84,10 +89,4 @@ fun NumberedList(vararg texts: String) {
             )
         }
     }
-}
-
-private object OnboardingImportNavRoute {
-    const val start = "start"
-    const val castbox = "castbox"
-    const val otherApps = "otherApps"
 }

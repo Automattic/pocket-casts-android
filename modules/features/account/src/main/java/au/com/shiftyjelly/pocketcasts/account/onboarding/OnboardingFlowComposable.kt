@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -48,6 +49,9 @@ fun OnboardingFlowComposable(
             navController = navController,
             startDestination = OnboardingNavRoute.logInOrSignUp
         ) {
+
+            importFlowGraph(navController)
+
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
                     onNotNowClicked = {
@@ -156,13 +160,7 @@ fun OnboardingFlowComposable(
                     isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                     onContinue = completeOnboarding,
                     onContinueToDiscover = completeOnboardingToDiscover,
-                    onImportTapped = { navController.navigate(OnboardingNavRoute.importFlow) },
-                    onBackPressed = { navController.popBackStack() },
-                )
-            }
-
-            composable(OnboardingNavRoute.importFlow) {
-                OnboardingImportFlow(
+                    onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
                     onBackPressed = { navController.popBackStack() },
                 )
             }
@@ -183,7 +181,6 @@ private object AnalyticsProp {
 private object OnboardingNavRoute {
     const val createFreeAccount = "create_free_account"
     const val forgotPassword = "forgot_password"
-    const val importFlow = "importFlow"
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
     const val logInOrSignUp = "log_in_or_sign_up"
