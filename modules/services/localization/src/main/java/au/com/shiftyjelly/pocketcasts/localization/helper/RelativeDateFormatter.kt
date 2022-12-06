@@ -15,14 +15,14 @@ import java.util.Locale
  * Format the date in the following format
  * "Today"
  * "Yesterday"
- * "Monday" if less than a week
+ * "Monday" if less than six days from now
  * "23 July" in the same year
  * "1 December 2017" in a previous year
  */
 class RelativeDateFormatter(val context: Context) {
 
-    private val sevenDaysAgo: Calendar = Calendar.getInstance().apply { add(Calendar.DATE, -7) }
-    private val sevenDaysFromNow: Calendar = Calendar.getInstance().apply { add(Calendar.DATE, 7) }
+    private val now: Calendar = Calendar.getInstance()
+    private val sixDaysFromNow: Calendar = Calendar.getInstance().apply { add(Calendar.DATE, 6) }
     private val yesterday: Calendar = Calendar.getInstance().apply { add(Calendar.DATE, -1) }
     private val currentYear: Int = Calendar.getInstance().get(Calendar.YEAR)
     private var relativeDateFormatter: RelativeDateTimeFormatter? = null
@@ -47,7 +47,7 @@ class RelativeDateFormatter(val context: Context) {
 
         val format = when {
             calendar.get(Calendar.YEAR) != currentYear -> DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR
-            calendar.after(sevenDaysAgo) && calendar.before(sevenDaysFromNow) -> DateUtils.FORMAT_SHOW_WEEKDAY
+            calendar.after(now) && calendar.before(sixDaysFromNow) -> DateUtils.FORMAT_SHOW_WEEKDAY
             else -> DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_NO_YEAR
         }
 
