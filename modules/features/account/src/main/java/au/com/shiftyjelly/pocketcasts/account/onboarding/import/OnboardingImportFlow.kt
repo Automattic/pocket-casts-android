@@ -37,13 +37,13 @@ object OnboardingImportFlow {
 
             composable(castbox) {
                 OnboardingImportCastbox(
-                    onBackPressed = { /* TODO */ },
+                    onBackPressed = { navController.popBackStack() },
                 )
             }
 
             composable(otherApps) {
                 OnboardingImportOtherApps(
-                    onBackPressed = { /* TODO */ },
+                    onBackPressed = { navController.popBackStack() },
                 )
             }
         }
