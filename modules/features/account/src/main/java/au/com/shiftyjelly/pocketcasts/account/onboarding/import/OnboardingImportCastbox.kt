@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.import
 
+import android.content.ActivityNotFoundException
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,11 +56,32 @@ fun OnboardingImportCastbox(
 
         Spacer(Modifier.weight(1f))
 
-        RowButton(
-            text = stringResource(LR.string.onboarding_import_from_castbox_open),
-            onClick = {},
-        )
+        val openCastbox = openCastboxFun()
+        // only show button if we can open the Castbox app
+        if (openCastbox != null) {
+            RowButton(
+                text = stringResource(LR.string.onboarding_import_from_castbox_open),
+                onClick = openCastbox,
+            )
+        }
     }
+}
+
+@Composable
+private fun openCastboxFun(): (() -> Unit)? {
+    val context = LocalContext.current
+    return context
+        .packageManager
+        .getLaunchIntentForPackage("fm.castbox.audiobook.radio.podcast")
+        ?.let { intent ->
+            {
+                try {
+                    context.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    // should only happen if the user uninstalls castbox after this screen is composed
+                }
+            }
+        }
 }
 
 @Preview
