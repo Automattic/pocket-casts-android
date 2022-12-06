@@ -60,13 +60,7 @@ fun OnboardingFlowComposable(
                     completeOnboarding()
                 },
                 onComplete = {
-                    navController.navigate(
-                        if (signInState?.isSignedInAsPlus == false) {
-                            OnboardingNavRoute.plusUpgrade
-                        } else {
-                            OnboardingNavRoute.welcome
-                        }
-                    )
+                    navController.navigate(OnboardingNavRoute.plusUpgrade)
                 },
                 navController = navController,
             )
