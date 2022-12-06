@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -92,27 +94,31 @@ internal fun OnboardingPlusFeaturesPage(
 
     LaunchedEffect(Unit) { viewModel.onShown() }
 
-    Box(
-        Modifier
-            .verticalScroll(rememberScrollState())
-            .background(background)
-    ) {
-        Background()
+    // Need this BoxWithConstraints so we can force the inner column to fill the screen
+    BoxWithConstraints(Modifier.fillMaxHeight()) {
 
-        Column {
+        Box(
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .background(background)
+        ) {
 
-            Spacer(Modifier.height(8.dp))
-            NavigationIconButton(
-                onNavigationClick = onBackPressed,
-                iconColor = Color.White,
-                modifier = Modifier
-                    .height(48.dp)
-                    .width(48.dp)
-            )
+            Background()
 
-            Spacer(Modifier.height(12.dp))
+            Column(
+                Modifier.heightIn(min = this@BoxWithConstraints.maxHeight)
+            ) {
 
-            Column {
+                Spacer(Modifier.height(8.dp))
+                NavigationIconButton(
+                    onNavigationClick = onBackPressed,
+                    iconColor = Color.White,
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(48.dp)
+                )
+
+                Spacer(Modifier.height(12.dp))
 
                 IconRow(Modifier.padding(horizontal = 24.dp))
 
