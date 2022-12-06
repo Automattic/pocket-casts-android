@@ -156,13 +156,15 @@ fun OnboardingFlowComposable(
                     isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                     onContinue = completeOnboarding,
                     onContinueToDiscover = completeOnboardingToDiscover,
-                    onImportTapped = { navController.navigate(OnboardingNavRoute.import) },
+                    onImportTapped = { navController.navigate(OnboardingNavRoute.importFlow) },
                     onBackPressed = { navController.popBackStack() },
                 )
             }
 
-            composable(OnboardingNavRoute.import) {
-                OnboardingImportFlow()
+            composable(OnboardingNavRoute.importFlow) {
+                OnboardingImportFlow(
+                    onBackPressed = { navController.popBackStack() },
+                )
             }
         }
     }
@@ -181,7 +183,7 @@ private object AnalyticsProp {
 private object OnboardingNavRoute {
     const val createFreeAccount = "create_free_account"
     const val forgotPassword = "forgot_password"
-    const val import = "import"
+    const val importFlow = "importFlow"
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
     const val logInOrSignUp = "log_in_or_sign_up"
