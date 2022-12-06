@@ -49,7 +49,6 @@ fun OnboardingImportCastbox(
                 stringResource(LR.string.onboarding_import_from_castbox_step_4),
                 stringResource(LR.string.onboarding_import_from_castbox_step_5),
                 stringResource(LR.string.onboarding_import_from_castbox_step_6),
-                stringResource(LR.string.onboarding_import_from_castbox_step_7),
             )
         }
 

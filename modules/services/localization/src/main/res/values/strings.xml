@@ -1504,17 +1504,16 @@
     <string name="onboarding_import_from_castbox">Import from Castbox</string>
     <string name="onboarding_import_from_other_apps">Import from other apps</string>
     <string name="onboarding_import_from_castbox_step_1">Open Castbox.</string>
-    <string name="onboarding_import_from_castbox_step_2">Tap the \"Personal\" tab.</string>
-    <string name="onboarding_import_from_castbox_step_3">Tap "Settings".</string>
-    <string name="onboarding_import_from_castbox_step_4">Scroll down to \"OPML Export\" and tap it.</string>
-    <string name="onboarding_import_from_castbox_step_5">Tap \"Open in Pocket Casts\" if it shows, otherwise tap \"More..\".</string>
-    <string name="onboarding_import_from_castbox_step_6">Find the \"Copy to Pocket Casts\" action by scrolling the app icons horizontally.</string>
-    <string name="onboarding_import_from_castbox_step_7">Tap \"Copy to Pocket Casts\".</string>
+    <string name="onboarding_import_from_castbox_step_2">Tap the \“Personal\” tab.</string>
+    <string name="onboarding_import_from_castbox_step_3">Tap “Settings”.</string>
+    <string name="onboarding_import_from_castbox_step_4">Scroll down to \“OPML Export\” and tap it.</string>
+    <string name="onboarding_import_from_castbox_step_5">@string/onboarding_import_from_other_apps_step_2</string>
+    <string name="onboarding_import_from_castbox_step_6">@string/onboarding_import_from_other_apps_step_3</string>
     <string name="onboarding_import_from_castbox_open">Open Castbox&#8230;</string>
     <string name="onboarding_can_import_from_opml">Pocket Casts can import podcasts from OPML files, so if your current app can export an OPML file, you can follow these steps:</string>
-    <string name="onboarding_import_from_other_apps_step_1">Find the export option or open an OPML file.</string>
-    <string name="onboarding_import_from_other_apps_step_2">Scroll horizontally until you see the Pocket Casts icon.</string>
-    <string name="onboarding_import_from_other_apps_step_3">Tap "Copy to Pocket Casts".</string>
+    <string name="onboarding_import_from_other_apps_step_1">Find the other app\’s export option and export an OPML file.</string>
+    <string name="onboarding_import_from_other_apps_step_2">Use your phone\’s \“Share\” menu to send the file to Pocket Casts.</string>
+    <string name="onboarding_import_from_other_apps_step_3">Alternatively, import the file from Pocket Casts\’ \“Import &amp; export OPML\” settings menu.</string>
 
     <!--    Tasker Plugin-->
 
