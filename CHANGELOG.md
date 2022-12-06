@@ -9,6 +9,8 @@
         ([#575](https://github.com/Automattic/pocket-casts-android/pull/575)).
     *   Fixed miniplayer play icon animation on theme change
         ([#527](https://github.com/Automattic/pocket-casts-android/pull/527)).
+    *   Fixed podcast date format
+        ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
 
 7.27
 -----

@@ -192,7 +192,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="next_image,next_text"
-            android:visibility="@{podcast.displayableNextEpisodeDate(context.resources) != null}"
+            android:visibility="@{podcast.displayableNextEpisodeDate(context) != null}"
             android:id="@+id/next_group"
             tools:ignore="MissingConstraints" />
 
@@ -220,7 +220,7 @@
             android:textAppearance="?attr/textBody1"
             android:ellipsize="end"
             android:lines="1"
-            android:text="@{podcast.displayableNextEpisodeDate(context.resources)}"
+            android:text="@{podcast.displayableNextEpisodeDate(context)}"
             android:textColor="?attr/primary_text_01"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/next_image"
