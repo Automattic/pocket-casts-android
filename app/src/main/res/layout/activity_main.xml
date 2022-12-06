@@ -62,7 +62,7 @@
             android:clickable="true"
             android:translationZ="200dp"/>
 
-        <androidx.compose.ui.platform.ComposeView
+        <FrameLayout
             android:id="@+id/modalBottomSheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

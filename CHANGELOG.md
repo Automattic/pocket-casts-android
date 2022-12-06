@@ -9,6 +9,8 @@
         ([#575](https://github.com/Automattic/pocket-casts-android/pull/575)).
     *   Fixed miniplayer play icon animation on theme change
         ([#527](https://github.com/Automattic/pocket-casts-android/pull/527)).
+    *   Fixed talkback issues
+        ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
 
 7.27
 -----
