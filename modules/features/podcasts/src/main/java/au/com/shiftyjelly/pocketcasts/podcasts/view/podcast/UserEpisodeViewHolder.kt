@@ -121,7 +121,7 @@ class UserEpisodeViewHolder(
         binding.playButtonType = playButtonType
         binding.episode = episode
         binding.tintColor = tintColor
-        binding.publishedDate = dateFormatter.format(episode.publishedDate, context.resources)
+        binding.publishedDate = dateFormatter.format(episode.publishedDate)
         binding.playButton.listener = playButtonListener
         binding.executePendingBindings()
 
