@@ -404,7 +404,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         Timber.d("Loading sugggested children")
         val upNext = listOfNotNull(playbackManager.getCurrentEpisode()) + playbackManager.upNextQueue.queueEpisodes
         val mediaUpNext = upNext.take(NUM_SUGGESTED_ITEMS).mapNotNull { playable ->
-            val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title)
+            val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
             val parentPodcast = (if (playable is Episode) podcastManager.findPodcastByUuid(playable.podcastUuid) else filesPodcast) ?: return@mapNotNull null
             AutoConverter.convertEpisodeToMediaItem(this, playable, parentPodcast)
         }
@@ -433,7 +433,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     private fun loadRecentChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
         Timber.d("Loading recent children")
         val upNext = playbackManager.getCurrentEpisode() ?: return arrayListOf()
-        val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title)
+        val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
         val parentPodcast = (if (upNext is Episode) podcastManager.findPodcastByUuid(upNext.podcastUuid) else filesPodcast) ?: return arrayListOf()
 
         Timber.d("Recent item ${upNext.title}")
@@ -545,7 +545,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
         return userEpisodeManager.findUserEpisodes().map {
-            val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title, thumbnailUrl = it.artworkUrl)
+            val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, thumbnailUrl = it.artworkUrl)
             AutoConverter.convertEpisodeToMediaItem(this, it, podcast)
         }
     }
