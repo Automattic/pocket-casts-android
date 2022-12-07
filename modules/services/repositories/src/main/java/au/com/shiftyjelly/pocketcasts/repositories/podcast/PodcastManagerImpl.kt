@@ -4,7 +4,6 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute.uuid
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -742,8 +741,8 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun buildUserEpisodePodcast(episode: UserEpisode): Podcast {
         return Podcast(
-            uuid = UserEpisodePodcastSubstitute.uuid,
-            title = UserEpisodePodcastSubstitute.title,
+            uuid = UserEpisodePodcastSubstitute.substituteUuid,
+            title = UserEpisodePodcastSubstitute.substituteTitle,
             thumbnailUrl = episode.getUrlForArtwork()
         )
     }
