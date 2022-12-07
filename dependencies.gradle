@@ -157,6 +157,7 @@ project.ext {
             viewPager: "androidx.viewpager2:viewpager2:1.0.0",
             composeActivity: "androidx.activity:activity-compose:1.5.1",
             composeAnimation: "androidx.compose.animation:animation:$versionCompose",
+            composeConstraint: "androidx.constraintlayout:constraintlayout-compose:1.0.1",
             composeIcons: "androidx.compose.material:material-icons-extended:$versionCompose",
             composeLiveData: "androidx.compose.runtime:runtime-livedata:$versionCompose",
             composeMaterial: "androidx.compose.material:material:$versionCompose",

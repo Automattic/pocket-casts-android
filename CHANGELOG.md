@@ -1,6 +1,9 @@
 7.29
 -----
 
+* Bug Fixes:
+    *   Fixed podcast date format
+        ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
 
 7.28
 -----
