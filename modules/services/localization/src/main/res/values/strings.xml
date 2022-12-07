@@ -450,6 +450,7 @@
     <string name="podcast_show_archived" translatable="false">@string/show_archived</string>
     <string name="podcast_sort_episodes">Sort episodes</string>
     <string name="podcast_subscribed">Subscribed</string>
+    <string name="podcast_not_subscribed">Not Subscribed</string>
     <string name="podcast_support_this_podcast">Support This Show</string>
     <string name="podcast_supporter">SUPPORTER</string>
     <string name="podcast_supporter_cancelled">Support cancelled</string>
