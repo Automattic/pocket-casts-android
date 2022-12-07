@@ -1,6 +1,8 @@
-package au.com.shiftyjelly.pocketcasts.account.onboarding
+package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +35,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingRecommendationsStartPage(
+    onShown: () -> Unit,
+    onImportClicked: () -> Unit,
     onSearch: () -> Unit,
+    onBackPressed: () -> Unit,
     onComplete: () -> Unit,
 ) {
+
+    LaunchedEffect(Unit) { onShown() }
+    BackHandler { onBackPressed() }
+
     Column(
         Modifier
             .fillMaxHeight()
@@ -45,10 +55,15 @@ fun OnboardingRecommendationsStartPage(
             horizontalArrangement = Arrangement.End,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 18.dp)
 
         ) {
-            TextH30(stringResource(LR.string.onboarding_recommendations_import))
+            TextH30(
+                text = stringResource(LR.string.onboarding_recommendations_import),
+                modifier = Modifier
+                    .clickable { onImportClicked() }
+                    .padding(horizontal = 16.dp, vertical = 9.dp)
+            )
         }
 
         TextH10(
@@ -95,7 +110,10 @@ private fun Preview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingRecommendationsStartPage(
+            onShown = {},
+            onImportClicked = {},
             onSearch = {},
+            onBackPressed = {},
             onComplete = {},
         )
     }

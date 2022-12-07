@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -53,6 +54,18 @@ fun OnboardingFlowComposable(
 
             importFlowGraph(navController)
 
+            onboardingRecommendationsFlowGraph(
+                onShown = { analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN) },
+                onBackPressed = {
+                    analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
+                    completeOnboarding()
+                },
+                onComplete = {
+                    navController.navigate(OnboardingNavRoute.plusUpgrade)
+                },
+                navController = navController,
+            )
+
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
                     onNotNowClicked = {
@@ -83,7 +96,7 @@ fun OnboardingFlowComposable(
                         navController.popBackStack()
                     },
                     onAccountCreated = {
-                        navController.navigate(OnboardingNavRoute.recommendationsFlow) {
+                        navController.navigate(OnboardingRecommendationsFlow.route) {
                             // clear backstack after account is created
                             popUpTo(OnboardingNavRoute.logInOrSignUp) {
                                 inclusive = true
@@ -117,27 +130,6 @@ fun OnboardingFlowComposable(
                         navController.popBackStack()
                     },
                     onCompleted = completeOnboarding,
-                )
-            }
-
-            composable(OnboardingNavRoute.recommendationsFlow) {
-                OnboardingRecommendationsFlow(
-                    onShown = {
-                        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN)
-                    },
-                    onBackPressed = {
-                        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
-                        completeOnboarding()
-                    },
-                    onComplete = {
-                        navController.navigate(
-                            if (signInState?.isSignedInAsPlus == false) {
-                                OnboardingNavRoute.plusUpgrade
-                            } else {
-                                OnboardingNavRoute.welcome
-                            }
-                        )
-                    }
                 )
             }
 
@@ -186,6 +178,5 @@ private object OnboardingNavRoute {
     const val logInGoogle = "log_in_google"
     const val logInOrSignUp = "log_in_or_sign_up"
     const val plusUpgrade = "upgrade_upgrade"
-    const val recommendationsFlow = "recommendationsFlow"
     const val welcome = "welcome"
 }
