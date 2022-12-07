@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -92,8 +94,12 @@ private fun Content(
             )
         }
 
+        val numColumns = when (LocalConfiguration.current.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> 7
+            else -> 3
+        }
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
+            columns = GridCells.Fixed(numColumns),
             contentPadding = PaddingValues(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
