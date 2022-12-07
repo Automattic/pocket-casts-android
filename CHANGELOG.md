@@ -11,6 +11,8 @@
         ([#527](https://github.com/Automattic/pocket-casts-android/pull/527)).
     *   Fixed talkback issues
         ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
+    *   Fixed skip forward/ backward buttons not showing in media notification while casting
+        ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
 
 7.27
 -----
