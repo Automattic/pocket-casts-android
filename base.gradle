@@ -195,6 +195,7 @@ dependencies {
     implementation androidLibs.flexbox
     implementation androidLibs.composeActivity
     implementation androidLibs.composeAnimation
+    implementation androidLibs.composeConstraint
     implementation androidLibs.composeIcons
     implementation androidLibs.composeLiveData
     implementation androidLibs.composeMaterial
