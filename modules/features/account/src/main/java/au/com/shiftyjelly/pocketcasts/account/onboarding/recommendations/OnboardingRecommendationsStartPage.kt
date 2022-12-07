@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.RecommendationPodcast
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
@@ -56,8 +57,25 @@ fun OnboardingRecommendationsStartPage(
     BackHandler { onBackPressed() }
 
     val viewModel = hiltViewModel<OnboardingRecommendationsStartPageViewModel>()
-    val state by viewModel.state.collectAsState()
+    val trendingPodcasts by viewModel.trendingPodcasts.collectAsState()
 
+    Content(
+        trendingPodcasts = trendingPodcasts,
+        onImportClicked = onImportClicked,
+        onSubscribeTap = viewModel::updateSubscribed,
+        onSearch = onSearch,
+        onComplete = onComplete
+    )
+}
+
+@Composable
+private fun Content(
+    trendingPodcasts: List<RecommendationPodcast>,
+    onImportClicked: () -> Unit,
+    onSubscribeTap: (RecommendationPodcast) -> Unit,
+    onSearch: () -> Unit,
+    onComplete: () -> Unit,
+) {
     Column {
         Row(
             horizontalArrangement = Arrangement.End,
@@ -108,7 +126,7 @@ fun OnboardingRecommendationsStartPage(
                 }
             }
 
-            items(items = state) {
+            items(items = trendingPodcasts) {
 
                 // Simulate minLines = 2
                 // This is a bit of a hack based on https://stackoverflow.com/a/66401128/1910286
@@ -125,7 +143,7 @@ fun OnboardingRecommendationsStartPage(
                         podcastUuid = it.uuid,
                         podcastTitle = it.title,
                         podcastSubscribed = it.isSubscribed,
-                        onSubscribeClick = { viewModel.updateSubscribed(it) },
+                        onSubscribeClick = { onSubscribeTap(it) },
                     )
 
                     Spacer(Modifier.height(8.dp))
@@ -154,12 +172,22 @@ private fun Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        OnboardingRecommendationsStartPage(
-            onShown = {},
+        Content(
+            trendingPodcasts = listOf(
+                RecommendationPodcast(
+                    uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
+                    title = "Short title",
+                    isSubscribed = false,
+                ),
+                RecommendationPodcast(
+                    uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
+                    title = "A very very long title that is longer than will fit on two lines",
+                    isSubscribed = true,
+                )
+            ),
             onImportClicked = {},
+            onSubscribeTap = {},
             onSearch = {},
-            onBackPressed = {},
-            onComplete = {},
-        )
+        ) {}
     }
 }

@@ -30,7 +30,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
 ) : AndroidViewModel(app) {
 
     private val _state: MutableStateFlow<List<RecommendationPodcast>> = MutableStateFlow(emptyList())
-    val state: StateFlow<List<RecommendationPodcast>> = _state
+    val trendingPodcasts: StateFlow<List<RecommendationPodcast>> = _state
 
     init {
         viewModelScope.launch {
