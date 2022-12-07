@@ -61,11 +61,10 @@ fun OnboardingRecommendationsSearchPage(
             onSearch = { viewModel.queryImmediately() },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .focusRequester(focusRequester)
         )
 
-        Spacer(Modifier.height(16.dp))
         Box(Modifier.height(2.dp)) {
             Divider(color = MaterialTheme.theme.colors.secondaryUi02)
             if (state.loading && state.results.isNotEmpty()) {
