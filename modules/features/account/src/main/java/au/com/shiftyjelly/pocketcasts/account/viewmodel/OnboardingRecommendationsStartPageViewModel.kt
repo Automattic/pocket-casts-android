@@ -35,7 +35,13 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     init {
         viewModelScope.launch {
 
-            val feed = repository.getDiscoverFeed().await()
+            val feed = try {
+                repository.getDiscoverFeed().await()
+            } catch (e: Exception) {
+                Timber.e(e)
+                return@launch
+            }
+
             val regionCode = settings.getDiscoveryCountryCode()
             val region = feed.regions[regionCode]
                 ?: feed.regions[feed.defaultRegionCode]
@@ -60,9 +66,14 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             val discoverPodcastList = updatedList
                 .find { it.id == "trending" } // only care about the trending list
                 ?.let { trendingRow ->
-                    repository
-                        .getListFeed(trendingRow.source).await()
-                        .podcasts
+                    try {
+                        repository
+                            .getListFeed(trendingRow.source).await()
+                            .podcasts
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        null
+                    }
                 }
 
             if (discoverPodcastList == null) {

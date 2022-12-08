@@ -125,10 +125,12 @@ private fun Content(
                         modifier = Modifier.padding(bottom = 25.dp)
                     )
 
-                    TextH20(
-                        text = stringResource(LR.string.discover_trending),
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    if (trendingPodcasts.isNotEmpty()) {
+                        TextH20(
+                            text = stringResource(LR.string.discover_trending),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                    }
                 }
             }
 
