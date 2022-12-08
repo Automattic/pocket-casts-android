@@ -111,7 +111,7 @@ project.ext {
             browser: "androidx.browser:browser:1.4.0",
             percent: "androidx.percentlayout:percentlayout:1.0.0-rc02",
             preference: "androidx.preference:preference:1.2.0",
-            cast: "com.google.android.gms:play-services-cast-framework:21.1.0",
+            cast: "com.google.android.gms:play-services-cast-framework:21.2.0",
             desugarJdk: "com.android.tools:desugar_jdk_libs:1.1.5",
             // Firebase BoM (Bill of Materials enables you to manage all your Firebase library versions by specifying only one version)
             firebaseBom: "com.google.firebase:firebase-bom:30.5.0",

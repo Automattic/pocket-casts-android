@@ -1,6 +1,9 @@
 7.29
 -----
 
+* Bug Fixes:
+    *   Fixed podcast date format
+        ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
 
 7.28
 -----
@@ -9,8 +12,10 @@
         ([#575](https://github.com/Automattic/pocket-casts-android/pull/575)).
     *   Fixed miniplayer play icon animation on theme change
         ([#527](https://github.com/Automattic/pocket-casts-android/pull/527)).
-    *   Fixed podcast date format
-        ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
+    *   Fixed talkback issues
+        ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
+    *   Fixed skip forward/ backward buttons not showing in media notification while casting
+        ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
 
 7.27
 -----
