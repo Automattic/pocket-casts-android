@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
@@ -54,16 +55,21 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingLoginOrSignUpPage(
-    onNotNowClicked: () -> Unit,
+    flow: String,
+    onDismiss: () -> Unit,
     onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     onContinueWithGoogleClicked: () -> Unit,
-    onShown: () -> Unit,
     viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel()
 ) {
 
     LaunchedEffect(Unit) {
-        onShown()
+        viewModel.onShown(flow)
+    }
+
+    BackHandler {
+        viewModel.onDismiss(flow)
+        onDismiss()
     }
 
     Column {
@@ -86,7 +92,10 @@ internal fun OnboardingLoginOrSignUpPage(
                     text = stringResource(LR.string.not_now),
                     textAlign = TextAlign.End,
                     modifier = Modifier
-                        .clickable { onNotNowClicked() }
+                        .clickable {
+                            viewModel.onDismiss(flow)
+                            onDismiss()
+                        }
                         .padding(all = 4.dp)
                         .align(Alignment.CenterEnd)
                 )
@@ -127,12 +136,22 @@ internal fun OnboardingLoginOrSignUpPage(
 
             if (viewModel.showContinueWithGoogleButton) {
                 Spacer(Modifier.height(8.dp))
-                ContinueWithGoogleButton(viewModel = viewModel, onClick = onContinueWithGoogleClicked)
+                ContinueWithGoogleButton(
+                    flow = flow,
+                    viewModel = viewModel,
+                    onClick = onContinueWithGoogleClicked
+                )
             } else {
                 Spacer(Modifier.height(32.dp))
             }
-            SignUpButton(onClick = onSignUpClicked)
-            LogInButton(onClick = onLoginClicked)
+            SignUpButton(onClick = {
+                viewModel.onSignUpClicked(flow)
+                onSignUpClicked()
+            })
+            LogInButton(onClick = {
+                viewModel.onLoginClicked(flow)
+                onLoginClicked()
+            })
         }
     }
 }
@@ -177,7 +196,11 @@ private fun Artwork(googleSignInShown: Boolean) {
  * The One Tap for Android library is used. Sign in doesn't work when no Google accounts are set up on the device. In this case, fallback to the legacy Google Sign-In for Android.
  */
 @Composable
-private fun ContinueWithGoogleButton(viewModel: OnboardingLoginOrSignUpViewModel, onClick: () -> Unit) {
+private fun ContinueWithGoogleButton(
+    flow: String,
+    viewModel: OnboardingLoginOrSignUpViewModel,
+    onClick: () -> Unit
+) {
     val context = LocalContext.current
     val errorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
 
@@ -210,6 +233,7 @@ private fun ContinueWithGoogleButton(viewModel: OnboardingLoginOrSignUpViewModel
 
     val onSignInClick = {
         viewModel.startGoogleOneTapSignIn(
+            flow = flow,
             onSuccess = { request -> googleOneTapSignInLauncher.launch(request) },
             onError = {
                 viewModel.startGoogleLegacySignIn(
@@ -290,11 +314,11 @@ private object Artwork {
 private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         OnboardingLoginOrSignUpPage(
-            onNotNowClicked = {},
+            flow = "initial_onboarding",
+            onDismiss = {},
             onSignUpClicked = {},
             onLoginClicked = {},
             onContinueWithGoogleClicked = {},
-            onShown = {}
         )
     }
 }
