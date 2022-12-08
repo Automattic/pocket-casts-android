@@ -1,11 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
+import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object OnboardingRecommendationsFlow {
 
@@ -31,7 +35,19 @@ object OnboardingRecommendationsFlow {
                 OnboardingRecommendationsStartPage(
                     onShown = onShown,
                     onImportClicked = { navController.navigate(OnboardingImportFlow.route) },
-                    onSearch = { navController.navigate(search) },
+                    onSearch = with(LocalContext.current) {
+                        if (Network.isConnected(this)) {
+                            { navController.navigate(search) }
+                        } else {
+                            {
+                                Toast.makeText(
+                                    this,
+                                    this.getString(LR.string.error_check_your_internet_connection),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    },
                     onBackPressed = onBackPressed,
                     onComplete = onComplete,
                 )
