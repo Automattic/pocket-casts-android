@@ -36,10 +36,10 @@ object OnboardingRecommendationsFlow {
                     onShown = onShown,
                     onImportClicked = { navController.navigate(OnboardingImportFlow.route) },
                     onSearch = with(LocalContext.current) {
-                        if (Network.isConnected(this)) {
-                            { navController.navigate(search) }
-                        } else {
-                            {
+                        {
+                            if (Network.isConnected(this)) {
+                                navController.navigate(search)
+                            } else {
                                 Toast.makeText(
                                     this,
                                     this.getString(LR.string.error_check_your_internet_connection),
