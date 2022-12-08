@@ -30,7 +30,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.RecommendationPodcast
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
@@ -59,10 +58,11 @@ fun OnboardingRecommendationsStartPage(
     BackHandler { onBackPressed() }
 
     val viewModel = hiltViewModel<OnboardingRecommendationsStartPageViewModel>()
-    val trendingPodcasts by viewModel.trendingPodcasts.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     Content(
-        trendingPodcasts = trendingPodcasts,
+        trendingPodcasts = state.trendingPodcasts,
+        buttonRes = state.buttonRes,
         onImportClicked = onImportClicked,
         onSubscribeTap = viewModel::updateSubscribed,
         onSearch = onSearch,
@@ -72,9 +72,10 @@ fun OnboardingRecommendationsStartPage(
 
 @Composable
 private fun Content(
-    trendingPodcasts: List<RecommendationPodcast>,
+    trendingPodcasts: List<OnboardingRecommendationsStartPageViewModel.RecommendationPodcast>,
+    buttonRes: Int,
     onImportClicked: () -> Unit,
-    onSubscribeTap: (RecommendationPodcast) -> Unit,
+    onSubscribeTap: (OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) -> Unit,
     onSearch: () -> Unit,
     onComplete: () -> Unit,
 ) {
@@ -168,7 +169,7 @@ private fun Content(
         }
 
         RowButton(
-            text = stringResource(LR.string.not_now),
+            text = stringResource(buttonRes),
             onClick = onComplete,
         )
     }
@@ -182,17 +183,18 @@ private fun Preview(
     AppThemeWithBackground(themeType) {
         Content(
             trendingPodcasts = listOf(
-                RecommendationPodcast(
+                OnboardingRecommendationsStartPageViewModel.RecommendationPodcast(
                     uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
                     title = "Short title",
                     isSubscribed = false,
                 ),
-                RecommendationPodcast(
+                OnboardingRecommendationsStartPageViewModel.RecommendationPodcast(
                     uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
                     title = "A very very long title that is longer than will fit on two lines",
                     isSubscribed = true,
                 )
             ),
+            LR.string.not_now,
             onImportClicked = {},
             onSubscribeTap = {},
             onSearch = {},

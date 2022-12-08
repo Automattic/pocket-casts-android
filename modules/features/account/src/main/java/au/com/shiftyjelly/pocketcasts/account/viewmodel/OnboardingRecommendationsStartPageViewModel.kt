@@ -19,6 +19,7 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class OnboardingRecommendationsStartPageViewModel @Inject constructor(
@@ -29,8 +30,26 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     app: Application,
 ) : AndroidViewModel(app) {
 
-    private val _state: MutableStateFlow<List<RecommendationPodcast>> = MutableStateFlow(emptyList())
-    val trendingPodcasts: StateFlow<List<RecommendationPodcast>> = _state
+    data class State(val trendingPodcasts: List<RecommendationPodcast>) {
+        val buttonRes = if (trendingPodcasts.any { it.isSubscribed }) {
+            LR.string.navigation_continue
+        } else {
+            LR.string.not_now
+        }
+
+        companion object {
+            val EMPTY = State(trendingPodcasts = emptyList())
+        }
+    }
+
+    data class RecommendationPodcast(
+        val uuid: String,
+        val title: String,
+        val isSubscribed: Boolean,
+    )
+
+    private val _state: MutableStateFlow<State> = MutableStateFlow(State.EMPTY)
+    val state: StateFlow<State> = _state
 
     init {
         viewModelScope.launch {
@@ -95,9 +114,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                     }
                 }
                 .stateIn(viewModelScope)
-                .collectLatest {
-                    _state.value = it
-                }
+                .collectLatest { _state.value = State(it) }
         }
     }
 
@@ -109,9 +126,3 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
     }
 }
-
-data class RecommendationPodcast(
-    val uuid: String,
-    val title: String,
-    val isSubscribed: Boolean,
-)
