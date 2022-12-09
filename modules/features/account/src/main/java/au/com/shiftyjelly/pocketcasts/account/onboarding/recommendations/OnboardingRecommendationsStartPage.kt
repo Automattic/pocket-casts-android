@@ -47,26 +47,36 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingRecommendationsStartPage(
-    onShown: () -> Unit,
     onImportClicked: () -> Unit,
     onSearch: () -> Unit,
     onBackPressed: () -> Unit,
     onComplete: () -> Unit,
 ) {
-
-    LaunchedEffect(Unit) { onShown() }
-    BackHandler { onBackPressed() }
-
     val viewModel = hiltViewModel<OnboardingRecommendationsStartPageViewModel>()
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) { viewModel.onShown() }
+    BackHandler {
+        viewModel.onBackPressed()
+        onBackPressed()
+    }
 
     Content(
         trendingPodcasts = state.trendingPodcasts,
         buttonRes = state.buttonRes,
-        onImportClicked = onImportClicked,
+        onImportClicked = {
+            viewModel.onImportClick()
+            onImportClicked()
+        },
         onSubscribeTap = viewModel::updateSubscribed,
-        onSearch = onSearch,
-        onComplete = onComplete
+        onSearch = {
+            viewModel.onSearch()
+            onSearch()
+        },
+        onComplete = {
+            viewModel.onComplete()
+            onComplete()
+        }
     )
 }
 

@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImport
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -24,7 +22,6 @@ fun OnboardingFlowComposable(
     completeOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
     abortOnboarding: () -> Unit,
-    analyticsTracker: AnalyticsTrackerWrapper,
     signInState: SignInState?
 ) {
     AppThemeWithBackground(activeTheme) {
@@ -55,11 +52,7 @@ fun OnboardingFlowComposable(
             importFlowGraph(navController)
 
             onboardingRecommendationsFlowGraph(
-                onShown = { analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN) },
-                onBackPressed = {
-                    analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
-                    completeOnboarding()
-                },
+                onBackPressed = completeOnboarding,
                 onComplete = {
                     navController.navigate(OnboardingNavRoute.plusUpgrade)
                 },

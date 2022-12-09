@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,7 +18,6 @@ import javax.inject.Inject
 class OnboardingActivity : AppCompatActivity() {
 
     @Inject lateinit var theme: Theme
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var userManager: UserManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +30,6 @@ class OnboardingActivity : AppCompatActivity() {
                 completeOnboarding = { finishWithResult(OnboardingFinish.Completed) },
                 completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.CompletedGoToDiscover) },
                 abortOnboarding = { finishWithResult(OnboardingFinish.AbortedOnboarding) },
-                analyticsTracker = analyticsTracker,
                 signInState = signInState,
             )
         }

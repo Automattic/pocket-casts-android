@@ -300,6 +300,9 @@ enum class AnalyticsEvent(val key: String) {
     /* Recommendations */
     RECOMMENDATIONS_SHOWN("recommendations_shown"),
     RECOMMENDATIONS_DISMISSED("recommendations_dismissed"),
+    RECOMMENDATIONS_SEARCH_TAPPED("recommendations_search_tapped"),
+    RECOMMENDATIONS_IMPORT_TAPPED("recommendations_import_tapped"),
+    RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
 
     /* Onboarding upgrade */
     ONBOARDING_UPGRADE_SHOWN("onboarding_upgrade_shown"),
