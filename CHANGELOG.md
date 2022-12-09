@@ -13,6 +13,8 @@
         ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
     *   Fixed skip forward/ backward buttons not showing in media notification while casting
         ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
+    *   Fix media notification controls configuration to support 3 icons
+        ([#641](https://github.com/Automattic/pocket-casts-android/pull/641)).
 
 7.27
 -----

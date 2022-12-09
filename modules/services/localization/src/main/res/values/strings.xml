@@ -979,6 +979,7 @@
     <string name="settings_select_filters">Select filters</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
+    <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Customize the buttons displayed in Android 13 playback notifications and Android Auto.</string>
     <string name="settings_developer">Developer</string>
     <string name="settings_downloads_clean_up">Clean up</string>
     <string name="settings_downloads_clean_up_summary">Are you sure you want to delete these downloaded files?</string>
@@ -1012,7 +1013,6 @@
     <string name="settings_manage_downloads_include_starred">Include starred</string>
     <string name="settings_manage_downloads_total">Total</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
-    <string name="settings_media_notification_controls_summary">Choose two actions to be displayed in the Android 13 playback notification, Android Auto, and other places the custom media controls are available</string>
     <string name="settings_media_notification_controls_title_archive" translatable="false">@string/archive</string>
     <string name="settings_media_notification_controls_title_mark_as_played" translatable="false">@string/mark_as_played</string>
     <string name="settings_media_notification_controls_title_play_next" translatable="false">@string/play_next</string>
@@ -1037,6 +1037,7 @@
     <string name="settings_notification_vibrate_never">New episodes</string>
     <string name="settings_open_player_automatically">Open Player Automatically</string>
     <string name="settings_open_player_automatically_summary">If on, the full-screen player will open when you start playing a podcast episode.</string>
+    <string name="settings_other_media_actions">Other media actions</string>
     <string name="settings_playback_resumption">Intelligent playback resumption</string>
     <string name="settings_playback_resumption_summary">If on, Pocket Casts will go back a little in episodes you resume so you can catch up more comfortably.</string>
     <string name="settings_podcast_artwork">Podcast Artwork</string>
@@ -1053,6 +1054,8 @@
     <string name="settings_podcasts_selected_one">1 podcast</string>
     <string name="settings_podcasts_selected_x">%d podcasts</string>
     <string name="settings_podcasts_selected_zero">No podcasts selected</string>
+    <string name="settings_prioritize_your_notification_actions">Prioritize your notification actions</string>
+    <string name="settings_rearrange_media_actions">Rearrange Media Actions</string>
     <string name="settings_refresh_all_podcast_artwork">Refresh all podcast artwork</string>
     <string name="settings_refresh_artwork_message">Pocket Casts is now refreshing all your podcast images, this will happen in the background and may take a little time.</string>
     <string name="settings_refresh_artwork_ok" translatable="false">@string/ok</string>
@@ -1257,6 +1260,7 @@
     <string name="settings_privacy_crash_summary">Allow us to collect crash reports.</string>
     <string name="settings_privacy_crash_link">Link your account to crashes</string>
     <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
+    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">Your top actions will be available in your Android 13 notification and Android Auto player.</string>
 
     <string name="whats_new_folders_title_7_20" translatable="false">@string/folders</string>
     <string name="whats_new_folders_7_20">If you love podcasts half as much as we do, you probably have a lot of them. If you\'re a Pocket Casts Plus subscriber, you can now sort these into folders and file them into neat groups.\n\nThanks to your support, your Home Screen has never looked better!</string>
