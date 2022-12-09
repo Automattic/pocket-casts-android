@@ -155,7 +155,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         saved = settings.skipForwardInSecsObservable
                             .subscribeAsState(settings.getSkipForwardInSecs())
                             .value,
-                        onSave = settings::setSkipForwardInSec
+                        onSave = {
+                            settings.setSkipForwardNeedsSync(true)
+                            settings.setSkipForwardInSec(it)
+                        }
                     )
 
                     // Skip back time
@@ -164,7 +167,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                         saved = settings.skipBackwardInSecsObservable
                             .subscribeAsState(settings.getSkipBackwardInSecs())
                             .value,
-                        onSave = settings::setSkipBackwardInSec
+                        onSave = {
+                            settings.setSkipBackNeedsSync(true)
+                            settings.setSkipBackwardInSec(it)
+                        }
                     )
 
                     KeepScreenAwake(
