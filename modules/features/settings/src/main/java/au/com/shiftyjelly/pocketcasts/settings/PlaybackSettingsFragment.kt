@@ -157,7 +157,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                             .value,
                         onSave = {
                             settings.setSkipForwardNeedsSync(true)
-                            settings::setSkipForwardInSec.invoke(it)
+                            settings.setSkipForwardInSec(it)
                         }
                     )
 
@@ -169,7 +169,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                             .value,
                         onSave = {
                             settings.setSkipBackNeedsSync(true)
-                            settings::setSkipBackwardInSec.invoke(it)
+                            settings.setSkipBackwardInSec(it)
                         }
                     )
 
