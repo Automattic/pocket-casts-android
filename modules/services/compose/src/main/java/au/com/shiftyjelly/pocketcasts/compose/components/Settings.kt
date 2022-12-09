@@ -104,37 +104,6 @@ fun <T> SettingRadioDialogRow(
     }
 }
 
-@Composable
-fun <T> SettingCheckBoxDialogRow(
-    primaryText: String,
-    modifier: Modifier = Modifier,
-    secondaryText: String? = null,
-    options: List<T>,
-    savedOption: List<T>,
-    maxOptions: Int = savedOption.size,
-    optionToLocalisedString: (T) -> String,
-    onSave: (List<T>) -> Unit,
-) {
-
-    var showDialog by remember { mutableStateOf(false) }
-    SettingRow(
-        primaryText = primaryText,
-        secondaryText = secondaryText,
-        modifier = modifier.clickable { showDialog = true }
-    ) {
-        if (showDialog) {
-            CheckboxDialog(
-                title = primaryText,
-                options = options.map { Pair(it, optionToLocalisedString(it)) },
-                savedOption = savedOption,
-                maxOptions = maxOptions,
-                onSave = onSave,
-                dismissDialog = { showDialog = false }
-            )
-        }
-    }
-}
-
 /*
  * Click handling should be done in the modifier passed to this composable to ensure the
  * entire row is clickable.

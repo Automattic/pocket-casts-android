@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
-import au.com.shiftyjelly.pocketcasts.compose.components.SettingCheckBoxDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
@@ -49,8 +47,8 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -137,14 +135,13 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
                     )
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        MediaNotificationControls(
-                            saved = settings.defaultMediaNotificationControlsFlow.collectAsState().value,
-                            onSave = {
-                                settings.setDefaultMediaNotificationControls(it)
-                            }
-                        )
-                    }
+                    SettingRow(
+                        primaryText = stringResource(LR.string.settings_media_notification_controls),
+                        secondaryText = stringResource(LR.string.settings_customize_buttons_displayed_in_android_13_notification_and_android_auto),
+                        modifier = Modifier.clickable {
+                            (activity as? FragmentHostListener)?.addFragment(MediaNotificationControlsFragment())
+                        }
+                    )
                 }
 
                 SettingSection(heading = stringResource(LR.string.settings_general_player)) {
@@ -293,20 +290,6 @@ class PlaybackSettingsFragment : BaseFragment() {
                 false -> getString(LR.string.settings_show_archived_action_hide)
             }
         },
-    )
-
-    @Composable
-    fun MediaNotificationControls(
-        saved: List<MediaNotificationControls>,
-        onSave: (List<MediaNotificationControls>) -> Unit
-    ) = SettingCheckBoxDialogRow(
-        primaryText = stringResource(LR.string.settings_media_notification_controls),
-        secondaryText = stringResource(LR.string.settings_media_notification_controls_summary),
-        options = MediaNotificationControls.All,
-        maxOptions = MediaNotificationControls.MaxSelectedOptions,
-        savedOption = saved,
-        optionToLocalisedString = { getString(it.controlName) },
-        onSave = onSave
     )
 
     @Composable
