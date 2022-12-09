@@ -96,7 +96,7 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val defaultPodcastGroupingFlow = MutableStateFlow(defaultPodcastGrouping())
-    override val defaultMediaNotificationControlsFlow = MutableStateFlow(defaultMediaNotificationControls())
+    override val defaultMediaNotificationControlsFlow = MutableStateFlow(getMediaNotificationControlItems())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
     override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
@@ -1202,23 +1202,17 @@ class SettingsImpl @Inject constructor(
         defaultShowArchivedFlow.update { value }
     }
 
-    override fun defaultMediaNotificationControls(): List<MediaNotificationControls> {
-        val selectedValue = MediaNotificationControls.All.map { mediaControl ->
-            val defaultValue =
-                (mediaControl == MediaNotificationControls.PlaybackSpeed || mediaControl == MediaNotificationControls.Star)
-            Pair(mediaControl, getBoolean(mediaControl.key, defaultValue))
-        }
+    override fun getMediaNotificationControlItems(): List<MediaNotificationControls> {
+        var items = getStringList("media_notification_controls_action")
 
-        return selectedValue.filter { (_, value) -> value }.map { (mediaControl, _) ->
-            mediaControl
-        }
+        if (items.isEmpty())
+            items = MediaNotificationControls.All.map { it.key }
+        return items.mapNotNull { MediaNotificationControls.itemForId(it) }
     }
 
-    override fun setDefaultMediaNotificationControls(mediaNotificationControls: List<MediaNotificationControls>) {
-        MediaNotificationControls.All.forEach { mediaControl ->
-            setBoolean(mediaControl.key, mediaNotificationControls.contains(mediaControl))
-        }
-        defaultMediaNotificationControlsFlow.update { mediaNotificationControls }
+    override fun setMediaNotificationControlItems(items: List<String>) {
+        setStringList("media_notification_controls_action", items)
+        defaultMediaNotificationControlsFlow.update { items.mapNotNull { MediaNotificationControls.itemForId(it) } }
     }
 
     override fun defaultPodcastGrouping(): PodcastGrouping {
