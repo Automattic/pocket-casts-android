@@ -96,11 +96,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.logIn) {
                 OnboardingLoginPage(
-                    onShown = { analyticsTracker.track(AnalyticsEvent.SIGNIN_SHOWN) },
-                    onBackPressed = {
-                        analyticsTracker.track(AnalyticsEvent.SIGNIN_DISMISSED)
-                        navController.popBackStack()
-                    },
+                    onBackPressed = { navController.popBackStack() },
                     onLoginComplete = completeOnboarding,
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
