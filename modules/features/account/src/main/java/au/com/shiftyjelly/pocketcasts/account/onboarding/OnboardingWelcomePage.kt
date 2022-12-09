@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -34,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -53,6 +57,7 @@ fun OnboardingWelcomePage(
     isSignedInAsPlus: Boolean,
     onContinue: () -> Unit,
     onContinueToDiscover: () -> Unit,
+    onImportTapped: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
 
@@ -78,6 +83,7 @@ fun OnboardingWelcomePage(
     Content(
         isSignedInAsPlus = isSignedInAsPlus,
         onContinueToDiscover = onContinueToDiscover,
+        onImportTapped = onImportTapped,
         state = state,
         onContinue = onContinue,
         onNewsletterCheckedChanged = viewModel::updateNewsletter
@@ -88,11 +94,17 @@ fun OnboardingWelcomePage(
 private fun Content(
     isSignedInAsPlus: Boolean,
     onContinueToDiscover: () -> Unit,
+    onImportTapped: () -> Unit,
     state: OnboardingWelcomeState,
     onContinue: () -> Unit,
-    onNewsletterCheckedChanged: (Boolean) -> Unit
+    onNewsletterCheckedChanged: (Boolean) -> Unit,
 ) {
-    Column(Modifier.padding(horizontal = 24.dp)) {
+    Column(
+        Modifier
+            .padding(horizontal = 24.dp)
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
+    ) {
         Spacer(modifier = Modifier.weight(1f))
 
         if (isSignedInAsPlus) {
@@ -111,6 +123,15 @@ private fun Content(
                 }
             ),
             modifier = Modifier.padding(end = 8.dp)
+        )
+
+        Spacer(Modifier.height(24.dp))
+        CardSection(
+            titleRes = LR.string.onboarding_import_podcasts_title,
+            descriptionRes = LR.string.onboarding_import_podcasts_text,
+            actionRes = LR.string.onboarding_import_podcasts_button,
+            iconRes = IR.drawable.pc_bw_import,
+            onClick = onImportTapped
         )
 
         Spacer(Modifier.height(24.dp))
@@ -277,6 +298,7 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
         OnboardingWelcomePage(
             onContinue = {},
             onContinueToDiscover = {},
+            onImportTapped = {},
             onBackPressed = {},
             isSignedInAsPlus = false
         )
@@ -288,12 +310,13 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
 private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         Content(
-            onContinue = {},
-            onContinueToDiscover = {},
             isSignedInAsPlus = true,
+            onContinueToDiscover = {},
+            onImportTapped = {},
             state = OnboardingWelcomeState(
                 newsletter = false
             ),
+            onContinue = {},
             onNewsletterCheckedChanged = {},
         )
     }

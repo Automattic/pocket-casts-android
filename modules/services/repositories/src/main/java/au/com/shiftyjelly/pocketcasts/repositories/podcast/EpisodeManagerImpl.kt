@@ -1062,7 +1062,7 @@ class EpisodeManagerImpl @Inject constructor(
     override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: Episode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<Playable> {
         return episodeDao.existsRx(episodeUuid)
             .flatMapMaybe { episodeExists ->
-                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.uuid) {
+                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
                     observePlayableByUuid(episodeUuid).firstElement()
                 } else {
                     podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->

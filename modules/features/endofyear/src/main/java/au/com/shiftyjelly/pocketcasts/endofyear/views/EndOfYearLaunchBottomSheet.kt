@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.views
 
+import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -39,12 +40,14 @@ private val ImageContentCoverBottomPadding = 8.dp
 
 @Composable
 fun EndOfYearLaunchBottomSheet(
+    parent: ViewGroup,
     modifier: Modifier = Modifier,
     shouldShow: Boolean = true,
     onClick: () -> Unit,
     onExpanded: () -> Unit,
 ) {
     ModalBottomSheet(
+        parent = parent,
         shouldShow = shouldShow,
         onExpanded = onExpanded,
         content = BottomSheetContentState.Content(
