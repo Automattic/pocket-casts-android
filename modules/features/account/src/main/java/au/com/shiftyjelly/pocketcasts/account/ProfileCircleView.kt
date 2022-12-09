@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
@@ -8,11 +9,17 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.toRect
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
+import coil.imageLoader
+import coil.request.ImageRequest
+import coil.target.Target
+import coil.transform.CircleCropTransformation
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val DRAW_FULL = 0
@@ -44,6 +51,7 @@ class ProfileCircleView @JvmOverloads constructor(
     private val iconColor = context.getThemeColor(UR.attr.primary_ui_01)
     private var iconDrawable0: Drawable? = context.getTintedDrawable(R.drawable.ic_plus_account, iconColor)
     private var iconDrawable1: Drawable? = context.getTintedDrawable(R.drawable.ic_free_account, iconColor)
+    private var bitmap: Bitmap? = null
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -103,17 +111,58 @@ class ProfileCircleView @JvmOverloads constructor(
                 iconDrawable1?.bounds = bounds3Rect.toRect()
                 iconDrawable1?.draw(canvas)
             }
+            bitmap?.let {
+                canvas.drawBitmap(
+                    it,
+                    bounds2Rect.centerX() - it.width / 2,
+                    bounds2Rect.centerY() - it.height / 2,
+                    paint
+                )
+            }
         }
     }
 
-    fun setup(percent: Float, plusOnly: Boolean) {
+    fun setup(
+        percent: Float,
+        plusOnly: Boolean,
+        gravatarUrl: String? = null,
+    ) {
         drawState = DRAW_FULL
         expiryDegrees = 360f * percent
         plusAccount = plusOnly
+        bitmap = null
+        gravatarUrl?.let {
+            if (width > 0) {
+                val size = if (!plusAccount) {
+                    width * 0.85f
+                } else {
+                    width - (inset + strokeWidth * 2) * 2
+                }
+                loadImageFromUri(uri = Uri.parse(gravatarUrl), size = size.toInt())
+            }
+        }
 
         color0 = context.getThemeColor(UR.attr.gradient_01_a)
         color1 = context.getThemeColor(UR.attr.gradient_01_e)
         update()
         invalidate()
+    }
+
+    private fun loadImageFromUri(uri: Uri, size: Int) {
+        val target = object : Target {
+            override fun onError(error: Drawable?) {
+            }
+            override fun onSuccess(result: Drawable) {
+                bitmap = result.toBitmap()
+                update()
+                invalidate()
+            }
+        }
+        val request = ImageRequest.Builder(context)
+            .data(uri)
+            .size(size)
+            .transformations(CircleCropTransformation())
+            .target(target)
+        context.imageLoader.enqueue(request.build())
     }
 }
