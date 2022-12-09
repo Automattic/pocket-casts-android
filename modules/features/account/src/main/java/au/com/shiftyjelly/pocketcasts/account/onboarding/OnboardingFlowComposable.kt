@@ -78,11 +78,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.createFreeAccount) {
                 OnboardingCreateAccountPage(
-                    onShown = { analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_SHOWN) },
-                    onBackPressed = {
-                        analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_DISMISSED)
-                        navController.popBackStack()
-                    },
+                    onBackPressed = { navController.popBackStack() },
                     onAccountCreated = {
                         navController.navigate(OnboardingRecommendationsFlow.route) {
                             // clear backstack after account is created
