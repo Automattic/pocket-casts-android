@@ -68,23 +68,11 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
-                    onNotNowClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, AnalyticsProp.source)
-                        completeOnboarding()
-                    },
-                    onSignUpClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.createAccount)
-                        navController.navigate(OnboardingNavRoute.createFreeAccount)
-                    },
-                    onLoginClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.signIn)
-                        navController.navigate(OnboardingNavRoute.logIn)
-                    },
-                    onContinueWithGoogleClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.continueWithGoogle)
-                        navController.navigate(OnboardingNavRoute.logInGoogle)
-                    },
-                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN, AnalyticsProp.source) }
+                    flow = "initial_onboarding",
+                    onDismiss = { completeOnboarding() },
+                    onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
+                    onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
+                    onContinueWithGoogleClicked = { navController.navigate(OnboardingNavRoute.logInGoogle) },
                 )
             }
 
