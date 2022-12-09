@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-22 11:54:03+0000
+Translation-Revision-Date: 2022-12-07 12:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+	<string name="onboarding_continue_with_google_error">Google ログインを起動できません。</string>
+	<string name="onboarding_find_podcasts">ポッドキャストを検索</string>
+	<string name="onboarding_welcome_recommendations_button">次のポッドキャストを検索</string>
+	<string name="onboarding_welcome_recommendations_text">厳選された Discover ページで、まだ知らない最近人気のポッドキャストを見つけましょう。</string>
+	<string name="onboarding_welcome_recommendations_title">新しいものを見つける</string>
+	<string name="onboarding_welcome_get_you_listening_plus">ありがとうございます。どうぞお聞きください !</string>
+	<string name="onboarding_welcome_get_you_listening">ようこそ、どうぞお聞きください !</string>
+	<string name="onboarding_plus_recurring_after_free_trial">%sの後に定期支払いが発生します</string>
+	<string name="onboarding_plus_start_free_trial_and_subscribe">無料お試しとサブスクリプションを開始</string>
+	<string name="onboarding_plus_terms_and_conditions">利用規約</string>
+	<string name="onboarding_plus_privacy_policy">プライバシーポリシー</string>
+	<string name="onboarding_plus_continuing_agrees_to">続行すると、%1$sと%2$sに同意したことになります。</string>
+	<string name="onboarding_plus_become_a_plus_member">Plus のメンバーになると、すべての Pocket Casts 機能を利用できるようになります</string>
+	<string name="onboarding_sign_up">登録</string>
+	<string name="onboarding_create_account">アカウントを作成</string>
+	<string name="onboarding_log_in">ログイン</string>
+	<string name="plus_trial_duration_free_trial">%s 無料トライアル</string>
+	<string name="end_of_year_stories_failed">年末のストーリーを読み込めません。インターネット接続を確認してください。</string>
 	<string name="onboarding_plus_feature_themes_icons_text">あなたの個性を表現しましょう。 Plus クラブ限定の特別なアイコンとテーマ。</string>
 	<string name="onboarding_plus_feature_themes_icons_title">テーマとアイコン</string>
 	<string name="onboarding_plus_feature_hide_ads_text">広告非表示の操作環境では気に入ったコンテンツを増やし、気に入らないコンテンツは減らすことができます。</string>
@@ -36,6 +54,7 @@ Language: ja_JP
 	<string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
 	<string name="end_of_year_story_top_categories">トップカテゴリー</string>
 	<string name="end_of_year_story_epilogue_subtitle">友達と共有したりお気に入りのポッドキャストクリエイターにエールを送ったりしましょう</string>
+	<string name="end_of_year_story_epilogue_title">2022年、Pocket Casts をお聴きくださりありがとうございました</string>
 	<string name="end_of_year_story_longest_episode_share_text">2022年に聴いた最長のエピソード: %1$s</string>
 	<string name="end_of_year_story_longest_episode_duration">このエピソードの時間は%1$sです</string>
 	<string name="end_of_year_story_longest_episode">お聴きになった最長のエピソードは、ポッドキャスト %2$s の %1$s のエピソードでした</string>
@@ -52,7 +71,7 @@ Language: ja_JP
 	<string name="end_of_year_story_listened_to_categories_subtitle">お気に入りをいくつか振り返りましょう…</string>
 	<string name="end_of_year_story_listened_to_categories">今年、%1$d個のカテゴリーを聴きました</string>
 	<string name="end_of_year_story_listened_to_share_text">2022年、ポッドキャストを聴いた時間は合計%1$s時間です</string>
-	<string name="end_of_year_story_intro_title">今年聴いたポッドキャストを振り返ってみましょう…</string>
+	<string name="end_of_year_story_intro_title">今年聴いたポッドキャストを振り返ってみましょう。</string>
 	<string name="end_of_year_launch_modal_image_title">ポッドキャストで振り返る1年</string>
 	<string name="end_of_year_replay">再生</string>
 	<string name="settings_media_notification_controls_summary">Android 13の再生通知、Android Auto、その他のカスタムメディアコントロールを使用できる場所に表示するアクションを2つ選択します</string>

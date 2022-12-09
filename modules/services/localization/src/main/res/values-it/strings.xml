@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-28 18:54:04+0000
+Translation-Revision-Date: 2022-12-06 13:54:21+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+	<string name="onboarding_continue_with_google_error">Impossibile avviare l\'accesso a Google.</string>
 	<string name="onboarding_find_podcasts">Trova Podcast</string>
 	<string name="onboarding_welcome_recommendations_button">Trova il mio prossimo podcast</string>
 	<string name="onboarding_welcome_recommendations_text">Trova podcast nascosti e di tendenza nella nostra pagina Discover selezionata.</string>
@@ -70,7 +71,7 @@ Language: it
 	<string name="end_of_year_story_listened_to_categories_subtitle">Diamo un\'occhiata ad alcuni dei tuoi preferiti...</string>
 	<string name="end_of_year_story_listened_to_categories">Hai ascoltato %1$d differenti categorie quest\'anno</string>
 	<string name="end_of_year_story_listened_to_share_text">Nel 2022, hai trascorso %1$s ascoltando podcast</string>
-	<string name="end_of_year_story_intro_title">Festeggiamo il tuo anno di ascolto...</string>
+	<string name="end_of_year_story_intro_title">Festeggiamo il tuo anno di ascolto!</string>
 	<string name="end_of_year_launch_modal_image_title">L\'anno in podcast</string>
 	<string name="end_of_year_replay">Riproduci</string>
 	<string name="settings_media_notification_controls_summary">Scegli due azioni da visualizzare nella notifica di riproduzione di Android 13, Android Auto e altri posti in cui sono disponibili i controlli degli elementi multimediali personalizzati</string>

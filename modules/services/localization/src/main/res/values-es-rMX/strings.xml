@@ -6,6 +6,24 @@ Generator: GlotPress/2.4.0-alpha
 Language: es_MX
 -->
 <resources>
+	<string name="onboarding_continue_with_google_error">No se puede acceder a Google.</string>
+	<string name="onboarding_find_podcasts">Encuentra pódcasts</string>
+	<string name="onboarding_welcome_recommendations_button">Buscar mi siguiente pódcast</string>
+	<string name="onboarding_welcome_recommendations_text">Encuentra pódcasts poco conocidos y pódcasts populares en nuestra página Descubrir, con selecciones elegidas con cariño.</string>
+	<string name="onboarding_welcome_recommendations_title">Descubre algo nuevo</string>
+	<string name="onboarding_welcome_get_you_listening_plus">Gracias. Y ahora... ¡a escuchar!</string>
+	<string name="onboarding_welcome_get_you_listening">Te damos la bienvenida. Y ahora... ¡a escuchar!</string>
+	<string name="onboarding_plus_recurring_after_free_trial">Los pagos recurrentes comenzarán después de tu %s</string>
+	<string name="onboarding_plus_start_free_trial_and_subscribe">Iniciar prueba gratuita y suscribirse</string>
+	<string name="onboarding_plus_terms_and_conditions">Términos y condiciones</string>
+	<string name="onboarding_plus_privacy_policy">Política de privacidad</string>
+	<string name="onboarding_plus_continuing_agrees_to">Al continuar, aceptas nuestros %1$s y la %2$s.</string>
+	<string name="onboarding_plus_become_a_plus_member">Conviértete en miembro Plus y disfruta de todas las funciones de Pocket Casts</string>
+	<string name="onboarding_sign_up">Registrarse</string>
+	<string name="onboarding_create_account">Crear cuenta</string>
+	<string name="onboarding_log_in">Acceder</string>
+	<string name="plus_trial_duration_free_trial">Prueba gratuita de %s</string>
+	<string name="end_of_year_stories_failed">No se han podido cargar las historias de final de año, comprueba tu conexión a Internet.</string>
 	<string name="onboarding_plus_feature_themes_icons_text">Muéstrate tal y como eres. Iconos y temas exclusivos solo para miembros Plus.</string>
 	<string name="onboarding_plus_feature_themes_icons_title">Temas e iconos</string>
 	<string name="onboarding_plus_feature_hide_ads_text">Experiencia sin anuncios que te da más de lo que te encanta y menos de lo que te desagrada.</string>
@@ -16,11 +34,13 @@ Language: es_MX
 	<string name="onboarding_plus_feature_folders_title">Carpetas</string>
 	<string name="onboarding_plus_feature_desktop_apps_text">Escucha pódcast en más lugares con nuestras aplicaciones para Windows, macOs y web.</string>
 	<string name="onboarding_plus_feature_desktop_apps_title">Aplicaciones para ordenador</string>
+	<string name="onboarding_upgrade_unlock_all_features">Disfruta de todas las funciones</string>
 	<string name="onboarding_upgrade_exclusive_features_and_options">Obtén acceso a funciones y opciones de personalización exclusivas</string>
 	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Todo lo que te encanta de Pocket Casts y mucho más</string>
 	<string name="onboarding_recommendations_import">Importar</string>
 	<string name="onboarding_recommendations_make_pocket_casts_yours">Haz tuya la aplicación Pocket Casts seleccionando tus pódcast favoritos o impórtalos desde otro reproductor de pódcast. Siempre puedes hacerlo más adelante.</string>
 	<string name="onboarding_recommendations_find_favorite_podcasts">Encuentra tus pódcast favoritos</string>
+	<string name="not_now">Ahora no</string>
 	<string name="settings_open_player_automatically_summary">Si la opción está activada, el reproductor de pantalla completa se abrirá cuando empieces a reproducir un episodio de pódcast.</string>
 	<string name="settings_open_player_automatically">Abrir reproductor automáticamente</string>
 	<string name="onboarding_email_invalid_message">Introduce una dirección de correo electrónico válida.</string>
@@ -33,7 +53,8 @@ Language: es_MX
 	<string name="end_of_year_create_account_to_see">Guarda tus pódcast en la nube, obtén un resumen al final del año y sincroniza tu progreso con otros dispositivos.</string>
 	<string name="end_of_year_story_top_categories_share_text">Mis categorías de pódcast más escuchadas</string>
 	<string name="end_of_year_story_top_categories">Tus categorías principales</string>
-	<string name="end_of_year_story_epilogue_subtitle">No olvides compartirlos con tus amigos y mandar un saludo a tus creadores de pódcast favoritos.</string>
+	<string name="end_of_year_story_epilogue_subtitle">No olvides compartirlos con tus amigos y mandar un saludo a tus creadores de pódcast favoritos</string>
+	<string name="end_of_year_story_epilogue_title">Gracias por permitir que Pocket Casts forme parte de tu experiencia auditiva en 2022.</string>
 	<string name="end_of_year_story_longest_episode_share_text">El episodio más largo que escuché en 2022 %1$s.</string>
 	<string name="end_of_year_story_longest_episode_duration">Este episodio duró %1$s.</string>
 	<string name="end_of_year_story_longest_episode">El episodio más largo que escuchaste fue %1$s del pódcast %2$s.</string>
@@ -50,7 +71,7 @@ Language: es_MX
 	<string name="end_of_year_story_listened_to_categories_subtitle">Vamos a echar un vistazo a algunos de tus favoritos...</string>
 	<string name="end_of_year_story_listened_to_categories">Escuchaste %1$d categorías diferentes este año.</string>
 	<string name="end_of_year_story_listened_to_share_text">Estuve %1$s escuchando pódcast en 2022.</string>
-	<string name="end_of_year_story_intro_title">Celebremos el año que llevas escuchando pódcast...</string>
+	<string name="end_of_year_story_intro_title">¡Celebremos el año que llevas escuchando pódcast!</string>
 	<string name="end_of_year_launch_modal_image_title">Año en pódcast</string>
 	<string name="end_of_year_replay">Volver a reproducir</string>
 	<string name="settings_media_notification_controls_summary">Elige dos acciones para que se muestren en la notificación de reproducción de Android 13, Android Auto y otros lugares en los que estén disponibles los controles de medios personalizados.</string>
