@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,14 +59,15 @@ fun OnboardingRecommendationsSearchPage(
             text = state.searchQuery,
             placeholder = stringResource(LR.string.search),
             onTextChanged = viewModel::updateSearchQuery,
-            onSearch = { viewModel.queryImmediately() },
+            onSearch = with(LocalContext.current) {
+                { viewModel.queryImmediately(this) }
+            },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .focusRequester(focusRequester)
         )
 
-        Spacer(Modifier.height(16.dp))
         Box(Modifier.height(2.dp)) {
             Divider(color = MaterialTheme.theme.colors.secondaryUi02)
             if (state.loading && state.results.isNotEmpty()) {

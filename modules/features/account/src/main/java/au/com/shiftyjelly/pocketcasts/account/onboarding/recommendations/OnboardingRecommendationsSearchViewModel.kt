@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -9,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.search.SearchHandler
 import au.com.shiftyjelly.pocketcasts.search.SearchState
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class OnboardingRecommendationsSearchViewModel @Inject constructor(
@@ -97,8 +101,16 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         searchHandler.updateSearchQuery(searchQuery)
     }
 
-    fun queryImmediately() {
-        searchHandler.updateSearchQuery(state.value.searchQuery, immediate = true)
+    fun queryImmediately(context: Context) {
+        if (Network.isConnected(context)) {
+            searchHandler.updateSearchQuery(state.value.searchQuery, immediate = true)
+        } else {
+            Toast.makeText(
+                context,
+                context.getString(LR.string.error_check_your_internet_connection),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     fun toggleSubscribed(podcastResult: PodcastResult) {
