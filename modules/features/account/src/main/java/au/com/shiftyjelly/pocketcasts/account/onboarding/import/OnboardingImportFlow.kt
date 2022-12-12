@@ -1,18 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.import
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import android.content.ActivityNotFoundException
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object OnboardingImportFlow {
 
@@ -36,14 +33,32 @@ object OnboardingImportFlow {
             }
 
             composable(castbox) {
-                OnboardingImportCastbox(
-                    onBackPressed = { navController.popBackStack() },
+                OnboardingImportFrom(
+                    drawableRes = IR.drawable.castbox,
+                    title = (stringResource(LR.string.onboarding_import_from_castbox)),
+                    steps = listOf(
+                        stringResource(LR.string.onboarding_import_from_castbox_step_1),
+                        stringResource(LR.string.onboarding_import_from_castbox_step_2),
+                        stringResource(LR.string.onboarding_import_from_castbox_step_3),
+                        stringResource(LR.string.onboarding_import_from_castbox_step_4),
+                        stringResource(LR.string.onboarding_import_from_castbox_step_5),
+                    ),
+                    buttonText = stringResource(LR.string.onboarding_import_from_castbox_open),
+                    buttonClick = openCastboxFun(),
+                    onBackPressed = { navController.popBackStack() }
                 )
             }
 
             composable(otherApps) {
-                OnboardingImportOtherApps(
-                    onBackPressed = { navController.popBackStack() },
+                OnboardingImportFrom(
+                    drawableRes = IR.drawable.other_apps,
+                    title = stringResource(LR.string.onboarding_import_from_other_apps),
+                    text = stringResource(LR.string.onboarding_can_import_from_opml),
+                    steps = listOf(
+                        stringResource(LR.string.onboarding_import_from_other_apps_step_1),
+                        stringResource(LR.string.onboarding_import_from_other_apps_step_2),
+                    ),
+                    onBackPressed = { navController.popBackStack() }
                 )
             }
         }
@@ -51,45 +66,18 @@ object OnboardingImportFlow {
 }
 
 @Composable
-fun NumberedList(vararg texts: String) {
-    ConstraintLayout(Modifier.fillMaxWidth()) {
-        val numberRefs = texts.map { createRef() }
-        val textRefs = texts.map { createRef() }
-
-        val barrier = createEndBarrier(*numberRefs.toTypedArray())
-
-        texts.forEachIndexed { index, text ->
-
-            val numberRef = numberRefs[index]
-            val textRef = textRefs[index]
-
-            // Number
-            TextP40(
-                text = "${index + 1}.",
-                modifier = Modifier
-                    .clearAndSetSemantics {} // ignore for accessibility
-                    .constrainAs(numberRef) {
-                        top.linkTo(
-                            anchor = if (index == 0) parent.top else textRefs[index - 1].bottom,
-                            margin = if (index == 0) 0.dp else 12.dp
-                        )
-                        start.linkTo(parent.start)
-                    }
-            )
-
-            // Indented text
-            TextP40(
-                text = text,
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .constrainAs(textRef) {
-                        top.linkTo(numberRef.top)
-                        start.linkTo(barrier, 8.dp)
-                        end.linkTo(parent.end)
-                        height = Dimension.wrapContent
-                        width = Dimension.fillToConstraints
-                    }
-            )
+private fun openCastboxFun(): (() -> Unit)? {
+    val context = LocalContext.current
+    return context
+        .packageManager
+        .getLaunchIntentForPackage("fm.castbox.audiobook.radio.podcast")
+        ?.let { intent ->
+            {
+                try {
+                    context.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    // should only happen if the user uninstalls castbox after this screen is composed
+                }
+            }
         }
-    }
 }
