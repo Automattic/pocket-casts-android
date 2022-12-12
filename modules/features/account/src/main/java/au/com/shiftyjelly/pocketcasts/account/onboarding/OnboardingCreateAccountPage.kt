@@ -33,16 +33,18 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingCreateAccountPage(
-    onShown: () -> Unit,
     onBackPressed: () -> Unit,
     onAccountCreated: () -> Unit,
 ) {
 
-    LaunchedEffect(Unit) { onShown() }
-    BackHandler { onBackPressed() }
-
     val viewModel = hiltViewModel<OnboardingCreateAccountViewModel>()
     val state by viewModel.stateFlow.collectAsState()
+
+    LaunchedEffect(Unit) { viewModel.onShown() }
+    BackHandler {
+        viewModel.onBackPressed()
+        onBackPressed()
+    }
 
     val view = LocalView.current
     @Suppress("NAME_SHADOWING")
@@ -54,7 +56,10 @@ internal fun OnboardingCreateAccountPage(
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.create_account),
-            onNavigationClick = onBackPressed
+            onNavigationClick = {
+                viewModel.onBackPressed()
+                onBackPressed()
+            }
         )
 
         Column(
@@ -117,7 +122,6 @@ private fun OnboardingCreateAccountPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingCreateAccountPage(
-            onShown = {},
             onBackPressed = {},
             onAccountCreated = {},
         )

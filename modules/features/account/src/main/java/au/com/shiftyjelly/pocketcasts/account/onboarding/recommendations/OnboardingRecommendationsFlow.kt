@@ -19,7 +19,6 @@ object OnboardingRecommendationsFlow {
     private const val search = "search"
 
     fun NavGraphBuilder.onboardingRecommendationsFlowGraph(
-        onShown: () -> Unit,
         onBackPressed: () -> Unit,
         onComplete: () -> Unit,
         navController: NavController,
@@ -33,7 +32,6 @@ object OnboardingRecommendationsFlow {
 
             composable(start) {
                 OnboardingRecommendationsStartPage(
-                    onShown = onShown,
                     onImportClicked = { navController.navigate(OnboardingImportFlow.route) },
                     onSearch = with(LocalContext.current) {
                         {

@@ -3,12 +3,15 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -25,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
+    val analyticsTracker: AnalyticsTrackerWrapper,
     repository: ListRepository,
     settings: Settings,
     app: Application,
@@ -118,11 +122,45 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
     }
 
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN)
+    }
+
+    fun onBackPressed() {
+        viewModelScope.launch(Dispatchers.IO) {
+            analyticsTracker.track(
+                AnalyticsEvent.RECOMMENDATIONS_DISMISSED,
+                mapOf(SUBSCRIPTIONS_PROP to podcastManager.countSubscribed())
+            )
+        }
+    }
+
+    fun onSearch() {
+        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SEARCH_TAPPED)
+    }
+
+    fun onImportClick() {
+        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_IMPORT_TAPPED)
+    }
+
+    fun onComplete() {
+        viewModelScope.launch(Dispatchers.IO) {
+            analyticsTracker.track(
+                AnalyticsEvent.RECOMMENDATIONS_CONTINUE_TAPPED,
+                mapOf(SUBSCRIPTIONS_PROP to podcastManager.countSubscribed())
+            )
+        }
+    }
+
     fun updateSubscribed(podcast: RecommendationPodcast) {
         if (podcast.isSubscribed) {
             podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, playbackManager = playbackManager)
         } else {
             podcastManager.subscribeToPodcast(podcastUuid = podcast.uuid, sync = true)
         }
+    }
+
+    companion object {
+        private const val SUBSCRIPTIONS_PROP = "subscriptions"
     }
 }

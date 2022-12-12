@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,6 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingForgotPasswordViewModel @Inject constructor(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     private val auth: AccountAuth
 ) : ViewModel() {
 
@@ -17,6 +20,14 @@ class OnboardingForgotPasswordViewModel @Inject constructor(
         OnboardingForgotPasswordState()
     )
     val stateFlow: StateFlow<OnboardingForgotPasswordState> = _stateFlow
+
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.FORGOT_PASSWORD_SHOWN)
+    }
+
+    fun onBackPressed() {
+        analyticsTracker.track(AnalyticsEvent.FORGOT_PASSWORD_DISMISSED)
+    }
 
     fun updateEmail(email: String) {
         _stateFlow.update { it.copy(email = email.trim()) }

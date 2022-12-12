@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -21,7 +21,6 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     private val auth: AccountAuth,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
-    private val settings: Settings,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -30,6 +29,14 @@ class OnboardingCreateAccountViewModel @Inject constructor(
         OnboardingCreateAccountState()
     )
     val stateFlow: StateFlow<OnboardingCreateAccountState> = _stateFlow
+
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_SHOWN)
+    }
+
+    fun onBackPressed() {
+        analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_DISMISSED)
+    }
 
     fun updateEmail(email: String) {
         _stateFlow.update { it.copy(email = email.trim()) }
