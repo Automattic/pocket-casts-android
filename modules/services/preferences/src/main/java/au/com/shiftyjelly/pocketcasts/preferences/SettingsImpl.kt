@@ -1492,7 +1492,7 @@ class SettingsImpl @Inject constructor(
         return BuildConfig.END_OF_YEAR_REQUIRE_LOGIN
     }
 
-    override fun getHasCompletedOnboarding() = getBoolean(COMPLETED_ONBOARDING_KEY, false)
+    override fun hasCompletedOnboarding() = getBoolean(COMPLETED_ONBOARDING_KEY, false)
 
     override fun setHasCompletedOnboarding() {
         setBoolean(COMPLETED_ONBOARDING_KEY, true)

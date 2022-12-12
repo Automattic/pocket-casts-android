@@ -188,10 +188,9 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
 
-        val showOnboarding = BuildConfig.ONBOARDING_ENABLED &&
-            !settings.getHasCompletedOnboarding() &&
-            !settings.isLoggedIn()
-        if (showOnboarding) {
+        val showOnboarding = !settings.hasCompletedOnboarding() && !settings.isLoggedIn()
+        // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
+        if (showOnboarding && savedInstanceState == null) {
             openOnboardingFlow()
         }
 
