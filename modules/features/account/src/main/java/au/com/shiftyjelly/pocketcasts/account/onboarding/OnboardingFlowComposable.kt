@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.flow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
@@ -61,7 +62,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
-                    flow = "initial_onboarding",
+                    flow = flow,
                     onDismiss = { completeOnboarding() },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                     onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
@@ -104,6 +105,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.plusUpgrade) {
                 OnboardingPlusUpgradeFlow(
+                    flow = flow,
                     onBackPressed = { navController.popBackStack() },
                     onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
                     onCompleteUpgrade = {
@@ -128,6 +130,10 @@ fun OnboardingFlowComposable(
             }
         }
     }
+}
+
+private object AnalyticsProp {
+    const val flow = "initial_onboarding"
 }
 
 private object OnboardingNavRoute {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.Loaded
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.Loading
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.NoSubscriptions
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
@@ -84,11 +85,18 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
 
     fun onClickSubscribe(
         activity: Activity,
+        flow: String,
         onComplete: () -> Unit,
     ) {
         (state.value as? Loaded)?.let { loadedState ->
             _state.update { loadedState.copy(purchaseFailed = false) }
             val subscription = loadedState.selectedSubscription
+
+            analyticsTracker.track(
+                AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
+                mapOf(flowKey to flow, selectedSubscriptionKey to subscription.productDetails.productId)
+            )
+
             viewModelScope.launch {
                 val purchaseEvent = subscriptionManager
                     .observePurchaseEvents()
@@ -133,6 +141,25 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
                 purchaseFailed = false,
             )
         }
+    }
+
+    fun onSelectPaymentFrequencyShown(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN,
+            mapOf(flowKey to flow)
+        )
+    }
+
+    fun onSelectPaymentFrequencyDismissed(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED,
+            mapOf(flowKey to flow)
+        )
+    }
+
+    companion object {
+        const val flowKey = "flow"
+        const val selectedSubscriptionKey = "product"
     }
 }
 

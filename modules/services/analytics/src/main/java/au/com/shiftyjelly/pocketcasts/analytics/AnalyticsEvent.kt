@@ -23,6 +23,7 @@ enum class AnalyticsEvent(val key: String) {
     PLUS_PROMOTION_SHOWN("plus_promotion_shown"),
     PLUS_PROMOTION_DISMISSED("plus_promotion_dismissed"),
     PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED("plus_promotion_upgrade_button_tapped"),
+    PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED("plus_promotion_not_now_button_tapped"),
 
     /* Setup Account */
     SETUP_ACCOUNT_SHOWN("setup_account_shown"),
@@ -303,12 +304,6 @@ enum class AnalyticsEvent(val key: String) {
     RECOMMENDATIONS_SEARCH_TAPPED("recommendations_search_tapped"),
     RECOMMENDATIONS_IMPORT_TAPPED("recommendations_import_tapped"),
     RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
-
-    /* Onboarding upgrade */
-    ONBOARDING_UPGRADE_SHOWN("onboarding_upgrade_shown"),
-    ONBOARDING_UPGRADE_DISMISSED("onboarding_upgrade_dismissed"),
-    ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED("onboarding_upgrade_unlock_all_features_tapped"),
-    ONBOARDING_UPGRADE_NOT_NOW_TAPPED("onboarding_upgrade_not_now_tapped"),
 
     /* End of Year */
     END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),

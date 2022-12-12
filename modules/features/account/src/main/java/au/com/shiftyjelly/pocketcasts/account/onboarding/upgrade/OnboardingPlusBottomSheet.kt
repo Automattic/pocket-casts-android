@@ -51,14 +51,13 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingPlusBottomSheet(
-    onCompleteUpgrade: () -> Unit,
+    onClickSubscribe: () -> Unit,
 ) {
 
     // The keyboard sometimes gets opened when returning from the Google payment flow.
@@ -207,17 +206,9 @@ fun OnboardingPlusBottomSheet(
                 .alpha(0.24f)
         )
 
-        val context = LocalContext.current
         PlusRowButton(
             text = stringResource(LR.string.onboarding_plus_start_free_trial_and_subscribe),
-            onClick = {
-                context.getActivity()?.let { activity ->
-                    viewModel.onClickSubscribe(
-                        activity = activity,
-                        onComplete = onCompleteUpgrade,
-                    )
-                }
-            },
+            onClick = onClickSubscribe,
         )
 
         Spacer(Modifier.height(16.dp))
