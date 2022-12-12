@@ -123,8 +123,9 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
+                    flow = flow,
                     isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
-                    onContinue = completeOnboarding,
+                    onDone = completeOnboarding,
                     onContinueToDiscover = completeOnboardingToDiscover,
                     onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
                     onBackPressed = { navController.popBackStack() },

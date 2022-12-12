@@ -25,6 +25,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -54,8 +55,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingWelcomePage(
+    flow: String,
     isSignedInAsPlus: Boolean,
-    onContinue: () -> Unit,
+    onDone: () -> Unit,
     onContinueToDiscover: () -> Unit,
     onImportTapped: () -> Unit,
     onBackPressed: () -> Unit,
@@ -64,28 +66,30 @@ fun OnboardingWelcomePage(
     val viewModel = hiltViewModel<OnboardingWelcomeViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
-    @Suppress("NAME_SHADOWING")
-    val onContinue = {
-        viewModel.persistNewsletterSelection()
-        onContinue()
-    }
-
-    @Suppress("NAME_SHADOWING")
-    val onContinueToDiscover = {
-        viewModel.persistNewsletterSelection()
-        onContinueToDiscover()
+    LaunchedEffect(Unit) {
+        viewModel.onShown(flow)
     }
 
     BackHandler {
+        viewModel.onBackPressed(flow)
         onBackPressed()
     }
 
     Content(
         isSignedInAsPlus = isSignedInAsPlus,
-        onContinueToDiscover = onContinueToDiscover,
-        onImportTapped = onImportTapped,
+        onContinueToDiscover = {
+            viewModel.onContinueToDiscover(flow)
+            onContinueToDiscover()
+        },
+        onImportTapped = {
+            viewModel.onImportTapped(flow)
+            onImportTapped()
+        },
         state = state,
-        onContinue = onContinue,
+        onDone = {
+            viewModel.onDone(flow)
+            onDone()
+        },
         onNewsletterCheckedChanged = viewModel::updateNewsletter
     )
 }
@@ -96,7 +100,7 @@ private fun Content(
     onContinueToDiscover: () -> Unit,
     onImportTapped: () -> Unit,
     state: OnboardingWelcomeState,
-    onContinue: () -> Unit,
+    onDone: () -> Unit,
     onNewsletterCheckedChanged: (Boolean) -> Unit,
 ) {
     Column(
@@ -154,7 +158,7 @@ private fun Content(
         RowButton(
             text = stringResource(LR.string.done),
             includePadding = false,
-            onClick = onContinue,
+            onClick = onDone,
         )
         Spacer(Modifier.height(24.dp))
     }
@@ -296,7 +300,8 @@ private fun PersonCheckmark(
 private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         OnboardingWelcomePage(
-            onContinue = {},
+            flow = "flow",
+            onDone = {},
             onContinueToDiscover = {},
             onImportTapped = {},
             onBackPressed = {},
@@ -316,7 +321,7 @@ private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParam
             state = OnboardingWelcomeState(
                 newsletter = false
             ),
-            onContinue = {},
+            onDone = {},
             onNewsletterCheckedChanged = {},
         )
     }

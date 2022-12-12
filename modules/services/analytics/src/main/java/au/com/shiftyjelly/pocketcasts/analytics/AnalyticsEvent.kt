@@ -315,5 +315,12 @@ enum class AnalyticsEvent(val key: String) {
     END_OF_YEAR_STORY_SHARE("end_of_year_story_share"),
     END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
     END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED("end_of_year_story_retry_button_tapped"),
-    END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped")
+    END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped"),
+
+    /* Welcome */
+    WELCOME_SHOWN("welcome_shown"),
+    WELCOME_IMPORT_TAPPED("welcome_import_tapped"),
+    WELCOME_DISCOVER_TAPPED("welcome_discover_tapped"),
+    WELCOME_DONE_TAPPED("welcome_done_tapped"),
+    WELCOME_DISMISSED("welcome_dismissed"),
 }

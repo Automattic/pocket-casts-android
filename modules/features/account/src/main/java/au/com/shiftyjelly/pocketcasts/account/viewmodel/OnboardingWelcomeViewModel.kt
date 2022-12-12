@@ -23,23 +23,61 @@ class OnboardingWelcomeViewModel @Inject constructor(
         _stateFlow.update { it.copy(newsletter = isChecked) }
     }
 
-    fun persistNewsletterSelection() {
-        val newsletter = stateFlow.value.newsletter
-        analyticsTracker.track(
-            AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
-            mapOf(
-                AnalyticsProp.SOURCE to NewsletterSource.ACCOUNT_CREATED.analyticsValue,
-                AnalyticsProp.ENABLED to newsletter
-            )
-        )
-
+    private fun persistNewsletterSelection(newsletter: Boolean) {
         settings.setMarketingOptIn(newsletter)
         settings.setMarketingOptInNeedsSync(true)
+    }
+
+    fun onShown(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_SHOWN,
+            mapOf(AnalyticsProp.FLOW to flow)
+        )
+    }
+
+    fun onBackPressed(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_DISMISSED,
+            mapOf(AnalyticsProp.FLOW to flow)
+        )
+    }
+
+    fun onContinueToDiscover(flow: String) {
+        val newsletter = stateFlow.value.newsletter
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_DISCOVER_TAPPED,
+            mapOf(
+                AnalyticsProp.FLOW to flow,
+                AnalyticsProp.NEWSLETTER_OPT_IN to newsletter
+            )
+        )
+        persistNewsletterSelection(newsletter)
+    }
+
+    fun onDone(flow: String) {
+        val newsletter = stateFlow.value.newsletter
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_DONE_TAPPED,
+            mapOf(
+                AnalyticsProp.FLOW to flow,
+                AnalyticsProp.NEWSLETTER_OPT_IN to newsletter
+            )
+        )
+        persistNewsletterSelection(newsletter)
+    }
+
+    fun onImportTapped(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_IMPORT_TAPPED,
+            mapOf(AnalyticsProp.FLOW to flow)
+        )
     }
 
     companion object {
         private object AnalyticsProp {
             const val SOURCE = "source"
+            const val FLOW = "flow"
+            const val NEWSLETTER_OPT_IN = "newsletter_opt_in"
             const val ENABLED = "enabled"
         }
     }
