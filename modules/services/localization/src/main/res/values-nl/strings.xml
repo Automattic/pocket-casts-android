@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-23 16:54:03+0000
+Translation-Revision-Date: 2022-12-08 08:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+	<string name="onboarding_continue_with_google_error">Kan het aanmeldingsscherm van Google niet opstarten.</string>
+	<string name="onboarding_find_podcasts">Vind podcasts</string>
+	<string name="onboarding_welcome_recommendations_button">Vind mijn volgende podcast</string>
+	<string name="onboarding_welcome_recommendations_text">Vind geheime en trending podcasts in onze handmatig samengestelde Ontdekkingspagina.</string>
+	<string name="onboarding_welcome_recommendations_title">Ontdek iets nieuws</string>
+	<string name="onboarding_welcome_get_you_listening_plus">Bedankt, veel luisterplezier!</string>
+	<string name="onboarding_welcome_get_you_listening">Welkom, veel luisterplezier!</string>
+	<string name="onboarding_plus_recurring_after_free_trial">Herhaaldelijke betalingen beginnen na je %s</string>
+	<string name="onboarding_plus_start_free_trial_and_subscribe">Start gratis proefversie en abonneer je</string>
+	<string name="onboarding_plus_terms_and_conditions">Algemene voorwaarden</string>
+	<string name="onboarding_plus_privacy_policy">Privacybeleid</string>
+	<string name="onboarding_plus_continuing_agrees_to">Door verder te gaan, ga je akkoord met onze %1$s en %2$s</string>
+	<string name="onboarding_plus_become_a_plus_member">Word Plus-lid en profiteer van alle Pocket Casts-functies</string>
+	<string name="onboarding_sign_up">Aanmelden</string>
+	<string name="onboarding_create_account">Account aanmaken</string>
+	<string name="onboarding_log_in">Log in</string>
+	<string name="plus_trial_duration_free_trial">%s gratis proefversie</string>
+	<string name="end_of_year_stories_failed">Kan je eindejaarsverhalen niet laden, controleer je internetverbinding.</string>
 	<string name="onboarding_plus_feature_themes_icons_text">Toon je ware aard. Exclusieve pictogrammen en thema\'s voor Plus-abonnees.</string>
 	<string name="onboarding_plus_feature_themes_icons_title">Thema\'s en pictogrammen</string>
 	<string name="onboarding_plus_feature_hide_ads_text">Een advertentievrije ervaring die je meer biedt van wat je leuk vindt en minder van wat je niet leuk vindt.</string>
@@ -16,11 +34,13 @@ Language: nl
 	<string name="onboarding_plus_feature_folders_title">Mappen</string>
 	<string name="onboarding_plus_feature_desktop_apps_text">Luister overal met onze apps voor Windows en macOS en de online apps.</string>
 	<string name="onboarding_plus_feature_desktop_apps_title">Desktop-apps</string>
+	<string name="onboarding_upgrade_unlock_all_features">Ontgrendel alle functies</string>
 	<string name="onboarding_upgrade_exclusive_features_and_options">Krijg toegang tot exclusieve functies en aanpassingsmogelijkheden</string>
 	<string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles wat je geweldig vindt aan Pocket Casts en meer</string>
 	<string name="onboarding_recommendations_import">Importeren</string>
 	<string name="onboarding_recommendations_make_pocket_casts_yours">Pas Pocket Casts aan je voorkeuren aan door je favoriete podcasts te selecteren of ze te importeren vanuit een andere podcast-speler. Je kunt dit later altijd nog doen.</string>
 	<string name="onboarding_recommendations_find_favorite_podcasts">Vind je favoriete podcasts</string>
+	<string name="not_now">Niet nu</string>
 	<string name="settings_open_player_automatically_summary">Indien dit is ingeschakeld, zal de speler automatisch openen op volledige schermgrootte wanneer je een podcast-aflevering afspeelt.</string>
 	<string name="settings_open_player_automatically">Speler automatisch openen</string>
 	<string name="onboarding_email_invalid_message">Voer een geldig e-mailadres in</string>
@@ -34,6 +54,7 @@ Language: nl
 	<string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
 	<string name="end_of_year_story_top_categories">Je beste categorieën</string>
 	<string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
+	<string name="end_of_year_story_epilogue_title">Bedankt dat je Pocket Casts onderdeel maakt van je luisterervaring in 2022</string>
 	<string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in 2022 %1$s</string>
 	<string name="end_of_year_story_longest_episode_duration">Deze aflevering duurde %1$s</string>
 	<string name="end_of_year_story_longest_episode">De langste aflevering die je hebt geluisterd was %1$s van de podcast %2$s</string>
@@ -47,10 +68,10 @@ Language: nl
 	<string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde...</string>
 	<string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d verschillende podcasts en %2$d afleveringen geluisterd</string>
 	<string name="end_of_year_story_listened_to_categories_share_text">Ik heb in 2022 naar %1$d verschillende categorieën geluisterd</string>
-	<string name="end_of_year_story_listened_to_categories_subtitle">Laten we eens kijken naar je favorieten…</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">Laten we eens kijken naar wat van je favorieten…</string>
 	<string name="end_of_year_story_listened_to_categories">Je hebt dit jaar naar %1$d verschillende categorieën geluisterd</string>
 	<string name="end_of_year_story_listened_to_share_text">In 2022 heb je %1$s naar podcasts geluisterd</string>
-	<string name="end_of_year_story_intro_title">Laten we je luisterjaar vieren…</string>
+	<string name="end_of_year_story_intro_title">Laten we je luisterjaar vieren!</string>
 	<string name="end_of_year_launch_modal_image_title">Jaar in podcasts</string>
 	<string name="end_of_year_replay">Herhalen</string>
 	<string name="settings_media_notification_controls_summary">Kies twee acties om weer te geven in de Android 13 afspeelmelding, Android Auto en andere locaties waar aangepaste mediabedieningen beschikbaar zijn</string>

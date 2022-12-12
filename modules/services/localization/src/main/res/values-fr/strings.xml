@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-28 16:54:10+0000
+Translation-Revision-Date: 2022-12-08 08:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+	<string name="onboarding_continue_with_google_error">Impossible de lancer la connexion Google.</string>
 	<string name="onboarding_find_podcasts">Trouver des podcasts</string>
 	<string name="onboarding_welcome_recommendations_button">Trouver mon prochain podcast</string>
 	<string name="onboarding_welcome_recommendations_text">Découvrez des podcasts tendance et d’autres passés inaperçus sur notre page des découvertes sélectionnées avec soin.</string>
@@ -52,7 +53,7 @@ Language: fr
 	<string name="end_of_year_create_account_to_see">Enregistrez vos podcasts dans le cloud, obtenez votre bilan de fin d’année et synchronisez votre progression avec d’autres appareils.</string>
 	<string name="end_of_year_story_top_categories_share_text">Mes catégories de podcasts les plus écoutés</string>
 	<string name="end_of_year_story_top_categories">Vos meilleures catégories</string>
-	<string name="end_of_year_story_epilogue_subtitle">N’oubliez pas de partager avec vos amis et de mettre en lumière vos créateurs de podcasts préférés.</string>
+	<string name="end_of_year_story_epilogue_subtitle">N’oubliez pas de montrer votre soutien à vos créateurs de podcasts préférés et à partager ces podcasts avec vos amis</string>
 	<string name="end_of_year_story_epilogue_title">Merci d’avoir utilisé Pocket Casts pour écouter vos podcasts en 2022.</string>
 	<string name="end_of_year_story_longest_episode_share_text">L\'épisode le plus long que j\'ai écouté en 2022 %1$s</string>
 	<string name="end_of_year_story_longest_episode_duration">La durée de cet épisode était de %1$s</string>
@@ -67,10 +68,10 @@ Language: fr
 	<string name="end_of_year_story_listened_to_numbers_subtitle">Vous avez écouté plusieurs fois un même podcast…</string>
 	<string name="end_of_year_story_listened_to_numbers">Vous avez écouté %1$d podcasts différents et %2$d épisodes</string>
 	<string name="end_of_year_story_listened_to_categories_share_text">J\'ai écouté %1$d catégories différentes en 2022</string>
-	<string name="end_of_year_story_listened_to_categories_subtitle">Découvrez certains de vos podcasts préférés…</string>
+	<string name="end_of_year_story_listened_to_categories_subtitle">Rétrospective sur certains de vos podcasts préférés…</string>
 	<string name="end_of_year_story_listened_to_categories">Cette année, vous avez écouté %1$d catégories différentes</string>
 	<string name="end_of_year_story_listened_to_share_text">En 2022, j\'ai passé %1$s à écouter des podcasts</string>
-	<string name="end_of_year_story_intro_title">Célébrez votre année d’écoute…</string>
+	<string name="end_of_year_story_intro_title">Un an d’écoute, ça se fête !</string>
 	<string name="end_of_year_launch_modal_image_title">Votre année en podcasts</string>
 	<string name="end_of_year_replay">Reprendre la lecture</string>
 	<string name="settings_media_notification_controls_summary">Choisissez deux actions à afficher dans la notification de lecture d’Android 13, d’Android Auto et d’autres plates-formes où les commandes médias personnalisées sont disponibles.</string>

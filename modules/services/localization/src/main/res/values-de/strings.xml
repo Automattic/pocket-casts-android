@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-24 10:54:04+0000
+Translation-Revision-Date: 2022-12-07 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+	<string name="onboarding_continue_with_google_error">Das Google-Anmeldungsmodul konnte nicht geöffnet werden.</string>
+	<string name="onboarding_find_podcasts">Podcasts suchen</string>
+	<string name="onboarding_welcome_recommendations_button">Meinen nächsten Podcast suchen</string>
+	<string name="onboarding_welcome_recommendations_text">Auf unserer handverlesenen Seite „Entdecken“ findest du unbekannte und angesagte Podcasts.</string>
+	<string name="onboarding_welcome_recommendations_title">Entdecke etwas Neues</string>
+	<string name="onboarding_welcome_get_you_listening_plus">Vielen Dank. Viel Spaß beim Hören!</string>
+	<string name="onboarding_welcome_get_you_listening">Willkommen. Viel Spaß beim Hören!</string>
+	<string name="onboarding_plus_recurring_after_free_trial">Wiederkehrende Zahlungen beginnen nach deinem %s</string>
+	<string name="onboarding_plus_start_free_trial_and_subscribe">Gratis-Test starten und abonnieren</string>
+	<string name="onboarding_plus_terms_and_conditions">Geschäftsbedingungen</string>
+	<string name="onboarding_plus_privacy_policy">Datenschutzerklärung</string>
+	<string name="onboarding_plus_continuing_agrees_to">Indem du fortfährst, stimmst du unserer %1$s und den %2$s zu.</string>
+	<string name="onboarding_plus_become_a_plus_member">Werde Plus-Mitglied und profitiere von allen Pocket Casts-Funktionen</string>
+	<string name="onboarding_sign_up">Registrieren</string>
+	<string name="onboarding_create_account">Konto erstellen</string>
+	<string name="onboarding_log_in">Anmelden</string>
+	<string name="plus_trial_duration_free_trial">Gratis-Test für %s</string>
+	<string name="end_of_year_stories_failed">Deine Geschichten zum Jahresende konnten nicht geladen werden, überprüfe deine Internetverbindung.</string>
 	<string name="onboarding_plus_feature_themes_icons_text">Farbe bekennen. Exklusive Icons und Themes nur für Plus-Abonnenten.</string>
 	<string name="onboarding_plus_feature_themes_icons_title">Themes und Icons</string>
 	<string name="onboarding_plus_feature_hide_ads_text">Werbefreies Erlebnis – für mehr Inhalte, die du magst, und weniger Ablenkung</string>
@@ -36,6 +54,7 @@ Language: de
 	<string name="end_of_year_story_top_categories_share_text">Meine am häufigsten gehörten Podcast-Kategorien</string>
 	<string name="end_of_year_story_top_categories">Deine Top-Kategorien</string>
 	<string name="end_of_year_story_epilogue_subtitle">Vergiss nicht, sie mit deinen Freunden zu teilen und deine bevorzugten Podcast-Ersteller dankend zu erwähnen</string>
+	<string name="end_of_year_story_epilogue_title">Danke, dass Pocket Casts zu deinem Audioerlebnis 2022 gehört</string>
 	<string name="end_of_year_story_longest_episode_share_text">Die längste Folge, die ich mir im Jahr 2022 angehört habe (%1$s)</string>
 	<string name="end_of_year_story_longest_episode_duration">Diese Folge dauerte %1$s</string>
 	<string name="end_of_year_story_longest_episode">Die längste von dir angehörte Folge war %1$s aus dem Podcast %2$s</string>
@@ -52,7 +71,7 @@ Language: de
 	<string name="end_of_year_story_listened_to_categories_subtitle">Sehen wir uns einige deiner Favoriten an …</string>
 	<string name="end_of_year_story_listened_to_categories">Du hast dir in diesem Jahr %1$d unterschiedliche Kategorien angehört</string>
 	<string name="end_of_year_story_listened_to_share_text">Ich habe 2022 %1$s mit dem Hören von Podcasts verbracht</string>
-	<string name="end_of_year_story_intro_title">Feiern wir dein Audiojahr …</string>
+	<string name="end_of_year_story_intro_title">Feiern wir dein Audio-Jahr!</string>
 	<string name="end_of_year_launch_modal_image_title">Das Jahr in Podcasts</string>
 	<string name="end_of_year_replay">Erneut abspielen</string>
 	<string name="settings_media_notification_controls_summary">Wähle zwei Aktionen, die in der Wiedergabe-Benachrichtigung von Android 13, Android Auto und anderen Orten angezeigt werden sollen, in denen die individuellen Mediensteuerelemente verfügbar sind.</string>
