@@ -130,16 +130,6 @@ fun OnboardingFlowComposable(
     }
 }
 
-private object AnalyticsProp {
-    object ButtonTapped {
-        private const val button = "button"
-        val signIn = source + mapOf(button to "sign_in")
-        val createAccount = source + mapOf(button to "create_account")
-        val continueWithGoogle = source + mapOf(button to "continue_with_google")
-    }
-    val source = mapOf("source" to "onboarding")
-}
-
 private object OnboardingNavRoute {
     const val createFreeAccount = "create_free_account"
     const val forgotPassword = "forgot_password"
