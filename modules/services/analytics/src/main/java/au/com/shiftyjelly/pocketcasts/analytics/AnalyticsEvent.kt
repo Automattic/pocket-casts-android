@@ -323,4 +323,10 @@ enum class AnalyticsEvent(val key: String) {
     WELCOME_DISCOVER_TAPPED("welcome_discover_tapped"),
     WELCOME_DONE_TAPPED("welcome_done_tapped"),
     WELCOME_DISMISSED("welcome_dismissed"),
+
+    /* Import */
+    ONBOARDING_IMPORT_SHOWN("onboarding_import_shown"),
+    ONBOARDING_IMPORT_APP_SELECTED("onboarding_import_app_selected"),
+    ONBOARDING_IMPORT_OPEN_APP_SELECTED("onboarding_import_open_app_selected"),
+    ONBOARDING_IMPORT_DISMISSED("onboarding_import_dismissed"),
 }

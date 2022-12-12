@@ -51,9 +51,10 @@ fun OnboardingFlowComposable(
             startDestination = OnboardingNavRoute.logInOrSignUp
         ) {
 
-            importFlowGraph(navController)
+            importFlowGraph(navController, flow)
 
             onboardingRecommendationsFlowGraph(
+                flow = flow,
                 onBackPressed = completeOnboarding,
                 onComplete = {
                     navController.navigate(OnboardingNavRoute.plusUpgrade)

@@ -4,10 +4,12 @@ import android.content.ActivityNotFoundException
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingImportViewModel
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -15,24 +17,32 @@ object OnboardingImportFlow {
 
     const val route = "onboardingImportFlow"
 
-    private const val start = "start"
-    private const val castbox = "castbox"
-    private const val otherApps = "otherApps"
-
-    fun NavGraphBuilder.importFlowGraph(navController: NavController) {
+    fun NavGraphBuilder.importFlowGraph(navController: NavController, flow: String) {
         navigation(
             route = this@OnboardingImportFlow.route,
-            startDestination = start,
+            startDestination = NavigationRoutes.start,
         ) {
-            composable(start) {
+            composable(NavigationRoutes.start) {
+                val viewModel = hiltViewModel<OnboardingImportViewModel>()
                 OnboardingImportStartPage(
-                    onCastboxClicked = { navController.navigate(castbox) },
-                    onOtherAppsClicked = { navController.navigate(otherApps) },
-                    onBackPressed = { navController.popBackStack() },
+                    onShown = { viewModel.onImportStartPageShown(flow) },
+                    onCastboxClicked = {
+                        viewModel.onAppSelected(flow, AnalyticsProps.castbox)
+                        navController.navigate(NavigationRoutes.castbox)
+                    },
+                    onOtherAppsClicked = {
+                        viewModel.onAppSelected(flow, AnalyticsProps.otherApps)
+                        navController.navigate(NavigationRoutes.otherApps)
+                    },
+                    onBackPressed = {
+                        viewModel.onImportDismissed(flow)
+                        navController.popBackStack()
+                    },
                 )
             }
 
-            composable(castbox) {
+            composable(NavigationRoutes.castbox) {
+                val viewModel = hiltViewModel<OnboardingImportViewModel>()
                 OnboardingImportFrom(
                     drawableRes = IR.drawable.castbox,
                     title = (stringResource(LR.string.onboarding_import_from_castbox)),
@@ -44,12 +54,17 @@ object OnboardingImportFlow {
                         stringResource(LR.string.onboarding_import_from_castbox_step_5),
                     ),
                     buttonText = stringResource(LR.string.onboarding_import_from_castbox_open),
-                    buttonClick = openCastboxFun(),
+                    buttonClick = openCastboxFun()?.let { function ->
+                        {
+                            viewModel.onOpenApp(flow, AnalyticsProps.castbox)
+                            function()
+                        }
+                    },
                     onBackPressed = { navController.popBackStack() }
                 )
             }
 
-            composable(otherApps) {
+            composable(NavigationRoutes.otherApps) {
                 OnboardingImportFrom(
                     drawableRes = IR.drawable.other_apps,
                     title = stringResource(LR.string.onboarding_import_from_other_apps),
@@ -80,4 +95,15 @@ private fun openCastboxFun(): (() -> Unit)? {
                 }
             }
         }
+}
+
+private object NavigationRoutes {
+    const val start = "start"
+    const val castbox = "castbox"
+    const val otherApps = "otherApps"
+}
+
+private object AnalyticsProps {
+    const val castbox = "castbox"
+    const val otherApps = "other_apps"
 }
