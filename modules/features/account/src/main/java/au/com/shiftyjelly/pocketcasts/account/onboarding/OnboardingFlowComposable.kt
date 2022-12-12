@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.flow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.recommendationsSource
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
@@ -106,6 +107,7 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.plusUpgrade) {
                 OnboardingPlusUpgradeFlow(
                     flow = flow,
+                    source = recommendationsSource,
                     onBackPressed = { navController.popBackStack() },
                     onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
                     onCompleteUpgrade = {
@@ -134,6 +136,7 @@ fun OnboardingFlowComposable(
 
 private object AnalyticsProp {
     const val flow = "initial_onboarding"
+    const val recommendationsSource = "recommendations"
 }
 
 private object OnboardingNavRoute {

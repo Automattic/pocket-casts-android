@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun OnboardingPlusUpgradeFlow(
     flow: String,
+    source: String,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
     onCompleteUpgrade: () -> Unit,
@@ -75,7 +76,7 @@ fun OnboardingPlusUpgradeFlow(
                 sheetState.hide()
             }
         } else {
-            mainSheetViewModel.onBackPressed(flow)
+            mainSheetViewModel.onBackPressed(flow, source)
             onBackPressed()
         }
     }
@@ -89,6 +90,7 @@ fun OnboardingPlusUpgradeFlow(
         content = @Composable {
             OnboardingPlusFeaturesPage(
                 flow = flow,
+                source = source,
                 onUpgradePressed = {
                     coroutineScope.launch {
                         sheetState.show()

@@ -67,6 +67,7 @@ private val background = Color(0xFF121212)
 @Composable
 internal fun OnboardingPlusFeaturesPage(
     flow: String,
+    source: String,
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
@@ -77,23 +78,23 @@ internal fun OnboardingPlusFeaturesPage(
 
     @Suppress("NAME_SHADOWING")
     val onUpgradePressed = {
-        viewModel.onUpgradePressed(flow)
+        viewModel.onUpgradePressed(flow, source)
         onUpgradePressed()
     }
 
     @Suppress("NAME_SHADOWING")
     val onNotNowPressed = {
-        viewModel.onNotNowPressed(flow)
+        viewModel.onNotNowPressed(flow, source)
         onNotNowPressed()
     }
 
     @Suppress("NAME_SHADOWING")
     val onBackPressed = {
-        viewModel.onBackPressed(flow)
+        viewModel.onBackPressed(flow, source)
         onBackPressed()
     }
 
-    LaunchedEffect(Unit) { viewModel.onShown(flow) }
+    LaunchedEffect(Unit) { viewModel.onShown(flow, source) }
 
     // Need this BoxWithConstraints so we can force the inner column to fill the screen
     BoxWithConstraints(Modifier.fillMaxHeight()) {
@@ -388,6 +389,7 @@ private tailrec suspend fun autoScroll(
 private fun OnboardingPlusFeaturesPreview() {
     OnboardingPlusFeaturesPage(
         flow = "flow",
+        source = "source",
         onBackPressed = {},
         onUpgradePressed = {},
         onNotNowPressed = {},
