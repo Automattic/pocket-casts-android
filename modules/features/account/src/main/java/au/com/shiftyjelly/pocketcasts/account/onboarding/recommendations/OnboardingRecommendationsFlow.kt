@@ -1,42 +1,62 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.compose.NavHost
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingRecommendationsStartPage
+import androidx.navigation.navigation
+import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
+import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@Composable
-fun OnboardingRecommendationsFlow(
-    onShown: () -> Unit,
-    onBackPressed: () -> Unit,
-    onComplete: () -> Unit,
-) {
+object OnboardingRecommendationsFlow {
 
-    LaunchedEffect(Unit) { onShown() }
-    BackHandler { onBackPressed() }
+    const val route = "onboardingRecommendationsFlow"
 
-    val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = OnboardingRecommendationsNavRoute.start
+    private const val start = "start"
+    private const val search = "search"
+
+    fun NavGraphBuilder.onboardingRecommendationsFlowGraph(
+        onShown: () -> Unit,
+        onBackPressed: () -> Unit,
+        onComplete: () -> Unit,
+        navController: NavController,
     ) {
-        composable(OnboardingRecommendationsNavRoute.start) {
-            OnboardingRecommendationsStartPage(
-                onSearch = { navController.navigate(OnboardingRecommendationsNavRoute.search) },
-                onComplete = onComplete,
-            )
-        }
-        composable(OnboardingRecommendationsNavRoute.search) {
-            OnboardingRecommendationsSearchPage(
-                onBackPressed = { navController.popBackStack() },
-            )
+        navigation(
+            route = this@OnboardingRecommendationsFlow.route,
+            startDestination = start
+        ) {
+
+            importFlowGraph(navController)
+
+            composable(start) {
+                OnboardingRecommendationsStartPage(
+                    onShown = onShown,
+                    onImportClicked = { navController.navigate(OnboardingImportFlow.route) },
+                    onSearch = with(LocalContext.current) {
+                        {
+                            if (Network.isConnected(this)) {
+                                navController.navigate(search)
+                            } else {
+                                Toast.makeText(
+                                    this,
+                                    this.getString(LR.string.error_check_your_internet_connection),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    },
+                    onBackPressed = onBackPressed,
+                    onComplete = onComplete,
+                )
+            }
+            composable(search) {
+                OnboardingRecommendationsSearchPage(
+                    onBackPressed = { navController.popBackStack() },
+                )
+            }
         }
     }
-}
-private object OnboardingRecommendationsNavRoute {
-    const val start = "start"
-    const val search = "search"
 }

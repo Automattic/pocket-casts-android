@@ -252,7 +252,7 @@ class PlayerViewModel @Inject constructor(
             if (it is Episode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)
             } else {
-                Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title, overrideGlobalEffects = false))
+                Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, overrideGlobalEffects = false))
             }
         }
         .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.getGlobalPlaybackEffects()) }

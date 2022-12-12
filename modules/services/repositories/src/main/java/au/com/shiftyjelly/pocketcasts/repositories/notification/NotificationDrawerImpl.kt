@@ -103,7 +103,7 @@ class NotificationDrawerImpl @Inject constructor(
         }
 
         val bitmap = if (podcast != null) loadArtwork(podcast) else if (episode is UserEpisode) loadUserEpisodeArtwork(episode) else null
-        val podcastTitle = (if (episode is Episode) podcast?.title else UserEpisodePodcastSubstitute.title) ?: ""
+        val podcastTitle = (if (episode is Episode) podcast?.title else UserEpisodePodcastSubstitute.substituteTitle) ?: ""
 
         val data = NotificationData(
             episodeUuid = episodeUuid,

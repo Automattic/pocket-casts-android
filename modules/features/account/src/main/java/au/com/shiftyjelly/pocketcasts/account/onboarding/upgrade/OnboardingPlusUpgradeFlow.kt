@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.account.onboarding
+package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke

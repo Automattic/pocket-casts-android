@@ -7,6 +7,8 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.BuildConfig
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -26,6 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingLoginOrSignUpViewModel @Inject constructor(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext context: Context
 ) : AndroidViewModel(context as Application) {
 
@@ -42,9 +45,14 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
      * It's common for the One Tap to fail so then try the legacy Google Sign-In.
      */
     fun startGoogleOneTapSignIn(
+        flow: String,
         onSuccess: (IntentSenderRequest) -> Unit,
         onError: suspend () -> Unit,
     ) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.continueWithGoogle)
+        )
         viewModelScope.launch {
             try {
                 val beginSignInRequest = BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
@@ -128,6 +136,34 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
         }
     }
 
+    fun onShown(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_SHOWN,
+            mapOf(AnalyticsProp.flow(flow))
+        )
+    }
+
+    fun onDismiss(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_DISMISSED,
+            mapOf(AnalyticsProp.flow(flow))
+        )
+    }
+
+    fun onSignUpClicked(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.createAccount)
+        )
+    }
+
+    fun onLoginClicked(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn)
+        )
+    }
+
     private suspend fun onGoogleSignInResult(result: ActivityResult) {
         val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
         val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
@@ -139,5 +175,17 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
         Timber.i("signInWithGoogleToken idToken: $idToken email: $email")
         // Todo send the Google ID token to the server, this will be done in a future change
         // accountAuth.signInWithGoogleToken(email = email, idToken = idToken)
+    }
+
+    companion object {
+        private object AnalyticsProp {
+            fun flow(s: String) = "flow" to s
+            object ButtonTapped {
+                private const val button = "button"
+                val signIn = button to "sign_in"
+                val createAccount = button to "create_account"
+                val continueWithGoogle = button to "continue_with_google"
+            }
+        }
     }
 }

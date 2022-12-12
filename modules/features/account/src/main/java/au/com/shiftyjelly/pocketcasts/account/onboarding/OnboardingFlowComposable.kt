@@ -7,7 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -47,25 +51,28 @@ fun OnboardingFlowComposable(
             navController = navController,
             startDestination = OnboardingNavRoute.logInOrSignUp
         ) {
+
+            importFlowGraph(navController)
+
+            onboardingRecommendationsFlowGraph(
+                onShown = { analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN) },
+                onBackPressed = {
+                    analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
+                    completeOnboarding()
+                },
+                onComplete = {
+                    navController.navigate(OnboardingNavRoute.plusUpgrade)
+                },
+                navController = navController,
+            )
+
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
-                    onNotNowClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, AnalyticsProp.source)
-                        completeOnboarding()
-                    },
-                    onSignUpClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.createAccount)
-                        navController.navigate(OnboardingNavRoute.createFreeAccount)
-                    },
-                    onLoginClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.signIn)
-                        navController.navigate(OnboardingNavRoute.logIn)
-                    },
-                    onContinueWithGoogleClicked = {
-                        analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED, AnalyticsProp.ButtonTapped.continueWithGoogle)
-                        navController.navigate(OnboardingNavRoute.logInGoogle)
-                    },
-                    onShown = { analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_SHOWN, AnalyticsProp.source) }
+                    flow = "initial_onboarding",
+                    onDismiss = { completeOnboarding() },
+                    onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
+                    onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
+                    onContinueWithGoogleClicked = { navController.navigate(OnboardingNavRoute.logInGoogle) },
                 )
             }
 
@@ -77,7 +84,7 @@ fun OnboardingFlowComposable(
                         navController.popBackStack()
                     },
                     onAccountCreated = {
-                        navController.navigate(OnboardingNavRoute.recommendationsFlow) {
+                        navController.navigate(OnboardingRecommendationsFlow.route) {
                             // clear backstack after account is created
                             popUpTo(OnboardingNavRoute.logInOrSignUp) {
                                 inclusive = true
@@ -114,27 +121,6 @@ fun OnboardingFlowComposable(
                 )
             }
 
-            composable(OnboardingNavRoute.recommendationsFlow) {
-                OnboardingRecommendationsFlow(
-                    onShown = {
-                        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_SHOWN)
-                    },
-                    onBackPressed = {
-                        analyticsTracker.track(AnalyticsEvent.RECOMMENDATIONS_DISMISSED)
-                        completeOnboarding()
-                    },
-                    onComplete = {
-                        navController.navigate(
-                            if (signInState?.isSignedInAsPlus == false) {
-                                OnboardingNavRoute.plusUpgrade
-                            } else {
-                                OnboardingNavRoute.welcome
-                            }
-                        )
-                    }
-                )
-            }
-
             composable(OnboardingNavRoute.plusUpgrade) {
                 OnboardingPlusUpgradeFlow(
                     onBackPressed = { navController.popBackStack() },
@@ -149,11 +135,13 @@ fun OnboardingFlowComposable(
                     },
                 )
             }
+
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
                     isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                     onContinue = completeOnboarding,
                     onContinueToDiscover = completeOnboardingToDiscover,
+                    onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
                     onBackPressed = { navController.popBackStack() },
                 )
             }
@@ -172,12 +160,11 @@ private object AnalyticsProp {
 }
 
 private object OnboardingNavRoute {
-    const val logInOrSignUp = "log_in_or_sign_up"
     const val createFreeAccount = "create_free_account"
+    const val forgotPassword = "forgot_password"
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
-    const val forgotPassword = "forgot_password"
-    const val recommendationsFlow = "recommendationsFlow"
+    const val logInOrSignUp = "log_in_or_sign_up"
     const val plusUpgrade = "upgrade_upgrade"
     const val welcome = "welcome"
 }

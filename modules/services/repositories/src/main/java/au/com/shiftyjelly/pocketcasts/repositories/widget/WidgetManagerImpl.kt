@@ -144,7 +144,7 @@ class WidgetManagerImpl @Inject constructor(
             return
         }
 
-        val podcastTitle = podcast?.title ?: UserEpisodePodcastSubstitute.title
+        val podcastTitle = podcast?.title ?: UserEpisodePodcastSubstitute.substituteTitle
         views.setContentDescription(R.id.widget_artwork, "$podcastTitle. Open Pocket Casts")
         views.setImageViewResource(R.id.widget_artwork, IR.drawable.defaultartwork_small_dark)
 
