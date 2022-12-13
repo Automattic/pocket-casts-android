@@ -76,6 +76,7 @@ enum class AnalyticsEvent(val key: String) {
     ACCOUNT_UPDATED_DISMISSED("account_updated_dismissed"),
 
     /* Account Details */
+    ACCOUNT_DETAILS_CANCEL_TAPPED("account_details_cancel_tapped"),
     ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
     ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
 
@@ -320,5 +321,11 @@ enum class AnalyticsEvent(val key: String) {
     END_OF_YEAR_STORY_SHARE("end_of_year_story_share"),
     END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
     END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED("end_of_year_story_retry_button_tapped"),
-    END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped")
+    END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped"),
+
+    /* Cancel Subscription Confirmation */
+    CANCEL_CONFIRMATION_VIEW_SHOWN("cancel_confirmation_view_shown"),
+    CANCEL_CONFIRMATION_VIEW_DISMISSED("cancel_confirmation_view_dismissed"),
+    CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("cancel_confirmation_stay_button_tapped"),
+    CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped")
 }

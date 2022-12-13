@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -75,6 +76,7 @@ class CancelConfirmationFragment : BaseDialogFragment() {
                 CancelConfirmationPage(
                     rows = getRows(),
                     onStayClicked = {
+                        viewModel.onStayClicked()
                         closeScreen()
                     },
                     onCloseClicked = ::closeScreen,
@@ -89,11 +91,17 @@ class CancelConfirmationFragment : BaseDialogFragment() {
     }
 
     private fun onCancelClicked() {
+        viewModel.onCancelClicked()
         WebViewActivity.show(
             context,
             resources.getString(LR.string.profile_cancel_subscription),
             Settings.INFO_CANCEL_URL
         )
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        viewModel.onViewDismissed()
     }
 
     @Composable

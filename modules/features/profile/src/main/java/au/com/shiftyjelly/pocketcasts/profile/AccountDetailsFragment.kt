@@ -167,6 +167,7 @@ class AccountDetailsFragment : BaseFragment() {
         }
 
         binding.btnCancelSub?.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
             CancelConfirmationFragment.newInstance()
                 .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
         }
