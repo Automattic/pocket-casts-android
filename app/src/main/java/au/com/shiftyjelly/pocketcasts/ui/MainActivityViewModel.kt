@@ -30,8 +30,12 @@ class MainActivityViewModel
 
     var isPlayerOpen: Boolean = false
     var lastPlaybackState: PlaybackState? = null
-    val shouldShowStoriesModal = MutableStateFlow(!settings.getEndOfYearModalHasBeenShown())
+    val shouldShowStoriesModal = MutableStateFlow(false)
     var waitingForSignInToShowStories = false
+
+    init {
+        updateStoriesModalShowState(!settings.getEndOfYearModalHasBeenShown())
+    }
 
     private val playbackStateRx = playbackManager.playbackStateRelay
         .doOnNext {
