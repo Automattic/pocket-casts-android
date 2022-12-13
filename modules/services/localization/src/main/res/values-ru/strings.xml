@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-28 12:54:04+0000
+Translation-Revision-Date: 2022-12-06 11:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+	<string name="onboarding_continue_with_google_error">Не удалось запустить вход Google.</string>
 	<string name="onboarding_find_podcasts">Поиск подкастов</string>
 	<string name="onboarding_welcome_recommendations_button">Найти следующий подкаст</string>
 	<string name="onboarding_welcome_recommendations_text">На странице поиска мы собрали для вас набирающие обороты и уже популярные подкасты.</string>
@@ -70,7 +71,7 @@ Language: ru
 	<string name="end_of_year_story_listened_to_categories_subtitle">Взглянем на самые популярные…</string>
 	<string name="end_of_year_story_listened_to_categories">В этом году вы выбрали %1$d рубрик (-и)</string>
 	<string name="end_of_year_story_listened_to_share_text">У меня ушло %1$s на прослушивание подкастов в 2022 году</string>
-	<string name="end_of_year_story_intro_title">Давайте отметим ваш год прослушиваний…</string>
+	<string name="end_of_year_story_intro_title">Давайте отметим ваш год прослушивания!</string>
 	<string name="end_of_year_launch_modal_image_title">Год в подкастах</string>
 	<string name="end_of_year_replay">Повторить</string>
 	<string name="settings_media_notification_controls_summary">Выберите два действия для отображения в уведомлении о воспроизведении на устройстве Android 13, в Android Auto и других местах, где доступны пользовательские элементы управления медиафайлами</string>

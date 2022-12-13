@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,10 +34,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingImportStartPage(
+    onShown: () -> Unit,
     onCastboxClicked: () -> Unit,
     onOtherAppsClicked: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
+
+    LaunchedEffect(Unit) {
+        onShown()
+    }
+
     Column(
         Modifier
             .fillMaxHeight()
@@ -105,6 +112,7 @@ private fun OnboardingImportStartPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingImportStartPage(
+            onShown = {},
             onCastboxClicked = {},
             onOtherAppsClicked = {},
             onBackPressed = {},

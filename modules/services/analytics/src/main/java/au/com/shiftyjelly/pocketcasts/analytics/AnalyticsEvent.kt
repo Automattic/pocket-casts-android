@@ -305,12 +305,6 @@ enum class AnalyticsEvent(val key: String) {
     RECOMMENDATIONS_IMPORT_TAPPED("recommendations_import_tapped"),
     RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
 
-    /* Onboarding upgrade */
-    ONBOARDING_UPGRADE_SHOWN("onboarding_upgrade_shown"),
-    ONBOARDING_UPGRADE_DISMISSED("onboarding_upgrade_dismissed"),
-    ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED("onboarding_upgrade_unlock_all_features_tapped"),
-    ONBOARDING_UPGRADE_NOT_NOW_TAPPED("onboarding_upgrade_not_now_tapped"),
-
     /* End of Year */
     END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),
     END_OF_YEAR_STORIES_SHOWN("end_of_year_stories_shown"),
@@ -322,6 +316,18 @@ enum class AnalyticsEvent(val key: String) {
     END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
     END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED("end_of_year_story_retry_button_tapped"),
     END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped"),
+
+    /* Welcome */
+    WELCOME_SHOWN("welcome_shown"),
+    WELCOME_IMPORT_TAPPED("welcome_import_tapped"),
+    WELCOME_DISCOVER_TAPPED("welcome_discover_tapped"),
+    WELCOME_DISMISSED("welcome_dismissed"),
+
+    /* Import */
+    ONBOARDING_IMPORT_SHOWN("onboarding_import_shown"),
+    ONBOARDING_IMPORT_APP_SELECTED("onboarding_import_app_selected"),
+    ONBOARDING_IMPORT_OPEN_APP_SELECTED("onboarding_import_open_app_selected"),
+    ONBOARDING_IMPORT_DISMISSED("onboarding_import_dismissed"),
 
     /* Cancel Subscription Confirmation */
     CANCEL_CONFIRMATION_VIEW_SHOWN("cancel_confirmation_view_shown"),

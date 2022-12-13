@@ -23,12 +23,12 @@ class OnboardingWelcomeViewModel @Inject constructor(
         _stateFlow.update { it.copy(newsletter = isChecked) }
     }
 
-    fun persistNewsletterSelection() {
+    private fun persistNewsletterSelection() {
         val newsletter = stateFlow.value.newsletter
         analyticsTracker.track(
             AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
             mapOf(
-                AnalyticsProp.SOURCE to NewsletterSource.ACCOUNT_CREATED.analyticsValue,
+                AnalyticsProp.SOURCE to NewsletterSource.WELCOME_NEW_ACCOUNT.analyticsValue,
                 AnalyticsProp.ENABLED to newsletter
             )
         )
@@ -37,9 +37,44 @@ class OnboardingWelcomeViewModel @Inject constructor(
         settings.setMarketingOptInNeedsSync(true)
     }
 
+    fun onShown(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_SHOWN,
+            mapOf(AnalyticsProp.FLOW to flow)
+        )
+    }
+
+    fun onContinueToDiscover(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_DISCOVER_TAPPED,
+            mapOf(AnalyticsProp.FLOW to flow)
+        )
+        persistNewsletterSelection()
+    }
+
+    fun onDismiss(flow: String, persistNewsletter: Boolean) {
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_DISMISSED,
+            mapOf(
+                AnalyticsProp.FLOW to flow
+            )
+        )
+        if (persistNewsletter) {
+            persistNewsletterSelection()
+        }
+    }
+
+    fun onImportTapped(flow: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.WELCOME_IMPORT_TAPPED,
+            mapOf(AnalyticsProp.FLOW to flow)
+        )
+    }
+
     companion object {
         private object AnalyticsProp {
             const val SOURCE = "source"
+            const val FLOW = "flow"
             const val ENABLED = "enabled"
         }
     }

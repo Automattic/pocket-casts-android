@@ -33,20 +33,30 @@ class OnboardingPlusFeaturesViewModel @Inject constructor(
         }
     }
 
-    fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_SHOWN)
+    fun onShown(flow: String, source: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.PLUS_PROMOTION_SHOWN,
+            mapOf(flowKey to flow, sourceKey to source)
+        )
     }
 
-    fun onBackPressed() {
-        analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_DISMISSED)
+    fun onDismiss(flow: String, source: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.PLUS_PROMOTION_DISMISSED,
+            mapOf(flowKey to flow, sourceKey to source)
+        )
     }
 
-    fun onUpgradePressed() {
-        analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_UNLOCK_ALL_FEATUERS_TAPPED)
+    fun onUpgradePressed(flow: String, source: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED,
+            mapOf(flowKey to flow, sourceKey to source)
+        )
     }
 
-    fun onNotNowPressed() {
-        analyticsTracker.track(AnalyticsEvent.ONBOARDING_UPGRADE_NOT_NOW_TAPPED)
+    companion object {
+        private const val flowKey = "flow"
+        private const val sourceKey = "source"
     }
 }
 

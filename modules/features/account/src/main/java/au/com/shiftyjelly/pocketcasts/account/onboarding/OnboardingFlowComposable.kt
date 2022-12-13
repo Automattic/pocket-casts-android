@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.flow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.recommendationsSource
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
@@ -49,9 +51,10 @@ fun OnboardingFlowComposable(
             startDestination = OnboardingNavRoute.logInOrSignUp
         ) {
 
-            importFlowGraph(navController)
+            importFlowGraph(navController, flow)
 
             onboardingRecommendationsFlowGraph(
+                flow = flow,
                 onBackPressed = completeOnboarding,
                 onComplete = {
                     navController.navigate(OnboardingNavRoute.plusUpgrade)
@@ -61,7 +64,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
-                    flow = "initial_onboarding",
+                    flow = flow,
                     onDismiss = { completeOnboarding() },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                     onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
@@ -104,6 +107,8 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.plusUpgrade) {
                 OnboardingPlusUpgradeFlow(
+                    flow = flow,
+                    source = recommendationsSource,
                     onBackPressed = { navController.popBackStack() },
                     onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
                     onCompleteUpgrade = {
@@ -119,8 +124,9 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
+                    flow = flow,
                     isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
-                    onContinue = completeOnboarding,
+                    onDone = completeOnboarding,
                     onContinueToDiscover = completeOnboardingToDiscover,
                     onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
                     onBackPressed = { navController.popBackStack() },
@@ -131,13 +137,8 @@ fun OnboardingFlowComposable(
 }
 
 private object AnalyticsProp {
-    object ButtonTapped {
-        private const val button = "button"
-        val signIn = source + mapOf(button to "sign_in")
-        val createAccount = source + mapOf(button to "create_account")
-        val continueWithGoogle = source + mapOf(button to "continue_with_google")
-    }
-    val source = mapOf("source" to "onboarding")
+    const val flow = "initial_onboarding"
+    const val recommendationsSource = "recommendations"
 }
 
 private object OnboardingNavRoute {

@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-Translation-Revision-Date: 2022-11-22 09:54:04+0000
+Translation-Revision-Date: 2022-12-06 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+	<string name="onboarding_continue_with_google_error">無法啟動 Google 登入。</string>
+	<string name="onboarding_find_podcasts">尋找 Podcast</string>
+	<string name="onboarding_welcome_recommendations_button">尋找我的下一個 Podcast</string>
+	<string name="onboarding_welcome_recommendations_text">在我們精心策劃的「探索」頁面中尋找低調時髦的 Podcast。</string>
+	<string name="onboarding_welcome_recommendations_title">探索新事物</string>
+	<string name="onboarding_welcome_get_you_listening_plus">謝謝，立刻讓你聽聽看！</string>
+	<string name="onboarding_welcome_get_you_listening">歡迎，立刻讓你聽聽看！</string>
+	<string name="onboarding_plus_recurring_after_free_trial">週期性付款將在你 %s 之後開始</string>
+	<string name="onboarding_plus_start_free_trial_and_subscribe">開始免費試用和訂閱</string>
+	<string name="onboarding_plus_terms_and_conditions">條款與條件</string>
+	<string name="onboarding_plus_privacy_policy">隱私權政策</string>
+	<string name="onboarding_plus_continuing_agrees_to">繼續即表示你同意我們的%1$s和%2$s。</string>
+	<string name="onboarding_plus_become_a_plus_member">成為 Plus 會員並解鎖所有 Pocket Casts 功能</string>
+	<string name="onboarding_sign_up">註冊</string>
+	<string name="onboarding_create_account">建立帳號</string>
+	<string name="onboarding_log_in">登入</string>
+	<string name="plus_trial_duration_free_trial">%s 免費試用</string>
+	<string name="end_of_year_stories_failed">無法載入你的年終故事，請檢查網際網路連線</string>
 	<string name="onboarding_plus_feature_themes_icons_text">展現你最真實的色彩。 僅供 Plus 社群使用的獨家圖示和主題。</string>
 	<string name="onboarding_plus_feature_themes_icons_title">佈景主題和圖示</string>
 	<string name="onboarding_plus_feature_hide_ads_text">不含廣告體驗提供你更多喜歡的內容，並減少不喜歡的內容。</string>
@@ -36,6 +54,7 @@ Language: zh_TW
 	<string name="end_of_year_story_top_categories_share_text">我最常收聽的 Podcast 分類</string>
 	<string name="end_of_year_story_top_categories">你最愛的分類</string>
 	<string name="end_of_year_story_epilogue_subtitle">別忘了與朋友分享，並向你最喜愛的 Podcast 創作者致意</string>
+	<string name="end_of_year_story_epilogue_title">感謝你在 2022 年使用 Pocket Casts 收聽節目</string>
 	<string name="end_of_year_story_longest_episode_share_text">我在 2022 年 %1$s 收聽時間最長的一集</string>
 	<string name="end_of_year_story_longest_episode_duration">這集長達 %1$s</string>
 	<string name="end_of_year_story_longest_episode">你收聽時間最長的一集為 Podcast「%2$s」的「%1$s」</string>
@@ -52,7 +71,7 @@ Language: zh_TW
 	<string name="end_of_year_story_listened_to_categories_subtitle">來看看你最愛的內容…</string>
 	<string name="end_of_year_story_listened_to_categories">你今年收聽了 %1$d 個不同分類</string>
 	<string name="end_of_year_story_listened_to_share_text">我在 2022 年花了 %1$s 收聽 Podcast</string>
-	<string name="end_of_year_story_intro_title">來慶祝你收聽節目的這一年…</string>
+	<string name="end_of_year_story_intro_title">來慶祝你收聽節目的這一年！</string>
 	<string name="end_of_year_launch_modal_image_title">Podcast 年度回顧</string>
 	<string name="end_of_year_replay">重播</string>
 	<string name="settings_media_notification_controls_summary">選擇兩個動作，顯示在 Android 13 播放通知、Android Auto 和其他可使用自訂媒體控制項的地方</string>

@@ -17,7 +17,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -274,8 +273,8 @@ class CreateAccountViewModel
 
 enum class NewsletterSource(val analyticsValue: String) {
     ACCOUNT_UPDATED("account_updated"),
-    ACCOUNT_CREATED("account_created"),
-    PROFILE("profile")
+    PROFILE("profile"),
+    WELCOME_NEW_ACCOUNT("welcome_new_account"),
 }
 
 enum class SubscriptionType(val value: String, val trackingLabel: String) {

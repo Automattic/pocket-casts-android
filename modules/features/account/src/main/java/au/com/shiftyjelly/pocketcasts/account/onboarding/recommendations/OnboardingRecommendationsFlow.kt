@@ -19,6 +19,7 @@ object OnboardingRecommendationsFlow {
     private const val search = "search"
 
     fun NavGraphBuilder.onboardingRecommendationsFlowGraph(
+        flow: String,
         onBackPressed: () -> Unit,
         onComplete: () -> Unit,
         navController: NavController,
@@ -28,7 +29,7 @@ object OnboardingRecommendationsFlow {
             startDestination = start
         ) {
 
-            importFlowGraph(navController)
+            importFlowGraph(navController, flow)
 
             composable(start) {
                 OnboardingRecommendationsStartPage(
