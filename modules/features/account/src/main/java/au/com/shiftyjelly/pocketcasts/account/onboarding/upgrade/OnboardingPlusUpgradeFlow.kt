@@ -19,6 +19,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -61,20 +62,24 @@ fun OnboardingPlusUpgradeFlow(
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true,
-        confirmStateChange = {
-            if (it == ModalBottomSheetValue.Hidden) {
-                bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow)
-            }
-            true
-        }
     )
+
+    LaunchedEffect(sheetState.targetValue) {
+        when (sheetState.targetValue) {
+            ModalBottomSheetValue.Hidden -> {
+                // Don't fire event when initially loading the screen and both current and target are "Hidden"
+                if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
+                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow)
+                }
+            }
+            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow)
+            else -> {}
+        }
+    }
 
     BackHandler {
         if (sheetState.isVisible) {
-            bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow)
-            coroutineScope.launch {
-                sheetState.hide()
-            }
+            coroutineScope.launch { sheetState.hide() }
         } else {
             mainSheetViewModel.onDismiss(flow, source)
             onBackPressed()
@@ -87,15 +92,12 @@ fun OnboardingPlusUpgradeFlow(
         sheetState = sheetState,
         scrimColor = Color.Black.copy(alpha = 0.5f),
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        content = @Composable {
+        content = {
             OnboardingPlusFeaturesPage(
                 flow = flow,
                 source = source,
                 onUpgradePressed = {
-                    coroutineScope.launch {
-                        sheetState.show()
-                        bottomSheetViewModel.onSelectPaymentFrequencyShown(flow)
-                    }
+                    coroutineScope.launch { sheetState.show() }
                 },
                 onNotNowPressed = onNotNowPressed,
                 onBackPressed = onBackPressed,
