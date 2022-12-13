@@ -624,7 +624,7 @@
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">your expiration date</string>
     <string name="profile_cancel_confirm_item_plus">Access to Pocket&#160;Casts Plus features will be locked after this date.</string>
     <string name="profile_cancel_confirm_item_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
-    <string name="profile_cancel_confirm_item_uploads">All files uploaded to your Pocket&#160;Casts account will be deleted (but downloaded files on your mobile devices will remain)</string>
+    <string name="profile_cancel_confirm_item_uploads">All files uploaded to your Pocket&#160;Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
     <string name="profile_cancel_confirm_item_web_player">You will no longer be able to access Pocket&#160;Casts using your web browser, or desktop computer.</string>
     <string name="profile_cancel_confirm_stay_button_title">Actually, I want to stay"</string>
     <string name="profile_cancel_confirm_cancel_button_title">Yes, cancel my subscription"</string>
