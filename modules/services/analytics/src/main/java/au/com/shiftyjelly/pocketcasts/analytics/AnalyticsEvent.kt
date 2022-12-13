@@ -76,6 +76,7 @@ enum class AnalyticsEvent(val key: String) {
     ACCOUNT_UPDATED_DISMISSED("account_updated_dismissed"),
 
     /* Account Details */
+    ACCOUNT_DETAILS_CANCEL_TAPPED("account_details_cancel_tapped"),
     ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
     ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
 
@@ -327,4 +328,10 @@ enum class AnalyticsEvent(val key: String) {
     ONBOARDING_IMPORT_APP_SELECTED("onboarding_import_app_selected"),
     ONBOARDING_IMPORT_OPEN_APP_SELECTED("onboarding_import_open_app_selected"),
     ONBOARDING_IMPORT_DISMISSED("onboarding_import_dismissed"),
+
+    /* Cancel Subscription Confirmation */
+    CANCEL_CONFIRMATION_VIEW_SHOWN("cancel_confirmation_view_shown"),
+    CANCEL_CONFIRMATION_VIEW_DISMISSED("cancel_confirmation_view_dismissed"),
+    CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("cancel_confirmation_stay_button_tapped"),
+    CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped")
 }

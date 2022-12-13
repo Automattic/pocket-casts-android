@@ -167,7 +167,9 @@ class AccountDetailsFragment : BaseFragment() {
         }
 
         binding.btnCancelSub?.setOnClickListener {
-            WebViewActivity.show(context, "Cancel subscription", Settings.INFO_CANCEL_URL)
+            analyticsTracker.track(AnalyticsEvent.ACCOUNT_DETAILS_CANCEL_TAPPED)
+            CancelConfirmationFragment.newInstance()
+                .show(childFragmentManager, "cancel_subscription_confirmation_dialog")
         }
 
         binding.btnSignOut.setOnClickListener {
