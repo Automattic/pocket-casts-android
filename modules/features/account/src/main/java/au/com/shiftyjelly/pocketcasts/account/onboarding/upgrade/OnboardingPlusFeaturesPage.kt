@@ -84,13 +84,13 @@ internal fun OnboardingPlusFeaturesPage(
 
     @Suppress("NAME_SHADOWING")
     val onNotNowPressed = {
-        viewModel.onNotNowPressed(flow, source)
+        viewModel.onDismiss(flow, source)
         onNotNowPressed()
     }
 
     @Suppress("NAME_SHADOWING")
     val onBackPressed = {
-        viewModel.onBackPressed(flow, source)
+        viewModel.onDismiss(flow, source)
         onBackPressed()
     }
 

@@ -76,7 +76,7 @@ fun OnboardingPlusUpgradeFlow(
                 sheetState.hide()
             }
         } else {
-            mainSheetViewModel.onBackPressed(flow, source)
+            mainSheetViewModel.onDismiss(flow, source)
             onBackPressed()
         }
     }

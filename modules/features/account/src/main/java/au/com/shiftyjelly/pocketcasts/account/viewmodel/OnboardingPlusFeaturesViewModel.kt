@@ -40,7 +40,7 @@ class OnboardingPlusFeaturesViewModel @Inject constructor(
         )
     }
 
-    fun onBackPressed(flow: String, source: String) {
+    fun onDismiss(flow: String, source: String) {
         analyticsTracker.track(
             AnalyticsEvent.PLUS_PROMOTION_DISMISSED,
             mapOf(flowKey to flow, sourceKey to source)
@@ -50,13 +50,6 @@ class OnboardingPlusFeaturesViewModel @Inject constructor(
     fun onUpgradePressed(flow: String, source: String) {
         analyticsTracker.track(
             AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED,
-            mapOf(flowKey to flow, sourceKey to source)
-        )
-    }
-
-    fun onNotNowPressed(flow: String, source: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED,
             mapOf(flowKey to flow, sourceKey to source)
         )
     }
