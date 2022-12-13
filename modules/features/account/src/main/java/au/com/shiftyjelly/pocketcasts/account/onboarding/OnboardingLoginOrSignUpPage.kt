@@ -107,7 +107,7 @@ internal fun OnboardingLoginOrSignUpPage(
                 .verticalScroll(rememberScrollState())
                 .weight(1f)
         ) {
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(32.dp))
 
             Artwork(viewModel.showContinueWithGoogleButton)
 
