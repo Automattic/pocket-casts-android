@@ -23,7 +23,16 @@ class OnboardingWelcomeViewModel @Inject constructor(
         _stateFlow.update { it.copy(newsletter = isChecked) }
     }
 
-    private fun persistNewsletterSelection(newsletter: Boolean) {
+    private fun persistNewsletterSelection() {
+        val newsletter = stateFlow.value.newsletter
+        analyticsTracker.track(
+            AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
+            mapOf(
+                AnalyticsProp.SOURCE to NewsletterSource.WELCOME_NEW_ACCOUNT.analyticsValue,
+                AnalyticsProp.ENABLED to newsletter
+            )
+        )
+
         settings.setMarketingOptIn(newsletter)
         settings.setMarketingOptInNeedsSync(true)
     }
@@ -35,35 +44,22 @@ class OnboardingWelcomeViewModel @Inject constructor(
         )
     }
 
-    fun onBackPressed(flow: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.WELCOME_DISMISSED,
-            mapOf(AnalyticsProp.FLOW to flow)
-        )
-    }
-
     fun onContinueToDiscover(flow: String) {
-        val newsletter = stateFlow.value.newsletter
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_DISCOVER_TAPPED,
-            mapOf(
-                AnalyticsProp.FLOW to flow,
-                AnalyticsProp.NEWSLETTER_OPT_IN to newsletter
-            )
+            mapOf(AnalyticsProp.FLOW to flow)
         )
-        persistNewsletterSelection(newsletter)
+        persistNewsletterSelection()
     }
 
     fun onDone(flow: String) {
-        val newsletter = stateFlow.value.newsletter
         analyticsTracker.track(
-            AnalyticsEvent.WELCOME_DONE_TAPPED,
+            AnalyticsEvent.WELCOME_DISMISSED,
             mapOf(
-                AnalyticsProp.FLOW to flow,
-                AnalyticsProp.NEWSLETTER_OPT_IN to newsletter
+                AnalyticsProp.FLOW to flow
             )
         )
-        persistNewsletterSelection(newsletter)
+        persistNewsletterSelection()
     }
 
     fun onImportTapped(flow: String) {
@@ -77,7 +73,6 @@ class OnboardingWelcomeViewModel @Inject constructor(
         private object AnalyticsProp {
             const val SOURCE = "source"
             const val FLOW = "flow"
-            const val NEWSLETTER_OPT_IN = "newsletter_opt_in"
             const val ENABLED = "enabled"
         }
     }

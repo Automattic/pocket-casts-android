@@ -320,7 +320,6 @@ enum class AnalyticsEvent(val key: String) {
     WELCOME_SHOWN("welcome_shown"),
     WELCOME_IMPORT_TAPPED("welcome_import_tapped"),
     WELCOME_DISCOVER_TAPPED("welcome_discover_tapped"),
-    WELCOME_DONE_TAPPED("welcome_done_tapped"),
     WELCOME_DISMISSED("welcome_dismissed"),
 
     /* Import */

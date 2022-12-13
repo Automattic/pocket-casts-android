@@ -70,10 +70,7 @@ fun OnboardingWelcomePage(
         viewModel.onShown(flow)
     }
 
-    BackHandler {
-        viewModel.onBackPressed(flow)
-        onBackPressed()
-    }
+    BackHandler { onBackPressed() }
 
     Content(
         isSignedInAsPlus = isSignedInAsPlus,
