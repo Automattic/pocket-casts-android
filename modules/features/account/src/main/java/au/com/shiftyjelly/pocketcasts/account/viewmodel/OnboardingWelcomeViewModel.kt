@@ -52,14 +52,16 @@ class OnboardingWelcomeViewModel @Inject constructor(
         persistNewsletterSelection()
     }
 
-    fun onDone(flow: String) {
+    fun onDismiss(flow: String, persistNewsletter: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_DISMISSED,
             mapOf(
                 AnalyticsProp.FLOW to flow
             )
         )
-        persistNewsletterSelection()
+        if (persistNewsletter) {
+            persistNewsletterSelection()
+        }
     }
 
     fun onImportTapped(flow: String) {

@@ -70,7 +70,10 @@ fun OnboardingWelcomePage(
         viewModel.onShown(flow)
     }
 
-    BackHandler { onBackPressed() }
+    BackHandler {
+        viewModel.onDismiss(flow, persistNewsletter = false)
+        onBackPressed()
+    }
 
     Content(
         isSignedInAsPlus = isSignedInAsPlus,
@@ -84,7 +87,7 @@ fun OnboardingWelcomePage(
         },
         state = state,
         onDone = {
-            viewModel.onDone(flow)
+            viewModel.onDismiss(flow, persistNewsletter = true)
             onDone()
         },
         onNewsletterCheckedChanged = viewModel::updateNewsletter
