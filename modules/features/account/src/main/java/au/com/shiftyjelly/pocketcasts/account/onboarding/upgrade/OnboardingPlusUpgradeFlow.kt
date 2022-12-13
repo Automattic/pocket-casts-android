@@ -19,6 +19,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,50 +35,69 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnboardingPlusUpgradeFlow(
+    flow: String,
+    source: String,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
     onCompleteUpgrade: () -> Unit,
 ) {
 
-    val viewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
-    val state = viewModel.state.collectAsState().value
+    val bottomSheetViewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
+    val mainSheetViewModel = hiltViewModel<OnboardingPlusFeaturesViewModel>()
+    val state = bottomSheetViewModel.state.collectAsState().value
     val hasSubscriptions = state is OnboardingPlusBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
 
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true
+        skipHalfExpanded = true,
     )
+
+    LaunchedEffect(sheetState.targetValue) {
+        when (sheetState.targetValue) {
+            ModalBottomSheetValue.Hidden -> {
+                // Don't fire event when initially loading the screen and both current and target are "Hidden"
+                if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
+                    bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow)
+                }
+            }
+            ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow)
+            else -> {}
+        }
+    }
 
     BackHandler {
         if (sheetState.isVisible) {
-            coroutineScope.launch {
-                sheetState.hide()
-            }
+            coroutineScope.launch { sheetState.hide() }
         } else {
+            mainSheetViewModel.onDismiss(flow, source)
             onBackPressed()
         }
     }
 
+    val activity = LocalContext.current.getActivity()
     @OptIn(ExperimentalMaterialApi::class)
     ModalBottomSheetLayout(
         sheetState = sheetState,
         scrimColor = Color.Black.copy(alpha = 0.5f),
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        content = @Composable {
+        content = {
             OnboardingPlusFeaturesPage(
+                flow = flow,
+                source = source,
                 onUpgradePressed = {
-                    coroutineScope.launch {
-                        sheetState.show()
-                    }
+                    coroutineScope.launch { sheetState.show() }
                 },
                 onNotNowPressed = onNotNowPressed,
                 onBackPressed = onBackPressed,
@@ -84,7 +105,22 @@ fun OnboardingPlusUpgradeFlow(
             )
         },
         sheetContent = {
-            OnboardingPlusBottomSheet(onCompleteUpgrade = onCompleteUpgrade)
+            OnboardingPlusBottomSheet(
+                onClickSubscribe = {
+                    if (activity != null) {
+                        bottomSheetViewModel.onClickSubscribe(
+                            activity = activity,
+                            flow = flow,
+                            onComplete = onCompleteUpgrade,
+                        )
+                    } else {
+                        LogBuffer.e(
+                            LogBuffer.TAG_SUBSCRIPTIONS,
+                            "Activity is null when attempting subscription"
+                        )
+                    }
+                }
+            )
         },
     )
 }
