@@ -4,10 +4,15 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -17,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,19 +40,29 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingLoginPage(
+    theme: Theme.ThemeType,
     onBackPressed: () -> Unit,
     onLoginComplete: () -> Unit,
     onForgotPasswordTapped: () -> Unit,
 ) {
+    val systemUiController = rememberSystemUiController()
+    val pocketCastsTheme = MaterialTheme.theme
 
     val viewModel = hiltViewModel<OnboardingLogInViewModel>()
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.onShown() }
+    LaunchedEffect(Unit) {
+        viewModel.onShown()
+        systemUiController.apply {
+            setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
+            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
+        }
+    }
     BackHandler {
         viewModel.onBackPressed()
         onBackPressed()
@@ -59,7 +75,12 @@ internal fun OnboardingLoginPage(
         onLoginComplete()
     }
 
-    Column {
+    Column(
+        Modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .windowInsetsPadding(WindowInsets.ime)
+    ) {
 
         ThemedTopAppBar(
             title = stringResource(LR.string.onboarding_welcome_back),
@@ -123,11 +144,12 @@ internal fun OnboardingLoginPage(
 
 @Preview(showBackground = true)
 @Composable
-fun OnBoardingLoginPage_Preview(
+fun OnboardingLoginPage_Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingLoginPage(
+            theme = themeType,
             onBackPressed = {},
             onLoginComplete = {},
             onForgotPasswordTapped = {},
