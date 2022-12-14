@@ -1,6 +1,13 @@
+7.30
+-----
+
+
 7.29
 -----
 
+* New Features:
+    *   Onboarding flow for new users
+        ([#645](https://github.com/Automattic/pocket-casts-android/pull/645)).
 * Bug Fixes:
     *   Fixed podcast date format
         ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
