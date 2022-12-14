@@ -51,7 +51,6 @@ fun OnboardingImportStartPage(
     ) {
 
         ThemedTopAppBar(
-            title = stringResource(LR.string.onboarding_welcome_back),
             onNavigationClick = onBackPressed
         )
 
