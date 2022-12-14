@@ -222,6 +222,7 @@ project.ext {
             hiltNavigationCompose: "androidx.hilt:hilt-navigation-compose:1.0.0",
             // Lottie
             lottie: "com.airbnb.android:lottie:5.2.0",
+            lottieCompose: "com.airbnb.android:lottie-compose:5.2.0",
             // JUnit
             junit: "junit:junit:4.13.2",
             // Mockito

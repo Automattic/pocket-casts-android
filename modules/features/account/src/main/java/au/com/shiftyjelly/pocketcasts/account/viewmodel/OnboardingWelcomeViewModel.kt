@@ -71,6 +71,10 @@ class OnboardingWelcomeViewModel @Inject constructor(
         )
     }
 
+    fun onConfettiShown() {
+        _stateFlow.update { it.copy(showConfetti = false) }
+    }
+
     companion object {
         private object AnalyticsProp {
             const val SOURCE = "source"
@@ -82,4 +86,5 @@ class OnboardingWelcomeViewModel @Inject constructor(
 
 data class OnboardingWelcomeState(
     val newsletter: Boolean = true,
+    val showConfetti: Boolean = true,
 )

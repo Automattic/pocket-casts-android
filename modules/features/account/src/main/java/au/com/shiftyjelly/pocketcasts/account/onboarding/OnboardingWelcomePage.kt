@@ -32,12 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeViewModel
@@ -50,6 +52,10 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -84,6 +90,8 @@ fun OnboardingWelcomePage(
         onImportTapped = {
             viewModel.onImportTapped(flow)
             onImportTapped()
+            /* Mark confetti as shown if import tapped before confetti animation ends. */
+            viewModel.onConfettiShown()
         },
         state = state,
         onDone = {
@@ -92,6 +100,10 @@ fun OnboardingWelcomePage(
         },
         onNewsletterCheckedChanged = viewModel::updateNewsletter
     )
+
+    if (state.showConfetti) {
+        Confetti { viewModel.onConfettiShown() }
+    }
 }
 
 @Composable
@@ -162,6 +174,20 @@ private fun Content(
         )
         Spacer(Modifier.height(24.dp))
     }
+}
+
+@Composable
+private fun Confetti(
+    onConfettiShown: () -> Unit,
+) {
+    val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.confetti))
+    val progress by animateLottieCompositionAsState(lottieComposition)
+
+    LottieAnimation(
+        composition = lottieComposition,
+        contentScale = ContentScale.Crop,
+    )
+    if (progress == 1.0f) onConfettiShown()
 }
 
 @Composable
