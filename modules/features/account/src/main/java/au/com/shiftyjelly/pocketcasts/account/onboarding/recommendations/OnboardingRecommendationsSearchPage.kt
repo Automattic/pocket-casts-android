@@ -55,10 +55,12 @@ fun OnboardingRecommendationsSearchPage(
 
     val focusRequester = remember { FocusRequester() }
     val systemUiController = rememberSystemUiController()
+    val pocketCastsTheme = MaterialTheme.theme
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
         systemUiController.apply {
-            setStatusBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
+            // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+            setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
             setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
         }
     }
