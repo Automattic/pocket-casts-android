@@ -76,6 +76,7 @@ enum class AnalyticsEvent(val key: String) {
     ACCOUNT_UPDATED_DISMISSED("account_updated_dismissed"),
 
     /* Account Details */
+    ACCOUNT_DETAILS_CANCEL_TAPPED("account_details_cancel_tapped"),
     ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
     ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
 
@@ -296,4 +297,41 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DETAIL_DISMISSED("episode_detail_dismissed"),
     EPISODE_DETAIL_PODCAST_NAME_TAPPED("episode_detail_podcast_name_tapped"),
     EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED("episode_detail_show_notes_link_tapped"),
+
+    /* Recommendations */
+    RECOMMENDATIONS_SHOWN("recommendations_shown"),
+    RECOMMENDATIONS_DISMISSED("recommendations_dismissed"),
+    RECOMMENDATIONS_SEARCH_TAPPED("recommendations_search_tapped"),
+    RECOMMENDATIONS_IMPORT_TAPPED("recommendations_import_tapped"),
+    RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
+
+    /* End of Year */
+    END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),
+    END_OF_YEAR_STORIES_SHOWN("end_of_year_stories_shown"),
+    END_OF_YEAR_STORIES_DISMISSED("end_of_year_stories_dismissed"),
+    END_OF_YEAR_STORIES_FAILED_TO_LOAD("end_of_year_stories_failed_to_load"),
+    END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED("end_of_year_story_replay_button_tapped"),
+    END_OF_YEAR_STORY_SHOWN("end_of_year_story_shown"),
+    END_OF_YEAR_STORY_SHARE("end_of_year_story_share"),
+    END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
+    END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED("end_of_year_story_retry_button_tapped"),
+    END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped"),
+
+    /* Welcome */
+    WELCOME_SHOWN("welcome_shown"),
+    WELCOME_IMPORT_TAPPED("welcome_import_tapped"),
+    WELCOME_DISCOVER_TAPPED("welcome_discover_tapped"),
+    WELCOME_DISMISSED("welcome_dismissed"),
+
+    /* Import */
+    ONBOARDING_IMPORT_SHOWN("onboarding_import_shown"),
+    ONBOARDING_IMPORT_APP_SELECTED("onboarding_import_app_selected"),
+    ONBOARDING_IMPORT_OPEN_APP_SELECTED("onboarding_import_open_app_selected"),
+    ONBOARDING_IMPORT_DISMISSED("onboarding_import_dismissed"),
+
+    /* Cancel Subscription Confirmation */
+    CANCEL_CONFIRMATION_VIEW_SHOWN("cancel_confirmation_view_shown"),
+    CANCEL_CONFIRMATION_VIEW_DISMISSED("cancel_confirmation_view_dismissed"),
+    CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("cancel_confirmation_stay_button_tapped"),
+    CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped")
 }

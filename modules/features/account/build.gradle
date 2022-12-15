@@ -16,6 +16,7 @@ dependencies {
     // features
     implementation project(':modules:features:cartheme')
     implementation project(':modules:features:settings')
+    implementation project(':modules:features:search')
 
     // services
     implementation project(':modules:services:analytics')

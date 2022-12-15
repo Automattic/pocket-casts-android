@@ -689,7 +689,6 @@ Language: en_GB
 	<string name="profile_create_subscription_failed">Could not create subscription. Please try again</string>
 	<string name="profile_create_privacy_policy_title">Privacy Policy</string>
 	<string name="profile_create_privacy_policy">We\'ve linked our Privacy Policy too in case you\'re interested. We\'ve tried to keep both short and to the point and included as little Legalese as possible.</string>
-	<string name="profile_create_password_requirements">Must be at least 6 characters</string>
 	<string name="profile_create_newsletter_summary">Receive news, app updates, themed podcast lists, interviews and more</string>
 	<string name="profile_create_license">Please excuse our formality</string>
 	<string name="profile_create_failed">Could not create account. Please try again</string>

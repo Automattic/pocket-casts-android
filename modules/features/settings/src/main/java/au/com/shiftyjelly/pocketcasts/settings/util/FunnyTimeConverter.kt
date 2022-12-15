@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts.settings.util
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
+import timber.log.Timber
 import java.util.Random
+import java.util.UnknownFormatConversionException
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class FunnyTimeConverter {
@@ -41,7 +43,12 @@ class FunnyTimeConverter {
             val mins = (timeSecs / 60).toDouble()
             val amount = mins * timesPerMinute
 
-            return resources.getString(formatStringId, amount)
+            return try {
+                resources.getString(formatStringId, amount)
+            } catch (ex: UnknownFormatConversionException) {
+                Timber.e(ex.message)
+                ""
+            }
         }
 
         fun suitableFor(timeSecs: Long): Boolean {

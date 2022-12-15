@@ -17,7 +17,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.launch
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,6 +46,38 @@ class CreateAccountViewModel
         private const val ERROR_CODE_KEY = "error_code"
         private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
+
+        fun trackPurchaseEvent(subscription: Subscription?, purchaseEvent: PurchaseEvent, analyticsTracker: AnalyticsTrackerWrapper) {
+            // extract part of the product id after the last period ("com.pocketcasts.plus.monthly" -> "monthly")
+            val shortProductId = subscription?.productDetails?.productId?.split('.')?.lastOrNull()
+                ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+            val isFreeTrial = subscription is Subscription.WithTrial
+
+            val analyticsProperties = mapOf(
+                PRODUCT_KEY to shortProductId,
+                IS_FREE_TRIAL_KEY to isFreeTrial
+            )
+
+            when (purchaseEvent) {
+
+                is PurchaseEvent.Success -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
+
+                is PurchaseEvent.Cancelled -> analyticsTracker.track(
+                    AnalyticsEvent.PURCHASE_CANCELLED,
+                    analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode)
+                )
+
+                is PurchaseEvent.Failure -> {
+
+                    // Exclude error_code property if we do not have a responseCode
+                    val properties = purchaseEvent.responseCode?.let {
+                        analyticsProperties.plus(ERROR_CODE_KEY to it)
+                    } ?: analyticsProperties
+
+                    analyticsTracker.track(AnalyticsEvent.PURCHASE_FAILED, properties)
+                }
+            }
+        }
     }
 
     fun loadSubs() {
@@ -221,45 +252,13 @@ class CreateAccountViewModel
                             errorUpdate(CreateAccountError.CANNOT_CREATE_SUB, true)
                         }
                     }
-                    trackPurchaseEvent(purchaseEvent)
+                    trackPurchaseEvent(subscription.value, purchaseEvent, analyticsTracker)
                 },
                 onError = {
                     errorUpdate(CreateAccountError.CANNOT_CREATE_SUB, true)
                 }
             )
             .addTo(disposables)
-    }
-
-    private fun trackPurchaseEvent(purchaseEvent: PurchaseEvent) {
-        // extract part of the product id after the last period ("com.pocketcasts.plus.monthly" -> "monthly")
-        val shortProductId = subscription.value?.productDetails?.productId?.split('.')?.lastOrNull()
-            ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-        val isFreeTrial = subscription.value is Subscription.WithTrial
-
-        val analyticsProperties = mapOf(
-            PRODUCT_KEY to shortProductId,
-            IS_FREE_TRIAL_KEY to isFreeTrial
-        )
-
-        when (purchaseEvent) {
-
-            is PurchaseEvent.Success -> analyticsTracker.track(AnalyticsEvent.PURCHASE_SUCCESSFUL, analyticsProperties)
-
-            is PurchaseEvent.Cancelled -> analyticsTracker.track(
-                AnalyticsEvent.PURCHASE_CANCELLED,
-                analyticsProperties.plus(ERROR_CODE_KEY to purchaseEvent.responseCode)
-            )
-
-            is PurchaseEvent.Failure -> {
-
-                // Exclude error_code property if we do not have a responseCode
-                val properties = purchaseEvent.responseCode?.let {
-                    analyticsProperties.plus(ERROR_CODE_KEY to it)
-                } ?: analyticsProperties
-
-                analyticsTracker.track(AnalyticsEvent.PURCHASE_FAILED, properties)
-            }
-        }
     }
 
     fun onCloseDoneForm() {
@@ -274,8 +273,8 @@ class CreateAccountViewModel
 
 enum class NewsletterSource(val analyticsValue: String) {
     ACCOUNT_UPDATED("account_updated"),
-    ACCOUNT_CREATED("account_created"),
-    PROFILE("profile")
+    PROFILE("profile"),
+    WELCOME_NEW_ACCOUNT("welcome_new_account"),
 }
 
 enum class SubscriptionType(val value: String, val trackingLabel: String) {

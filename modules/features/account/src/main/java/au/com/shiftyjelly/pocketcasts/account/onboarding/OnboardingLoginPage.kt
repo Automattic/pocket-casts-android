@@ -38,16 +38,19 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingLoginPage(
-    onShown: () -> Unit,
     onBackPressed: () -> Unit,
     onLoginComplete: () -> Unit,
     onForgotPasswordTapped: () -> Unit,
 ) {
-    LaunchedEffect(Unit) { onShown() }
-    BackHandler { onBackPressed() }
 
     val viewModel = hiltViewModel<OnboardingLogInViewModel>()
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) { viewModel.onShown() }
+    BackHandler {
+        viewModel.onBackPressed()
+        onBackPressed()
+    }
 
     val view = LocalView.current
     @Suppress("NAME_SHADOWING")
@@ -60,7 +63,10 @@ internal fun OnboardingLoginPage(
 
         ThemedTopAppBar(
             title = stringResource(LR.string.onboarding_welcome_back),
-            onNavigationClick = onBackPressed
+            onNavigationClick = {
+                viewModel.onBackPressed()
+                onBackPressed()
+            }
         )
 
         Column(
@@ -107,7 +113,7 @@ internal fun OnboardingLoginPage(
             Spacer(Modifier.height(16.dp))
 
             RowButton(
-                text = stringResource(LR.string.log_in),
+                text = stringResource(LR.string.onboarding_log_in),
                 enabled = state.enableSubmissionFields,
                 onClick = { viewModel.logIn(onLoginComplete) },
             )
@@ -122,7 +128,6 @@ fun OnBoardingLoginPage_Preview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingLoginPage(
-            onShown = {},
             onBackPressed = {},
             onLoginComplete = {},
             onForgotPasswordTapped = {},

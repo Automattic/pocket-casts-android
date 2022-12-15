@@ -2,23 +2,17 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,9 +24,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -41,16 +33,18 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingCreateAccountPage(
-    onShown: () -> Unit,
     onBackPressed: () -> Unit,
     onAccountCreated: () -> Unit,
 ) {
 
-    LaunchedEffect(Unit) { onShown() }
-    BackHandler { onBackPressed() }
-
     val viewModel = hiltViewModel<OnboardingCreateAccountViewModel>()
     val state by viewModel.stateFlow.collectAsState()
+
+    LaunchedEffect(Unit) { viewModel.onShown() }
+    BackHandler {
+        viewModel.onBackPressed()
+        onBackPressed()
+    }
 
     val view = LocalView.current
     @Suppress("NAME_SHADOWING")
@@ -62,7 +56,10 @@ internal fun OnboardingCreateAccountPage(
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.create_account),
-            onNavigationClick = onBackPressed
+            onNavigationClick = {
+                viewModel.onBackPressed()
+                onBackPressed()
+            }
         )
 
         Column(
@@ -109,30 +106,8 @@ internal fun OnboardingCreateAccountPage(
 
             Spacer(Modifier.weight(1f))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 32.dp)
-            ) {
-                Column(Modifier.padding(end = 16.dp)) {
-                    TextH30(stringResource(LR.string.onboarding_get_the_newsletter))
-                    TextP60(stringResource(LR.string.profile_create_newsletter_summary))
-                }
-
-                Switch(
-                    checked = state.newsletter,
-                    onCheckedChange = viewModel::updateNewsletter,
-                    colors = SwitchDefaults.colors(
-                        uncheckedThumbColor = Color.Gray,
-                        uncheckedTrackColor = Color.Gray,
-                    )
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
             RowButton(
-                text = stringResource(LR.string.create_account),
+                text = stringResource(LR.string.onboarding_create_account),
                 enabled = state.enableSubmissionFields,
                 onClick = { viewModel.createAccount(onAccountCreated) },
             )
@@ -147,7 +122,6 @@ private fun OnboardingCreateAccountPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingCreateAccountPage(
-            onShown = {},
             onBackPressed = {},
             onAccountCreated = {},
         )

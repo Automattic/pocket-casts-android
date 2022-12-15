@@ -8,10 +8,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 
+private const val Black60 = 0x99000000
+
 fun Modifier.podcastDynamicBackground(podcast: Podcast) =
     dynamicBackground(Color(podcast.getTintColor(false)))
 
-fun Modifier.dynamicBackground(color: Color) =
+fun Modifier.dynamicBackground(
+    baseColor: Color,
+    colorStops: List<Color> = listOf(Color.Black, Color(Black60)),
+    direction: FadeDirection = FadeDirection.TopToBottom,
+) =
     graphicsLayer {
         /*
         https://rb.gy/iju6fn
@@ -19,18 +25,19 @@ fun Modifier.dynamicBackground(color: Color) =
         The Clear blend mode will not work without it */
         alpha = 0.99f
     }.drawWithContent {
-        val colors = listOf(
-            Color.Black,
-            Color(0x80000000), // 50% Black
-        )
-        drawRect(color = color)
+        drawRect(color = baseColor)
         drawRect(
             brush = Brush.verticalGradient(
-                colors,
-                startY = Float.POSITIVE_INFINITY,
-                endY = 0f,
+                colorStops,
+                startY = if (direction == FadeDirection.BottomToTop) Float.POSITIVE_INFINITY else 0f,
+                endY = if (direction == FadeDirection.BottomToTop) 0f else Float.POSITIVE_INFINITY,
             ),
             blendMode = BlendMode.DstIn
         )
         drawContent()
     }
+
+enum class FadeDirection {
+    TopToBottom,
+    BottomToTop
+}

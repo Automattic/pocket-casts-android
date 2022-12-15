@@ -11,7 +11,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonColors
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,36 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-
-@Composable
-fun OutlinedRowButton(
-    text: String,
-    modifier: Modifier = Modifier,
-    includePadding: Boolean = true,
-    enabled: Boolean = true,
-    border: BorderStroke = BorderStroke(1.dp, MaterialTheme.colors.onSurface),
-    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
-    textColor: Color = MaterialTheme.theme.colors.primaryInteractive01,
-    @DrawableRes leadingIcon: Int? = null,
-    onClick: () -> Unit
-) {
-    RowButton(
-        text = text,
-        modifier = modifier,
-        includePadding = includePadding,
-        enabled = enabled,
-        border = border,
-        colors = colors,
-        textColor = textColor,
-        leadingIcon = leadingIcon,
-        onClick = onClick
-    )
-}
 
 @Composable
 fun RowButton(
@@ -85,9 +61,8 @@ fun RowButton(
                             .padding(4.dp)
                     )
                 }
-                Text(
+                TextH30(
                     text = text,
-                    fontSize = 18.sp,
                     modifier = Modifier
                         .padding(6.dp)
                         .align(Alignment.Center),
@@ -101,19 +76,8 @@ fun RowButton(
 
 @Preview(showBackground = true)
 @Composable
-fun RowButtonLightPreview() {
-    AppTheme(Theme.ThemeType.LIGHT) {
-        RowButton(
-            text = "Accept",
-            onClick = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-fun RowButtonDarkPreview() {
-    AppTheme(Theme.ThemeType.DARK) {
+fun RowButtonPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+    AppThemeWithBackground(themeType) {
         RowButton(
             text = "Accept",
             onClick = {}

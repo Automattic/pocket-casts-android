@@ -73,7 +73,7 @@ class EpisodeRow @JvmOverloads constructor(
                 durationPublishedSeparator.showIf(durationVisible)
 
                 val published = value.published
-                publishedView.text = if (published == null) "" else dateFormatter.format(published, context.resources)
+                publishedView.text = if (published == null) "" else dateFormatter.format(published)
                 imageLoader.loadSmallImage(episode?.podcast_uuid).into(imageView)
                 playButton.setPlaying(isPlaying = value.isPlaying, animate = false)
             }

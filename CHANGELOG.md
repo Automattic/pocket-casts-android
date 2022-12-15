@@ -1,12 +1,42 @@
-7.28
+7.30
 -----
 
+
+7.29
+-----
+
+* New Features:
+    *   Onboarding flow for new users
+        ([#645](https://github.com/Automattic/pocket-casts-android/pull/645)).
+* Bug Fixes:
+    *   Fixed podcast date format
+        ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
+    *   Fix unable to permanently change "Skip back time" setting
+        ([#632](https://github.com/Automattic/pocket-casts-android/pull/632)).
+    *   Display gravatar on profile screen
+        ([#644](https://github.com/Automattic/pocket-casts-android/pull/644)).
+
+7.28
+-----
+*   Bug Fixes:
+    *   Fixed effects bottomsheet flickering to the expanded state while being dragged
+        ([#575](https://github.com/Automattic/pocket-casts-android/pull/575)).
+    *   Fixed miniplayer play icon animation on theme change
+        ([#527](https://github.com/Automattic/pocket-casts-android/pull/527)).
+    *   Fixed talkback issues
+        ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
+    *   Fixed skip forward/ backward buttons not showing in media notification while casting
+        ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
+    *   Fix media notification controls configuration to support 3 icons
+        ([#641](https://github.com/Automattic/pocket-casts-android/pull/641)).
 
 7.27
 -----
 
 *   New Features:
-    *   Support Android 13 per-app language preferences
+    * Add End of Year stats
+        ([#410](https://github.com/Automattic/pocket-casts-android/issues/410)).  
+    * Support Android 13 per-app language preferences
         ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
 *   Bug Fixes:
     *   Fixed some layout issues in the EpisodeFragment

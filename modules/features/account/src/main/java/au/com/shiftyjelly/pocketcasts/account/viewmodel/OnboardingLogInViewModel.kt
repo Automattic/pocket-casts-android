@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +20,7 @@ import kotlin.coroutines.CoroutineContext
 @HiltViewModel
 class OnboardingLogInViewModel @Inject constructor(
     private val auth: AccountAuth,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
 ) : ViewModel(), CoroutineScope {
 
@@ -69,6 +72,14 @@ class OnboardingLogInViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.SIGNIN_SHOWN)
+    }
+
+    fun onBackPressed() {
+        analyticsTracker.track(AnalyticsEvent.SIGNIN_DISMISSED)
     }
 }
 

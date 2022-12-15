@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.db.helper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 
 data class LongestEpisode(
+    val uuid: String,
     val title: String,
     val duration: Double,
     val podcastUuid: String,

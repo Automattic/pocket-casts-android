@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +21,6 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     private val auth: AccountAuth,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
-    private val settings: Settings,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -32,16 +30,20 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     )
     val stateFlow: StateFlow<OnboardingCreateAccountState> = _stateFlow
 
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_SHOWN)
+    }
+
+    fun onBackPressed() {
+        analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_DISMISSED)
+    }
+
     fun updateEmail(email: String) {
         _stateFlow.update { it.copy(email = email.trim()) }
     }
 
     fun updatePassword(password: String) {
         _stateFlow.update { it.copy(password = password) }
-    }
-
-    fun updateNewsletter(isChecked: Boolean) {
-        _stateFlow.update { it.copy(newsletter = isChecked) }
     }
 
     fun createAccount(onAccountCreated: () -> Unit) {
@@ -69,7 +71,6 @@ class OnboardingCreateAccountViewModel @Inject constructor(
                 is AccountAuth.AuthResult.Success -> {
                     analyticsTracker.refreshMetadata()
                     onAccountCreated()
-                    persistNewsletterSelection()
                 }
 
                 is AccountAuth.AuthResult.Failed -> {
@@ -83,34 +84,12 @@ class OnboardingCreateAccountViewModel @Inject constructor(
             }
         }
     }
-
-    private fun persistNewsletterSelection() {
-        val newsletter = stateFlow.value.newsletter
-        analyticsTracker.track(
-            AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
-            mapOf(
-                AnalyticsProp.SOURCE to NewsletterSource.ACCOUNT_CREATED.analyticsValue,
-                AnalyticsProp.ENABLED to newsletter
-            )
-        )
-
-        settings.setMarketingOptIn(newsletter)
-        settings.setMarketingOptInNeedsSync(true)
-    }
-
-    companion object {
-        private object AnalyticsProp {
-            const val SOURCE = "source"
-            const val ENABLED = "enabled"
-        }
-    }
 }
 
 data class OnboardingCreateAccountState(
     val email: String = "",
     private val hasAttemptedLogIn: Boolean = false,
     private val isCallInProgress: Boolean = false,
-    val newsletter: Boolean = true,
     val password: String = "",
     val serverErrorMessage: String? = null,
 ) {

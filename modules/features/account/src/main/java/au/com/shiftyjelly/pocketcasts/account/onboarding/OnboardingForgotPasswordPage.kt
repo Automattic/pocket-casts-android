@@ -38,10 +38,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingForgotPasswordPage(
-    onShown: () -> Unit,
     onBackPressed: () -> Unit,
     onCompleted: () -> Unit,
 ) {
+
+    val viewModel = hiltViewModel<OnboardingForgotPasswordViewModel>()
+    val state by viewModel.stateFlow.collectAsState()
+
     val emailFocusRequester = remember { FocusRequester() }
 
     val context = LocalContext.current
@@ -57,18 +60,21 @@ fun OnboardingForgotPasswordPage(
     }
 
     LaunchedEffect(Unit) {
-        onShown()
+        viewModel.onShown()
         emailFocusRequester.requestFocus()
     }
-    BackHandler { onBackPressed() }
-
-    val viewModel = hiltViewModel<OnboardingForgotPasswordViewModel>()
-    val state by viewModel.stateFlow.collectAsState()
+    BackHandler {
+        viewModel.onBackPressed()
+        onBackPressed()
+    }
 
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.profile_reset_password),
-            onNavigationClick = onBackPressed
+            onNavigationClick = {
+                viewModel.onBackPressed()
+                onBackPressed()
+            }
         )
 
         Column(
@@ -118,7 +124,6 @@ fun OnboardingForgotPasswordPreview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingForgotPasswordPage(
-            onShown = {},
             onBackPressed = {},
             onCompleted = {},
         )

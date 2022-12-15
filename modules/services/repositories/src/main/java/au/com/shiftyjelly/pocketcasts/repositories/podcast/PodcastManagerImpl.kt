@@ -117,7 +117,7 @@ class PodcastManagerImpl @Inject constructor(
      * Do this now rather than adding it to a queue.
      */
     override fun subscribeToPodcastRx(podcastUuid: String, sync: Boolean): Single<Podcast> {
-        return subscribeManager.addPodcast(podcastUuid, sync, subscribed = true)
+        return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true)
     }
 
     /**
@@ -127,6 +127,10 @@ class PodcastManagerImpl @Inject constructor(
         return findPodcastByUuidRx(podcastUuid)
             .switchIfEmpty(subscribeManager.addPodcast(podcastUuid, sync = false, subscribed = false).toMaybe())
             .toSingle()
+    }
+
+    override fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean): Single<Podcast> {
+        return subscribeManager.addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed)
     }
 
     override fun isSubscribingToPodcast(podcastUuid: String): Boolean {
@@ -332,6 +336,10 @@ class PodcastManagerImpl @Inject constructor(
         }
 
         return false
+    }
+
+    override suspend fun findSubscribedUuids(): List<String> {
+        return podcastDao.findSubscribedUuids()
     }
 
     override fun findPodcastByUuid(uuid: String): Podcast? {
@@ -733,8 +741,8 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun buildUserEpisodePodcast(episode: UserEpisode): Podcast {
         return Podcast(
-            uuid = UserEpisodePodcastSubstitute.uuid,
-            title = UserEpisodePodcastSubstitute.title,
+            uuid = UserEpisodePodcastSubstitute.substituteUuid,
+            title = UserEpisodePodcastSubstitute.substituteTitle,
             thumbnailUrl = episode.getUrlForArtwork()
         )
     }
@@ -751,6 +759,6 @@ class PodcastManagerImpl @Inject constructor(
         return refreshServerManager.refreshPodcastFeed(podcastUuid).isSuccessful
     }
 
-    override fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): Flow<List<TopPodcast>> =
+    override suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast> =
         podcastDao.findTopPodcasts(fromEpochMs, toEpochMs, limit)
 }

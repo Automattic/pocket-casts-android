@@ -20,6 +20,26 @@ PLAY_STORE_TRACK_AUTOMOTIVE_BETA = "automotive:beta"
 PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION = "automotive:production"
 PLAY_STORE_TRACK_BETA = "beta"
 PLAY_STORE_TRACK_PRODUCTION = "production"
+GLOTPRESS_APP_STRINGS_PROJECT_URL = 'https://translate.wordpress.com/projects/pocket-casts/android/'
+
+SUPPORTED_LOCALES = [
+  { glotpress: "ar", android: "ar", google_play: "ar",  promo_config: {}},
+  { glotpress: "de", android: "de", google_play: "de-DE",  promo_config: {} },
+  { glotpress: "es", android: "es", google_play: "es-ES",  promo_config: {} },
+  { glotpress: "es", android: "es-rMX", google_play: "es-MX",  promo_config: {} },
+  { glotpress: "en-gb", android: "en-rGB", google_play: "en-GB",  promo_config: {} },
+  { glotpress: "fr", android: "fr", google_play: "fr-FR",  promo_config: {} },
+  { glotpress: "fr", android: "fr-rCA", google_play: "fr-CA",  promo_config: {} },
+  { glotpress: "it", android: "it", google_play: "it-IT",  promo_config: {} },
+  { glotpress: "ja", android: "ja", google_play: "ja-JP",  promo_config: {} },
+  { glotpress: "nl", android: "nl", google_play: "nl-NL",  promo_config: {} },
+  { glotpress: "nl", android: "nb", google_play: "nb-NB",  promo_config: {} },
+  { glotpress: "pt-br", android: "pt-rBR", google_play: "pt-BR",  promo_config: {} },
+  { glotpress: "ru", android: "ru", google_play: "ru-RU",  promo_config: {} },
+  { glotpress: "sv", android: "sv", google_play: "sv-SE",  promo_config: {} },
+  { glotpress: "zh-cn", android: "zh", google_play: "zh-CN",  promo_config: {} },
+  { glotpress: "zh-tw", android: "zh-rTW", google_play: "zh-TW",  promo_config: {} },
+].freeze
 
 ########################################################################
 # Environment
@@ -168,6 +188,14 @@ platform :android do
     android_bump_version_final_release()
 
     version = android_get_release_version()
+
+    # Download Localizations
+    android_download_translations(
+      res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
+      glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
+      locales: SUPPORTED_LOCALES,
+      lint_task: 'lintRelease'
+    )
 
     # Wrap up
     removebranchprotection(repository:GH_REPOSITORY, branch: "release/#{version["name"]}")
