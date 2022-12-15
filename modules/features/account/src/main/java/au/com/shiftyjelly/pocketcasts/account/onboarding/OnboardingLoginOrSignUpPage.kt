@@ -43,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.RectangleCover
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -88,7 +87,7 @@ internal fun OnboardingLoginOrSignUpPage(
             )
 
             Box(Modifier.weight(1f)) {
-                TextH30(
+                TextH40(
                     text = stringResource(LR.string.not_now),
                     textAlign = TextAlign.End,
                     modifier = Modifier
