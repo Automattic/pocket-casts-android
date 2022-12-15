@@ -157,7 +157,7 @@ internal fun OnboardingLoginOrSignUpPage(
                 onClick = onContinueWithGoogleClicked
             )
         } else {
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(8.dp))
         }
 
         SignUpButton(onClick = {
@@ -185,7 +185,7 @@ private fun Artwork(googleSignInShown: Boolean) {
     val artworkWidth = viewWidth * Artwork.getScaleFactor(googleSignInShown)
     val maxY = Artwork.coverModels.maxOf { it.y }
     val artworkAspectRatio = Artwork.getAspectRatio(configuration, googleSignInShown)
-    val artworkHeight = minOf(viewWidth * maxY * 2f, viewHeight / artworkAspectRatio)
+    val artworkHeight = minOf(viewWidth * maxY * artworkAspectRatio, viewHeight / 2f)
 
     Box(
         contentAlignment = Alignment.Center,
@@ -198,7 +198,7 @@ private fun Artwork(googleSignInShown: Boolean) {
             RectangleCover(
                 imageResId = model.imageResId,
                 coverWidth = (artworkWidth * model.size)
-                    .coerceAtMost(artworkHeight / artworkAspectRatio),
+                    .coerceAtMost(artworkHeight / 2f),
                 modifier = Modifier
                     .offset(
                         x = artworkWidth * model.x,
@@ -302,27 +302,25 @@ private object Artwork {
         val y: Float,
     )
     val coverModels = listOf(
-        CoverModel(imageResId = R.drawable.conan, size = 0.22f, x = -0.4f, y = 0.05f),
-        CoverModel(imageResId = R.drawable.radiolab, size = 0.1375f, x = 0.14f, y = 0.28f),
-        CoverModel(imageResId = R.drawable.theverge, size = 0.22f, x = 0.38f, y = 0.05f),
-        CoverModel(imageResId = R.drawable.a24, size = 0.1375f, x = -0.13f, y = 0.35f),
-        CoverModel(imageResId = R.drawable.conversations, size = 0.1375f, x = -0.18f, y = -0.37f),
-        CoverModel(imageResId = R.drawable.sevenam, size = 0.22f, x = -0.04f, y = -0.14f),
-        CoverModel(imageResId = R.drawable.thedaily, size = 0.22f, x = 0.22f, y = -0.3f),
+        CoverModel(imageResId = R.drawable.conan, size = 0.2f, x = -0.39f, y = 0.05f),
+        CoverModel(imageResId = R.drawable.radiolab, size = 0.126f, x = 0.14f, y = 0.28f),
+        CoverModel(imageResId = R.drawable.theverge, size = 0.2f, x = 0.38f, y = 0.05f),
+        CoverModel(imageResId = R.drawable.a24, size = 0.126f, x = -0.13f, y = 0.34f),
+        CoverModel(imageResId = R.drawable.conversations, size = 0.126f, x = -0.18f, y = -0.34f),
+        CoverModel(imageResId = R.drawable.sevenam, size = 0.2f, x = -0.05f, y = -0.14f),
+        CoverModel(imageResId = R.drawable.thedaily, size = 0.183f, x = 0.25f, y = -0.3f),
     )
 
     fun getAspectRatio(configuration: Configuration, googleSignInShown: Boolean) =
-        if (configuration.orientation == ORIENTATION_LANDSCAPE) {
+        if (configuration.orientation == ORIENTATION_LANDSCAPE || googleSignInShown) {
             2.2f
-        } else if (googleSignInShown) {
-            1.5f
         } else {
-            1.2f
+            2.6f
         }
     fun getScaleFactor(googleSignInShown: Boolean) =
-        if (googleSignInShown) 1.35f else 1.65f
+        if (googleSignInShown) 1.65f else 1.85f
     fun getOffsetFactor(googleSignInShown: Boolean) =
-        if (googleSignInShown) 0.01f else 0.08f
+        if (googleSignInShown) 0.06f else 0.0f
     fun getCoverYOffsetFactor(configuration: Configuration) =
         if (configuration.orientation == ORIENTATION_LANDSCAPE) 0.75f else 0.95f
 }
