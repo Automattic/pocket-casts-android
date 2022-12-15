@@ -73,6 +73,7 @@ fun OnboardingImportStartPage(
                 onNavigationClick = onBackPressed,
             )
 
+            Spacer(Modifier.height(12.dp))
             TextH10(
                 text = stringResource(LR.string.onboarding_bring_your_podcasts),
                 modifier = Modifier.padding(horizontal = 24.dp)
