@@ -199,6 +199,7 @@ private fun Artwork(googleSignInShown: Boolean) {
                 imageResId = model.imageResId,
                 coverWidth = (artworkWidth * model.size)
                     .coerceAtMost(artworkHeight / 2f),
+                cornerRadius = 4.dp,
                 modifier = Modifier
                     .offset(
                         x = artworkWidth * model.x,
@@ -304,7 +305,6 @@ private object Artwork {
     val coverModels = listOf(
         CoverModel(imageResId = R.drawable.conan, size = 0.2f, x = -0.39f, y = 0.05f),
         CoverModel(imageResId = R.drawable.radiolab, size = 0.126f, x = 0.14f, y = 0.28f),
-        CoverModel(imageResId = R.drawable.theverge, size = 0.2f, x = 0.38f, y = 0.05f),
         CoverModel(imageResId = R.drawable.a24, size = 0.126f, x = -0.13f, y = 0.34f),
         CoverModel(imageResId = R.drawable.conversations, size = 0.126f, x = -0.18f, y = -0.34f),
         CoverModel(imageResId = R.drawable.sevenam, size = 0.2f, x = -0.05f, y = -0.14f),
