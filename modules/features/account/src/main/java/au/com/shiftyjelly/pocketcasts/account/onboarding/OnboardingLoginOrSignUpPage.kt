@@ -12,10 +12,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
@@ -24,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -50,11 +56,13 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingLoginOrSignUpPage(
+    theme: Theme.ThemeType,
     flow: String,
     onDismiss: () -> Unit,
     onSignUpClicked: () -> Unit,
@@ -63,8 +71,15 @@ internal fun OnboardingLoginOrSignUpPage(
     viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel()
 ) {
 
+    val systemUiController = rememberSystemUiController()
+    val pocketCastsTheme = MaterialTheme.theme
+
     LaunchedEffect(Unit) {
         viewModel.onShown(flow)
+        systemUiController.apply {
+            setStatusBarColor(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), darkIcons = !theme.darkTheme)
+            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
+        }
     }
 
     BackHandler {
@@ -72,7 +87,13 @@ internal fun OnboardingLoginOrSignUpPage(
         onDismiss()
     }
 
-    Column {
+    Column(
+        Modifier
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
+    ) {
+
+        Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
 
         Row(
             Modifier
@@ -102,57 +123,54 @@ internal fun OnboardingLoginOrSignUpPage(
             }
         }
 
-        Column(
+        Spacer(Modifier.height(32.dp))
+
+        Artwork(viewModel.showContinueWithGoogleButton)
+
+        Spacer(Modifier.weight(1f))
+
+        TextH10(
+            text = stringResource(LR.string.onboarding_discover_your_next_favorite_podcast),
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .weight(1f)
-        ) {
-            Spacer(Modifier.weight(1f))
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center,
+        )
 
-            Artwork(viewModel.showContinueWithGoogleButton)
+        Spacer(Modifier.height(8.dp))
 
-            Spacer(Modifier.weight(1f))
+        TextH40(
+            text = stringResource(LR.string.onboarding_create_an_account_to),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
 
-            TextH10(
-                text = stringResource(LR.string.onboarding_discover_your_next_favorite_podcast),
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                maxLines = 2
-            )
+        Spacer(Modifier.weight(1f))
 
+        if (viewModel.showContinueWithGoogleButton) {
             Spacer(Modifier.height(8.dp))
-
-            TextH40(
-                text = stringResource(LR.string.onboarding_create_an_account_to),
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
+            ContinueWithGoogleButton(
+                flow = flow,
+                viewModel = viewModel,
+                onClick = onContinueWithGoogleClicked
             )
-
-            Spacer(Modifier.weight(1f))
-
-            if (viewModel.showContinueWithGoogleButton) {
-                Spacer(Modifier.height(8.dp))
-                ContinueWithGoogleButton(
-                    flow = flow,
-                    viewModel = viewModel,
-                    onClick = onContinueWithGoogleClicked
-                )
-            } else {
-                Spacer(Modifier.height(32.dp))
-            }
-            SignUpButton(onClick = {
-                viewModel.onSignUpClicked(flow)
-                onSignUpClicked()
-            })
-            LogInButton(onClick = {
-                viewModel.onLoginClicked(flow)
-                onLoginClicked()
-            })
+        } else {
+            Spacer(Modifier.height(32.dp))
         }
+
+        SignUpButton(onClick = {
+            viewModel.onSignUpClicked(flow)
+            onSignUpClicked()
+        })
+
+        LogInButton(onClick = {
+            viewModel.onLoginClicked(flow)
+            onLoginClicked()
+        })
+
+        Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
     }
 }
 @Composable
@@ -314,6 +332,7 @@ private object Artwork {
 private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         OnboardingLoginOrSignUpPage(
+            theme = themeType,
             flow = "initial_onboarding",
             onDismiss = {},
             onSignUpClicked = {},

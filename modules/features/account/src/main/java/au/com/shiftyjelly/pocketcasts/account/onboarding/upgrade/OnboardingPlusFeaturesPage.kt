@@ -3,26 +3,35 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
@@ -46,6 +55,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
@@ -57,6 +67,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import java.lang.Long.max
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -73,6 +84,7 @@ internal fun OnboardingPlusFeaturesPage(
     onBackPressed: () -> Unit,
     canUpgrade: Boolean
 ) {
+
     val viewModel = hiltViewModel<OnboardingPlusFeaturesViewModel>()
     val state by viewModel.state.collectAsState()
 
@@ -94,21 +106,32 @@ internal fun OnboardingPlusFeaturesPage(
         onBackPressed()
     }
 
-    LaunchedEffect(Unit) { viewModel.onShown(flow, source) }
+    LaunchedEffect(Unit) {
+        viewModel.onShown(flow, source)
+    }
 
-    // Need this BoxWithConstraints so we can force the inner column to fill the screen
-    BoxWithConstraints(Modifier.fillMaxHeight()) {
+    val scrollState = rememberScrollState()
+    setStatusBarBackground(scrollState)
+
+    // Need this BoxWithConstraints so we can force the inner column to fill the screen with vertical scroll enabled
+    BoxWithConstraints(
+        Modifier
+            .fillMaxHeight()
+            .background(background)
+    ) {
 
         Box(
             Modifier
-                .verticalScroll(rememberScrollState())
-                .background(background)
+                .verticalScroll(scrollState)
         ) {
 
             Background()
 
             Column(
-                Modifier.heightIn(min = this@BoxWithConstraints.maxHeight)
+                Modifier
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .heightIn(min = this@BoxWithConstraints.calculateMinimumHeightWithInsets())
             ) {
 
                 Spacer(Modifier.height(8.dp))
@@ -167,6 +190,42 @@ internal fun OnboardingPlusFeaturesPage(
             }
         }
     }
+}
+
+@Composable
+private fun setStatusBarBackground(scrollState: ScrollState) {
+    val systemUiController = rememberSystemUiController()
+    val hasScrolled = scrollState.value > 0
+
+    val scrimAlpha by animateFloatAsState(
+        targetValue = if (hasScrolled) 0.6f else 0f,
+        animationSpec = tween(durationMillis = 400)
+    )
+
+    val statusBarBackground = if (scrimAlpha > 0) {
+        background.copy(alpha = scrimAlpha)
+    } else {
+        Color.Transparent
+    }
+
+    LaunchedEffect(statusBarBackground) {
+        systemUiController.apply {
+            setStatusBarColor(statusBarBackground, darkIcons = false)
+            setNavigationBarColor(Color.Transparent, darkIcons = false)
+        }
+    }
+}
+
+@Composable
+private fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
+    val statusBarPadding = WindowInsets.statusBars
+        .asPaddingValues()
+        .calculateTopPadding()
+    val navigationBarPadding = WindowInsets.navigationBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+    val fullHeight = this.maxHeight
+    return fullHeight - statusBarPadding - navigationBarPadding
 }
 
 @Composable

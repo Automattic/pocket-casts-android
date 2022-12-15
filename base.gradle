@@ -239,6 +239,7 @@ dependencies {
     implementation libs.hiltWorkManager
     implementation libs.hiltNavigationCompose
     implementation libs.accompanistFlowLayout
+    implementation libs.accompanistSystemUiController
     implementation platform(libs.sentryBom)
     implementation libs.sentry
     implementation libs.sentryFragment

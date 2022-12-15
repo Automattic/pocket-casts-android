@@ -8,18 +8,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -42,20 +48,33 @@ import au.com.shiftyjelly.pocketcasts.compose.components.textH60FontSize
 import au.com.shiftyjelly.pocketcasts.compose.extensions.header
 import au.com.shiftyjelly.pocketcasts.compose.podcast.PodcastSubscribeImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingRecommendationsStartPage(
+    theme: Theme.ThemeType,
     onImportClicked: () -> Unit,
     onSearch: () -> Unit,
     onBackPressed: () -> Unit,
     onComplete: () -> Unit,
 ) {
+
     val viewModel = hiltViewModel<OnboardingRecommendationsStartPageViewModel>()
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.onShown() }
+    val systemUiController = rememberSystemUiController()
+    val pocketCastsTheme = MaterialTheme.theme
+
+    LaunchedEffect(Unit) {
+        viewModel.onShown()
+        systemUiController.apply {
+            setStatusBarColor(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), darkIcons = !theme.darkTheme)
+            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
+        }
+    }
     BackHandler {
         viewModel.onBackPressed()
         onBackPressed()
@@ -90,25 +109,12 @@ private fun Content(
     onComplete: () -> Unit,
 ) {
     Column {
-        Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 18.dp)
-
-        ) {
-            TextH30(
-                text = stringResource(LR.string.onboarding_recommendations_import),
-                modifier = Modifier
-                    .clickable { onImportClicked() }
-                    .padding(horizontal = 16.dp, vertical = 9.dp)
-            )
-        }
 
         val numColumns = when (LocalConfiguration.current.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> 7
             else -> 3
         }
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(numColumns),
             contentPadding = PaddingValues(horizontal = 24.dp),
@@ -119,6 +125,21 @@ private fun Content(
 
             header {
                 Column {
+                    Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 18.dp)
+
+                    ) {
+                        TextH30(
+                            text = stringResource(LR.string.onboarding_recommendations_import),
+                            modifier = Modifier
+                                .clickable { onImportClicked() }
+                                .padding(horizontal = 16.dp, vertical = 9.dp)
+                        )
+                    }
 
                     TextH10(
                         text = stringResource(LR.string.onboarding_recommendations_find_favorite_podcasts),
@@ -182,6 +203,7 @@ private fun Content(
             text = stringResource(buttonRes),
             onClick = onComplete,
         )
+        Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
     }
 }
 
