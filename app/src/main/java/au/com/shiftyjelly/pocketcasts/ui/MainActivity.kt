@@ -1005,6 +1005,8 @@ class MainActivity :
                 } else if (IntentUtil.isShareLink(intent)) { // Must go last, catches all pktc links
                     openSharingUrl(intent)
                     return
+                } else if (IntentUtil.isNativeShareLink(intent)) {
+                    openNativeSharingUrl(intent)
                 }
 
                 val scheme = intent.scheme
@@ -1190,6 +1192,22 @@ class MainActivity :
                 }
             }
         )
+    }
+
+    @Suppress("DEPRECATION")
+    private fun openNativeSharingUrl(intent: Intent) {
+        val urlSegments = intent.data?.pathSegments ?: return
+        if (urlSegments.size < 2) return
+
+        when (urlSegments[0]) {
+            "podcast" -> openPodcastUrl(urlSegments[1])
+            "episode" -> openEpisodeDialog(
+                episodeUuid = urlSegments[1],
+                source = EpisodeViewSource.SHARE,
+                podcastUuid = null,
+                forceDark = false
+            )
+        }
     }
 
     @Suppress("DEPRECATION")
