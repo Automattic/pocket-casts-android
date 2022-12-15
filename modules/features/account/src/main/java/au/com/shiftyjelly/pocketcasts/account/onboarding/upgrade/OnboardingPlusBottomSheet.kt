@@ -91,7 +91,7 @@ fun OnboardingPlusBottomSheet(
             // Using LazyColumn instead of Column to avoid issue where unselected button that was not
             // being tapped would sometimes display the on-touch ripple effect
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 subscriptions.forEach { subscription ->
 
@@ -106,21 +106,28 @@ fun OnboardingPlusBottomSheet(
                         ?.numPeriodFreeTrial(resources)
                         ?.uppercase(Locale.getDefault())
 
-                    if (subscription == state.selectedSubscription) {
-                        PlusOutlinedRowButton(
-                            text = text,
-                            topText = topText,
-                            onClick = { viewModel.updateSelectedSubscription(subscription) },
-                            interactionSource = interactionSource,
-                            selectedCheckMark = true,
-                        )
-                    } else {
-                        UnselectedPlusOutlinedRowButton(
-                            text = text,
-                            topText = topText,
-                            onClick = { viewModel.updateSelectedSubscription(subscription) },
-                            interactionSource = interactionSource,
-                        )
+                    Column {
+
+                        if (topText == null) {
+                            Spacer(Modifier.height(8.dp))
+                        }
+
+                        if (subscription == state.selectedSubscription) {
+                            PlusOutlinedRowButton(
+                                text = text,
+                                topText = topText,
+                                onClick = { viewModel.updateSelectedSubscription(subscription) },
+                                interactionSource = interactionSource,
+                                selectedCheckMark = true,
+                            )
+                        } else {
+                            UnselectedPlusOutlinedRowButton(
+                                text = text,
+                                topText = topText,
+                                onClick = { viewModel.updateSelectedSubscription(subscription) },
+                                interactionSource = interactionSource,
+                            )
+                        }
                     }
                 }
             }
