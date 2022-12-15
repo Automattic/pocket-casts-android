@@ -4,10 +4,14 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
@@ -23,33 +27,54 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingRecommendationsSearchPage(
+    theme: Theme.ThemeType,
     onBackPressed: () -> Unit,
 ) {
+
     val viewModel = hiltViewModel<OnboardingRecommendationsSearchViewModel>()
     val state by viewModel.state.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
+    val systemUiController = rememberSystemUiController()
+    val pocketCastsTheme = MaterialTheme.theme
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+        systemUiController.apply {
+            // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+            setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
+            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
+        }
     }
 
     BackHandler {
         onBackPressed()
     }
 
-    Column(Modifier.fillMaxHeight()) {
+    Column(
+        Modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.ime)
+            .fillMaxHeight()
+    ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.onboarding_find_podcasts),
             onNavigationClick = onBackPressed
@@ -98,5 +123,18 @@ fun OnboardingRecommendationsSearchPage(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun OnboardingRecommendationSearchPage_Preview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        OnboardingRecommendationsSearchPage(
+            theme = themeType,
+            onBackPressed = {},
+        )
     }
 }

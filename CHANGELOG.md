@@ -8,13 +8,15 @@
 * New Features:
     *   Onboarding flow for new users
         ([#645](https://github.com/Automattic/pocket-casts-android/pull/645)).
+    *   Display gravatar on profile screen
+        ([#644](https://github.com/Automattic/pocket-casts-android/pull/644)).
 * Bug Fixes:
     *   Fixed podcast date format
         ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
     *   Fix unable to permanently change "Skip back time" setting
         ([#632](https://github.com/Automattic/pocket-casts-android/pull/632)).
-    *   Display gravatar on profile screen
-        ([#644](https://github.com/Automattic/pocket-casts-android/pull/644)).
+    *   Included deep link support for share links
+        ([#526](https://github.com/Automattic/pocket-casts-android/pull/526)).
 
 7.28
 -----

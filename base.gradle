@@ -233,11 +233,13 @@ dependencies {
     implementation libs.timber
     implementation libs.materialDialog
     implementation libs.lottie
+    implementation libs.lottieCompose
     implementation libs.materialProgressBar
     implementation libs.hiltAndroid
     implementation libs.hiltWorkManager
     implementation libs.hiltNavigationCompose
     implementation libs.accompanistFlowLayout
+    implementation libs.accompanistSystemUiController
     implementation platform(libs.sentryBom)
     implementation libs.sentry
     implementation libs.sentryFragment

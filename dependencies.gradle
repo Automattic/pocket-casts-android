@@ -222,6 +222,7 @@ project.ext {
             hiltNavigationCompose: "androidx.hilt:hilt-navigation-compose:1.0.0",
             // Lottie
             lottie: "com.airbnb.android:lottie:5.2.0",
+            lottieCompose: "com.airbnb.android:lottie-compose:5.2.0",
             // JUnit
             junit: "junit:junit:4.13.2",
             // Mockito
@@ -236,6 +237,7 @@ project.ext {
             barista: "com.adevinta.android:barista:4.2.0",
             // Accompanist - https://google.github.io/accompanist/
             accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1",
+            accompanistSystemUiController: "com.google.accompanist:accompanist-systemuicontroller:0.28.0",
             // Automattic Tracks
             automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks",
             // Sentry

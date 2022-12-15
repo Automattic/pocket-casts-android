@@ -33,6 +33,7 @@ sealed class NavigationButton(val image: ImageVector, val contentDescription: In
 
 @Composable
 fun ThemedTopAppBar(
+    modifier: Modifier = Modifier,
     title: String? = null,
     navigationButton: NavigationButton = NavigationButton.Back,
     iconColor: Color = MaterialTheme.theme.colors.secondaryIcon01,
@@ -40,7 +41,7 @@ fun ThemedTopAppBar(
     backgroundColor: Color = MaterialTheme.theme.colors.secondaryUi01,
     bottomShadow: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {},
-    onNavigationClick: () -> Unit
+    onNavigationClick: () -> Unit,
 ) {
     TopAppBar(
         navigationIcon = {
@@ -61,9 +62,9 @@ fun ThemedTopAppBar(
         actions = actions,
         backgroundColor = backgroundColor,
         elevation = 0.dp,
-        modifier = if (bottomShadow) Modifier
+        modifier = if (bottomShadow) modifier
             .zIndex(1f)
-            .shadow(4.dp) else Modifier
+            .shadow(4.dp) else modifier
     )
 }
 

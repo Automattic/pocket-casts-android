@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -32,12 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeViewModel
@@ -50,11 +56,17 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingWelcomePage(
+    activeTheme: Theme.ThemeType,
     flow: String,
     isSignedInAsPlus: Boolean,
     onDone: () -> Unit,
@@ -62,12 +74,18 @@ fun OnboardingWelcomePage(
     onImportTapped: () -> Unit,
     onBackPressed: () -> Unit,
 ) {
-
     val viewModel = hiltViewModel<OnboardingWelcomeViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
+    val systemUiController = rememberSystemUiController()
+    val pocketCastsTheme = MaterialTheme.theme
+
     LaunchedEffect(Unit) {
         viewModel.onShown(flow)
+        systemUiController.apply {
+            setStatusBarColor(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), darkIcons = !activeTheme.darkTheme)
+            setNavigationBarColor(Color.Transparent, darkIcons = !activeTheme.darkTheme)
+        }
     }
 
     BackHandler {
@@ -84,6 +102,8 @@ fun OnboardingWelcomePage(
         onImportTapped = {
             viewModel.onImportTapped(flow)
             onImportTapped()
+            /* Mark confetti as shown if import tapped before confetti animation ends. */
+            viewModel.onConfettiShown()
         },
         state = state,
         onDone = {
@@ -92,6 +112,10 @@ fun OnboardingWelcomePage(
         },
         onNewsletterCheckedChanged = viewModel::updateNewsletter
     )
+
+    if (state.showConfetti) {
+        Confetti { viewModel.onConfettiShown() }
+    }
 }
 
 @Composable
@@ -105,11 +129,13 @@ private fun Content(
 ) {
     Column(
         Modifier
+//            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(horizontal = 24.dp)
             .fillMaxHeight()
             .verticalScroll(rememberScrollState())
     ) {
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
+        Spacer(Modifier.weight(1f))
 
         if (isSignedInAsPlus) {
             PlusPersonCheckmark()
@@ -148,6 +174,7 @@ private fun Content(
         )
 
         Spacer(modifier = Modifier.weight(1f))
+        Spacer(Modifier.height(16.dp))
 
         NewsletterSwitch(
             checked = state.newsletter,
@@ -159,9 +186,29 @@ private fun Content(
             text = stringResource(LR.string.done),
             includePadding = false,
             onClick = onDone,
+
         )
-        Spacer(Modifier.height(24.dp))
+
+        Spacer(
+            Modifier
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .height(16.dp)
+        )
     }
+}
+
+@Composable
+private fun Confetti(
+    onConfettiShown: () -> Unit,
+) {
+    val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.confetti))
+    val progress by animateLottieCompositionAsState(lottieComposition)
+
+    LottieAnimation(
+        composition = lottieComposition,
+        contentScale = ContentScale.Crop,
+    )
+    if (progress == 1.0f) onConfettiShown()
 }
 
 @Composable
@@ -299,13 +346,13 @@ private fun PersonCheckmark(
 @Composable
 private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
-        OnboardingWelcomePage(
-            flow = "flow",
-            onDone = {},
+        Content(
+            isSignedInAsPlus = false,
             onContinueToDiscover = {},
             onImportTapped = {},
-            onBackPressed = {},
-            isSignedInAsPlus = false
+            state = OnboardingWelcomeState(newsletter = false),
+            onDone = {},
+            onNewsletterCheckedChanged = {},
         )
     }
 }
@@ -318,9 +365,7 @@ private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParam
             isSignedInAsPlus = true,
             onContinueToDiscover = {},
             onImportTapped = {},
-            state = OnboardingWelcomeState(
-                newsletter = false
-            ),
+            state = OnboardingWelcomeState(newsletter = false),
             onDone = {},
             onNewsletterCheckedChanged = {},
         )
