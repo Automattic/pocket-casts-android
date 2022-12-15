@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -19,6 +20,7 @@ object OnboardingRecommendationsFlow {
     private const val search = "search"
 
     fun NavGraphBuilder.onboardingRecommendationsFlowGraph(
+        theme: Theme.ThemeType,
         flow: String,
         onBackPressed: () -> Unit,
         onComplete: () -> Unit,
@@ -29,10 +31,11 @@ object OnboardingRecommendationsFlow {
             startDestination = start
         ) {
 
-            importFlowGraph(navController, flow)
+            importFlowGraph(theme, navController, flow)
 
             composable(start) {
                 OnboardingRecommendationsStartPage(
+                    theme = theme,
                     onImportClicked = { navController.navigate(OnboardingImportFlow.route) },
                     onSearch = with(LocalContext.current) {
                         {
@@ -53,6 +56,7 @@ object OnboardingRecommendationsFlow {
             }
             composable(search) {
                 OnboardingRecommendationsSearchPage(
+                    theme = theme,
                     onBackPressed = { navController.popBackStack() },
                 )
             }

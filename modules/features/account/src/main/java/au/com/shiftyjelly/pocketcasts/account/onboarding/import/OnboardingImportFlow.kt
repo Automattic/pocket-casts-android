@@ -10,6 +10,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingImportViewModel
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -17,7 +18,11 @@ object OnboardingImportFlow {
 
     const val route = "onboardingImportFlow"
 
-    fun NavGraphBuilder.importFlowGraph(navController: NavController, flow: String) {
+    fun NavGraphBuilder.importFlowGraph(
+        theme: Theme.ThemeType,
+        navController: NavController,
+        flow: String
+    ) {
         navigation(
             route = this@OnboardingImportFlow.route,
             startDestination = NavigationRoutes.start,
@@ -25,6 +30,7 @@ object OnboardingImportFlow {
             composable(NavigationRoutes.start) {
                 val viewModel = hiltViewModel<OnboardingImportViewModel>()
                 OnboardingImportStartPage(
+                    theme = theme,
                     onShown = { viewModel.onImportStartPageShown(flow) },
                     onCastboxClicked = {
                         viewModel.onAppSelected(flow, AnalyticsProps.castbox)
@@ -44,6 +50,7 @@ object OnboardingImportFlow {
             composable(NavigationRoutes.castbox) {
                 val viewModel = hiltViewModel<OnboardingImportViewModel>()
                 OnboardingImportFrom(
+                    theme = theme,
                     drawableRes = IR.drawable.castbox,
                     title = (stringResource(LR.string.onboarding_import_from_castbox)),
                     steps = listOf(
@@ -66,6 +73,7 @@ object OnboardingImportFlow {
 
             composable(NavigationRoutes.otherApps) {
                 OnboardingImportFrom(
+                    theme = theme,
                     drawableRes = IR.drawable.other_apps,
                     title = stringResource(LR.string.onboarding_import_from_other_apps),
                     text = stringResource(LR.string.onboarding_can_import_from_opml),

@@ -20,13 +20,13 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun OnboardingFlowComposable(
-    activeTheme: Theme.ThemeType,
+    theme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
     abortOnboarding: () -> Unit,
     signInState: SignInState?
 ) {
-    AppThemeWithBackground(activeTheme) {
+    AppThemeWithBackground(theme) {
         val navController = rememberNavController()
 
         val backStackEntry by navController.currentBackStackEntryAsState()
@@ -51,9 +51,10 @@ fun OnboardingFlowComposable(
             startDestination = OnboardingNavRoute.logInOrSignUp
         ) {
 
-            importFlowGraph(navController, flow)
+            importFlowGraph(theme, navController, flow)
 
             onboardingRecommendationsFlowGraph(
+                theme = theme,
                 flow = flow,
                 onBackPressed = completeOnboarding,
                 onComplete = {
@@ -64,6 +65,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
+                    theme = theme,
                     flow = flow,
                     onDismiss = { completeOnboarding() },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
@@ -74,6 +76,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.createFreeAccount) {
                 OnboardingCreateAccountPage(
+                    theme = theme,
                     onBackPressed = { navController.popBackStack() },
                     onAccountCreated = {
                         navController.navigate(OnboardingRecommendationsFlow.route) {
@@ -88,6 +91,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.logIn) {
                 OnboardingLoginPage(
+                    theme = theme,
                     onBackPressed = { navController.popBackStack() },
                     onLoginComplete = completeOnboarding,
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
@@ -100,6 +104,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.forgotPassword) {
                 OnboardingForgotPasswordPage(
+                    theme = theme,
                     onBackPressed = { navController.popBackStack() },
                     onCompleted = completeOnboarding,
                 )
@@ -124,6 +129,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
+                    activeTheme = theme,
                     flow = flow,
                     isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                     onDone = completeOnboarding,

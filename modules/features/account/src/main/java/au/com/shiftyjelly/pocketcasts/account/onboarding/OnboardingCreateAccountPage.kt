@@ -3,8 +3,13 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -13,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,10 +35,12 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingCreateAccountPage(
+    theme: Theme.ThemeType,
     onBackPressed: () -> Unit,
     onAccountCreated: () -> Unit,
 ) {
@@ -40,7 +48,18 @@ internal fun OnboardingCreateAccountPage(
     val viewModel = hiltViewModel<OnboardingCreateAccountViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.onShown() }
+    val systemUiController = rememberSystemUiController()
+    val pocketCastsTheme = MaterialTheme.theme
+
+    LaunchedEffect(Unit) {
+        viewModel.onShown()
+        systemUiController.apply {
+            // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+            setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
+            setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
+        }
+    }
+
     BackHandler {
         viewModel.onBackPressed()
         onBackPressed()
@@ -53,7 +72,12 @@ internal fun OnboardingCreateAccountPage(
         onAccountCreated()
     }
 
-    Column {
+    Column(
+        Modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .windowInsetsPadding(WindowInsets.ime)
+    ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.create_account),
             onNavigationClick = {
@@ -122,6 +146,7 @@ private fun OnboardingCreateAccountPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         OnboardingCreateAccountPage(
+            theme = themeType,
             onBackPressed = {},
             onAccountCreated = {},
         )
