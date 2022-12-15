@@ -66,6 +66,7 @@
             android:textAppearance="?attr/textBody1"
             android:text="@{podcast.podcastDescription}"
             android:textColor="?attr/primary_text_01"
+            android:textColorLink="@{tintColor}"
             app:readMore="@{3}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
