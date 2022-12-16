@@ -9,7 +9,9 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -21,6 +23,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -29,7 +32,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OnboardingLoginOrSignUpViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
+    private val podcastManager: PodcastManager
 ) : AndroidViewModel(context as Application) {
 
     val showContinueWithGoogleButton =
@@ -37,8 +41,17 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
             Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty() &&
             GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(context)
 
+    val randomPodcasts = mutableListOf<Podcast>()
+
     private val context: Context
         get() = getApplication()
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            randomPodcasts.clear()
+            randomPodcasts.addAll(podcastManager.findRandomPodcasts(limit = 6))
+        }
+    }
 
     /**
      * Try to sign in with Google One Tap.

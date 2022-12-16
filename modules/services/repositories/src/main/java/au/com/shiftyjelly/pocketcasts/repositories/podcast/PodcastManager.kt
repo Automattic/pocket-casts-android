@@ -141,4 +141,6 @@ interface PodcastManager {
     suspend fun refreshPodcastFeed(podcastUuid: String): Boolean
 
     suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
+
+    fun findRandomPodcasts(limit: Int): List<Podcast>
 }
