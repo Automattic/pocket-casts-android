@@ -21,11 +21,13 @@ fun PodcastCover(
     coverWidth: Dp,
     modifier: Modifier = Modifier,
     coverSize: CoverSize = CoverSize.SMALL,
+    cornerRadius: Dp? = null,
 ) {
+    val cornerRadiusSize = cornerRadius ?: if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
     PodcastImage(
         uuid = uuid,
         elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp,
-        cornerSize = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp,
+        cornerSize = cornerRadiusSize,
         modifier = modifier.size(coverWidth)
     )
 }
