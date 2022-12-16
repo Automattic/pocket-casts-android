@@ -36,10 +36,11 @@ fun RectangleCover(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colors.surface,
     @DrawableRes imageResId: Int? = null,
+    cornerRadius: Dp? = null,
     coverSize: CoverSize = CoverSize.BIG,
 ) {
     val elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
-    val cornerRadiusSize = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
+    val cornerRadiusSize = cornerRadius ?: if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
     Card(
         elevation = elevation,
         shape = RoundedCornerShape(cornerRadiusSize),
