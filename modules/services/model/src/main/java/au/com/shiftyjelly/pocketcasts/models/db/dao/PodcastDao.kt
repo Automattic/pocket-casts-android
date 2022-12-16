@@ -361,4 +361,7 @@ abstract class PodcastDao {
         """
     )
     abstract suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
+
+    @Query("SELECT * FROM podcasts ORDER BY random() LIMIT :limit")
+    abstract fun findRandomPodcasts(limit: Int): List<Podcast>
 }

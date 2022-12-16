@@ -1,4 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
+
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.widget.Toast
@@ -47,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.RectangleCover
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -54,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -125,7 +128,7 @@ internal fun OnboardingLoginOrSignUpPage(
 
         Spacer(Modifier.height(32.dp))
 
-        Artwork(viewModel.showContinueWithGoogleButton)
+        Artwork(viewModel.showContinueWithGoogleButton, viewModel.randomPodcasts)
 
         Spacer(Modifier.weight(1f))
 
@@ -173,8 +176,12 @@ internal fun OnboardingLoginOrSignUpPage(
         Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
     }
 }
+
 @Composable
-private fun Artwork(googleSignInShown: Boolean) {
+private fun Artwork(
+    googleSignInShown: Boolean,
+    podcasts: List<Podcast>,
+) {
     val context = LocalContext.current
     val localView = LocalView.current
     val configuration = LocalConfiguration.current
@@ -194,17 +201,26 @@ private fun Artwork(googleSignInShown: Boolean) {
             .fillMaxWidth()
             .offset(x = artworkWidth * Artwork.getOffsetFactor(googleSignInShown))
     ) {
-        Artwork.coverModels.map { model ->
-            RectangleCover(
+        Artwork.coverModels.mapIndexed { index, model ->
+            val coverWidth = (artworkWidth * model.size).coerceAtMost(artworkHeight / 2f)
+            val modifier = Modifier
+                .offset(
+                    x = artworkWidth * model.x,
+                    y = artworkHeight * model.y * Artwork.getCoverYOffsetFactor(configuration)
+                )
+            val podcast = if (index < podcasts.size) podcasts[index] else null
+            podcast?.let {
+                PodcastCover(
+                    uuid = it.uuid,
+                    coverWidth = coverWidth,
+                    cornerRadius = 4.dp,
+                    modifier = modifier
+                )
+            } ?: RectangleCover(
                 imageResId = model.imageResId,
-                coverWidth = (artworkWidth * model.size)
-                    .coerceAtMost(artworkHeight / 2f),
+                coverWidth = coverWidth,
                 cornerRadius = 4.dp,
-                modifier = Modifier
-                    .offset(
-                        x = artworkWidth * model.x,
-                        y = artworkHeight * model.y * Artwork.getCoverYOffsetFactor(configuration)
-                    )
+                modifier = modifier
             )
         }
     }
