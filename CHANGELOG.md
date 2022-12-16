@@ -1,6 +1,8 @@
 7.30
 -----
-
+* New Features:
+    *   Add tappable links to podcast description
+        ([#657](https://github.com/Automattic/pocket-casts-android/pull/657)).
 
 7.29
 -----
