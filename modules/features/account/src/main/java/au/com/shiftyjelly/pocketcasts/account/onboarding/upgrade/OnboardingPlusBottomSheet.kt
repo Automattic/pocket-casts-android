@@ -10,16 +10,11 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
@@ -34,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -44,7 +38,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.UnselectedPlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
@@ -79,9 +72,8 @@ fun OnboardingPlusBottomSheet(
         modifier = Modifier
             .background(Color(0xFF282829))
             .verticalScroll(rememberScrollState())
-            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(horizontal = 20.dp)
-            .padding(top = 20.dp, bottom = 40.dp)
+            .padding(top = 16.dp, bottom = 40.dp)
     ) {
 
         Pill()
@@ -95,48 +87,11 @@ fun OnboardingPlusBottomSheet(
 
         if (state is OnboardingPlusBottomSheetState.Loaded) {
             Spacer(Modifier.height(16.dp))
-            AnimatedVisibility(
-                visible = state.showTrialInfo,
-                enter = expandVertically(
-                    expandFrom = Alignment.Top,
-                    animationSpec = animationSpec,
-                ),
-                exit = shrinkVertically(
-                    shrinkTowards = Alignment.Top,
-                    animationSpec = animationSpec,
-                ),
-            ) {
-                Box(
-                    Modifier
-                        .padding(bottom = 16.dp)
-                        .background(
-                            brush = plusGradientBrush,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                ) {
-                    state
-                        .mostRecentlySelectedTrialPhase
-                        ?.numPeriodFreeTrial(resources)
-                        ?.uppercase(Locale.getDefault())
-                        ?.let { text ->
-                            TextP60(
-                                text = text,
-                                color = Color.Black,
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier.padding(
-                                    horizontal = 12.dp,
-                                    vertical = 4.dp
-                                ),
-                            )
-                        }
-                }
-            }
 
             // Using LazyColumn instead of Column to avoid issue where unselected button that was not
             // being tapped would sometimes display the on-touch ripple effect
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 subscriptions.forEach { subscription ->
 
@@ -145,42 +100,57 @@ fun OnboardingPlusBottomSheet(
                     // as the user changes selections.
                     val interactionSource = remember(subscription) { MutableInteractionSource() }
 
-                    if (subscription == state.selectedSubscription) {
-                        PlusOutlinedRowButton(
-                            text = subscription.recurringPricingPhase.pricePerPeriod(resources),
-                            selectedCheckMark = true,
-                            interactionSource = interactionSource,
-                            onClick = { viewModel.updateSelectedSubscription(subscription) }
-                        )
-                    } else {
-                        UnselectedPlusOutlinedRowButton(
-                            text = subscription.recurringPricingPhase.pricePerPeriod(resources),
-                            onClick = { viewModel.updateSelectedSubscription(subscription) },
-                            interactionSource = interactionSource
+                    val text = subscription.recurringPricingPhase.pricePerPeriod(resources)
+                    val topText = subscription
+                        .trialPricingPhase
+                        ?.numPeriodFreeTrial(resources)
+                        ?.uppercase(Locale.getDefault())
 
-                        )
+                    Column {
+
+                        if (topText == null) {
+                            Spacer(Modifier.height(8.dp))
+                        }
+
+                        if (subscription == state.selectedSubscription) {
+                            PlusOutlinedRowButton(
+                                text = text,
+                                topText = topText,
+                                onClick = { viewModel.updateSelectedSubscription(subscription) },
+                                interactionSource = interactionSource,
+                                selectedCheckMark = true,
+                            )
+                        } else {
+                            UnselectedPlusOutlinedRowButton(
+                                text = text,
+                                topText = topText,
+                                onClick = { viewModel.updateSelectedSubscription(subscription) },
+                                interactionSource = interactionSource,
+                            )
+                        }
                     }
                 }
             }
 
-            AnimatedVisibility(
-                visible = state.showTrialInfo,
-                enter = expandVertically(animationSpec),
-                exit = shrinkVertically(animationSpec),
-            ) {
-                state.mostRecentlySelectedTrialPhase?.let { trialPhase ->
-                    val text = stringResource(
+            val descriptionText = state.selectedSubscription.trialPricingPhase.let { trialPhase ->
+                if (trialPhase != null) {
+                    stringResource(
                         LR.string.onboarding_plus_recurring_after_free_trial,
                         recurringAfterString(trialPhase, resources)
                     )
-                    TextP60(
-                        text = text,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 16.dp)
-                    )
+                } else {
+                    val firstLine = stringResource(state.selectedSubscription.recurringPricingPhase.renews)
+                    val secondLine = stringResource(LR.string.onboarding_plus_can_be_canceled_at_any_time)
+                    "$firstLine.\n$secondLine"
                 }
             }
+
+            TextP60(
+                text = descriptionText,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 16.dp)
+            )
 
             AnimatedVisibility(
                 visible = state.purchaseFailed,
