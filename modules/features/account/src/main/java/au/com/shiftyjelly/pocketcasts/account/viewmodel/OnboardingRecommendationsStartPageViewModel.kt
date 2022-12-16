@@ -34,15 +34,18 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     app: Application,
 ) : AndroidViewModel(app) {
 
-    data class State(val trendingPodcasts: List<RecommendationPodcast>) {
-        val buttonRes = if (trendingPodcasts.any { it.isSubscribed }) {
+    data class State(val trendingPodcasts: List<RecommendationPodcast>, private val anySubscribed: Boolean) {
+        val buttonRes = if (anySubscribed) {
             LR.string.navigation_continue
         } else {
             LR.string.not_now
         }
 
         companion object {
-            val EMPTY = State(trendingPodcasts = emptyList())
+            val EMPTY = State(
+                trendingPodcasts = emptyList(),
+                anySubscribed = false
+            )
         }
     }
 
@@ -109,16 +112,20 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 .asFlow()
                 .map { subscribed ->
                     val subscribedUuids = subscribed.map { it.uuid }
-                    discoverPodcastList.map { discoverPodcast ->
+                    val trendingPodcasts = discoverPodcastList.map { discoverPodcast ->
                         RecommendationPodcast(
                             uuid = discoverPodcast.uuid,
                             title = discoverPodcast.title ?: "",
                             isSubscribed = discoverPodcast.uuid in subscribedUuids
                         )
                     }
+                    State(
+                        trendingPodcasts = trendingPodcasts,
+                        anySubscribed = subscribed.isNotEmpty()
+                    )
                 }
                 .stateIn(viewModelScope)
-                .collectLatest { _state.value = State(it) }
+                .collectLatest { _state.value = it }
         }
     }
 
