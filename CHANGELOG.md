@@ -19,6 +19,8 @@
         ([#632](https://github.com/Automattic/pocket-casts-android/pull/632)).
     *   Included deep link support for share links
         ([#526](https://github.com/Automattic/pocket-casts-android/pull/526)).
+    *   Episode show notes will support system font 
+        ([#667](https://github.com/Automattic/pocket-casts-android/pull/667)).
 
 7.28
 -----
