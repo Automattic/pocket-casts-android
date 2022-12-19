@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.OutputQueryEpisodes
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.ViewModelBase
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playlistManager
-import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.podcastManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.queryfilterepisodes.ActionHelperQueryFilterEpisodes
 import au.com.shiftyjelly.pocketcasts.taskerplugin.queryfilterepisodes.InputQueryFilterEpisodes
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
