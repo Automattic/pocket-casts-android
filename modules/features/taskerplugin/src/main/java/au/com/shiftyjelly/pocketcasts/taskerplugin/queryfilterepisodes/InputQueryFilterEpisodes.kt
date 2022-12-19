@@ -5,5 +5,5 @@ import com.joaomgcd.taskerpluginlibrary.input.TaskerInputRoot
 
 @TaskerInputRoot
 class InputQueryFilterEpisodes @JvmOverloads constructor(
-    @field:TaskerInputField("title_or_id", labelResIdName = "podcast_id_or_title") var titleOrId: String? = null
+    @field:TaskerInputField("title_or_id", labelResIdName = "filter_id_or_title") var titleOrId: String? = null
 )

@@ -1471,4 +1471,5 @@
     <string name="filter_id">Filter ID</string>
     <string name="filter_id_description">An unique ID that represents the filter. Can be used on the \'Query Filter Episodes\' action.</string>
     <string name="filter_title">Filter Title</string>
+    <string name="filter_id_or_title">Filter ID or Title</string>
 </resources>
