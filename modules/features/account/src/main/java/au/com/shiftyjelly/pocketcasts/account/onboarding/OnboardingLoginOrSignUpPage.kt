@@ -8,7 +8,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,13 +44,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastCover
 import au.com.shiftyjelly.pocketcasts.compose.components.RectangleCover
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -103,7 +103,16 @@ internal fun OnboardingLoginOrSignUpPage(
                 .padding(vertical = 12.dp, horizontal = 16.dp)
                 .fillMaxWidth()
         ) {
-            Spacer(Modifier.weight(1f))
+            Box(Modifier.weight(1f)) {
+                NavigationIconButton(
+                    iconColor = MaterialTheme.theme.colors.primaryText01,
+                    navigationButton = NavigationButton.Close,
+                    onNavigationClick = {
+                        viewModel.onDismiss(flow)
+                        onDismiss()
+                    }
+                )
+            }
 
             HorizontalLogo(
                 modifier = Modifier
@@ -111,19 +120,7 @@ internal fun OnboardingLoginOrSignUpPage(
                     .height(28.dp)
             )
 
-            Box(Modifier.weight(1f)) {
-                TextH30(
-                    text = stringResource(LR.string.not_now),
-                    textAlign = TextAlign.End,
-                    modifier = Modifier
-                        .clickable {
-                            viewModel.onDismiss(flow)
-                            onDismiss()
-                        }
-                        .padding(all = 4.dp)
-                        .align(Alignment.CenterEnd)
-                )
-            }
+            Spacer(Modifier.weight(1f))
         }
 
         Spacer(Modifier.height(32.dp))
