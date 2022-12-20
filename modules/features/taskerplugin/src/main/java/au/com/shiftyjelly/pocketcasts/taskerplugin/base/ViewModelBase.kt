@@ -106,5 +106,6 @@ abstract class ViewModelBase<TInput : Any, TOutput : Any, THelper : TaskerPlugin
 
     fun finishForTasker() = taskerHelper.finishForTasker()
 
-    val taskerVariables by lazy { taskerHelper.relevantVariables.distinct().sortedBy { it } }
+    // sort by descending so that %var() comes before %var, then remove all duplicates ignoring the () and then sort normally. This gets rid of variables that that are available both in array and non-array form (which makes sense to exist in some cases) to make it less confusing for users.
+    val taskerVariables by lazy { taskerHelper.relevantVariables.sortedByDescending { it }.distinctBy { it.removeSuffix("()") }.sortedBy { it } }
 }
