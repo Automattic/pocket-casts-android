@@ -3,6 +3,8 @@
 * New Features:
     *   Add tappable links to podcast description
         ([#657](https://github.com/Automattic/pocket-casts-android/pull/657)).
+    *   Added new Tasker "Query Podcasts", "Query Podcast Episodes", "Query Filter", "Query Filter Episodes" and "Add To Up Next" actions.
+        ([#583](https://github.com/Automattic/pocket-casts-android/pull/583)).
 
 7.29
 -----

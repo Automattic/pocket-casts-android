@@ -5,14 +5,14 @@ import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
-import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerActionNoOutput
+import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerAction
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
-import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfigHelperNoOutput
+import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfigHelper
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-abstract class ViewModelBase<TInput : Any, THelper : TaskerPluginConfigHelperNoOutput<TInput, out TaskerPluginRunnerActionNoOutput<TInput>>>(application: Application) : AndroidViewModel(application), TaskerPluginConfig<TInput> {
+abstract class ViewModelBase<TInput : Any, TOutput : Any, THelper : TaskerPluginConfigHelper<TInput, TOutput, out TaskerPluginRunnerAction<TInput, TOutput>>>(application: Application) : AndroidViewModel(application), TaskerPluginConfig<TInput> {
     override val context get() = getApplication<Application>()
     abstract fun getNewHelper(pluginConfig: TaskerPluginConfig<TInput>): THelper
     private val taskerHelper by lazy { getNewHelper(this) }
@@ -45,8 +45,36 @@ abstract class ViewModelBase<TInput : Any, THelper : TaskerPluginConfigHelperNoO
         fun getValueDescription(possibleValue: Any?): String = tryOrNull { getValueDescriptionSpecific(possibleValue as? T?) } ?: ""
         protected open fun getValueDescriptionSpecific(possibleValue: T?) = possibleValue?.toString()
     }
-    abstract val inputFields: List<InputFieldBase<*>>
 
+    protected inner class InputFieldString constructor(@StringRes labelResId: Int, @DrawableRes iconResId: Int, valueGetter: TInput.() -> String?, valueSetter: TInput.(String?) -> Unit) : InputFieldBase<String>(labelResId, iconResId, valueGetter, valueSetter) {
+        override val askFor get() = true
+    }
+
+    protected inner class InputFieldBoolean constructor(@StringRes labelResId: Int, @DrawableRes iconResId: Int, valueGetter: TInput.() -> String?, valueSetter: TInput.(String?) -> Unit) : InputFieldBase<Boolean>(labelResId, iconResId, valueGetter, valueSetter) {
+        override val askFor get() = true
+        override fun getPossibleValues() = MutableStateFlow(listOf(true, false))
+    }
+
+    @JvmName("InputFieldEnumResId")
+    protected inline fun <reified T : Enum<T>> InputFieldEnum(@StringRes labelResId: Int, @DrawableRes iconResId: Int, noinline valueGetter: TInput.() -> String?, noinline valueSetter: TInput.(String?) -> Unit, noinline valueDescriptionResIdGetter: ((T?) -> Int?)? = null): InputFieldBase<T> =
+        InputFieldEnumStringDescription(labelResId, iconResId, valueGetter, valueSetter) { item ->
+            if (valueDescriptionResIdGetter == null) return@InputFieldEnumStringDescription null
+            val resId = valueDescriptionResIdGetter(item) ?: return@InputFieldEnumStringDescription null
+            context.getString(resId)
+        }
+
+    @JvmName("InputFieldEnumString")
+    protected inline fun <reified T : Enum<T>> InputFieldEnumStringDescription(@StringRes labelResId: Int, @DrawableRes iconResId: Int, noinline valueGetter: TInput.() -> String?, noinline valueSetter: TInput.(String?) -> Unit, noinline valueDescriptionGetter: ((T?) -> String?)? = null) = object : InputFieldBase<T>(labelResId, iconResId, valueGetter, valueSetter) {
+        override val askFor get() = true
+        override fun getPossibleValues() = MutableStateFlow(T::class.java.enumConstants?.toList() ?: listOf())
+        override fun getValueDescriptionSpecific(possibleValue: T?): String? {
+            if (valueDescriptionGetter == null) return super.getValueDescriptionSpecific(possibleValue)
+
+            return valueDescriptionGetter(possibleValue)
+        }
+    }
+
+    open val inputFields: List<InputFieldBase<*>> get() = listOf()
     private var taskerInput
         get() = TaskerInput(input ?: taskerHelper.inputClass.newInstance())
         set(value) {
@@ -78,5 +106,6 @@ abstract class ViewModelBase<TInput : Any, THelper : TaskerPluginConfigHelperNoO
 
     fun finishForTasker() = taskerHelper.finishForTasker()
 
-    val taskerVariables by lazy { taskerHelper.relevantVariables.distinct().sortedBy { it } }
+    // sort by descending so that %var() comes before %var, then remove all duplicates ignoring the () and then sort normally. This gets rid of variables that that are available both in array and non-array form (which makes sense to exist in some cases) to make it less confusing for users.
+    val taskerVariables by lazy { taskerHelper.relevantVariables.sortedByDescending { it }.distinctBy { it.removeSuffix("()") }.sortedBy { it } }
 }
