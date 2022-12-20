@@ -79,7 +79,8 @@ project.ext {
 
     // Library versions
     versionBillingClient = '5.0.0'
-    versionCompose = '1.2.1'
+    versionCompose = '1.2.1' // When updating this, also check if versionComposeAccompanist should be updated as well: https://github.com/google/accompanist#compose-versions
+    versionComposeAccompanist = '0.25.1'
     versionComposeCompiler = '1.3.0'
     versionDagger = '2.41'
     versionEspresso = '3.4.0'
@@ -236,8 +237,8 @@ project.ext {
             mockWebServer: "com.squareup.okhttp3:mockwebserver:4.9.3",
             barista: "com.adevinta.android:barista:4.2.0",
             // Accompanist - https://google.github.io/accompanist/
-            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1",
-            accompanistSystemUiController: "com.google.accompanist:accompanist-systemuicontroller:0.28.0",
+            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:$versionComposeAccompanist",
+            accompanistSystemUiController: "com.google.accompanist:accompanist-systemuicontroller:$versionComposeAccompanist",
             // Automattic Tracks
             automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks",
             // Sentry
