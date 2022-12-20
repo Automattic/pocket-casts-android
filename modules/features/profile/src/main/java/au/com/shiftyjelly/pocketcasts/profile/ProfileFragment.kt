@@ -17,6 +17,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +25,7 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -65,6 +66,7 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileViewModel by viewModels()
+
     private var binding: FragmentProfileBinding? = null
     private val sections = listOf(
         SettingsAdapter.Item(LR.string.profile_navigation_stats, R.drawable.ic_stats, StatsFragment::class.java),
@@ -98,10 +100,6 @@ class ProfileFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val binding = binding ?: return
-
-        if (BuildConfig.END_OF_YEAR_ENABLED) {
-            binding.setupEndOfYearPromptCard()
-        }
 
         binding.btnSettings.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SETTINGS_BUTTON_TAPPED)
@@ -156,6 +154,11 @@ class ProfileFragment : BaseFragment() {
         binding.imgBannerBackground.setOnLongClickListener {
             theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity)
             true
+        }
+
+        lifecycleScope.launchWhenStarted {
+            val isEligible = viewModel.isEndOfYearStoriesEligible()
+            binding.setupEndOfYearPromptCard(isEligible)
         }
 
         viewModel.podcastCount.observe(viewLifecycleOwner) {
@@ -223,15 +226,17 @@ class ProfileFragment : BaseFragment() {
         }
     }
 
-    private fun FragmentProfileBinding.setupEndOfYearPromptCard() {
+    private fun FragmentProfileBinding.setupEndOfYearPromptCard(isEligible: Boolean) {
         endOfYearPromptCard.setContent {
-            AppTheme(theme.activeTheme) {
-                EndOfYearPromptCard(
-                    onClick = {
-                        StoriesFragment.newInstance()
-                            .show(childFragmentManager, "stories_dialog")
-                    }
-                )
+            if (isEligible) {
+                AppTheme(theme.activeTheme) {
+                    EndOfYearPromptCard(
+                        onClick = {
+                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
+                            (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
+                        }
+                    )
+                }
             }
         }
     }

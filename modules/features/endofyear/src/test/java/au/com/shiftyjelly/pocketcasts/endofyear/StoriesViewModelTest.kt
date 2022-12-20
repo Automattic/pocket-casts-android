@@ -1,12 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import au.com.shiftyjelly.pocketcasts.endofyear.stories.Story
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -29,7 +32,7 @@ class StoriesViewModelTest {
     private lateinit var fileUtilWrapper: FileUtilWrapper
 
     @Mock
-    private lateinit var storiesDataSource: StoriesDataSource
+    private lateinit var endOfYearManager: EndOfYearManager
 
     @Before
     fun setUp() {
@@ -38,25 +41,35 @@ class StoriesViewModelTest {
 
     @Test
     fun `when vm starts, then progress is zero`() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher())
-        val viewModel = initViewModel(listOf(story1, story2))
+        val backgroundScope = CoroutineScope(coroutineContext + Job())
+        try {
+            val viewModel = initViewModel(listOf(story1, story2))
 
-        assertEquals(viewModel.progress.value, 0f)
+            assertEquals(viewModel.progress.value, 0f)
+        } finally {
+            backgroundScope.cancel()
+        }
     }
 
     @Test
     fun `when vm starts, then loading is shown`() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher())
-        val viewModel = initViewModel(listOf(story1, story2))
+        val backgroundScope = CoroutineScope(coroutineContext + Job())
+        try {
+            backgroundScope.launch {
+                val viewModel = initViewModel(listOf(story1, story2))
 
-        assertEquals(viewModel.state.value is StoriesViewModel.State.Loading, true)
+                assertEquals(viewModel.state.value is StoriesViewModel.State.Loading, true)
+            }
+        } finally {
+            backgroundScope.cancel()
+        }
     }
 
     @Test
     fun `when vm starts, then stories are loaded`() = runTest {
         initViewModel(emptyList())
 
-        verify(storiesDataSource).loadStories()
+        verify(endOfYearManager).loadStories()
     }
 
     @Test
@@ -94,11 +107,26 @@ class StoriesViewModelTest {
         assertEquals(state.currentStory, story1)
     }
 
+    @Test
+    fun `when replay is invoked, then first story is shown`() = runTest {
+        val story3 = mock<Story>()
+        val viewModel = initViewModel(listOf(story1, story2, story3))
+        viewModel.skipNext()
+        viewModel.skipNext() // At last story
+
+        viewModel.replay()
+
+        val state = viewModel.state.value as StoriesViewModel.State.Loaded
+        assertEquals(state.currentStory, story1)
+    }
+
     private suspend fun initViewModel(mockStories: List<Story>): StoriesViewModel {
-        whenever(storiesDataSource.loadStories()).thenReturn(flowOf(mockStories))
+        whenever(endOfYearManager.loadStories()).thenReturn(mockStories)
         return StoriesViewModel(
-            storiesDataSource = storiesDataSource,
-            fileUtilWrapper = fileUtilWrapper
+            endOfYearManager = endOfYearManager,
+            fileUtilWrapper = fileUtilWrapper,
+            shareableTextProvider = mock(),
+            analyticsTracker = mock(),
         )
     }
 }

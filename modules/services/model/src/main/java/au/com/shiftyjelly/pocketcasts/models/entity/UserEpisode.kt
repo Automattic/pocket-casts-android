@@ -53,7 +53,7 @@ data class UserEpisode(
     override var playing: Boolean = false
 
     override fun displaySubtitle(podcast: Podcast?): String {
-        return UserEpisodePodcastSubstitute.title
+        return UserEpisodePodcastSubstitute.substituteTitle
     }
 
     val isUploading: Boolean

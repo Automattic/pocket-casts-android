@@ -94,6 +94,22 @@
                         android:scheme="pktc"/>
             </intent-filter>
             <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="pca.st"
+                    android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="pcast.pocketcasts.net"
+                    android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data
@@ -462,6 +478,8 @@
                 <action android:name="au.com.shiftyjelly.pocketcasts.action.NOTIFICATION_STREAM_EPISODE"/>
             </intent-filter>
         </receiver>
+
+        <receiver android:name="au.com.shiftyjelly.pocketcasts.endofyear.ShareResultReceiver" />
 
         <service
                 android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService"

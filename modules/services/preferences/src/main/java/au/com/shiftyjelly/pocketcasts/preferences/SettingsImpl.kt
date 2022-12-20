@@ -70,6 +70,8 @@ class SettingsImpl @Inject constructor(
         private const val SEND_CRASH_REPORTS_KEY = "SendCrashReportsKey"
         private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
+        private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
+        private const val COMPLETED_ONBOARDING_KEY = "CompletedOnboardingKey"
     }
 
     private var languageCode: String? = null
@@ -94,9 +96,10 @@ class SettingsImpl @Inject constructor(
     override val autoAddUpNextLimit = BehaviorRelay.create<Int>().apply { accept(getAutoAddUpNextLimit()) }
 
     override val defaultPodcastGroupingFlow = MutableStateFlow(defaultPodcastGrouping())
-    override val defaultMediaNotificationControlsFlow = MutableStateFlow(defaultMediaNotificationControls())
+    override val defaultMediaNotificationControlsFlow = MutableStateFlow(getMediaNotificationControlItems())
     override val defaultShowArchivedFlow = MutableStateFlow(defaultShowArchived())
     override val keepScreenAwakeFlow = MutableStateFlow(keepScreenAwake())
+    override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
 
@@ -494,7 +497,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getAutoSubscribeToPlayed(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, true)
+        return getBoolean(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, false)
     }
 
     override fun getAutoShowPlayed(): Boolean {
@@ -787,6 +790,15 @@ class SettingsImpl @Inject constructor(
     override fun setKeepScreenAwake(newValue: Boolean) {
         setBoolean(Settings.PREFERENCE_KEEP_SCREEN_AWAKE, newValue)
         keepScreenAwakeFlow.update { newValue }
+    }
+
+    override fun openPlayerAutomatically(): Boolean {
+        return sharedPreferences.getBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, false)
+    }
+
+    override fun setOpenPlayerAutomatically(newValue: Boolean) {
+        setBoolean(Settings.PREFERENCE_OPEN_PLAYER_AUTOMATICALLY, newValue)
+        openPlayerAutomaticallyFlow.update { newValue }
     }
 
     override fun isPodcastAutoDownloadUnmeteredOnly(): Boolean {
@@ -1190,23 +1202,17 @@ class SettingsImpl @Inject constructor(
         defaultShowArchivedFlow.update { value }
     }
 
-    override fun defaultMediaNotificationControls(): List<MediaNotificationControls> {
-        val selectedValue = MediaNotificationControls.All.map { mediaControl ->
-            val defaultValue =
-                (mediaControl == MediaNotificationControls.PlaybackSpeed || mediaControl == MediaNotificationControls.Star)
-            Pair(mediaControl, getBoolean(mediaControl.key, defaultValue))
-        }
+    override fun getMediaNotificationControlItems(): List<MediaNotificationControls> {
+        var items = getStringList("media_notification_controls_action")
 
-        return selectedValue.filter { (_, value) -> value }.map { (mediaControl, _) ->
-            mediaControl
-        }
+        if (items.isEmpty())
+            items = MediaNotificationControls.All.map { it.key }
+        return items.mapNotNull { MediaNotificationControls.itemForId(it) }
     }
 
-    override fun setDefaultMediaNotificationControls(mediaNotificationControls: List<MediaNotificationControls>) {
-        MediaNotificationControls.All.forEach { mediaControl ->
-            setBoolean(mediaControl.key, mediaNotificationControls.contains(mediaControl))
-        }
-        defaultMediaNotificationControlsFlow.update { mediaNotificationControls }
+    override fun setMediaNotificationControlItems(items: List<String>) {
+        setStringList("media_notification_controls_action", items)
+        defaultMediaNotificationControlsFlow.update { items.mapNotNull { MediaNotificationControls.itemForId(it) } }
     }
 
     override fun defaultPodcastGrouping(): PodcastGrouping {
@@ -1474,4 +1480,21 @@ class SettingsImpl @Inject constructor(
 
     override fun getEndOfYearShowBadge2022(): Boolean =
         getBoolean(END_OF_YEAR_SHOW_BADGE_2022_KEY, true)
+
+    override fun setEndOfYearModalHasBeenShown(value: Boolean) {
+        setBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, value)
+    }
+
+    override fun getEndOfYearModalHasBeenShown(): Boolean =
+        getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, false)
+
+    override fun endOfYearRequireLogin(): Boolean {
+        return BuildConfig.END_OF_YEAR_REQUIRE_LOGIN
+    }
+
+    override fun hasCompletedOnboarding() = getBoolean(COMPLETED_ONBOARDING_KEY, false)
+
+    override fun setHasCompletedOnboarding() {
+        setBoolean(COMPLETED_ONBOARDING_KEY, true)
+    }
 }

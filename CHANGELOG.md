@@ -1,17 +1,60 @@
-7.28
+7.30
+-----
+* New Features:
+    *   Add tappable links to podcast description
+        ([#657](https://github.com/Automattic/pocket-casts-android/pull/657)).
     *   Added new Tasker "Query Podcasts", "Query Podcast Episodes", "Query Filter", "Query Filter Episodes" and "Add To Up Next" actions.
         ([#583](https://github.com/Automattic/pocket-casts-android/pull/583)).
 
+7.29
+-----
+
+* New Features:
+    *   Onboarding flow for new users
+        ([#645](https://github.com/Automattic/pocket-casts-android/pull/645)).
+    *   Display gravatar on profile screen
+        ([#644](https://github.com/Automattic/pocket-casts-android/pull/644)).
+* Bug Fixes:
+    *   Fixed podcast date format
+        ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
+    *   Fix unable to permanently change "Skip back time" setting
+        ([#632](https://github.com/Automattic/pocket-casts-android/pull/632)).
+    *   Included deep link support for share links
+        ([#526](https://github.com/Automattic/pocket-casts-android/pull/526)).
+
+7.28
+-----
+*   Bug Fixes:
+    *   Fixed effects bottomsheet flickering to the expanded state while being dragged
+        ([#575](https://github.com/Automattic/pocket-casts-android/pull/575)).
+    *   Fixed miniplayer play icon animation on theme change
+        ([#527](https://github.com/Automattic/pocket-casts-android/pull/527)).
+    *   Fixed talkback issues
+        ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
+    *   Fixed skip forward/ backward buttons not showing in media notification while casting
+        ([#630](https://github.com/Automattic/pocket-casts-android/pull/630)).
+    *   Fix media notification controls configuration to support 3 icons
+        ([#641](https://github.com/Automattic/pocket-casts-android/pull/641)).
+
 7.27
 -----
-*   New Features:
-    *   Added ability to set playback effects in Tasker "Control Playback" action.
-        ([#509](https://github.com/Automattic/pocket-casts-android/pull/509)).
-    *   Fixed crashes with Tasker plugin actions when using minified code.
-        ([#543](https://github.com/Automattic/pocket-casts-android/pull/543)).
 
-    * Allowed customization of actions through Settings in Media Notification Control for Android 13 users.
-      ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
+*   New Features:
+    * Add End of Year stats
+        ([#410](https://github.com/Automattic/pocket-casts-android/issues/410)).  
+    * Support Android 13 per-app language preferences
+        ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
+*   Bug Fixes:
+    *   Fixed some layout issues in the EpisodeFragment
+        ([#459](https://github.com/Automattic/pocket-casts-android/pull/459)).
+    *   Fixed RTL support for notes
+        ([#514](https://github.com/Automattic/pocket-casts-android/pull/514)).
+    *   Allowed customization of actions through Settings in Media Notification Control for Android 13 users.
+        ([#499](https://github.com/Automattic/pocket-casts-android/pull/540)).
+    *   Fixed small "Go to Podcast" icon in Landscape
+        ([#547](https://github.com/Automattic/pocket-casts-android/pull/547)).
+    *   Added option to open player automatically when user start playing podcast.
+        ([#23](https://github.com/Automattic/pocket-casts-android/pull/550))
 
 7.26
 -----
@@ -27,8 +70,6 @@
         ([#483](https://github.com/Automattic/pocket-casts-android/pull/483)).
     *   Updated select filters title & hide podcast setting filter option when applicable
         ([#494](https://github.com/Automattic/pocket-casts-android/pull/494)).
-    *   Support Android 13 per-app language preferences
-        ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
 *   Bug Fixes:
     *   Fixed Help & Feedback buttons being hidden when using text zoom.
         ([#446](https://github.com/Automattic/pocket-casts-android/pull/446)).
@@ -40,10 +81,12 @@
         ([#432](https://github.com/Automattic/pocket-casts-android/pull/432)).
     *   Fixed full screen video player not closing the first time in landscape mode
         ([#464](https://github.com/Automattic/pocket-casts-android/pull/464)).
-    *   Fixed some layout issues in the EpisodeFragment
-        ([#459](https://github.com/Automattic/pocket-casts-android/pull/459)).
-    *   Fixed RTL support for notes
-        ([#514](https://github.com/Automattic/pocket-casts-android/pull/514)).
+    *   Added ability to set playback effects in Tasker "Control Playback" action.
+        ([#509](https://github.com/Automattic/pocket-casts-android/pull/509)).
+    *   Fixed crashes with Tasker plugin actions when using minified code.
+        ([#543](https://github.com/Automattic/pocket-casts-android/pull/543)).
+    *   Fixed auto subscribe issue.
+        ([#545](https://github.com/Automattic/pocket-casts-android/pull/545)).
 
 7.25
 -----

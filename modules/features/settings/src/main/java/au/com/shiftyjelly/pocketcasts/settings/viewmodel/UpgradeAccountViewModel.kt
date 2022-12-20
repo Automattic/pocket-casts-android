@@ -34,7 +34,7 @@ class UpgradeAccountViewModel
                 is Subscription.WithTrial -> ProductState.ProductWithTrial(
                     featureLabel = context.resources.getString(
                         LR.string.profile_feature_try_trial,
-                        subscription.trialPricingPhase.periodValue(context.resources)
+                        subscription.trialPricingPhase.periodValuePlural(context.resources)
                     ),
                     price = subscription.numFreeThenPricePerPeriod(context.resources)
                 )

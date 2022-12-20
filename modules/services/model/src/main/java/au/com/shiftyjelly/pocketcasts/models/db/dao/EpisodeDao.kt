@@ -13,6 +13,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -22,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 @Dao
@@ -312,27 +312,71 @@ abstract class EpisodeDao {
     abstract suspend fun markAllUnplayed(episodesUUIDs: List<String>, modified: Long, playingStatus: EpisodePlayingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
     @Query("SELECT SUM(played_up_to) FROM episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > :fromEpochMs AND last_playback_interaction_date < :toEpochMs")
-    abstract fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?>
+    abstract suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?
 
     @Query(
         """
-        SELECT COUNT(DISTINCT podcast_id) as numberOfPodcasts, SUM(played_up_to) as totalPlayedTime, REPLACE(IFNULL(NULLIF(SUBSTR(podcasts.podcast_category, 0, INSTR(podcasts.podcast_category, char(10))), ''), podcasts.podcast_category), char(10), '') as category
+        SELECT DISTINCT episodes.uuid as episodeId, COUNT(DISTINCT podcast_id) as numberOfPodcasts, SUM(played_up_to) as totalPlayedTime, 
+        SUBSTR(TRIM(podcasts.podcast_category),1,INSTR(trim(podcasts.podcast_category)||char(10),char(10))-1) as category,
+        podcasts.uuid as mostListenedPodcastId, podcasts.primary_color as mostListenedPodcastTintColor
         FROM episodes
         JOIN podcasts ON episodes.podcast_id = podcasts.uuid
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        AND category IS NOT NULL and category != ''
         GROUP BY category
         ORDER BY totalPlayedTime DESC
         """
     )
-    abstract fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>>
+    abstract suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
 
     @Query(
         """
-        SELECT COUNT(episodes.uuid) as numberOfEpisodes, COUNT(DISTINCT podcasts.uuid) as numberOfPodcasts
+        SELECT COUNT(DISTINCT episodes.uuid) as numberOfEpisodes, COUNT(DISTINCT podcasts.uuid) as numberOfPodcasts
         FROM episodes
         JOIN podcasts ON episodes.podcast_id = podcasts.uuid
         WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
         """
     )
-    abstract fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers>
+    abstract suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers
+
+    @Query(
+        """
+        SELECT episodes.uuid, episodes.title, episodes.duration, podcasts.uuid as podcastUuid, podcasts.title as podcastTitle, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg
+        FROM episodes
+        JOIN podcasts ON episodes.podcast_id = podcasts.uuid
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        ORDER BY episodes.played_up_to DESC
+        LIMIT 1
+        """
+    )
+    abstract suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
+
+    @Query(
+        """
+        SELECT COUNT(DISTINCT uuid) 
+        FROM episodes
+        WHERE played_up_to > :playedUpToInSecs 
+        AND episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        """
+    )
+    abstract suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
+
+    @Query(
+        """
+        SELECT * 
+        FROM episodes
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date < :fromEpochMs AND episodes.last_playback_interaction_date != 0
+        LIMIT 1
+        """
+    )
+    abstract suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): Episode?
+
+    @Query(
+        """
+        SELECT COUNT(*) 
+        FROM episodes
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        """
+    )
+    abstract suspend fun findEpisodesCountInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
 }

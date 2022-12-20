@@ -75,10 +75,12 @@ project.ext {
     settingsEncryptSecret = secretProperties.getProperty("pocketcastsSettingsEncryptSecret", "")
     sharingServerSecret = secretProperties.getProperty("pocketcastsSharingServerSecret", "")
     pocketcastsSentryDsn = secretProperties.getProperty("pocketcastsSentryDsn", "")
+    googleSignInServerClientId = secretProperties.getProperty("googleSignInServerClientId", "")
 
     // Library versions
     versionBillingClient = '5.0.0'
-    versionCompose = '1.2.1'
+    versionCompose = '1.2.1' // When updating this, also check if versionComposeAccompanist should be updated as well: https://github.com/google/accompanist#compose-versions
+    versionComposeAccompanist = '0.25.1'
     versionComposeCompiler = '1.3.0'
     versionDagger = '2.41'
     versionEspresso = '3.4.0'
@@ -100,6 +102,7 @@ project.ext {
 
     androidLibs = [
             appCompat: "androidx.appcompat:appcompat:1.5.0",
+            auth: "com.google.android.gms:play-services-auth:20.4.0",
             mediarouter: "androidx.mediarouter:mediarouter:1.3.1",
             palette: "androidx.palette:palette:1.0.0",
             recyclerview: "androidx.recyclerview:recyclerview:1.2.1",
@@ -109,7 +112,7 @@ project.ext {
             browser: "androidx.browser:browser:1.4.0",
             percent: "androidx.percentlayout:percentlayout:1.0.0-rc02",
             preference: "androidx.preference:preference:1.2.0",
-            cast: "com.google.android.gms:play-services-cast-framework:21.1.0",
+            cast: "com.google.android.gms:play-services-cast-framework:21.2.0",
             desugarJdk: "com.android.tools:desugar_jdk_libs:1.1.5",
             // Firebase BoM (Bill of Materials enables you to manage all your Firebase library versions by specifying only one version)
             firebaseBom: "com.google.firebase:firebase-bom:30.5.0",
@@ -154,17 +157,20 @@ project.ext {
             navigationUi: "androidx.navigation:navigation-ui-ktx:$versionNavigation",
             viewPager: "androidx.viewpager2:viewpager2:1.0.0",
             composeActivity: "androidx.activity:activity-compose:1.5.1",
+            composeAnimation: "androidx.compose.animation:animation:$versionCompose",
+            composeConstraint: "androidx.constraintlayout:constraintlayout-compose:1.0.1",
+            composeIcons: "androidx.compose.material:material-icons-extended:$versionCompose",
+            composeLiveData: "androidx.compose.runtime:runtime-livedata:$versionCompose",
+            composeMaterial: "androidx.compose.material:material:$versionCompose",
+            composeNavigation: "androidx.navigation:navigation-compose:$versionNavigation",
             composeUi: "androidx.compose.ui:ui:$versionCompose",
             composeUiTestManifest: "androidx.compose.ui:ui-test-manifest:$versionCompose",
             composeUiTestJunit: "androidx.compose.ui:ui-test-junit4:$versionCompose",
             composeUiTooling: "androidx.compose.ui:ui-tooling:$versionCompose",
             composeUiToolingPreview: "androidx.compose.ui:ui-tooling-preview:$versionCompose",
-            composeMaterial: "androidx.compose.material:material:$versionCompose",
-            composeAnimation: "androidx.compose.animation:animation:$versionCompose",
-            composeLiveData: "androidx.compose.runtime:runtime-livedata:$versionCompose",
-            composeNavigation: "androidx.navigation:navigation-compose:$versionNavigation",
             composeRx: "androidx.compose.runtime:runtime-rxjava2:$versionCompose",
             composeViewModel: "androidx.lifecycle:lifecycle-viewmodel-compose:$versionLifecycle",
+            composeUiUtil: "androidx.compose.ui:ui-util:$versionCompose",
             guava: 'com.google.guava:guava:27.1-android' // Required to fix conflict between versions in exoplayer and workmanager
     ]
 
@@ -172,8 +178,10 @@ project.ext {
             kotlin: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
             kotlinCoroutines: "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versionKotlinCoroutines",
             kotlinCoroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versionKotlinCoroutines",
+            kotlinCoroutinesPlayServices: "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$versionKotlinCoroutines",
             kotlinCoroutinesRx: "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$versionKotlinCoroutines",
             kotlinCoroutinesTest: "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versionKotlinCoroutines",
+
             // Retrofit
             retrofit: "com.squareup.retrofit2:retrofit:$versionRetrofit",
             retrofitMoshi: "com.squareup.retrofit2:converter-moshi:$versionRetrofit",
@@ -212,8 +220,10 @@ project.ext {
             hiltDaggerCompiler: "com.google.dagger:hilt-compiler:$versionHilt",
             hiltCompiler: "androidx.hilt:hilt-compiler:1.0.0",
             hiltWorkManager: "androidx.hilt:hilt-work:1.0.0",
+            hiltNavigationCompose: "androidx.hilt:hilt-navigation-compose:1.0.0",
             // Lottie
             lottie: "com.airbnb.android:lottie:5.2.0",
+            lottieCompose: "com.airbnb.android:lottie-compose:5.2.0",
             // JUnit
             junit: "junit:junit:4.13.2",
             // Mockito
@@ -227,7 +237,8 @@ project.ext {
             mockWebServer: "com.squareup.okhttp3:mockwebserver:4.9.3",
             barista: "com.adevinta.android:barista:4.2.0",
             // Accompanist - https://google.github.io/accompanist/
-            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:0.25.1",
+            accompanistFlowLayout: "com.google.accompanist:accompanist-flowlayout:$versionComposeAccompanist",
+            accompanistSystemUiController: "com.google.accompanist:accompanist-systemuicontroller:$versionComposeAccompanist",
             // Automattic Tracks
             automatticTracks: "com.automattic:Automattic-Tracks-Android:$versionTracks",
             // Sentry

@@ -1,37 +1,52 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import android.content.Intent
+import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.utils.FileUtil
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import timber.log.Timber
-import java.io.File
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseAppCompatDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-class StoriesFragment : BaseDialogFragment() {
+@AndroidEntryPoint
+class StoriesFragment : BaseAppCompatDialogFragment() {
     private val viewModel: StoriesViewModel by viewModels()
     override val statusBarColor: StatusBarColor
         get() = StatusBarColor.Custom(Color.BLACK, true)
+    private val source: StoriesSource
+        get() = StoriesSource.fromString(arguments?.getString(ARG_SOURCE))
 
-    private val shareLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        /* Share activity dismissed, start paused story */
-        viewModel.start()
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.attributes?.windowAnimations = UR.style.WindowAnimationSlideTransition
+        return dialog
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstance: Bundle?) {
         super.onCreate(savedInstance)
-        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogThemeBlack)
+        val isTablet = Util.isTablet(requireContext())
+        if (!isTablet) {
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            setStyle(STYLE_NORMAL, android.R.style.Theme_Material_NoActionBar)
+        }
     }
 
     override fun onCreateView(
@@ -43,15 +58,15 @@ class StoriesFragment : BaseDialogFragment() {
             setContent {
                 AppTheme(theme.activeTheme) {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                    analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_SHOWN, AnalyticsProp.storiesShown(source))
                     StoriesPage(
                         viewModel = viewModel,
-                        onCloseClicked = { dismiss() },
-                        onShareClicked = { onCaptureBitmap ->
-                            viewModel.onShareClicked(
-                                onCaptureBitmap,
-                                requireContext(),
-                                ::showShareForFile
-                            )
+                        onCloseClicked = {
+                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED, AnalyticsProp.StoriesDismissed.closeButton)
+                            dismiss()
+                        },
+                        onRetryClicked = {
+                            viewModel.onRetryClicked()
                         }
                     )
                 }
@@ -59,20 +74,31 @@ class StoriesFragment : BaseDialogFragment() {
         }
     }
 
-    private fun showShareForFile(file: File) {
-        val context = requireContext()
-        try {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "image/png"
-            val uri = FileUtil.createUriWithReadPermissions(file, intent, requireContext())
-            intent.putExtra(Intent.EXTRA_STREAM, uri)
-            shareLauncher.launch(Intent.createChooser(intent, context.getString(LR.string.end_of_year_share_via)))
-        } catch (e: Exception) {
-            Timber.e(e)
+    private object AnalyticsProp {
+        private const val source = "source"
+        object StoriesDismissed {
+            val closeButton = mapOf(source to "close_button")
+        }
+        fun storiesShown(storiesSource: StoriesSource) = mapOf(source to storiesSource.value)
+    }
+
+    enum class StoriesSource(val value: String) {
+        MODAL("modal"),
+        PROFILE("profile"),
+        USER_LOGIN("user_login"),
+        UNKNOWN("unknown");
+        companion object {
+            fun fromString(source: String?) =
+                StoriesSource.values().find { it.value == source } ?: UNKNOWN
         }
     }
 
     companion object {
-        fun newInstance() = StoriesFragment()
+        private const val ARG_SOURCE = "source"
+        fun newInstance(source: StoriesSource) = StoriesFragment().apply {
+            arguments = bundleOf(
+                ARG_SOURCE to source.value,
+            )
+        }
     }
 }

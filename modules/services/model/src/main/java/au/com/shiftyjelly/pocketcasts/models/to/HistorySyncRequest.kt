@@ -17,7 +17,6 @@ data class HistorySyncResponse(
     @field:Json(name = "lastCleared") val lastCleared: Long,
     @field:Json(name = "changes") val changes: List<HistorySyncChange>?
 ) {
-
     fun hasChanged(existingServerModified: Long): Boolean {
         return serverModified != 0L && serverModified != existingServerModified
     }

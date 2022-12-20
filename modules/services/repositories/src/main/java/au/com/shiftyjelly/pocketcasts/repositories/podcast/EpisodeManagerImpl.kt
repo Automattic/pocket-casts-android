@@ -13,6 +13,7 @@ import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -47,7 +48,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -916,6 +916,12 @@ class EpisodeManagerImpl @Inject constructor(
         return addedEpisodes
     }
 
+    override fun insert(episodes: List<Episode>) {
+        if (episodes.isNotEmpty()) {
+            episodeDao.insertAll(episodes)
+        }
+    }
+
     override fun findEpisodesToSync(): List<Episode> {
         return episodeDao.findEpisodesToSync()
     }
@@ -1056,7 +1062,7 @@ class EpisodeManagerImpl @Inject constructor(
     override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: Episode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<Playable> {
         return episodeDao.existsRx(episodeUuid)
             .flatMapMaybe { episodeExists ->
-                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.uuid) {
+                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
                     observePlayableByUuid(episodeUuid).firstElement()
                 } else {
                     podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
@@ -1073,12 +1079,24 @@ class EpisodeManagerImpl @Inject constructor(
             }
     }
 
-    override fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Flow<Long?> =
+    override suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long? =
         episodeDao.calculateListeningTime(fromEpochMs, toEpochMs)
 
-    override fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): Flow<List<ListenedCategory>> =
+    override suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory> =
         episodeDao.findListenedCategories(fromEpochMs, toEpochMs)
 
-    override fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): Flow<ListenedNumbers> =
+    override suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers =
         episodeDao.findListenedNumbers(fromEpochMs, toEpochMs)
+
+    override suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode? =
+        episodeDao.findLongestPlayedEpisode(fromEpochMs, toEpochMs)
+
+    override suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int =
+        episodeDao.countEpisodesPlayedUpto(fromEpochMs, toEpochMs, playedUpToInSecs)
+
+    override suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): Episode? =
+        episodeDao.findEpisodeInteractedBefore(fromEpochMs)
+
+    override suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int =
+        episodeDao.findEpisodesCountInListeningHistory(fromEpochMs, toEpochMs)
 }

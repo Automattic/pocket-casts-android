@@ -336,7 +336,7 @@ class MediaSessionManager(
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
         }
 
-        settings.defaultMediaNotificationControls().forEach { mediaControl ->
+        settings.getMediaNotificationControlItems().take(MediaNotificationControls.MAX_VISIBLE_OPTIONS).forEach { mediaControl ->
             when (mediaControl) {
                 MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
                 MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)

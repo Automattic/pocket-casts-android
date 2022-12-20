@@ -17,7 +17,7 @@ import java.util.Locale
 fun Playable.getSummaryText(dateFormatter: RelativeDateFormatter, @ColorInt tintColor: Int, showDuration: Boolean, context: Context): Spannable {
     return when (this) {
         is Episode -> episodeSummaryText(episode = this, dateFormatter = dateFormatter, tintColor = tintColor, showDuration = showDuration, context = context)
-        is UserEpisode -> userEpisodeSummaryText(userEpisode = this, dateFormatter = dateFormatter, context = context)
+        is UserEpisode -> userEpisodeSummaryText(userEpisode = this, dateFormatter = dateFormatter)
         else -> "".toSpannable()
     }
 }
@@ -44,7 +44,7 @@ private fun episodeSummaryText(episode: Episode, dateFormatter: RelativeDateForm
 
     val timeLeft = TimeHelper.getTimeLeft(episode.playedUpToMs, episode.durationMs.toLong(), episode.isInProgress, context)
     val duration = if (showDuration) " • ${timeLeft.text}" else ""
-    val text = "$startText${dateFormatter.format(episode.publishedDate, context.resources)}$duration".toSpannable()
+    val text = "$startText${dateFormatter.format(episode.publishedDate)}$duration".toSpannable()
     if (episode.episodeType != Episode.EpisodeType.Regular) {
         text[0, startText.replace(" • ", "").length] = ForegroundColorSpan(tintColor)
     }
@@ -52,6 +52,6 @@ private fun episodeSummaryText(episode: Episode, dateFormatter: RelativeDateForm
     return text
 }
 
-private fun userEpisodeSummaryText(userEpisode: UserEpisode, dateFormatter: RelativeDateFormatter, context: Context): Spannable {
-    return dateFormatter.format(userEpisode.publishedDate, context.resources).toSpannable()
+private fun userEpisodeSummaryText(userEpisode: UserEpisode, dateFormatter: RelativeDateFormatter): Spannable {
+    return dateFormatter.format(userEpisode.publishedDate).toSpannable()
 }
