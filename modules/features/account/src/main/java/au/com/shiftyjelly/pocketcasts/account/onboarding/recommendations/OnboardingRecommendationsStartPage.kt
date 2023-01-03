@@ -14,12 +14,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.progressSemantics
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,7 +86,7 @@ fun OnboardingRecommendationsStartPage(
     }
 
     Content(
-        sections = state.sections,
+        state = state,
         buttonRes = state.buttonRes,
         onImportClicked = {
             viewModel.onImportClick()
@@ -104,7 +107,7 @@ fun OnboardingRecommendationsStartPage(
 
 @Composable
 private fun Content(
-    sections: List<OnboardingRecommendationsStartPageViewModel.RecommendationSection>,
+    state: OnboardingRecommendationsStartPageViewModel.State,
     buttonRes: Int,
     onImportClicked: () -> Unit,
     onSubscribeTap: (OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) -> Unit,
@@ -164,12 +167,20 @@ private fun Content(
                 }
             }
 
-            sections.forEach { section ->
+            state.sections.forEach { section ->
                 section(
                     section = section,
                     onShowMore = { showMore(section.title) },
                     onSubscribeTap = onSubscribeTap
                 )
+            }
+
+            if (state.showLoadingSpinner) {
+                header {
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        CircularProgressIndicator(Modifier.progressSemantics().size(48.dp))
+                    }
+                }
             }
         }
 
@@ -244,8 +255,11 @@ private fun Preview(
 ) {
     AppThemeWithBackground(themeType) {
         Content(
-            emptyList(),
-            LR.string.not_now,
+            state = OnboardingRecommendationsStartPageViewModel.State(
+                sections = emptyList(),
+                showLoadingSpinner = true,
+            ),
+            buttonRes = LR.string.not_now,
             onImportClicked = {},
             onSubscribeTap = {},
             onSearch = {},

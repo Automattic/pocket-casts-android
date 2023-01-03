@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
@@ -15,9 +16,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -36,8 +36,10 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     app: Application,
 ) : AndroidViewModel(app) {
 
-    data class State(val sections: List<RecommendationSection>) {
-
+    data class State(
+        val sections: List<RecommendationSection>,
+        val showLoadingSpinner: Boolean,
+    ) {
         private val anySubscribed: Boolean = sections.any { it.anySubscribed }
 
         val buttonRes = if (anySubscribed) {
@@ -47,7 +49,10 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
 
         companion object {
-            val EMPTY = State(emptyList())
+            val EMPTY = State(
+                sections = emptyList(),
+                showLoadingSpinner = true
+            )
         }
     }
 
@@ -55,6 +60,11 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         val uuid: String,
         val title: String,
         val isSubscribed: Boolean,
+    )
+
+    private data class SectionInternal(
+        val title: String,
+        val podcasts: List<DiscoverPodcast>
     )
 
     data class RecommendationSection(
@@ -70,6 +80,35 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     val state: StateFlow<State> = _state
 
     init {
+        val subscriptionsFlow = podcastManager
+            .observeSubscribed()
+            .asFlow()
+            .map { subscribed ->
+                subscribed.map { it.uuid }
+            }
+
+        val flow = MutableStateFlow<List<SectionInternal>>(emptyList())
+
+        viewModelScope.launch {
+            combine(flow, subscriptionsFlow) { sections, subscriptions ->
+                sections.map { section ->
+                    val podcasts = section.podcasts.map { podcast ->
+                        RecommendationPodcast(
+                            uuid = podcast.uuid,
+                            title = podcast.title ?: "",
+                            isSubscribed = podcast.uuid in subscriptions,
+                        )
+                    }
+                    RecommendationSection(
+                        title = section.title,
+                        podcasts = podcasts,
+                    )
+                }
+            }.collect { sections ->
+                _state.update { it.copy(sections = sections) }
+            }
+        }
+
         viewModelScope.launch {
 
             val feed = try {
@@ -100,7 +139,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 getApplication<Application>().resources
             ) // Update the list with the correct region substituted in where needed
 
-            val trendingPodcastList = updatedList
+            val trendingPodcasts = updatedList
                 .find { it.id == "trending" }
                 ?.let { trendingRow ->
                     try {
@@ -113,79 +152,57 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                     }
                 }
 
+            if (trendingPodcasts != null) {
+                flow.emit(
+                    flow.value + SectionInternal(
+                        title = getApplication<Application>().resources.getString(LR.string.discover_trending),
+                        podcasts = trendingPodcasts
+                    )
+                )
+            }
+
             val categories = updatedList
-                .find { it.type is ListType.Categories } // only care about the trending list
+                .find { it.type is ListType.Categories }
                 ?.let { row ->
                     try {
                         repository
                             .getCategoriesList(row.source)
                             .await()
-                            .associate { rawCategory ->
-                                val category = rawCategory.transformWithReplacements(replacements, getApplication<Application>().resources)
-                                val podcasts = repository
-                                    .getListFeed(category.source).await()
-                                    .podcasts
-                                category.title to podcasts
+                            .map {
+                                it.transformWithReplacements(
+                                    replacements,
+                                    getApplication<Application>().resources
+                                )
                             }
                     } catch (e: Exception) {
                         Timber.e(e)
                         null
                     }
-                } ?: emptyMap()
+                } ?: emptyList()
 
-            if (trendingPodcastList == null) {
-                Timber.e("Could not get trending podcast list")
-                return@launch
-            }
-
-            podcastManager
-                .observeSubscribed()
-                .asFlow()
-                .map { subscribed ->
-                    val subscribedUuids = subscribed.map { it.uuid }
-                    val trendingPodcasts = trendingPodcastList.map { discoverPodcast ->
-                        RecommendationPodcast(
-                            uuid = discoverPodcast.uuid,
-                            title = discoverPodcast.title ?: "",
-                            isSubscribed = discoverPodcast.uuid in subscribedUuids
+            // Make network calls one at a time so the UI doesn't wait for all the
+            // calls to complete before updating and to maintain order
+            categories.forEach { category ->
+                repository
+                    .getListFeed(category.source).await()
+                    .podcasts?.let { podcasts ->
+                        flow.emit(
+                            flow.value + SectionInternal(
+                                title = category.title,
+                                podcasts = podcasts
+                            )
                         )
                     }
+            }
 
-                    val trendingSection = RecommendationSection(
-                        title = getApplication<Application>().resources.getString(LR.string.discover_trending),
-                        podcasts = trendingPodcasts
-                    )
-
-                    val categorySections = categories.mapNotNull { (title, podcasts) ->
-                        if (podcasts.isNullOrEmpty()) {
-                            null
-                        } else {
-                            RecommendationSection(
-                                title = title,
-                                podcasts = podcasts.map { podcast ->
-                                    RecommendationPodcast(
-                                        uuid = podcast.uuid,
-                                        title = podcast.title ?: "",
-                                        isSubscribed = podcast.uuid in subscribedUuids
-                                    )
-                                }
-                            )
-                        }
-                    }
-
-                    State(
-                        sections = listOf(trendingSection) + categorySections,
-                    )
-                }
-                .stateIn(viewModelScope)
-                .collectLatest { _state.value = it }
+            _state.update { it.copy(showLoadingSpinner = false) }
         }
     }
 
     fun showMore(sectionTitle: String) {
         _state.update { oldState ->
-            State(
-                oldState.sections.map {
+            oldState.copy(
+                sections = oldState.sections.map {
                     if (it.title == sectionTitle) {
                         it.copy(numToShow = it.numToShow + NUM_TO_SHOW_INCREASE)
                     } else {
@@ -226,7 +243,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
     }
 
-    fun updateSubscribed(podcast: OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) {
+    fun updateSubscribed(podcast: RecommendationPodcast) {
         if (podcast.isSubscribed) {
             podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, playbackManager = playbackManager)
         } else {
