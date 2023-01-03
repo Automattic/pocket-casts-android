@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
@@ -31,8 +32,8 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
     val analyticsTracker: AnalyticsTrackerWrapper,
-    repository: ListRepository,
-    settings: Settings,
+    private val repository: ListRepository,
+    private val settings: Settings,
     app: Application,
 ) : AndroidViewModel(app) {
 
@@ -80,120 +81,59 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     val state: StateFlow<State> = _state
 
     init {
-        val subscriptionsFlow = podcastManager
-            .observeSubscribed()
-            .asFlow()
-            .map { subscribed ->
-                subscribed.map { it.uuid }
-            }
-
-        val flow = MutableStateFlow<List<SectionInternal>>(emptyList())
-
         viewModelScope.launch {
-            combine(flow, subscriptionsFlow) { sections, subscriptions ->
-                sections.map { section ->
-                    val podcasts = section.podcasts.map { podcast ->
-                        RecommendationPodcast(
-                            uuid = podcast.uuid,
-                            title = podcast.title ?: "",
-                            isSubscribed = podcast.uuid in subscriptions,
+
+            val sectionsFlow = MutableStateFlow<List<SectionInternal>>(emptyList())
+            launch {
+                val subscriptionsFlow = podcastManager
+                    .observeSubscribed()
+                    .asFlow()
+                    .map { subscribed ->
+                        subscribed.map { it.uuid }
+                    }
+                combine(sectionsFlow, subscriptionsFlow) { sections, subscriptions ->
+                    sections.map { section ->
+                        val podcasts = section.podcasts.map { podcast ->
+                            RecommendationPodcast(
+                                uuid = podcast.uuid,
+                                title = podcast.title ?: "",
+                                isSubscribed = podcast.uuid in subscriptions,
+                            )
+                        }
+                        RecommendationSection(
+                            title = section.title,
+                            podcasts = podcasts,
                         )
                     }
-                    RecommendationSection(
-                        title = section.title,
-                        podcasts = podcasts,
-                    )
+                }.collect { sections ->
+                    _state.update { it.copy(sections = sections) }
                 }
-            }.collect { sections ->
-                _state.update { it.copy(sections = sections) }
             }
-        }
-
-        viewModelScope.launch {
 
             val feed = try {
                 repository.getDiscoverFeed().await()
             } catch (e: Exception) {
-                Timber.e(e)
+                Timber.e("Exception retrieving Discover feed: $e")
                 return@launch
             }
 
             val regionCode = settings.getDiscoveryCountryCode()
             val region = feed.regions[regionCode]
                 ?: feed.regions[feed.defaultRegionCode]
+                    .let {
+                        Timber.e("Could not get region for $regionCode")
+                        return@launch
+                    }
 
-            if (region == null) {
-                val message = "Could not get region $regionCode"
-                Timber.e(message)
-                return@launch
-            }
-
+            // Update list with the correct region substituted in where appropriate
             val replacements = mapOf(
                 feed.regionCodeToken to region.code,
                 feed.regionNameToken to region.name
             )
+            val updatedList = feed.layout.transformWithRegion(region, replacements, getApplication<Application>().resources)
 
-            val updatedList = feed.layout.transformWithRegion(
-                region,
-                replacements,
-                getApplication<Application>().resources
-            ) // Update the list with the correct region substituted in where needed
-
-            val trendingPodcasts = updatedList
-                .find { it.id == "trending" }
-                ?.let { trendingRow ->
-                    try {
-                        repository
-                            .getListFeed(trendingRow.source).await()
-                            .podcasts
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                        null
-                    }
-                }
-
-            if (trendingPodcasts != null) {
-                flow.emit(
-                    flow.value + SectionInternal(
-                        title = getApplication<Application>().resources.getString(LR.string.discover_trending),
-                        podcasts = trendingPodcasts
-                    )
-                )
-            }
-
-            val categories = updatedList
-                .find { it.type is ListType.Categories }
-                ?.let { row ->
-                    try {
-                        repository
-                            .getCategoriesList(row.source)
-                            .await()
-                            .map {
-                                it.transformWithReplacements(
-                                    replacements,
-                                    getApplication<Application>().resources
-                                )
-                            }
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                        null
-                    }
-                } ?: emptyList()
-
-            // Make network calls one at a time so the UI doesn't wait for all the
-            // calls to complete before updating and to maintain order
-            categories.forEach { category ->
-                repository
-                    .getListFeed(category.source).await()
-                    .podcasts?.let { podcasts ->
-                        flow.emit(
-                            flow.value + SectionInternal(
-                                title = category.title,
-                                podcasts = podcasts
-                            )
-                        )
-                    }
-            }
+            updateFlowWithTrending(sectionsFlow, updatedList)
+            updateFlowWithCategories(sectionsFlow, updatedList, replacements)
 
             _state.update { it.copy(showLoadingSpinner = false) }
         }
@@ -248,6 +188,73 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, playbackManager = playbackManager)
         } else {
             podcastManager.subscribeToPodcast(podcastUuid = podcast.uuid, sync = true)
+        }
+    }
+
+    private suspend fun updateFlowWithTrending(
+        sectionsFlow: MutableStateFlow<List<SectionInternal>>,
+        updatedList: List<DiscoverRow>
+    ) {
+        val trendingPodcasts = updatedList
+            .find { it.id == "trending" }
+            ?.let { trendingRow ->
+                try {
+                    repository
+                        .getListFeed(trendingRow.source).await()
+                        .podcasts
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    null
+                }
+            }
+
+        if (trendingPodcasts != null) {
+            sectionsFlow.emit(
+                sectionsFlow.value + SectionInternal(
+                    title = getApplication<Application>().resources.getString(LR.string.discover_trending),
+                    podcasts = trendingPodcasts
+                )
+            )
+        }
+    }
+
+    private suspend fun updateFlowWithCategories(
+        sectionsFlow: MutableStateFlow<List<SectionInternal>>,
+        updatedList: List<DiscoverRow>,
+        replacements: Map<String, String>
+    ) {
+        val categories = updatedList
+            .find { it.type is ListType.Categories }
+            ?.let { row ->
+                try {
+                    repository
+                        .getCategoriesList(row.source)
+                        .await()
+                        .map {
+                            it.transformWithReplacements(
+                                replacements,
+                                getApplication<Application>().resources
+                            )
+                        }
+                } catch (e: Exception) {
+                    Timber.e(e)
+                    null
+                }
+            } ?: emptyList()
+
+        // Make network calls one at a time so the UI doesn't wait for all the
+        // calls to complete before updating and to maintain order
+        categories.forEach { category ->
+            repository
+                .getListFeed(category.source).await()
+                .podcasts?.let { podcasts ->
+                    sectionsFlow.emit(
+                        sectionsFlow.value + SectionInternal(
+                            title = category.title,
+                            podcasts = podcasts
+                        )
+                    )
+                }
         }
     }
 
