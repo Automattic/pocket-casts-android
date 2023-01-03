@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.MaterialTheme
@@ -38,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -81,7 +83,7 @@ fun OnboardingRecommendationsStartPage(
     }
 
     Content(
-        trendingPodcasts = state.trendingPodcasts,
+        sections = state.sections,
         buttonRes = state.buttonRes,
         onImportClicked = {
             viewModel.onImportClick()
@@ -92,6 +94,7 @@ fun OnboardingRecommendationsStartPage(
             viewModel.onSearch()
             onSearch()
         },
+        showMore = viewModel::showMore,
         onComplete = {
             viewModel.onComplete()
             onComplete()
@@ -101,18 +104,20 @@ fun OnboardingRecommendationsStartPage(
 
 @Composable
 private fun Content(
-    trendingPodcasts: List<OnboardingRecommendationsStartPageViewModel.RecommendationPodcast>,
+    sections: List<OnboardingRecommendationsStartPageViewModel.RecommendationSection>,
     buttonRes: Int,
     onImportClicked: () -> Unit,
     onSubscribeTap: (OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) -> Unit,
     onSearch: () -> Unit,
+    showMore: (String) -> Unit,
     onComplete: () -> Unit,
 ) {
     Column {
 
+        val numToShowDefault = OnboardingRecommendationsStartPageViewModel.NUM_TO_SHOW_DEFAULT
         val numColumns = when (LocalConfiguration.current.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> 7
-            else -> 3
+            Configuration.ORIENTATION_LANDSCAPE -> numToShowDefault
+            else -> numToShowDefault / 2
         }
 
         LazyVerticalGrid(
@@ -156,46 +161,15 @@ private fun Content(
                         onClick = onSearch,
                         modifier = Modifier.padding(bottom = 25.dp)
                     )
-
-                    if (trendingPodcasts.isNotEmpty()) {
-                        TextH20(
-                            text = stringResource(LR.string.discover_trending),
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                    }
                 }
             }
 
-            items(items = trendingPodcasts) {
-
-                // Simulate minLines = 2
-                // This is a bit of a hack based on https://stackoverflow.com/a/66401128/1910286
-                // Google is working on adding a minLines capability though: https://issuetracker.google.com/issues/122476634
-                val twoLines = with(LocalDensity.current) {
-                    val pixelsInAPoint = 4 / 3
-                    val lineHeight = textH60FontSize * pixelsInAPoint
-                    val twoLines = lineHeight * 2
-                    twoLines.toDp()
-                }
-
-                Column(Modifier.semantics(mergeDescendants = true) {}) {
-                    PodcastSubscribeImage(
-                        podcastUuid = it.uuid,
-                        podcastTitle = it.title,
-                        podcastSubscribed = it.isSubscribed,
-                        onSubscribeClick = { onSubscribeTap(it) },
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    TextH60(
-                        text = it.title,
-                        maxLines = 2,
-                        modifier = Modifier
-                            .heightIn(min = twoLines)
-                            .clearAndSetSemantics {}
-                    )
-                }
+            sections.forEach { section ->
+                section(
+                    section = section,
+                    onShowMore = { showMore(section.title) },
+                    onSubscribeTap = onSubscribeTap
+                )
             }
         }
 
@@ -207,6 +181,62 @@ private fun Content(
     }
 }
 
+private fun LazyGridScope.section(
+    section: OnboardingRecommendationsStartPageViewModel.RecommendationSection,
+    onShowMore: () -> Unit,
+    onSubscribeTap: (OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) -> Unit
+) {
+    if (section.visiblePodcasts.isEmpty()) return
+
+    header {
+        TextH20(
+            text = section.title,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+    }
+
+    items(items = section.visiblePodcasts) {
+
+        // Simulate minLines = 2 since we can't do that directly
+        // This is a bit of a hack based on https://stackoverflow.com/a/66401128/1910286
+        // Google is working on adding a minLines capability though: https://issuetracker.google.com/issues/122476634
+        val twoLines = with(LocalDensity.current) {
+            val pixelsInAPoint = 4 / 3
+            val lineHeight = textH60FontSize * pixelsInAPoint
+            val twoLines = lineHeight * 2
+            twoLines.toDp()
+        }
+
+        Column(Modifier.semantics(mergeDescendants = true) {}) {
+            PodcastSubscribeImage(
+                podcastUuid = it.uuid,
+                podcastTitle = it.title,
+                podcastSubscribed = it.isSubscribed,
+                onSubscribeClick = { onSubscribeTap(it) },
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            TextH60(
+                text = it.title,
+                maxLines = 2,
+                modifier = Modifier
+                    .heightIn(min = twoLines)
+                    .clearAndSetSemantics {}
+            )
+        }
+    }
+
+    header {
+        RowOutlinedButton(
+            text = stringResource(LR.string.onboarding_recommendations_more, section.title),
+            includePadding = false,
+            onClick = onShowMore,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun Preview(
@@ -214,22 +244,13 @@ private fun Preview(
 ) {
     AppThemeWithBackground(themeType) {
         Content(
-            trendingPodcasts = listOf(
-                OnboardingRecommendationsStartPageViewModel.RecommendationPodcast(
-                    uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
-                    title = "Short title",
-                    isSubscribed = false,
-                ),
-                OnboardingRecommendationsStartPageViewModel.RecommendationPodcast(
-                    uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
-                    title = "A very very long title that is longer than will fit on two lines",
-                    isSubscribed = true,
-                )
-            ),
+            emptyList(),
             LR.string.not_now,
             onImportClicked = {},
             onSubscribeTap = {},
             onSearch = {},
-        ) {}
+            showMore = {},
+            onComplete = {}
+        )
     }
 }

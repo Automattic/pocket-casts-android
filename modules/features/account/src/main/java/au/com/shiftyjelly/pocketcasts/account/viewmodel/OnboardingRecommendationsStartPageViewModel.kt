@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
@@ -34,7 +36,10 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     app: Application,
 ) : AndroidViewModel(app) {
 
-    data class State(val trendingPodcasts: List<RecommendationPodcast>, private val anySubscribed: Boolean) {
+    data class State(val sections: List<RecommendationSection>) {
+
+        private val anySubscribed: Boolean = sections.any { it.anySubscribed }
+
         val buttonRes = if (anySubscribed) {
             LR.string.navigation_continue
         } else {
@@ -42,10 +47,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
 
         companion object {
-            val EMPTY = State(
-                trendingPodcasts = emptyList(),
-                anySubscribed = false
-            )
+            val EMPTY = State(emptyList())
         }
     }
 
@@ -54,6 +56,15 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         val title: String,
         val isSubscribed: Boolean,
     )
+
+    data class RecommendationSection(
+        val title: String,
+        val numToShow: Int = NUM_TO_SHOW_DEFAULT,
+        private val podcasts: List<RecommendationPodcast>,
+    ) {
+        val anySubscribed = podcasts.any { it.isSubscribed }
+        val visiblePodcasts = podcasts.take(numToShow)
+    }
 
     private val _state: MutableStateFlow<State> = MutableStateFlow(State.EMPTY)
     val state: StateFlow<State> = _state
@@ -89,8 +100,8 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 getApplication<Application>().resources
             ) // Update the list with the correct region substituted in where needed
 
-            val discoverPodcastList = updatedList
-                .find { it.id == "trending" } // only care about the trending list
+            val trendingPodcastList = updatedList
+                .find { it.id == "trending" }
                 ?.let { trendingRow ->
                     try {
                         repository
@@ -102,7 +113,27 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                     }
                 }
 
-            if (discoverPodcastList == null) {
+            val categories = updatedList
+                .find { it.type is ListType.Categories } // only care about the trending list
+                ?.let { row ->
+                    try {
+                        repository
+                            .getCategoriesList(row.source)
+                            .await()
+                            .associate { rawCategory ->
+                                val category = rawCategory.transformWithReplacements(replacements, getApplication<Application>().resources)
+                                val podcasts = repository
+                                    .getListFeed(category.source).await()
+                                    .podcasts
+                                category.title to podcasts
+                            }
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        null
+                    }
+                } ?: emptyMap()
+
+            if (trendingPodcastList == null) {
                 Timber.e("Could not get trending podcast list")
                 return@launch
             }
@@ -112,20 +143,56 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 .asFlow()
                 .map { subscribed ->
                     val subscribedUuids = subscribed.map { it.uuid }
-                    val trendingPodcasts = discoverPodcastList.map { discoverPodcast ->
+                    val trendingPodcasts = trendingPodcastList.map { discoverPodcast ->
                         RecommendationPodcast(
                             uuid = discoverPodcast.uuid,
                             title = discoverPodcast.title ?: "",
                             isSubscribed = discoverPodcast.uuid in subscribedUuids
                         )
                     }
+
+                    val trendingSection = RecommendationSection(
+                        title = getApplication<Application>().resources.getString(LR.string.discover_trending),
+                        podcasts = trendingPodcasts
+                    )
+
+                    val categorySections = categories.mapNotNull { (title, podcasts) ->
+                        if (podcasts.isNullOrEmpty()) {
+                            null
+                        } else {
+                            RecommendationSection(
+                                title = title,
+                                podcasts = podcasts.map { podcast ->
+                                    RecommendationPodcast(
+                                        uuid = podcast.uuid,
+                                        title = podcast.title ?: "",
+                                        isSubscribed = podcast.uuid in subscribedUuids
+                                    )
+                                }
+                            )
+                        }
+                    }
+
                     State(
-                        trendingPodcasts = trendingPodcasts,
-                        anySubscribed = subscribed.isNotEmpty()
+                        sections = listOf(trendingSection) + categorySections,
                     )
                 }
                 .stateIn(viewModelScope)
                 .collectLatest { _state.value = it }
+        }
+    }
+
+    fun showMore(sectionTitle: String) {
+        _state.update { oldState ->
+            State(
+                oldState.sections.map {
+                    if (it.title == sectionTitle) {
+                        it.copy(numToShow = it.numToShow + NUM_TO_SHOW_INCREASE)
+                    } else {
+                        it
+                    }
+                }
+            )
         }
     }
 
@@ -159,7 +226,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
     }
 
-    fun updateSubscribed(podcast: RecommendationPodcast) {
+    fun updateSubscribed(podcast: OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) {
         if (podcast.isSubscribed) {
             podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, playbackManager = playbackManager)
         } else {
@@ -169,5 +236,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
 
     companion object {
         private const val SUBSCRIPTIONS_PROP = "subscriptions"
+        const val NUM_TO_SHOW_DEFAULT = 6
+        private const val NUM_TO_SHOW_INCREASE = 6
     }
 }
