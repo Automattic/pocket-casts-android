@@ -531,7 +531,7 @@ class MainActivity :
     }
 
     override fun showStoriesOrAccount(source: String) {
-        if (viewModel.isSignedIn || !settings.endOfYearRequireLogin()) {
+        if (viewModel.isSignedIn) {
             showStories(StoriesSource.fromString(source))
         } else {
             viewModel.waitingForSignInToShowStories = true
