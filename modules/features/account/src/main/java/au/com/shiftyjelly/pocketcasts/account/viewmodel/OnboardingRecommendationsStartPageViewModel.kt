@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.await
 import timber.log.Timber
+import java.util.Locale
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -39,7 +41,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
 ) : AndroidViewModel(app) {
 
     data class State(
-        val sections: List<RecommendationSection>,
+        val sections: List<Section>,
         val showLoadingSpinner: Boolean,
     ) {
         private val anySubscribed: Boolean = sections.any { it.anySubscribed }
@@ -58,24 +60,32 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
     }
 
-    data class RecommendationPodcast(
+    data class SectionId(val value: String)
+
+    data class Podcast(
         val uuid: String,
         val title: String,
         val isSubscribed: Boolean,
     )
 
+    // This class exists to hold sections before they are merged with the data
+    // about the user's subscriptions to create a `RecommendationSection`.
     private data class SectionInternal(
         val title: String,
+        val sectionId: SectionId,
         val podcasts: List<DiscoverPodcast>
     )
 
-    data class RecommendationSection(
+    data class Section(
         val title: String,
+        val sectionId: SectionId,
         val numToShow: Int = NUM_TO_SHOW_DEFAULT,
-        private val podcasts: List<RecommendationPodcast>,
+        private val podcasts: List<Podcast>,
+        private val onShowMoreFun: (Section) -> Unit,
     ) {
         val anySubscribed = podcasts.any { it.isSubscribed }
         val visiblePodcasts = podcasts.take(numToShow)
+        fun onShowMore() = onShowMoreFun(this)
     }
 
     private val _state: MutableStateFlow<State> = MutableStateFlow(State.EMPTY)
@@ -95,15 +105,17 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 combine(sectionsFlow, subscriptionsFlow) { sections, subscriptions ->
                     sections.map { section ->
                         val podcasts = section.podcasts.map { podcast ->
-                            RecommendationPodcast(
+                            Podcast(
                                 uuid = podcast.uuid,
                                 title = podcast.title ?: "",
                                 isSubscribed = podcast.uuid in subscriptions,
                             )
                         }
-                        RecommendationSection(
+                        Section(
                             title = section.title,
+                            sectionId = section.sectionId,
                             podcasts = podcasts,
+                            onShowMoreFun = ::onShowMore,
                         )
                     }
                 }.collect { sections ->
@@ -140,11 +152,19 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
     }
 
-    fun showMore(sectionTitle: String) {
+    private fun onShowMore(section: Section) {
+        analyticsTracker.track(
+            AnalyticsEvent.RECOMMENDATIONS_MORE_TAPPED,
+            mapOf(
+                "section" to section.sectionId.value.lowercase(Locale.ENGLISH),
+                "number_visible" to section.numToShow,
+            ),
+        )
+
         _state.update { oldState ->
             oldState.copy(
                 sections = oldState.sections.map {
-                    if (it.title == sectionTitle) {
+                    if (it.sectionId == section.sectionId) {
                         it.copy(numToShow = it.numToShow + NUM_TO_SHOW_INCREASE)
                     } else {
                         it
@@ -184,7 +204,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
     }
 
-    fun updateSubscribed(podcast: RecommendationPodcast) {
+    fun updateSubscribed(podcast: Podcast) {
         if (podcast.isSubscribed) {
             podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, playbackManager = playbackManager)
         } else {
@@ -213,6 +233,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             sectionsFlow.emit(
                 sectionsFlow.value + SectionInternal(
                     title = getApplication<Application>().resources.getString(LR.string.discover_trending),
+                    sectionId = SectionId(NetworkLoadableList.TRENDING),
                     podcasts = trendingPodcasts
                 )
             )
@@ -243,8 +264,8 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 }
             } ?: emptyList()
 
-        // Make network calls one at a time so the UI doesn't wait for all the
-        // calls to complete before updating and to maintain order
+        // Make network calls one at a time so the UI can load the initial sections as quickly
+        // as possible, and to maintain the order of the sections
         categories.forEach { category ->
             repository
                 .getListFeed(category.source).await()
@@ -252,6 +273,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                     sectionsFlow.emit(
                         sectionsFlow.value + SectionInternal(
                             title = category.title.tryToLocalise(getApplication<Application>().resources),
+                            sectionId = SectionId(category.title),
                             podcasts = podcasts
                         )
                     )

@@ -40,6 +40,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.Podcast
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.Section
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.SectionId
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
@@ -97,7 +100,6 @@ fun OnboardingRecommendationsStartPage(
             viewModel.onSearch()
             onSearch()
         },
-        showMore = viewModel::showMore,
         onComplete = {
             viewModel.onComplete()
             onComplete()
@@ -110,9 +112,8 @@ private fun Content(
     state: OnboardingRecommendationsStartPageViewModel.State,
     buttonRes: Int,
     onImportClicked: () -> Unit,
-    onSubscribeTap: (OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) -> Unit,
+    onSubscribeTap: (Podcast) -> Unit,
     onSearch: () -> Unit,
-    showMore: (String) -> Unit,
     onComplete: () -> Unit,
 ) {
     Column {
@@ -170,7 +171,6 @@ private fun Content(
             state.sections.forEach { section ->
                 section(
                     section = section,
-                    onShowMore = { showMore(section.title) },
                     onSubscribeTap = onSubscribeTap
                 )
             }
@@ -193,9 +193,8 @@ private fun Content(
 }
 
 private fun LazyGridScope.section(
-    section: OnboardingRecommendationsStartPageViewModel.RecommendationSection,
-    onShowMore: () -> Unit,
-    onSubscribeTap: (OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) -> Unit
+    section: Section,
+    onSubscribeTap: (Podcast) -> Unit
 ) {
     if (section.visiblePodcasts.isEmpty()) return
 
@@ -242,7 +241,7 @@ private fun LazyGridScope.section(
         RowOutlinedButton(
             text = stringResource(LR.string.onboarding_recommendations_more, section.title),
             includePadding = false,
-            onClick = onShowMore,
+            onClick = section::onShowMore,
             modifier = Modifier.padding(bottom = 16.dp)
         )
     }
@@ -253,17 +252,39 @@ private fun LazyGridScope.section(
 private fun Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
+
+    fun podcast(isSubscribed: Boolean = false) = Podcast(
+        uuid = "5168e260-372e-013b-efad-0acc26574db2",
+        title = "Why Do We Do That?",
+        isSubscribed = isSubscribed
+    )
+
     AppThemeWithBackground(themeType) {
         Content(
             state = OnboardingRecommendationsStartPageViewModel.State(
-                sections = emptyList(),
+                sections = listOf(
+                    Section(
+                        title = "A Very Special Section",
+                        sectionId = SectionId(""),
+                        numToShow = 6,
+                        podcasts = listOf(
+                            podcast(),
+                            podcast(isSubscribed = true),
+                            podcast(),
+                            podcast(),
+                            podcast(),
+                            podcast(),
+                            podcast(),
+                        ),
+                        onShowMoreFun = {},
+                    )
+                ),
                 showLoadingSpinner = true,
             ),
             buttonRes = LR.string.not_now,
             onImportClicked = {},
             onSubscribeTap = {},
             onSearch = {},
-            showMore = {},
             onComplete = {}
         )
     }
