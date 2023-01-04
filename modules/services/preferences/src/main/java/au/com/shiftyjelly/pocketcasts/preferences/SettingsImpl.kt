@@ -1488,10 +1488,6 @@ class SettingsImpl @Inject constructor(
     override fun getEndOfYearModalHasBeenShown(): Boolean =
         getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, false)
 
-    override fun endOfYearRequireLogin(): Boolean {
-        return BuildConfig.END_OF_YEAR_REQUIRE_LOGIN
-    }
-
     override fun hasCompletedOnboarding() = getBoolean(COMPLETED_ONBOARDING_KEY, false)
 
     override fun setHasCompletedOnboarding() {

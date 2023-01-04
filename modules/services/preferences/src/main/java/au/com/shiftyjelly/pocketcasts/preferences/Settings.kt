@@ -602,7 +602,6 @@ interface Settings {
 
     fun setEndOfYearModalHasBeenShown(value: Boolean)
     fun getEndOfYearModalHasBeenShown(): Boolean
-    fun endOfYearRequireLogin(): Boolean
 
     fun hasCompletedOnboarding(): Boolean
     fun setHasCompletedOnboarding()
