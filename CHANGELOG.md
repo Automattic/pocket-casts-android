@@ -10,6 +10,8 @@
         ([#645](https://github.com/Automattic/pocket-casts-android/pull/645)).
     *   Display gravatar on profile screen
         ([#644](https://github.com/Automattic/pocket-casts-android/pull/644)).
+    *   Remove 2022 End of Year stats flow
+        ([#672](https://github.com/Automattic/pocket-casts-android/pull/672)).
 * Bug Fixes:
     *   Fixed podcast date format
         ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
