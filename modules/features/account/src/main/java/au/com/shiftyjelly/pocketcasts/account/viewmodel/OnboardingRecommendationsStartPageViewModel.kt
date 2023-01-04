@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -250,7 +251,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 .podcasts?.let { podcasts ->
                     sectionsFlow.emit(
                         sectionsFlow.value + SectionInternal(
-                            title = category.title,
+                            title = category.title.tryToLocalise(getApplication<Application>().resources),
                             podcasts = podcasts
                         )
                     )
