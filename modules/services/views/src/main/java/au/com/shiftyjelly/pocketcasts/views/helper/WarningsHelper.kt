@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import androidx.fragment.app.Fragment
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -41,7 +42,7 @@ class WarningsHelper @Inject constructor(
     fun streamingWarningDialog(
         episode: Playable,
         snackbarParentView: View? = null,
-        playbackSource: PlaybackManager.PlaybackSource
+        playbackSource: AnalyticsSource
     ): ConfirmationDialog {
         return streamingWarningDialog(onConfirm = {
             GlobalScope.launch {

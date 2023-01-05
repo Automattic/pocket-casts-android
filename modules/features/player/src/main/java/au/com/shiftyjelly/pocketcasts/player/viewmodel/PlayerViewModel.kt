@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -27,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -149,7 +149,7 @@ class PlayerViewModel @Inject constructor(
     ) {
         fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
     }
-    private val playbackSource = PlaybackSource.PLAYER
+    private val source = AnalyticsSource.PLAYER
     private val _showPlayerFlow = MutableSharedFlow<Unit>()
     val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
 
@@ -368,10 +368,10 @@ class PlayerViewModel @Inject constructor(
 
     fun play() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play clicked in player")
-        playbackManager.playQueue(playbackSource = playbackSource)
+        playbackManager.playQueue(playbackSource = source)
     }
 
-    fun playEpisode(uuid: String, playbackSource: PlaybackSource = PlaybackSource.UNKNOWN) {
+    fun playEpisode(uuid: String, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
         launch {
             val episode = episodeManager.findPlayableByUuid(uuid) ?: return@launch
             playbackManager.playNow(episode = episode, playbackSource = playbackSource)
@@ -379,11 +379,11 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun skipBackward() {
-        playbackManager.skipBackward(playbackSource = playbackSource)
+        playbackManager.skipBackward(playbackSource = source)
     }
 
     fun skipForward() {
-        playbackManager.skipForward(playbackSource = playbackSource)
+        playbackManager.skipForward(playbackSource = source)
     }
 
     fun onMarkAsPlayedClick() {
@@ -397,7 +397,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextEpisodeClick() {
-        playbackManager.playNextInQueue(playbackSource = playbackSource)
+        playbackManager.playNextInQueue(playbackSource = source)
     }
 
     private fun markAsPlayedConfirmed(episode: Playable) {

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -28,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
@@ -124,10 +124,10 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
 
-        playButtonListener.playbackSource = when (mode) {
-            Mode.Downloaded -> PlaybackSource.DOWNLOADS
-            Mode.Starred -> PlaybackSource.STARRED
-            Mode.History -> PlaybackSource.LISTENING_HISTORY
+        playButtonListener.source = when (mode) {
+            Mode.Downloaded -> AnalyticsSource.DOWNLOADS
+            Mode.Starred -> AnalyticsSource.STARRED
+            Mode.History -> AnalyticsSource.LISTENING_HISTORY
         }
     }
 

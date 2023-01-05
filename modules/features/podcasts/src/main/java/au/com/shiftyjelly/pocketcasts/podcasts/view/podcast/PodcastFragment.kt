@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
@@ -40,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -514,7 +514,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             }
         }
 
-        playButtonListener.playbackSource = PlaybackSource.PODCAST_SCREEN
+        playButtonListener.source = AnalyticsSource.PODCAST_SCREEN
         if (adapter == null) {
             adapter = PodcastAdapter(downloadManager, playbackManager, upNextQueue, settings, theme, fromListUuid, onHeaderSummaryToggled, onSubscribeClicked, onUnsubscribeClicked, onEpisodesOptionsClicked, onRowLongPress, onFoldersClicked, onNotificationsClicked, onSettingsClicked, playButtonListener, onRowClicked, onSearchQueryChanged, onSearchFocus, onShowArchivedClicked, multiSelectHelper, onArtworkLongClicked)
         }
