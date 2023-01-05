@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
-import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -151,7 +150,8 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             )
             val updatedList = feed.layout.transformWithRegion(region, replacements, getApplication<Application>().resources)
 
-            updateFlowWithTrending(sectionsFlow, updatedList)
+            updateFlowWith("featured", sectionsFlow, updatedList)
+            updateFlowWith("trending", sectionsFlow, updatedList)
             updateFlowWithCategories(sectionsFlow, updatedList, replacements)
 
             _state.update { it.copy(showLoadingSpinner = false) }
@@ -218,32 +218,38 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun updateFlowWithTrending(
+    private suspend fun updateFlowWith(
+        id: String,
         sectionsFlow: MutableStateFlow<List<SectionInternal>>,
         updatedList: List<DiscoverRow>
     ) {
-        val trendingPodcasts = updatedList
-            .find { it.id == "trending" }
-            ?.let { trendingRow ->
-                try {
-                    repository
-                        .getListFeed(trendingRow.source).await()
-                        .podcasts
-                } catch (e: Exception) {
-                    Timber.e(e)
-                    null
-                }
-            }
-
-        if (trendingPodcasts != null) {
-            sectionsFlow.emit(
-                sectionsFlow.value + SectionInternal(
-                    title = getApplication<Application>().resources.getString(LR.string.discover_trending),
-                    sectionId = SectionId(NetworkLoadableList.TRENDING),
-                    podcasts = trendingPodcasts
-                )
-            )
+        val listItem = updatedList.find { it.id == id }
+        if (listItem == null) {
+            Timber.e("Could not find section with id $id")
+            return
         }
+
+        val feed = try {
+            repository.getListFeed(listItem.source)
+                .await()
+                ?: return
+        } catch (e: Exception) {
+            Timber.e(e)
+            return
+        }
+
+        val podcasts = feed.podcasts
+        if (podcasts.isNullOrEmpty()) return
+
+        val title = listItem.title.tryToLocalise(getApplication<Application>().resources)
+
+        sectionsFlow.emit(
+            sectionsFlow.value + SectionInternal(
+                title = title,
+                sectionId = SectionId(id),
+                podcasts = podcasts
+            )
+        )
     }
 
     private suspend fun updateFlowWithCategories(
