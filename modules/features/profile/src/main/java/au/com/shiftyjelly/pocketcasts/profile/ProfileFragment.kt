@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,7 +20,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.account.AccountActivity
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingAnalyticsFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -195,8 +196,14 @@ class ProfileFragment : BaseFragment() {
                 val fragment = AccountDetailsFragment.newInstance()
                 (activity as FragmentHostListener).addFragment(fragment)
             } else {
-                val intent = Intent(activity, AccountActivity::class.java)
-                activity?.startActivity(intent)
+                if (activity is OnboardingLauncher) {
+                    (activity as OnboardingLauncher).openOnboardingFlow(OnboardingAnalyticsFlow.LOGGED_OUT)
+                } else {
+                    LogBuffer.e(
+                        LogBuffer.TAG_INVALID_STATE,
+                        "Unable to launch onboarding from ${ProfileFragment::class.simpleName} because its activity is not an ${OnboardingLauncher::class.simpleName}"
+                    )
+                }
             }
         }
 

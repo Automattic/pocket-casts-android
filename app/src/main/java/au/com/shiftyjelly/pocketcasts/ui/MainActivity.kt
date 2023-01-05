@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -30,6 +31,8 @@ import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingAnalyticsFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -135,6 +138,7 @@ class MainActivity :
     FragmentHostListener,
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
+    OnboardingLauncher,
     CoroutineScope {
 
     companion object {
@@ -183,6 +187,21 @@ class MainActivity :
     private lateinit var binding: ActivityMainBinding
     private lateinit var navigator: BottomNavigator
 
+    private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
+        when (result) {
+            OnboardingFinish.Completed -> {
+                settings.setHasCompletedOnboarding()
+            }
+            OnboardingFinish.CompletedGoToDiscover -> {
+                settings.setHasCompletedOnboarding()
+                openTab(VR.id.navigation_discover)
+            }
+            null -> {
+                Timber.e("Unexpected null result from onboarding activity")
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
         super.onCreate(savedInstanceState)
@@ -191,7 +210,7 @@ class MainActivity :
         val showOnboarding = !settings.hasCompletedOnboarding() && !settings.isLoggedIn()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
-            openOnboardingFlow()
+            openOnboardingFlow(OnboardingAnalyticsFlow.INITIAL_ONBOARDING)
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -290,21 +309,8 @@ class MainActivity :
         updateSystemColors()
     }
 
-    private fun openOnboardingFlow() {
-        registerForActivityResult(OnboardingActivityContract()) { result ->
-            when (result) {
-                OnboardingFinish.Completed -> {
-                    settings.setHasCompletedOnboarding()
-                }
-                OnboardingFinish.CompletedGoToDiscover -> {
-                    settings.setHasCompletedOnboarding()
-                    openTab(VR.id.navigation_discover)
-                }
-                null -> {
-                    Timber.e("Unexpected null result from onboarding activity")
-                }
-            }
-        }.launch(Intent(this, OnboardingActivity::class.java))
+    override fun openOnboardingFlow(onboardingAnalyticsFlow: OnboardingAnalyticsFlow) {
+        onboardingLauncher.launch(OnboardingActivity.newInstance(this, onboardingAnalyticsFlow))
     }
 
     override fun onStart() {

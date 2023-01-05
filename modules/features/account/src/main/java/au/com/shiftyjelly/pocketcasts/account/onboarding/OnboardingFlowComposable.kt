@@ -1,11 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.flow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.recommendationsSource
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
@@ -19,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 @Composable
 fun OnboardingFlowComposable(
     theme: Theme.ThemeType,
+    analyticsFlow: String,
     completeOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
     signInState: SignInState?
@@ -31,11 +30,11 @@ fun OnboardingFlowComposable(
             startDestination = OnboardingNavRoute.logInOrSignUp
         ) {
 
-            importFlowGraph(theme, navController, flow)
+            importFlowGraph(theme, navController, analyticsFlow)
 
             onboardingRecommendationsFlowGraph(
                 theme = theme,
-                flow = flow,
+                flow = analyticsFlow,
                 onBackPressed = completeOnboarding,
                 onComplete = {
                     navController.navigate(OnboardingNavRoute.plusUpgrade)
@@ -46,7 +45,7 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
                     theme = theme,
-                    flow = flow,
+                    flow = analyticsFlow,
                     onDismiss = { completeOnboarding() },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                     onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
@@ -92,7 +91,7 @@ fun OnboardingFlowComposable(
 
             composable(OnboardingNavRoute.plusUpgrade) {
                 OnboardingPlusUpgradeFlow(
-                    flow = flow,
+                    flow = analyticsFlow,
                     source = recommendationsSource,
                     onBackPressed = { navController.popBackStack() },
                     onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
@@ -110,7 +109,7 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
                     activeTheme = theme,
-                    flow = flow,
+                    flow = analyticsFlow,
                     isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
                     onDone = completeOnboarding,
                     onContinueToDiscover = completeOnboardingToDiscover,
@@ -123,7 +122,6 @@ fun OnboardingFlowComposable(
 }
 
 private object AnalyticsProp {
-    const val flow = "initial_onboarding"
     const val recommendationsSource = "recommendations"
 }
 

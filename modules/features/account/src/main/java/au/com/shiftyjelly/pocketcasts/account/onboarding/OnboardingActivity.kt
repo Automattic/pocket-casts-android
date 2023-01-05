@@ -1,12 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -30,8 +32,13 @@ class OnboardingActivity : AppCompatActivity() {
         setContent {
             val signInState by userManager.getSignInState().asFlow().collectAsState(null)
 
+            val analyticsFlow = remember(savedInstanceState) {
+                intent?.extras?.getString(ANALYTICS_FLOW_KEY)
+            } ?: throw IllegalStateException("Analytics flow not set")
+
             OnboardingFlowComposable(
                 theme = theme.activeTheme,
+                analyticsFlow = analyticsFlow,
                 completeOnboarding = { finishWithResult(OnboardingFinish.Completed) },
                 completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.CompletedGoToDiscover) },
                 signInState = signInState,
@@ -47,5 +54,14 @@ class OnboardingActivity : AppCompatActivity() {
             }
         )
         finish()
+    }
+
+    companion object {
+        fun newInstance(context: Context, onboardingAnalyticsFlow: OnboardingAnalyticsFlow) =
+            Intent(context, OnboardingActivity::class.java).apply {
+                putExtra(ANALYTICS_FLOW_KEY, onboardingAnalyticsFlow.value)
+            }
+
+        private const val ANALYTICS_FLOW_KEY = "analytics_flow"
     }
 }
