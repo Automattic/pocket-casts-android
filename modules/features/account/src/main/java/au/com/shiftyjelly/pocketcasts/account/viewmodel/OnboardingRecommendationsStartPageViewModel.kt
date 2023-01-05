@@ -104,6 +104,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                     }
                 combine(sectionsFlow, subscriptionsFlow) { sections, subscriptions ->
                     sections.map { section ->
+
                         val podcasts = section.podcasts.map { podcast ->
                             Podcast(
                                 uuid = podcast.uuid,
@@ -112,19 +113,16 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                             )
                         }
 
-                        // use the previous value if it exists
-                        val numToShow = state.value.sections
+                        _state.value.sections
                             .find { it.sectionId == section.sectionId }
-                            ?.numToShow
-                            ?: NUM_TO_SHOW_DEFAULT
-
-                        Section(
-                            title = section.title,
-                            sectionId = section.sectionId,
-                            podcasts = podcasts,
-                            numToShow = numToShow,
-                            onShowMoreFun = ::onShowMore,
-                        )
+                            ?.copy(podcasts = podcasts) // update previous section if it exists
+                            ?: Section( // otherwise create a new section
+                                title = section.title,
+                                sectionId = section.sectionId,
+                                podcasts = podcasts,
+                                numToShow = NUM_TO_SHOW_DEFAULT,
+                                onShowMoreFun = ::onShowMore,
+                            )
                     }
                 }.collect { sections ->
                     _state.update { it.copy(sections = sections) }
