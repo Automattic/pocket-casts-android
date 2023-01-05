@@ -79,7 +79,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     data class Section(
         val title: String,
         val sectionId: SectionId,
-        val numToShow: Int = NUM_TO_SHOW_DEFAULT,
+        val numToShow: Int,
         private val podcasts: List<Podcast>,
         private val onShowMoreFun: (Section) -> Unit,
     ) {
@@ -111,10 +111,18 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                                 isSubscribed = podcast.uuid in subscriptions,
                             )
                         }
+
+                        // use the previous value if it exists
+                        val numToShow = state.value.sections
+                            .find { it.sectionId == section.sectionId }
+                            ?.numToShow
+                            ?: NUM_TO_SHOW_DEFAULT
+
                         Section(
                             title = section.title,
                             sectionId = section.sectionId,
                             podcasts = podcasts,
+                            numToShow = numToShow,
                             onShowMoreFun = ::onShowMore,
                         )
                     }
