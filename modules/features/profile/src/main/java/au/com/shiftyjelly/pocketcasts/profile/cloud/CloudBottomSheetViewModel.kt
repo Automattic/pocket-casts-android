@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -35,10 +36,12 @@ class CloudBottomSheetViewModel @Inject constructor(
     private val downloadManager: DownloadManager,
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics,
     userManager: UserManager
 ) : ViewModel() {
     lateinit var state: LiveData<BottomSheetState>
     var signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    private val source = AnalyticsSource.FILES
 
     fun setup(uuid: String) {
         val isPlayingFlowable = playbackManager.playbackStateRelay.filter { it.episodeUuid == uuid }.map { it.isPlaying }.startWith(false).toFlowable(BackpressureStrategy.LATEST)
@@ -62,6 +65,7 @@ class CloudBottomSheetViewModel @Inject constructor(
 
     fun uploadEpisode(episode: UserEpisode) {
         userEpisodeManager.uploadToServer(episode, waitForWifi = false)
+        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_QUEUED, source = source, uuid = episode.uuid)
     }
 
     fun removeEpisode(episode: UserEpisode) {
@@ -72,6 +76,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun cancelUpload(episode: UserEpisode) {
         userEpisodeManager.cancelUpload(episode)
         trackOptionTapped(CANCEL_UPLOAD)
+        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_CANCELLED, source = source, uuid = episode.uuid)
     }
 
     fun cancelDownload(episode: UserEpisode) {
@@ -121,12 +126,12 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun playNow(episode: UserEpisode, forceStream: Boolean) {
-        playbackManager.playNow(episode = episode, forceStream = forceStream, playbackSource = AnalyticsSource.FILES)
+        playbackManager.playNow(episode = episode, forceStream = forceStream, playbackSource = source)
         analyticsTracker.track(AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED, mapOf(OPTION_KEY to PLAY))
     }
 
     fun pause() {
-        playbackManager.pause(playbackSource = AnalyticsSource.FILES)
+        playbackManager.pause(playbackSource = source)
         analyticsTracker.track(AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED, mapOf(OPTION_KEY to PAUSE))
     }
 

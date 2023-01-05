@@ -7,6 +7,9 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -121,7 +124,9 @@ class UserEpisodeManagerImpl @Inject constructor(
     val settings: Settings,
     val subscriptionManager: SubscriptionManager,
     val downloadManager: DownloadManager,
-    @ApplicationContext val context: Context
+    @ApplicationContext val context: Context,
+    val analyticsTracker: AnalyticsTrackerWrapper,
+    val episodeAnalytics: EpisodeAnalytics
 ) : UserEpisodeManager, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
@@ -464,6 +469,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                     }
                     .flatMapCompletable { success ->
                         if (success) {
+                            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FINISHED, uuid = userEpisode.uuid)
                             userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
                         } else {
                             userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, "Upload failed")
