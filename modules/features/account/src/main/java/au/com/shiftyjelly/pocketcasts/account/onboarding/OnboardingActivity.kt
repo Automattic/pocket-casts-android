@@ -34,7 +34,6 @@ class OnboardingActivity : AppCompatActivity() {
                 theme = theme.activeTheme,
                 completeOnboarding = { finishWithResult(OnboardingFinish.Completed) },
                 completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.CompletedGoToDiscover) },
-                abortOnboarding = { finishWithResult(OnboardingFinish.AbortedOnboarding) },
                 signInState = signInState,
             )
         }

@@ -1,11 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.flow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.recommendationsSource
@@ -23,28 +21,10 @@ fun OnboardingFlowComposable(
     theme: Theme.ThemeType,
     completeOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
-    abortOnboarding: () -> Unit,
     signInState: SignInState?
 ) {
     AppThemeWithBackground(theme) {
         val navController = rememberNavController()
-
-        val backStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = backStackEntry?.destination?.route
-
-        BackHandler {
-            val failedToPop = !navController.popBackStack()
-            if (failedToPop) {
-                // The ony time the back stack will be empty and the user is aborting
-                // onboarding is from the logInOrSignUp screen
-                val abortingOnboarding = currentDestination == OnboardingNavRoute.logInOrSignUp
-                if (abortingOnboarding) {
-                    abortOnboarding()
-                } else {
-                    completeOnboarding()
-                }
-            }
-        }
 
         NavHost(
             navController = navController,

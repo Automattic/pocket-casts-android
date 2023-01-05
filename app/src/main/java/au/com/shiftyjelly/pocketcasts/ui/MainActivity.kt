@@ -300,9 +300,6 @@ class MainActivity :
                     settings.setHasCompletedOnboarding()
                     openTab(VR.id.navigation_discover)
                 }
-                OnboardingFinish.AbortedOnboarding -> {
-                    finish()
-                }
                 null -> {
                     Timber.e("Unexpected null result from onboarding activity")
                 }
