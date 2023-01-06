@@ -303,6 +303,7 @@ enum class AnalyticsEvent(val key: String) {
     RECOMMENDATIONS_DISMISSED("recommendations_dismissed"),
     RECOMMENDATIONS_SEARCH_TAPPED("recommendations_search_tapped"),
     RECOMMENDATIONS_IMPORT_TAPPED("recommendations_import_tapped"),
+    RECOMMENDATIONS_MORE_TAPPED("recommendations_more_tapped"),
     RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
 
     /* End of Year */
