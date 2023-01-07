@@ -198,6 +198,7 @@ project.ext {
             exoplayerUi: "com.google.android.exoplayer:exoplayer-ui:$versionExoplayer",
             exoplayerMediaSession: "com.google.android.exoplayer:extension-mediasession:$versionExoplayer",
             exoplayerCast: "com.google.android.exoplayer:extension-cast:$versionExoplayer",
+            exoplayerHls: "com.google.android.exoplayer:exoplayer-hls:$versionExoplayer",
             // Material Dialog - https://github.com/afollestad/material-dialogs
             materialDialog: "com.afollestad.material-dialogs:core:3.3.0",
             // Glide (image loading) - https://github.com/bumptech/glide

@@ -20,6 +20,8 @@ import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp3.Mp3Extractor
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
@@ -254,8 +256,12 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         } ?: return
 
         val mediaItem = MediaItem.fromUri(uri)
-        val source = ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
+        val source = if (isHLS) {
+            HlsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
+        } else {
+            ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
             .createMediaSource(mediaItem)
+        }
         player.setMediaSource(source)
         player.prepare()
 

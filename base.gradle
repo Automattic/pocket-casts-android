@@ -214,6 +214,7 @@ dependencies {
     implementation libs.exoplayerUi
     implementation libs.exoplayerMediaSession
     implementation libs.exoplayerCast
+    implementation libs.exoplayerHls
     implementation libs.glide
     implementation libs.glideOkHttp
     implementation libs.coil
