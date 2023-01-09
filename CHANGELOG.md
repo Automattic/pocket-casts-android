@@ -7,6 +7,8 @@
         ([#583](https://github.com/Automattic/pocket-casts-android/pull/583)).
     *   Add categories to recommendations screen
         ([#675](https://github.com/Automattic/pocket-casts-android/pull/675)).
+    *   Improved the Android Automotive search
+        ([#681](https://github.com/Automattic/pocket-casts-android/pull/681)).
 
 7.29
 -----

@@ -661,7 +661,7 @@ class MediaSessionManager(
      * ‘Listen to [filter name] in Pocket Casts’
      * ‘Listen to Up Next in Pocket Casts’
      * ‘Play Up Next in Pocket Casts’
-     * ‘Play New Releasees Next in Pocket Casts’
+     * ‘Play New Releases Next in Pocket Casts’
      */
     private fun performPlayFromSearch(searchTerm: String?) {
         Timber.d("performSearch $searchTerm")
