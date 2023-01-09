@@ -7,6 +7,7 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.BuildConfig
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -58,7 +59,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
      * It's common for the One Tap to fail so then try the legacy Google Sign-In.
      */
     fun startGoogleOneTapSignIn(
-        flow: String,
+        flow: OnboardingFlow,
         onSuccess: (IntentSenderRequest) -> Unit,
         onError: suspend () -> Unit,
     ) {
@@ -149,28 +150,28 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
         }
     }
 
-    fun onShown(flow: String) {
+    fun onShown(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_SHOWN,
             mapOf(AnalyticsProp.flow(flow))
         )
     }
 
-    fun onDismiss(flow: String) {
+    fun onDismiss(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_DISMISSED,
             mapOf(AnalyticsProp.flow(flow))
         )
     }
 
-    fun onSignUpClicked(flow: String) {
+    fun onSignUpClicked(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
             mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.createAccount)
         )
     }
 
-    fun onLoginClicked(flow: String) {
+    fun onLoginClicked(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
             mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn)
@@ -192,7 +193,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
 
     companion object {
         private object AnalyticsProp {
-            fun flow(s: String) = "flow" to s
+            fun flow(flow: OnboardingFlow) = "flow" to flow.analyticsValue
             object ButtonTapped {
                 private const val button = "button"
                 val signIn = button to "sign_in"

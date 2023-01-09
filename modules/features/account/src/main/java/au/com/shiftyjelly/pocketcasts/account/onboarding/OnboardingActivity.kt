@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -30,19 +31,28 @@ class OnboardingActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val signInState by userManager.getSignInState().asFlow().collectAsState(null)
+            val signInState = userManager.getSignInState().asFlow().collectAsState(null)
+            val currentSignInState = signInState.value
 
-            val analyticsFlow = remember(savedInstanceState) {
-                intent?.extras?.getString(ANALYTICS_FLOW_KEY)
-            } ?: throw IllegalStateException("Analytics flow not set")
+            if (currentSignInState != null) {
 
-            OnboardingFlowComposable(
-                theme = theme.activeTheme,
-                analyticsFlow = analyticsFlow,
-                completeOnboarding = { finishWithResult(OnboardingFinish.Completed) },
-                completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.CompletedGoToDiscover) },
-                signInState = signInState,
-            )
+                val onboardingFlow = remember(savedInstanceState) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        intent?.getParcelableExtra(ANALYTICS_FLOW_KEY, OnboardingFlow::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        intent?.getParcelableExtra(ANALYTICS_FLOW_KEY) as OnboardingFlow?
+                    }
+                } ?: throw IllegalStateException("Analytics flow not set")
+
+                OnboardingFlowComposable(
+                    theme = theme.activeTheme,
+                    flow = onboardingFlow,
+                    exitOnboarding = { finishWithResult(OnboardingFinish.Completed) },
+                    completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.CompletedGoToDiscover) },
+                    signInState = currentSignInState,
+                )
+            }
         }
     }
 
@@ -57,9 +67,9 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun newInstance(context: Context, onboardingAnalyticsFlow: OnboardingAnalyticsFlow) =
+        fun newInstance(context: Context, onboardingFlow: OnboardingFlow) =
             Intent(context, OnboardingActivity::class.java).apply {
-                putExtra(ANALYTICS_FLOW_KEY, onboardingAnalyticsFlow.value)
+                putExtra(ANALYTICS_FLOW_KEY, onboardingFlow)
             }
 
         private const val ANALYTICS_FLOW_KEY = "analytics_flow"

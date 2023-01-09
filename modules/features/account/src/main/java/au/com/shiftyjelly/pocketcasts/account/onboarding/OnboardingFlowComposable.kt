@@ -1,43 +1,55 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import android.os.Build
+import android.os.Bundle
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.account.onboarding.AnalyticsProp.recommendationsSource
+import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow.UpgradeSource
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import java.io.Serializable
 
 @Composable
 fun OnboardingFlowComposable(
     theme: Theme.ThemeType,
-    analyticsFlow: String,
-    completeOnboarding: () -> Unit,
+    flow: OnboardingFlow,
+    exitOnboarding: () -> Unit,
     completeOnboardingToDiscover: () -> Unit,
-    signInState: SignInState?
+    signInState: SignInState
 ) {
     AppThemeWithBackground(theme) {
         val navController = rememberNavController()
 
-        NavHost(
-            navController = navController,
-            startDestination = OnboardingNavRoute.logInOrSignUp
-        ) {
+        val startDestination = when (flow) {
+            OnboardingFlow.LoggedOut,
+            OnboardingFlow.InitialOnboarding -> OnboardingNavRoute.logInOrSignUp
 
-            importFlowGraph(theme, navController, analyticsFlow)
+            // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here because
+            // the startDestination cannot be dynamic, see https://stackoverflow.com/a/70410872/1910286
+            is OnboardingFlow.PlusFlow -> OnboardingNavRoute.PlusUpgrade.route
+        }
+
+        NavHost(navController, startDestination) {
+
+            importFlowGraph(theme, navController, flow)
 
             onboardingRecommendationsFlowGraph(
                 theme = theme,
-                flow = analyticsFlow,
-                onBackPressed = completeOnboarding,
+                flow = flow,
+                onBackPressed = exitOnboarding,
                 onComplete = {
-                    navController.navigate(OnboardingNavRoute.plusUpgrade)
+                    val route = OnboardingNavRoute.PlusUpgrade.routeWithSource(UpgradeSource.RECOMMENDATIONS)
+                    navController.navigate(route)
                 },
                 navController = navController,
             )
@@ -45,8 +57,8 @@ fun OnboardingFlowComposable(
             composable(OnboardingNavRoute.logInOrSignUp) {
                 OnboardingLoginOrSignUpPage(
                     theme = theme,
-                    flow = analyticsFlow,
-                    onDismiss = { completeOnboarding() },
+                    flow = flow,
+                    onDismiss = { exitOnboarding() },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                     onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
                     onContinueWithGoogleClicked = { navController.navigate(OnboardingNavRoute.logInGoogle) },
@@ -72,7 +84,7 @@ fun OnboardingFlowComposable(
                 OnboardingLoginPage(
                     theme = theme,
                     onBackPressed = { navController.popBackStack() },
-                    onLoginComplete = completeOnboarding,
+                    onLoginComplete = exitOnboarding,
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
             }
@@ -85,52 +97,107 @@ fun OnboardingFlowComposable(
                 OnboardingForgotPasswordPage(
                     theme = theme,
                     onBackPressed = { navController.popBackStack() },
-                    onCompleted = completeOnboarding,
+                    onCompleted = exitOnboarding,
                 )
             }
 
-            composable(OnboardingNavRoute.plusUpgrade) {
+            composable(
+                route = OnboardingNavRoute.PlusUpgrade.route,
+                arguments = listOf(
+                    navArgument(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey) {
+                        type = NavType.EnumType(UpgradeSource::class.java)
+                    }
+                )
+            ) { navBackStackEntry ->
+
+                val upgradeSource = navBackStackEntry.arguments
+                    ?.getSerializableCompat(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey, UpgradeSource::class.java)
+                    // If null, that means upgradeSource was not passed as an argument, so this must be the
+                    // startDestination. We have to use the flow to get the upgradeSource when this is
+                    // the startDestination because arguments can not be passed in the startDestination,
+                    // see https://stackoverflow.com/a/70410872/1910286. In that case, the flow should
+                    // always be a PlusFlow, but the compiler doesn't enforce that.
+                    ?: when (flow) {
+                        is OnboardingFlow.PlusFlow -> flow.source
+                        else -> throw IllegalStateException("upgradeSource not set")
+                    }
+
                 OnboardingPlusUpgradeFlow(
-                    flow = analyticsFlow,
-                    source = recommendationsSource,
-                    onBackPressed = { navController.popBackStack() },
-                    onNotNowPressed = { navController.navigate(OnboardingNavRoute.welcome) },
-                    onCompleteUpgrade = {
-                        navController.navigate(OnboardingNavRoute.welcome) {
-                            // Don't allow navigation back to the upgrade screen after the user upgrades
-                            popUpTo(OnboardingNavRoute.plusUpgrade) {
-                                inclusive = true
-                            }
+                    flow = flow,
+                    source = upgradeSource,
+                    isLoggedIn = signInState.isSignedIn,
+                    onBackPressed = {
+                        when (upgradeSource) {
+                            UpgradeSource.NEEDS_LOGIN,
+                            UpgradeSource.PROFILE -> exitOnboarding()
+                            UpgradeSource.RECOMMENDATIONS -> navController.popBackStack()
                         }
                     },
+                    onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
+                    onProceed = {
+                        when (upgradeSource) {
+                            UpgradeSource.NEEDS_LOGIN,
+                            UpgradeSource.PROFILE -> { exitOnboarding() }
+                            UpgradeSource.RECOMMENDATIONS -> { navController.navigate(OnboardingNavRoute.welcome) }
+                        }
+                        navController.navigate(OnboardingNavRoute.welcome)
+                    }
                 )
             }
 
             composable(OnboardingNavRoute.welcome) {
                 OnboardingWelcomePage(
                     activeTheme = theme,
-                    flow = analyticsFlow,
-                    isSignedInAsPlus = signInState?.isSignedInAsPlus ?: false,
-                    onDone = completeOnboarding,
+                    flow = flow,
+                    isSignedInAsPlus = signInState.isSignedInAsPlus,
+                    onDone = exitOnboarding,
                     onContinueToDiscover = completeOnboardingToDiscover,
                     onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
-                    onBackPressed = { navController.popBackStack() },
+                    onBackPressed = {
+                        // Don't allow navigation back to the upgrade screen after the user upgrades
+                        if (signInState.isSignedInAsPlus) {
+                            exitOnboarding()
+                        } else {
+                            navController.popBackStack()
+                        }
+                    },
                 )
             }
         }
     }
 }
 
-private object AnalyticsProp {
-    const val recommendationsSource = "recommendations"
-}
+private fun <T : Serializable> Bundle.getSerializableCompat(key: String, clazz: Class<T>): T? =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getSerializable(key, clazz)
+    } else {
+        @Suppress("DEPRECATION")
+        getSerializable(key)?.let { result ->
+            if (clazz.isInstance(result)) {
+                @Suppress("UNCHECKED_CAST")
+                result as T
+            } else {
+                null
+            }
+        }
+    }
 
 private object OnboardingNavRoute {
+
     const val createFreeAccount = "create_free_account"
     const val forgotPassword = "forgot_password"
     const val logIn = "log_in"
     const val logInGoogle = "log_in_google"
     const val logInOrSignUp = "log_in_or_sign_up"
-    const val plusUpgrade = "upgrade_upgrade"
     const val welcome = "welcome"
+
+    object PlusUpgrade {
+        private const val routeBase = "plus_upgrade"
+
+        const val sourceArgumentKey = "source"
+        // The route variable should only be used to navigate to the PlusUpgrade screens
+        // when they are the startDestination. In all other cases, use the routeWithSource function.
+        const val route = "$routeBase/{$sourceArgumentKey}"
+        fun routeWithSource(source: UpgradeSource) = "$routeBase/$source"
+    }
 }

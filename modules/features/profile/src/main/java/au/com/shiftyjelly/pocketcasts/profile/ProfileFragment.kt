@@ -20,8 +20,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingAnalyticsFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow.UpgradeSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -37,8 +38,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.SettingsAdapter
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
 import au.com.shiftyjelly.pocketcasts.settings.util.SettingsHelper
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -46,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -196,14 +194,7 @@ class ProfileFragment : BaseFragment() {
                 val fragment = AccountDetailsFragment.newInstance()
                 (activity as FragmentHostListener).addFragment(fragment)
             } else {
-                if (activity is OnboardingLauncher) {
-                    (activity as OnboardingLauncher).openOnboardingFlow(OnboardingAnalyticsFlow.LOGGED_OUT)
-                } else {
-                    LogBuffer.e(
-                        LogBuffer.TAG_INVALID_STATE,
-                        "Unable to launch onboarding from ${ProfileFragment::class.simpleName} because its activity is not an ${OnboardingLauncher::class.simpleName}"
-                    )
-                }
+                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
             }
         }
 
@@ -221,7 +212,10 @@ class ProfileFragment : BaseFragment() {
 
         upgradeLayout.lblGetMore.text = getString(LR.string.profile_help_support)
         upgradeLayout.root.setOnClickListener {
-            PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Profile).show(childFragmentManager, "upgradebottomsheet")
+            OnboardingLauncher.openOnboardingFlow(
+                activity = activity,
+                onboardingFlow = OnboardingFlow.PlusUpsell(UpgradeSource.PROFILE)
+            )
         }
 
         viewModel.refreshObservable.observe(viewLifecycleOwner) { state ->

@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.AndroidViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,30 +35,21 @@ class OnboardingPlusFeaturesViewModel @Inject constructor(
         }
     }
 
-    fun onShown(flow: String, source: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLUS_PROMOTION_SHOWN,
-            mapOf(flowKey to flow, sourceKey to source)
-        )
+    fun onShown(flow: OnboardingFlow, source: OnboardingPlusUpgradeFlow.UpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, analyticsProps(flow, source))
     }
 
-    fun onDismiss(flow: String, source: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLUS_PROMOTION_DISMISSED,
-            mapOf(flowKey to flow, sourceKey to source)
-        )
+    fun onDismiss(flow: OnboardingFlow, source: OnboardingPlusUpgradeFlow.UpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, analyticsProps(flow, source))
     }
 
-    fun onUpgradePressed(flow: String, source: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED,
-            mapOf(flowKey to flow, sourceKey to source)
-        )
+    fun onUpgradePressed(flow: OnboardingFlow, source: OnboardingPlusUpgradeFlow.UpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
     companion object {
-        private const val flowKey = "flow"
-        private const val sourceKey = "source"
+        private fun analyticsProps(flow: OnboardingFlow, source: OnboardingPlusUpgradeFlow.UpgradeSource) =
+            mapOf("flow" to flow.analyticsValue, "source" to source.analyticsValue)
     }
 }
 

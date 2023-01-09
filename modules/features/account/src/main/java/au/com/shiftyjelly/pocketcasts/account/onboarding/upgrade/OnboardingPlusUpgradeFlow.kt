@@ -40,6 +40,7 @@ import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.UnselectedPlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
@@ -50,18 +51,18 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import kotlinx.coroutines.NonDisposableHandle.parent
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnboardingPlusUpgradeFlow(
-    flow: String,
-    source: String,
-    onNotNowPressed: () -> Unit,
+    flow: OnboardingFlow,
+    source: OnboardingPlusUpgradeFlow.UpgradeSource,
+    isLoggedIn: Boolean,
     onBackPressed: () -> Unit,
-    onCompleteUpgrade: () -> Unit,
+    onNeedLogin: () -> Unit,
+    onProceed: () -> Unit,
 ) {
 
     val bottomSheetViewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
@@ -108,9 +109,13 @@ fun OnboardingPlusUpgradeFlow(
                 flow = flow,
                 source = source,
                 onUpgradePressed = {
-                    coroutineScope.launch { sheetState.show() }
+                    if (isLoggedIn) {
+                        coroutineScope.launch { sheetState.show() }
+                    } else {
+                        onNeedLogin()
+                    }
                 },
-                onNotNowPressed = onNotNowPressed,
+                onNotNowPressed = onProceed,
                 onBackPressed = onBackPressed,
                 canUpgrade = hasSubscriptions,
             )
@@ -122,7 +127,7 @@ fun OnboardingPlusUpgradeFlow(
                         bottomSheetViewModel.onClickSubscribe(
                             activity = activity,
                             flow = flow,
-                            onComplete = onCompleteUpgrade,
+                            onComplete = onProceed,
                         )
                     } else {
                         LogBuffer.e(
@@ -312,6 +317,17 @@ object OnboardingPlusFeatures {
                 ),
             )
         }
+    }
+}
+
+object OnboardingPlusUpgradeFlow {
+    enum class UpgradeSource(val analyticsValue: String) {
+        NEEDS_LOGIN("needs_login"),
+        PROFILE("profile"),
+        RECOMMENDATIONS("recommendations"),
+
+//        START_DESTINATION("start_destination"),
+//        UNKNOWN("unknown"); // This analyticsValue should never actually be sent. It is just a fallback.
     }
 }
 

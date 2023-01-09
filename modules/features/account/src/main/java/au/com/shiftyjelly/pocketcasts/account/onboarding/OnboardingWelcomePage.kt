@@ -67,7 +67,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingWelcomePage(
     activeTheme: Theme.ThemeType,
-    flow: String,
+    flow: OnboardingFlow,
     isSignedInAsPlus: Boolean,
     onDone: () -> Unit,
     onContinueToDiscover: () -> Unit,

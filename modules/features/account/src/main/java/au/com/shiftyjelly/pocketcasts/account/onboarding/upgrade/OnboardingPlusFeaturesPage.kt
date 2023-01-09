@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
@@ -77,8 +78,8 @@ private val background = Color(0xFF121212)
 
 @Composable
 internal fun OnboardingPlusFeaturesPage(
-    flow: String,
-    source: String,
+    flow: OnboardingFlow,
+    source: OnboardingPlusUpgradeFlow.UpgradeSource,
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
@@ -447,8 +448,8 @@ private tailrec suspend fun autoScroll(
 @Composable
 private fun OnboardingPlusFeaturesPreview() {
     OnboardingPlusFeaturesPage(
-        flow = "flow",
-        source = "source",
+        flow = OnboardingFlow.InitialOnboarding,
+        source = OnboardingPlusUpgradeFlow.UpgradeSource.RECOMMENDATIONS,
         onBackPressed = {},
         onUpgradePressed = {},
         onNotNowPressed = {},

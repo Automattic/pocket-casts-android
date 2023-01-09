@@ -31,7 +31,7 @@ import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingAnalyticsFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
@@ -210,7 +210,7 @@ class MainActivity :
         val showOnboarding = !settings.hasCompletedOnboarding() && !settings.isLoggedIn()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
-            openOnboardingFlow(OnboardingAnalyticsFlow.INITIAL_ONBOARDING)
+            openOnboardingFlow(OnboardingFlow.InitialOnboarding)
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -309,8 +309,8 @@ class MainActivity :
         updateSystemColors()
     }
 
-    override fun openOnboardingFlow(onboardingAnalyticsFlow: OnboardingAnalyticsFlow) {
-        onboardingLauncher.launch(OnboardingActivity.newInstance(this, onboardingAnalyticsFlow))
+    override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
+        onboardingLauncher.launch(OnboardingActivity.newInstance(this, onboardingFlow))
     }
 
     override fun onStart() {

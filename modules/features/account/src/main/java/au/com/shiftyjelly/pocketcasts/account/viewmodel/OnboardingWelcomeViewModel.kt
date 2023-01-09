@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -37,26 +38,26 @@ class OnboardingWelcomeViewModel @Inject constructor(
         settings.setMarketingOptInNeedsSync(true)
     }
 
-    fun onShown(flow: String) {
+    fun onShown(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_SHOWN,
-            mapOf(AnalyticsProp.FLOW to flow)
+            mapOf(AnalyticsProp.FLOW to flow.analyticsValue)
         )
     }
 
-    fun onContinueToDiscover(flow: String) {
+    fun onContinueToDiscover(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_DISCOVER_TAPPED,
-            mapOf(AnalyticsProp.FLOW to flow)
+            mapOf(AnalyticsProp.FLOW to flow.analyticsValue)
         )
         persistNewsletterSelection()
     }
 
-    fun onDismiss(flow: String, persistNewsletter: Boolean) {
+    fun onDismiss(flow: OnboardingFlow, persistNewsletter: Boolean) {
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_DISMISSED,
             mapOf(
-                AnalyticsProp.FLOW to flow
+                AnalyticsProp.FLOW to flow.analyticsValue
             )
         )
         if (persistNewsletter) {
@@ -64,10 +65,10 @@ class OnboardingWelcomeViewModel @Inject constructor(
         }
     }
 
-    fun onImportTapped(flow: String) {
+    fun onImportTapped(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.WELCOME_IMPORT_TAPPED,
-            mapOf(AnalyticsProp.FLOW to flow)
+            mapOf(AnalyticsProp.FLOW to flow.analyticsValue)
         )
     }
 

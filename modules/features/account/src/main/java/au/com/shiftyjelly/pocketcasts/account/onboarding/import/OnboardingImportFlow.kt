@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingImportViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -21,7 +22,7 @@ object OnboardingImportFlow {
     fun NavGraphBuilder.importFlowGraph(
         theme: Theme.ThemeType,
         navController: NavController,
-        flow: String
+        flow: OnboardingFlow,
     ) {
         navigation(
             route = this@OnboardingImportFlow.route,

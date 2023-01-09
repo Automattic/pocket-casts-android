@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,34 +12,34 @@ class OnboardingImportViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
-    fun onImportStartPageShown(flow: String) {
+    fun onImportStartPageShown(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.ONBOARDING_IMPORT_SHOWN,
-            mapOf(flowKey to flow)
+            mapOf(flowKey to flow.analyticsValue)
         )
     }
 
-    fun onOpenApp(flow: String, appName: String) {
+    fun onOpenApp(flow: OnboardingFlow, appName: String) {
         analyticsTracker.track(
             AnalyticsEvent.ONBOARDING_IMPORT_OPEN_APP_SELECTED,
             mapOf(
-                flowKey to flow,
+                flowKey to flow.analyticsValue,
                 appNameKey to appName
             )
         )
     }
 
-    fun onAppSelected(flow: String, appName: String) {
+    fun onAppSelected(flow: OnboardingFlow, appName: String) {
         analyticsTracker.track(
             AnalyticsEvent.ONBOARDING_IMPORT_APP_SELECTED,
             mapOf(flowKey to flow, appNameKey to appName)
         )
     }
 
-    fun onImportDismissed(flow: String) {
+    fun onImportDismissed(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.ONBOARDING_IMPORT_DISMISSED,
-            mapOf(flowKey to flow)
+            mapOf(flowKey to flow.analyticsValue)
         )
     }
 
