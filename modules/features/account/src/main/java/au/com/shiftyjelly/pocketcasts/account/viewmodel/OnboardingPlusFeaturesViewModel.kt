@@ -4,10 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.AndroidViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,20 +35,20 @@ class OnboardingPlusFeaturesViewModel @Inject constructor(
         }
     }
 
-    fun onShown(flow: OnboardingFlow, source: OnboardingPlusUpgradeFlow.UpgradeSource) {
+    fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, analyticsProps(flow, source))
     }
 
-    fun onDismiss(flow: OnboardingFlow, source: OnboardingPlusUpgradeFlow.UpgradeSource) {
+    fun onDismiss(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, analyticsProps(flow, source))
     }
 
-    fun onUpgradePressed(flow: OnboardingFlow, source: OnboardingPlusUpgradeFlow.UpgradeSource) {
+    fun onUpgradePressed(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
     companion object {
-        private fun analyticsProps(flow: OnboardingFlow, source: OnboardingPlusUpgradeFlow.UpgradeSource) =
+        private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) =
             mapOf("flow" to flow.analyticsValue, "source" to source.analyticsValue)
     }
 }

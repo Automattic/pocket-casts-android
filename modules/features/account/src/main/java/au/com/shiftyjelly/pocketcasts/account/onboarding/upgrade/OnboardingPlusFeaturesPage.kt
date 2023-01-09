@@ -59,7 +59,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
@@ -68,6 +67,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import java.lang.Long.max
@@ -79,7 +80,7 @@ private val background = Color(0xFF121212)
 @Composable
 internal fun OnboardingPlusFeaturesPage(
     flow: OnboardingFlow,
-    source: OnboardingPlusUpgradeFlow.UpgradeSource,
+    source: OnboardingUpgradeSource,
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
@@ -449,7 +450,7 @@ private tailrec suspend fun autoScroll(
 private fun OnboardingPlusFeaturesPreview() {
     OnboardingPlusFeaturesPage(
         flow = OnboardingFlow.InitialOnboarding,
-        source = OnboardingPlusUpgradeFlow.UpgradeSource.RECOMMENDATIONS,
+        source = OnboardingUpgradeSource.RECOMMENDATIONS,
         onBackPressed = {},
         onUpgradePressed = {},
         onNotNowPressed = {},

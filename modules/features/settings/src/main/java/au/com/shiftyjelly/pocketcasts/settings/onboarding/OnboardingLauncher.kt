@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.account.onboarding
+package au.com.shiftyjelly.pocketcasts.settings.onboarding
 
 import android.app.Activity
 

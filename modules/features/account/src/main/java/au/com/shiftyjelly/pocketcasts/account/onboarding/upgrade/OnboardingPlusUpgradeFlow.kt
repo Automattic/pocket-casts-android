@@ -40,7 +40,6 @@ import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.UnselectedPlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
@@ -49,6 +48,8 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesVi
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.launch
@@ -58,7 +59,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun OnboardingPlusUpgradeFlow(
     flow: OnboardingFlow,
-    source: OnboardingPlusUpgradeFlow.UpgradeSource,
+    source: OnboardingUpgradeSource,
     isLoggedIn: Boolean,
     onBackPressed: () -> Unit,
     onNeedLogin: () -> Unit,
@@ -317,17 +318,6 @@ object OnboardingPlusFeatures {
                 ),
             )
         }
-    }
-}
-
-object OnboardingPlusUpgradeFlow {
-    enum class UpgradeSource(val analyticsValue: String) {
-        NEEDS_LOGIN("needs_login"),
-        PROFILE("profile"),
-        RECOMMENDATIONS("recommendations"),
-
-//        START_DESTINATION("start_destination"),
-//        UNKNOWN("unknown"); // This analyticsValue should never actually be sent. It is just a fallback.
     }
 }
 
