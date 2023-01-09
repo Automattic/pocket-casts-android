@@ -40,7 +40,6 @@ interface EpisodeManager {
     fun findLatestUnfinishedEpisodeByPodcast(podcast: Podcast): Episode?
     fun findLatestEpisodeToPlay(): Episode?
     fun observeEpisodesByPodcastOrderedRx(podcast: Podcast): Flowable<List<Episode>>
-    fun findPodcastEpisodesForMediaBrowserSearch(podcastUuid: String): List<Episode>
     fun observeEpisodesWhere(queryAfterWhere: String): Flowable<List<Episode>>
     fun observeDownloadingEpisodes(): LiveData<List<Episode>>
 

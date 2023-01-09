@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
@@ -66,7 +67,6 @@ const val RECENT_ROOT = "__RECENT__"
 const val SUGGESTED_ROOT = "__SUGGESTED__"
 const val FOLDER_ROOT_PREFIX = "__FOLDER__"
 
-private const val MAX_SEARCH_RESULT_COUNT = 10
 private const val MEDIA_SEARCH_SUPPORTED = "android.media.browse.SEARCH_SUPPORTED"
 private const val CONTENT_STYLE_SUPPORTED = "android.media.browse.CONTENT_STYLE_SUPPORTED"
 
@@ -569,86 +569,40 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     override fun onSearch(query: String, extras: Bundle?, result: Result<List<MediaBrowserCompat.MediaItem>>) {
         result.detach()
         launch {
-            result.sendResult(performSearch(query))
+            result.sendResult(podcastSearch(query))
         }
     }
 
     /**
-     * Voice search.
-     *   "Play Up Next"
-     *   "Play Material"
-     *   "Play Material in Pocket Casts"
+     * Search for local and remote podcasts.
+     * Returning an empty list displays "No media available for browsing here"
+     * Returning null displays "Something went wrong". There is no way to display our own error message.
      */
-    private fun performSearch(searchTerm: String): List<MediaBrowserCompat.MediaItem> {
-        val searchResults = mutableListOf<MediaBrowserCompat.MediaItem>()
-
-        val query = searchTerm.trim { it <= ' ' }.lowercase()
-        if (query.startsWith("up next") || query.startsWith("next episode") || query.startsWith("next podcast")) {
-            val upNextEpisodes = playbackManager.upNextQueue.queueEpisodes.take(10)
-            for (episode in upNextEpisodes) {
-                if (episode is Episode) {
-                    podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { parentPodcast ->
-                        addToResultsIfNotExists(AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = parentPodcast), searchResults)
-                    }
-                } else {
-                    // TODO: UserEpisode
-                }
+    private suspend fun podcastSearch(term: String): List<MediaBrowserCompat.MediaItem>? {
+        val termCleaned = term.trim()
+        // search for local podcasts
+        val localPodcasts = podcastManager.findSubscribedNoOrder()
+            .filter { it.title.contains(termCleaned, ignoreCase = true) || it.author.contains(termCleaned, ignoreCase = true) }
+            .sortedBy { PodcastsSortType.cleanStringForSort(it.title) }
+        // search for podcasts on the server
+        val serverPodcasts = try {
+            // only search the server if the term is over one character long
+            if (termCleaned.length <= 1) {
+                emptyList()
+            } else {
+                serverManager.searchForPodcastsSuspend(searchTerm = term, resources = resources).searchResults
             }
-
-            return searchResults
+        } catch (ex: Exception) {
+            Timber.e(ex)
+            // display the error message when the server call fails only if there is no local podcasts to display
+            if (localPodcasts.isEmpty()) {
+                return null
+            }
+            emptyList()
         }
-
-        val options = MediaSessionManager.calculateSearchQueryOptions(query)
-        for (option in options) {
-            val matchingPodcast = podcastManager.searchPodcastByTitle(option) ?: continue
-            val latestEpisodeUuid = matchingPodcast.latestEpisodeUuid
-            val latestEpisode = if (latestEpisodeUuid == null) null else episodeManager.findByUuid(latestEpisodeUuid)
-
-            if (latestEpisode != null) {
-                addToResultsIfNotExists(AutoConverter.convertEpisodeToMediaItem(context = this, episode = latestEpisode, parentPodcast = matchingPodcast), searchResults)
-                if (searchResults.size >= MAX_SEARCH_RESULT_COUNT) {
-                    return searchResults
-                }
-            }
-
-            // add a few of the latest episodes from this podcast
-            episodeManager.findPodcastEpisodesForMediaBrowserSearch(matchingPodcast.uuid).forEach { episode ->
-                addToResultsIfNotExists(AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = matchingPodcast), searchResults)
-            }
-            if (searchResults.size >= MAX_SEARCH_RESULT_COUNT) {
-                return searchResults
-            }
-        }
-
-        for (option in options) {
-            episodeManager.findFirstBySearchQuery(option)?.let { firstMatch ->
-                podcastManager.findPodcastByUuid(firstMatch.podcastUuid)?.let { parentPodcast ->
-                    addToResultsIfNotExists(AutoConverter.convertEpisodeToMediaItem(context = this, episode = firstMatch, parentPodcast = parentPodcast), searchResults)
-                }
-
-                if (searchResults.size >= MAX_SEARCH_RESULT_COUNT) {
-                    return searchResults
-                }
-            }
-        }
-
-        if (searchResults.isEmpty()) { // Try the server
-            serverManager.searchForPodcastsRx(query).blockingGet().searchResults.forEach { podcast ->
-                val mediaItem = convertPodcastToMediaItem(podcast = podcast, context = this)
-                addToResultsIfNotExists(mediaItem, searchResults)
-            }
-        }
-
-        return searchResults
-    }
-
-    private fun addToResultsIfNotExists(item: MediaBrowserCompat.MediaItem?, searchResults: MutableList<MediaBrowserCompat.MediaItem>) {
-        item ?: return
-
-        for (existingItem in searchResults) {
-            if (existingItem.mediaId == item.mediaId) return
-        }
-
-        searchResults.add(item)
+        // merge the local and remote podcasts
+        val podcasts = (localPodcasts + serverPodcasts).distinctBy { it.uuid }
+        // convert podcasts to the media browser format
+        return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast) }
     }
 }
