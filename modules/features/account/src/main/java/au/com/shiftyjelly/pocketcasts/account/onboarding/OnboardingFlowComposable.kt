@@ -61,7 +61,18 @@ fun OnboardingFlowComposable(
                 OnboardingLoginOrSignUpPage(
                     theme = theme,
                     flow = flow,
-                    onDismiss = { exitOnboarding() },
+                    onDismiss = {
+                        when (flow) {
+                            // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
+                            is OnboardingFlow.PlusAccountUpgrade -> throw IllegalStateException("PlusAccountUpgrade flow tried to present LoginOrSignupPage")
+
+                            OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+                            is OnboardingFlow.PlusUpsell -> navController.popBackStack()
+
+                            OnboardingFlow.InitialOnboarding,
+                            OnboardingFlow.LoggedOut -> exitOnboarding()
+                        }
+                    },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                     onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
                     onContinueWithGoogleClicked = { navController.navigate(OnboardingNavRoute.logInGoogle) },
