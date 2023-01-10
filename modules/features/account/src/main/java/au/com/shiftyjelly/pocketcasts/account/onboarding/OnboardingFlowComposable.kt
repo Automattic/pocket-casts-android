@@ -91,9 +91,7 @@ fun OnboardingFlowComposable(
                     onAccountCreated = {
                         navController.navigate(OnboardingRecommendationsFlow.route) {
                             // clear backstack after account is created
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                                inclusive = true
-                            }
+                            popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
                         }
                     },
                 )
@@ -103,7 +101,21 @@ fun OnboardingFlowComposable(
                 OnboardingLoginPage(
                     theme = theme,
                     onBackPressed = { navController.popBackStack() },
-                    onLoginComplete = exitOnboarding,
+                    onLoginComplete = {
+                        when (flow) {
+                            OnboardingFlow.InitialOnboarding,
+                            OnboardingFlow.LoggedOut -> exitOnboarding()
+
+                            is OnboardingFlow.PlusAccountUpgrade,
+                            OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+                            is OnboardingFlow.PlusUpsell -> navController.navigate(
+                                OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
+                            ) {
+                                // clear backstack after successful login
+                                popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
+                            }
+                        }
+                    },
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
             }
@@ -147,7 +159,7 @@ fun OnboardingFlowComposable(
                     isLoggedIn = signInState.isSignedIn,
                     onBackPressed = {
                         when (upgradeSource) {
-                            OnboardingUpgradeSource.NEEDS_LOGIN,
+                            OnboardingUpgradeSource.LOGIN,
                             OnboardingUpgradeSource.PLUS_DETAILS,
                             OnboardingUpgradeSource.PROFILE -> exitOnboarding()
                             OnboardingUpgradeSource.RECOMMENDATIONS -> navController.popBackStack()
@@ -156,7 +168,7 @@ fun OnboardingFlowComposable(
                     onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
                     onProceed = {
                         when (upgradeSource) {
-                            OnboardingUpgradeSource.NEEDS_LOGIN,
+                            OnboardingUpgradeSource.LOGIN,
                             OnboardingUpgradeSource.PLUS_DETAILS,
                             OnboardingUpgradeSource.PROFILE -> { exitOnboarding() }
                             OnboardingUpgradeSource.RECOMMENDATIONS -> { navController.navigate(OnboardingNavRoute.welcome) }
