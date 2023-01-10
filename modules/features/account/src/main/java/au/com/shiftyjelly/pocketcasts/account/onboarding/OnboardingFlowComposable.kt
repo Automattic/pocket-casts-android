@@ -153,29 +153,34 @@ fun OnboardingFlowComposable(
                         else -> throw IllegalStateException("upgradeSource not set")
                     }
 
+                val userCreatedNewAccount = when (upgradeSource) {
+                    OnboardingUpgradeSource.APPEARANCE,
+                    OnboardingUpgradeSource.FOLDERS,
+                    OnboardingUpgradeSource.LOGIN,
+                    OnboardingUpgradeSource.PLUS_DETAILS,
+                    OnboardingUpgradeSource.PROFILE -> false
+
+                    OnboardingUpgradeSource.RECOMMENDATIONS -> true
+                }
+
                 OnboardingPlusUpgradeFlow(
                     flow = flow,
                     source = upgradeSource,
                     isLoggedIn = signInState.isSignedIn,
                     onBackPressed = {
-                        when (upgradeSource) {
-                            OnboardingUpgradeSource.APPEARANCE,
-                            OnboardingUpgradeSource.LOGIN,
-                            OnboardingUpgradeSource.PLUS_DETAILS,
-                            OnboardingUpgradeSource.PROFILE -> exitOnboarding()
-                            OnboardingUpgradeSource.RECOMMENDATIONS -> navController.popBackStack()
+                        if (userCreatedNewAccount) {
+                            navController.popBackStack()
+                        } else {
+                            exitOnboarding()
                         }
                     },
                     onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
                     onProceed = {
-                        when (upgradeSource) {
-                            OnboardingUpgradeSource.APPEARANCE,
-                            OnboardingUpgradeSource.LOGIN,
-                            OnboardingUpgradeSource.PLUS_DETAILS,
-                            OnboardingUpgradeSource.PROFILE -> exitOnboarding()
-                            OnboardingUpgradeSource.RECOMMENDATIONS -> navController.navigate(OnboardingNavRoute.welcome)
+                        if (userCreatedNewAccount) {
+                            navController.navigate(OnboardingNavRoute.welcome)
+                        } else {
+                            exitOnboarding()
                         }
-                        navController.navigate(OnboardingNavRoute.welcome)
                     }
                 )
             }
