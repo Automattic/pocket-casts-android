@@ -159,6 +159,7 @@ fun OnboardingFlowComposable(
                     isLoggedIn = signInState.isSignedIn,
                     onBackPressed = {
                         when (upgradeSource) {
+                            OnboardingUpgradeSource.APPEARANCE,
                             OnboardingUpgradeSource.LOGIN,
                             OnboardingUpgradeSource.PLUS_DETAILS,
                             OnboardingUpgradeSource.PROFILE -> exitOnboarding()
@@ -168,10 +169,11 @@ fun OnboardingFlowComposable(
                     onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
                     onProceed = {
                         when (upgradeSource) {
+                            OnboardingUpgradeSource.APPEARANCE,
                             OnboardingUpgradeSource.LOGIN,
                             OnboardingUpgradeSource.PLUS_DETAILS,
-                            OnboardingUpgradeSource.PROFILE -> { exitOnboarding() }
-                            OnboardingUpgradeSource.RECOMMENDATIONS -> { navController.navigate(OnboardingNavRoute.welcome) }
+                            OnboardingUpgradeSource.PROFILE -> exitOnboarding()
+                            OnboardingUpgradeSource.RECOMMENDATIONS -> navController.navigate(OnboardingNavRoute.welcome)
                         }
                         navController.navigate(OnboardingNavRoute.welcome)
                     }
