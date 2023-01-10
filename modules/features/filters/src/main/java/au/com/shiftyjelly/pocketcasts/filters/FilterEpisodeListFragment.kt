@@ -388,6 +388,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val multiSelectToolbar = binding.multiSelectToolbar
+        multiSelectHelper.source = AnalyticsSource.FILTERS
         multiSelectHelper.isMultiSelectingLive.observe(
             viewLifecycleOwner,
             Observer {

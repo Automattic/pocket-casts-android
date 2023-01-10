@@ -124,11 +124,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
 
-        playButtonListener.source = when (mode) {
-            Mode.Downloaded -> AnalyticsSource.DOWNLOADS
-            Mode.Starred -> AnalyticsSource.STARRED
-            Mode.History -> AnalyticsSource.LISTENING_HISTORY
-        }
+        playButtonListener.source = getAnalyticsEventSource()
+        multiSelectHelper.source = getAnalyticsEventSource()
     }
 
     override fun onPause() {
@@ -395,5 +392,11 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             Mode.Starred -> AnalyticsEvent.STARRED_MULTI_SELECT_EXITED
         }
         analyticsTracker.track(analyticsEvent)
+    }
+
+    private fun getAnalyticsEventSource() = when (mode) {
+        Mode.Downloaded -> AnalyticsSource.DOWNLOADS
+        Mode.Starred -> AnalyticsSource.STARRED
+        Mode.History -> AnalyticsSource.LISTENING_HISTORY
     }
 }

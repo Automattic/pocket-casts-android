@@ -588,7 +588,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
         }
-
+        multiSelectHelper.source = AnalyticsSource.PODCAST_SCREEN
         binding.multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
 
         return binding.root

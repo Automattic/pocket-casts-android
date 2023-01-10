@@ -8,6 +8,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -48,7 +50,8 @@ class MultiSelectHelper @Inject constructor(
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
     val downloadManager: DownloadManager,
-    val settings: Settings
+    val settings: Settings,
+    private val episodeAnalytics: EpisodeAnalytics
 ) :
     CoroutineScope {
     interface Listener {
@@ -85,6 +88,7 @@ class MultiSelectHelper @Inject constructor(
 
     var coordinatorLayout: View? = null
     var context: Context? = null
+    var source = AnalyticsSource.UNKNOWN
 
     lateinit var listener: Listener
 

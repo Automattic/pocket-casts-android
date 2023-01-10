@@ -127,6 +127,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val imageLoader = PodcastImageLoaderThemed(context)
+        multiSelectHelper.source = AnalyticsSource.UP_NEXT
         adapter = UpNextAdapter(
             context = context,
             imageLoader = imageLoader,
