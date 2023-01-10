@@ -72,12 +72,20 @@ fun OnboardingPlusUpgradeFlow(
     val hasSubscriptions = state is OnboardingPlusBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
 
     val coroutineScope = rememberCoroutineScope()
-    val initialValue = if (flow is OnboardingFlow.PlusUpsell && source == OnboardingUpgradeSource.RECOMMENDATIONS) {
+
+    val isPresentingSecondTime = flow is OnboardingFlow.PlusUpsell && source == OnboardingUpgradeSource.RECOMMENDATIONS
+    val initialValue = when {
         // The hidden state is shown as the first screen in the PlusUpsell flow, so when we return
-        // to this screen immediately expand the purchase bottom sheet.
-        ModalBottomSheetValue.Expanded
-    } else {
-        ModalBottomSheetValue.Hidden
+        // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
+        isPresentingSecondTime ||
+            // User already indicated they want to upgrade, so go straight to purchase modal
+            flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
+            flow is OnboardingFlow.PlusAccountUpgrade -> {
+            ModalBottomSheetValue.Expanded
+        }
+        else -> {
+            ModalBottomSheetValue.Hidden
+        }
     }
     val sheetState = rememberModalBottomSheetState(
         initialValue = initialValue,
