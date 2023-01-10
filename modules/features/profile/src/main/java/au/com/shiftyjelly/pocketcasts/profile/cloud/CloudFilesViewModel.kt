@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.profile.cloud
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -32,6 +34,7 @@ class CloudFilesViewModel @Inject constructor(
     private val settings: Settings,
     userManager: UserManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics
 ) : ViewModel() {
 
     val sortOrderRelay = BehaviorRelay.create<Settings.CloudSortOrder>().apply { accept(settings.getCloudSortOrder()) }
@@ -77,6 +80,11 @@ class CloudFilesViewModel @Inject constructor(
 
     fun deleteEpisode(episode: UserEpisode, deleteState: DeleteState) {
         CloudDeleteHelper.deleteEpisode(episode, deleteState, playbackManager, episodeManager, userEpisodeManager)
+        episodeAnalytics.trackEvent(
+            event = if (deleteState == DeleteState.Cloud && !episode.isDownloaded) AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD else AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+            source = AnalyticsSource.FILES,
+            uuid = episode.uuid,
+        )
     }
 
     fun changeSort(sortOrder: Settings.CloudSortOrder) {

@@ -155,6 +155,11 @@ class EpisodeFragmentViewModel @Inject constructor(
         episode?.let {
             launch {
                 episodeManager.deleteEpisodeFile(it, playbackManager, disableAutoDownload = true, removeFromUpNext = true)
+                episodeAnalytics.trackEvent(
+                    event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+                    source = source,
+                    uuid = it.uuid,
+                )
             }
         }
     }

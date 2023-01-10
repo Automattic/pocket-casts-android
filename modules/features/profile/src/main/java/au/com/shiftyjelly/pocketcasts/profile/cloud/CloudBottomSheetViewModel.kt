@@ -61,6 +61,11 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun deleteEpisode(episode: UserEpisode, deleteState: DeleteState) {
         CloudDeleteHelper.deleteEpisode(episode, deleteState, playbackManager, episodeManager, userEpisodeManager)
         analyticsTracker.track(AnalyticsEvent.USER_FILE_DELETED)
+        episodeAnalytics.trackEvent(
+            event = if (deleteState == DeleteState.Cloud && !episode.isDownloaded) AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD else AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+            source = source,
+            uuid = episode.uuid,
+        )
     }
 
     fun uploadEpisode(episode: UserEpisode) {
@@ -71,6 +76,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun removeEpisode(episode: UserEpisode) {
         userEpisodeManager.removeFromCloud(episode)
         trackOptionTapped(DELETE_FROM_CLOUD)
+        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD, source = source, uuid = episode.uuid)
     }
 
     fun cancelUpload(episode: UserEpisode) {

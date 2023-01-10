@@ -8,7 +8,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -125,7 +124,6 @@ class UserEpisodeManagerImpl @Inject constructor(
     val subscriptionManager: SubscriptionManager,
     val downloadManager: DownloadManager,
     @ApplicationContext val context: Context,
-    val analyticsTracker: AnalyticsTrackerWrapper,
     val episodeAnalytics: EpisodeAnalytics
 ) : UserEpisodeManager, CoroutineScope {
     override val coroutineContext: CoroutineContext

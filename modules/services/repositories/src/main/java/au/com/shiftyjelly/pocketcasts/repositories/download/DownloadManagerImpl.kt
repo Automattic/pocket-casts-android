@@ -12,6 +12,8 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -57,7 +59,8 @@ class DownloadManagerImpl @Inject constructor(
     private val fileStorage: FileStorage,
     private val settings: Settings,
     private val notificationHelper: NotificationHelper,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val episodeAnalytics: EpisodeAnalytics
 ) : DownloadManager, CoroutineScope {
 
     companion object {
@@ -387,6 +390,7 @@ class DownloadManagerImpl @Inject constructor(
 
             if (result.success) {
                 episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.DOWNLOADED)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED, uuid = episode.uuid)
 
                 RefreshPodcastsThread.updateNotifications(settings.getNotificationLastSeen(), settings, podcastManager, episodeManager, notificationHelper, context)
             } else {

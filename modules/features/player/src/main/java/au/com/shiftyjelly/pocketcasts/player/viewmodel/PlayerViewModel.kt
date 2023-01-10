@@ -6,8 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -74,6 +76,7 @@ class PlayerViewModel @Inject constructor(
     private val settings: Settings,
     private val theme: Theme,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationContext private val context: Context,
 ) : ViewModel(), CoroutineScope {
 
@@ -445,6 +448,11 @@ class PlayerViewModel @Inject constructor(
         if (episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
             launch {
                 episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
+                episodeAnalytics.trackEvent(
+                    event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+                    source = source,
+                    uuid = episode.uuid,
+                )
             }
         } else {
             launch {

@@ -38,6 +38,10 @@ class EpisodeAnalytics @Inject constructor(
         analyticsTracker.track(event, AnalyticsProp.uuidMap(uuid))
     }
 
+    fun trackBulkEvent(event: AnalyticsEvent, source: AnalyticsSource, count: Int) {
+        analyticsTracker.track(event, AnalyticsProp.bulkMap(source, count))
+    }
+
     fun trackBulkEvent(event: AnalyticsEvent, source: AnalyticsSource, episodes: List<Playable>) {
         if (event == AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED) {
             downloadEpisodeUuidQueue.clear()

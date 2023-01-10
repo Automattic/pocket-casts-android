@@ -403,6 +403,14 @@ class MultiSelectHelper @Inject constructor(
             val userEpisodes = list.filterIsInstance<UserEpisode>()
             userEpisodeManager.deleteAll(userEpisodes, playbackManager)
 
+            if (episodes.isNotEmpty()) {
+                episodeAnalytics.trackBulkEvent(
+                    AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED,
+                    source = source,
+                    count = if (episodes.isNotEmpty()) episodes.size else userEpisodes.size
+                )
+            }
+
             withContext(Dispatchers.Main) {
                 closeMultiSelect()
             }
@@ -469,6 +477,7 @@ class MultiSelectHelper @Inject constructor(
                 Timber.d("Deleting $it")
                 CloudDeleteHelper.deleteEpisode(it, state, playbackManager, episodeManager, userEpisodeManager)
             }
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED, source, episodesToDelete.size)
 
             val snackText = resources.getStringPlural(episodesToDelete.size, LR.string.episodes_deleted_singular, LR.string.episodes_deleted_plural)
             showSnackBar(snackText)
