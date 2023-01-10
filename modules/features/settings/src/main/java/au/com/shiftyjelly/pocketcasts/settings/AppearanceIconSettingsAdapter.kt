@@ -106,11 +106,8 @@ class AppearanceIconSettingsAdapter(
                 return
             }
             val beforeAppIcon = selectedAppIcon
-            var afterAppIcon = list[bindingAdapterPosition]
+            val afterAppIcon = list[bindingAdapterPosition]
             val validAppIcon = !afterAppIcon.isPlus || isPlusSignedIn
-            if (afterAppIcon.isPlus && !isPlusSignedIn) {
-                afterAppIcon = beforeAppIcon // prevent changing icon
-            }
 
             selectedAppIcon = afterAppIcon
             clickListener(beforeAppIcon, afterAppIcon, validAppIcon)

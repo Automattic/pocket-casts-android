@@ -108,11 +108,8 @@ class AppearanceThemeSettingsAdapter(
                 return
             }
             val beforeTheme = selectedTheme
-            var afterTheme = list[bindingAdapterPosition]
+            val afterTheme = list[bindingAdapterPosition]
             val validTheme = !afterTheme.isPlus || isPlusSignedIn
-            if (afterTheme.isPlus && !isPlusSignedIn) {
-                afterTheme = beforeTheme // prevent changing theme
-            }
 
             selectedTheme = afterTheme
             clickListener(beforeTheme, afterTheme, validTheme)
