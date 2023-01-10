@@ -258,6 +258,8 @@ class EpisodeFragment : BaseDialogFragment() {
                         binding.podcastColor = ThemeColor.podcastIcon02(activeTheme, state.podcastColor)
 
                         binding.btnDownload.tintColor = iconColor
+                        binding.btnDownload.isEnabled = !state.episode.isHLS
+                        binding.btnDownload.alpha = if (state.episode.isHLS) 0.3f else 1.0f
                         binding.btnAddToUpNext.tintColor = iconColor
                         binding.btnArchive.tintColor = iconColor
                         binding.btnPlayed.tintColor = iconColor
@@ -295,8 +297,10 @@ class EpisodeFragment : BaseDialogFragment() {
                             else -> DownloadButton.State.Queued
                         }
 
-                        val playbackError = state.episode.playErrorDetails
-
+                        var playbackError = state.episode.playErrorDetails
+                        if (state.episode.isHLS) {
+                            playbackError = getString(LR.string.podcast_episode_downloaded_hls_playback_message)
+                        }
                         if (playbackError == null) {
                             binding.errorLayout.isVisible = episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED || episodeStatus == EpisodeStatusEnum.WAITING_FOR_POWER || episodeStatus == EpisodeStatusEnum.WAITING_FOR_WIFI
                             binding.lblErrorDetail.isVisible = false
@@ -324,9 +328,14 @@ class EpisodeFragment : BaseDialogFragment() {
                             }
                         } else {
                             binding.errorLayout.isVisible = true
-                            binding.lblError.setText(LR.string.podcast_episode_playback_error)
                             binding.lblErrorDetail.text = playbackError
-                            binding.imgError.setImageResource(IR.drawable.ic_play_all)
+                            if (state.episode.isHLS) {
+                                binding.lblError.setText(LR.string.podcast_episode_download_not_supported)
+                                binding.imgError.setImageResource(IR.drawable.ic_info_outline)
+                            } else {
+                                binding.lblError.setText(LR.string.podcast_episode_playback_error)
+                                binding.imgError.setImageResource(IR.drawable.ic_play_all)
+                            }
                         }
 
                         // If we aren't showing another error we can show the episode limit warning

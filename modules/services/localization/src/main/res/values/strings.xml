@@ -375,6 +375,8 @@
     <string name="podcast_archive_all_played">Archive all played</string>
     <string name="podcast_archive_played">You should only do this if you don\'t want to see them anymore.</string>
     <string name="podcast_download_all">Download all</string>
+    <string name="podcast_episode_download_not_supported">Download not supported</string>
+    <string name="podcast_episode_downloaded_hls_playback_message">Playing from downloaded HLS files is not supported.</string>
     <string name="podcast_episode_file_not_uploaded">File not uploaded</string>
     <string name="podcast_episode_manually_unarchived">Episode Manually Unarchived</string>
     <string name="podcast_episode_manually_unarchived_summary">It won\'t be auto archived by your new episode limit of %d</string>
