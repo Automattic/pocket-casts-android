@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts.podcasts.helper
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
@@ -27,6 +29,7 @@ class PlayButtonListener @Inject constructor(
     val settings: Settings,
     private val warningsHelper: WarningsHelper,
     @ActivityContext private val activity: Context,
+    private val episodeAnalytics: EpisodeAnalytics
 ) : PlayButton.OnClickListener, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -108,6 +111,11 @@ class PlayButtonListener @Inject constructor(
                         it.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
                     }
                     downloadManager.addEpisodeToQueue(it, "play button", true)
+                    episodeAnalytics.trackEvent(
+                        AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
+                        source = source,
+                        uuid = episodeUuid
+                    )
                     launch {
                         episodeManager.unarchive(it)
                     }

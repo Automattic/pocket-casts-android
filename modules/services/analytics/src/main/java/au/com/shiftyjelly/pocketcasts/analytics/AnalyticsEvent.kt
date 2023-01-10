@@ -293,6 +293,10 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED("player_shelf_overflow_menu_rearrange_finished"),
 
     /* Episode */
+    EPISODE_DOWNLOAD_QUEUED("episode_download_queued"),
+    EPISODE_BULK_DOWNLOAD_QUEUED("episode_bulk_download_queued"),
+    EPISODE_DOWNLOAD_FINISHED("episode_download_finished"),
+    EPISODE_DOWNLOAD_CANCELLED("episode_download_cancelled"),
     EPISODE_UPLOAD_QUEUED("episode_upload_queued"),
     EPISODE_UPLOAD_CANCELLED("episode_upload_cancelled"),
     EPISODE_UPLOAD_FINISHED("episode_upload_finished"),
