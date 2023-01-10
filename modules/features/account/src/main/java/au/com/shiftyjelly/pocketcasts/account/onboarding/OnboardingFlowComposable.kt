@@ -51,8 +51,13 @@ fun OnboardingFlowComposable(
                 flow = flow,
                 onBackPressed = exitOnboarding,
                 onComplete = {
-                    val route = OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
-                    navController.navigate(route)
+                    navController.navigate(
+                        if (signInState.isSignedInAsPlus) {
+                            OnboardingNavRoute.welcome
+                        } else {
+                            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
+                        }
+                    )
                 },
                 navController = navController,
             )
