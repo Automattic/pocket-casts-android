@@ -21,5 +21,59 @@
             <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
         </intent-filter>
     </activity>
+    <activity
+        android:name=".querypodcasts.config.ActivityConfigQueryPodcasts"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/pocket_casts_query_podcasts">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
+    <activity
+        android:name=".querypodcastepisodes.config.ActivityConfigQueryPodcastEpisodes"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/pocket_casts_query_podcast_episodes">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
+    <activity
+        android:name=".addtoupnext.config.ActivityConfigAddToUpNext"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/pocket_casts_add_to_up_next">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
+    <activity
+        android:name=".queryfilters.config.ActivityConfigQueryFilters"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/pocket_casts_query_filters">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
+    <activity
+        android:name=".queryfilterepisodes.config.ActivityConfigQueryFilterEpisodes"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/pocket_casts_query_filter_episodes">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
+    <activity
+        android:name=".queryUpNext.config.ActivityConfigQueryUpNext"
+        android:exported="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/pocket_casts_query_up_next_episodes">
+        <intent-filter>
+            <action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING" />
+        </intent-filter>
+    </activity>
 </application>
 </manifest>

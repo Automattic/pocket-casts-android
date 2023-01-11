@@ -173,10 +173,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findPodcastEpisodesForMediaBrowserSearch(podcastUuid: String): List<Episode> {
-        return episodeDao.findPodcastEpisodesForMediaBrowserSearch(podcastUuid)
-    }
-
     override fun findEpisodesWhere(queryAfterWhere: String): List<Episode> {
         return episodeDao.findEpisodes(SimpleSQLiteQuery("SELECT episodes.* FROM episodes JOIN podcasts ON episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND $queryAfterWhere"))
     }

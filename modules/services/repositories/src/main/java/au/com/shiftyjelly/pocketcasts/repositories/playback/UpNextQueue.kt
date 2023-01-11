@@ -18,6 +18,7 @@ interface UpNextQueue {
     val size: Int
         get() = queueEpisodes.size
 
+    val allEpisodes get(): List<Playable> = currentEpisode?.let { listOf(it) + queueEpisodes } ?: queueEpisodes
     fun isCurrentEpisode(episode: Playable): Boolean
     suspend fun playNow(episode: Playable, onAdd: (() -> Unit)?)
     suspend fun playNext(episode: Playable, downloadManager: DownloadManager, onAdd: (() -> Unit)?)

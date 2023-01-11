@@ -133,9 +133,6 @@ abstract class EpisodeDao {
     @Query("SELECT * FROM episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC, added_date DESC LIMIT 1")
     abstract fun findLatestRx(podcastUuid: String): Maybe<Episode>
 
-    @Query("SELECT * FROM episodes WHERE podcast_id = :podcastUuid AND playing_status != 2 ORDER BY published_date DESC LIMIT 10")
-    abstract fun findPodcastEpisodesForMediaBrowserSearch(podcastUuid: String): List<Episode>
-
     @Query("SELECT * FROM episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeStatusEnum OR (episode_status == :failedEpisodeStatusEnum AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
     abstract fun observeDownloadingEpisodesIncludingFailed(failedDownloadCutoff: Long, failedEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOAD_FAILED, downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<Episode>>
 

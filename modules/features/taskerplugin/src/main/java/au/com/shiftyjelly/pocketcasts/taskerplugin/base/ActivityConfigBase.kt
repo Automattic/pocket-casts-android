@@ -7,11 +7,15 @@ import androidx.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.appTheme
 
-abstract class ActivityConfigBase<TViewModel : ViewModelBase<*, *>> : ComponentActivity() {
+abstract class ActivityConfigBase<TViewModel : ViewModelBase<*, *, *>> : ComponentActivity() {
     protected abstract val viewModel: TViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.onCreate({ finish() }, { intent }, { code, data -> setResult(code, data) })
+        if (finishForTaskerRightAway) {
+            viewModel.finishForTasker()
+            return
+        }
         setContent {
             AppThemeWithBackground(themeType = appTheme.activeTheme) {
                 val taskerVariables = viewModel.taskerVariables
@@ -34,4 +38,5 @@ abstract class ActivityConfigBase<TViewModel : ViewModelBase<*, *>> : ComponentA
             }
         }
     }
+    protected open val finishForTaskerRightAway get() = false
 }

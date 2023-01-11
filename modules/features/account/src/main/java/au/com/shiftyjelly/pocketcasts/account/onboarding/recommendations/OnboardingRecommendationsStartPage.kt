@@ -14,11 +14,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.progressSemantics
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,8 +40,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.Podcast
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.Section
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.SectionId
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -81,7 +89,7 @@ fun OnboardingRecommendationsStartPage(
     }
 
     Content(
-        trendingPodcasts = state.trendingPodcasts,
+        state = state,
         buttonRes = state.buttonRes,
         onImportClicked = {
             viewModel.onImportClick()
@@ -101,18 +109,19 @@ fun OnboardingRecommendationsStartPage(
 
 @Composable
 private fun Content(
-    trendingPodcasts: List<OnboardingRecommendationsStartPageViewModel.RecommendationPodcast>,
+    state: OnboardingRecommendationsStartPageViewModel.State,
     buttonRes: Int,
     onImportClicked: () -> Unit,
-    onSubscribeTap: (OnboardingRecommendationsStartPageViewModel.RecommendationPodcast) -> Unit,
+    onSubscribeTap: (Podcast) -> Unit,
     onSearch: () -> Unit,
     onComplete: () -> Unit,
 ) {
     Column {
 
+        val numToShowDefault = OnboardingRecommendationsStartPageViewModel.NUM_TO_SHOW_DEFAULT
         val numColumns = when (LocalConfiguration.current.orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> 7
-            else -> 3
+            Configuration.ORIENTATION_LANDSCAPE -> numToShowDefault
+            else -> numToShowDefault / 2
         }
 
         LazyVerticalGrid(
@@ -156,45 +165,21 @@ private fun Content(
                         onClick = onSearch,
                         modifier = Modifier.padding(bottom = 25.dp)
                     )
-
-                    if (trendingPodcasts.isNotEmpty()) {
-                        TextH20(
-                            text = stringResource(LR.string.discover_trending),
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                    }
                 }
             }
 
-            items(items = trendingPodcasts) {
+            state.sections.forEach { section ->
+                section(
+                    section = section,
+                    onSubscribeTap = onSubscribeTap
+                )
+            }
 
-                // Simulate minLines = 2
-                // This is a bit of a hack based on https://stackoverflow.com/a/66401128/1910286
-                // Google is working on adding a minLines capability though: https://issuetracker.google.com/issues/122476634
-                val twoLines = with(LocalDensity.current) {
-                    val pixelsInAPoint = 4 / 3
-                    val lineHeight = textH60FontSize * pixelsInAPoint
-                    val twoLines = lineHeight * 2
-                    twoLines.toDp()
-                }
-
-                Column(Modifier.semantics(mergeDescendants = true) {}) {
-                    PodcastSubscribeImage(
-                        podcastUuid = it.uuid,
-                        podcastTitle = it.title,
-                        podcastSubscribed = it.isSubscribed,
-                        onSubscribeClick = { onSubscribeTap(it) },
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    TextH60(
-                        text = it.title,
-                        maxLines = 2,
-                        modifier = Modifier
-                            .heightIn(min = twoLines)
-                            .clearAndSetSemantics {}
-                    )
+            if (state.showLoadingSpinner) {
+                header {
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        CircularProgressIndicator(Modifier.progressSemantics().size(48.dp))
+                    }
                 }
             }
         }
@@ -207,29 +192,100 @@ private fun Content(
     }
 }
 
+private fun LazyGridScope.section(
+    section: Section,
+    onSubscribeTap: (Podcast) -> Unit
+) {
+    if (section.visiblePodcasts.isEmpty()) return
+
+    header {
+        TextH20(
+            text = section.title,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+    }
+
+    items(items = section.visiblePodcasts) {
+
+        // Simulate minLines = 2 since we can't do that directly
+        // This is a bit of a hack based on https://stackoverflow.com/a/66401128/1910286
+        // Google is working on adding a minLines capability though: https://issuetracker.google.com/issues/122476634
+        val twoLines = with(LocalDensity.current) {
+            val pixelsInAPoint = 4 / 3
+            val lineHeight = textH60FontSize * pixelsInAPoint
+            val twoLines = lineHeight * 2
+            twoLines.toDp()
+        }
+
+        Column(Modifier.semantics(mergeDescendants = true) {}) {
+            PodcastSubscribeImage(
+                podcastUuid = it.uuid,
+                podcastTitle = it.title,
+                podcastSubscribed = it.isSubscribed,
+                onSubscribeClick = { onSubscribeTap(it) },
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            TextH60(
+                text = it.title,
+                maxLines = 2,
+                modifier = Modifier
+                    .heightIn(min = twoLines)
+                    .clearAndSetSemantics {}
+            )
+        }
+    }
+
+    header {
+        RowOutlinedButton(
+            text = stringResource(LR.string.onboarding_recommendations_more, section.title),
+            includePadding = false,
+            onClick = section::onShowMore,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
+
+    fun podcast(isSubscribed: Boolean = false) = Podcast(
+        uuid = "5168e260-372e-013b-efad-0acc26574db2",
+        title = "Why Do We Do That?",
+        isSubscribed = isSubscribed
+    )
+
     AppThemeWithBackground(themeType) {
         Content(
-            trendingPodcasts = listOf(
-                OnboardingRecommendationsStartPageViewModel.RecommendationPodcast(
-                    uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
-                    title = "Short title",
-                    isSubscribed = false,
+            state = OnboardingRecommendationsStartPageViewModel.State(
+                sections = listOf(
+                    Section(
+                        title = "A Very Special Section",
+                        sectionId = SectionId(""),
+                        numToShow = 6,
+                        podcasts = listOf(
+                            podcast(),
+                            podcast(isSubscribed = true),
+                            podcast(),
+                            podcast(),
+                            podcast(),
+                            podcast(),
+                            podcast(),
+                        ),
+                        onShowMoreFun = {},
+                    )
                 ),
-                OnboardingRecommendationsStartPageViewModel.RecommendationPodcast(
-                    uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
-                    title = "A very very long title that is longer than will fit on two lines",
-                    isSubscribed = true,
-                )
+                showLoadingSpinner = true,
             ),
-            LR.string.not_now,
+            buttonRes = LR.string.not_now,
             onImportClicked = {},
             onSubscribeTap = {},
             onSearch = {},
-        ) {}
+            onComplete = {}
+        )
     }
 }

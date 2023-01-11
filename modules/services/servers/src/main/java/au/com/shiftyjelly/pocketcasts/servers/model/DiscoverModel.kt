@@ -31,7 +31,7 @@ interface NetworkLoadableList {
     }
 
     companion object {
-        private const val TRENDING = "trending"
+        const val TRENDING = "trending"
         private const val POPULAR = "popular"
         const val NONE = "none"
     }

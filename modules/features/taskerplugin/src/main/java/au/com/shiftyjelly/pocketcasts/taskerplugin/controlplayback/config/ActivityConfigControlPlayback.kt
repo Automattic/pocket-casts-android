@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback.InputControlP
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
+import au.com.shiftyjelly.pocketcasts.images.R as RD
 
 @AndroidEntryPoint
 class ActivityConfigControlPlayback : ActivityConfigBase<ViewModelConfigControlPlayback>() {
@@ -27,7 +28,7 @@ private fun ComposableConfigControlPlaybackPreview() {
                 TaskerInputFieldState.Content(
                     MutableStateFlow(InputControlPlayback.PlaybackCommand.SkipToTime.name),
                     R.string.playback_command,
-                    au.com.shiftyjelly.pocketcasts.images.R.drawable.filter_play,
+                    RD.drawable.filter_play,
                     MutableStateFlow(true),
                     {},
                     listOf("%test"),
@@ -36,7 +37,7 @@ private fun ComposableConfigControlPlaybackPreview() {
                 TaskerInputFieldState.Content(
                     MutableStateFlow("60"),
                     R.string.time_to_skip_to_seconds,
-                    au.com.shiftyjelly.pocketcasts.images.R.drawable.filter_time,
+                    RD.drawable.filter_time,
                     MutableStateFlow(true),
                     {},
                     listOf("%test")
