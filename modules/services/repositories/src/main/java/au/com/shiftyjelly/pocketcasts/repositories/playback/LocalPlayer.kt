@@ -25,6 +25,8 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
     private var seekingToPositionMs: Int = 0
     private var seekRetryAllowed: Boolean = false
 
+    protected var isHLS: Boolean = false
+
     override var episodeUuid: String? = null
 
     override var episodeLocation: EpisodeLocation? = null
@@ -177,6 +179,7 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
 
     override fun setEpisode(episode: Playable) {
         this.episodeUuid = episode.uuid
+        this.isHLS = episode.isHLS
         episodeLocation = if (episode.isDownloaded) {
             EpisodeLocation.Downloaded(episode.downloadedFilePath)
         } else {

@@ -8,13 +8,13 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import androidx.annotation.ColorInt
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.component.ProgressCircleView
 import au.com.shiftyjelly.pocketcasts.views.extensions.inflate
@@ -69,7 +69,7 @@ class PlayButton @JvmOverloads constructor(
     }
 
     interface OnClickListener {
-        var playbackSource: PlaybackManager.PlaybackSource
+        var source: AnalyticsSource
         fun onPlayClicked(episodeUuid: String)
         fun onPauseClicked()
         fun onPlayNext(episodeUuid: String)

@@ -78,6 +78,9 @@ interface Playable {
     val isVideo: Boolean
         get() = fileType?.startsWith("video/") ?: false
 
+    val isHLS: Boolean
+        get() = downloadUrl?.endsWith("m3u8") ?: false
+
     val isAudio: Boolean
         get() = !isVideo
 
