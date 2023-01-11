@@ -1,12 +1,15 @@
 7.31
 -----
-* New Features:
+*   Health:
+    *   Switched to using the new user login and register endpoints.
+        ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
+*   New Features:
     *   Add support for HLS streams
         ([#679](https://github.com/Automattic/pocket-casts-android/pull/679)).
 
 7.30
 -----
-* New Features:
+*   New Features:
     *   Add tappable links to podcast description
         ([#657](https://github.com/Automattic/pocket-casts-android/pull/657)).
     *   Added new Tasker "Query Podcasts", "Query Podcast Episodes", "Query Filter", "Query Filter Episodes" and "Add To Up Next" actions.
@@ -19,14 +22,14 @@
 7.29
 -----
 
-* New Features:
+*   New Features:
     *   Onboarding flow for new users
         ([#645](https://github.com/Automattic/pocket-casts-android/pull/645)).
     *   Display gravatar on profile screen
         ([#644](https://github.com/Automattic/pocket-casts-android/pull/644)).
     *   Remove 2022 End of Year stats flow
         ([#672](https://github.com/Automattic/pocket-casts-android/pull/672)).
-* Bug Fixes:
+*   Bug Fixes:
     *   Fixed podcast date format
         ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
     *   Fix unable to permanently change "Skip back time" setting

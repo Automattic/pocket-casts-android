@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokenedOkHttpClient
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
-import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -23,8 +22,6 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.json.JSONException
-import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
@@ -43,33 +40,6 @@ open class ServerManager @Inject constructor(
     companion object {
         private const val LIST_SEPERATOR = ","
         private const val NO_INTERNET_CONNECTION_MSG = "Check your connection and try again."
-    }
-
-    fun registerWithSyncServer(email: String, password: String, callback: ServerCallback<AuthResultModel>): Call? {
-        return postToSyncServer("/security/register", email, password, null, true, authResultExtractionCallback(callback))
-    }
-
-    fun loginToSyncServer(email: String, password: String, callback: ServerCallback<AuthResultModel>): Call? {
-        return postToSyncServer("/security/login", email, password, null, true, authResultExtractionCallback(callback))
-    }
-
-    private fun authResultExtractionCallback(callback: ServerCallback<AuthResultModel>): PostCallback {
-        return object : PostCallback, ServerFailure by callback {
-            override fun onSuccess(data: String?, response: ServerResponse) {
-                try {
-                    if (data == null) {
-                        throw Exception("Response empty")
-                    }
-                    val jsonData = JSONObject(data)
-                    val token = jsonData.getString("token")
-                    val uuid = jsonData.getString("uuid")
-                    callback.dataReturned(AuthResultModel(token = token, uuid = uuid))
-                } catch (e: JSONException) {
-                    Timber.e(e)
-                    callback.dataReturned(null)
-                }
-            }
-        }
     }
 
     fun obtainThirdPartyToken(email: String, password: String, scope: String, callback: ServerCallback<String>) {
