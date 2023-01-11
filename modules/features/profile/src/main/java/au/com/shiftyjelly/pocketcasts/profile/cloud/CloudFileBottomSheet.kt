@@ -33,8 +33,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -253,8 +254,10 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
                 binding.layoutLockedCloud.setOnClickListener {
                     viewModel.trackOptionTapped(UPLOAD_UPGRADE_REQUIRED)
-                    val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Files)
-                    bottomSheet.show(parentFragmentManager, "upgrade_bottom_sheet")
+                    OnboardingLauncher.openOnboardingFlow(
+                        activity,
+                        OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.FILES)
+                    )
                 }
 
                 binding.layoutDelete.setOnClickListener {

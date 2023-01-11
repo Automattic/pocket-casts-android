@@ -12,8 +12,9 @@ import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudSettingsBinding
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
@@ -120,18 +121,18 @@ class CloudSettingsFragment : BaseFragment() {
         }
 
         binding.btnLock.setOnClickListener {
-            openUpgradeBottomSheet()
+            openUpgradeSheet()
         }
 
         binding.lblFindMore.setOnClickListener {
-            openUpgradeBottomSheet()
+            openUpgradeSheet()
         }
     }
 
-    private fun openUpgradeBottomSheet() {
-        val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Files)
-        activity?.supportFragmentManager?.let {
-            bottomSheet.show(it, "upgrade_bottom_sheet")
-        }
+    private fun openUpgradeSheet() {
+        OnboardingLauncher.openOnboardingFlow(
+            activity,
+            OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.FILES)
+        )
     }
 }

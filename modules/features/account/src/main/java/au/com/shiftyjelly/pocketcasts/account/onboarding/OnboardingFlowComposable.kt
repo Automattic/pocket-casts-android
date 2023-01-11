@@ -155,6 +155,7 @@ fun OnboardingFlowComposable(
 
                 val userCreatedNewAccount = when (upgradeSource) {
                     OnboardingUpgradeSource.APPEARANCE,
+                    OnboardingUpgradeSource.FILES,
                     OnboardingUpgradeSource.FOLDERS,
                     OnboardingUpgradeSource.LOGIN,
                     OnboardingUpgradeSource.PLUS_DETAILS,
