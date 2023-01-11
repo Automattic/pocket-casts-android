@@ -6,6 +6,8 @@
 *   New Features:
     *   Add support for HLS streams
         ([#679](https://github.com/Automattic/pocket-casts-android/pull/679)).
+    *   Incorporated new onboarding flow throughout the app
+        ([#694](https://github.com/Automattic/pocket-casts-android/pull/694)).
 
 7.30
 -----
