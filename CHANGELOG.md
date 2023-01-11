@@ -1,6 +1,8 @@
 7.31
 -----
-
+*   Health:
+    *   Switched to using the new user login and register endpoints.
+        ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
 
 7.30
 -----
