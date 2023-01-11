@@ -19,6 +19,12 @@
     *   Improved the Android Automotive search
         ([#681](https://github.com/Automattic/pocket-casts-android/pull/681)).
 
+7.29.1
+-----
+* Bug Fixes:
+    *   Fixed Norwegian translations
+        ([#689](https://github.com/Automattic/pocket-casts-android/pull/689)).
+
 7.29
 -----
 
