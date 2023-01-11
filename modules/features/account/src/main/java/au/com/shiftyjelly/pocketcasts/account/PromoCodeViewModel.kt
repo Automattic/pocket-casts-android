@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account
 
+import android.content.Context
+import android.content.res.Resources
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorMessage
+import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Single
@@ -34,19 +36,19 @@ class PromoCodeViewModel @Inject constructor(
     private var disposable: Disposable? = null
     val state: MutableLiveData<ViewState> = MutableLiveData(ViewState.Loading)
 
-    fun setup(code: String) {
+    fun setup(code: String, context: Context) {
         val signedInFlow = Single.defer<ViewState> { syncServerManager.redeemPromoCode(code).map { ViewState.Success(it) } }
             .flatMap { viewState ->
                 subscriptionManager.getSubscriptionStatus(allowCache = false).map { viewState } // Force reloading of the new subscription status
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .onErrorReturn(errorHandler(isSignedIn = true))
+            .onErrorReturn(errorHandler(isSignedIn = true, resources = context.resources))
             .toFlowable()
 
         val signedOutFlow = syncServerManager.validatePromoCode(code)
             .observeOn(AndroidSchedulers.mainThread())
             .map<ViewState> { ViewState.NotSignedIn(it) }
-            .onErrorReturn(errorHandler(isSignedIn = false))
+            .onErrorReturn(errorHandler(isSignedIn = false, resources = context.resources))
             .toFlowable()
 
         disposable?.dispose()
@@ -72,11 +74,12 @@ class PromoCodeViewModel @Inject constructor(
         disposable?.dispose()
     }
 
-    private fun errorHandler(isSignedIn: Boolean): Function<Throwable, ViewState> {
+    private fun errorHandler(isSignedIn: Boolean, resources: Resources): Function<Throwable, ViewState> {
         return Function {
             when (it) {
                 is HttpException -> {
-                    var message = it.parseErrorMessage() ?: "Unknown error"
+                    val errorResponse = it.parseErrorResponse()
+                    var message = errorResponse?.messageLocalized(resources) ?: "Unknown error"
                     if (it.code() == 404) {
                         message = if (isSignedIn) {
                             "$message\nYou’re welcome to sign up for Pocket Casts Plus anyway, or continue using all the great features of your free account."
