@@ -189,11 +189,11 @@ class MainActivity :
 
     private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
         when (result) {
-            OnboardingFinish.Completed -> {
-                settings.setHasCompletedOnboarding()
+            OnboardingFinish.Done -> {
+                settings.setHasDoneInitialOnboarding()
             }
-            OnboardingFinish.CompletedGoToDiscover -> {
-                settings.setHasCompletedOnboarding()
+            OnboardingFinish.DoneGoToDiscover -> {
+                settings.setHasDoneInitialOnboarding()
                 openTab(VR.id.navigation_discover)
             }
             null -> {

@@ -48,8 +48,8 @@ class OnboardingActivity : AppCompatActivity() {
                 OnboardingFlowComposable(
                     theme = theme.activeTheme,
                     flow = onboardingFlow,
-                    exitOnboarding = { finishWithResult(OnboardingFinish.Completed) },
-                    completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.CompletedGoToDiscover) },
+                    exitOnboarding = { finishWithResult(OnboardingFinish.Done) },
+                    completeOnboardingToDiscover = { finishWithResult(OnboardingFinish.DoneGoToDiscover) },
                     signInState = currentSignInState,
                 )
             }
