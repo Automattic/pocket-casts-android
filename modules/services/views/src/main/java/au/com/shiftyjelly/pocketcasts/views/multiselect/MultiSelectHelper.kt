@@ -8,6 +8,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -48,7 +51,8 @@ class MultiSelectHelper @Inject constructor(
     val podcastManager: PodcastManager,
     val playbackManager: PlaybackManager,
     val downloadManager: DownloadManager,
-    val settings: Settings
+    val settings: Settings,
+    private val episodeAnalytics: EpisodeAnalytics
 ) :
     CoroutineScope {
     interface Listener {
@@ -85,6 +89,7 @@ class MultiSelectHelper @Inject constructor(
 
     var coordinatorLayout: View? = null
     var context: Context? = null
+    var source = AnalyticsSource.UNKNOWN
 
     lateinit var listener: Listener
 
@@ -377,6 +382,7 @@ class MultiSelectHelper @Inject constructor(
             trimmedList.forEach {
                 downloadManager.addEpisodeToQueue(it, "podcast download all", false)
             }
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED, source, trimmedList)
             val snackText = resources.getStringPlural(trimmedList.size, LR.string.download_queued_singular, LR.string.download_queued_plural)
             showSnackBar(snackText)
             closeMultiSelect()
@@ -396,6 +402,14 @@ class MultiSelectHelper @Inject constructor(
 
             val userEpisodes = list.filterIsInstance<UserEpisode>()
             userEpisodeManager.deleteAll(userEpisodes, playbackManager)
+
+            if (episodes.isNotEmpty()) {
+                episodeAnalytics.trackBulkEvent(
+                    AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED,
+                    source = source,
+                    count = if (episodes.isNotEmpty()) episodes.size else userEpisodes.size
+                )
+            }
 
             withContext(Dispatchers.Main) {
                 closeMultiSelect()
@@ -463,6 +477,7 @@ class MultiSelectHelper @Inject constructor(
                 Timber.d("Deleting $it")
                 CloudDeleteHelper.deleteEpisode(it, state, playbackManager, episodeManager, userEpisodeManager)
             }
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_DOWNLOAD_DELETED, source, episodesToDelete.size)
 
             val snackText = resources.getStringPlural(episodesToDelete.size, LR.string.episodes_deleted_singular, LR.string.episodes_deleted_plural)
             showSnackBar(snackText)

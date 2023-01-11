@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -25,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentUpnextBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -81,7 +81,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var adapter: UpNextAdapter
-    private val playbackSource = PlaybackSource.UP_NEXT
+    private val playbackSource = AnalyticsSource.UP_NEXT
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private var userRearrangingFrom: Int? = null
     private var userDraggingStart: Int? = null
@@ -127,6 +127,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val imageLoader = PodcastImageLoaderThemed(context)
+        multiSelectHelper.source = AnalyticsSource.UP_NEXT
         adapter = UpNextAdapter(
             context = context,
             imageLoader = imageLoader,

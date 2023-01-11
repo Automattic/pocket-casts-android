@@ -18,6 +18,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -30,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
@@ -79,7 +79,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private var binding: AdapterPlayerHeaderBinding? = null
     private var skippedFirstTouch: Boolean = false
     private var hasReceivedOnTouchDown = false
-    private val playbackSource = PlaybackSource.PLAYER
+    private val playbackSource = AnalyticsSource.PLAYER
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
@@ -121,7 +121,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
                 viewModel.seekToMs(progress, seekComplete)
-                playbackManager.trackPlaybackSeek(progress, PlaybackSource.PLAYER)
+                playbackManager.trackPlaybackSeek(progress, AnalyticsSource.PLAYER)
             }
 
             override fun onSeekPositionChanging(progress: Int) {}

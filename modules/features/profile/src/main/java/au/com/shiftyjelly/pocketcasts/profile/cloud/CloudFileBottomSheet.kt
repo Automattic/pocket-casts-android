@@ -15,6 +15,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -325,7 +326,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
     private fun upload(episode: UserEpisode, isOnWifi: Boolean) {
         viewModel.trackOptionTapped(UPLOAD)
         if (settings.warnOnMeteredNetwork() && !isOnWifi) {
-            warningsHelper.uploadWarning(episodeUUID)
+            warningsHelper.uploadWarning(episodeUUID, source = AnalyticsSource.FILES)
                 .show(parentFragmentManager, "upload_warning")
         } else {
             viewModel.uploadEpisode(episode)

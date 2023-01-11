@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -13,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
@@ -122,7 +122,7 @@ class FilterEpisodeListViewModel @Inject constructor(
             if (startIndex > -1) {
                 playbackManager.upNextQueue.removeAll()
                 val count = min(episodes.size - startIndex, settings.getMaxUpNextEpisodes())
-                playbackManager.playEpisodes(episodes = episodes.subList(startIndex, startIndex + count), playbackSource = PlaybackSource.FILTERS)
+                playbackManager.playEpisodes(episodes = episodes.subList(startIndex, startIndex + count), playbackSource = AnalyticsSource.FILTERS)
             }
         }
     }
