@@ -13,6 +13,10 @@ import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.BackpressureStrategy
@@ -26,7 +30,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
-import timber.log.Timber
 import java.io.File
 import java.net.HttpURLConnection
 import javax.inject.Inject
@@ -40,14 +43,20 @@ open class SyncServerManager @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) {
 
-    val server = retrofit.create(SyncServer::class.java)
-
-    fun loginMobile(email: String, password: String): Single<String> {
-        return login(email, password, "mobile")
+    companion object {
+        const val SCOPE_MOBILE = "mobile"
     }
 
-    fun loginSonos(email: String, password: String): Single<String> {
-        return login(email, password, "sonos")
+    private val server: SyncServer = retrofit.create(SyncServer::class.java)
+
+    suspend fun register(email: String, password: String): RegisterResponse {
+        val request = RegisterRequest(email = email, password = password, scope = SCOPE_MOBILE)
+        return server.register(request)
+    }
+
+    suspend fun login(email: String, password: String): LoginResponse {
+        val request = LoginRequest(email = email, password = password, scope = SCOPE_MOBILE)
+        return server.login(request)
     }
 
     fun emailChange(newEmail: String, password: String): Single<UserChangeResponse> {
@@ -55,7 +64,7 @@ open class SyncServerManager @Inject constructor(
             val request = EmailChangeRequest(
                 newEmail,
                 password,
-                "mobile"
+                SCOPE_MOBILE
             )
             server.emailChange(addBearer(token), request)
         }.doOnSuccess {
@@ -76,7 +85,7 @@ open class SyncServerManager @Inject constructor(
 
     fun pwdChange(pwdNew: String, pwdOld: String): Single<PwdChangeResponse> {
         return getCacheTokenOrLogin { token ->
-            val request = PwdChangeRequest(pwdNew, pwdOld, "mobile")
+            val request = PwdChangeRequest(pwdNew, pwdOld, SCOPE_MOBILE)
             server.pwdChange(addBearer(token), request)
         }.doOnSuccess {
             if (it.success == true) {
@@ -346,19 +355,6 @@ open class SyncServerManager @Inject constructor(
             model = Settings.SYNC_API_MODEL,
             version = Settings.SYNC_API_VERSION
         )
-    }
-
-    private fun login(email: String, password: String, scope: String): Single<String> {
-        val request = LoginRequest(email, password, scope)
-        return server.login(request)
-            .map { response ->
-                val token = response.token
-                if (token.isNullOrBlank()) {
-                    throw RuntimeException("Failed to get token.")
-                }
-                token
-            }
-            .doOnError { Timber.e(it) }
     }
 
     private suspend fun refreshTokenSuspend(): String {

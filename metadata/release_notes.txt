@@ -1,9 +1,10 @@
-
-* Bug Fixes:
-    *   Fixed podcast date format
-        ([#477](https://github.com/Automattic/pocket-casts-android/pull/477)).
-    *   Fix unable to permanently change "Skip back time" setting
-        ([#632](https://github.com/Automattic/pocket-casts-android/pull/632)).
-    *   Display gravatar on profile screen
-        ([#644](https://github.com/Automattic/pocket-casts-android/pull/644)).
+* New Features:
+    *   Add tappable links to podcast description
+        ([#657](https://github.com/Automattic/pocket-casts-android/pull/657)).
+    *   Added new Tasker "Query Podcasts", "Query Podcast Episodes", "Query Filter", "Query Filter Episodes" and "Add To Up Next" actions.
+        ([#583](https://github.com/Automattic/pocket-casts-android/pull/583)).
+    *   Add categories to recommendations screen
+        ([#675](https://github.com/Automattic/pocket-casts-android/pull/675)).
+    *   Improved the Android Automotive search
+        ([#681](https://github.com/Automattic/pocket-casts-android/pull/681)).
 

@@ -7,7 +7,7 @@ import androidx.work.RxWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorMessage
+import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -48,7 +48,8 @@ class UploadEpisodeTask @AssistedInject constructor(
                 val retry: Boolean
 
                 if (it is HttpException) {
-                    errorMessage = it.parseErrorMessage()
+                    val errorResponse = it.parseErrorResponse()
+                    errorMessage = errorResponse?.messageLocalized(context.resources)
 
                     if (errorMessage == null) {
                         errorMessage = when (it.code()) {

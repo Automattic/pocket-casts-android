@@ -33,7 +33,7 @@ SUPPORTED_LOCALES = [
   { glotpress: "it", android: "it", google_play: "it-IT",  promo_config: {} },
   { glotpress: "ja", android: "ja", google_play: "ja-JP",  promo_config: {} },
   { glotpress: "nl", android: "nl", google_play: "nl-NL",  promo_config: {} },
-  { glotpress: "nl", android: "nb", google_play: "nb-NB",  promo_config: {} },
+  { glotpress: "nb", android: "nb", google_play: "nb-NB",  promo_config: {} },
   { glotpress: "pt-br", android: "pt-rBR", google_play: "pt-BR",  promo_config: {} },
   { glotpress: "ru", android: "ru", google_play: "ru-RU",  promo_config: {} },
   { glotpress: "sv", android: "sv", google_play: "sv-SE",  promo_config: {} },

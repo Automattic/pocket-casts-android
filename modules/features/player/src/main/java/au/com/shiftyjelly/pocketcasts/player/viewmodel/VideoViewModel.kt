@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -27,7 +27,7 @@ class VideoViewModel @Inject constructor(
     private var lastTimeHidingControls = 0L
 
     private var controlsVisibleMutable = MutableLiveData(true)
-    private val playbackSource = PlaybackSource.FULL_SCREEN_VIDEO
+    private val playbackSource = AnalyticsSource.FULL_SCREEN_VIDEO
     val controlsVisible: LiveData<Boolean> get() = controlsVisibleMutable
 
     fun play() {

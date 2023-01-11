@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
@@ -67,7 +68,6 @@ import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
 import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
@@ -820,31 +820,31 @@ class MainActivity :
                 playbackManager.getCurrentEpisode()?.let { episode ->
                     launch(Dispatchers.Main) {
                         if (episode.isDownloaded) {
-                            playbackManager.playQueue(PlaybackSource.MINIPLAYER)
+                            playbackManager.playQueue(AnalyticsSource.MINIPLAYER)
                             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                         } else {
-                            warningsHelper.streamingWarningDialog(episode = episode, playbackSource = PlaybackSource.MINIPLAYER)
+                            warningsHelper.streamingWarningDialog(episode = episode, playbackSource = AnalyticsSource.MINIPLAYER)
                                 .show(supportFragmentManager, "streaming dialog")
                         }
                     }
                 }
             }
         } else {
-            playbackManager.playQueue(PlaybackSource.MINIPLAYER)
+            playbackManager.playQueue(AnalyticsSource.MINIPLAYER)
             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
         }
     }
 
     override fun onPauseClicked() {
-        playbackManager.pause(playbackSource = PlaybackSource.MINIPLAYER)
+        playbackManager.pause(playbackSource = AnalyticsSource.MINIPLAYER)
     }
 
     override fun onSkipBackwardClicked() {
-        playbackManager.skipBackward(playbackSource = PlaybackSource.MINIPLAYER)
+        playbackManager.skipBackward(playbackSource = AnalyticsSource.MINIPLAYER)
     }
 
     override fun onSkipForwardClicked() {
-        playbackManager.skipForward(playbackSource = PlaybackSource.MINIPLAYER)
+        playbackManager.skipForward(playbackSource = AnalyticsSource.MINIPLAYER)
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean) {
