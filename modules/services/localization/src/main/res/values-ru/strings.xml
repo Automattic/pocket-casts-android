@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-03 14:54:04+0000
+Translation-Revision-Date: 2023-01-10 13:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="onboarding_recommendations_more">Другие %s</string>
     <string name="filter_id_or_title">ID или название фильтра</string>
     <string name="filter_title">Название фильтра</string>
     <string name="filter_id_description">Уникальный ID, представляющий собой фильтр. Может использоваться в операции \"Запрос фильтра\".</string>

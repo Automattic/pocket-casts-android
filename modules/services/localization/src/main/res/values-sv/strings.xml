@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-04 13:54:03+0000
+Translation-Revision-Date: 2023-01-10 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="onboarding_recommendations_more">Mer %s</string>
     <string name="filter_id_or_title">Filter-ID eller -titel</string>
     <string name="filter_title">Filtertitel</string>
     <string name="filter_id_description">Ett unikt ID som representerar filtret. Kan användas för åtgärden \"Sök filteravsnitt\".</string>

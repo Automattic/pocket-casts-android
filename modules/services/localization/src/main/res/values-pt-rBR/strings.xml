@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-04 09:54:03+0000
+Translation-Revision-Date: 2023-01-09 18:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="onboarding_recommendations_more">Mais %s</string>
     <string name="filter_id_or_title">Título ou ID do filtro</string>
     <string name="filter_title">Título do filtro</string>
     <string name="filter_id_description">Uma ID exclusiva que representa o filtro. Pode ser usada na ação \"Consultar episódios filtrados\".</string>

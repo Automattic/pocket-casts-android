@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-06 09:54:20+0000
+Translation-Revision-Date: 2023-01-11 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="onboarding_recommendations_more">%sをもっと見る</string>
     <string name="filter_id_or_title">フィルター ID またはタイトル</string>
     <string name="filter_title">フィルタータイトル</string>
     <string name="filter_id_description">フィルターを表す一意の ID。 「フィルターエピソードをクエリー」アクションで使用できます。</string>
