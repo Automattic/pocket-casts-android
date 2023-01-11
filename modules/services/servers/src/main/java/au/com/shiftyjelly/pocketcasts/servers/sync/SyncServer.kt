@@ -4,6 +4,10 @@ import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
 import io.reactivex.Single
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -19,7 +23,10 @@ import retrofit2.http.Url
 
 interface SyncServer {
     @POST("/user/login")
-    fun login(@Body request: LoginRequest): Single<LoginResponse>
+    suspend fun login(@Body request: LoginRequest): LoginResponse
+
+    @POST("/user/register")
+    suspend fun register(@Body request: RegisterRequest): RegisterResponse
 
     @POST("/user/change_email")
     fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): Single<UserChangeResponse>
