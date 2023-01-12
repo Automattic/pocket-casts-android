@@ -72,7 +72,12 @@ fun OnboardingFlowComposable(
                             is OnboardingFlow.PlusAccountUpgrade -> throw IllegalStateException("PlusAccountUpgrade flow tried to present LoginOrSignupPage")
 
                             OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-                            is OnboardingFlow.PlusUpsell -> navController.popBackStack()
+                            is OnboardingFlow.PlusUpsell -> {
+                                val popped = navController.popBackStack()
+                                if (!popped) {
+                                    exitOnboarding()
+                                }
+                            }
 
                             OnboardingFlow.InitialOnboarding,
                             OnboardingFlow.LoggedOut -> exitOnboarding()
