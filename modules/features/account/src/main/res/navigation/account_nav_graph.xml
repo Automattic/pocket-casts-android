@@ -32,11 +32,6 @@
             android:id="@+id/action_accountFragment_to_createAccountFragment"
             app:destination="@id/createAccountFragment" />
         <action
-            android:id="@+id/action_accountFragment_to_upgradedAccountFragment"
-            app:destination="@id/upgradedAccountFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
-        <action
             android:id="@+id/action_accountFragment_to_createEmailFragment"
             app:destination="@id/createEmailFragment" />
     </fragment>
@@ -104,10 +99,6 @@
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
-    <fragment
-        android:id="@+id/upgradedAccountFragment"
-        android:name="au.com.shiftyjelly.pocketcasts.profile.UpgradedAccountFragment"
-        android:label="Account Upgraded" />
     <fragment
         android:id="@+id/resetPasswordFragment"
         android:name="au.com.shiftyjelly.pocketcasts.account.ResetPasswordFragment"
