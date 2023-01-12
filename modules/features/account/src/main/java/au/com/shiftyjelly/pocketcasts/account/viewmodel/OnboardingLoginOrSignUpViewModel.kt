@@ -31,6 +31,8 @@ import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import javax.inject.Inject
 
+data class GoogleSignInState(val isNewAccount: Boolean)
+
 @HiltViewModel
 class OnboardingLoginOrSignUpViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
@@ -123,7 +125,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
      */
     fun onGoogleOneTapSignInResult(
         result: ActivityResult,
-        onSuccess: () -> Unit,
+        onSuccess: (GoogleSignInState) -> Unit,
         onError: suspend () -> Unit,
     ) {
         viewModelScope.launch {
@@ -135,7 +137,6 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
                         onError()
                     }
                 )
-                onSuccess()
             } catch (e: Exception) {
                 if (e is ApiException && e.statusCode == CommonStatusCodes.CANCELED) {
                     // user declined to sign in
@@ -150,7 +151,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     /**
      * Handle the response from the legacy Google Sign-In intent.
      */
-    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: () -> Unit, onError: () -> Unit) {
+    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: (GoogleSignInState) -> Unit, onError: () -> Unit) {
         viewModelScope.launch {
             try {
                 onGoogleSignInResult(
@@ -193,16 +194,20 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
         )
     }
 
-    private suspend fun onGoogleSignInResult(result: ActivityResult, onSuccess: () -> Unit, onError: suspend () -> Unit) {
+    private suspend fun onGoogleSignInResult(result: ActivityResult, onSuccess: (GoogleSignInState) -> Unit, onError: suspend () -> Unit) {
         val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
         val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
         signInWithGoogleToken(idToken = idToken, onSuccess = onSuccess, onError = onError)
     }
 
-    private suspend fun signInWithGoogleToken(idToken: String, onSuccess: () -> Unit, onError: suspend () -> Unit) =
-        when (accountAuth.signInWithGoogle(idToken = idToken, signInSource = SignInSource.Onboarding)) {
-            is AccountAuth.AuthResult.Success -> onSuccess()
-            is AccountAuth.AuthResult.Failed -> onError()
+    private suspend fun signInWithGoogleToken(idToken: String, onSuccess: (GoogleSignInState) -> Unit, onError: suspend () -> Unit) =
+        when (val authResult = accountAuth.signInWithGoogle(idToken = idToken, signInSource = SignInSource.Onboarding)) {
+            is AccountAuth.AuthResult.Success -> {
+                onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))
+            }
+            is AccountAuth.AuthResult.Failed -> {
+                onError()
+            }
         }
 
     companion object {

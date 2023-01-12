@@ -43,7 +43,7 @@ class AccountAuth @Inject constructor(
     ): AuthResult {
         val authResult = try {
             val response = syncServerManager.loginGoogle(idToken)
-            val result = AuthResultModel(token = response.refreshToken, uuid = response.uuid)
+            val result = AuthResultModel(token = response.refreshToken, uuid = response.uuid, isNewAccount = response.isNew)
             signInSuccessful(
                 email = response.email,
                 refreshTokenOrPassword = response.refreshToken,
@@ -125,7 +125,7 @@ class AccountAuth @Inject constructor(
     private suspend fun register(email: String, password: String): AuthResult {
         return try {
             val response = syncServerManager.register(email = email, password = password)
-            AuthResult.Success(AuthResultModel(token = response.token, uuid = response.uuid))
+            AuthResult.Success(AuthResultModel(token = response.token, uuid = response.uuid, isNewAccount = true))
         } catch (ex: Exception) {
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
         }
@@ -134,7 +134,7 @@ class AccountAuth @Inject constructor(
     private suspend fun login(email: String, password: String): AuthResult {
         return try {
             val response = syncServerManager.login(email = email, password = password)
-            val result = AuthResultModel(token = response.token, uuid = response.uuid)
+            val result = AuthResultModel(token = response.token, uuid = response.uuid, isNewAccount = false)
             AuthResult.Success(result)
         } catch (ex: Exception) {
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)

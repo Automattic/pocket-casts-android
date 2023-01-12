@@ -46,6 +46,15 @@ fun OnboardingFlowComposable(
             }
         }
 
+        val onAccountCreated = {
+            navController.navigate(OnboardingRecommendationsFlow.route) {
+                // clear backstack after account is created
+                popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                    inclusive = true
+                }
+            }
+        }
+
         NavHost(
             navController = navController,
             startDestination = OnboardingNavRoute.logInOrSignUp
@@ -70,7 +79,13 @@ fun OnboardingFlowComposable(
                     onDismiss = { completeOnboarding() },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                     onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
-                    onContinueWithGoogleComplete = { completeOnboarding() },
+                    onContinueWithGoogleComplete = { state ->
+                        if (state.isNewAccount) {
+                            onAccountCreated()
+                        } else {
+                            completeOnboarding()
+                        }
+                    },
                 )
             }
 
@@ -78,14 +93,7 @@ fun OnboardingFlowComposable(
                 OnboardingCreateAccountPage(
                     theme = theme,
                     onBackPressed = { navController.popBackStack() },
-                    onAccountCreated = {
-                        navController.navigate(OnboardingRecommendationsFlow.route) {
-                            // clear backstack after account is created
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                                inclusive = true
-                            }
-                        }
-                    },
+                    onAccountCreated = onAccountCreated,
                 )
             }
 

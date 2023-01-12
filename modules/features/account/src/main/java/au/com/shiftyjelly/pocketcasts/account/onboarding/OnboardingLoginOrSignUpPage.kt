@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
@@ -72,7 +73,7 @@ internal fun OnboardingLoginOrSignUpPage(
     onDismiss: () -> Unit,
     onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
-    onContinueWithGoogleComplete: () -> Unit,
+    onContinueWithGoogleComplete: (GoogleSignInState) -> Unit,
     viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel()
 ) {
 
@@ -233,7 +234,7 @@ private fun Artwork(
 private fun ContinueWithGoogleButton(
     flow: String,
     viewModel: OnboardingLoginOrSignUpViewModel,
-    onComplete: () -> Unit
+    onComplete: (GoogleSignInState) -> Unit
 ) {
     val context = LocalContext.current
     val errorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
