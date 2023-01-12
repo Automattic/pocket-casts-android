@@ -120,12 +120,13 @@ class CloudSettingsFragment : BaseFragment() {
             binding.upgradeLayout.isVisible = false
         }
 
-        binding.btnLock.setOnClickListener {
-            openUpgradeSheet()
-        }
-
-        binding.lblFindMore.setOnClickListener {
-            openUpgradeSheet()
+        listOf(
+            binding.btnLock,
+            binding.imgLogo,
+            binding.lblGetMore,
+            binding.lblFindMore
+        ).forEach {
+            it.setOnClickListener { openUpgradeSheet() }
         }
     }
 
