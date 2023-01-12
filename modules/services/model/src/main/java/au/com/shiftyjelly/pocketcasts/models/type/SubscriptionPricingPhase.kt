@@ -1,8 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import android.content.res.Resources
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralYears
+import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.ProductDetails
 import java.time.Period
@@ -41,12 +42,13 @@ sealed interface RecurringSubscriptionPricingPhase : SubscriptionPricingPhase {
 
 sealed interface SubscriptionPricingPhase {
     val pricingPhase: ProductDetails.PricingPhase
-    val periodRes: Int
+    @get:StringRes val periodResSingular: Int
+    @get:StringRes val periodResPlural: Int
     val periodValue: Int
     fun periodValuePlural(res: Resources): String =
-        res.getStringPluralYears(periodValue)
+        res.getStringPlural(periodValue, periodResSingular, periodResPlural)
     fun periodValueSingular(res: Resources): String =
-        "$periodValue ${res.getString(periodRes)}"
+        "$periodValue ${res.getString(periodResSingular)}"
     fun phaseType(): Type = pricingPhase.subscriptionPricingPhaseType
 
     enum class Type { TRIAL, RECURRING, UNKNOWN }
@@ -67,7 +69,8 @@ sealed interface SubscriptionPricingPhase {
     ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
         override val periodValue = period.years
         override val chronoUnit = ChronoUnit.YEARS
-        override val periodRes = R.string.plus_year
+        override val periodResSingular = R.string.plus_year
+        override val periodResPlural = R.string.years_plural
         override val perPeriod = R.string.profile_per_year
         override val renews = R.string.plus_renews_automatically_yearly
         override val hint = R.string.plus_best_value
@@ -87,7 +90,8 @@ sealed interface SubscriptionPricingPhase {
         private val period: Period
     ) : RecurringSubscriptionPricingPhase, TrialSubscriptionPricingPhase {
 
-        override val periodRes = R.string.plus_month
+        override val periodResSingular = R.string.plus_month
+        override val periodResPlural = R.string.months_plural
         override val periodValue = period.months
         override val chronoUnit = ChronoUnit.MONTHS
         override val perPeriod = R.string.profile_per_month
@@ -108,7 +112,8 @@ sealed interface SubscriptionPricingPhase {
         override val pricingPhase: ProductDetails.PricingPhase,
         private val period: Period
     ) : TrialSubscriptionPricingPhase {
-        override val periodRes = R.string.plus_day
+        override val periodResSingular = R.string.plus_day
+        override val periodResPlural = R.string.days_plural
         override val periodValue = period.days
         override val chronoUnit = ChronoUnit.DAYS
 
