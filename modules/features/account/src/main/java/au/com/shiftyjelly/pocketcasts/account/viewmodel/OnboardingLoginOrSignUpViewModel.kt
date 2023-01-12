@@ -6,7 +6,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.BuildConfig
+import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -33,7 +35,8 @@ import javax.inject.Inject
 class OnboardingLoginOrSignUpViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext context: Context,
-    private val podcastManager: PodcastManager
+    private val podcastManager: PodcastManager,
+    private val accountAuth: AccountAuth,
 ) : AndroidViewModel(context as Application) {
 
     val showContinueWithGoogleButton =
@@ -103,7 +106,11 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
                 val intentSenderRequest = IntentSenderRequest.Builder(signInIntent.intentSender).build()
                 onSuccess(intentSenderRequest)
             } else {
-                signInWithGoogleToken(email = email, idToken = idToken)
+                signInWithGoogleToken(
+                    idToken = idToken,
+                    onSuccess = {},
+                    onError = onError
+                )
             }
         } catch (ex: Exception) {
             LogBuffer.e(LogBuffer.TAG_CRASH, ex, "Unable to sign in with legacy Google Sign-In")
@@ -121,7 +128,13 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                onGoogleSignInResult(result)
+                onGoogleSignInResult(
+                    result = result,
+                    onSuccess = onSuccess,
+                    onError = {
+                        onError()
+                    }
+                )
                 onSuccess()
             } catch (e: Exception) {
                 if (e is ApiException && e.statusCode == CommonStatusCodes.CANCELED) {
@@ -140,8 +153,11 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: () -> Unit, onError: () -> Unit) {
         viewModelScope.launch {
             try {
-                onGoogleSignInResult(result)
-                onSuccess()
+                onGoogleSignInResult(
+                    result = result,
+                    onSuccess = onSuccess,
+                    onError = onError
+                )
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to get sign in credentials from legacy Google Sign-In result.")
                 onError()
@@ -177,18 +193,17 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
         )
     }
 
-    private suspend fun onGoogleSignInResult(result: ActivityResult) {
+    private suspend fun onGoogleSignInResult(result: ActivityResult, onSuccess: () -> Unit, onError: suspend () -> Unit) {
         val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
         val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
-        val email = credential.id
-        signInWithGoogleToken(email = email, idToken = idToken)
+        signInWithGoogleToken(idToken = idToken, onSuccess = onSuccess, onError = onError)
     }
 
-    private fun signInWithGoogleToken(email: String, idToken: String) {
-        Timber.i("signInWithGoogleToken idToken: $idToken email: $email")
-        // Todo send the Google ID token to the server, this will be done in a future change
-        // accountAuth.signInWithGoogleToken(email = email, idToken = idToken)
-    }
+    private suspend fun signInWithGoogleToken(idToken: String, onSuccess: () -> Unit, onError: suspend () -> Unit) =
+        when (accountAuth.signInWithGoogle(idToken = idToken, signInSource = SignInSource.Onboarding)) {
+            is AccountAuth.AuthResult.Success -> onSuccess()
+            is AccountAuth.AuthResult.Failed -> onError()
+        }
 
     companion object {
         private object AnalyticsProp {

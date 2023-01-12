@@ -6,21 +6,18 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
-import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -40,19 +37,47 @@ class AccountAuth @Inject constructor(
         private const val KEY_ERROR_CODE = "error_code"
     }
 
+    suspend fun signInWithGoogle(
+        idToken: String,
+        signInSource: SignInSource,
+    ): AuthResult {
+        val authResult = try {
+            val response = syncServerManager.loginGoogle(idToken)
+            val result = AuthResultModel(token = response.refreshToken, uuid = response.uuid)
+            signInSuccessful(
+                email = response.email,
+                refreshTokenOrPassword = response.refreshToken,
+                accessToken = response.accessToken,
+                userUuid = response.uuid,
+                signInType = AccountConstants.SignInType.RefreshToken
+            )
+            AuthResult.Success(result)
+        } catch (ex: Exception) {
+            Timber.e(ex, "Failed to sign in with Google")
+            exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
+        }
+        trackSignIn(authResult, signInSource)
+        return authResult
+    }
+
     suspend fun signInWithEmailAndPassword(
         email: String,
         password: String,
         signInSource: SignInSource
     ): AuthResult {
-        return withContext(Dispatchers.IO) {
-            val authResult = login(email, password)
-            if (authResult is AuthResult.Success) {
-                signInSuccessful(email, password, authResult.result)
-            }
-            trackSignIn(authResult, signInSource)
-            authResult
+        val authResult = login(email, password)
+        if (authResult is AuthResult.Success) {
+            val result = authResult.result
+            signInSuccessful(
+                email = email,
+                refreshTokenOrPassword = password,
+                accessToken = result.token,
+                userUuid = result.uuid,
+                signInType = AccountConstants.SignInType.EmailPassword
+            )
         }
+        trackSignIn(authResult, signInSource)
+        return authResult
     }
 
     private fun trackSignIn(authResult: AuthResult, signInSource: SignInSource) {
@@ -70,14 +95,19 @@ class AccountAuth @Inject constructor(
     }
 
     suspend fun createUserWithEmailAndPassword(email: String, password: String): AuthResult {
-        return withContext(Dispatchers.IO) {
-            val authResult = register(email, password)
-            if (authResult is AuthResult.Success) {
-                signInSuccessful(email, password, authResult.result)
-            }
-            trackRegister(authResult)
-            authResult
+        val authResult = register(email, password)
+        if (authResult is AuthResult.Success) {
+            val result = authResult.result
+            signInSuccessful(
+                email = email,
+                refreshTokenOrPassword = password,
+                accessToken = result.token,
+                userUuid = result.uuid,
+                signInType = AccountConstants.SignInType.EmailPassword
+            )
         }
+        trackRegister(authResult)
+        return authResult
     }
 
     private fun trackRegister(authResult: AuthResult) {
@@ -112,60 +142,67 @@ class AccountAuth @Inject constructor(
     }
 
     private fun exceptionToAuthResult(exception: Exception, fallbackMessage: Int): AuthResult.Failed {
-        val errorResponse = (exception as HttpException).parseErrorResponse()
         val resources = context.resources
-        val message = errorResponse?.messageLocalized(resources) ?: resources.getString(fallbackMessage)
-        val messageId = errorResponse?.messageId
+        var message: String? = null
+        var messageId: String? = null
+        if (exception is HttpException) {
+            val errorResponse = exception.parseErrorResponse()
+            message = errorResponse?.messageLocalized(resources)
+            messageId = errorResponse?.messageId
+        }
+        message = message ?: resources.getString(fallbackMessage)
         return AuthResult.Failed(message = message, messageId = messageId)
     }
 
-    fun resetPasswordWithEmail(email: String, complete: (AuthResult) -> Unit) {
-        serverManager.forgottenPasswordToSyncServer(
-            email,
-            object : ServerCallback<String> {
-                override fun dataReturned(result: String?) {
-                    complete(AuthResult.Success(null))
-                    analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_RESET)
-                }
-
-                override fun onFailed(
-                    errorCode: Int,
-                    userMessage: String?,
-                    serverMessageId: String?,
-                    serverMessage: String?,
-                    throwable: Throwable?
-                ) {
-                    val message = LocaliseHelper.serverMessageIdToMessage(serverMessageId, ::getResourceString)
-                        ?: userMessage
-                        ?: getResourceString(LR.string.profile_reset_password_failed)
-                    complete(
-                        AuthResult.Failed(message = message, messageId = serverMessageId)
-                    )
-                }
+    suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        try {
+            val response = syncServerManager.forgotPassword(email = email)
+            if (response.success) {
+                analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_RESET)
+                onSuccess()
+            } else {
+                onError(response.message)
             }
-        )
+        } catch (ex: Exception) {
+            Timber.e(ex, "Failed to reset password.")
+            onError(getResourceString(LR.string.profile_reset_password_failed))
+        }
     }
 
-    private suspend fun signInSuccessful(email: String, password: String, authResult: AuthResultModel?) {
+    private suspend fun signInSuccessful(email: String, refreshTokenOrPassword: String, accessToken: String, userUuid: String, signInType: AccountConstants.SignInType) {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully to $email")
         // Store details in android account manager
-        if (authResult != null && authResult.token.isNotEmpty()) {
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Saving $email to account manager")
-            val account = Account(email, AccountConstants.ACCOUNT_TYPE)
-            val accountManager = AccountManager.get(context)
-            accountManager.addAccountExplicitly(account, password, null)
-            accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, authResult.token)
-            accountManager.setUserData(account, AccountConstants.UUID, authResult.uuid)
+        val account = Account(email, AccountConstants.ACCOUNT_TYPE)
+        val accountManager = AccountManager.get(context)
+        accountManager.addAccountExplicitly(account, refreshTokenOrPassword, null)
+        accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken)
+        accountManager.setUserData(account, AccountConstants.UUID, userUuid)
+        accountManager.setUserData(account, AccountConstants.SIGN_IN_TYPE_KEY, signInType.toString())
 
-            settings.setUsedAccountManager(true)
-        } else {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Sign in marked as successful but we didn't get a token back.")
-        }
+        settings.setUsedAccountManager(true)
+        startPodcastRefresh()
+    }
 
+    private suspend fun startPodcastRefresh() {
         settings.setLastModified(null)
         RefreshPodcastsThread.clearLastRefreshTime()
         podcastManager.markAllPodcastsUnsynced()
         podcastManager.refreshPodcasts("login")
+    }
+
+    suspend fun refreshToken(email: String, refreshTokenOrPassword: String, signInSource: SignInSource, signInType: AccountConstants.SignInType): String {
+        val properties = mapOf(KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
+        try {
+            val accessToken = when (signInType) {
+                AccountConstants.SignInType.EmailPassword -> syncServerManager.login(email = email, password = refreshTokenOrPassword).token
+                AccountConstants.SignInType.RefreshToken -> syncServerManager.loginToken(refreshToken = refreshTokenOrPassword).accessToken
+            }
+            analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
+            return accessToken
+        } catch (ex: Exception) {
+            analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, properties)
+            throw ex
+        }
     }
 
     private fun getResourceString(stringId: Int): String {
@@ -173,7 +210,7 @@ class AccountAuth @Inject constructor(
     }
 
     sealed class AuthResult {
-        data class Success(val result: AuthResultModel?) : AuthResult()
+        data class Success(val result: AuthResultModel) : AuthResult()
         data class Failed(val message: String, val messageId: String?) : AuthResult()
     }
 }

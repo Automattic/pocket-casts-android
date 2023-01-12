@@ -70,7 +70,7 @@ fun OnboardingFlowComposable(
                     onDismiss = { completeOnboarding() },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                     onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
-                    onContinueWithGoogleClicked = { navController.navigate(OnboardingNavRoute.logInGoogle) },
+                    onContinueWithGoogleComplete = { completeOnboarding() },
                 )
             }
 
@@ -96,10 +96,6 @@ fun OnboardingFlowComposable(
                     onLoginComplete = completeOnboarding,
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
-            }
-
-            composable(OnboardingNavRoute.logInGoogle) {
-                OnboardingLoginGooglePage()
             }
 
             composable(OnboardingNavRoute.forgotPassword) {
@@ -151,7 +147,6 @@ private object OnboardingNavRoute {
     const val createFreeAccount = "create_free_account"
     const val forgotPassword = "forgot_password"
     const val logIn = "log_in"
-    const val logInGoogle = "log_in_google"
     const val logInOrSignUp = "log_in_or_sign_up"
     const val plusUpgrade = "upgrade_upgrade"
     const val welcome = "welcome"
