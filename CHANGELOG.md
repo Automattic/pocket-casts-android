@@ -2,6 +2,12 @@
 -----
 
 
+7.29.2
+-----
+* Bug Fixes:
+    *    Fix text on purchase button in new onboarding flow
+         ([#698](https://github.com/Automattic/pocket-casts-android/pull/698)).
+
 7.29
 -----
 
