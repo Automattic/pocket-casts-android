@@ -2,10 +2,15 @@ package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
 import io.reactivex.Single
@@ -25,8 +30,17 @@ interface SyncServer {
     @POST("/user/login")
     suspend fun login(@Body request: LoginRequest): LoginResponse
 
+    @POST("/user/login_google")
+    suspend fun loginGoogle(@Body request: LoginGoogleRequest): LoginTokenResponse
+
+    @POST("/user/token")
+    suspend fun loginToken(@Body request: LoginTokenRequest): LoginTokenResponse
+
     @POST("/user/register")
     suspend fun register(@Body request: RegisterRequest): RegisterResponse
+
+    @POST("/user/forgot_password")
+    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): ForgotPasswordResponse
 
     @POST("/user/change_email")
     fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): Single<UserChangeResponse>

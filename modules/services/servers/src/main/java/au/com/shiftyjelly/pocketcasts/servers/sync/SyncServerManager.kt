@@ -11,10 +11,15 @@ import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerRetrofit
+import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
@@ -57,6 +62,21 @@ open class SyncServerManager @Inject constructor(
     suspend fun login(email: String, password: String): LoginResponse {
         val request = LoginRequest(email = email, password = password, scope = SCOPE_MOBILE)
         return server.login(request)
+    }
+
+    suspend fun loginGoogle(idToken: String): LoginTokenResponse {
+        val request = LoginGoogleRequest(idToken)
+        return server.loginGoogle(request)
+    }
+
+    suspend fun loginToken(refreshToken: String): LoginTokenResponse {
+        val request = LoginTokenRequest(refreshCode = refreshToken)
+        return server.loginToken(request)
+    }
+
+    suspend fun forgotPassword(email: String): ForgotPasswordResponse {
+        val request = ForgotPasswordRequest(email = email)
+        return server.forgotPassword(request)
     }
 
     fun emailChange(newEmail: String, password: String): Single<UserChangeResponse> {
@@ -318,7 +338,7 @@ open class SyncServerManager @Inject constructor(
                 serverCall(token)
             } catch (ex: Exception) {
                 // refresh invalid
-                if (isInvalidTokenError(ex)) {
+                if (isHttpUnauthorized(ex)) {
                     val token = refreshTokenSuspend()
                     serverCall(token)
                 } else {
@@ -337,7 +357,7 @@ open class SyncServerManager @Inject constructor(
                 .flatMap { token -> serverCall(token) }
                 // refresh invalid
                 .onErrorResumeNext { throwable ->
-                    return@onErrorResumeNext if (isInvalidTokenError(throwable)) {
+                    return@onErrorResumeNext if (isHttpUnauthorized(throwable)) {
                         refreshToken().flatMap { token -> serverCall(token) }
                     }
                     // re-throw this error because it's not recoverable from here
@@ -370,7 +390,7 @@ open class SyncServerManager @Inject constructor(
             }
     }
 
-    private fun isInvalidTokenError(throwable: Throwable?): Boolean {
+    private fun isHttpUnauthorized(throwable: Throwable?): Boolean {
         return throwable is HttpException && throwable.code() == 401
     }
 
