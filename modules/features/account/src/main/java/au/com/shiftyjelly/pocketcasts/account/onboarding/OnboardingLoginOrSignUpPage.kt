@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
@@ -72,7 +73,7 @@ internal fun OnboardingLoginOrSignUpPage(
     onDismiss: () -> Unit,
     onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
-    onContinueWithGoogleClicked: () -> Unit,
+    onContinueWithGoogleComplete: (GoogleSignInState) -> Unit,
     viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel()
 ) {
 
@@ -156,7 +157,7 @@ internal fun OnboardingLoginOrSignUpPage(
             ContinueWithGoogleButton(
                 flow = flow,
                 viewModel = viewModel,
-                onClick = onContinueWithGoogleClicked
+                onComplete = onContinueWithGoogleComplete
             )
         } else {
             Spacer(Modifier.height(8.dp))
@@ -233,7 +234,7 @@ private fun Artwork(
 private fun ContinueWithGoogleButton(
     flow: String,
     viewModel: OnboardingLoginOrSignUpViewModel,
-    onClick: () -> Unit
+    onComplete: (GoogleSignInState) -> Unit
 ) {
     val context = LocalContext.current
     val errorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
@@ -246,7 +247,7 @@ private fun ContinueWithGoogleButton(
     val googleLegacySignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         viewModel.onGoogleLegacySignInResult(
             result = result,
-            onSuccess = onClick,
+            onSuccess = onComplete,
             onError = showError
         )
     }
@@ -255,7 +256,7 @@ private fun ContinueWithGoogleButton(
     val googleOneTapSignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         viewModel.onGoogleOneTapSignInResult(
             result = result,
-            onSuccess = onClick,
+            onSuccess = onComplete,
             onError = {
                 viewModel.startGoogleLegacySignIn(
                     onSuccess = { request -> googleLegacySignInLauncher.launch(request) },
@@ -350,7 +351,7 @@ private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProv
             onDismiss = {},
             onSignUpClicked = {},
             onLoginClicked = {},
-            onContinueWithGoogleClicked = {},
+            onContinueWithGoogleComplete = {},
         )
     }
 }

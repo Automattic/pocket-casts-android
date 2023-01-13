@@ -4,11 +4,11 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager.PlaybackSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +27,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var playbackManager: PlaybackManager
 
-    private val playbackSource = PlaybackSource.NOTIFICATION
+    private val source = AnalyticsSource.NOTIFICATION
 
     companion object {
 
@@ -92,7 +92,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun playNow(episodeUuid: String, forceStream: Boolean) {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNow(episode, forceStream = forceStream, playbackSource = playbackSource)
+                playbackManager.playNow(episode, forceStream = forceStream, playbackSource = source)
             }
         }
     }
@@ -134,7 +134,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playLast(episode)
                 if (playNext) {
-                    playbackManager.playNextInQueue(playbackSource = playbackSource)
+                    playbackManager.playNextInQueue(playbackSource = source)
                 }
             }
         }

@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
+import au.com.shiftyjelly.pocketcasts.preferences.getSignInType
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -34,13 +35,16 @@ class PocketCastsAccountAuthenticator(val context: Context, private val accountA
         var authToken = accountManager.peekAuthToken(account, authTokenType)
         if (authToken.isNullOrEmpty() && account != null) {
             runBlocking {
-                Timber.d("Signing in to get a new token")
-                val authResult = accountAuth.signInWithEmailAndPassword(account.name, accountManager.getPassword(account), SignInSource.AccountAuthenticator)
-                if (authResult is AccountAuth.AuthResult.Success) {
-                    Timber.d("Token refresh success")
-                    authToken = authResult.result?.token
-                } else if (authResult is AccountAuth.AuthResult.Failed) {
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Could not get new token, ${authResult.message}")
+                Timber.d("Refreshing the access token")
+                try {
+                    authToken = accountAuth.refreshToken(
+                        email = account.name,
+                        refreshTokenOrPassword = accountManager.getPassword(account),
+                        signInType = accountManager.getSignInType(account),
+                        signInSource = SignInSource.AccountAuthenticator
+                    )
+                } catch (ex: Exception) {
+                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to refresh token.")
                 }
             }
 
