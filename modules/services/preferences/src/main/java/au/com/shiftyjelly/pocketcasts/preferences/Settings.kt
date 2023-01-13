@@ -604,5 +604,5 @@ interface Settings {
     fun getEndOfYearModalHasBeenShown(): Boolean
 
     fun hasCompletedOnboarding(): Boolean
-    fun setHasCompletedOnboarding()
+    fun setHasDoneInitialOnboarding()
 }

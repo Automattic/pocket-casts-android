@@ -6,6 +6,8 @@ import android.view.accessibility.AccessibilityManager
 import androidx.lifecycle.AndroidViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,30 +35,21 @@ class OnboardingPlusFeaturesViewModel @Inject constructor(
         }
     }
 
-    fun onShown(flow: String, source: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLUS_PROMOTION_SHOWN,
-            mapOf(flowKey to flow, sourceKey to source)
-        )
+    fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, analyticsProps(flow, source))
     }
 
-    fun onDismiss(flow: String, source: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLUS_PROMOTION_DISMISSED,
-            mapOf(flowKey to flow, sourceKey to source)
-        )
+    fun onDismiss(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, analyticsProps(flow, source))
     }
 
-    fun onUpgradePressed(flow: String, source: String) {
-        analyticsTracker.track(
-            AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED,
-            mapOf(flowKey to flow, sourceKey to source)
-        )
+    fun onUpgradePressed(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
     companion object {
-        private const val flowKey = "flow"
-        private const val sourceKey = "source"
+        private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) =
+            mapOf("flow" to flow.analyticsValue, "source" to source.analyticsValue)
     }
 }
 

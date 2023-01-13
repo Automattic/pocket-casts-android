@@ -58,18 +58,17 @@ import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.androidbrowserhelper.trusted.Utils.setNavigationBarColor
-import com.google.androidbrowserhelper.trusted.Utils.setStatusBarColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingLoginOrSignUpPage(
     theme: Theme.ThemeType,
-    flow: String,
+    flow: OnboardingFlow,
     onDismiss: () -> Unit,
     onSignUpClicked: () -> Unit,
     onLoginClicked: () -> Unit,
@@ -232,7 +231,7 @@ private fun Artwork(
  */
 @Composable
 private fun ContinueWithGoogleButton(
-    flow: String,
+    flow: OnboardingFlow,
     viewModel: OnboardingLoginOrSignUpViewModel,
     onComplete: (GoogleSignInState) -> Unit
 ) {
@@ -347,7 +346,7 @@ private fun RowOutlinedButtonPreview(@PreviewParameter(ThemePreviewParameterProv
     AppThemeWithBackground(themeType) {
         OnboardingLoginOrSignUpPage(
             theme = themeType,
-            flow = "initial_onboarding",
+            flow = OnboardingFlow.InitialOnboarding,
             onDismiss = {},
             onSignUpClicked = {},
             onLoginClicked = {},

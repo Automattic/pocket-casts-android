@@ -31,8 +31,9 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
@@ -184,8 +185,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
         toolbar.setOnMenuItemClickListener(this)
 
         toolbar.menu.findItem(R.id.folders_locked).setOnMenuItemClickListener {
-            // show the upgrade to Plus dialog
-            PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Folders).show(parentFragmentManager, "plus_upgrade_bottom_sheet")
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.FOLDERS))
             true
         }
 
