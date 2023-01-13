@@ -60,6 +60,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.androidbrowserhelper.trusted.Utils.setNavigationBarColor
+import com.google.androidbrowserhelper.trusted.Utils.setStatusBarColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 

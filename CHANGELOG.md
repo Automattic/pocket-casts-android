@@ -1,12 +1,31 @@
-7.30
+7.31
 -----
 
+
+7.30
+-----
+* New Features:
+    *   Add tappable links to podcast description
+        ([#657](https://github.com/Automattic/pocket-casts-android/pull/657)).
+    *   Added new Tasker "Query Podcasts", "Query Podcast Episodes", "Query Filter", "Query Filter Episodes" and "Add To Up Next" actions.
+        ([#583](https://github.com/Automattic/pocket-casts-android/pull/583)).
+    *   Add categories to recommendations screen
+        ([#675](https://github.com/Automattic/pocket-casts-android/pull/675)).
+    *   Improved the Android Automotive search
+        ([#681](https://github.com/Automattic/pocket-casts-android/pull/681)).
 
 7.29.2
 -----
 * Bug Fixes:
     *    Fix text on purchase button in new onboarding flow
          ([#698](https://github.com/Automattic/pocket-casts-android/pull/698)).
+
+
+7.29.1
+-----
+* Bug Fixes:
+    *   Fixed Norwegian translations
+        ([#689](https://github.com/Automattic/pocket-casts-android/pull/689)).
 
 7.29
 -----

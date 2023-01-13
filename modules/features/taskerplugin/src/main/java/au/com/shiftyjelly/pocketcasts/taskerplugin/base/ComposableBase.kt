@@ -41,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import au.com.shiftyjelly.pocketcasts.images.R as RD
+import au.com.shiftyjelly.pocketcasts.taskerplugin.R as RT
 
 class TaskerInputFieldState<T>(val content: Content<T>) {
     data class Content<T> constructor(
@@ -102,7 +104,7 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                             if (hasTaskerVariables) {
                                 IconButton(onClick = { selectionMode = TaskerInputFieldSelectMode.Variable }) {
                                     Icon(
-                                        painter = painterResource(au.com.shiftyjelly.pocketcasts.taskerplugin.R.drawable.label_outline),
+                                        painter = painterResource(RT.drawable.label_outline),
                                         contentDescription = stringResource(R.string.tasker_variables),
                                         tint = MaterialTheme.theme.colors.primaryIcon01,
                                         modifier = Modifier.padding(end = 16.dp, start = 16.dp)
@@ -112,7 +114,7 @@ fun <T> ComposableTaskerInputField(content: TaskerInputFieldState.Content<T>) {
                             if (hasSuggestedItems) {
                                 IconButton(onClick = { selectionMode = TaskerInputFieldSelectMode.ItemList }) {
                                     Icon(
-                                        painter = painterResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_search),
+                                        painter = painterResource(RD.drawable.ic_search),
                                         contentDescription = stringResource(R.string.search),
                                         tint = MaterialTheme.theme.colors.primaryIcon01,
                                         modifier = Modifier.padding(end = 16.dp, start = 16.dp)
@@ -167,7 +169,7 @@ private fun ComposableTaskerInputFieldPreview() {
         ComposableTaskerInputField(
             TaskerInputFieldState.Content(
                 MutableStateFlow("some value"), R.string.archive,
-                au.com.shiftyjelly.pocketcasts.images.R.drawable.widget_play,
+                RD.drawable.widget_play,
                 MutableStateFlow(true),
                 {},
                 listOf("%test"),

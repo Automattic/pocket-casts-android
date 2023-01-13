@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.taskerplugin.base.TaskerInputFieldState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
+import au.com.shiftyjelly.pocketcasts.images.R as RD
 
 @AndroidEntryPoint
 class ActivityConfigPlayPlaylist : ActivityConfigBase<ViewModelConfigPlayPlaylist>() {
@@ -26,7 +27,7 @@ private fun ComposableConfigPlayPlaylistPreview() {
                 TaskerInputFieldState.Content(
                     MutableStateFlow("New Release"),
                     R.string.filters_filter_name,
-                    au.com.shiftyjelly.pocketcasts.images.R.drawable.filter_bullet,
+                    RD.drawable.filter_bullet,
                     MutableStateFlow(true),
                     {},
                     listOf("%test"),

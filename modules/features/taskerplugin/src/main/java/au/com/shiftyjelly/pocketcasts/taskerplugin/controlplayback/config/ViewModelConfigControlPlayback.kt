@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class ViewModelConfigControlPlayback @Inject constructor(
     application: Application
-) : ViewModelBase<InputControlPlayback, ActionHelperControlPlayback>(application), TaskerPluginConfig<InputControlPlayback> {
+) : ViewModelBase<InputControlPlayback, Unit, ActionHelperControlPlayback>(application), TaskerPluginConfig<InputControlPlayback> {
     override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputControlPlayback>) = ActionHelperControlPlayback(pluginConfig)
 
     /**
