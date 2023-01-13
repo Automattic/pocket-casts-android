@@ -42,6 +42,15 @@ fun OnboardingFlowComposable(
             is OnboardingFlow.PlusFlow -> OnboardingNavRoute.PlusUpgrade.route
         }
 
+        val onAccountCreated = {
+            navController.navigate(OnboardingRecommendationsFlow.route) {
+                // clear backstack after account is created
+                popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                    inclusive = true
+                }
+            }
+        }
+
         NavHost(navController, startDestination) {
 
             importFlowGraph(theme, navController, flow)
@@ -85,7 +94,13 @@ fun OnboardingFlowComposable(
                     },
                     onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
                     onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
-                    onContinueWithGoogleClicked = { navController.navigate(OnboardingNavRoute.logInGoogle) },
+                    onContinueWithGoogleComplete = { state ->
+                        if (state.isNewAccount) {
+                            onAccountCreated()
+                        } else {
+                            exitOnboarding()
+                        }
+                    },
                 )
             }
 
@@ -93,12 +108,7 @@ fun OnboardingFlowComposable(
                 OnboardingCreateAccountPage(
                     theme = theme,
                     onBackPressed = { navController.popBackStack() },
-                    onAccountCreated = {
-                        navController.navigate(OnboardingRecommendationsFlow.route) {
-                            // clear backstack after account is created
-                            popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
-                        }
-                    },
+                    onAccountCreated = onAccountCreated,
                 )
             }
 
@@ -123,10 +133,6 @@ fun OnboardingFlowComposable(
                     },
                     onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
                 )
-            }
-
-            composable(OnboardingNavRoute.logInGoogle) {
-                OnboardingLoginGooglePage()
             }
 
             composable(OnboardingNavRoute.forgotPassword) {
@@ -233,7 +239,6 @@ private object OnboardingNavRoute {
     const val createFreeAccount = "create_free_account"
     const val forgotPassword = "forgot_password"
     const val logIn = "log_in"
-    const val logInGoogle = "log_in_google"
     const val logInOrSignUp = "log_in_or_sign_up"
     const val welcome = "welcome"
 
