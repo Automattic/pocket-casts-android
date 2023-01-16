@@ -67,6 +67,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import java.lang.Long.max
@@ -77,8 +79,8 @@ private val background = Color(0xFF121212)
 
 @Composable
 internal fun OnboardingPlusFeaturesPage(
-    flow: String,
-    source: String,
+    flow: OnboardingFlow,
+    source: OnboardingUpgradeSource,
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
@@ -447,8 +449,8 @@ private tailrec suspend fun autoScroll(
 @Composable
 private fun OnboardingPlusFeaturesPreview() {
     OnboardingPlusFeaturesPage(
-        flow = "flow",
-        source = "source",
+        flow = OnboardingFlow.InitialOnboarding,
+        source = OnboardingUpgradeSource.RECOMMENDATIONS,
         onBackPressed = {},
         onUpgradePressed = {},
         onNotNowPressed = {},

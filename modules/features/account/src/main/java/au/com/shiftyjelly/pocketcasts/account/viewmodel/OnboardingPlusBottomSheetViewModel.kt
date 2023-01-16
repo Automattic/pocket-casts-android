@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,7 +86,7 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
 
     fun onClickSubscribe(
         activity: Activity,
-        flow: String,
+        flow: OnboardingFlow,
         onComplete: () -> Unit,
     ) {
         (state.value as? Loaded)?.let { loadedState ->
@@ -94,7 +95,7 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
 
             analyticsTracker.track(
                 AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-                mapOf(flowKey to flow, selectedSubscriptionKey to subscription.productDetails.productId)
+                mapOf(flowKey to flow.analyticsValue, selectedSubscriptionKey to subscription.productDetails.productId)
             )
 
             viewModelScope.launch {
@@ -143,17 +144,17 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
         }
     }
 
-    fun onSelectPaymentFrequencyShown(flow: String) {
+    fun onSelectPaymentFrequencyShown(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN,
-            mapOf(flowKey to flow)
+            mapOf(flowKey to flow.analyticsValue)
         )
     }
 
-    fun onSelectPaymentFrequencyDismissed(flow: String) {
+    fun onSelectPaymentFrequencyDismissed(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED,
-            mapOf(flowKey to flow)
+            mapOf(flowKey to flow.analyticsValue)
         )
     }
 

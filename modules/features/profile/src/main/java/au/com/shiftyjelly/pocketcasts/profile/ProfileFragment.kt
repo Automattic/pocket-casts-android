@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -21,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -37,8 +35,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.SettingsAdapter
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
 import au.com.shiftyjelly.pocketcasts.settings.util.SettingsHelper
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -195,8 +194,7 @@ class ProfileFragment : BaseFragment() {
                 val fragment = AccountDetailsFragment.newInstance()
                 (activity as FragmentHostListener).addFragment(fragment)
             } else {
-                val intent = Intent(activity, AccountActivity::class.java)
-                activity?.startActivity(intent)
+                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
             }
         }
 
@@ -214,7 +212,10 @@ class ProfileFragment : BaseFragment() {
 
         upgradeLayout.lblGetMore.text = getString(LR.string.profile_help_support)
         upgradeLayout.root.setOnClickListener {
-            PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Profile).show(childFragmentManager, "upgradebottomsheet")
+            OnboardingLauncher.openOnboardingFlow(
+                activity = activity,
+                onboardingFlow = OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.PROFILE)
+            )
         }
 
         viewModel.refreshObservable.observe(viewLifecycleOwner) { state ->

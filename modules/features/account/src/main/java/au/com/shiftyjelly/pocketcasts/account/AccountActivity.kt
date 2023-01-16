@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -64,16 +63,6 @@ class AccountActivity : AppCompatActivity() {
             } else if (isPromoCodeInstance(intent)) {
                 graph.setStartDestination(R.id.promoCodeFragment)
                 arguments.putString(PromoCodeFragment.ARG_PROMO_CODE, intent.getStringExtra(PROMO_CODE_VALUE))
-            } else if (isSignInInstance(intent)) {
-                graph.setStartDestination(R.id.signInFragment)
-
-                val successIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(SUCCESS_INTENT, Parcelable::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    intent.getParcelableExtra(SUCCESS_INTENT)
-                }
-                arguments.putParcelable(SignInFragment.EXTRA_SUCCESS_INTENT, successIntent)
             } else {
                 if (isNewAutoSelectPlusInstance(intent)) {
                     viewModel.defaultSubscriptionType = SubscriptionType.PLUS
@@ -210,11 +199,9 @@ class AccountActivity : AppCompatActivity() {
         private const val PRODUCT_KEY = "product"
         private const val SOURCE_KEY = "source"
         private const val ACCOUNT_PROP_VALUE = "account"
-        const val IS_PROMO_CODE = "account_activity.is_promo_code"
+        private const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
         const val PROMO_CODE_RETURN_DESCRIPTION = "account_activity.promo_code_return_description"
-        const val SIGN_IN_ONLY = "account_activity.sign_in_only"
-        const val SUCCESS_INTENT = "account_activity.success_intent"
         const val SUPPORTER_INTENT = "account_activity.supporter"
 
         fun promoCodeInstance(context: Context?, code: String): Intent {
@@ -226,10 +213,6 @@ class AccountActivity : AppCompatActivity() {
 
         fun isPromoCodeInstance(intent: Intent): Boolean {
             return intent.getBooleanExtra(IS_PROMO_CODE, false)
-        }
-
-        fun isSignInInstance(intent: Intent): Boolean {
-            return intent.getBooleanExtra(SIGN_IN_ONLY, false)
         }
     }
 

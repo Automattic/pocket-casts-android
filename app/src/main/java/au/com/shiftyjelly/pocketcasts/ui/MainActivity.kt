@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -84,6 +85,8 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -135,6 +138,7 @@ class MainActivity :
     FragmentHostListener,
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
+    OnboardingLauncher,
     CoroutineScope {
 
     companion object {
@@ -183,6 +187,21 @@ class MainActivity :
     private lateinit var binding: ActivityMainBinding
     private lateinit var navigator: BottomNavigator
 
+    private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
+        when (result) {
+            OnboardingFinish.Done -> {
+                settings.setHasDoneInitialOnboarding()
+            }
+            OnboardingFinish.DoneGoToDiscover -> {
+                settings.setHasDoneInitialOnboarding()
+                openTab(VR.id.navigation_discover)
+            }
+            null -> {
+                Timber.e("Unexpected null result from onboarding activity")
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
         super.onCreate(savedInstanceState)
@@ -191,7 +210,7 @@ class MainActivity :
         val showOnboarding = !settings.hasCompletedOnboarding() && !settings.isLoggedIn()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
-            openOnboardingFlow()
+            openOnboardingFlow(OnboardingFlow.InitialOnboarding)
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -290,24 +309,8 @@ class MainActivity :
         updateSystemColors()
     }
 
-    private fun openOnboardingFlow() {
-        registerForActivityResult(OnboardingActivityContract()) { result ->
-            when (result) {
-                OnboardingFinish.Completed -> {
-                    settings.setHasCompletedOnboarding()
-                }
-                OnboardingFinish.CompletedGoToDiscover -> {
-                    settings.setHasCompletedOnboarding()
-                    openTab(VR.id.navigation_discover)
-                }
-                OnboardingFinish.AbortedOnboarding -> {
-                    finish()
-                }
-                null -> {
-                    Timber.e("Unexpected null result from onboarding activity")
-                }
-            }
-        }.launch(Intent(this, OnboardingActivity::class.java))
+    override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
+        onboardingLauncher.launch(OnboardingActivity.newInstance(this, onboardingFlow))
     }
 
     override fun onStart() {

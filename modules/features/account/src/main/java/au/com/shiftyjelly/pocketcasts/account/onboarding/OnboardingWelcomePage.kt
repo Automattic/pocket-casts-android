@@ -55,6 +55,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -67,7 +69,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingWelcomePage(
     activeTheme: Theme.ThemeType,
-    flow: String,
+    flow: OnboardingFlow,
     isSignedInAsPlus: Boolean,
     onDone: () -> Unit,
     onContinueToDiscover: () -> Unit,
@@ -93,8 +95,13 @@ fun OnboardingWelcomePage(
         onBackPressed()
     }
 
+    // Do not prompt for discover if the user was adding a file because we don't want to break them
+    // out of the add file flow
+    val showDiscover = (flow as? OnboardingFlow.PlusFlow)?.source != OnboardingUpgradeSource.FILES
+
     Content(
         isSignedInAsPlus = isSignedInAsPlus,
+        showDiscover = showDiscover,
         onContinueToDiscover = {
             viewModel.onContinueToDiscover(flow)
             onContinueToDiscover()
@@ -121,6 +128,7 @@ fun OnboardingWelcomePage(
 @Composable
 private fun Content(
     isSignedInAsPlus: Boolean,
+    showDiscover: Boolean,
     onContinueToDiscover: () -> Unit,
     onImportTapped: () -> Unit,
     state: OnboardingWelcomeState,
@@ -129,7 +137,6 @@ private fun Content(
 ) {
     Column(
         Modifier
-//            .windowInsetsPadding(WindowInsets.statusBars)
             .padding(horizontal = 24.dp)
             .fillMaxHeight()
             .verticalScroll(rememberScrollState())
@@ -164,14 +171,16 @@ private fun Content(
             onClick = onImportTapped
         )
 
-        Spacer(Modifier.height(24.dp))
-        CardSection(
-            titleRes = LR.string.onboarding_welcome_recommendations_title,
-            descriptionRes = LR.string.onboarding_welcome_recommendations_text,
-            actionRes = LR.string.onboarding_welcome_recommendations_button,
-            iconRes = IR.drawable.circle_star,
-            onClick = onContinueToDiscover
-        )
+        if (showDiscover) {
+            Spacer(Modifier.height(24.dp))
+            CardSection(
+                titleRes = LR.string.onboarding_welcome_recommendations_title,
+                descriptionRes = LR.string.onboarding_welcome_recommendations_text,
+                actionRes = LR.string.onboarding_welcome_recommendations_button,
+                iconRes = IR.drawable.circle_star,
+                onClick = onContinueToDiscover
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
         Spacer(Modifier.height(16.dp))
@@ -348,6 +357,7 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
     AppThemeWithBackground(themeType) {
         Content(
             isSignedInAsPlus = false,
+            showDiscover = true,
             onContinueToDiscover = {},
             onImportTapped = {},
             state = OnboardingWelcomeState(newsletter = false),
@@ -363,6 +373,7 @@ private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParam
     AppThemeWithBackground(themeType) {
         Content(
             isSignedInAsPlus = true,
+            showDiscover = true,
             onContinueToDiscover = {},
             onImportTapped = {},
             state = OnboardingWelcomeState(newsletter = false),

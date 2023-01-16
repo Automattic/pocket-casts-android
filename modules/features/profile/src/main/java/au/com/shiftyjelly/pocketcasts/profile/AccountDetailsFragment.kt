@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -30,11 +29,13 @@ import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetails
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -122,18 +123,12 @@ class AccountDetailsFragment : BaseFragment() {
                                     },
                                     storageLimit = settings.getCustomStorageLimitGb(),
                                     onLearnMoreClick = {
-                                        WebViewActivity.show(
-                                            context,
-                                            "Learn more",
-                                            Settings.INFO_LEARN_MORE_URL
-                                        )
+                                        val flow = OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.PROFILE)
+                                        OnboardingLauncher.openOnboardingFlow(activity, flow)
                                     },
                                     onUpgradeClick = {
-                                        activity?.startActivity(
-                                            AccountActivity.newUpgradeInstance(
-                                                context
-                                            )
-                                        )
+                                        val flow = OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.PROFILE)
+                                        OnboardingLauncher.openOnboardingFlow(activity, flow)
                                     }
                                 )
                             }

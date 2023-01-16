@@ -71,7 +71,7 @@ class SettingsImpl @Inject constructor(
         private const val LINK_CRASH_REPORTS_TO_USER_KEY = "LinkCrashReportsToUserKey"
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
         private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
-        private const val COMPLETED_ONBOARDING_KEY = "CompletedOnboardingKey"
+        private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
     }
 
     private var languageCode: String? = null
@@ -1488,9 +1488,9 @@ class SettingsImpl @Inject constructor(
     override fun getEndOfYearModalHasBeenShown(): Boolean =
         getBoolean(END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY, false)
 
-    override fun hasCompletedOnboarding() = getBoolean(COMPLETED_ONBOARDING_KEY, false)
+    override fun hasCompletedOnboarding() = getBoolean(DONE_INITIAL_ONBOARDING_KEY, false)
 
-    override fun setHasCompletedOnboarding() {
-        setBoolean(COMPLETED_ONBOARDING_KEY, true)
+    override fun setHasDoneInitialOnboarding() {
+        setBoolean(DONE_INITIAL_ONBOARDING_KEY, true)
     }
 }

@@ -48,20 +48,22 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesVi
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import kotlinx.coroutines.NonDisposableHandle.parent
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnboardingPlusUpgradeFlow(
-    flow: String,
-    source: String,
-    onNotNowPressed: () -> Unit,
+    flow: OnboardingFlow,
+    source: OnboardingUpgradeSource,
+    isLoggedIn: Boolean,
     onBackPressed: () -> Unit,
-    onCompleteUpgrade: () -> Unit,
+    onNeedLogin: () -> Unit,
+    onProceed: () -> Unit,
 ) {
 
     val bottomSheetViewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
@@ -70,8 +72,26 @@ fun OnboardingPlusUpgradeFlow(
     val hasSubscriptions = state is OnboardingPlusBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
 
     val coroutineScope = rememberCoroutineScope()
+
+    val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.PlusUpsell &&
+        (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
+    val startInExpandedState =
+        // Only start with expanded state if there are any subscriptions
+        hasSubscriptions && (
+            // The hidden state is shown as the first screen in the PlusUpsell flow, so when we return
+            // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
+            userSignedInOrSignedUpInUpsellFlow ||
+                // User already indicated they want to upgrade, so go straight to purchase modal
+                flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
+                flow is OnboardingFlow.PlusAccountUpgrade
+            )
+    val initialValue = if (startInExpandedState) {
+        ModalBottomSheetValue.Expanded
+    } else {
+        ModalBottomSheetValue.Hidden
+    }
     val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
+        initialValue = initialValue,
         skipHalfExpanded = true,
     )
 
@@ -108,9 +128,13 @@ fun OnboardingPlusUpgradeFlow(
                 flow = flow,
                 source = source,
                 onUpgradePressed = {
-                    coroutineScope.launch { sheetState.show() }
+                    if (isLoggedIn) {
+                        coroutineScope.launch { sheetState.show() }
+                    } else {
+                        onNeedLogin()
+                    }
                 },
-                onNotNowPressed = onNotNowPressed,
+                onNotNowPressed = onProceed,
                 onBackPressed = onBackPressed,
                 canUpgrade = hasSubscriptions,
             )
@@ -122,7 +146,7 @@ fun OnboardingPlusUpgradeFlow(
                         bottomSheetViewModel.onClickSubscribe(
                             activity = activity,
                             flow = flow,
-                            onComplete = onCompleteUpgrade,
+                            onComplete = onProceed,
                         )
                     } else {
                         LogBuffer.e(

@@ -18,9 +18,8 @@ class OnboardingActivityContract : ActivityResultContract<Intent, OnboardingActi
         }
 
     enum class OnboardingFinish {
-        Completed,
-        CompletedGoToDiscover,
-        AbortedOnboarding
+        Done,
+        DoneGoToDiscover,
     }
 
     companion object {
