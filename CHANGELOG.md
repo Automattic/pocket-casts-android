@@ -8,6 +8,9 @@
         ([#679](https://github.com/Automattic/pocket-casts-android/pull/679)).
     *   Incorporated new onboarding flow throughout the app
         ([#694](https://github.com/Automattic/pocket-casts-android/pull/694)).
+*   Updates
+    *   Update styling of upgrade prompt on account details screen
+        ([#706](https://github.com/Automattic/pocket-casts-android/pull/706)).
 
 7.30
 -----
