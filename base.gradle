@@ -282,6 +282,7 @@ dependencies {
     androidTestImplementation(libs.barista) {
         exclude group: 'org.jetbrains.kotlin'
     }
+    androidTestImplementation androidLibs.accessibilityTestFramework
 
     coreLibraryDesugaring androidLibs.desugarJdk
 }
