@@ -245,7 +245,9 @@ open class PlaybackManager @Inject constructor(
         syncTimerDisposable = playbackStateRelay.sample(settings.getPeriodicSaveTimeMs(), TimeUnit.MILLISECONDS)
             .concatMap {
                 if (it.isPlaying && settings.isLoggedIn()) {
-                    syncEpisodeProgress(it).toObservable()
+                    syncEpisodeProgress(it)
+                        .toObservable<EpisodeSyncResponse>()
+                        .onErrorResumeNext(Observable.empty())
                 } else {
                     Observable.empty<EpisodeSyncResponse>()
                 }
