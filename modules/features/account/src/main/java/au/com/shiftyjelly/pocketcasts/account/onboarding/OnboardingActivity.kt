@@ -26,6 +26,7 @@ class OnboardingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        theme.setupThemeForConfig(this, resources.configuration)
 
         // Make content edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
