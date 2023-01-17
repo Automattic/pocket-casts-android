@@ -11,6 +11,9 @@
 *   Updates
     *   Update styling of upgrade prompt on account details screen
         ([#706](https://github.com/Automattic/pocket-casts-android/pull/706)).
+*   Bug Fixes:
+    *   Improved handling of sync errors
+        ([#711](https://github.com/Automattic/pocket-casts-android/pull/711)).
 
 7.30
 -----
