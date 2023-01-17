@@ -285,12 +285,8 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state removing notification: $removeNotification")
                         }
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            stopForeground(if (removeNotification) STOP_FOREGROUND_REMOVE else STOP_FOREGROUND_DETACH)
-                        } else {
-                            @Suppress("DEPRECATION")
-                            stopForeground(removeNotification)
-                        }
+                        @Suppress("DEPRECATION")
+                        stopForeground(removeNotification)
                     }
 
                     if (state == PlaybackStateCompat.STATE_ERROR) {
