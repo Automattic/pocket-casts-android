@@ -3,6 +3,8 @@
 *   Health:
     *   Switched to using the new user login and register endpoints.
         ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
+    *   Upgraded ExoPlayer to 2.18.2
+        ([#707](https://github.com/Automattic/pocket-casts-android/pull/707)).
 *   New Features:
     *   Add support for HLS streams
         ([#679](https://github.com/Automattic/pocket-casts-android/pull/679)).
