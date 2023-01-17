@@ -10,20 +10,19 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfilePlusUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -107,31 +106,13 @@ class AccountDetailsFragment : BaseFragment() {
                 setContent {
                     AppTheme(theme.activeTheme) {
                         if (subscription != null && (signInState.isSignedInAsFree || giftExpiring)) {
-                            Column {
-
-                                HorizontalDivider()
-
-                                UserUpgradeView(
-                                    data = when (subscription) {
-                                        is Subscription.Simple -> UserUpgradeViewData.WithoutTrial(
-                                            subscription.recurringPricingPhase.pricePerPeriod(resources)
-                                        )
-                                        is Subscription.WithTrial -> UserUpgradeViewData.WithTrial(
-                                            numFree = subscription.trialPricingPhase.numPeriodFree(resources),
-                                            thenPriceSlashPeriod = subscription.recurringPricingPhase.thenPriceSlashPeriod(resources),
-                                        )
-                                    },
-                                    storageLimit = settings.getCustomStorageLimitGb(),
-                                    onLearnMoreClick = {
-                                        val flow = OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.PROFILE)
-                                        OnboardingLauncher.openOnboardingFlow(activity, flow)
-                                    },
-                                    onUpgradeClick = {
-                                        val flow = OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.PROFILE)
-                                        OnboardingLauncher.openOnboardingFlow(activity, flow)
-                                    }
-                                )
-                            }
+                            ProfilePlusUpgradeBanner(
+                                onClick = {
+                                    val source = OnboardingUpgradeSource.PROFILE
+                                    val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
+                                    OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
+                                }
+                            )
                         }
                     }
                 }
