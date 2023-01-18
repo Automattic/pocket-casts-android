@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import androidx.compose.foundation.layout.Arrangement
@@ -41,8 +39,8 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
 import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
-import com.google.android.horologist.compose.navscaffold.scalingLazyColumnComposable
-import com.google.android.horologist.compose.navscaffold.wearNavComposable
+import com.google.android.horologist.compose.navscaffold.composable
+import com.google.android.horologist.compose.navscaffold.scrollable
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,9 +53,8 @@ private object AuthenticationRoutes {
 
 fun NavGraphBuilder.authenticationGraph(navController: NavController) {
     navigation(startDestination = AuthenticationRoutes.email, route = authenticationSubGraph) {
-        scalingLazyColumnComposable(
+        scrollable(
             route = AuthenticationRoutes.email,
-            scrollStateBuilder = { ScalingLazyListState(0) }
         ) {
             it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
 
@@ -72,10 +69,10 @@ fun NavGraphBuilder.authenticationGraph(navController: NavController) {
                 viewModel = viewModel
             )
         }
-        wearNavComposable(AuthenticationRoutes.password) { backStackEntry, scaffoldViewModel ->
-            scaffoldViewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+        composable(AuthenticationRoutes.password) {
+            it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
 
-            val parentEntry = remember(backStackEntry) {
+            val parentEntry = remember(it.backStackEntry) {
                 navController.getBackStackEntry(authenticationSubGraph)
             }
             val viewModel = hiltViewModel<SignInViewModel>(parentEntry)
