@@ -19,7 +19,6 @@ interface PlayerClickListener {
     fun onHeaderChapterClick(chapter: Chapter)
     fun onPictureInPictureClick()
     fun onFullScreenVideoClick()
-    fun onPlayingEpisodeActionsClick()
     fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit)
 }
 

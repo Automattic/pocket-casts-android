@@ -18,13 +18,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -48,7 +51,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -80,6 +82,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         const val ARG_FEATURED_PODCAST = "ARG_FEATURED_PODCAST"
         private const val OPTION_KEY = "option"
         private const val IS_EXPANDED_KEY = "is_expanded"
+        private const val PODCAST_UUID_KEY = "podcast_uuid"
+        private const val LIST_ID_KEY = "list_id"
+        private const val EPISODE_UUID_KEY = "episode_uuid"
         private const val REMOVE = "remove"
         private const val CHANGE = "change"
         private const val GO_TO = "go_to"
@@ -139,9 +144,15 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     private val onSubscribeClicked: () -> Unit = {
         fromListUuid?.let {
-            AnalyticsHelper.podcastSubscribedFromList(it, podcastUuid)
+            FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
         }
-        if (featuredPodcast) AnalyticsHelper.subscribedToFeaturedPodcast()
+        if (featuredPodcast) {
+            FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
+            viewModel.podcast.value?.uuid?.let { podcastUuid ->
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcastUuid))
+            }
+        }
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SUBSCRIBE_TAPPED)
 
         viewModel.subscribeToPodcast()
@@ -163,6 +174,8 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 .setOnConfirm {
                     successCallback()
                     viewModel.unsubscribeFromPodcast()
+
+                    @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 }
             dialog.show(parentFragmentManager, "unsubscribe")
@@ -189,9 +202,18 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
     private val onRowClicked: (Episode) -> Unit = { episode ->
         fromListUuid?.let { listUuid ->
-            AnalyticsHelper.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
+            FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
+                mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcastUuid, EPISODE_UUID_KEY to episode.uuid)
+            )
         }
-        val episodeCard = EpisodeFragment.newInstance(episode, overridePodcastLink = true, fromListUuid = fromListUuid)
+        val episodeCard = EpisodeFragment.newInstance(
+            episode = episode,
+            source = EpisodeViewSource.PODCAST_SCREEN,
+            overridePodcastLink = true,
+            fromListUuid = fromListUuid
+        )
         episodeCard.show(parentFragmentManager, "episode_card")
     }
 
@@ -412,7 +434,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
         if (savedInstanceState == null) {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN)
-            AnalyticsHelper.openedPodcast(podcastUuid)
+            FirebaseAnalyticsTracker.openedPodcast(podcastUuid)
         }
     }
 
@@ -439,6 +461,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         if (shouldCloseOnReturn) {
             launch(Dispatchers.Main) {
                 // You can't call back during onresume
+                @Suppress("DEPRECATION")
                 (activity as? AppCompatActivity)?.onBackPressed()
             }
         }
@@ -476,7 +499,10 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding.toolbar.let {
             it.inflateMenu(R.menu.podcast_menu)
             it.setOnMenuItemClickListener(this)
-            it.setNavigationOnClickListener { activity?.onBackPressed() }
+            it.setNavigationOnClickListener {
+                @Suppress("DEPRECATION")
+                activity?.onBackPressed()
+            }
             val iconColor = it.context.getThemeColor(UR.attr.contrast_01)
             it.menu.setupChromeCastButton(context)
             it.menu.tintIcons(iconColor)
@@ -488,6 +514,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             }
         }
 
+        playButtonListener.source = AnalyticsSource.PODCAST_SCREEN
         if (adapter == null) {
             adapter = PodcastAdapter(downloadManager, playbackManager, upNextQueue, settings, theme, fromListUuid, onHeaderSummaryToggled, onSubscribeClicked, onUnsubscribeClicked, onEpisodesOptionsClicked, onRowLongPress, onFoldersClicked, onNotificationsClicked, onSettingsClicked, playButtonListener, onRowClicked, onSearchQueryChanged, onSearchFocus, onShowArchivedClicked, multiSelectHelper, onArtworkLongClicked)
         }
@@ -561,7 +588,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
         }
-
+        multiSelectHelper.source = AnalyticsSource.PODCAST_SCREEN
         binding.multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
 
         return binding.root

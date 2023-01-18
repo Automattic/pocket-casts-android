@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -14,6 +16,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,6 +52,9 @@ class FilterEpisodeListViewModel @Inject constructor(
         private const val SOURCE_KEY = "source"
         const val MAX_DOWNLOAD_ALL = Settings.MAX_DOWNLOAD
     }
+
+    var isFragmentChangingConfigurations: Boolean = false
+        private set
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -87,6 +95,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) }?.let { playlist ->
                 playlistManager.delete(playlist)
+                analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
             }
         }
     }
@@ -113,25 +122,21 @@ class FilterEpisodeListViewModel @Inject constructor(
             if (startIndex > -1) {
                 playbackManager.upNextQueue.removeAll()
                 val count = min(episodes.size - startIndex, settings.getMaxUpNextEpisodes())
-                playbackManager.playEpisodes(episodes.subList(startIndex, startIndex + count))
+                playbackManager.playEpisodes(episodes = episodes.subList(startIndex, startIndex + count), playbackSource = AnalyticsSource.FILTERS)
             }
         }
     }
 
-    fun playAll() {
-        launch {
-            val episodes = episodesList.value ?: emptyList()
-            if (episodes.isNotEmpty()) {
-                onPlayAllFromHere(episodes.first())
-            }
-        }
-    }
-
-    fun changeSort(sortOrder: Int) {
+    fun changeSort(sortOrder: Playlist.SortOrder) {
         launch {
             playlist.value?.let { playlist ->
-                playlist.sortId = sortOrder
-                playlistManager.update(playlist)
+                playlist.sortId = sortOrder.value
+
+                val userPlaylistUpdate = UserPlaylistUpdate(
+                    listOf(PlaylistProperty.Sort(sortOrder)),
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST
+                )
+                playlistManager.update(playlist, userPlaylistUpdate)
             }
         }
     }
@@ -140,7 +145,12 @@ class FilterEpisodeListViewModel @Inject constructor(
         launch {
             playlist.value?.let { playlist ->
                 playlist.starred = !playlist.starred
-                playlistManager.update(playlist)
+
+                val userPlaylistUpdate = UserPlaylistUpdate(
+                    listOf(PlaylistProperty.Starred),
+                    PlaylistUpdateSource.FILTER_EPISODE_LIST
+                )
+                playlistManager.update(playlist, userPlaylistUpdate)
             }
         }
     }
@@ -193,5 +203,14 @@ class FilterEpisodeListViewModel @Inject constructor(
                 SOURCE_KEY to SwipeSource.FILTERS.analyticsValue
             )
         )
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
+
+    fun trackFilterShown() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
+        FirebaseAnalyticsTracker.openedFilter()
     }
 }

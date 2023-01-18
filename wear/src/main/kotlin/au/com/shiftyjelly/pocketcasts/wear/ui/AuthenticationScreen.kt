@@ -37,14 +37,15 @@ import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
-import au.com.shiftyjelly.pocketcasts.podcasts.view.compose.components.FormField
+import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
-import com.google.android.horologist.compose.navscaffold.scalingLazyColumnComposable
-import com.google.android.horologist.compose.navscaffold.wearNavComposable
+import com.google.android.horologist.compose.navscaffold.composable
+import com.google.android.horologist.compose.navscaffold.scrollable
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val authenticationSubGraph = "authentication_screen"
+
 private object AuthenticationRoutes {
     const val email = "authentication_email"
     const val password = "authentication_password"
@@ -52,9 +53,8 @@ private object AuthenticationRoutes {
 
 fun NavGraphBuilder.authenticationGraph(navController: NavController) {
     navigation(startDestination = AuthenticationRoutes.email, route = authenticationSubGraph) {
-        scalingLazyColumnComposable(
+        scrollable(
             route = AuthenticationRoutes.email,
-            scrollStateBuilder = { ScalingLazyListState(0) }
         ) {
             it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
 
@@ -69,10 +69,10 @@ fun NavGraphBuilder.authenticationGraph(navController: NavController) {
                 viewModel = viewModel
             )
         }
-        wearNavComposable(AuthenticationRoutes.password) { backStackEntry, scaffoldViewModel ->
-            scaffoldViewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+        composable(AuthenticationRoutes.password) {
+            it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
 
-            val parentEntry = remember(backStackEntry) {
+            val parentEntry = remember(it.backStackEntry) {
                 navController.getBackStackEntry(authenticationSubGraph)
             }
             val viewModel = hiltViewModel<SignInViewModel>(parentEntry)
@@ -91,7 +91,7 @@ fun NavGraphBuilder.authenticationGraph(navController: NavController) {
 private fun EmailScreen(
     viewModel: SignInViewModel = hiltViewModel(),
     listState: ScalingLazyListState,
-    navigateToRoute: (String) -> Unit
+    navigateToRoute: (String) -> Unit,
 ) {
 
     val email by viewModel.email.observeAsState()
@@ -109,8 +109,7 @@ private fun EmailScreen(
                 value = email ?: "",
                 onValueChange = { viewModel.updateEmail(it) },
                 placeholder = "",
-                label = { Text(stringResource(LR.string.profile_email)) },
-                onNext = onNext,
+                onImeAction = onNext,
                 singleLine = false,
                 modifier = Modifier
                     .padding(all = 8.dp)
@@ -138,7 +137,7 @@ private fun EmailScreen(
 @Composable
 private fun PasswordScreen(
     viewModel: SignInViewModel = hiltViewModel(),
-    navigateOnSignInSuccess: () -> Unit
+    navigateOnSignInSuccess: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -159,8 +158,7 @@ private fun PasswordScreen(
         FormField(
             value = password ?: "",
             onValueChange = { viewModel.updatePassword(it) },
-            placeholder = "",
-            label = { Text(stringResource(LR.string.profile_password)) },
+            placeholder = stringResource(LR.string.profile_password),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -177,7 +175,7 @@ private fun PasswordScreen(
                     }
                 }
             },
-            onNext = onNext,
+            onImeAction = onNext,
             singleLine = false,
             modifier = Modifier
                 .padding(all = 8.dp)

@@ -49,6 +49,7 @@ fun Toolbar.setup(
     if (navigationIcon != None) {
         setNavigationOnClickListener {
             if (onNavigationClick == null) {
+                @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             } else {
                 onNavigationClick()

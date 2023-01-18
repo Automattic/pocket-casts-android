@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -94,6 +95,8 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         imageLoader = PodcastImageLoaderThemed(context).apply {
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
+
+        playButtonListener.source = AnalyticsSource.FILES
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -239,6 +242,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
+        multiSelectHelper.source = AnalyticsSource.FILES
         binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
     }
 

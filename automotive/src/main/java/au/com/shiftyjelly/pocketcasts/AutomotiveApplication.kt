@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -15,12 +17,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
+import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -46,7 +48,9 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
+        setupSentry()
         setupLogging()
+        setupAnalytics()
         setupAutomotiveDefaults()
         setupApp()
     }
@@ -63,7 +67,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         Log.i(Settings.LOG_TAG_AUTO, "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
 
         runBlocking {
-            AnalyticsHelper.setup(FirebaseAnalytics.getInstance(this@AutomotiveApplication))
+            FirebaseAnalyticsTracker.setup(FirebaseAnalytics.getInstance(this@AutomotiveApplication), settings)
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
@@ -96,10 +100,20 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         }
     }
 
+    private fun setupSentry() {
+        SentryAndroid.init(this) { options ->
+            options.dsn = settings.getSentryDsn()
+        }
+    }
+
     private fun setupLogging() {
         // TODO uncomment this after we have playback issues resolved
         // if (BuildConfig.DEBUG) {
         Timber.plant(TimberDebugTree())
         // }
+    }
+
+    private fun setupAnalytics() {
+        AnalyticsTracker.init(settings)
     }
 }

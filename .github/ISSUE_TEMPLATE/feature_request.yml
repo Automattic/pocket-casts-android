@@ -1,6 +1,6 @@
 name: Feature suggestion
 description: Propose a feature in the Pocket Casts Android app
-labels: ["feature", "triage"]
+labels: ["feature request", "triage"]
 body:
 
     - type: markdown

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentResetPasswordBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ResetPasswordError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ResetPasswordState
@@ -86,7 +87,7 @@ class ResetPasswordFragment : BaseFragment() {
                             getString(LR.string.profile_reset_password_check_email),
                             onComplete = {
                                 if (isAdded) {
-                                    parentFragmentManager.popBackStack()
+                                    view.findNavController().popBackStack()
                                 }
                             }
                         )
@@ -108,7 +109,7 @@ class ResetPasswordFragment : BaseFragment() {
         val context = binding.root.context
 
         val emailColor = context.getThemeColor(UR.attr.primary_interactive_01)
-        val emailDrawable = context.getTintedDrawable(R.drawable.ic_mail, emailColor)
+        val emailDrawable = context.getTintedDrawable(IR.drawable.ic_mail, emailColor)
         val tickColor = context.getThemeColor(UR.attr.support_02)
         val tickDrawable = if (!invalidEmail)context.getTintedDrawable(IR.drawable.ic_tick_circle, tickColor) else null
         val max = 64

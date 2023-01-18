@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCategoriesBinding
@@ -24,6 +27,9 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBi
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -43,7 +49,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.images.ThemedImageTintTransformation
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
@@ -66,6 +71,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MAX_ROWS_SMALL_LIST = 20
+private const val CURRENT_PAGE = "current_page"
+private const val TOTAL_PAGES = "total_pages"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
@@ -74,7 +81,8 @@ internal class DiscoverAdapter(
     val staticServerManager: StaticServerManagerImpl,
     val listener: Listener,
     val theme: Theme,
-    val loadPodcastList: (String) -> Flowable<PodcastList>
+    val loadPodcastList: (String) -> Flowable<PodcastList>,
+    private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
         fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?)
@@ -138,7 +146,7 @@ internal class DiscoverAdapter(
     }
 
     inner class LargeListViewHolder(val binding: RowPodcastLargeListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = LargeListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe)
+        val adapter = LargeListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
         override val showAllButton: TextView
             get() = binding.btnShowAll
 
@@ -155,7 +163,7 @@ internal class DiscoverAdapter(
     }
 
     inner class CarouselListViewHolder(var binding: RowCarouselListBinding) : NetworkLoadableViewHolder(binding.root) {
-        val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe)
+        val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         private val linearLayoutManager =
             LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
@@ -169,6 +177,7 @@ internal class DiscoverAdapter(
             snapHelper.attachToRecyclerView(recyclerView)
             snapHelper.onSnapPositionChanged = { position ->
                 binding.pageIndicatorView.position = position
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED, mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount))
             }
 
             recyclerView?.adapter = adapter
@@ -184,7 +193,7 @@ internal class DiscoverAdapter(
     }
 
     inner class SmallListViewHolder(val binding: RowPodcastSmallListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
-        val adapter = SmallListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe)
+        val adapter = SmallListRowAdapter(listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         override val showAllButton: TextView
             get() = binding.btnShowAll
@@ -201,6 +210,13 @@ internal class DiscoverAdapter(
             snapHelper.attachToRecyclerView(recyclerView)
             snapHelper.onSnapPositionChanged = { position ->
                 binding.pageIndicatorView.position = position
+                val row = getItem(bindingAdapterPosition) as? DiscoverRow
+                row?.let {
+                    analyticsTracker.track(
+                        AnalyticsEvent.DISCOVER_SMALL_LIST_PAGE_CHANGED,
+                        mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount, LIST_ID_KEY to it.inferredId())
+                    )
+                }
             }
 
             recyclerView?.adapter = adapter
@@ -300,7 +316,7 @@ internal class DiscoverAdapter(
                             holder.adapter.submitList(it.podcasts) { onRestoreInstanceState(holder) }
                         }
                     )
-                    row.listUuid?.let { AnalyticsHelper.listImpression(it) }
+                    row.listUuid?.let { trackListImpression(it) }
                 }
                 is CarouselListViewHolder -> {
                     val featuredLimit = 5
@@ -342,7 +358,7 @@ internal class DiscoverAdapter(
                             holder.adapter.submitPodcastList(podcasts) { onRestoreInstanceState(holder) }
                         }
                     )
-                    row.listUuid?.let { AnalyticsHelper.listImpression(it) }
+                    row.listUuid?.let { trackListImpression(it) }
                 }
                 is CategoriesViewHolder -> {
                     holder.binding.lblTitle.text = row.title.tryToLocalise(resources)
@@ -371,12 +387,13 @@ internal class DiscoverAdapter(
                             btnSubscribe.setOnClickListener {
                                 btnSubscribe.updateSubscribeButtonIcon(true)
                                 listener.onPodcastSubscribe(podcast = podcast, listUuid = row.listUuid)
+                                row.listUuid?.let { listUuid -> trackDiscoverListPodcastSubscribed(listUuid, podcast.uuid) }
                             }
 
                             imageLoader.loadSmallImage(podcast.uuid).into(holder.binding.imgPodcast)
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
-                                    AnalyticsHelper.podcastTappedFromList(listUuid, podcast.uuid)
+                                    trackDiscoverListPodcastTapped(listUuid, podcast.uuid)
                                     listener.onPodcastClicked(podcast, row.listUuid)
                                 }
                             }
@@ -390,7 +407,7 @@ internal class DiscoverAdapter(
                                 lblSponsored.text = context.getString(LR.string.discover_row_fresh_pick)
                             }
 
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
 
                             val textSize = if ((podcastTitle ?: "").length < 15) 18f else 15f
                             holder.binding.lblTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
@@ -424,8 +441,10 @@ internal class DiscoverAdapter(
                             binding.publishedDate.text = episode.published?.toLocalizedFormatPattern(pattern = "d MMM")
                             binding.btnPlay.setIconResource(if (episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
                             binding.btnPlay.setOnClickListener {
+
                                 row.listUuid?.let { listUuid ->
-                                    AnalyticsHelper.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
+                                    FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid)
+                                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid))
                                 }
                                 binding.btnPlay.setIconResource(if (!episode.isPlaying) R.drawable.pause_episode else R.drawable.play_episode)
                                 if (episode.isPlaying) {
@@ -450,12 +469,16 @@ internal class DiscoverAdapter(
                             }
                             holder.itemView.setOnClickListener {
                                 row.listUuid?.let { listUuid ->
-                                    AnalyticsHelper.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
+                                    FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcast_uuid, episodeUuid = episode.uuid)
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED,
+                                        mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to episode.podcast_uuid, EPISODE_UUID_KEY to episode.uuid)
+                                    )
                                 }
                                 listener.onEpisodeClicked(episode = episode, listUuid = row.listUuid)
                             }
                             onRestoreInstanceState(holder)
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
                         }
                     )
                 }
@@ -503,7 +526,7 @@ internal class DiscoverAdapter(
 
                             onRestoreInstanceState(holder)
 
-                            row.listUuid?.let { listUuid -> AnalyticsHelper.listImpression(listUuid) }
+                            row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
                         }
                     )
                 }
@@ -538,6 +561,21 @@ internal class DiscoverAdapter(
                 savedState[holder.itemId] = holder.onSaveInstanceState()
             }
         }
+    }
+
+    private fun trackListImpression(listUuid: String) {
+        FirebaseAnalyticsTracker.listImpression(listUuid)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_IMPRESSION, mapOf(LIST_ID_KEY to listUuid))
+    }
+
+    private fun trackDiscoverListPodcastTapped(listUuid: String, podcastUuid: String) {
+        FirebaseAnalyticsTracker.podcastTappedFromList(listUuid, podcastUuid)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
+    }
+
+    private fun trackDiscoverListPodcastSubscribed(listUuid: String, podcastUuid: String) {
+        FirebaseAnalyticsTracker.podcastSubscribedFromList(listUuid, podcastUuid)
+        analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
     }
 }
 

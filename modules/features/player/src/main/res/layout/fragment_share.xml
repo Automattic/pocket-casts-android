@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/primary_ui_01"
+    android:theme="@style/PlayerTheme">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="24dp">
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/sharePodcast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="labelSharePodcast,buttonSharePodcast,separator1"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/shareEpisode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="separator1,labelShareEpisode,buttonShareEpisode"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/shareCurrentPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="separator2,labelShareCurrentPosition,buttonShareCurrentPosition"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/openFileIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="separator3,labelOpenFileIn,buttonOpenFileIn"
+            tools:ignore="MissingConstraints" />
+
+        <View
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/background_dragger_player"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/labelSharePodcast"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:text="@string/share_podcast"
+            android:textColor="?attr/player_contrast_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/buttonSharePodcast"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/share_podcast"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/labelSharePodcast"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelSharePodcast" />
+
+        <View
+            android:id="@+id/separator1"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/player_contrast_05"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labelSharePodcast" />
+
+        <TextView
+            android:id="@+id/labelShareEpisode"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp"
+            android:layout_marginStart="32dp"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:text="@string/podcast_share_episode"
+            android:textColor="?attr/player_contrast_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/separator1" />
+
+        <View
+            android:id="@+id/buttonShareEpisode"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/podcast_share_episode"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/labelShareEpisode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelShareEpisode" />
+
+        <View
+            android:id="@+id/separator2"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/player_contrast_05"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labelShareEpisode" />
+
+        <TextView
+            android:id="@+id/labelShareCurrentPosition"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp"
+            android:layout_marginStart="32dp"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:text="@string/podcast_share_current_position"
+            android:textColor="?attr/player_contrast_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/separator2" />
+
+        <View
+            android:id="@+id/buttonShareCurrentPosition"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/podcast_share_current_position"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/labelShareCurrentPosition"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelShareCurrentPosition" />
+
+        <View
+            android:id="@+id/separator3"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/player_contrast_05"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labelShareCurrentPosition" />
+
+        <TextView
+            android:id="@+id/labelOpenFileIn"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp"
+            android:layout_marginStart="32dp"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:text="@string/podcast_share_open_file_in"
+            android:textColor="?attr/player_contrast_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/separator3" />
+
+        <View
+            android:id="@+id/buttonOpenFileIn"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/podcast_share_open_file_in"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/labelOpenFileIn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelOpenFileIn" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

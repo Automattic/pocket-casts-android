@@ -15,7 +15,7 @@ class UpNextTouchCallback(
         fun onUpNextEpisodeMove(fromPosition: Int, toPosition: Int)
         fun onUpNextEpisodeRemove(position: Int)
         fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder)
-        fun onUpNextItemTouchHelperFinished()
+        fun onUpNextItemTouchHelperFinished(position: Int)
     }
 
     interface ItemTouchHelperViewHolder {
@@ -64,7 +64,7 @@ class UpNextTouchCallback(
         }
 
         viewHolder.setIsRecyclable(true)
-        adapter.onUpNextItemTouchHelperFinished()
+        adapter.onUpNextItemTouchHelperFinished(viewHolder.bindingAdapterPosition)
     }
 
     override fun isItemViewSwipeEnabled(): Boolean {

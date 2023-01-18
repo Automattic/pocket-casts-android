@@ -18,6 +18,7 @@ object LogBuffer {
     const val TAG_CRASH = "Crash"
     const val TAG_BACKGROUND_TASKS = "BgTask"
     const val TAG_SUBSCRIPTIONS = "Subscriptions"
+    const val TAG_INVALID_STATE = "InvalidState"
 
     private const val LOG_FILE_NAME = "debug.log"
     private const val LOG_BACKUP_FILE_NAME = "debug.log.1"

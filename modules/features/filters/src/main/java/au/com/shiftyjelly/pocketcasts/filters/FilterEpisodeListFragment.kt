@@ -3,24 +3,28 @@ package au.com.shiftyjelly.pocketcasts.filters
 import android.animation.LayoutTransition
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
@@ -37,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -82,6 +85,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var multiSelectHelper: MultiSelectHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var imageLoader: PodcastImageLoader
 
@@ -95,10 +99,13 @@ class FilterEpisodeListFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        listSavedState = savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
+        listSavedState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER, Parcelable::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            savedInstanceState?.getParcelable(STATE_LAYOUT_MANAGER)
+        }
         showingFilterOptionsBeforeModal = arguments?.getBoolean(ARG_FILTER_IS_NEW) ?: false
-
-        AnalyticsHelper.openedFilter()
     }
 
     override fun onAttach(context: Context) {
@@ -108,6 +115,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
 
+        playButtonListener.source = AnalyticsSource.FILTERS
         adapter = EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, this::onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager)
     }
 
@@ -118,6 +126,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     override fun onPause() {
         super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
 
         val binding = binding ?: return
         binding.toolbar.menu.close()
@@ -151,12 +160,16 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     private fun onRowClick(episode: Playable) {
         if (episode is Episode) {
-            val fragment = EpisodeFragment.newInstance(episode)
+            val fragment = EpisodeFragment.newInstance(episode = episode, source = EpisodeViewSource.FILTERS)
             fragment.show(parentFragmentManager, "episode_card")
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        if (!viewModel.isFragmentChangingConfigurations) {
+            viewModel.trackFilterShown()
+        }
+
         binding = FragmentFilterBinding.inflate(inflater, container, false)
         return binding?.root
     }
@@ -179,7 +192,6 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbarColors = null
         )
 
-        toolbar.setNavigationOnClickListener { (activity as AppCompatActivity).onBackPressed() }
         toolbar.setOnMenuItemClickListener { item ->
             when (item?.itemId) {
                 R.id.menu_delete -> {
@@ -223,6 +235,8 @@ class FilterEpisodeListFragment : BaseFragment() {
 
         viewModel.playlistDeleted.observe(viewLifecycleOwner) { deleted ->
             if (deleted) {
+                clearSelectedFilter()
+                @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
         }
@@ -374,13 +388,23 @@ class FilterEpisodeListFragment : BaseFragment() {
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val multiSelectToolbar = binding.multiSelectToolbar
+        multiSelectHelper.source = AnalyticsSource.FILTERS
         multiSelectHelper.isMultiSelectingLive.observe(
             viewLifecycleOwner,
             Observer {
+
                 if (!multiSelectLoaded) {
                     multiSelectLoaded = true
                     return@Observer // Skip the initial value or else it will always hide the filter controls on load
                 }
+
+                analyticsTracker.track(
+                    if (it) {
+                        AnalyticsEvent.FILTER_MULTI_SELECT_ENTERED
+                    } else {
+                        AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
+                    }
+                )
 
                 if (!multiSelectToolbar.isVisible) {
                     showingFilterOptionsBeforeMultiSelect = layoutFilterOptions.isVisible
@@ -397,6 +421,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.listener = object : MultiSelectHelper.Listener {
             override fun multiSelectSelectAll() {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BUTTON_TAPPED)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
@@ -413,6 +438,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
 
             override fun multiSelectSelectAllUp(episode: Playable) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_ABOVE)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(episode)
@@ -425,6 +451,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
 
             override fun multiSelectSelectAllDown(episode: Playable) {
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BELOW)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(episode)
@@ -468,23 +495,23 @@ class FilterEpisodeListFragment : BaseFragment() {
                 .setTitle(getString(LR.string.sort_by))
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_newest_to_oldest,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_NEWEST_TO_OLDEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.NEWEST_TO_OLDEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_oldest_to_newest,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_OLDEST_TO_NEWEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_OLDEST_TO_NEWEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.OLDEST_TO_NEWEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.OLDEST_TO_NEWEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_short_to_long,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_SHORTEST_TO_LONGEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_SHORTEST_TO_LONGEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.SHORTEST_TO_LONGEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.SHORTEST_TO_LONGEST)
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_long_to_short,
-                    click = { viewModel.changeSort(Playlist.PLAYLIST_SORT_LONGEST_TO_SHORTEST) },
-                    checked = (it.sortId == Playlist.PLAYLIST_SORT_LONGEST_TO_SHORTEST)
+                    click = { viewModel.changeSort(Playlist.SortOrder.LONGEST_TO_SHORTEST) },
+                    checked = (it.sortOrder() == Playlist.SortOrder.LONGEST_TO_SHORTEST)
                 )
             dialog.show(parentFragmentManager, "sort_options")
         }
@@ -504,6 +531,8 @@ class FilterEpisodeListFragment : BaseFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.filters_warning_delete_button)))
             .setOnConfirm {
                 viewModel.deletePlaylist()
+                clearSelectedFilter()
+                @Suppress("DEPRECATION")
                 activity?.onBackPressed()
             }
             .show(childFragmentManager, "confirm")
@@ -572,12 +601,20 @@ class FilterEpisodeListFragment : BaseFragment() {
             multiSelectHelper.isMultiSelecting = false
             true
         } else {
+            clearSelectedFilter()
             super.onBackPressed()
         }
     }
 
     override fun getBackstackCount(): Int {
         return super.getBackstackCount() + if (multiSelectHelper.isMultiSelecting) 1 else 0
+    }
+
+    private fun clearSelectedFilter() {
+        // Only clear the selected filter if the currently displayed filter is the selected filter
+        if (settings.selectedFilter() == viewModel.playlist.value?.uuid) {
+            settings.setSelectedFilter(null)
+        }
     }
 }
 

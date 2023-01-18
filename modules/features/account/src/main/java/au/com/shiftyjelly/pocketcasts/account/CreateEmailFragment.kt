@@ -152,11 +152,11 @@ class CreateEmailFragment : BaseFragment() {
         val finalInvalidPassword = invalidPassword && txtPassword.length() > 0
 
         val emailColor = if (currentEditText == txtEmail) context.getThemeColor(UR.attr.primary_icon_03_active) else context.getThemeColor(UR.attr.primary_icon_03)
-        val emailDrawable = context.getTintedDrawable(R.drawable.ic_mail, emailColor)
+        val emailDrawable = context.getTintedDrawable(IR.drawable.ic_mail, emailColor)
         val tickColor = context.getThemeColor(UR.attr.support_02)
         val tickDrawable = if (!finalInvalidEmail) context.getTintedDrawable(IR.drawable.ic_tick_circle, tickColor) else null
         val passwordColor = if (currentEditText == txtPassword) context.getThemeColor(UR.attr.primary_icon_03_active) else context.getThemeColor(UR.attr.primary_icon_03)
-        val passwordDrawable = context.getTintedDrawable(R.drawable.ic_password, passwordColor)
+        val passwordDrawable = context.getTintedDrawable(IR.drawable.ic_password, passwordColor)
 
         val iconSize = 32.dpToPx(context)
         val tickSize = 24.dpToPx(context)

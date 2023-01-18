@@ -8,8 +8,8 @@ import androidx.wear.compose.material.Scaffold
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.AnimatedPlayerScreenMediaDisplay
 import com.google.android.horologist.media.ui.components.PodcastControlButtons
 import com.google.android.horologist.media.ui.screens.player.PlayerScreen
+import com.google.android.horologist.media.ui.state.PlayerUiController
 import com.google.android.horologist.media.ui.state.PlayerUiState
-import com.google.android.horologist.media.ui.state.PlayerViewModel
 
 object NowPlayingScreen {
     const val route = "now_playing_screen"
@@ -28,8 +28,8 @@ fun NowPlayingScreen(
             mediaDisplay = { playerUiState ->
                 AnimatedPlayerScreenMediaDisplay(playerUiState)
             },
-            controlButtons = {
-                PlayerScreenPodcastControlButtons(viewModel, it)
+            controlButtons = { playerUiController, playerUiState ->
+                PlayerScreenPodcastControlButtons(playerUiController, playerUiState)
             }
         )
     }
@@ -37,18 +37,18 @@ fun NowPlayingScreen(
 
 @Composable
 fun PlayerScreenPodcastControlButtons(
-    playerViewModel: PlayerViewModel,
+    playerUiController: PlayerUiController,
     playerUiState: PlayerUiState,
 ) {
     PodcastControlButtons(
-        onPlayButtonClick = { playerViewModel.play() },
-        onPauseButtonClick = { playerViewModel.pause() },
+        onPlayButtonClick = { playerUiController.play() },
+        onPauseButtonClick = { playerUiController.pause() },
         playPauseButtonEnabled = playerUiState.playPauseEnabled,
         playing = playerUiState.playing,
         percent = playerUiState.trackPosition?.percent ?: 0f,
-        onSeekBackButtonClick = { playerViewModel.seekBack() },
+        onSeekBackButtonClick = { playerUiController.seekBack() },
         seekBackButtonEnabled = playerUiState.seekBackEnabled,
-        onSeekForwardButtonClick = { playerViewModel.seekForward() },
+        onSeekForwardButtonClick = { playerUiController.seekForward() },
         seekForwardButtonEnabled = playerUiState.seekForwardEnabled,
         seekBackButtonIncrement = playerUiState.seekBackButtonIncrement,
         seekForwardButtonIncrement = playerUiState.seekForwardButtonIncrement

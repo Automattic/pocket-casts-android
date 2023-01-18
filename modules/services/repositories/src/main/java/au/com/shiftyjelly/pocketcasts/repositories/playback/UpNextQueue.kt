@@ -18,6 +18,7 @@ interface UpNextQueue {
     val size: Int
         get() = queueEpisodes.size
 
+    val allEpisodes get(): List<Playable> = currentEpisode?.let { listOf(it) + queueEpisodes } ?: queueEpisodes
     fun isCurrentEpisode(episode: Playable): Boolean
     suspend fun playNow(episode: Playable, onAdd: (() -> Unit)?)
     suspend fun playNext(episode: Playable, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
@@ -71,6 +72,18 @@ interface UpNextQueue {
                 Observable.just(state)
             }
         }
+    }
+}
+
+enum class UpNextSource(val analyticsValue: String) {
+    MINI_PLAYER("mini_player"),
+    PLAYER("player"),
+    NOW_PLAYING("now_playing"),
+    UP_NEXT_SHORTCUT("up_next_shortcut"),
+    UNKNOWN("unknown");
+
+    companion object {
+        fun fromString(string: String) = UpNextSource.values().find { it.analyticsValue == string } ?: UNKNOWN
     }
 }
 

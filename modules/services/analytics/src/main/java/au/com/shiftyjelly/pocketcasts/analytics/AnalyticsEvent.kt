@@ -76,6 +76,7 @@ enum class AnalyticsEvent(val key: String) {
     ACCOUNT_UPDATED_DISMISSED("account_updated_dismissed"),
 
     /* Account Details */
+    ACCOUNT_DETAILS_CANCEL_TAPPED("account_details_cancel_tapped"),
     ACCOUNT_DETAILS_SHOW_PRIVACY_POLICY("account_details_show_privacy_policy"),
     ACCOUNT_DETAILS_SHOW_TOS("account_details_show_tos"),
 
@@ -92,7 +93,7 @@ enum class AnalyticsEvent(val key: String) {
     PODCASTS_LIST_BADGES_CHANGED("podcasts_list_badges_changed"),
 
     /* Tab bar items */
-    PODCAST_TAB_OPENED("podcast_tab_opened"),
+    PODCASTS_TAB_OPENED("podcasts_tab_opened"),
     FILTERS_TAB_OPENED("filters_tab_opened"),
     DISCOVER_TAB_OPENED("discover_tab_opened"),
     PROFILE_TAB_OPENED("profile_tab_opened"),
@@ -199,4 +200,151 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_TOGGLE_ARCHIVED("podcast_screen_toggle_archived"),
     PODCAST_SCREEN_TOGGLE_SUMMARY("podcast_screen_toggle_summary"),
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
+
+    /* Playback */
+    PLAYBACK_PLAY("playback_play"),
+    PLAYBACK_PAUSE("playback_pause"),
+    PLAYBACK_SKIP_BACK("playback_skip_back"),
+    PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
+    PLAYBACK_STOP("playback_stop"),
+    PLAYBACK_SEEK("playback_seek"),
+
+    /* Privacy */
+    PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
+    ANALYTICS_OPT_IN("analytics_opt_in"),
+    ANALYTICS_OPT_OUT("analytics_opt_out"),
+    SETTINGS_SHOW_PRIVACY_POLICY("settings_show_privacy_policy"),
+
+    /* Filters */
+    FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED("filter_auto_download_limit_updated"),
+    FILTER_AUTO_DOWNLOAD_UPDATED("filter_auto_download_updated"),
+    FILTER_CREATED("filter_created"),
+    FILTER_DELETED("filter_deleted"),
+    FILTER_EDIT_DISMISSED("filter_edit_dismissed"),
+    FILTER_LIST_REORDERED("filter_list_reordered"),
+    FILTER_LIST_SHOWN("filter_list_shown"),
+    FILTER_MULTI_SELECT_ENTERED("filter_multi_select_entered"),
+    FILTER_MULTI_SELECT_EXITED("filter_multi_select_exited"),
+    FILTER_SELECT_ALL_BUTTON_TAPPED("filter_select_all_button_tapped"),
+    FILTER_SELECT_ALL_ABOVE("filter_select_all_above"),
+    FILTER_SELECT_ALL_BELOW("filter_select_all_below"),
+    FILTER_SHOWN("filter_shown"),
+    FILTER_SORT_BY_CHANGED("filter_sort_by_changed"),
+    FILTER_UPDATED("filter_updated"),
+
+    /* Discover */
+    DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
+    DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),
+    DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),
+    DISCOVER_SHOW_ALL_TAPPED("discover_show_all_tapped"),
+    DISCOVER_LIST_SHOW_ALL_TAPPED("discover_list_show_all_tapped"),
+    DISCOVER_LIST_IMPRESSION("discover_list_impression"),
+    DISCOVER_LIST_EPISODE_TAPPED("discover_list_episode_tapped"),
+    DISCOVER_LIST_EPISODE_PLAY("discover_list_episode_play"),
+    DISCOVER_LIST_PODCAST_TAPPED("discover_list_podcast_tapped"),
+    DISCOVER_LIST_PODCAST_SUBSCRIBED("discover_list_podcast_subscribed"),
+    DISCOVER_FEATURED_PAGE_CHANGED("discover_featured_page_changed"),
+    DISCOVER_SMALL_LIST_PAGE_CHANGED("discover_small_list_page_changed"),
+    DISCOVER_REGION_CHANGED("discover_region_changed"),
+    DISCOVER_COLLECTION_LINK_TAPPED("discover_collection_link_tapped"),
+
+    /* Mini Player */
+    MINI_PLAYER_LONG_PRESS_MENU_SHOWN("mini_player_long_press_menu_shown"),
+    MINI_PLAYER_LONG_PRESS_MENU_OPTION_TAPPED("mini_player_long_press_menu_option_tapped"),
+    MINI_PLAYER_LONG_PRESS_MENU_DISMISSED("mini_player_long_press_menu_dismissed"),
+
+    /* Up Next */
+    UP_NEXT_SHOWN("up_next_shown"),
+    UP_NEXT_QUEUE_CLEARED("up_next_queue_cleared"),
+    UP_NEXT_NOW_PLAYING_TAPPED("up_next_now_playing_tapped"),
+    UP_NEXT_QUEUE_EPISODE_TAPPED("up_next_queue_episode_tapped"),
+    UP_NEXT_QUEUE_EPISODE_LONG_PRESSED("up_next_queue_episode_long_pressed"),
+    UP_NEXT_MULTI_SELECT_ENTERED("up_next_multi_select_entered"),
+    UP_NEXT_SELECT_ALL_TAPPED("up_next_select_all_tapped"),
+    UP_NEXT_MULTI_SELECT_EXITED("up_next_multi_select_exited"),
+    UP_NEXT_QUEUE_REORDERED("up_next_queue_reordered"),
+    UP_NEXT_DISMISSED("up_next_dismissed"),
+
+    /* Player */
+    PLAYER_SHOWN("player_shown"),
+    PLAYER_DISMISSED("player_dismissed"),
+    PLAYER_TAB_SELECTED("player_tab_selected"),
+    PLAYER_SHOW_NOTES_LINK_TAPPED("player_show_notes_link_tapped"),
+    PLAYER_CHAPTER_SELECTED("player_chapter_selected"),
+    PLAYER_PREVIOUS_CHAPTER_TAPPED("player_previous_chapter_tapped"),
+    PLAYER_NEXT_CHAPTER_TAPPED("player_next_chapter_tapped"),
+
+    /* Player - Sleep Timer */
+    PLAYER_SLEEP_TIMER_ENABLED("player_sleep_timer_enabled"),
+    PLAYER_SLEEP_TIMER_EXTENDED("player_sleep_timer_extended"),
+    PLAYER_SLEEP_TIMER_CANCELLED("player_sleep_timer_cancelled"),
+
+    /* Player - Playback effects */
+    PLAYBACK_EFFECT_SPEED_CHANGED("playback_effect_speed_changed"),
+    PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED("playback_effect_trim_silence_toggled"),
+    PLAYBACK_EFFECT_TRIM_SILENCE_AMOUNT_CHANGED("playback_effect_trim_silence_amount_changed"),
+    PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED("playback_effect_volume_boost_toggled"),
+
+    /* Player - Shelf */
+    PLAYER_SHELF_ACTION_TAPPED("player_shelf_action_tapped"),
+    PLAYER_SHELF_OVERFLOW_MENU_SHOWN("player_shelf_overflow_menu_shown"),
+    PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED("player_shelf_overflow_menu_rearrange_started"),
+    PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED("player_shelf_overflow_menu_rearrange_action_moved"),
+    PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED("player_shelf_overflow_menu_rearrange_finished"),
+
+    /* Episode */
+    EPISODE_DOWNLOAD_DELETED("episode_download_deleted"),
+    EPISODE_BULK_DOWNLOAD_DELETED("episode_bulk_download_deleted"),
+    EPISODE_DELETED_FROM_CLOUD("episode_deleted_from_cloud"),
+    EPISODE_DOWNLOAD_QUEUED("episode_download_queued"),
+    EPISODE_BULK_DOWNLOAD_QUEUED("episode_bulk_download_queued"),
+    EPISODE_DOWNLOAD_FINISHED("episode_download_finished"),
+    EPISODE_DOWNLOAD_CANCELLED("episode_download_cancelled"),
+    EPISODE_UPLOAD_QUEUED("episode_upload_queued"),
+    EPISODE_UPLOAD_CANCELLED("episode_upload_cancelled"),
+    EPISODE_UPLOAD_FINISHED("episode_upload_finished"),
+
+    /* Episode Details */
+    EPISODE_DETAIL_SHOWN("episode_detail_shown"),
+    EPISODE_DETAIL_DISMISSED("episode_detail_dismissed"),
+    EPISODE_DETAIL_PODCAST_NAME_TAPPED("episode_detail_podcast_name_tapped"),
+    EPISODE_DETAIL_SHOW_NOTES_LINK_TAPPED("episode_detail_show_notes_link_tapped"),
+
+    /* Recommendations */
+    RECOMMENDATIONS_SHOWN("recommendations_shown"),
+    RECOMMENDATIONS_DISMISSED("recommendations_dismissed"),
+    RECOMMENDATIONS_SEARCH_TAPPED("recommendations_search_tapped"),
+    RECOMMENDATIONS_IMPORT_TAPPED("recommendations_import_tapped"),
+    RECOMMENDATIONS_MORE_TAPPED("recommendations_more_tapped"),
+    RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
+
+    /* End of Year */
+    END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),
+    END_OF_YEAR_STORIES_SHOWN("end_of_year_stories_shown"),
+    END_OF_YEAR_STORIES_DISMISSED("end_of_year_stories_dismissed"),
+    END_OF_YEAR_STORIES_FAILED_TO_LOAD("end_of_year_stories_failed_to_load"),
+    END_OF_YEAR_STORY_REPLAY_BUTTON_TAPPED("end_of_year_story_replay_button_tapped"),
+    END_OF_YEAR_STORY_SHOWN("end_of_year_story_shown"),
+    END_OF_YEAR_STORY_SHARE("end_of_year_story_share"),
+    END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
+    END_OF_YEAR_STORY_RETRY_BUTTON_TAPPED("end_of_year_story_retry_button_tapped"),
+    END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped"),
+
+    /* Welcome */
+    WELCOME_SHOWN("welcome_shown"),
+    WELCOME_IMPORT_TAPPED("welcome_import_tapped"),
+    WELCOME_DISCOVER_TAPPED("welcome_discover_tapped"),
+    WELCOME_DISMISSED("welcome_dismissed"),
+
+    /* Import */
+    ONBOARDING_IMPORT_SHOWN("onboarding_import_shown"),
+    ONBOARDING_IMPORT_APP_SELECTED("onboarding_import_app_selected"),
+    ONBOARDING_IMPORT_OPEN_APP_SELECTED("onboarding_import_open_app_selected"),
+    ONBOARDING_IMPORT_DISMISSED("onboarding_import_dismissed"),
+
+    /* Cancel Subscription Confirmation */
+    CANCEL_CONFIRMATION_VIEW_SHOWN("cancel_confirmation_view_shown"),
+    CANCEL_CONFIRMATION_VIEW_DISMISSED("cancel_confirmation_view_dismissed"),
+    CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("cancel_confirmation_stay_button_tapped"),
+    CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped")
 }

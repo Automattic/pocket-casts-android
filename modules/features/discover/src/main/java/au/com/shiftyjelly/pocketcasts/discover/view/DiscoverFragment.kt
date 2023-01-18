@@ -9,9 +9,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -25,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -36,6 +39,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     @Inject lateinit var settings: Settings
     @Inject lateinit var staticServerManager: StaticServerManagerImpl
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: DiscoverViewModel by viewModels()
     private var adapter: DiscoverAdapter? = null
@@ -54,25 +58,34 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val transformedList = viewModel.transformNetworkLoadableList(list, resources) // Replace any [regionCode] etc references
         val listId = list.listUuid
         if (listId != null) {
-            AnalyticsHelper.listShowAllTapped(listId)
+            FirebaseAnalyticsTracker.listShowAllTapped(listId)
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to listId))
+        } else {
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOW_ALL_TAPPED, mapOf(LIST_ID_KEY to transformedList.inferredId()))
         }
         if (list is DiscoverCategory) {
             viewModel.currentRegionCode?.let {
-                AnalyticsHelper.openedCategory(list.id, it)
+                FirebaseAnalyticsTracker.openedCategory(list.id, it)
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_CATEGORY_SHOWN, mapOf(NAME_KEY to list.name, REGION_KEY to it, ID_KEY to list.id))
             }
         }
 
         if (list.expandedStyle is ExpandedStyle.GridList) {
-            val fragment = PodcastGridFragment.newInstance(listId, transformedList.title, transformedList.source, transformedList.type, transformedList.displayStyle, transformedList.expandedStyle, transformedList.expandedTopItemLabel, transformedList.curated)
+            val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         } else {
-            val fragment = PodcastListFragment.newInstance(listId, transformedList.title, transformedList.source, transformedList.type, transformedList.displayStyle, transformedList.expandedStyle, transformedList.expandedTopItemLabel, transformedList.curated)
+            val fragment = PodcastListFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         }
     }
 
     override fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?) {
-        val fragment = EpisodeFragment.newInstance(episodeUuid = episode.uuid, podcastUuid = episode.podcast_uuid, fromListUuid = listUuid)
+        val fragment = EpisodeFragment.newInstance(
+            episodeUuid = episode.uuid,
+            source = EpisodeViewSource.DISCOVER,
+            podcastUuid = episode.podcast_uuid,
+            fromListUuid = listUuid
+        )
         fragment.show(parentFragmentManager, "episode_card")
     }
 
@@ -113,7 +126,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val recyclerView = binding?.recyclerView ?: return
         recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         if (adapter == null) {
-            adapter = DiscoverAdapter(viewModel.repository, staticServerManager, this, theme, viewModel::loadPodcastList)
+            adapter = DiscoverAdapter(viewModel.repository, staticServerManager, this, theme, viewModel::loadPodcastList, analyticsTracker)
         }
         recyclerView.adapter = adapter
         recyclerView.itemAnimator = null
@@ -157,14 +170,27 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     override fun onRegionSelected(region: DiscoverRegion) {
         viewModel.changeRegion(region, resources)
+
+        @Suppress("DEPRECATION")
         activity?.onBackPressed()
+
         binding?.recyclerView?.scrollToPosition(0)
     }
 
+    @Suppress("DEPRECATION")
     override fun setUserVisibleHint(visible: Boolean) {
         super.setUserVisibleHint(visible)
         if (visible) {
-            AnalyticsHelper.navigatedToDiscover()
+            FirebaseAnalyticsTracker.navigatedToDiscover()
         }
+    }
+
+    companion object {
+        private const val ID_KEY = "id"
+        private const val NAME_KEY = "name"
+        private const val REGION_KEY = "region"
+        const val LIST_ID_KEY = "list_id"
+        const val PODCAST_UUID_KEY = "podcast_uuid"
+        const val EPISODE_UUID_KEY = "episode_uuid"
     }
 }

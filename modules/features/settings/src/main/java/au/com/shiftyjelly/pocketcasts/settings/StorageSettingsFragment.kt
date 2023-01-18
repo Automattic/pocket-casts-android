@@ -40,7 +40,10 @@ class StorageSettingsFragment : BaseFragment() {
                     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                     StorageSettingsPage(
                         viewModel = viewModel,
-                        onBackPressed = { activity?.onBackPressed() },
+                        onBackPressed = {
+                            @Suppress("DEPRECATION")
+                            activity?.onBackPressed()
+                        },
                         onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance()) }
                     )
                 }
@@ -69,7 +72,7 @@ class StorageSettingsFragment : BaseFragment() {
         viewModel.onFragmentResume()
     }
 
-    private fun getFileLocations() = StorageOptions().getFolderLocations(activity)
+    private fun getFileLocations() = StorageOptions().getFolderLocations(requireActivity())
 
     private fun permissionGranted() =
         ContextCompat.checkSelfPermission(

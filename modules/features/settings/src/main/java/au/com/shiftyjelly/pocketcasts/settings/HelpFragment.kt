@@ -18,12 +18,12 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -62,7 +62,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
         )
         toolbar.setOnMenuItemClickListener(this)
 
-        AnalyticsHelper.userGuideOpened()
+        FirebaseAnalyticsTracker.userGuideOpened()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,6 +89,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
             webViewClient = SupportWebViewClient()
             loadUrl(loadedUrl ?: "https://support.pocketcasts.com/android/?device=android")
             settings.javaScriptEnabled = true
+            settings.textZoom = 100
         }
         loadingView = view.findViewById(VR.id.progress_circle)
         layoutError = view.findViewById(VR.id.layoutLoadingError)
@@ -185,7 +186,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
             }
         }
 
-        AnalyticsHelper.userGuideEmailFeedback()
+        FirebaseAnalyticsTracker.userGuideEmailFeedback()
     }
 
     private fun sendSupportEmail() {
@@ -200,6 +201,6 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
             }
         }
 
-        AnalyticsHelper.userGuideEmailSupport()
+        FirebaseAnalyticsTracker.userGuideEmailSupport()
     }
 }

@@ -16,10 +16,12 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.view.KeyEvent
 import androidx.annotation.DrawableRes
 import androidx.core.os.bundleOf
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
@@ -79,6 +81,7 @@ class MediaSessionManager(
     val mediaSession = MediaSessionCompat(context, "PocketCastsMediaSession")
     val disposables = CompositeDisposable()
     var seeking = false
+    private val source = AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -101,11 +104,23 @@ class MediaSessionManager(
 
     fun startObserving() {
         observePlaybackState()
+        observeMediaNotificationControls()
         playbackManager.upNextQueue.changesObservable
             .observeOn(Schedulers.io())
             .doOnNext { updateUpNext(it) }
             .subscribeBy(onError = { Timber.e(it) })
             .addTo(disposables)
+    }
+
+    private fun observeMediaNotificationControls() {
+        launch {
+            settings.defaultMediaNotificationControlsFlow.collect {
+                withContext(Dispatchers.Main) {
+                    val playbackStateCompat = getPlaybackStateCompat(playbackManager.playbackStateRelay.blockingFirst(), currentEpisode = playbackManager.getCurrentEpisode())
+                    updatePlaybackState(playbackStateCompat)
+                }
+            }
+        }
     }
 
     private fun connect() {
@@ -301,7 +316,7 @@ class MediaSessionManager(
 
         if (settings.showArtworkOnLockScreen()) {
             if (Util.isAutomotive(context)) {
-                val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, context)?.toString()
+                val bitmapUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)?.toString()
                 nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
                 nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
             } else {
@@ -321,43 +336,51 @@ class MediaSessionManager(
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
         }
 
-        if (playbackManager.isAudioEffectsAvailable()) {
-            val currentSpeed = playbackState.playbackSpeed
-            val drawableId = when {
-                currentSpeed <= 1 -> IR.drawable.auto_1x
-                currentSpeed == 1.1 -> IR.drawable.auto_1_1x
-                currentSpeed == 1.2 -> IR.drawable.auto_1_2x
-                currentSpeed == 1.3 -> IR.drawable.auto_1_3x
-                currentSpeed == 1.4 -> IR.drawable.auto_1_4x
-                currentSpeed == 1.5 -> IR.drawable.auto_1_5x
-                currentSpeed == 1.6 -> IR.drawable.auto_1_6x
-                currentSpeed == 1.7 -> IR.drawable.auto_1_7x
-                currentSpeed == 1.8 -> IR.drawable.auto_1_8x
-                currentSpeed == 1.9 -> IR.drawable.auto_1_9x
-                currentSpeed == 2.0 -> IR.drawable.auto_2x
-                currentSpeed == 2.1 -> IR.drawable.auto_2_1x
-                currentSpeed == 2.2 -> IR.drawable.auto_2_2x
-                currentSpeed == 2.3 -> IR.drawable.auto_2_3x
-                currentSpeed == 2.4 -> IR.drawable.auto_2_4x
-                currentSpeed == 2.5 -> IR.drawable.auto_2_5x
-                currentSpeed == 2.6 -> IR.drawable.auto_2_6x
-                currentSpeed == 2.7 -> IR.drawable.auto_2_7x
-                currentSpeed == 2.8 -> IR.drawable.auto_2_8x
-                currentSpeed == 2.9 -> IR.drawable.auto_2_9x
-                currentSpeed == 3.0 -> IR.drawable.auto_3x
-                else -> IR.drawable.auto_1x
-            }
+        settings.getMediaNotificationControlItems().take(MediaNotificationControls.MAX_VISIBLE_OPTIONS).forEach { mediaControl ->
+            when (mediaControl) {
+                MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
+                MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
+                MediaNotificationControls.PlayNext -> addCustomAction(stateBuilder, APP_ACTION_PLAY_NEXT, "Play next", com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next)
+                MediaNotificationControls.PlaybackSpeed -> {
+                    if (playbackManager.isAudioEffectsAvailable()) {
+                        val currentSpeed = playbackState.playbackSpeed
+                        val drawableId = when {
+                            currentSpeed <= 1 -> IR.drawable.auto_1x
+                            currentSpeed == 1.1 -> IR.drawable.auto_1_1x
+                            currentSpeed == 1.2 -> IR.drawable.auto_1_2x
+                            currentSpeed == 1.3 -> IR.drawable.auto_1_3x
+                            currentSpeed == 1.4 -> IR.drawable.auto_1_4x
+                            currentSpeed == 1.5 -> IR.drawable.auto_1_5x
+                            currentSpeed == 1.6 -> IR.drawable.auto_1_6x
+                            currentSpeed == 1.7 -> IR.drawable.auto_1_7x
+                            currentSpeed == 1.8 -> IR.drawable.auto_1_8x
+                            currentSpeed == 1.9 -> IR.drawable.auto_1_9x
+                            currentSpeed == 2.0 -> IR.drawable.auto_2x
+                            currentSpeed == 2.1 -> IR.drawable.auto_2_1x
+                            currentSpeed == 2.2 -> IR.drawable.auto_2_2x
+                            currentSpeed == 2.3 -> IR.drawable.auto_2_3x
+                            currentSpeed == 2.4 -> IR.drawable.auto_2_4x
+                            currentSpeed == 2.5 -> IR.drawable.auto_2_5x
+                            currentSpeed == 2.6 -> IR.drawable.auto_2_6x
+                            currentSpeed == 2.7 -> IR.drawable.auto_2_7x
+                            currentSpeed == 2.8 -> IR.drawable.auto_2_8x
+                            currentSpeed == 2.9 -> IR.drawable.auto_2_9x
+                            currentSpeed == 3.0 -> IR.drawable.auto_3x
+                            else -> IR.drawable.auto_1x
+                        }
 
-            stateBuilder.addCustomAction(APP_ACTION_CHANGE_SPEED, "Change speed", drawableId)
-        }
-
-        addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
-
-        if (currentEpisode is Episode) {
-            if (currentEpisode.isStarred) {
-                addCustomAction(stateBuilder, APP_ACTION_UNSTAR, "Unstar", IR.drawable.auto_starred)
-            } else {
-                addCustomAction(stateBuilder, APP_ACTION_STAR, "Star", IR.drawable.auto_star)
+                        stateBuilder.addCustomAction(APP_ACTION_CHANGE_SPEED, "Change speed", drawableId)
+                    }
+                }
+                MediaNotificationControls.Star -> {
+                    if (currentEpisode is Episode) {
+                        if (currentEpisode.isStarred) {
+                            addCustomAction(stateBuilder, APP_ACTION_UNSTAR, "Unstar", IR.drawable.auto_starred)
+                        } else {
+                            addCustomAction(stateBuilder, APP_ACTION_STAR, "Star", IR.drawable.auto_star)
+                        }
+                    }
+                }
             }
         }
     }
@@ -383,7 +406,12 @@ class MediaSessionManager(
 
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             if (Intent.ACTION_MEDIA_BUTTON == mediaButtonEvent.action) {
-                val keyEvent: KeyEvent = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT) ?: return false
+                val keyEvent: KeyEvent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
+                } ?: return false
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     when (keyEvent.keyCode) {
                         KeyEvent.KEYCODE_HEADSETHOOK -> {
@@ -423,7 +451,7 @@ class MediaSessionManager(
                         object : TimerTask() {
                             override fun run() {
                                 logEvent("play from headset hook", inSessionCallback = false)
-                                playbackManager.playPause()
+                                playbackManager.playPause(playbackSource = source)
                                 playPauseTimer = null
                             }
                         },
@@ -436,7 +464,7 @@ class MediaSessionManager(
                 playPauseTimer = null
 
                 logEvent("skip forwards from headset hook")
-                playbackManager.skipForward()
+                playbackManager.skipForward(playbackSource = source)
             }
         }
 
@@ -454,12 +482,12 @@ class MediaSessionManager(
 
         override fun onPlay() {
             logEvent("play")
-            playbackManager.playQueue()
+            playbackManager.playQueue(playbackSource = source)
         }
 
         override fun onPause() {
             logEvent("pause")
-            playbackManager.pause()
+            playbackManager.pause(playbackSource = source)
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
@@ -474,18 +502,18 @@ class MediaSessionManager(
             logEvent("stop")
             launch {
                 // note: the stop event is called from cars when they only want to pause, this is less destructive and doesn't cause issues if they try to play again
-                playbackManager.pause()
+                playbackManager.pause(playbackSource = source)
             }
         }
 
         override fun onSkipToPrevious() {
             logEvent("skip backwards")
-            playbackManager.skipBackward()
+            playbackManager.skipBackward(playbackSource = source)
         }
 
         override fun onSkipToNext() {
             logEvent("skip forwards")
-            playbackManager.skipForward()
+            playbackManager.skipForward(playbackSource = source)
         }
 
         override fun onSetRating(rating: RatingCompat?) {
@@ -506,7 +534,7 @@ class MediaSessionManager(
                 val autoMediaId = AutoMediaId.fromMediaId(mediaId)
                 val playableId = autoMediaId.playableId
                 episodeManager.findPlayableByUuid(playableId)?.let { episode ->
-                    playbackManager.playNow(episode)
+                    playbackManager.playNow(episode, playbackSource = source)
 
                     playbackManager.lastLoadedFromPodcastOrPlaylistUuid = autoMediaId.sourceId
                 }
@@ -523,6 +551,8 @@ class MediaSessionManager(
                 APP_ACTION_STAR -> starEpisode()
                 APP_ACTION_UNSTAR -> unstarEpisode()
                 APP_ACTION_CHANGE_SPEED -> changePlaybackSpeed()
+                APP_ACTION_ARCHIVE -> archive()
+                APP_ACTION_PLAY_NEXT -> playbackManager.playNextInQueue()
             }
         }
 
@@ -531,7 +561,7 @@ class MediaSessionManager(
             if (state is UpNextQueue.State.Loaded) {
                 state.queue.find { it.adapterId == id }?.let { episode ->
                     logEvent("play from skip to queue item")
-                    playbackManager.playNow(episode)
+                    playbackManager.playNow(episode = episode, playbackSource = source)
                 }
             }
         }
@@ -541,6 +571,7 @@ class MediaSessionManager(
             seeking = true
             launch {
                 playbackManager.seekToTimeMs(pos.toInt())
+                playbackManager.trackPlaybackSeek(pos.toInt(), AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION)
             }
         }
     }
@@ -604,6 +635,17 @@ class MediaSessionManager(
         }
     }
 
+    private fun archive() {
+        launch {
+            playbackManager.getCurrentEpisode()?.let {
+                if (it is Episode) {
+                    it.isArchived = true
+                    episodeManager.archive(it, playbackManager)
+                }
+            }
+        }
+    }
+
     fun playFromSearchExternal(extras: Bundle) {
         val searchTerm = extras.getString(SearchManager.QUERY) ?: return
         performPlayFromSearch(searchTerm)
@@ -619,7 +661,7 @@ class MediaSessionManager(
      * ‘Listen to [filter name] in Pocket Casts’
      * ‘Listen to Up Next in Pocket Casts’
      * ‘Play Up Next in Pocket Casts’
-     * ‘Play New Releasees Next in Pocket Casts’
+     * ‘Play New Releases Next in Pocket Casts’
      */
     private fun performPlayFromSearch(searchTerm: String?) {
         Timber.d("performSearch $searchTerm")
@@ -627,9 +669,10 @@ class MediaSessionManager(
 
         Timber.i("performPlayFromSearch query: $query")
 
+        val playbackSource = AnalyticsSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION
         launch {
             if (query.startsWith("up next")) {
-                playbackManager.playQueue()
+                playbackManager.playQueue(playbackSource = playbackSource)
                 return@launch
             }
 
@@ -646,7 +689,7 @@ class MediaSessionManager(
                 val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitle(option)
                 if (matchingPodcast != null) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played podcast from search %s.", option)
-                    playPodcast(matchingPodcast)
+                    playPodcast(podcast = matchingPodcast, playbackSource = playbackSource)
                     return@launch
                 }
             }
@@ -654,7 +697,7 @@ class MediaSessionManager(
             for (option in options) {
                 val matchingEpisode = episodeManager.findFirstBySearchQuery(option) ?: continue
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played episode from search %s.", option)
-                playbackManager.playNow(matchingEpisode)
+                playbackManager.playNow(episode = matchingEpisode, playbackSource = playbackSource)
                 return@launch
             }
 
@@ -669,7 +712,7 @@ class MediaSessionManager(
                 val episodesToPlay = playlistManager.findEpisodes(playlist, episodeManager, playbackManager).take(5)
                 if (episodesToPlay.isEmpty()) return@launch
 
-                playEpisodes(episodesToPlay)
+                playEpisodes(episodesToPlay, playbackSource)
 
                 return@launch
             }
@@ -696,17 +739,17 @@ class MediaSessionManager(
         return Completable.fromAction { performPlayFromSearch(searchTerm) }
     }
 
-    private fun playEpisodes(episodes: List<Episode>) {
+    private fun playEpisodes(episodes: List<Episode>, playbackSource: AnalyticsSource) {
         if (episodes.isEmpty()) {
             return
         }
 
-        playbackManager.playEpisodes(episodes)
+        playbackManager.playEpisodes(episodes = episodes, playbackSource = playbackSource)
     }
 
-    private suspend fun playPodcast(podcast: Podcast) {
+    private suspend fun playPodcast(podcast: Podcast, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
         val latestEpisode = withContext(Dispatchers.Default) { episodeManager.findLatestUnfinishedEpisodeByPodcast(podcast) } ?: return
-        playbackManager.playNow(latestEpisode)
+        playbackManager.playNow(episode = latestEpisode, playbackSource = playbackSource)
     }
 
     // there's an issue on Samsung phones that if you don't say you support ACTION_SKIP_TO_PREVIOUS and ACTION_SKIP_TO_NEXT then the skip buttons on the lock screen are disabled.
@@ -722,6 +765,8 @@ private const val APP_ACTION_SKIP_BACK = "jumpBack"
 private const val APP_ACTION_SKIP_FWD = "jumpFwd"
 private const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
 private const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
+private const val APP_ACTION_ARCHIVE = "archive"
+private const val APP_ACTION_PLAY_NEXT = "playNext"
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")

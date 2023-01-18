@@ -1,7 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account
 
+import android.accounts.AccountAuthenticatorResponse
+import android.accounts.AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -16,8 +19,8 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,7 +37,7 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(theme.activeTheme.resourceId)
+        theme.setupThemeForConfig(this, resources.configuration)
 
         binding = AccountActivityBinding.inflate(layoutInflater)
         val view = binding.root
@@ -46,15 +49,20 @@ class AccountActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
 
-            if (isNewUpgradeInstance(intent)) {
+            val accountAuthenticatorResponse = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE)
+            }
+            if (accountAuthenticatorResponse != null) {
+                graph.setStartDestination(R.id.signInFragment)
+            } else if (isNewUpgradeInstance(intent)) {
                 viewModel.clearReadyForUpgrade()
                 graph.setStartDestination(R.id.createFrequencyFragment)
             } else if (isPromoCodeInstance(intent)) {
                 graph.setStartDestination(R.id.promoCodeFragment)
                 arguments.putString(PromoCodeFragment.ARG_PROMO_CODE, intent.getStringExtra(PROMO_CODE_VALUE))
-            } else if (isSignInInstance(intent)) {
-                graph.setStartDestination(R.id.signInFragment)
-                arguments.putParcelable(SignInFragment.EXTRA_SUCCESS_INTENT, intent.getParcelableExtra(SUCCESS_INTENT))
             } else {
                 if (isNewAutoSelectPlusInstance(intent)) {
                     viewModel.defaultSubscriptionType = SubscriptionType.PLUS
@@ -106,10 +114,11 @@ class AccountActivity : AppCompatActivity() {
             return
         }
         if (currentFragment?.id == R.id.accountFragment) {
-            AnalyticsHelper.closeAccountMissingClicked()
+            FirebaseAnalyticsTracker.closeAccountMissingClicked()
         }
 
         UiUtil.hideKeyboard(binding.root)
+        @Suppress("DEPRECATION")
         super.onBackPressed()
     }
 
@@ -139,6 +148,7 @@ class AccountActivity : AppCompatActivity() {
                 }
                 source?.let { mapOf(SOURCE_KEY to source) }
             }
+            R.id.accountFragment -> mapOf(SOURCE_KEY to ACCOUNT_PROP_VALUE)
             else -> null
         } ?: emptyMap()
         analyticsEvent?.let { analyticsTracker.track(it, properties) }
@@ -157,7 +167,13 @@ class AccountActivity : AppCompatActivity() {
             R.id.createDoneFragment -> AnalyticsEvent.ACCOUNT_UPDATED_DISMISSED
             else -> null
         }
-        analyticsEvent?.let { analyticsTracker.track(it) }
+
+        val properties = when (id) {
+            R.id.accountFragment -> mapOf(SOURCE_KEY to ACCOUNT_PROP_VALUE)
+            else -> emptyMap()
+        }
+
+        analyticsEvent?.let { analyticsTracker.track(it, properties) }
     }
 
     companion object {
@@ -182,11 +198,10 @@ class AccountActivity : AppCompatActivity() {
         }
         private const val PRODUCT_KEY = "product"
         private const val SOURCE_KEY = "source"
-        const val IS_PROMO_CODE = "account_activity.is_promo_code"
+        private const val ACCOUNT_PROP_VALUE = "account"
+        private const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
         const val PROMO_CODE_RETURN_DESCRIPTION = "account_activity.promo_code_return_description"
-        const val SIGN_IN_ONLY = "account_activity.sign_in_only"
-        const val SUCCESS_INTENT = "account_activity.success_intent"
         const val SUPPORTER_INTENT = "account_activity.supporter"
 
         fun promoCodeInstance(context: Context?, code: String): Intent {
@@ -198,10 +213,6 @@ class AccountActivity : AppCompatActivity() {
 
         fun isPromoCodeInstance(intent: Intent): Boolean {
             return intent.getBooleanExtra(IS_PROMO_CODE, false)
-        }
-
-        fun isSignInInstance(intent: Intent): Boolean {
-            return intent.getBooleanExtra(SIGN_IN_ONLY, false)
         }
     }
 

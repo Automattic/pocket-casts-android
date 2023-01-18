@@ -17,11 +17,14 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
+import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -51,6 +54,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.math.abs
@@ -60,7 +64,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val UPNEXT_DRAG_DISTANCE_MULTIPLIER = 1.85f // Open up next at a different rate than we are dragging
 private const val UPNEXT_HEIGHT_OPEN_THRESHOLD = 0.15f // We only have an open threshold because we only control swipe up, swipe down is the standard bottom sheet behaviour
-private const val UPNEXT_OUTLIER_THRESHOLD = 150.0f // Sometimes we get a random large delta, it seems better to filter them out or else you get random jumps
+private const val UPNEXT_OUTLIER_THRESHOLD = 400.0f // Sometimes we get a random large delta, it seems better to filter them out or else you get random jumps
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
@@ -68,12 +72,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var warningsHelper: WarningsHelper
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var imageLoader: PodcastImageLoaderThemed
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: AdapterPlayerHeaderBinding? = null
-
-    var skippedFirstTouch: Boolean = false
+    private var skippedFirstTouch: Boolean = false
+    private var hasReceivedOnTouchDown = false
+    private val playbackSource = AnalyticsSource.PLAYER
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
@@ -115,6 +121,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
                 viewModel.seekToMs(progress, seekComplete)
+                playbackManager.trackPlaybackSeek(progress, AnalyticsSource.PLAYER)
             }
 
             override fun onSeekPositionChanging(progress: Int) {}
@@ -152,23 +159,33 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.share.setOnClickListener { onShareClick() }
         binding.playerActions.setOnClickListener { onMoreClicked() }
         binding.podcast.setOnClickListener { showPodcast() }
-        binding.played.setOnClickListener { viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played") }
-        binding.archive.setOnClickListener { viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive") }
-        binding.download.setOnClickListener { viewModel.downloadCurrentlyPlaying() }
+        binding.played.setOnClickListener {
+            trackShelfAction(ShelfItem.Played.analyticsValue)
+            viewModel.markCurrentlyPlayingAsPlayed(requireContext())?.show(childFragmentManager, "mark_as_played")
+        }
+        binding.archive.setOnClickListener {
+            trackShelfAction(ShelfItem.Archive.analyticsValue)
+            viewModel.archiveCurrentlyPlaying(resources)?.show(childFragmentManager, "archive")
+        }
+        binding.download.setOnClickListener {
+            trackShelfAction(ShelfItem.Download.analyticsValue)
+            viewModel.downloadCurrentlyPlaying()
+        }
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
         CastButtonFactory.setUpMediaRouteButton(binding.root.context, binding.castButton)
         binding.castButton.setAlwaysVisible(true)
         binding.castButton.updateColor(ThemeColor.playerContrast03(theme.activeTheme))
+        binding.castButton.setOnClickListener { trackShelfAction(ShelfItem.Cast.analyticsValue) }
 
-        setupUpNextDrag(view)
+        setupUpNextDrag(view, binding.topView)
 
         viewModel.listDataLive.observe(viewLifecycleOwner) {
             val headerViewModel = it.podcastHeader
             binding.viewModel = headerViewModel
 
-            binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = false)
+            binding.largePlayButton.setPlaying(isPlaying = headerViewModel.isPlaying, animate = true)
 
             val playerContrast1 = ThemeColor.playerContrast01(headerViewModel.theme)
             binding.largePlayButton.setCircleTintColor(playerContrast1)
@@ -253,27 +270,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-    private fun setupUpNextDrag(view: View) {
+    private fun setupUpNextDrag(view: View, topView: View?) {
         val context = context ?: return
         val swipeGesture = GestureDetectorCompat(
             context,
-            object : GestureDetector.OnGestureListener {
-                override fun onShowPress(e: MotionEvent?) {
-                }
+            object : GestureDetector.SimpleOnGestureListener() {
 
-                override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                    return false
-                }
+                override fun onDown(e: MotionEvent) = true
 
-                override fun onDown(e: MotionEvent?): Boolean {
-                    return true
-                }
-
-                override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-                    return false
-                }
-
-                override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+                override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
                     val upNextBottomSheetBehavior = (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior
                         ?: return false
                     if (!skippedFirstTouch) {
@@ -284,7 +289,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         return false
                     }
 
-                    if ((upNextBottomSheetBehavior.peekHeight == 0 && distanceY < 0) || abs(distanceY) > UPNEXT_OUTLIER_THRESHOLD) { // Dragging down when we are at the bottom already or random large outlier
+                    // Bottom sheet is already at the bottom
+                    if (upNextBottomSheetBehavior.peekHeight == 0 && distanceY < 0) {
+                        return false
+                    }
+
+                    // Filtering out large deltas to avoid jumps in scrolling
+                    if (abs(distanceY) > UPNEXT_OUTLIER_THRESHOLD) {
                         return false
                     }
 
@@ -297,40 +308,66 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
                     return upNextBottomSheetBehavior.peekHeight != 0
                 }
-
-                override fun onLongPress(e: MotionEvent?) {
-                }
             }
         )
+
+        @Suppress("ClickableViewAccessibility")
+        topView?.setOnTouchListener { _, event ->
+            // Check for down events from the top view because sometimes they don't make it to
+            // the NestedScrollView's OnTouchListener and the first event we pass to our
+            // swipe gesture handler must be a down event
+            if (!hasReceivedOnTouchDown && event.actionMasked == MotionEvent.ACTION_DOWN) {
+                swipeGesture.onTouchEvent(event)
+                hasReceivedOnTouchDown = true
+            }
+            false
+        }
 
         view.setOnTouchListener { _, event ->
             if ((activity as? FragmentHostListener)?.getPlayerBottomSheetState() != BottomSheetBehavior.STATE_EXPANDED) {
                 return@setOnTouchListener false
             }
 
-            val action = event.actionMasked
-            if (action == MotionEvent.ACTION_UP) {
-                skippedFirstTouch = false
+            when (event.actionMasked) {
 
-                val playerContainerFragment = parentFragment as? PlayerContainerFragment
-                val upNextBottomSheetBehavior = playerContainerFragment?.upNextBottomSheetBehavior
-                if (upNextBottomSheetBehavior != null) {
-                    val peekHeight = upNextBottomSheetBehavior.peekHeight
-                    val cutOff = Resources.getSystem().displayMetrics.heightPixels * UPNEXT_HEIGHT_OPEN_THRESHOLD
-                    if (peekHeight > cutOff) {
-                        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    } else {
-                        upNextBottomSheetBehavior.setPeekHeight(0, true)
-                        upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                MotionEvent.ACTION_DOWN -> {
+                    hasReceivedOnTouchDown = true
+                }
 
-                        if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
-                            (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(false)
+                MotionEvent.ACTION_UP -> {
+                    skippedFirstTouch = false
+
+                    val playerContainerFragment = parentFragment as? PlayerContainerFragment
+                    val upNextBottomSheetBehavior =
+                        playerContainerFragment?.upNextBottomSheetBehavior
+                    if (upNextBottomSheetBehavior != null) {
+                        val peekHeight = upNextBottomSheetBehavior.peekHeight
+                        val cutOff =
+                            Resources.getSystem().displayMetrics.heightPixels * UPNEXT_HEIGHT_OPEN_THRESHOLD
+                        if (peekHeight > cutOff) {
+                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        } else {
+                            upNextBottomSheetBehavior.setPeekHeight(0, true)
+                            upNextBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+                            if (peekHeight == 0) { // If we are already collapsed the state of the sheet won't change so the listener needs to be called manually
+                                (parentFragment as? PlayerContainerFragment)?.updateUpNextVisibility(
+                                    false
+                                )
+                            }
                         }
                     }
                 }
             }
 
-            swipeGesture.onTouchEvent(event)
+            // Only pass events to swipeGesture if a down event has been received to avoid
+            // this crash: https://github.com/Automattic/pocket-casts-android/issues/370
+            if (hasReceivedOnTouchDown) {
+                swipeGesture.onTouchEvent(event)
+            } else {
+                Timber.w("Not passing touch event to swipe gesture handler")
+                false
+            }
         }
     }
 
@@ -399,26 +436,31 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onSkipForwardLongPress() {
-        viewModel.longSkipForwardOptionsDialog().show(parentFragmentManager, "longpressoptions")
+        LongPressOptionsFragment().show(parentFragmentManager, "longpressoptions")
     }
 
     override fun onEffectsClick() {
+        trackShelfAction(ShelfItem.Effects.analyticsValue)
         EffectsFragment().show(parentFragmentManager, "effects_sheet")
     }
 
     override fun onSleepClick() {
-        SleepFragment().show(parentFragmentManager, "effects_sheet")
+        trackShelfAction(ShelfItem.Sleep.analyticsValue)
+        SleepFragment().show(parentFragmentManager, "sleep_sheet")
     }
 
     override fun onStarClick() {
+        trackShelfAction(ShelfItem.Star.analyticsValue)
         viewModel.starToggle()
     }
 
     override fun onShareClick() {
-        viewModel.shareDialog(context, childFragmentManager)?.show()
+        trackShelfAction(ShelfItem.Share.analyticsValue)
+        ShareFragment().show(parentFragmentManager, "share_sheet")
     }
 
     private fun showPodcast() {
+        trackShelfAction(ShelfItem.Podcast.analyticsValue)
         val podcast = viewModel.podcast
         (activity as FragmentHostListener).closePlayer()
         if (podcast != null) {
@@ -429,17 +471,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     override fun onPreviousChapter() {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_PREVIOUS_CHAPTER_TAPPED)
         viewModel.previousChapter()
     }
 
     override fun onNextChapter() {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_NEXT_CHAPTER_TAPPED)
         viewModel.nextChapter()
-    }
-
-    override fun onPlayingEpisodeActionsClick() {
-        viewModel.episode?.let { episode ->
-            (activity as? FragmentHostListener)?.openEpisodeDialog(episode.uuid, (episode as? Episode)?.podcastUuid, forceDark = true)
-        }
     }
 
     fun onMoreClicked() {
@@ -447,13 +485,14 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         if (childFragmentManager.fragments.firstOrNull() is ShelfBottomSheet) {
             return
         }
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
         ShelfBottomSheet().show(childFragmentManager, "shelf_bottom_sheet")
     }
 
     override fun onPlayClicked() {
         if (playbackManager.isPlaying()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
-            playbackManager.pause()
+            playbackManager.pause(playbackSource = playbackSource)
         } else {
             if (playbackManager.shouldWarnAboutPlayback()) {
                 launch {
@@ -464,7 +503,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 viewModel.play()
                                 warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
                             } else {
-                                warningsHelper.streamingWarningDialog(episode, snackbarParentView = view)
+                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, playbackSource = playbackSource)
                                     .show(parentFragmentManager, "streaming dialog")
                             }
                         }
@@ -501,5 +540,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     override fun onHeaderChapterClick(chapter: Chapter) {
         (parentFragment as? PlayerContainerFragment)?.openChaptersAt(chapter)
+    }
+
+    private fun trackShelfAction(analyticsAction: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.PLAYER_SHELF_ACTION_TAPPED,
+            mapOf(AnalyticsProp.Key.FROM to AnalyticsProp.Value.SHELF, AnalyticsProp.Key.ACTION to analyticsAction)
+        )
     }
 }

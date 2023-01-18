@@ -100,15 +100,17 @@ class CreateDoneFragment : BaseFragment() {
 
     private fun processCreated(subscriptionType: SubscriptionType?) {
         var resourceId = 0
-        val title = getString(LR.string.profile_account_created)
+        var title = ""
         var detail = ""
         if (subscriptionType != null) {
             if (subscriptionType == SubscriptionType.FREE) {
                 resourceId = R.drawable.ic_created_free_account
                 detail = getString(LR.string.profile_welcome_to_free)
+                title = getString(LR.string.profile_account_created)
             } else {
                 resourceId = R.drawable.ic_created_plus_account
                 detail = getString(LR.string.profile_welcome_to_plus)
+                title = getString(LR.string.profile_account_upgraded)
             }
         }
         binding?.imgDone?.setImageResource(resourceId)

@@ -14,10 +14,10 @@ android {
     if (canSignRelease) {
         signingConfigs {
             release {
-                storeFile = file(pocketcastsKeyStoreFile)
-                storePassword = pocketcastsKeyStorePassword
-                keyAlias = pocketcastsKeyStoreAlias
-                keyPassword = pocketcastsKeyStoreAliasPassword
+                storeFile = project.storeFile
+                storePassword = project.storePassword
+                keyAlias = project.keyAlias
+                keyPassword = project.keyPassword
             }
         }
     }
@@ -63,6 +63,7 @@ android {
         freeCompilerArgs += "-opt-in=com.google.android.horologist.composables.ExperimentalHorologistComposablesApi"
         freeCompilerArgs += "-opt-in=com.google.android.horologist.media3.ExperimentalHorologistMedia3BackendApi"
         freeCompilerArgs += "-opt-in=com.google.android.horologist.networks.ExperimentalHorologistNetworksApi"
+        freeCompilerArgs += "-opt-in=com.google.android.horologist.compose.navscaffold.ExperimentalHorologistComposeLayoutApi"
         freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
 }
@@ -94,6 +95,7 @@ dependencies {
 
     implementation androidLibs.horologistComposeLayout
 
+    implementation project(':modules:services:analytics')
     implementation project(':modules:services:compose')
     implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')

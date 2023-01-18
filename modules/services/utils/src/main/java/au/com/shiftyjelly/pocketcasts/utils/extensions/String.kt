@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import timber.log.Timber
+import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -73,4 +75,25 @@ fun String.sha1(): String? {
     } catch (e: Exception) {
         null
     }
+}
+
+/* https://en.gravatar.com/site/implement/images/java/ */
+fun String.md5Hex(): String? {
+    try {
+        val md = MessageDigest.getInstance("MD5")
+        return hex(md.digest(this.toByteArray(charset("CP1252"))))
+    } catch (e: NoSuchAlgorithmException) {
+        Timber.e(e.message)
+    } catch (e: UnsupportedEncodingException) {
+        Timber.e(e.message)
+    }
+    return null
+}
+
+private fun hex(array: ByteArray): String {
+    val sb = StringBuffer()
+    for (i in array.indices) {
+        sb.append(Integer.toHexString((array[i].toInt() and 0xFF) or 0x100).substring(1, 3))
+    }
+    return sb.toString()
 }

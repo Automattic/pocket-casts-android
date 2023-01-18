@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import androidx.fragment.app.Fragment
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -34,17 +37,19 @@ class WarningsHelper @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
     private val systemBatteryRestrictions: SystemBatteryRestrictions,
-    private val userEpisodeManager: UserEpisodeManager
+    private val userEpisodeManager: UserEpisodeManager,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun streamingWarningDialog(
         episode: Playable,
-        snackbarParentView: View? = null
+        snackbarParentView: View? = null,
+        playbackSource: AnalyticsSource
     ): ConfirmationDialog {
         return streamingWarningDialog(onConfirm = {
             GlobalScope.launch {
-                playbackManager.playNow(episode, true)
+                playbackManager.playNow(episode = episode, forceStream = true, playbackSource = playbackSource)
                 showBatteryWarningSnackbarIfAppropriate(snackbarParentView)
             }
         })
@@ -74,7 +79,7 @@ class WarningsHelper @Inject constructor(
             .setOnSecondary { download(episodeUuid, waitForWifi = true, from = from) }
     }
 
-    fun uploadWarning(episodeUuid: String): ConfirmationDialog {
+    fun uploadWarning(episodeUuid: String, source: AnalyticsSource): ConfirmationDialog {
         val titleRes =
             if (Network.isWifiConnection(activity)) LR.string.profile_cloud_upload_warning_title_metered_wifi else LR.string.profile_cloud_upload_warning_title_on_wifi
         return ConfirmationDialog()
@@ -82,19 +87,20 @@ class WarningsHelper @Inject constructor(
             .setTitle(activity.getString(titleRes))
             .setSummary(activity.getString(LR.string.profile_cloud_upload_warning_summary))
             .setButtonType(ConfirmationDialog.ButtonType.Normal(activity.getString(LR.string.profile_cloud_upload_warning_button)))
-            .setOnConfirm { upload(episodeUuid, waitForWifi = false) }
+            .setOnConfirm { upload(episodeUuid, waitForWifi = false, source = source) }
             .setSecondaryButtonType(ConfirmationDialog.ButtonType.Normal(activity.getString(LR.string.profile_cloud_upload_warning_later)))
-            .setOnSecondary { upload(episodeUuid, waitForWifi = true) }
+            .setOnSecondary { upload(episodeUuid, waitForWifi = true, source = source) }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun upload(episodeUuid: String, waitForWifi: Boolean) {
+    private fun upload(episodeUuid: String, waitForWifi: Boolean, source: AnalyticsSource) {
         GlobalScope.launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let {
                 if (it !is UserEpisode) return@let
 
                 if (!it.isUploaded && !it.isQueuedForUpload && !it.isUploading) {
                     userEpisodeManager.uploadToServer(it, waitForWifi)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_QUEUED, source = source, uuid = it.uuid)
                 }
             }
         }

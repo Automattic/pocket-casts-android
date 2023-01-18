@@ -3,29 +3,33 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 
-dependencies {
-    implementation project(':modules:services:localization')
-    implementation project(':modules:services:preferences')
-    implementation project(':modules:services:utils')
-    implementation project(':modules:services:analytics')
-    implementation project(':modules:services:images')
-    implementation project(':modules:services:ui')
-    implementation project(':modules:services:compose')
-    implementation project(':modules:services:views')
-    implementation project(':modules:services:servers')
-    implementation project(':modules:services:repositories')
-    implementation project(':modules:services:model')
-    implementation project(':modules:services:analytics')
-    implementation project(':modules:features:settings')
-    implementation project(':modules:features:podcasts')
-    implementation project(':modules:features:cartheme')
-    implementation project(':modules:features:account')
-}
-
 android {
+    namespace 'au.com.shiftyjelly.pocketcasts.profile'
     buildFeatures {
         viewBinding true
         dataBinding = true
         compose true
     }
+}
+
+dependencies {
+    // features
+    implementation project(':modules:features:account')
+    implementation project(':modules:features:cartheme')
+    implementation project(':modules:features:endofyear')
+    implementation project(':modules:features:podcasts')
+    implementation project(':modules:features:settings')
+
+    // services
+    implementation project(':modules:services:analytics')
+    implementation project(':modules:services:compose')
+    implementation project(':modules:services:images')
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:model')
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:servers')
+    implementation project(':modules:services:ui')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:views')
 }

@@ -6,6 +6,7 @@ import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.MediaBrowserCompat
@@ -15,12 +16,14 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
@@ -36,10 +39,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -65,7 +67,6 @@ const val RECENT_ROOT = "__RECENT__"
 const val SUGGESTED_ROOT = "__SUGGESTED__"
 const val FOLDER_ROOT_PREFIX = "__FOLDER__"
 
-private const val MAX_SEARCH_RESULT_COUNT = 10
 private const val MEDIA_SEARCH_SUPPORTED = "android.media.browse.SEARCH_SUPPORTED"
 private const val CONTENT_STYLE_SUPPORTED = "android.media.browse.CONTENT_STYLE_SUPPORTED"
 
@@ -220,14 +221,19 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
             // If we have switched to casting we need to remove the notification
             if (isForegroundService && notification == null && playbackManager.isPlaybackRemote()) {
-                stopForeground(true)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                } else {
+                    @Suppress("DEPRECATION")
+                    stopForeground(true)
+                }
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground as player is remote")
             }
 
             // If we are already showing a notification, update it no matter the state.
-            if (notification != null && notificationHelper.isShowing(NotificationHelper.NOTIFICATION_ID_PLAYING)) {
+            if (notification != null && notificationHelper.isShowing(Settings.NotificationId.PLAYING.value)) {
                 Timber.d("Updating playback notification")
-                notificationManager.notify(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                notificationManager.notify(Settings.NotificationId.PLAYING.value, notification)
                 if (isForegroundService && (state == PlaybackStateCompat.STATE_PLAYING || state == PlaybackStateCompat.STATE_BUFFERING)) {
                     // Nothing else to do
                     return
@@ -241,14 +247,18 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 PlaybackStateCompat.STATE_PLAYING -> {
                     if (notification != null) {
                         try {
-                            startForeground(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                            startForeground(Settings.NotificationId.PLAYING.value, notification)
                             notificationManager.enteredForeground(notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "startForeground state: $state")
-                        } catch (e: ForegroundServiceStartNotAllowedException) {
-                            addBatteryWarnings()
+                        } catch (e: Exception) {
                             LogBuffer.e(LogBuffer.TAG_PLAYBACK, "attempted startForeground for state: $state, but that threw an exception we caught: $e")
-                            CrashlyticsHelper.recordException(e)
-                            AnalyticsHelper.foregroundServiceStartNotAllowedException()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                                e is ForegroundServiceStartNotAllowedException
+                            ) {
+                                addBatteryWarnings()
+                                SentryHelper.recordException(e)
+                                FirebaseAnalyticsTracker.foregroundServiceStartNotAllowedException()
+                            }
                         }
                     } else {
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "can't startForeground as the notification is null")
@@ -269,13 +279,18 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                         }
 
                         if (notification != null && state == PlaybackStateCompat.STATE_PAUSED && isForegroundService) {
-                            notificationManager.notify(NotificationHelper.NOTIFICATION_ID_PLAYING, notification)
+                            notificationManager.notify(Settings.NotificationId.PLAYING.value, notification)
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state (update notification)")
                         } else {
                             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "stopForeground state: $state removing notification: $removeNotification")
                         }
 
-                        stopForeground(removeNotification)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            stopForeground(if (removeNotification) STOP_FOREGROUND_REMOVE else STOP_FOREGROUND_DETACH)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            stopForeground(removeNotification)
+                        }
                     }
 
                     if (state == PlaybackStateCompat.STATE_ERROR) {
@@ -389,7 +404,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         Timber.d("Loading sugggested children")
         val upNext = listOfNotNull(playbackManager.getCurrentEpisode()) + playbackManager.upNextQueue.queueEpisodes
         val mediaUpNext = upNext.take(NUM_SUGGESTED_ITEMS).mapNotNull { playable ->
-            val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title)
+            val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
             val parentPodcast = (if (playable is Episode) podcastManager.findPodcastByUuid(playable.podcastUuid) else filesPodcast) ?: return@mapNotNull null
             AutoConverter.convertEpisodeToMediaItem(this, playable, parentPodcast)
         }
@@ -418,14 +433,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     private fun loadRecentChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
         Timber.d("Loading recent children")
         val upNext = playbackManager.getCurrentEpisode() ?: return arrayListOf()
-        val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title)
+        val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
         val parentPodcast = (if (upNext is Episode) podcastManager.findPodcastByUuid(upNext.podcastUuid) else filesPodcast) ?: return arrayListOf()
 
         Timber.d("Recent item ${upNext.title}")
         return arrayListOf(AutoConverter.convertEpisodeToMediaItem(this, upNext, parentPodcast))
     }
 
-    open fun loadRootChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
+    open suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
         val rootItems = ArrayList<MediaBrowserCompat.MediaItem>()
 
         // podcasts
@@ -509,7 +524,13 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         } else {
             val podcastFound = podcastManager.findPodcastByUuidSuspend(parentId) ?: podcastManager.findOrDownloadPodcastRx(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
-                val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast).filterNot { it.isFinished || it.isArchived }.take(EPISODE_LIMIT).toMutableList()
+
+                val showPlayed = settings.getAutoShowPlayed()
+                val episodes = episodeManager
+                    .findEpisodesByPodcastOrdered(podcast)
+                    .filterNot { !showPlayed && (it.isFinished || it.isArchived) }
+                    .take(EPISODE_LIMIT)
+                    .toMutableList()
                 if (!podcast.isSubscribed) {
                     episodes.sortBy { it.episodeType !is Episode.EpisodeType.Trailer } // Bring trailers to the top
                 }
@@ -522,94 +543,66 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         return episodeItems
     }
 
-    private fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
-        val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title)
-        return userEpisodeManager.observeUserEpisodes().firstOrError().blockingGet().map { AutoConverter.convertEpisodeToMediaItem(this, it, podcast) }
+    protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
+        return userEpisodeManager.findUserEpisodes().map {
+            val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, thumbnailUrl = it.artworkUrl)
+            AutoConverter.convertEpisodeToMediaItem(this, it, podcast)
+        }
+    }
+
+    protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
+        return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
+            podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
+                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+            }
+        }
+    }
+
+    protected suspend fun loadListeningHistoryChildren(): List<MediaBrowserCompat.MediaItem> {
+        return episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
+            podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
+                AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
+            }
+        }
     }
 
     override fun onSearch(query: String, extras: Bundle?, result: Result<List<MediaBrowserCompat.MediaItem>>) {
         result.detach()
         launch {
-            result.sendResult(performSearch(query))
+            result.sendResult(podcastSearch(query))
         }
     }
 
     /**
-     * Voice search.
-     *   "Play Up Next"
-     *   "Play Material"
-     *   "Play Material in Pocket Casts"
+     * Search for local and remote podcasts.
+     * Returning an empty list displays "No media available for browsing here"
+     * Returning null displays "Something went wrong". There is no way to display our own error message.
      */
-    private fun performSearch(searchTerm: String): List<MediaBrowserCompat.MediaItem> {
-        val searchResults = mutableListOf<MediaBrowserCompat.MediaItem>()
-
-        val query = searchTerm.trim { it <= ' ' }.lowercase()
-        if (query.startsWith("up next") || query.startsWith("next episode") || query.startsWith("next podcast")) {
-            val upNextEpisodes = playbackManager.upNextQueue.queueEpisodes.take(10)
-            for (episode in upNextEpisodes) {
-                if (episode is Episode) {
-                    podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { parentPodcast ->
-                        addToResultsIfNotExists(AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = parentPodcast), searchResults)
-                    }
-                } else {
-                    // TODO: UserEpisode
-                }
+    private suspend fun podcastSearch(term: String): List<MediaBrowserCompat.MediaItem>? {
+        val termCleaned = term.trim()
+        // search for local podcasts
+        val localPodcasts = podcastManager.findSubscribedNoOrder()
+            .filter { it.title.contains(termCleaned, ignoreCase = true) || it.author.contains(termCleaned, ignoreCase = true) }
+            .sortedBy { PodcastsSortType.cleanStringForSort(it.title) }
+        // search for podcasts on the server
+        val serverPodcasts = try {
+            // only search the server if the term is over one character long
+            if (termCleaned.length <= 1) {
+                emptyList()
+            } else {
+                serverManager.searchForPodcastsSuspend(searchTerm = term, resources = resources).searchResults
             }
-
-            return searchResults
+        } catch (ex: Exception) {
+            Timber.e(ex)
+            // display the error message when the server call fails only if there is no local podcasts to display
+            if (localPodcasts.isEmpty()) {
+                return null
+            }
+            emptyList()
         }
-
-        val options = MediaSessionManager.calculateSearchQueryOptions(query)
-        for (option in options) {
-            val matchingPodcast = podcastManager.searchPodcastByTitle(option) ?: continue
-            val latestEpisodeUuid = matchingPodcast.latestEpisodeUuid
-            val latestEpisode = if (latestEpisodeUuid == null) null else episodeManager.findByUuid(latestEpisodeUuid)
-
-            if (latestEpisode != null) {
-                addToResultsIfNotExists(AutoConverter.convertEpisodeToMediaItem(context = this, episode = latestEpisode, parentPodcast = matchingPodcast), searchResults)
-                if (searchResults.size >= MAX_SEARCH_RESULT_COUNT) {
-                    return searchResults
-                }
-            }
-
-            // add a few of the latest episodes from this podcast
-            episodeManager.findPodcastEpisodesForMediaBrowserSearch(matchingPodcast.uuid).forEach { episode ->
-                addToResultsIfNotExists(AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = matchingPodcast), searchResults)
-            }
-            if (searchResults.size >= MAX_SEARCH_RESULT_COUNT) {
-                return searchResults
-            }
-        }
-
-        for (option in options) {
-            episodeManager.findFirstBySearchQuery(option)?.let { firstMatch ->
-                podcastManager.findPodcastByUuid(firstMatch.podcastUuid)?.let { parentPodcast ->
-                    addToResultsIfNotExists(AutoConverter.convertEpisodeToMediaItem(context = this, episode = firstMatch, parentPodcast = parentPodcast), searchResults)
-                }
-
-                if (searchResults.size >= MAX_SEARCH_RESULT_COUNT) {
-                    return searchResults
-                }
-            }
-        }
-
-        if (searchResults.isEmpty()) { // Try the server
-            serverManager.searchForPodcastsRx(query).blockingGet().searchResults.forEach { podcast ->
-                val mediaItem = convertPodcastToMediaItem(podcast = podcast, context = this)
-                addToResultsIfNotExists(mediaItem, searchResults)
-            }
-        }
-
-        return searchResults
-    }
-
-    private fun addToResultsIfNotExists(item: MediaBrowserCompat.MediaItem?, searchResults: MutableList<MediaBrowserCompat.MediaItem>) {
-        item ?: return
-
-        for (existingItem in searchResults) {
-            if (existingItem.mediaId == item.mediaId) return
-        }
-
-        searchResults.add(item)
+        // merge the local and remote podcasts
+        val podcasts = (localPodcasts + serverPodcasts).distinctBy { it.uuid }
+        // convert podcasts to the media browser format
+        return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast) }
     }
 }

@@ -135,7 +135,10 @@ class ChangeEmailFragment : BaseFragment() {
                     doneViewModel.trackShown(AccountUpdatedSource.CHANGE_EMAIL)
 
                     val activity = requireActivity()
+
+                    @Suppress("DEPRECATION")
                     activity.onBackPressed() // done fragment needs to back to profile page
+
                     val fragment = ChangeDoneFragment.newInstance()
                     (activity as FragmentHostListener).addFragment(fragment)
                 }
@@ -166,8 +169,8 @@ class ChangeEmailFragment : BaseFragment() {
         val btnConfirm = binding.btnConfirm
 
         val emailColor = context.getThemeColor(UR.attr.primary_interactive_01)
-        val emailDrawable = context.getTintedDrawable(R.drawable.ic_mail, emailColor)
-        val passwordDrawable = context.getTintedDrawable(R.drawable.ic_password, emailColor)
+        val emailDrawable = context.getTintedDrawable(IR.drawable.ic_mail, emailColor)
+        val passwordDrawable = context.getTintedDrawable(IR.drawable.ic_password, emailColor)
 
         val tickColor = context.getThemeColor(UR.attr.support_02)
         val tickDrawable = if (!invalidEmail) context.getTintedDrawable(IR.drawable.ic_tick_circle, tickColor) else null

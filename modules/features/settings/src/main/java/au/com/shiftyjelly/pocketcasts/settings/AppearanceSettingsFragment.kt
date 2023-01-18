@@ -14,12 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentSettingsAppearanceBinding
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceState
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.SettingsAppearanceViewModel
 import au.com.shiftyjelly.pocketcasts.ui.worker.RefreshArtworkWorker
-import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
@@ -77,9 +77,8 @@ class AppearanceSettingsFragment : BaseFragment() {
                                 binding.swtSystemTheme.isChecked = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
                             }
                         } else {
-                            val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Themes)
                             viewModel.updateChangeThemeType(Pair(beforeThemeType, afterThemeType))
-                            bottomSheet.show(parentFragmentManager, "upgrade_bottom_sheet")
+                            openOnboardingFlow()
                         }
                     }
                     binding.themeRecyclerView.setHasFixedSize(true)
@@ -95,9 +94,8 @@ class AppearanceSettingsFragment : BaseFragment() {
                                 .setPositiveButton(LR.string.settings_app_icon_ok, null)
                                 .show()
                         } else {
-                            val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Icons)
                             viewModel.updateChangeAppIconType(Pair(beforeAppIconType, afterAppIconType))
-                            bottomSheet.show(parentFragmentManager, "upgrade_bottom_sheet")
+                            openOnboardingFlow()
                         }
                     }
                     binding.appIconRecyclerView.setHasFixedSize(true)
@@ -181,13 +179,17 @@ class AppearanceSettingsFragment : BaseFragment() {
         }
 
         binding.upgradeBannerBackground.setOnClickListener {
-            WebViewActivity.show(context, getString(LR.string.learn_more), Settings.INFO_LEARN_MORE_URL)
+            openOnboardingFlow()
         }
 
         binding.btnCloseUpgrade.setOnClickListener {
             settings.setUpgradeClosedAppearSettings(true)
             binding.upgradeGroup.isVisible = false
         }
+    }
+
+    private fun openOnboardingFlow() {
+        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.APPEARANCE))
     }
 
     private fun scrollToCurrentTheme() {

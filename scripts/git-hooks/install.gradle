@@ -1,3 +1,4 @@
+
 task copyGitHooks(type: Copy) {
     description 'Copies the git hooks from scripts/git-hooks to the .git folder.'
     from("${rootDir}/scripts/git-hooks/") {

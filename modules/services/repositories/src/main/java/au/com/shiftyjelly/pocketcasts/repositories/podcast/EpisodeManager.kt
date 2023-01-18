@@ -1,6 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import androidx.lifecycle.LiveData
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -37,7 +40,6 @@ interface EpisodeManager {
     fun findLatestUnfinishedEpisodeByPodcast(podcast: Podcast): Episode?
     fun findLatestEpisodeToPlay(): Episode?
     fun observeEpisodesByPodcastOrderedRx(podcast: Podcast): Flowable<List<Episode>>
-    fun findPodcastEpisodesForMediaBrowserSearch(podcastUuid: String): List<Episode>
     fun observeEpisodesWhere(queryAfterWhere: String): Flowable<List<Episode>>
     fun observeDownloadingEpisodes(): LiveData<List<Episode>>
 
@@ -51,12 +53,14 @@ interface EpisodeManager {
     fun observeDownloadEpisodes(): Flowable<List<Episode>>
     fun observeDownloadedEpisodes(): Flowable<List<Episode>>
     fun observeStarredEpisodes(): Flowable<List<Episode>>
+    suspend fun findStarredEpisodes(): List<Episode>
 
     fun exists(episodeUuid: String): Boolean
 
     /** Add methods  */
     fun add(episode: Episode, downloadMetaData: Boolean): Boolean
     fun add(episodes: List<Episode>, podcastUuid: String, downloadMetaData: Boolean): List<Episode>
+    fun insert(episodes: List<Episode>)
 
     /** Update methods  */
     fun update(episode: Episode?)
@@ -81,6 +85,7 @@ interface EpisodeManager {
     fun markAsNotPlayedRx(episode: Episode): Single<Episode>
     suspend fun markAllAsPlayed(playables: List<Playable>, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun markedAsPlayedExternally(episode: Episode, playbackManager: PlaybackManager, podcastManager: PodcastManager)
+    fun markAsPlayedAsync(episode: Playable?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun markAsPlayed(episode: Playable?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun rxMarkAsPlayed(episode: Episode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable
     fun markAsPlaybackError(episode: Playable?, errorMessage: String?)
@@ -119,6 +124,7 @@ interface EpisodeManager {
     fun deleteEpisodes(episodes: List<Episode>, playbackManager: PlaybackManager)
     fun unarchiveAllInList(episodes: List<Episode>)
     fun observePlaybackHistoryEpisodes(): Flowable<List<Episode>>
+    suspend fun findPlaybackHistoryEpisodes(): List<Episode>
     fun checkPodcastForEpisodeLimit(podcast: Podcast, playbackManager: PlaybackManager?)
     fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?)
     fun episodeCanBeCleanedUp(episode: Episode, playbackManager: PlaybackManager): Boolean
@@ -131,4 +137,11 @@ interface EpisodeManager {
     suspend fun updatePlaybackInteractionDate(episode: Playable?)
     suspend fun deleteEpisodeFiles(episodes: List<Episode>, playbackManager: PlaybackManager)
     suspend fun findStaleDownloads(): List<Episode>
+    suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?
+    suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory>
+    suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers
+    suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
+    suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int
+    suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): Episode?
+    suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int
 }

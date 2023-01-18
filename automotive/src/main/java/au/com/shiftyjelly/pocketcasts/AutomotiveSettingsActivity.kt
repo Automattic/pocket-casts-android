@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -33,6 +34,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     }
 
     override fun onSupportNavigateUp(): Boolean {
+        @Suppress("DEPRECATION")
         onBackPressed()
         return true
     }
@@ -50,6 +52,7 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
             return
         }
 
+        @Suppress("DEPRECATION")
         super.onBackPressed()
     }
 
@@ -117,7 +120,12 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
         return 0
     }
 
-    override fun openEpisodeDialog(episodeUuid: String?, podcastUuid: String?, forceDark: Boolean) {
+    override fun openEpisodeDialog(
+        episodeUuid: String?,
+        source: EpisodeViewSource,
+        podcastUuid: String?,
+        forceDark: Boolean,
+    ) {
     }
 
     override fun lockPlayerBottomSheet(locked: Boolean) {
@@ -127,5 +135,12 @@ class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
     }
 
     override fun overrideNextRefreshTimer() {
+    }
+
+    override fun isUpNextShowing(): Boolean {
+        return false
+    }
+
+    override fun showStoriesOrAccount(source: String) {
     }
 }

@@ -11,16 +11,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentChaptersBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ChaptersFragment : BaseFragment(), ChapterListener {
+
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val playerViewModel: PlayerViewModel by activityViewModels()
     lateinit var adapter: ChapterAdapter
     private var binding: FragmentChaptersBinding? = null
@@ -61,6 +66,7 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
     }
 
     override fun onChapterClick(chapter: Chapter) {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_CHAPTER_SELECTED)
         playerViewModel.onChapterClick(chapter)
     }
 

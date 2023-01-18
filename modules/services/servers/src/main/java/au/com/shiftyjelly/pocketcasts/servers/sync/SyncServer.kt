@@ -2,6 +2,18 @@ package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
+import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -17,7 +29,19 @@ import retrofit2.http.Url
 
 interface SyncServer {
     @POST("/user/login")
-    fun login(@Body request: LoginRequest): Single<LoginResponse>
+    suspend fun login(@Body request: LoginRequest): LoginResponse
+
+    @POST("/user/login_google")
+    suspend fun loginGoogle(@Body request: LoginGoogleRequest): LoginTokenResponse
+
+    @POST("/user/token")
+    suspend fun loginToken(@Body request: LoginTokenRequest): LoginTokenResponse
+
+    @POST("/user/register")
+    suspend fun register(@Body request: RegisterRequest): RegisterResponse
+
+    @POST("/user/forgot_password")
+    suspend fun forgotPassword(@Body request: ForgotPasswordRequest): ForgotPasswordResponse
 
     @POST("/user/change_email")
     fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): Single<UserChangeResponse>
@@ -49,8 +73,11 @@ interface SyncServer {
     @POST("/history/sync")
     fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): Single<HistorySyncResponse>
 
+    @POST("/history/year")
+    suspend fun historyYear(@Header("Authorization") authorization: String, @Body request: HistoryYearSyncRequest): HistoryYearResponse
+
     @POST("/sync/update_episode")
-    fun episodeProgressSync(@Header("Authorization") authorization: String, @Body request: EpisodeSyncRequest): Single<Void>
+    fun episodeProgressSync(@Header("Authorization") authorization: String, @Body request: EpisodeSyncRequest): Completable
 
     @GET("/subscription/status")
     fun subscriptionStatus(@Header("Authorization") authorization: String): Single<SubscriptionStatusResponse>

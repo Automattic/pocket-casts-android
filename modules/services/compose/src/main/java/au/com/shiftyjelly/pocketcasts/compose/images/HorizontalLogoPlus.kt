@@ -9,21 +9,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun HorizontalLogoPlus(modifier: Modifier = Modifier) {
 
     val resourceId = if (MaterialTheme.theme.isLight) {
-        R.drawable.plus_logo_horizontal_light
+        IR.drawable.plus_logo_horizontal_light
     } else {
-        R.drawable.plus_logo_horizontal_dark
+        IR.drawable.plus_logo_horizontal_dark
     }
 
     Image(
         painter = painterResource(resourceId),
-        contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.pocket_casts_plus),
+        contentDescription = stringResource(LR.string.pocket_casts_plus),
         modifier = modifier
     )
 }

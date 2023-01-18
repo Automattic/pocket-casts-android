@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/primary_ui_01"
+    android:theme="@style/PlayerTheme">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="24dp">
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/markPlayed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="labelMarkPlayed,buttonMarkPlayed"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/nextEpisode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="separator1,labelNextEpisode,buttonNextEpisode"
+            tools:ignore="MissingConstraints" />
+
+        <View
+            android:layout_width="48dp"
+            android:layout_height="4dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/background_dragger_player"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/labelMarkPlayed"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:text="@string/mark_played"
+            android:textColor="?attr/player_contrast_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/buttonMarkPlayed"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/mark_played"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/labelMarkPlayed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelMarkPlayed" />
+
+        <View
+            android:id="@+id/separator1"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/divider_height"
+            android:background="?attr/player_contrast_05"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labelMarkPlayed" />
+
+        <TextView
+            android:id="@+id/labelNextEpisode"
+            style="@style/DarkSubtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="64dp"
+            android:layout_marginStart="32dp"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:text="@string/next_episode"
+            android:textColor="?attr/player_contrast_01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/separator1" />
+
+        <View
+            android:id="@+id/buttonNextEpisode"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/next_episode"
+            android:focusable="true"
+            app:layout_constraintBottom_toBottomOf="@+id/labelNextEpisode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/labelNextEpisode" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -7,6 +7,8 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -64,6 +66,7 @@ interface UserEpisodeManager {
     suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager)
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     fun observeUserEpisodes(): Flowable<List<UserEpisode>>
+    suspend fun findUserEpisodes(): List<UserEpisode>
     fun observeEpisode(uuid: String): Flowable<UserEpisode>
     fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
@@ -120,7 +123,8 @@ class UserEpisodeManagerImpl @Inject constructor(
     val settings: Settings,
     val subscriptionManager: SubscriptionManager,
     val downloadManager: DownloadManager,
-    @ApplicationContext val context: Context
+    @ApplicationContext val context: Context,
+    val episodeAnalytics: EpisodeAnalytics
 ) : UserEpisodeManager, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
@@ -201,6 +205,10 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override fun observeUserEpisodes(): Flowable<List<UserEpisode>> {
         return userEpisodeDao.observeUserEpisodesDesc()
+    }
+
+    override suspend fun findUserEpisodes(): List<UserEpisode> {
+        return userEpisodeDao.findUserEpisodesDesc()
     }
 
     override fun observeUserEpisodesSorted(sortOrder: Settings.CloudSortOrder): Flowable<List<UserEpisode>> {
@@ -459,6 +467,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                     }
                     .flatMapCompletable { success ->
                         if (success) {
+                            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FINISHED, uuid = userEpisode.uuid)
                             userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
                         } else {
                             userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, "Upload failed")
