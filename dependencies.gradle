@@ -47,7 +47,7 @@ project.ext {
 
     // Android
     minSdkVersion = 23
-    minSdkVersionWear = 23
+    minSdkVersionWear = 26
     targetSdkVersion = 33
     compileSdkVersion = 33
     testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
