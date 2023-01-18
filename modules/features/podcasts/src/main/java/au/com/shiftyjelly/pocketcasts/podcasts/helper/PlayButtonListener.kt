@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.podcasts.helper
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
@@ -26,9 +29,12 @@ class PlayButtonListener @Inject constructor(
     val settings: Settings,
     private val warningsHelper: WarningsHelper,
     @ActivityContext private val activity: Context,
+    private val episodeAnalytics: EpisodeAnalytics
 ) : PlayButton.OnClickListener, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    override var source = AnalyticsSource.UNKNOWN
 
     override fun onPlayClicked(episodeUuid: String) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "In app play button pushed for $episodeUuid")
@@ -40,7 +46,7 @@ class PlayButtonListener @Inject constructor(
                         if (episode.isDownloaded) {
                             play(episode)
                         } else if (activity is AppCompatActivity) {
-                            warningsHelper.streamingWarningDialog(episode)
+                            warningsHelper.streamingWarningDialog(episode = episode, playbackSource = source)
                                 .show(activity.supportFragmentManager, "streaming dialog")
                         }
                     }
@@ -52,12 +58,12 @@ class PlayButtonListener @Inject constructor(
     }
 
     private fun play(episode: Playable, force: Boolean = true) {
-        playbackManager.playNow(episode, force)
+        playbackManager.playNow(episode = episode, forceStream = force, playbackSource = source)
         warningsHelper.showBatteryWarningSnackbarIfAppropriate()
     }
 
     override fun onPauseClicked() {
-        playbackManager.pause()
+        playbackManager.pause(playbackSource = source)
     }
 
     override fun onPlayedClicked(episodeUuid: String) {
@@ -105,6 +111,11 @@ class PlayButtonListener @Inject constructor(
                         it.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
                     }
                     downloadManager.addEpisodeToQueue(it, "play button", true)
+                    episodeAnalytics.trackEvent(
+                        AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
+                        source = source,
+                        uuid = episodeUuid
+                    )
                     launch {
                         episodeManager.unarchive(it)
                     }

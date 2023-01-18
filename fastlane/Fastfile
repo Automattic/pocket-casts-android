@@ -1,0 +1,304 @@
+default_platform(:android)
+fastlane_require 'dotenv'
+
+unless FastlaneCore::Helper.bundler?
+  UI.user_error!('Please run fastlane via `bundle exec`')
+end
+
+########################################################################
+# Constants
+########################################################################
+ENV_FILE_NAME = '.pocketcastsandroid-env.default'
+USER_ENV_FILE_PATH = File.join(Dir.home, ENV_FILE_NAME)
+PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
+APP_PACKAGE_NAME = 'au.com.shiftyjelly.pocketcasts'
+GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
+ORIGINALS_METADATA_DIR_PATH = File.join(PROJECT_ROOT_FOLDER, 'metadata')
+RELEASE_NOTES_SOURCE_PATH = File.join(PROJECT_ROOT_FOLDER, 'CHANGELOG.md')
+EXTRACTED_RELEASE_NOTES_PATH = File.join(ORIGINALS_METADATA_DIR_PATH, 'release_notes.txt')
+PLAY_STORE_TRACK_AUTOMOTIVE_BETA = "automotive:beta"
+PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION = "automotive:production"
+PLAY_STORE_TRACK_BETA = "beta"
+PLAY_STORE_TRACK_PRODUCTION = "production"
+GLOTPRESS_APP_STRINGS_PROJECT_URL = 'https://translate.wordpress.com/projects/pocket-casts/android/'
+
+SUPPORTED_LOCALES = [
+  { glotpress: "ar", android: "ar", google_play: "ar",  promo_config: {}},
+  { glotpress: "de", android: "de", google_play: "de-DE",  promo_config: {} },
+  { glotpress: "es", android: "es", google_play: "es-ES",  promo_config: {} },
+  { glotpress: "es", android: "es-rMX", google_play: "es-MX",  promo_config: {} },
+  { glotpress: "en-gb", android: "en-rGB", google_play: "en-GB",  promo_config: {} },
+  { glotpress: "fr", android: "fr", google_play: "fr-FR",  promo_config: {} },
+  { glotpress: "fr", android: "fr-rCA", google_play: "fr-CA",  promo_config: {} },
+  { glotpress: "it", android: "it", google_play: "it-IT",  promo_config: {} },
+  { glotpress: "ja", android: "ja", google_play: "ja-JP",  promo_config: {} },
+  { glotpress: "ko", android: "ko", google_play: "ko-KR",  promo_config: {} },
+  { glotpress: "nl", android: "nl", google_play: "nl-NL",  promo_config: {} },
+  { glotpress: "nb", android: "nb", google_play: "nb-NB",  promo_config: {} },
+  { glotpress: "pt-br", android: "pt-rBR", google_play: "pt-BR",  promo_config: {} },
+  { glotpress: "ru", android: "ru", google_play: "ru-RU",  promo_config: {} },
+  { glotpress: "sv", android: "sv", google_play: "sv-SE",  promo_config: {} },
+  { glotpress: "zh-cn", android: "zh", google_play: "zh-CN",  promo_config: {} },
+  { glotpress: "zh-tw", android: "zh-rTW", google_play: "zh-TW",  promo_config: {} },
+].freeze
+
+########################################################################
+# Environment
+########################################################################
+Dotenv.load(USER_ENV_FILE_PATH)
+ENV["PROJECT_NAME"] = "pocket-casts-android"
+ENV["PROJECT_ROOT_FOLDER"] = "./"
+ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
+GH_REPOSITORY = "automattic/pocket-casts-android"
+APPS_APP = "app"
+APPS_AUTOMOTIVE = "automotive"
+APPS = [APPS_APP, APPS_AUTOMOTIVE]
+
+UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
+
+before_all do |lane|
+  # Ensure we use the latest version of the toolkit
+  check_for_toolkit_updates unless is_ci || ENV['FASTLANE_SKIP_TOOLKIT_UPDATE_CHECK']
+
+  # Check that the env files exist
+  # rubocop:disable Style/IfUnlessModifier
+  unless is_ci || File.file?(USER_ENV_FILE_PATH)
+    example_path = File.join(PROJECT_ROOT_FOLDER, 'fastlane/env/user.env-example')
+    UI.user_error! "#{ENV_FILE_NAME} not found: Please copy '#{example_path}' to '#{USER_ENV_FILE_PATH}' and fill in the values."
+  end
+end
+
+platform :android do
+  lane :code_freeze do | options |
+    android_codefreeze_prechecks(options)
+
+    android_bump_version_release()
+    new_version = android_get_app_version()
+
+    extract_release_notes_for_version(
+      version: new_version,
+      release_notes_file_path: RELEASE_NOTES_SOURCE_PATH,
+      extracted_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH
+    )
+    android_update_release_notes(
+      new_version: new_version,
+      release_notes_file_path: RELEASE_NOTES_SOURCE_PATH
+    )
+    setbranchprotection(repository:GH_REPOSITORY, branch: "release/#{new_version}")
+    setfrozentag(repository:GH_REPOSITORY, milestone: new_version)
+  end
+
+  lane :complete_code_freeze do | options |
+    android_completecodefreeze_prechecks(options)
+
+    new_version = android_get_app_version()
+    trigger_release_build(branch_to_build: "release/#{new_version}")
+  end
+
+  lane :new_beta_release do | options |
+    android_betabuild_prechecks(options)
+    android_bump_version_beta()
+    new_version = android_get_app_version()
+    trigger_release_build(branch_to_build: "release/#{new_version}")
+  end
+
+  # Sets the stage to start working on a hotfix
+  #
+  # - Cuts a new `release/x.y.z` branch from the tag from the latest (`x.y`) version
+  # - Bumps the app version numbers appropriately
+  #
+  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
+  # @option [String] version_name (required) The version name to use for the hotfix (`"x.y.z"`)
+  # @option [String] version_code (required) The version code to use for the hotfix (`"x.y.z"`)
+  #
+  # Note that the version_code needs to be higher than any of the existing version_codes in Play Store
+  lane :new_hotfix_release do |options|
+    hotfix_version = options[:version_name] || UI.input('Version number for the new hotfix?')
+    previous_tag = android_hotfix_prechecks(version_name: hotfix_version, skip_confirm: options[:skip_confirm])
+    android_bump_version_hotfix(previous_version_name: previous_tag, version_name: hotfix_version, version_code: options[:version_code])
+  end
+
+  lane :finalize_hotfix_release do |options|
+    new_version = android_get_app_version()
+    trigger_release_build(branch_to_build: "release/#{new_version}")
+  end
+
+  # @param [String] branch_to_build (default: current git branch) The branch to build
+  lane :trigger_release_build do | options |
+    buildkite_trigger_build(
+      buildkite_organization: 'automattic',
+      buildkite_pipeline: 'pocket-casts-android',
+      branch: options[:branch_to_build] || git_branch,
+      pipeline_file: 'release-builds.yml'
+    )
+  end
+
+  # - Uses the current version to decide if this is a beta or production build
+  # - Builds the apps for external distribution
+  # - Uploads the builds to 'beta' or 'production' Play Store channel (but does not release it)
+  # - Creates draft Github release
+  #
+  # @option [Boolean] skip_confirm (default: false) If true, avoids any interactive prompt
+  # @option [Boolean] skip_prechecks (default: false) If true, skips android_build_preflight
+  # @option [Boolean] create_gh_release (default: false) If true, creates a draft GitHub release
+  #
+  desc "Builds and uploads a new build to Google Play (without releasing it)"
+  lane :build_and_upload_to_play_store do | options |
+    version = android_get_release_version()
+    is_beta = is_beta_version(version)
+    android_build_prechecks(skip_confirm: options[:skip_confirm], alpha: false, beta: is_beta, final: !is_beta) unless (options[:skip_prechecks])
+    android_build_preflight() unless options[:skip_prechecks]
+
+    release_assets = []
+
+    APPS.each do |app|
+        build_bundle(app: app, version: version)
+
+        aab_artifact_path = aab_artifact_path(app, version)
+        UI.error("Unable to find a build artifact at #{aab_artifact_path}") unless File.exist? aab_artifact_path
+
+        track = if (app == APPS_AUTOMOTIVE)
+            is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
+        else
+            is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
+        end
+
+        upload_to_play_store(
+          package_name: APP_PACKAGE_NAME,
+          aab: aab_artifact_path,
+          track: track,
+          release_status: 'draft',
+          skip_upload_apk: true,
+          skip_upload_metadata: true,
+          skip_upload_changelogs: true,
+          skip_upload_images: true,
+          skip_upload_screenshots: true,
+          json_key: UPLOAD_TO_PLAY_STORE_JSON_KEY
+        )
+
+        release_assets << aab_artifact_path
+    end
+
+    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if options[:create_gh_release]
+  end
+
+  lane :finalize_release do | options |
+    android_finalize_prechecks(options)
+    configure_apply(force: is_ci)
+
+    android_bump_version_final_release()
+
+    version = android_get_release_version()
+
+    # Download Localizations
+    android_download_translations(
+      res_dir: File.join('modules', 'services', 'localization', 'src', 'main', 'res'),
+      glotpress_url: GLOTPRESS_APP_STRINGS_PROJECT_URL,
+      locales: SUPPORTED_LOCALES,
+      lint_task: 'lintRelease'
+    )
+
+    # Wrap up
+    removebranchprotection(repository:GH_REPOSITORY, branch: "release/#{version["name"]}")
+    setfrozentag(repository:GH_REPOSITORY, milestone: version["name"], freeze: false)
+    create_new_milestone(repository:GH_REPOSITORY, need_appstore_submission: true)
+    close_milestone(repository:GH_REPOSITORY, milestone: version["name"])
+
+    trigger_release_build(branch_to_build: "release/#{version["name"]}")
+  end
+
+  # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
+  # @param [String] app The Android app to build (i.e 'app' or 'automotive')
+  desc "Builds and bundles the given app"
+  lane :build_bundle do | options |
+    version = options[:version]
+    app = options[:app]
+    aab_artifact_path = aab_artifact_path(app, version)
+    build_dir = "artifacts/"
+
+    gradle(task: "clean")
+    UI.message("Running lint...")
+    gradle(task: ":#{app}:lintRelease")
+    UI.message("Building #{version["name"]} / #{version["code"]} - #{aab_artifact_path}...")
+    gradle(
+        task: ":#{app}:bundle",
+        build_type: "Release",
+        properties: {
+            "IS_AUTOMOTIVE_BUILD" => app == APPS_AUTOMOTIVE
+        }
+    )
+
+    Dir.chdir("..") do
+      sh("mkdir -p #{build_dir} && cp -v #{bundle_output_path(app)} #{aab_artifact_path}")
+      UI.message("Bundle ready: #{aab_artifact_path}")
+    end
+  end
+
+  # Run instrumented tests in Google Firebase Test Lab
+  desc "Build the application and instrumented tests, then run the tests in Firebase Test Lab"
+  lane :build_and_instrumented_test do | options |
+    gradle(tasks: ['assembleDebug', 'assembleDebugAndroidTest'])
+
+    # Run the instrumented tests in Firebase Test Lab
+    firebase_login(
+      key_file: GOOGLE_FIREBASE_SECRETS_PATH
+    )
+
+    apk_dir = File.join(PROJECT_ROOT_FOLDER, 'app', 'build', 'outputs', 'apk')
+
+    android_firebase_test(
+      project_id: firebase_secret(name: 'project_id'),
+      key_file: GOOGLE_FIREBASE_SECRETS_PATH,
+      model: 'Nexus5',
+      version: 23,
+      test_apk_path: File.join(apk_dir, 'androidTest', 'debug', 'app-debug-androidTest.apk'),
+      apk_path: File.join(apk_dir, 'debug', 'app-debug.apk'),
+      results_output_dir: File.join(PROJECT_ROOT_FOLDER, 'build', 'instrumented-tests')
+     )
+  end
+
+  #####################################################################################
+  # Private lanes
+  #####################################################################################
+
+  # Creates a new GitHub Release for the given version
+  #
+  # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
+  # @param [Bool] prerelease If true, the GitHub Release will have the prerelease flag
+  #
+  private_lane :create_gh_release do | options |
+    version = options[:version]
+    prerelease = options[:prerelease] || false
+    release_assets = options[:release_assets]
+
+    create_release(
+      repository: GH_REPOSITORY,
+      version: version["name"],
+      release_notes_file_path: nil,
+      prerelease: prerelease,
+      release_assets: release_assets.join(',')
+    )
+  end
+
+  #####################################################################################
+  # Utils
+  #####################################################################################
+  def aab_artifact_path(app, version)
+    File.join(PROJECT_ROOT_FOLDER, 'artifacts', "#{app}-#{version["name"]}.aab")
+  end
+
+  def bundle_output_path(app)
+    "#{app}/build/outputs/bundle/release/#{app}-release.aab"
+  end
+
+  def firebase_secret(name:)
+    UI.user_error!('Unable to locale Firebase Secrets File – did you run `bundle exec fastlane run configure_apply`?') unless File.file? GOOGLE_FIREBASE_SECRETS_PATH
+    key_file_secrets = JSON.parse(File.read(GOOGLE_FIREBASE_SECRETS_PATH))
+    UI.user_error!("Unable to find key `#{name}` in #{GOOGLE_FIREBASE_SECRETS_PATH}") if key_file_secrets[name].nil?
+    key_file_secrets[name]
+  end
+
+  def is_beta_version(version)
+    version['name'].include? "-rc-"
+  end
+end

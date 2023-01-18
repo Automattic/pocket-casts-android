@@ -13,7 +13,11 @@ import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-class ColorAdapter(val colorList: IntArray, val readOnly: Boolean, val onSelectedChange: (Int) -> Unit) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
+class ColorAdapter(
+    private val colorList: IntArray,
+    readOnly: Boolean,
+    private val onSelectedChange: (index: Int, fromUserInteraction: Boolean) -> Unit
+) : RecyclerView.Adapter<ColorAdapter.ViewHolder>() {
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     var currentReadOnly = true
@@ -27,11 +31,13 @@ class ColorAdapter(val colorList: IntArray, val readOnly: Boolean, val onSelecte
     }
 
     var selectedIndex = 0
-        set(value) {
-            field = value
-            onSelectedChange(value)
-            notifyDataSetChanged()
-        }
+        private set // always use setSelectedIndex method when updating this field
+
+    fun setSelectedIndex(value: Int, fromUserInteraction: Boolean) {
+        selectedIndex = value
+        onSelectedChange(value, fromUserInteraction)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = IconView(parent.context)
@@ -62,7 +68,7 @@ class ColorAdapter(val colorList: IntArray, val readOnly: Boolean, val onSelecte
         iconView.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 notifyItemChanged(selectedIndex)
-                selectedIndex = position
+                setSelectedIndex(position, fromUserInteraction = true)
             }
 
             setupView(iconView, selectedIndex == position)

@@ -11,7 +11,10 @@ import androidx.fragment.app.commit
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PodcastOptionsFragmentBinding
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -24,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -51,6 +55,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
     var podcastSelection: List<String> = listOf()
     var playlist: Playlist? = null
     private var binding: PodcastOptionsFragmentBinding? = null
+    private var userChanged = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = PodcastOptionsFragmentBinding.inflate(inflater, container, false)
@@ -96,6 +101,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
                     podcastSelection = subscribedPodcasts
                     fragment.selectAll()
                 }
+                userChanged = true
             }
 
             val filterTintColor = ThemeColor.filterInteractive01(theme.activeTheme, color)
@@ -111,10 +117,24 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
         btnSave.setOnClickListener {
             playlist?.let { playlist ->
                 playlist.podcastUuidList = podcastSelection
-                playlist.allPodcasts = switchAllPodcasts.isChecked
+                playlist.allPodcasts = switchAllPodcasts.isChecked || podcastSelection.isEmpty()
                 launch(Dispatchers.Default) {
                     playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
-                    playlistManager.update(playlist)
+
+                    val podcastSelectFragment = childFragmentManager.findFragmentById(R.id.podcastSelectFrame) as? PodcastSelectFragment
+                    if (podcastSelectFragment == null) {
+                        Timber.e("Could not retrieve child PodcastSelectFragment")
+                    }
+                    val userChangedChild = podcastSelectFragment?.userChanged() ?: false
+
+                    val userPlaylistUpdate = if (userChanged || userChangedChild) {
+                        UserPlaylistUpdate(
+                            listOf(PlaylistProperty.Podcasts),
+                            PlaylistUpdateSource.FILTER_EPISODE_LIST
+                        )
+                    } else null
+                    playlistManager.update(playlist, userPlaylistUpdate)
+
                     launch(Dispatchers.Main) { (activity as? FragmentHostListener)?.closeModal(this@PodcastOptionsFragment) }
                 }
             }

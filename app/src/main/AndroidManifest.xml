@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools" package="au.com.shiftyjelly.pocketcasts">
+          xmlns:tools="http://schemas.android.com/tools">
 
     <supports-screens
             android:largeScreens="true"
@@ -23,9 +23,12 @@
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
 
     <application
-            android:name=".PocketcastsApplication"
+            android:name=".PocketCastsApplication"
             android:hardwareAccelerated="true"
             android:icon="${appIcon}"
             android:label="@string/app_name"
@@ -35,6 +38,8 @@
             android:supportsRtl="false"
             tools:replace="android:supportsRtl"
             android:theme="@style/ThemeDark"
+            android:networkSecurityConfig="@xml/network_security_config"
+            android:localeConfig="@xml/locales_config"
             tools:ignore="UnusedAttribute">
 
         <meta-data android:name="com.google.android.gms.car.application"
@@ -87,6 +92,22 @@
                 <data
                         android:host="*"
                         android:scheme="pktc"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="pca.st"
+                    android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="pcast.pocketcasts.net"
+                    android:scheme="https"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -398,6 +419,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
+        <activity-alias
+            android:name=".ui.MainActivity_13"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_halloween">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
 
         <activity android:name=".profile.sonos.SonosAppLinkActivity" android:label="@string/profile_sonos"/>
 
@@ -405,9 +438,6 @@
             android:theme="@style/Theme.AppCompat.DayNight"/>
         <activity android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
             android:theme="@style/Theme.AppCompat.DayNight"/>
-
-        <!-- services which are user triggered, eg: run in the foreground -->
-        <service android:name="au.com.shiftyjelly.pocketcasts.ui.tasks.RefreshArtworkTask"/>
 
         <!-- services which are periodic or trigerred by the app automatically triggered, eg: can run in the background -->
         <service android:name="au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsJob"
@@ -449,6 +479,8 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name="au.com.shiftyjelly.pocketcasts.endofyear.ShareResultReceiver" />
+
         <service
                 android:name="au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService"
                 android:exported="true"
@@ -468,11 +500,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>
-        </receiver>
-
-        <receiver
-                android:name="au.com.shiftyjelly.pocketcasts.views.component.CustomTabsBroadcastReceiver"
-                android:enabled="true">
         </receiver>
 
         <!-- Google play services -->
@@ -525,6 +552,10 @@
         <!-- Samsung Carmode -->
         <meta-data android:name="com.sec.android.automotive.drivelink.notification.SmallIcon" android:resource="@drawable/notification"/>
 
+        <!-- Disable Sentry exception tracking so we can turn it on based on the user preference -->
+        <meta-data android:name="io.sentry.auto-init" android:value="false" />
+        <!-- Pass in the Sentry DSN -->
+        <meta-data android:name="au.com.shiftyjelly.pocketcasts.sentryDsn" android:value="${sentryDsn}"/>
     </application>
 
 </manifest>

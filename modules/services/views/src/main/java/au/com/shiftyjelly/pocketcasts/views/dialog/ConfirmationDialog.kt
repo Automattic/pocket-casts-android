@@ -38,8 +38,8 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
     private var title: String? = null
     private var summary: String? = null
     @DrawableRes private var iconId: Int = 0
-    private lateinit var buttonType: ConfirmationDialog.ButtonType
-    var secondaryType: ConfirmationDialog.ButtonType? = null
+    private lateinit var buttonType: ButtonType
+    var secondaryType: ButtonType? = null
     @AttrRes private var iconTintAttr: Int? = UR.attr.primary_icon_01
     private var onConfirm: (() -> Unit)? = null
     private var onSecondary: (() -> Unit)? = null
@@ -56,13 +56,13 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
                 null
             } else if (episodeCount in 5..Settings.MAX_DOWNLOAD) {
                 ConfirmationDialog()
-                    .setButtonType(ConfirmationDialog.ButtonType.Normal(resources.getString(LR.string.download_warning_button, episodeCount)))
+                    .setButtonType(ButtonType.Normal(resources.getString(LR.string.download_warning_button, episodeCount)))
                     .setIconId(IR.drawable.ic_download)
                     .setTitle(resources.getString(LR.string.download_warning_title))
                     .setOnConfirm(onConfirm)
             } else {
                 ConfirmationDialog()
-                    .setButtonType(ConfirmationDialog.ButtonType.Normal(resources.getString(LR.string.download_warning_button, Settings.MAX_DOWNLOAD)))
+                    .setButtonType(ButtonType.Normal(resources.getString(LR.string.download_warning_button, Settings.MAX_DOWNLOAD)))
                     .setIconId(IR.drawable.ic_download)
                     .setTitle(resources.getString(LR.string.download_warning_title))
                     .setSummary(resources.getString(LR.string.download_warning_limit_summary, Settings.MAX_DOWNLOAD))

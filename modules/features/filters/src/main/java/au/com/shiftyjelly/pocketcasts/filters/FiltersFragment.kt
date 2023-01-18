@@ -34,6 +34,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     @Inject lateinit var castManager: CastManager
 
     private val viewModel: FiltersFragmentViewModel by viewModels()
+    private var trackFilterListShown = false
     var filterCount: Int? = null
     var lastFilterUuidShown: String? = null
     var previousLastFilter: Playlist? = null
@@ -46,6 +47,11 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentFiltersBinding.inflate(inflater, container, false)
         return binding?.root
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     override fun onDestroyView() {
@@ -82,6 +88,11 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
             }
 
             this.filterCount = it.size
+            if (trackFilterListShown) {
+                viewModel.trackFilterListShown(it.size)
+                trackFilterListShown = false
+            }
+
             previousLastFilter = it.lastOrNull()
             viewModel.adapterState = it.toMutableList()
             adapter.submitList(it)
@@ -90,13 +101,13 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
         val touchHelperCallback = FiltersListItemTouchCallback({ from, to ->
             val newList = viewModel.movePlaylist(from, to)
             adapter.submitList(newList)
-        }) {
-            viewModel.commitMoves()
+        }) { from, to ->
+            viewModel.commitMoves(from != to)
         }
         val itemTouchHelper = ItemTouchHelper(touchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        openSavedFilter()
+        checkForSavedFilter()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -109,20 +120,31 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun setUserVisibleHint(visible: Boolean) {
         super.setUserVisibleHint(visible)
         if (visible && isAdded) {
-            openSavedFilter()
+            checkForSavedFilter()
         }
     }
 
-    private fun openSavedFilter() {
-        if (settings.selectedFilter() != null && lastFilterUuidShown != settings.selectedFilter()) {
+    private fun checkForSavedFilter() {
+        val shouldOpenSavedFilter = settings.selectedFilter() != null && lastFilterUuidShown != settings.selectedFilter()
+        if (shouldOpenSavedFilter) {
             runBlocking {
                 val playlistUUID = settings.selectedFilter() ?: return@runBlocking
                 lastFilterUuidShown = playlistUUID
                 val playlist = withContext(Dispatchers.Default) { playlistManager.findByUuid(playlistUUID) } ?: return@runBlocking
                 openPlaylist(playlist, isNewFilter = false)
+            }
+        } else if (!viewModel.isFragmentChangingConfigurations) {
+            // Not showing a specific filter, so track showing of the filter list if not just a configuration change
+            filterCount.let {
+                if (it != null) {
+                    viewModel.trackFilterListShown(it)
+                } else {
+                    trackFilterListShown = true
+                }
             }
         }
     }
@@ -145,17 +167,33 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
     }
 }
 
-private class FiltersListItemTouchCallback(val onMoveListener: (Int, Int) -> Unit, val onFinish: () -> Unit) : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP.or(ItemTouchHelper.DOWN), 0) {
+private class FiltersListItemTouchCallback(
+    val onMoveListener: (from: Int, to: Int) -> Unit,
+    val onFinish: (from: Int?, to: Int?) -> Unit
+) : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP.or(ItemTouchHelper.DOWN), 0) {
+    private var moveFrom: Int? = null
+    private var moveTo: Int? = null
+
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+
+        // Only update moveFrom if it is not initialized because it represents the position where the move started
+        if (moveFrom == null) {
+            moveFrom = viewHolder.bindingAdapterPosition
+        }
+
+        // Always update moveTo because it represents the final position
+        moveTo = target.bindingAdapterPosition
+
         onMoveListener(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
         return true
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-    }
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
-        onFinish()
+        onFinish(moveFrom, moveTo)
+        moveFrom = null
+        moveTo = null
     }
 }

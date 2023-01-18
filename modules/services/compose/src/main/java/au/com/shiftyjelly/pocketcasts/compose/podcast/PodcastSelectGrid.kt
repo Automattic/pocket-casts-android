@@ -91,7 +91,8 @@ private fun SelectGridFooter(
                 } else {
                     onSelectAll()
                 }
-            }
+            },
+            modifier = modifier.padding(8.dp)
         )
     }
 }

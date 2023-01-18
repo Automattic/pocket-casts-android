@@ -8,10 +8,14 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -19,19 +23,29 @@ import androidx.fragment.app.commitNow
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentInfo
 import au.com.shiftyjelly.pocketcasts.navigation.NavigatorAction
@@ -52,10 +66,12 @@ import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFileBottomSheetFragment
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.profile.sonos.SonosAppLinkActivity
+import au.com.shiftyjelly.pocketcasts.repositories.bumpstats.BumpStatsTask
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -69,13 +85,14 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.BottomNavHideManager
@@ -113,6 +130,7 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 import com.google.android.material.R as MR
 
 private const val SAVEDSTATE_PLAYER_OPEN = "player_open"
+private const val SAVEDSTATE_MINIPLAYER_SHOWN = "miniplayer_shown"
 
 @AndroidEntryPoint
 class MainActivity :
@@ -120,10 +138,12 @@ class MainActivity :
     FragmentHostListener,
     PlayerBottomSheet.PlayerBottomSheetListener,
     SearchFragment.Listener,
+    OnboardingLauncher,
     CoroutineScope {
 
     companion object {
         private const val INITIAL_KEY = "initial"
+        private const val SOURCE_KEY = "source"
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         }
@@ -167,14 +187,47 @@ class MainActivity :
     private lateinit var binding: ActivityMainBinding
     private lateinit var navigator: BottomNavigator
 
+    private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
+        when (result) {
+            OnboardingFinish.Done -> {
+                settings.setHasDoneInitialOnboarding()
+            }
+            OnboardingFinish.DoneGoToDiscover -> {
+                settings.setHasDoneInitialOnboarding()
+                openTab(VR.id.navigation_discover)
+            }
+            null -> {
+                Timber.e("Unexpected null result from onboarding activity")
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
 
+        val showOnboarding = !settings.hasCompletedOnboarding() && !settings.isLoggedIn()
+        // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
+        if (showOnboarding && savedInstanceState == null) {
+            openOnboardingFlow(OnboardingFlow.InitialOnboarding)
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        lifecycleScope.launchWhenCreated {
+            val isEligible = viewModel.isEndOfYearStoriesEligible()
+            if (isEligible) {
+                if (!settings.getEndOfYearModalHasBeenShown()) {
+                    setupEndOfYearLaunchBottomSheet()
+                }
+                if (settings.getEndOfYearShowBadge2022()) {
+                    binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                }
+            }
+        }
 
         var selectedTab = settings.selectedTab()
         val tabs = mapOf(
@@ -207,7 +260,10 @@ class MainActivity :
             activity = this
         )
 
-        setupPlayerViews()
+        val showMiniPlayerImmediately = savedInstanceState?.getBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, false) ?: false
+        binding.playerBottomSheet.isVisible = showMiniPlayerImmediately
+
+        setupPlayerViews(showMiniPlayerImmediately)
 
         if (savedInstanceState != null) {
             val videoComingToPortrait =
@@ -230,10 +286,16 @@ class MainActivity :
                     if (settings.selectedTab() != currentTab) {
                         trackTabOpened(currentTab)
                         when (currentTab) {
-                            VR.id.navigation_podcasts -> AnalyticsHelper.navigatedToPodcasts()
-                            VR.id.navigation_filters -> AnalyticsHelper.navigatedToFilters()
-                            VR.id.navigation_discover -> AnalyticsHelper.navigatedToDiscover()
-                            VR.id.navigation_profile -> AnalyticsHelper.navigatedToProfile()
+                            VR.id.navigation_podcasts -> FirebaseAnalyticsTracker.navigatedToPodcasts()
+                            VR.id.navigation_filters -> FirebaseAnalyticsTracker.navigatedToFilters()
+                            VR.id.navigation_discover -> FirebaseAnalyticsTracker.navigatedToDiscover()
+                            VR.id.navigation_profile -> {
+                                if (settings.getEndOfYearModalHasBeenShown()) {
+                                    binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
+                                    settings.setEndOfYearShowBadge2022(false)
+                                }
+                                FirebaseAnalyticsTracker.navigatedToProfile()
+                            }
                         }
                     }
                     settings.setSelectedTab(currentTab)
@@ -247,12 +309,15 @@ class MainActivity :
         updateSystemColors()
     }
 
+    override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
+        onboardingLauncher.launch(OnboardingActivity.newInstance(this, onboardingFlow))
+    }
+
     override fun onStart() {
         super.onStart()
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             if (!videoPlayerShown && playbackManager.getCurrentEpisode()?.isVideo == true && playbackManager.isPlaybackLocal() && playbackManager.isPlaying() && viewModel.isPlayerOpen) {
                 openFullscreenViewPlayer()
-                videoPlayerShown = true
             } else {
                 videoPlayerShown = false
             }
@@ -260,6 +325,7 @@ class MainActivity :
     }
 
     private fun openFullscreenViewPlayer() {
+        videoPlayerShown = true
         startActivity(VideoActivity.buildIntent(context = this))
     }
 
@@ -267,12 +333,12 @@ class MainActivity :
         super.onResume()
 
         if (settings.selectedTab() == VR.id.navigation_discover) {
-            AnalyticsHelper.navigatedToDiscover()
+            FirebaseAnalyticsTracker.navigatedToDiscover()
         }
 
         refreshApp()
-
         addLineView()
+        BumpStatsTask.scheduleToRun(this)
     }
 
     override fun onPause() {
@@ -293,6 +359,7 @@ class MainActivity :
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(SAVEDSTATE_PLAYER_OPEN, binding.playerBottomSheet.isPlayerOpen)
+        outState.putBoolean(SAVEDSTATE_MINIPLAYER_SHOWN, binding.playerBottomSheet.isShown)
     }
 
     override fun overrideNextRefreshTimer() {
@@ -430,16 +497,60 @@ class MainActivity :
     }
 
     override fun onUpNextClicked() {
-        showBottomSheet(UpNextFragment())
+        showUpNextFragment(UpNextSource.MINI_PLAYER)
     }
 
     override fun onMiniPlayerLongClick() {
-        MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager).show(this)
+        MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager, analyticsTracker).show(this)
+    }
+
+    private fun showUpNextFragment(source: UpNextSource) {
+        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
+        showBottomSheet(UpNextFragment.newInstance(source = source))
+    }
+
+    private fun setupEndOfYearLaunchBottomSheet() {
+        val viewGroup = binding.modalBottomSheet
+        viewGroup.removeAllViews()
+        viewGroup.addView(
+            ComposeView(viewGroup.context).apply {
+                setContent {
+                    val shouldShow by viewModel.shouldShowStoriesModal.collectAsState()
+                    EndOfYearLaunchBottomSheet(
+                        parent = viewGroup,
+                        shouldShow = shouldShow,
+                        onClick = {
+                            showStoriesOrAccount(StoriesSource.MODAL.value)
+                        },
+                        onExpanded = {
+                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN)
+                            settings.setEndOfYearModalHasBeenShown(true)
+                            viewModel.updateStoriesModalShowState(false)
+                        }
+                    )
+                }
+            }
+        )
+    }
+
+    override fun showStoriesOrAccount(source: String) {
+        if (viewModel.isSignedIn) {
+            showStories(StoriesSource.fromString(source))
+        } else {
+            viewModel.waitingForSignInToShowStories = true
+            val intent = Intent(this, AccountActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun showStories(source: StoriesSource) {
+        StoriesFragment.newInstance(source)
+            .show(supportFragmentManager, "stories_dialog")
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     @Suppress("DEPRECATION")
-    private fun setupPlayerViews() {
+    private fun setupPlayerViews(showMiniPlayerImmediately: Boolean) {
         binding.playerBottomSheet.listener = this
 
         viewModel.playbackState.observe(this) { state ->
@@ -462,6 +573,10 @@ class MainActivity :
                 updateNavAndStatusColors(true, state.podcast)
             }
 
+            if (viewModel.lastPlaybackState != null && (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) && settings.openPlayerAutomatically()) {
+                binding.playerBottomSheet.openPlayer()
+            }
+
             updatePlaybackState(state)
 
             viewModel.lastPlaybackState = state
@@ -477,11 +592,25 @@ class MainActivity :
                 .toFlowable(BackpressureStrategy.LATEST)
         observeUpNext = LiveDataReactiveStreams.fromPublisher(upNextQueueObservable)
         observeUpNext.observe(this) { upNext ->
-            binding.playerBottomSheet.setUpNext(upNext, theme)
+            binding.playerBottomSheet.setUpNext(
+                upNext = upNext,
+                theme = theme,
+                shouldAnimateOnAttach = !showMiniPlayerImmediately
+            )
         }
 
         viewModel.signInState.observe(this) { signinState ->
             val status = (signinState as? SignInState.SignedIn)?.subscriptionStatus
+
+            if (signinState.isSignedIn) {
+                if (viewModel.waitingForSignInToShowStories) {
+                    showStories(StoriesSource.USER_LOGIN)
+                    viewModel.waitingForSignInToShowStories = false
+                } else if (!settings.getEndOfYearModalHasBeenShown()) {
+                    viewModel.updateStoriesModalShowState(true)
+                    setupEndOfYearLaunchBottomSheet()
+                }
+            }
 
             if (signinState.isSignedInAsPlus) {
                 status?.let {
@@ -521,6 +650,7 @@ class MainActivity :
 
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISMISSED)
                         supportFragmentManager.findFragmentByTag(bottomSheetTag)?.let {
                             removeBottomSheetFragment(it)
                         }
@@ -579,7 +709,7 @@ class MainActivity :
         if (intent.getStringExtra(INTENT_EXTRA_PAGE) == "upnext") {
             intent.putExtra(INTENT_EXTRA_PAGE, null as String?)
             binding.playerBottomSheet.openPlayer()
-            onUpNextClicked()
+            showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
         }
     }
 
@@ -602,7 +732,7 @@ class MainActivity :
         updateNavAndStatusColors(true, viewModel.lastPlaybackState?.podcast)
         UiUtil.hideKeyboard(binding.root)
 
-        AnalyticsHelper.nowPlayingOpen()
+        FirebaseAnalyticsTracker.nowPlayingOpen()
 
         viewModel.isPlayerOpen = true
     }
@@ -645,6 +775,8 @@ class MainActivity :
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
+
+    override fun isUpNextShowing() = bottomSheetTag == UpNextFragment::class.java.name
 
     private fun removeBottomSheetFragment(fragment: Fragment) {
         val tag = fragment::class.java.name
@@ -691,31 +823,31 @@ class MainActivity :
                 playbackManager.getCurrentEpisode()?.let { episode ->
                     launch(Dispatchers.Main) {
                         if (episode.isDownloaded) {
-                            playbackManager.playQueue()
+                            playbackManager.playQueue(AnalyticsSource.MINIPLAYER)
                             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                         } else {
-                            warningsHelper.streamingWarningDialog(episode)
+                            warningsHelper.streamingWarningDialog(episode = episode, playbackSource = AnalyticsSource.MINIPLAYER)
                                 .show(supportFragmentManager, "streaming dialog")
                         }
                     }
                 }
             }
         } else {
-            playbackManager.playQueue()
+            playbackManager.playQueue(AnalyticsSource.MINIPLAYER)
             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
         }
     }
 
     override fun onPauseClicked() {
-        playbackManager.pause()
+        playbackManager.pause(playbackSource = AnalyticsSource.MINIPLAYER)
     }
 
     override fun onSkipBackwardClicked() {
-        playbackManager.skipBackward()
+        playbackManager.skipBackward(playbackSource = AnalyticsSource.MINIPLAYER)
     }
 
     override fun onSkipForwardClicked() {
-        playbackManager.skipForward()
+        playbackManager.skipForward(playbackSource = AnalyticsSource.MINIPLAYER)
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean) {
@@ -810,7 +942,12 @@ class MainActivity :
                 // intents were being reused for notifications so we had to use the extra to pass action
                 val episodeUuid =
                     intent.extras?.getString(Settings.INTENT_OPEN_APP_EPISODE_UUID, null)
-                openEpisodeDialog(episodeUuid, null, forceDark = false)
+                openEpisodeDialog(
+                    episodeUuid = episodeUuid,
+                    source = EpisodeViewSource.NOTIFICATION,
+                    podcastUuid = null,
+                    forceDark = false
+                )
             } else if (action == Intent.ACTION_VIEW) {
                 val extraPage = intent.extras?.getString(INTENT_EXTRA_PAGE, null)
                 if (extraPage != null) {
@@ -871,6 +1008,8 @@ class MainActivity :
                 } else if (IntentUtil.isShareLink(intent)) { // Must go last, catches all pktc links
                     openSharingUrl(intent)
                     return
+                } else if (IntentUtil.isNativeShareLink(intent)) {
+                    openNativeSharingUrl(intent)
                 }
 
                 val scheme = intent.scheme
@@ -908,7 +1047,7 @@ class MainActivity :
             }
         } catch (e: Exception) {
             Timber.e(e)
-            CrashlyticsHelper.recordException(e)
+            SentryHelper.recordException(e)
         }
     }
 
@@ -932,7 +1071,12 @@ class MainActivity :
         addFragment(PodcastFragment.newInstance(podcastUuid = uuid))
     }
 
-    override fun openEpisodeDialog(episodeUuid: String?, podcastUuid: String?, forceDark: Boolean) {
+    override fun openEpisodeDialog(
+        episodeUuid: String?,
+        source: EpisodeViewSource,
+        podcastUuid: String?,
+        forceDark: Boolean
+    ) {
         episodeUuid ?: return
 
         launch(Dispatchers.Main.immediate) {
@@ -942,13 +1086,15 @@ class MainActivity :
                 val podcastUuidFound = podcastUuid ?: return@launch
                 // Assume it's an episode we don't know about
                 EpisodeFragment.newInstance(
-                    episodeUuid,
+                    episodeUuid = episodeUuid,
+                    source = source,
                     podcastUuid = podcastUuidFound,
                     forceDark = forceDark
                 )
             } else if (playable is Episode) {
                 EpisodeFragment.newInstance(
-                    episodeUuid,
+                    episodeUuid = episodeUuid,
+                    source = source,
                     podcastUuid = podcastUuid,
                     forceDark = forceDark
                 )
@@ -1020,7 +1166,12 @@ class MainActivity :
 
                     val episode = result.episode
                     if (episode != null) {
-                        openEpisodeDialog(episode.uuid, podcastUuid, forceDark = false)
+                        openEpisodeDialog(
+                            episodeUuid = episode.uuid,
+                            source = EpisodeViewSource.SHARE,
+                            podcastUuid = podcastUuid,
+                            forceDark = false
+                        )
                     } else {
                         openPodcastPage(podcastUuid)
                     }
@@ -1044,6 +1195,22 @@ class MainActivity :
                 }
             }
         )
+    }
+
+    @Suppress("DEPRECATION")
+    private fun openNativeSharingUrl(intent: Intent) {
+        val urlSegments = intent.data?.pathSegments ?: return
+        if (urlSegments.size < 2) return
+
+        when (urlSegments[0]) {
+            "podcast" -> openPodcastUrl(urlSegments[1])
+            "episode" -> openEpisodeDialog(
+                episodeUuid = urlSegments[1],
+                source = EpisodeViewSource.SHARE,
+                podcastUuid = null,
+                forceDark = false
+            )
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -1082,7 +1249,7 @@ class MainActivity :
 
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
         val event: AnalyticsEvent? = when (tab) {
-            VR.id.navigation_podcasts -> AnalyticsEvent.PODCAST_TAB_OPENED
+            VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
             VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
             VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
             VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED

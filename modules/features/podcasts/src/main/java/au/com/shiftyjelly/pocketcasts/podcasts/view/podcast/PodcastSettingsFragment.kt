@@ -9,8 +9,8 @@ import androidx.fragment.app.viewModels
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -25,10 +25,11 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
+import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateColors
+import au.com.shiftyjelly.pocketcasts.views.fragments.BasePreferenceFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
@@ -48,7 +49,7 @@ import au.com.shiftyjelly.pocketcasts.settings.R as SR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, FilterSelectFragment.Listener, HasBackstack {
+class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, FilterSelectFragment.Listener, HasBackstack {
     @Inject lateinit var theme: Theme
     @Inject lateinit var podcastManager: PodcastManager
 
@@ -120,6 +121,7 @@ class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, Filt
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        showLoading()
 
         view.setBackgroundColor(view.context.getThemeColor(UR.attr.primary_ui_01))
         view.isClickable = true
@@ -172,11 +174,15 @@ class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, Filt
             preferenceFilters?.icon = context.getTintedDrawable(IR.drawable.ic_filters, colors.iconColor)
 
             preferenceUnsubscribe?.isVisible = podcast.isSubscribed
+
+            hideLoading()
         }
 
-        viewModel.includedFilters.observe(viewLifecycleOwner) {
-            updateFiltersSummary(it)
-        }
+        viewModel.includedFilters
+            .combineLatest(viewModel.availableFilters)
+            .observe(viewLifecycleOwner) { (included, available) ->
+                updateFiltersSummary(included, available)
+            }
 
         viewModel.globalSettings.observe(viewLifecycleOwner) {
             val summary = when (it.second) {
@@ -209,7 +215,7 @@ class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, Filt
                     launch {
                         podcastManager.updateRefreshAvailable(podcastUuid = podcastUuid, refreshAvailable = false)
                         val success = podcastManager.refreshPodcastFeed(podcastUuid = podcastUuid)
-                        AnalyticsHelper.podcastFeedRefreshed()
+                        FirebaseAnalyticsTracker.podcastFeedRefreshed()
                         showFeedUpdateQueued(success = success)
                     }
                 }
@@ -415,13 +421,14 @@ class PodcastSettingsFragment : PreferenceFragmentCompat(), CoroutineScope, Filt
         preferenceSkipLast?.icon = context.getTintedDrawable(R.drawable.ic_skip_outro, tintColor)
     }
 
-    private fun updateFiltersSummary(filters: List<Playlist>) {
-        val filterTitles = filters.map { it.title }
+    private fun updateFiltersSummary(includedFilters: List<Playlist>, availableFilters: List<Playlist>) {
+        val filterTitles = includedFilters.map { it.title }
         if (filterTitles.isEmpty()) {
             preferenceFilters?.summary = getString(LR.string.podcast_not_in_filters)
         } else {
             preferenceFilters?.summary = getString(LR.string.podcast_included_in_filters, filterTitles.joinToString())
         }
+        preferenceFilters?.isVisible = availableFilters.isNotEmpty()
     }
 
     override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {

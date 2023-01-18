@@ -48,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -78,7 +79,10 @@ class PlaybackSettingsFragment : BaseFragment() {
             AppThemeWithBackground(theme.activeTheme) {
                 PlaybackSettings(
                     settings = settings,
-                    onBackClick = { activity?.onBackPressed() },
+                    onBackClick = {
+                        @Suppress("DEPRECATION")
+                        activity?.onBackPressed()
+                    },
                 )
             }
         }
@@ -130,6 +134,14 @@ class PlaybackSettingsFragment : BaseFragment() {
                             showSetAllArchiveDialog(it)
                         }
                     )
+
+                    SettingRow(
+                        primaryText = stringResource(LR.string.settings_media_notification_controls),
+                        secondaryText = stringResource(LR.string.settings_customize_buttons_displayed_in_android_13_notification_and_android_auto),
+                        modifier = Modifier.clickable {
+                            (activity as? FragmentHostListener)?.addFragment(MediaNotificationControlsFragment())
+                        }
+                    )
                 }
 
                 SettingSection(heading = stringResource(LR.string.settings_general_player)) {
@@ -140,21 +152,32 @@ class PlaybackSettingsFragment : BaseFragment() {
                         saved = settings.skipForwardInSecsObservable
                             .subscribeAsState(settings.getSkipForwardInSecs())
                             .value,
-                        onSave = settings::setSkipForwardInSec
+                        onSave = {
+                            settings.setSkipForwardNeedsSync(true)
+                            settings.setSkipForwardInSec(it)
+                        }
                     )
 
                     // Skip back time
                     SkipTime(
                         primaryText = stringResource(LR.string.settings_skip_back_time),
                         saved = settings.skipBackwardInSecsObservable
-                            .subscribeAsState(settings.getSkipForwardInSecs())
+                            .subscribeAsState(settings.getSkipBackwardInSecs())
                             .value,
-                        onSave = settings::setSkipBackwardInSec
+                        onSave = {
+                            settings.setSkipBackNeedsSync(true)
+                            settings.setSkipBackwardInSec(it)
+                        }
                     )
 
                     KeepScreenAwake(
                         saved = settings.keepScreenAwakeFlow.collectAsState().value,
                         onSave = settings::setKeepScreenAwake
+                    )
+
+                    OpenPlayerAutomatically(
+                        saved = settings.openPlayerAutomaticallyFlow.collectAsState().value,
+                        onSave = settings::setOpenPlayerAutomatically
                     )
 
                     IntelligentPlaybackResumption(
@@ -369,6 +392,15 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_keep_screen_awake),
             secondaryText = stringResource(LR.string.settings_keep_screen_awake_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+        )
+
+    @Composable
+    private fun OpenPlayerAutomatically(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(id = LR.string.settings_open_player_automatically),
+            secondaryText = stringResource(id = LR.string.settings_open_player_automatically_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )

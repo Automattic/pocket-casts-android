@@ -12,7 +12,7 @@ import com.google.android.gms.cast.framework.media.NotificationOptions
 
 class CastOptionsProvider : OptionsProvider {
     override fun getCastOptions(context: Context): CastOptions {
-        val application = context as PocketcastsApplication
+        val application = context as PocketCastsApplication
         val buttonActions = listOf(
             MediaIntentReceiver.ACTION_REWIND,
             MediaIntentReceiver.ACTION_TOGGLE_PLAYBACK,

@@ -46,7 +46,7 @@ class EpisodeListAdapter(
     val imageLoader: PodcastImageLoader,
     val multiSelectHelper: MultiSelectHelper,
     val fragmentManager: FragmentManager,
-    val fromListUuid: String? = null
+    val fromListUuid: String? = null,
 ) : ListAdapter<Playable, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
     val disposables = CompositeDisposable()

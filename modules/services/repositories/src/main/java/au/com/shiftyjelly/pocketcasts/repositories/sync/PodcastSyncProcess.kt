@@ -28,7 +28,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncOldServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncUpdateResponse
-import au.com.shiftyjelly.pocketcasts.utils.CrashlyticsHelper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -97,7 +97,7 @@ class PodcastSyncProcess(
             .andThen(syncPlayHistory())
         return syncUpNextObservable
             .doOnError { throwable ->
-                CrashlyticsHelper.recordException("Sync failed", throwable)
+                SentryHelper.recordException("Sync failed", throwable)
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
             }
             .doOnComplete {
@@ -631,7 +631,7 @@ class PodcastSyncProcess(
             if (playlist.id == null) {
                 playlist.id = playlistManager.create(playlist)
             } else {
-                playlistManager.update(playlist)
+                playlistManager.update(playlist, userPlaylistUpdate = null)
             }
 
             return@fromCallable playlist

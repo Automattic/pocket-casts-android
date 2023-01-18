@@ -7,6 +7,11 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -19,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.servers.CachedServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.AnalyticsHelper
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,11 +50,14 @@ class EpisodeFragmentViewModel @Inject constructor(
     val downloadManager: DownloadManager,
     val serverManager: ServerManager,
     val playbackManager: PlaybackManager,
-    val settings: Settings
+    val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
+    private val source = AnalyticsSource.EPISODE_DETAILS
     lateinit var state: LiveData<EpisodeFragmentState>
     val showNotes: MutableLiveData<String> = MutableLiveData()
     lateinit var inUpNext: LiveData<Boolean>
@@ -61,6 +68,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     val disposables = CompositeDisposable()
 
     var episode: Episode? = null
+    var isFragmentChangingConfigurations: Boolean = false
 
     fun setup(episodeUUID: String, podcastUUID: String?, forceDark: Boolean) {
         val isDarkTheme = forceDark || theme.isDarkTheme
@@ -147,6 +155,11 @@ class EpisodeFragmentViewModel @Inject constructor(
         episode?.let {
             launch {
                 episodeManager.deleteEpisodeFile(it, playbackManager, disableAutoDownload = true, removeFromUpNext = true)
+                episodeAnalytics.trackEvent(
+                    event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+                    source = source,
+                    uuid = it.uuid,
+                )
             }
         }
     }
@@ -160,13 +173,19 @@ class EpisodeFragmentViewModel @Inject constructor(
     fun downloadEpisode() {
         launch {
             episode?.let {
+                var analyticsEvent: AnalyticsEvent? = null
                 if (it.downloadTaskId != null) {
                     episodeManager.stopDownloadAndCleanUp(it, "episode card")
+                    analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED
                 } else if (!it.isDownloaded) {
                     it.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                     downloadManager.addEpisodeToQueue(it, "episode card", true)
+                    analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED
                 }
                 episodeManager.clearPlaybackError(episode)
+                analyticsEvent?.let { event ->
+                    episodeAnalytics.trackEvent(event, source = source, uuid = it.uuid)
+                }
             }
         }
     }
@@ -240,13 +259,14 @@ class EpisodeFragmentViewModel @Inject constructor(
     ): Boolean {
         episode?.let { episode ->
             if (isPlaying.value == true) {
-                playbackManager.pause()
+                playbackManager.pause(playbackSource = source)
                 return false
             } else {
                 fromListUuid?.let {
-                    AnalyticsHelper.podcastEpisodePlayedFromList(it, episode.podcastUuid)
+                    FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
+                    analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
                 }
-                playbackManager.playNow(episode, force)
+                playbackManager.playNow(episode, forceStream = force, playbackSource = source)
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                 return true
             }
@@ -259,6 +279,11 @@ class EpisodeFragmentViewModel @Inject constructor(
         episode?.let { episode ->
             episodeManager.toggleStarEpisodeAsync(episode)
         }
+    }
+
+    companion object {
+        private const val LIST_ID_KEY = "list_id"
+        private const val PODCAST_ID_KEY = "podcast_id"
     }
 }
 

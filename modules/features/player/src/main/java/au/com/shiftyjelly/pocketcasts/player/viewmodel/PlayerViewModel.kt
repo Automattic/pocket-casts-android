@@ -2,11 +2,14 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.content.Context
 import android.content.res.Resources
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -30,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -37,8 +41,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialog
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -73,7 +75,9 @@ class PlayerViewModel @Inject constructor(
     private val sleepTimer: SleepTimer,
     private val settings: Settings,
     private val theme: Theme,
-    @ApplicationContext private val context: Context
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics,
+    @ApplicationContext private val context: Context,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -148,7 +152,7 @@ class PlayerViewModel @Inject constructor(
     ) {
         fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
     }
-
+    private val source = AnalyticsSource.PLAYER
     private val _showPlayerFlow = MutableSharedFlow<Unit>()
     val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
 
@@ -251,7 +255,7 @@ class PlayerViewModel @Inject constructor(
             if (it is Episode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)
             } else {
-                Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.uuid, title = UserEpisodePodcastSubstitute.title, overrideGlobalEffects = false))
+                Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, overrideGlobalEffects = false))
             }
         }
         .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.getGlobalPlaybackEffects()) }
@@ -367,42 +371,36 @@ class PlayerViewModel @Inject constructor(
 
     fun play() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play clicked in player")
-        playbackManager.playQueue()
+        playbackManager.playQueue(playbackSource = source)
     }
 
-    fun playEpisode(uuid: String) {
+    fun playEpisode(uuid: String, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
         launch {
             val episode = episodeManager.findPlayableByUuid(uuid) ?: return@launch
-            playbackManager.playNow(episode)
+            playbackManager.playNow(episode = episode, playbackSource = playbackSource)
         }
-    }
-
-    fun pause() {
-        playbackManager.pause()
     }
 
     fun skipBackward() {
-        playbackManager.skipBackward()
+        playbackManager.skipBackward(playbackSource = source)
     }
 
     fun skipForward() {
-        playbackManager.skipForward()
+        playbackManager.skipForward(playbackSource = source)
     }
 
-    fun longSkipForwardOptionsDialog(): OptionsDialog {
-        var optionsDialogBuilder = OptionsDialog().setForceDarkTheme(true)
-        optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.mark_played) {
-            playbackManager.upNextQueue.currentEpisode?.let {
-                markAsPlayedConfirmed(it)
-            }
+    fun onMarkAsPlayedClick() {
+        playbackManager.upNextQueue.currentEpisode?.let {
+            markAsPlayedConfirmed(it)
         }
-        if (playbackManager.upNextQueue.queueEpisodes.isNotEmpty()) {
-            optionsDialogBuilder = optionsDialogBuilder.addTextOption(titleId = LR.string.next_episode) {
-                playbackManager.playNextInQueue()
-            }
-        }
+    }
 
-        return optionsDialogBuilder
+    fun hasNextEpisode(): Boolean {
+        return playbackManager.upNextQueue.queueEpisodes.isNotEmpty()
+    }
+
+    fun onNextEpisodeClick() {
+        playbackManager.playNextInQueue(playbackSource = source)
     }
 
     private fun markAsPlayedConfirmed(episode: Playable) {
@@ -450,6 +448,11 @@ class PlayerViewModel @Inject constructor(
         if (episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
             launch {
                 episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
+                episodeAnalytics.trackEvent(
+                    event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
+                    source = source,
+                    uuid = episode.uuid,
+                )
             }
         } else {
             launch {
@@ -460,24 +463,6 @@ class PlayerViewModel @Inject constructor(
 
     fun seekToMs(seekTimeMs: Int, seekComplete: () -> Unit) {
         playbackManager.seekToTimeMs(seekTimeMs, seekComplete)
-    }
-
-    fun shareDialog(context: Context?, fragmentManager: FragmentManager): ShareDialog? {
-        val contextFound = context ?: return null
-        val podcast = this.podcast ?: return null
-        val episode = this.episode ?: return null
-
-        return if (episode is Episode) {
-            ShareDialog(
-                podcast = podcast,
-                episode = episode,
-                fragmentManager = fragmentManager,
-                context = contextFound,
-                forceDarkTheme = true
-            )
-        } else {
-            null
-        }
     }
 
     override fun onCleared() {
@@ -559,8 +544,14 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun clearUpNext(context: Context): ClearUpNextDialog {
-        val dialog = ClearUpNextDialog(removeNowPlaying = false, playbackManager = playbackManager, context = context)
+    fun clearUpNext(context: Context, upNextSource: UpNextSource): ClearUpNextDialog {
+        val dialog = ClearUpNextDialog(
+            source = upNextSource,
+            removeNowPlaying = false,
+            playbackManager = playbackManager,
+            analyticsTracker = analyticsTracker,
+            context = context
+        )
         dialog.setForceDarkTheme(true)
         return dialog
     }
@@ -571,10 +562,6 @@ class PlayerViewModel @Inject constructor(
 
     fun previousChapter() {
         playbackManager.skipToPreviousChapter()
-    }
-
-    fun playPause() {
-        playbackManager.playPause()
     }
 
     fun onChapterClick(chapter: Chapter) {

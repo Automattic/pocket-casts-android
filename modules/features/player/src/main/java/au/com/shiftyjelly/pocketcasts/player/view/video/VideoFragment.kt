@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentVideoBinding
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.VideoViewModel
@@ -135,10 +136,12 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
 
     private fun hideSystemUi() {
         getInsetsController()?.hide(WindowInsetsCompat.Type.statusBars())
+        getInsetsController()?.hide(WindowInsetsCompat.Type.navigationBars())
     }
 
     private fun showSystemUi() {
         getInsetsController()?.show(WindowInsetsCompat.Type.statusBars())
+        getInsetsController()?.show(WindowInsetsCompat.Type.navigationBars())
     }
 
     private fun getInsetsController(): WindowInsetsControllerCompat? {
@@ -156,6 +159,7 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
 
     override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
         viewModel.seekToMs(progress)
+        playbackManager.trackPlaybackSeek(progress, AnalyticsSource.FULL_SCREEN_VIDEO)
         seekComplete()
     }
 }

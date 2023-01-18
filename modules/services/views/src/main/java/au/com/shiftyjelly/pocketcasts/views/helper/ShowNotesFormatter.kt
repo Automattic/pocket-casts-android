@@ -4,6 +4,8 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import timber.log.Timber
+import java.text.Bidi
+import java.util.*
 import java.util.regex.Pattern
 
 class ShowNotesFormatter(settings: Settings?, private val context: Context) {
@@ -61,7 +63,10 @@ class ShowNotesFormatter(settings: Settings?, private val context: Context) {
             }
 
             addShowNotesHead(html)
-            html.append("<body>")
+
+            val isRtl = !Bidi(showNotes, Bidi.DIRECTION_DEFAULT_LEFT_TO_RIGHT).baseIsLeftToRight()
+            html.append("<body ${if (isRtl) "dir=\"rtl\"" else ""}>")
+
             val bodyTrimmed = body.trim { it <= ' ' }
             val addParagraph = !bodyTrimmed.startsWith("<p")
             if (addParagraph) {

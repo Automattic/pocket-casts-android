@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 import android.content.res.Resources
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -40,6 +41,7 @@ class DiscoverViewModel @Inject constructor(
     val userManager: UserManager
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
+    private val playbackSource = AnalyticsSource.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.getDiscoveryCountryCode()
     var replacements = emptyMap<String, String>()
@@ -161,11 +163,11 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: Episode) {
-        playbackManager.playNow(episode, forceStream = true)
+        playbackManager.playNow(episode = episode, forceStream = true, playbackSource = playbackSource)
     }
 
     fun stopPlayback() {
-        playbackManager.stopAsync()
+        playbackManager.stopAsync(playbackSource = playbackSource)
     }
 }
 

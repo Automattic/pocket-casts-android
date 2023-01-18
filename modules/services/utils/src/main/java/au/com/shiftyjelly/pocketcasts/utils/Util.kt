@@ -4,13 +4,16 @@ import android.app.UiModeManager
 import android.content.Context
 import android.content.Context.ACCESSIBILITY_SERVICE
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.ApplicationInfoFlags
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Looper
 import android.text.format.Formatter
 import android.view.accessibility.AccessibilityManager
 import java.util.Locale
 
 object Util {
+    private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 570
 
     fun isCarUiMode(context: Context): Boolean {
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
@@ -18,9 +21,18 @@ object Util {
     }
 
     fun isAutomotive(context: Context): Boolean {
-        val appInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
+        val appInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.packageManager.getApplicationInfo(context.packageName, ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
+        } else {
+            @Suppress("DEPRECATION")
+            context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+        }.metaData
         return appInfo?.getBoolean("pocketcasts_automotive", false) == true
     }
+
+    fun isTablet(context: Context) =
+        !isAutomotive(context) &&
+            context.resources.configuration.smallestScreenWidthDp > MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET
 
     fun isTalkbackOn(context: Context): Boolean {
         val am = context.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager?

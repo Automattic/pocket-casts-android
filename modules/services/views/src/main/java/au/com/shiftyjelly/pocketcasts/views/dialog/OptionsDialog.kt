@@ -85,8 +85,8 @@ class OptionsDialog : BottomSheetDialogFragment() {
         var closeAndClick: (() -> Unit)? = null
         if (click != null) {
             closeAndClick = {
-                dismiss()
                 click.invoke()
+                dismiss()
             }
         }
 
@@ -118,5 +118,10 @@ class OptionsDialog : BottomSheetDialogFragment() {
                 }
             }
         }
+    }
+
+    fun setOnDismiss(onDismiss: (() -> Unit)?): OptionsDialog {
+        this.onDismiss = onDismiss
+        return this
     }
 }

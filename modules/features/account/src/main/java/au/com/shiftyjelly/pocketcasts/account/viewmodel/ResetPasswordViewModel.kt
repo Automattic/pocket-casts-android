@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,17 +49,17 @@ class ResetPasswordViewModel @Inject constructor(private val auth: AccountAuth) 
         }
         resetPasswordState.postValue(ResetPasswordState.Loading)
 
-        auth.resetPasswordWithEmail(emailString) { result ->
-            when (result) {
-                is AccountAuth.AuthResult.Success -> {
+        viewModelScope.launch {
+            auth.forgotPassword(
+                email = emailString,
+                onSuccess = {
                     resetPasswordState.postValue(ResetPasswordState.Success)
-                }
-                is AccountAuth.AuthResult.Failed -> {
-                    val message = result.message
+                },
+                onError = { message ->
                     val errors = mutableSetOf(ResetPasswordError.SERVER)
                     resetPasswordState.postValue(ResetPasswordState.Failure(errors, message))
                 }
-            }
+            )
         }
     }
 }

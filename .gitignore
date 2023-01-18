@@ -4,6 +4,7 @@
 bin/
 gen/
 captures/
+artifacts/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -19,6 +20,7 @@ build/
 
 # Android
 google-services.json
+google-upload-credentials.json
 
 ### fastlane ###
 # fastlane - A streamlined workflow tool for Cocoa deployment
@@ -36,5 +38,23 @@ fastlane/screenshots/screenshots.html
 # scan temporary files
 fastlane/test_output
 
+fastlane/README.md
+
 # Downloaded dependencies such as 'configure' plugin: https://github.com/Automattic/configure
 /vendor
+
+# secrets
+secret.properties
+.configure-files/firebase.secrets.json
+firebase.secrets.json
+*.keystore
+*.jks
+
+# Silver Searcher ignore file
+.agignore
+
+# ripgrep ignore file
+.rgignore
+
+# Sentry
+sentry.properties

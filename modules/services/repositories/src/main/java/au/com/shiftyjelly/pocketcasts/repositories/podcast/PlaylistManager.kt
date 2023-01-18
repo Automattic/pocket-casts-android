@@ -6,10 +6,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
+import kotlinx.coroutines.flow.Flow
 
 interface PlaylistManager {
     fun findAll(): List<Playlist>
     suspend fun findAllSuspend(): List<Playlist>
+    fun findAllFlow(): Flow<List<Playlist>>
     fun observeAll(): Flowable<List<Playlist>>
 
     fun findById(id: Long): Playlist?
@@ -31,7 +33,7 @@ interface PlaylistManager {
     fun createPlaylist(name: String, iconId: Int, draft: Boolean): Playlist
 
     fun create(playlist: Playlist): Long
-    fun update(playlist: Playlist)
+    fun update(playlist: Playlist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
 
     fun updateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean)
     fun rxUpdateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean): Completable

@@ -7,9 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentSleepBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.minutes
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.airbnb.lottie.LottieProperty
@@ -24,9 +27,12 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SleepFragment : BaseDialogFragment() {
+
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     override val statusBarColor: StatusBarColor? = null
 
     private val viewModel: PlayerViewModel by activityViewModels()
@@ -62,12 +68,18 @@ class SleepFragment : BaseDialogFragment() {
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
         binding.buttonMins60.setOnClickListener { startTimer(mins = 60) }
-        binding.buttonEndOfEpisode.setOnClickListener { startTimerEndOfEpisode() }
+        binding.buttonEndOfEpisode.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_EPISODE))
+            startTimerEndOfEpisode()
+        }
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
         binding.buttonAddTime.setOnClickListener { addExtraMins() }
-        binding.buttonEndOfEpisode2.setOnClickListener { startTimerEndOfEpisode() }
+        binding.buttonEndOfEpisode2.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE))
+            startTimerEndOfEpisode()
+        }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
         binding.buttonCancelEndOfEpisode.setOnClickListener { cancelTimer() }
 
@@ -106,6 +118,7 @@ class SleepFragment : BaseDialogFragment() {
 
     private fun addExtraMins() {
         viewModel.sleepTimerAddExtraMins(mins = 5)
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to TimeUnit.MILLISECONDS.toSeconds(5.minutes())))
         viewModel.timeLeftInSeconds()?.let { timeLeft ->
             binding?.root?.announceForAccessibility("5 minutes added to sleep timer. ${timeLeft / 60} minutes ${timeLeft % 60} seconds remaining")
         }
@@ -114,6 +127,7 @@ class SleepFragment : BaseDialogFragment() {
     private fun startCustomTimer() {
         viewModel.sleepTimerAfter(mins = viewModel.sleepCustomTimeMins)
         binding?.root?.announceForAccessibility("Sleep timer set for ${viewModel.sleepCustomTimeMins} minutes")
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to TimeUnit.MILLISECONDS.toSeconds(viewModel.sleepCustomTimeMins.minutes())))
         close()
     }
 
@@ -136,16 +150,24 @@ class SleepFragment : BaseDialogFragment() {
     private fun startTimer(mins: Int) {
         viewModel.sleepTimerAfter(mins = mins)
         binding?.root?.announceForAccessibility("Sleep timer set for $mins minutes")
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to TimeUnit.MILLISECONDS.toSeconds(mins.minutes())))
         close()
     }
 
     private fun cancelTimer() {
         viewModel.cancelSleepTimer()
         binding?.root?.announceForAccessibility("Sleep timer cancelled")
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_CANCELLED)
         close()
     }
 
     private fun close() {
         dismiss()
+    }
+
+    companion object {
+        private const val TIME_KEY = "time" // in seconds
+        private const val AMOUNT_KEY = "amount"
+        private const val END_OF_EPISODE = "end_of_episode"
     }
 }

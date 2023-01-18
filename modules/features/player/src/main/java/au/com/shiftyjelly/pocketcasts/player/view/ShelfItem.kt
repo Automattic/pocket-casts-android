@@ -19,49 +19,90 @@ object ShelfItems {
     }
 }
 
-sealed class ShelfItem(val id: String, var title: (Playable?) -> Int, var iconRes: (Playable?) -> Int, val shownWhen: Shown, @StringRes val subtitle: Int? = null) {
+sealed class ShelfItem(
+    val id: String,
+    var title: (Playable?) -> Int,
+    var iconRes: (Playable?) -> Int,
+    val shownWhen: Shown,
+    val analyticsValue: String,
+    @StringRes val subtitle: Int? = null
+) {
     sealed class Shown {
         object Always : Shown()
         object EpisodeOnly : Shown()
         object UserEpisodeOnly : Shown()
     }
 
-    object Effects : ShelfItem("effects", { LR.string.podcast_playback_effects }, { R.drawable.ic_effects_off }, Shown.Always)
+    object Effects : ShelfItem(
+        id = "effects",
+        title = { LR.string.podcast_playback_effects },
+        iconRes = { R.drawable.ic_effects_off },
+        shownWhen = Shown.Always,
+        analyticsValue = "playback_effects"
+    )
 
-    object Sleep : ShelfItem("sleep", { LR.string.player_sleep_timer }, { R.drawable.ic_sleep }, Shown.Always)
+    object Sleep : ShelfItem(
+        id = "sleep",
+        title = { LR.string.player_sleep_timer },
+        iconRes = { R.drawable.ic_sleep },
+        shownWhen = Shown.Always,
+        analyticsValue = "sleep_timer"
+    )
 
     object Star : ShelfItem(
-        "star",
-        { if (it is Episode && it.isStarred) LR.string.unstar_episode else LR.string.star_episode },
-        { if (it is Episode && it.isStarred) IR.drawable.ic_star_filled else IR.drawable.ic_star },
-        Shown.EpisodeOnly,
-        LR.string.player_actions_hidden_for_custom
+        id = "star",
+        title = { if (it is Episode && it.isStarred) LR.string.unstar_episode else LR.string.star_episode },
+        subtitle = LR.string.player_actions_hidden_for_custom,
+        iconRes = { if (it is Episode && it.isStarred) IR.drawable.ic_star_filled else IR.drawable.ic_star },
+        shownWhen = Shown.EpisodeOnly,
+        analyticsValue = "star_episode"
     )
 
-    object Share : ShelfItem("share", { LR.string.podcast_share_episode }, { IR.drawable.ic_share }, Shown.EpisodeOnly, LR.string.player_actions_hidden_for_custom)
+    object Share : ShelfItem(
+        id = "share",
+        title = { LR.string.podcast_share_episode },
+        subtitle = LR.string.player_actions_hidden_for_custom,
+        iconRes = { IR.drawable.ic_share },
+        shownWhen = Shown.EpisodeOnly,
+        analyticsValue = "share_episode"
+    )
 
     object Podcast : ShelfItem(
-        "podcast",
-        { if (it is UserEpisode) LR.string.go_to_files else LR.string.go_to_podcast },
-        { R.drawable.ic_arrow_goto },
-        Shown.Always
+        id = "podcast",
+        title = { if (it is UserEpisode) LR.string.go_to_files else LR.string.go_to_podcast },
+        iconRes = { R.drawable.ic_arrow_goto },
+        shownWhen = Shown.Always,
+        analyticsValue = "go_to_podcast"
     )
 
-    object Cast : ShelfItem("cast", { LR.string.chromecast }, { com.google.android.gms.cast.framework.R.drawable.quantum_ic_cast_connected_white_24 }, Shown.Always)
+    object Cast : ShelfItem(
+        id = "cast",
+        title = { LR.string.chromecast },
+        iconRes = { com.google.android.gms.cast.framework.R.drawable.quantum_ic_cast_connected_white_24 },
+        shownWhen = Shown.Always,
+        analyticsValue = "chromecast"
+    )
 
-    object Played : ShelfItem("played", { LR.string.mark_as_played }, { R.drawable.ic_markasplayed }, Shown.Always)
+    object Played : ShelfItem(
+        id = "played",
+        title = { LR.string.mark_as_played },
+        iconRes = { R.drawable.ic_markasplayed },
+        shownWhen = Shown.Always,
+        analyticsValue = "mark_as_played"
+    )
 
     object Archive : ShelfItem(
-        "archive",
-        { if (it is UserEpisode) LR.string.delete else LR.string.archive },
-        { if (it is UserEpisode) VR.drawable.ic_delete else IR.drawable.ic_archive },
-        Shown.Always,
-        LR.string.player_actions_show_as_delete_for_custom
+        id = "archive",
+        title = { if (it is UserEpisode) LR.string.delete else LR.string.archive },
+        subtitle = LR.string.player_actions_show_as_delete_for_custom,
+        iconRes = { if (it is UserEpisode) VR.drawable.ic_delete else IR.drawable.ic_archive },
+        shownWhen = Shown.Always,
+        analyticsValue = "archive"
     )
 
     object Download : ShelfItem(
-        "download",
-        {
+        id = "download",
+        title = {
             if (it?.isDownloaded == true) {
                 LR.string.delete_download
             } else if (it?.isDownloading == true) {
@@ -70,7 +111,7 @@ sealed class ShelfItem(val id: String, var title: (Playable?) -> Int, var iconRe
                 LR.string.download
             }
         },
-        {
+        iconRes = {
             if (it?.isDownloaded == true) {
                 VR.drawable.ic_delete
             } else if (it?.episodeStatus == EpisodeStatusEnum.DOWNLOADING || it?.episodeStatus == EpisodeStatusEnum.QUEUED) {
@@ -79,6 +120,7 @@ sealed class ShelfItem(val id: String, var title: (Playable?) -> Int, var iconRe
                 IR.drawable.ic_download
             }
         },
-        Shown.Always
+        shownWhen = Shown.Always,
+        analyticsValue = "download"
     )
 }

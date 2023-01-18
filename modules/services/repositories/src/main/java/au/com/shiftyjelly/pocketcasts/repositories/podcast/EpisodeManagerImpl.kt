@@ -11,6 +11,9 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
+import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
+import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.QueryHelper
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -170,10 +173,6 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findPodcastEpisodesForMediaBrowserSearch(podcastUuid: String): List<Episode> {
-        return episodeDao.findPodcastEpisodesForMediaBrowserSearch(podcastUuid)
-    }
-
     override fun findEpisodesWhere(queryAfterWhere: String): List<Episode> {
         return episodeDao.findEpisodes(SimpleSQLiteQuery("SELECT episodes.* FROM episodes JOIN podcasts ON episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND $queryAfterWhere"))
     }
@@ -204,6 +203,10 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun observePlaybackHistoryEpisodes(): Flowable<List<Episode>> {
         return episodeDao.observePlaybackHistory()
+    }
+
+    override suspend fun findPlaybackHistoryEpisodes(): List<Episode> {
+        return episodeDao.findPlaybackHistoryEpisodes()
     }
 
     override fun observeDownloadingEpisodes(): LiveData<List<Episode>> {
@@ -486,6 +489,12 @@ class EpisodeManagerImpl @Inject constructor(
         // Auto archive after playing if the episode isn't already archived
         if (!episode.isArchived) {
             archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true)
+        }
+    }
+
+    override fun markAsPlayedAsync(episode: Playable?, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+        launch {
+            markAsPlayed(episode, playbackManager, podcastManager)
         }
     }
 
@@ -830,6 +839,10 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.observeStarredEpisodes()
     }
 
+    override suspend fun findStarredEpisodes(): List<Episode> {
+        return episodeDao.findStarredEpisodes()
+    }
+
     override fun exists(episodeUuid: String): Boolean {
         return episodeDao.exists(episodeUuid)
     }
@@ -897,6 +910,12 @@ class EpisodeManagerImpl @Inject constructor(
         }
 
         return addedEpisodes
+    }
+
+    override fun insert(episodes: List<Episode>) {
+        if (episodes.isNotEmpty()) {
+            episodeDao.insertAll(episodes)
+        }
     }
 
     override fun findEpisodesToSync(): List<Episode> {
@@ -1039,7 +1058,7 @@ class EpisodeManagerImpl @Inject constructor(
     override fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: Episode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<Playable> {
         return episodeDao.existsRx(episodeUuid)
             .flatMapMaybe { episodeExists ->
-                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.uuid) {
+                if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
                     observePlayableByUuid(episodeUuid).firstElement()
                 } else {
                     podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
@@ -1055,4 +1074,25 @@ class EpisodeManagerImpl @Inject constructor(
                 }
             }
     }
+
+    override suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long? =
+        episodeDao.calculateListeningTime(fromEpochMs, toEpochMs)
+
+    override suspend fun findListenedCategories(fromEpochMs: Long, toEpochMs: Long): List<ListenedCategory> =
+        episodeDao.findListenedCategories(fromEpochMs, toEpochMs)
+
+    override suspend fun findListenedNumbers(fromEpochMs: Long, toEpochMs: Long): ListenedNumbers =
+        episodeDao.findListenedNumbers(fromEpochMs, toEpochMs)
+
+    override suspend fun findLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode? =
+        episodeDao.findLongestPlayedEpisode(fromEpochMs, toEpochMs)
+
+    override suspend fun countEpisodesPlayedUpto(fromEpochMs: Long, toEpochMs: Long, playedUpToInSecs: Long): Int =
+        episodeDao.countEpisodesPlayedUpto(fromEpochMs, toEpochMs, playedUpToInSecs)
+
+    override suspend fun findEpisodeInteractedBefore(fromEpochMs: Long): Episode? =
+        episodeDao.findEpisodeInteractedBefore(fromEpochMs)
+
+    override suspend fun countEpisodesInListeningHistory(fromEpochMs: Long, toEpochMs: Long): Int =
+        episodeDao.findEpisodesCountInListeningHistory(fromEpochMs, toEpochMs)
 }

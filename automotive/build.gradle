@@ -2,11 +2,14 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-parcelize'
+    id 'io.sentry.android.gradle'
     id 'com.mikepenz.aboutlibraries.plugin'
 }
 apply from: "../base.gradle"
 
 android {
+    namespace 'au.com.shiftyjelly.pocketcasts'
+
     defaultConfig {
         applicationId project.applicationId
         minSdkVersion 28
@@ -17,20 +20,13 @@ android {
         compose true
     }
 
-    if (canSignRelease) {
-        signingConfigs {
-            release {
-                storeFile = file(pocketcastsKeyStoreFile)
-                storePassword = pocketcastsKeyStorePassword
-                keyAlias = pocketcastsKeyStoreAlias
-                keyPassword = pocketcastsKeyStoreAliasPassword
-            }
-        }
-    }
-
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
+
+            manifestPlaceholders = [
+                    sentryDsn: ""
+            ]
         }
 
         debugProd {
@@ -40,15 +36,11 @@ android {
 
         release {
             manifestPlaceholders = [
-                    gitHash: ""
+                    gitHash: "",
+                    sentryDsn: project.pocketcastsSentryDsn
             ]
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            if (canSignRelease) {
-                signingConfig signingConfigs.release
-            }
-
         }
     }
 }
@@ -57,17 +49,17 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     // Commented out the Automotive library as it clashes with the Material library and we don't use it. Duplicate value for resource attr/navigationIconTint.
     //implementation 'androidx.car:car:1.0.0-alpha7'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'com.google.android.material:material:1.5.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
-    implementation 'com.mikepenz:aboutlibraries-core:10.4.0'
-    implementation 'com.mikepenz:aboutlibraries-compose:10.4.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation project(':modules:services:localization')
+    implementation androidLibs.appCompat
+    implementation androidLibs.ktx
+    implementation androidLibs.design
+    implementation androidLibs.constraintLayout
+    implementation libs.aboutLibrariesCore
+    implementation libs.aboutLibrariesCompose
+    testImplementation libs.junit
+    androidTestImplementation androidLibs.junitExt
+    androidTestImplementation androidLibs.testEspressoCore
 
+    implementation project(':modules:services:localization')
     implementation project(':modules:services:preferences')
     implementation project(':modules:services:utils')
     implementation project(':modules:services:model')
@@ -76,6 +68,7 @@ dependencies {
     implementation project(':modules:services:compose')
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:servers')
+    implementation project(':modules:services:analytics')
     implementation project(':modules:features:profile')
     implementation project(':modules:features:podcasts')
     implementation project(':modules:features:settings')
@@ -84,7 +77,6 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
 
 task useGoogleServicesDebugFile {
     description 'Copies the debug google-services.json file if file is missing.'

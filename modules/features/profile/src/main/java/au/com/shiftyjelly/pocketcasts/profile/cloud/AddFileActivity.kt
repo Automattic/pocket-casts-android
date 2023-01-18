@@ -8,6 +8,7 @@ import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.MediaStore
@@ -24,6 +25,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -37,12 +39,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -84,8 +86,13 @@ private const val EXTRA_FILE_CHOOSER = "filechooser"
 private const val STATE_LAUNCHED_FILE_CHOOSER = "LAUNCHED_FILE_CHOOSER"
 
 @AndroidEntryPoint
-class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemClickListener {
+class AddFileActivity :
+    AppCompatActivity(),
+    CoroutineScope,
+    OnboardingLauncher,
+    Toolbar.OnMenuItemClickListener {
     companion object {
+
         fun newFileChooser(context: Context): Intent {
             val intent = Intent(context, AddFileActivity::class.java)
             intent.putExtra(EXTRA_FILE_CHOOSER, true)
@@ -158,23 +165,22 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(theme.activeTheme.resourceId)
+        theme.setupThemeForConfig(this, resources.configuration)
 
         binding = ActivityAddFileBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
 
-        val onSelectedChanged: (AddFileColourAdapter.Item) -> Unit = {
-            tintColor = if (it is AddFileColourAdapter.Item.Colour) {
-                it.color
-            } else {
-                0
-            }
-        }
-        val onLockedTapped = {
-            showUpgradeSheet()
-        }
-        colorAdapter = AddFileColourAdapter(onSelectedChanged, onLockedTapped)
+        colorAdapter = AddFileColourAdapter(
+            onSelectedChange = {
+                tintColor = if (it is AddFileColourAdapter.Item.Colour) {
+                    it.color
+                } else {
+                    0
+                }
+            },
+            onLockedItemTapped = ::openOnboardingFlow
+        )
 
         updateForm(readOnly = true, loading = true)
         viewModel.signInState.observe(this) { signInState ->
@@ -188,7 +194,7 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
                 }
             } else {
                 binding.imgFile.setOnClickListener {
-                    showUpgradeSheet()
+                    openOnboardingFlow()
                 }
             }
         }
@@ -199,7 +205,7 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
             upgradeLayout.isVisible = false
         }
         upgradeLayout.setOnClickListener {
-            WebViewActivity.show(this, "Learn more", Settings.INFO_LEARN_MORE_URL)
+            openOnboardingFlow()
         }
 
         val colorLayoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
@@ -212,7 +218,7 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
             if (!freeSubscription) {
                 startImagePicker()
             } else {
-                showUpgradeSheet()
+                openOnboardingFlow()
             }
         }
 
@@ -227,7 +233,14 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
             }
 
             dataUri = when (intent?.action) {
-                Intent.ACTION_SEND -> intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
+                Intent.ACTION_SEND -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
+                    }
+                }
                 Intent.ACTION_VIEW -> intent.data
                 else -> null
             }
@@ -268,9 +281,16 @@ class AddFileActivity : AppCompatActivity(), CoroutineScope, Toolbar.OnMenuItemC
         outState.putBoolean(STATE_LAUNCHED_FILE_CHOOSER, launchedFileChooser)
     }
 
-    private fun showUpgradeSheet() {
-        val bottomSheet = PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Files)
-        bottomSheet.show(supportFragmentManager, "upgrade_bottom_sheet")
+    private fun openOnboardingFlow() {
+        openOnboardingFlow(OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.FILES))
+    }
+
+    override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
+        // Just starting the activity without registering for a result because
+        // we don't need the result since we don't want to break the user's flow
+        // by sending them back to the Discover screen with an
+        // OnboardingFinish.DoneGoToDiscover result.
+        startActivity(OnboardingActivity.newInstance(this, onboardingFlow))
     }
 
     @Suppress("NAME_SHADOWING")

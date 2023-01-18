@@ -158,7 +158,7 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
                 chipStarred.setInactiveColors(theme.activeTheme, color)
             }
             chipStarred.setOnClickListener {
-                viewModel.starredChipTapped()
+                viewModel.starredChipTapped(isCreatingFilter = true)
                 scrollToChip = it
             }
 

@@ -83,6 +83,7 @@ class WhatsNewFragment : BaseFragment() {
     }
 
     private fun close() {
+        @Suppress("DEPRECATION")
         activity?.onBackPressed()
     }
 }

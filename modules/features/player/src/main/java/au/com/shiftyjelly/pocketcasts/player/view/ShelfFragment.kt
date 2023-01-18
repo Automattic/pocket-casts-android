@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -46,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter {
     private var items = emptyList<Any>()
 
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var settings: Settings
 
     private lateinit var itemTouchHelper: ItemTouchHelper
@@ -54,6 +57,7 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
     private val shortcutTitle = ShelfTitle(LR.string.player_rearrange_actions_shown)
     private val moreActionsTitle = ShelfTitle(LR.string.player_rearrange_actions_hidden)
     private var binding: FragmentShelfBinding? = null
+    private var dragStartPosition: Int? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentShelfBinding.inflate(inflater, container, false)
@@ -73,7 +77,10 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
         val toolbar = binding.toolbar
         toolbar.setTitle(LR.string.rearrange_actions)
         toolbar.setTitleTextColor(toolbar.context.getThemeColor(UR.attr.player_contrast_01))
-        toolbar.setNavigationOnClickListener { (activity as? FragmentHostListener)?.closeModal(this) }
+        toolbar.setNavigationOnClickListener {
+            trackRearrangeFinishedEvent()
+            (activity as? FragmentHostListener)?.closeModal(this)
+        }
         toolbar.navigationIcon?.setTint(ThemeColor.playerContrast01(theme.activeTheme))
 
         val backgroundColor = theme.playerBackground2Color(playerViewModel.podcast)
@@ -108,6 +115,11 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
         }
     }
 
+    override fun onBackPressed(): Boolean {
+        trackRearrangeFinishedEvent()
+        return super.onBackPressed()
+    }
+
     override fun onShelfItemMove(fromPosition: Int, toPosition: Int) {
         val listData = items.toMutableList()
 
@@ -137,11 +149,61 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
     }
 
     override fun onShelfItemStartDrag(viewHolder: ShelfAdapter.ItemViewHolder) {
+        dragStartPosition = viewHolder.bindingAdapterPosition
         itemTouchHelper.startDrag(viewHolder)
     }
 
-    override fun onShelfItemTouchHelperFinished() {
+    override fun onShelfItemTouchHelperFinished(position: Int) {
+        trackShelfItemMovedEvent(position)
         settings.setShelfItems(items.filterIsInstance<ShelfItem>().map { it.id })
+    }
+
+    private fun sectionTitleAt(position: Int) =
+        if (position < items.indexOf(moreActionsTitle)) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+
+    private fun trackShelfItemMovedEvent(position: Int) {
+        dragStartPosition?.let {
+            val title = (items[position] as? ShelfItem)?.analyticsValue
+                ?: AnalyticsProp.Value.UNKNOWN
+            val movedFrom = sectionTitleAt(it)
+            val movedTo = sectionTitleAt(position)
+            val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {
+                position - 1
+            } else {
+                position - (items.indexOf(moreActionsTitle) + 1)
+            }
+            analyticsTracker.track(
+                AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
+                mapOf(
+                    AnalyticsProp.Key.ACTION to title,
+                    AnalyticsProp.Key.POSITION to newPosition, // it is the new position in section it was moved to
+                    AnalyticsProp.Key.MOVED_FROM to movedFrom,
+                    AnalyticsProp.Key.MOVED_TO to movedTo
+                )
+            )
+            dragStartPosition = null
+        }
+    }
+
+    private fun trackRearrangeFinishedEvent() {
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED)
+    }
+
+    companion object {
+        object AnalyticsProp {
+            object Key {
+                const val FROM = "from"
+                const val ACTION = "action"
+                const val MOVED_FROM = "moved_from"
+                const val MOVED_TO = "moved_to"
+                const val POSITION = "position"
+            }
+            object Value {
+                const val SHELF = "shelf"
+                const val OVERFLOW_MENU = "overflow_menu"
+                const val UNKNOWN = "unknown"
+            }
+        }
     }
 }
 

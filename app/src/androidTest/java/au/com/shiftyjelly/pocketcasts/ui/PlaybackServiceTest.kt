@@ -7,9 +7,9 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ServiceTestRule
-import au.com.shiftyjelly.pocketcasts.PocketcastsApplication
+import au.com.shiftyjelly.pocketcasts.PocketCastsApplication
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper.Companion.NOTIFICATION_ID_PLAYING
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerNotificationManager
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
@@ -37,7 +37,7 @@ class PlaybackServiceTest {
     @Test
     @Throws(TimeoutException::class)
     fun testPlaybackServiceEntersAndExitsForeground() {
-        val application = ApplicationProvider.getApplicationContext<PocketcastsApplication>()
+        val application = ApplicationProvider.getApplicationContext<PocketCastsApplication>()
         val testScheduler = SchedulerProvider.testScheduler
 
         // Create the service Intent.
@@ -94,7 +94,7 @@ class PlaybackServiceTest {
         service.testPlaybackStateChange(metaData, paused)
         testScheduler.triggerActions()
 
-        verify(testNotificationManager, timeout(5000).times(2)).notify(eq(NOTIFICATION_ID_PLAYING), any()) // Once for updating meta data, and then once to remove
+        verify(testNotificationManager, timeout(5000).times(2)).notify(eq(NotificationId.PLAYING.value), any()) // Once for updating meta data, and then once to remove
         assertFalse("Service should have exited the foreground", service.isForegroundService())
 
         // Mock remove the notification so we can test we don't notify again

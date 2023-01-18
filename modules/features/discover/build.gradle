@@ -1,25 +1,30 @@
 apply from: "../../modules.gradle"
 
-dependencies {
-    implementation project(':modules:services:localization')
-    implementation project(':modules:services:preferences')
-    implementation project(':modules:services:utils')
-    implementation project(':modules:services:images')
-    implementation project(':modules:services:ui')
-    implementation project(':modules:services:compose')
-    implementation project(':modules:services:views')
-    implementation project(':modules:services:servers')
-    implementation project(':modules:services:repositories')
-    implementation project(':modules:services:model')
-    implementation project(':modules:features:podcasts')
-    implementation project(':modules:features:search')
-    implementation project(':modules:features:account')
-}
-
 android {
+    namespace 'au.com.shiftyjelly.pocketcasts.discover'
     buildFeatures {
         viewBinding true
         dataBinding = true
         compose true
     }
+}
+
+dependencies {
+    // features
+    implementation project(':modules:features:account')
+    implementation project(':modules:features:podcasts')
+    implementation project(':modules:features:search')
+
+    // services
+    implementation project(':modules:services:analytics')
+    implementation project(':modules:services:compose')
+    implementation project(':modules:services:localization')
+    implementation project(':modules:services:images')
+    implementation project(':modules:services:model')
+    implementation project(':modules:services:preferences')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:servers')
+    implementation project(':modules:services:utils')
+    implementation project(':modules:services:ui')
+    implementation project(':modules:services:views')
 }

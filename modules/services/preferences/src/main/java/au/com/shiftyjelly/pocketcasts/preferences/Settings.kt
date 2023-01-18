@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -12,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 interface Settings {
@@ -25,9 +28,12 @@ interface Settings {
         const val SERVER_SHORT_URL = BuildConfig.SERVER_SHORT_URL
         const val SERVER_LIST_URL = BuildConfig.SERVER_LIST_URL
         const val SERVER_LIST_HOST = BuildConfig.SERVER_LIST_HOST
+        const val WP_COM_API_URL = "https://public-api.wordpress.com"
 
         const val SHARING_SERVER_SECRET = BuildConfig.SHARING_SERVER_SECRET
         val SETTINGS_ENCRYPT_SECRET = BuildConfig.SETTINGS_ENCRYPT_SECRET.toCharArray()
+
+        const val GOOGLE_SIGN_IN_SERVER_CLIENT_ID = BuildConfig.GOOGLE_SIGN_IN_SERVER_CLIENT_ID
 
         const val INFO_LEARN_MORE_URL = "https://www.pocketcasts.com/plus/"
         const val INFO_TOS_URL = "https://support.pocketcasts.com/article/terms-of-use-overview/"
@@ -84,6 +90,7 @@ interface Settings {
         const val PREFERENCE_ALLOW_OTHER_APPS_ACCESS = "allowOtherAppsAccess"
         const val PREFERENCE_HIDE_SYNC_SETUP_MENU = "hideSyncSetupMenu"
         const val PREFERENCE_KEEP_SCREEN_AWAKE = "keepScreenAwake4"
+        const val PREFERENCE_OPEN_PLAYER_AUTOMATICALLY = "openPlayerAutomatically"
         const val PREFERENCE_SHOW_NOTE_IMAGES_ON = "showNotesImagesOn"
         const val PREFERENCE_SELECTED_FILTER = "selectedFilter"
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
@@ -92,6 +99,7 @@ interface Settings {
 
         const val PREFERENCE_AUTO_PLAY_ON_EMPTY = "autoUpNextEmpty"
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
+        const val PREFERENCE_AUTO_SHOW_PLAYED = "autoShowPlayed"
 
         const val PREFERENCE_DISCOVERY_COUNTRY_CODE = "discovery_country_code"
         const val PREFERENCE_POPULAR_PODCAST_COUNTRY_CODE = "popular_podcast_country_code"
@@ -121,6 +129,22 @@ interface Settings {
         const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"
 
         const val LOG_TAG_AUTO = "PocketCastsAuto"
+    }
+
+    enum class NotificationChannel(val id: String) {
+        NOTIFICATION_CHANNEL_ID_PLAYBACK("playback"),
+        NOTIFICATION_CHANNEL_ID_DOWNLOAD("download"),
+        NOTIFICATION_CHANNEL_ID_EPISODE("episode"),
+        NOTIFICATION_CHANNEL_ID_PLAYBACK_ERROR("playbackError"),
+        NOTIFICATION_CHANNEL_ID_PODCAST("podcastImport"),
+        NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR("signInError"),
+    }
+
+    enum class NotificationId(val value: Int) {
+        OPML(21483646),
+        PLAYING(21483647),
+        DOWNLOADING(21483648),
+        SIGN_IN_ERROR(21483649),
     }
 
     enum class BadgeType(val labelId: Int, val analyticsValue: String) {
@@ -189,6 +213,37 @@ interface Settings {
         fun toIndex(): Int = options.indexOf(this)
     }
 
+    sealed class MediaNotificationControls(@StringRes val controlName: Int, @DrawableRes val iconRes: Int, val key: String) {
+
+        companion object {
+            val All
+                get() = listOf(PlaybackSpeed, Star, MarkAsPlayed, PlayNext, Archive)
+            val items = All.associateBy { it.key }
+
+            const val MAX_VISIBLE_OPTIONS = 3
+
+            private const val ARCHIVE_KEY = "default_media_control_archive"
+            private const val MARK_AS_PLAYED_KEY = "default_media_control_mark_as_played"
+            private const val PLAY_NEXT_KEY = "default_media_control_play_next_key"
+            private const val PLAYBACK_SPEED_KEY = "default_media_control_playback_speed_key"
+            private const val STAR_KEY = "default_media_control_star_key"
+
+            fun itemForId(id: String): MediaNotificationControls? {
+                return items[id]
+            }
+        }
+
+        object Archive : MediaNotificationControls(LR.string.archive, IR.drawable.ic_archive, ARCHIVE_KEY)
+
+        object MarkAsPlayed : MediaNotificationControls(LR.string.mark_as_played, IR.drawable.ic_markasplayed, MARK_AS_PLAYED_KEY)
+
+        object PlayNext : MediaNotificationControls(LR.string.play_next, com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next, PLAY_NEXT_KEY)
+
+        object PlaybackSpeed : MediaNotificationControls(LR.string.playback_speed, IR.drawable.auto_1x, PLAYBACK_SPEED_KEY)
+
+        object Star : MediaNotificationControls(LR.string.star, IR.drawable.ic_star, STAR_KEY)
+    }
+
     sealed class AutoArchiveInactive(val timeSeconds: Int) {
         object Never : AutoArchiveInactive(-1)
         object Hours24 : AutoArchiveInactive(24 * 60 * 60)
@@ -240,15 +295,19 @@ interface Settings {
     val autoAddUpNextLimit: Observable<Int>
 
     val defaultPodcastGroupingFlow: StateFlow<PodcastGrouping>
+    val defaultMediaNotificationControlsFlow: StateFlow<List<MediaNotificationControls>>
     val defaultShowArchivedFlow: StateFlow<Boolean>
     val intelligentPlaybackResumptionFlow: StateFlow<Boolean>
     val keepScreenAwakeFlow: StateFlow<Boolean>
+    val openPlayerAutomaticallyFlow: StateFlow<Boolean>
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
 
     fun getVersion(): String
     fun getVersionCode(): Int
 
     fun getGitHash(): String?
+
+    fun getSentryDsn(): String
 
     fun isScreenReaderOn(): Boolean
 
@@ -332,6 +391,7 @@ interface Settings {
     fun clearEmailAndPassword()
     fun getSyncEmail(): String?
     fun getSyncPassword(): String?
+    fun getSyncUuid(): String?
     fun getSyncRefreshToken(): String?
     fun getSyncToken(): String?
     suspend fun getSyncTokenSuspend(): String?
@@ -351,6 +411,9 @@ interface Settings {
 
     fun keepScreenAwake(): Boolean
     fun setKeepScreenAwake(newValue: Boolean)
+
+    fun openPlayerAutomatically(): Boolean
+    fun setOpenPlayerAutomatically(newValue: Boolean)
 
     fun isPodcastAutoDownloadUnmeteredOnly(): Boolean
     fun isPodcastAutoDownloadPowerOnly(): Boolean
@@ -495,9 +558,12 @@ interface Settings {
     fun setTrialFinishedSeen(seen: Boolean)
     fun getTrialFinishedSeen(): Boolean
     fun getAutoSubscribeToPlayed(): Boolean
+    fun getAutoShowPlayed(): Boolean
     fun getAutoPlayNextEpisodeOnEmpty(): Boolean
     fun defaultShowArchived(): Boolean
     fun setDefaultShowArchived(value: Boolean)
+    fun getMediaNotificationControlItems(): List<MediaNotificationControls>
+    fun setMediaNotificationControlItems(items: List<String>)
     fun setMultiSelectItems(items: List<Int>)
     fun getMultiSelectItems(): List<Int>
     fun setLastPauseTime(date: Date)
@@ -520,6 +586,23 @@ interface Settings {
     fun setTimesToShowBatteryWarning(value: Int)
     fun getTimesToShowBatteryWarning(): Int
 
+    // Only the AnalyticsTracker object should update or retrieve SendUsageState directly. Everything else
+    // should update/access this setting through the AnalyticsTracker.
     fun setSendUsageStats(value: Boolean)
     fun getSendUsageStats(): Boolean
+
+    fun setSendCrashReports(value: Boolean)
+    fun getSendCrashReports(): Boolean
+
+    fun setLinkCrashReportsToUser(value: Boolean)
+    fun getLinkCrashReportsToUser(): Boolean
+
+    fun setEndOfYearShowBadge2022(value: Boolean)
+    fun getEndOfYearShowBadge2022(): Boolean
+
+    fun setEndOfYearModalHasBeenShown(value: Boolean)
+    fun getEndOfYearModalHasBeenShown(): Boolean
+
+    fun hasCompletedOnboarding(): Boolean
+    fun setHasDoneInitialOnboarding()
 }

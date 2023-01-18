@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
@@ -32,6 +33,9 @@ abstract class PodcastDao {
 
     @Query("SELECT * FROM podcasts WHERE subscribed = 1")
     abstract suspend fun findSubscribedNoOrder(): List<Podcast>
+
+    @Query("SELECT uuid FROM podcasts WHERE subscribed = 1")
+    abstract suspend fun findSubscribedUuids(): List<String>
 
     @Query("SELECT * FROM podcasts WHERE subscribed = 0")
     abstract fun findUnsubscribed(): List<Podcast>
@@ -344,4 +348,20 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET start_from = :startFromSecs, skip_last = :skipLastSecs, folder_uuid = :folderUuid, sort_order = :sortPosition, added_date = :addedDate WHERE uuid = :uuid")
     abstract suspend fun updateSyncData(uuid: String, startFromSecs: Int, skipLastSecs: Int, folderUuid: String?, sortPosition: Int, addedDate: Date)
+
+    @Query(
+        """
+        SELECT DISTINCT episodes.uuid as episodeId, podcasts.uuid, podcasts.title, podcasts.author, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg, SUM(episodes.played_up_to) as totalPlayedTime, COUNT(episodes.uuid) as numberOfPlayedEpisodes
+        FROM episodes
+        JOIN podcasts ON episodes.podcast_id = podcasts.uuid
+        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        GROUP BY podcast_id
+        ORDER BY totalPlayedTime DESC, numberOfPlayedEpisodes DESC
+        LIMIT :limit
+        """
+    )
+    abstract suspend fun findTopPodcasts(fromEpochMs: Long, toEpochMs: Long, limit: Int): List<TopPodcast>
+
+    @Query("SELECT * FROM podcasts ORDER BY random() LIMIT :limit")
+    abstract fun findRandomPodcasts(limit: Int): List<Podcast>
 }

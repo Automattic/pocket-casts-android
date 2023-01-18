@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,12 +16,15 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
@@ -33,8 +35,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.SettingsAdapter
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment
-import au.com.shiftyjelly.pocketcasts.settings.plus.PlusUpgradeFragment.UpgradePage
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
 import au.com.shiftyjelly.pocketcasts.settings.util.SettingsHelper
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -62,6 +65,7 @@ class ProfileFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: ProfileViewModel by viewModels()
+
     private var binding: FragmentProfileBinding? = null
     private val sections = listOf(
         SettingsAdapter.Item(LR.string.profile_navigation_stats, R.drawable.ic_stats, StatsFragment::class.java),
@@ -151,6 +155,11 @@ class ProfileFragment : BaseFragment() {
             true
         }
 
+        lifecycleScope.launchWhenStarted {
+            val isEligible = viewModel.isEndOfYearStoriesEligible()
+            binding.setupEndOfYearPromptCard(isEligible)
+        }
+
         viewModel.podcastCount.observe(viewLifecycleOwner) {
             binding.lblPodcastCount.text = it.toString()
             // check if the stats have changed, causes the stats to change on first sign in
@@ -185,8 +194,7 @@ class ProfileFragment : BaseFragment() {
                 val fragment = AccountDetailsFragment.newInstance()
                 (activity as FragmentHostListener).addFragment(fragment)
             } else {
-                val intent = Intent(activity, AccountActivity::class.java)
-                activity?.startActivity(intent)
+                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
             }
         }
 
@@ -204,7 +212,10 @@ class ProfileFragment : BaseFragment() {
 
         upgradeLayout.lblGetMore.text = getString(LR.string.profile_help_support)
         upgradeLayout.root.setOnClickListener {
-            PlusUpgradeFragment.newInstance(upgradePage = UpgradePage.Profile).show(childFragmentManager, "upgradebottomsheet")
+            OnboardingLauncher.openOnboardingFlow(
+                activity = activity,
+                onboardingFlow = OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.PROFILE)
+            )
         }
 
         viewModel.refreshObservable.observe(viewLifecycleOwner) { state ->
@@ -213,6 +224,21 @@ class ProfileFragment : BaseFragment() {
 
         if (!viewModel.isFragmentChangingConfigurations) {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SHOWN)
+        }
+    }
+
+    private fun FragmentProfileBinding.setupEndOfYearPromptCard(isEligible: Boolean) {
+        endOfYearPromptCard.setContent {
+            if (isEligible) {
+                AppTheme(theme.activeTheme) {
+                    EndOfYearPromptCard(
+                        onClick = {
+                            analyticsTracker.track(AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED)
+                            (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
+                        }
+                    )
+                }
+            }
         }
     }
 

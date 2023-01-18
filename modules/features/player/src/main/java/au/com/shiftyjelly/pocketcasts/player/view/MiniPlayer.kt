@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -24,6 +25,7 @@ import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
 import com.airbnb.lottie.model.KeyPath
+import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
@@ -60,8 +62,17 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        // set the initial play button icon to the play triangle. This is run after the button has inflated or the Lottie drawable is null and it won't work.
-        updatePlayButton(isPlaying = false, animate = false)
+        updatePlayButton(isPlaying = playing, animate = false)
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        return MiniPlayerState(superState = super.onSaveInstanceState(), isPlaying = playing)
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        val miniPlayerState = state as? MiniPlayerState
+        super.onRestoreInstanceState(miniPlayerState?.superState)
+        this.playing = miniPlayerState?.isPlaying ?: false
     }
 
     fun setPlaybackState(playbackState: PlaybackState) {
@@ -193,4 +204,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         fun onSkipForwardClicked()
         fun onLongClick()
     }
+
+    @Parcelize
+    private class MiniPlayerState(val superState: Parcelable?, val isPlaying: Boolean) : Parcelable
 }

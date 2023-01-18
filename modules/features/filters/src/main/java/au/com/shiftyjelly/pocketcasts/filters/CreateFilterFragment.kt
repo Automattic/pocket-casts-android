@@ -76,11 +76,14 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
     val playlistUUID: String?
         get() = arguments?.getString(ARG_PLAYLIST_UUID)
 
-    val iconViews: MutableList<IconView> = mutableListOf()
-    var selectedIconIndex: Int = 0
+    private val iconViews: MutableList<IconView> = mutableListOf()
+    private var selectedIconIndex: Int = 0
         set(value) {
             field = value
             viewModel.iconId = value
+            if (selectedIconIndexInitialized) {
+                viewModel.userChangedIcon()
+            }
         }
 
     var tintColor: Int = 0
@@ -89,6 +92,9 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
             updateIconViews()
         }
 
+    private var txtNameInitialized = false
+    private var selectedIconIndexInitialized = false
+
     override fun onPause() {
         super.onPause()
         rootView?.let {
@@ -96,10 +102,15 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         }
         if (!isCreate) {
             launch {
-                viewModel.saveFilter(selectedIconIndex, colorAdapter.selectedIndex)
+                viewModel.saveFilter(
+                    iconIndex = selectedIconIndex,
+                    colorIndex = colorAdapter.selectedIndex,
+                    isCreatingNewFilter = isCreate
+                )
                 viewModel.reset()
             }
         }
+        viewModel.isAutoDownloadSwitchInitialized = false
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -121,9 +132,12 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         }
 
         val colors = Playlist.getColors(context)
-        colorAdapter = ColorAdapter(colors.toIntArray(), false) { index ->
+        colorAdapter = ColorAdapter(colors.toIntArray(), false) { index, fromUserInteraction ->
             tintColor = context?.getThemeColor(Playlist.themeColors[index]) ?: Color.WHITE
-            viewModel.colorId.value = index
+            viewModel.colorIndex.value = index
+            if (fromUserInteraction) {
+                viewModel.userChangedColor()
+            }
         }
         tintColor = view.context.getThemeColor(Playlist.themeColors.first())
 
@@ -149,26 +163,37 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
 
         txtName.addAfterTextChanged {
             viewModel.filterName.value = it
+            if (txtNameInitialized) {
+                viewModel.userChangedFilterName()
+            }
         }
 
         viewModel.playlist.observe(viewLifecycleOwner) { filter ->
             if (filter.title.isEmpty()) {
                 txtName.setHint(LR.string.filters_filter_name)
             } else {
+                txtNameInitialized = false
                 txtName.setText(filter.title)
             }
+            txtNameInitialized = true
 
-            colorAdapter.selectedIndex = filter.colorIndex
+            colorAdapter.setSelectedIndex(filter.colorIndex, fromUserInteraction = false)
+
+            selectedIconIndexInitialized = false
             selectedIconIndex = filter.drawableIndex
+            selectedIconIndexInitialized = true
+
             tintColor = filter.getColor(context)
             updateIconViews()
 
             binding.switchAutoDownload.isChecked = filter.autoDownload
+            viewModel.isAutoDownloadSwitchInitialized = true
+
             binding.layoutDownloadLimit.isVisible = filter.autoDownload && !isCreate
             binding.lblDownloadLimit.text = getString(LR.string.filters_auto_download_limit, filter.autodownloadLimit)
         }
 
-        viewModel.colorId.observe(viewLifecycleOwner) {
+        viewModel.colorIndex.observe(viewLifecycleOwner) {
             val colorResId = Playlist.themeColors.getOrNull(it) ?: 0
             val context = view.context
             val tintColor = context.getThemeColor(colorResId)
@@ -179,7 +204,10 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         if (isCreate) {
             binding.toolbarLayout.isVisible = false
         } else {
-            binding.toolbar.setNavigationOnClickListener { (activity as AppCompatActivity).onBackPressed() }
+            binding.toolbar.setNavigationOnClickListener {
+                @Suppress("DEPRECATION")
+                (activity as AppCompatActivity).onBackPressed()
+            }
         }
 
         val layoutAutoDownload = binding.layoutAutoDownload
@@ -207,6 +235,11 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
                 .setTitle(getString(LR.string.filters_download_title))
             dialog.show(parentFragmentManager, "auto_download_first")
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        viewModel.onBackPressed(isCreate)
+        return super.onBackPressed()
     }
 
     private fun setupIconViews() {

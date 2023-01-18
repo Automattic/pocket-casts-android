@@ -20,8 +20,11 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentPlusSettingsBinding
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.component.GradientIcon
 import au.com.shiftyjelly.pocketcasts.views.component.TileDrawable
@@ -36,6 +39,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class PlusSettingsFragment : BaseFragment() {
 
     @Inject lateinit var subscriptionManager: SubscriptionManager
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var userManager: UserManager
 
     private var binding: FragmentPlusSettingsBinding? = null
 
@@ -81,7 +86,12 @@ class PlusSettingsFragment : BaseFragment() {
             )
 
             val onAccountUpgradeClick: (() -> Unit) = {
-                (activity as? FragmentHostListener)?.showAccountUpgradeNow(true)
+                val flow = if (settings.isLoggedIn()) {
+                    OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.PLUS_DETAILS)
+                } else {
+                    OnboardingFlow.PlusAccountUpgradeNeedsLogin
+                }
+                OnboardingLauncher.openOnboardingFlow(activity, flow)
             }
 
             val adapter = PlusAdapter(onAccountUpgradeClick)
@@ -98,6 +108,17 @@ class PlusSettingsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.toolbar?.setup(title = getString(LR.string.pocket_casts_plus), navigationIcon = BackArrow, activity = activity, theme = theme)
+
+        LiveDataReactiveStreams
+            .fromPublisher(userManager.getSignInState())
+            .observe(viewLifecycleOwner) { signInState ->
+                // If the user has gone through the upgraded to Plus, we no longer want
+                // to present this screen since it is asking them to sign up for Plus
+                if (signInState.isSignedInAsPlus && isAdded) {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                }
+            }
     }
 }
 

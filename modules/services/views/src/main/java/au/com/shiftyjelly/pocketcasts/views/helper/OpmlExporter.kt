@@ -110,7 +110,7 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
                             UiUtil.hideProgressDialog(progressDialog)
                             val opmlFile = opmlFile
                             if (opmlFile != null && opmlFile.exists()) {
-                                if (sendAsEmail) sendIntentEmail() else sendIntentFile()
+                                if (sendAsEmail) sendIntentEmail(opmlFile) else sendIntentFile(opmlFile)
                             }
                         } catch (e: Exception) {
                             UiUtil.hideProgressDialog(progressDialog)
@@ -122,11 +122,11 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
         }
     }
 
-    private fun sendIntentFile() {
+    private fun sendIntentFile(file: File) {
         try {
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = "text/xml"
-            val uri = FileUtil.createUriWithReadPermissions(opmlFile, intent, fragment.activity)
+            val uri = FileUtil.createUriWithReadPermissions(file, intent, fragment.requireActivity())
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 context.startActivity(intent)
@@ -139,7 +139,7 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
         }
     }
 
-    private fun sendIntentEmail() {
+    private fun sendIntentEmail(file: File) {
         try {
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = "text/html"
@@ -151,7 +151,7 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
 
             intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(LR.string.settings_opml_email_subject))
             intent.putExtra(Intent.EXTRA_TEXT, HtmlCompat.fromHtml(context.getString(LR.string.settings_opml_email_body), HtmlCompat.FROM_HTML_MODE_COMPACT))
-            val uri = FileUtil.createUriWithReadPermissions(opmlFile, intent, fragment.activity)
+            val uri = FileUtil.createUriWithReadPermissions(file, intent, fragment.requireActivity())
             intent.putExtra(Intent.EXTRA_STREAM, uri)
             try {
                 context.startActivity(intent)

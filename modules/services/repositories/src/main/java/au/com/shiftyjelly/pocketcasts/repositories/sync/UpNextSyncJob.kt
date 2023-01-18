@@ -144,7 +144,7 @@ class UpNextSyncJob : JobService() {
             val uuids = change.uuids?.splitIgnoreEmpty(",") ?: listOf()
             val episodes = uuids.map { uuid ->
                 val episode = runBlocking { episodeManager.findPlayableByUuid(uuid) }
-                val podcastUuid = if (episode is Episode) episode.podcastUuid else UserEpisodePodcastSubstitute.uuid
+                val podcastUuid = if (episode is Episode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
                 UpNextSyncRequest.ChangeEpisode(
                     uuid,
                     episode?.title,
@@ -164,7 +164,7 @@ class UpNextSyncJob : JobService() {
             val uuid = change.uuid
             val episode = if (uuid == null) null else runBlocking { episodeManager.findPlayableByUuid(uuid) }
             val publishedDate = episode?.publishedDate?.switchInvalidForNow()?.toIsoString()
-            val podcastUuid = if (episode is Episode) episode.podcastUuid else UserEpisodePodcastSubstitute.uuid
+            val podcastUuid = if (episode is Episode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
             return UpNextSyncRequest.Change(
                 action = change.type,
                 modified = change.modified,
@@ -189,7 +189,7 @@ class UpNextSyncJob : JobService() {
         }
 
         // import missing podcasts
-        val podcastUuids: List<String> = response.episodes?.mapNotNull { it.podcast }?.filter { it != UserEpisodePodcastSubstitute.uuid } ?: emptyList()
+        val podcastUuids: List<String> = response.episodes?.mapNotNull { it.podcast }?.filter { it != UserEpisodePodcastSubstitute.substituteUuid } ?: emptyList()
         val addMissingPodcast: Completable = Observable.fromIterable(podcastUuids).flatMapCompletable { podcastUuid ->
             podcastManager.findOrDownloadPodcastRx(podcastUuid = podcastUuid).ignoreElement()
         }
@@ -201,7 +201,7 @@ class UpNextSyncJob : JobService() {
             if (podcastUuid == null) {
                 Observable.empty()
             } else {
-                if (podcastUuid == UserEpisodePodcastSubstitute.uuid) {
+                if (podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
                     userEpisodeManager.downloadMissingUserEpisode(episodeUuid, placeholderTitle = responseEpisode.title, placeholderPublished = responseEpisode.published?.parseIsoDate()).toObservable()
                 } else {
                     val skeletonEpisode = responseEpisode.toSkeletonEpisode(podcastUuid)

@@ -2,3 +2,6 @@ apply from: "../../modules.gradle"
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
+android {
+    namespace 'au.com.shiftyjelly.pocketcasts.localization'
+}

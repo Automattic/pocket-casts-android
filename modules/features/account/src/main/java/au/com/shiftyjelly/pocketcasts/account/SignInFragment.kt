@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account
 
 import android.app.PendingIntent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -123,7 +124,12 @@ class SignInFragment : BaseFragment() {
                         activity?.finish()
 
                         if (arguments?.containsKey(EXTRA_SUCCESS_INTENT) == true) {
-                            arguments?.getParcelable<PendingIntent?>(EXTRA_SUCCESS_INTENT)?.send()
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                arguments?.getParcelable(EXTRA_SUCCESS_INTENT, PendingIntent::class.java)
+                            } else {
+                                @Suppress("DEPRECATION")
+                                arguments?.getParcelable(EXTRA_SUCCESS_INTENT)
+                            }?.send()
                         }
                     }
                 }
@@ -160,8 +166,8 @@ class SignInFragment : BaseFragment() {
         val context = view.context
 
         val emailColor = context.getThemeColor(UR.attr.primary_interactive_01)
-        val emailDrawable = context.getTintedDrawable(R.drawable.ic_mail, emailColor)
-        val passwordDrawable = context.getTintedDrawable(R.drawable.ic_password, emailColor)
+        val emailDrawable = context.getTintedDrawable(IR.drawable.ic_mail, emailColor)
+        val passwordDrawable = context.getTintedDrawable(IR.drawable.ic_password, emailColor)
 
         val tickColor = context.getThemeColor(UR.attr.support_02)
         val tickDrawable = if (!invalidEmail) context.getTintedDrawable(IR.drawable.ic_tick_circle, tickColor) else null

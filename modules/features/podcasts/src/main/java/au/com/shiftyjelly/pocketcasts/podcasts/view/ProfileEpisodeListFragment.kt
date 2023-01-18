@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentProfileEpisodeListBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
@@ -98,7 +100,12 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
 
     val onRowClick = { episode: Playable ->
         if (episode is Episode) {
-            val fragment = EpisodeFragment.newInstance(episode)
+            val episodeViewSource = when (mode) {
+                Mode.Downloaded -> EpisodeViewSource.DOWNLOADS
+                Mode.History -> EpisodeViewSource.LISTENING_HISTORY
+                Mode.Starred -> EpisodeViewSource.STARRED
+            }
+            val fragment = EpisodeFragment.newInstance(episode = episode, source = episodeViewSource)
             fragment.show(parentFragmentManager, "episode_card")
         }
     }
@@ -116,6 +123,9 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         imageLoader = PodcastImageLoaderThemed(context).apply {
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
+
+        playButtonListener.source = getAnalyticsEventSource()
+        multiSelectHelper.source = getAnalyticsEventSource()
     }
 
     override fun onPause() {
@@ -176,10 +186,12 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             binding?.toolbar?.isVisible = !isMultiSelecting
             binding?.multiSelectToolbar?.setNavigationIcon(R.drawable.ic_arrow_back)
 
-            if (isMultiSelecting) {
-                trackMultiSelectEntered()
-            } else if (wasMultiSelecting) {
-                trackMultiSelectExited()
+            if ((activity as? FragmentHostListener)?.isUpNextShowing() == false) {
+                if (isMultiSelecting) {
+                    trackMultiSelectEntered()
+                } else if (wasMultiSelecting) {
+                    trackMultiSelectExited()
+                }
             }
 
             adapter.notifyDataSetChanged()
@@ -380,5 +392,11 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             Mode.Starred -> AnalyticsEvent.STARRED_MULTI_SELECT_EXITED
         }
         analyticsTracker.track(analyticsEvent)
+    }
+
+    private fun getAnalyticsEventSource() = when (mode) {
+        Mode.Downloaded -> AnalyticsSource.DOWNLOADS
+        Mode.Starred -> AnalyticsSource.STARRED
+        Mode.History -> AnalyticsSource.LISTENING_HISTORY
     }
 }
