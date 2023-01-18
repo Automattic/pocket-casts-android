@@ -14,10 +14,10 @@ android {
     if (canSignRelease) {
         signingConfigs {
             release {
-                storeFile = file(pocketcastsKeyStoreFile)
-                storePassword = pocketcastsKeyStorePassword
-                keyAlias = pocketcastsKeyStoreAlias
-                keyPassword = pocketcastsKeyStoreAliasPassword
+                storeFile = project.storeFile
+                storePassword = project.storePassword
+                keyAlias = project.keyAlias
+                keyPassword = project.keyPassword
             }
         }
     }
