@@ -18,6 +18,8 @@
         ([#711](https://github.com/Automattic/pocket-casts-android/pull/711)).
     *   App does a better job respecting the device's dark/light mode settings
         ([#710](https://github.com/Automattic/pocket-casts-android/pull/710)).
+    *   Make it easier to tap newsletter toggle
+        ([#714](https://github.com/Automattic/pocket-casts-android/pull/714)).
 
 7.30
 -----
