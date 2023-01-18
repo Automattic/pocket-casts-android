@@ -11,6 +11,8 @@
 *   Health:
     *   Switched to using the new user login and register endpoints.
         ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
+    *   Upgraded ExoPlayer to 2.18.2
+        ([#707](https://github.com/Automattic/pocket-casts-android/pull/707)).
 *   Bug Fixes:
     *   Improved handling of sync errors
         ([#711](https://github.com/Automattic/pocket-casts-android/pull/711)).

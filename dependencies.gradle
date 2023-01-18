@@ -84,7 +84,7 @@ project.ext {
     versionComposeCompiler = '1.3.0'
     versionDagger = '2.41'
     versionEspresso = '3.4.0'
-    versionExoplayer = '2.16.1'
+    versionExoplayer = '2.18.2'
     versionGlide = '4.13.2'
     versionHilt = '2.43.2'
     versionKotlinCoroutines = '1.6.4'
@@ -96,6 +96,7 @@ project.ext {
     versionRoom = '2.4.3'
     versionTest = '1.4.0'
     versionWork = '2.7.1'
+    versionAccessibilityTestFramework = '4.0.0'
 
     // Automattic library versions
     versionTracks = 'trunk-b3655d42123501a1d9a304789b738610ab4403c8'
@@ -171,7 +172,9 @@ project.ext {
             composeRx: "androidx.compose.runtime:runtime-rxjava2:$versionCompose",
             composeViewModel: "androidx.lifecycle:lifecycle-viewmodel-compose:$versionLifecycle",
             composeUiUtil: "androidx.compose.ui:ui-util:$versionCompose",
-            guava: 'com.google.guava:guava:27.1-android' // Required to fix conflict between versions in exoplayer and workmanager
+            guava: 'com.google.guava:guava:27.1-android', // Required to fix conflict between versions in exoplayer and workmanager
+            // Fixes instrumentation tests, see: https://github.com/android/android-test/issues/861#issuecomment-1180219978
+            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework"
     ]
 
     libs = [
