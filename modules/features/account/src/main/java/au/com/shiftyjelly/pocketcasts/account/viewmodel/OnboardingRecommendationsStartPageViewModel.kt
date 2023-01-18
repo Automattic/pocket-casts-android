@@ -216,6 +216,23 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         } else {
             podcastManager.subscribeToPodcast(podcastUuid = podcast.uuid, sync = true)
         }
+
+        // Immediately update subscribed state in the UI
+        _state.update {
+            it.copy(
+                sections = it.sections.map { section ->
+                    section.copy(
+                        podcasts = section.visiblePodcasts.map { podcastInList ->
+                            if (podcastInList.uuid == podcast.uuid) {
+                                podcastInList.copy(isSubscribed = !podcastInList.isSubscribed)
+                            } else {
+                                podcastInList
+                            }
+                        }
+                    )
+                }
+            )
+        }
     }
 
     private suspend fun updateFlowWith(
