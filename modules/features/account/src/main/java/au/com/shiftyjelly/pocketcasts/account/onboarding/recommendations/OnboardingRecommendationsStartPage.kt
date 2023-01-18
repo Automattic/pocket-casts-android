@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -184,10 +185,12 @@ private fun Content(
             }
         }
 
-        RowButton(
-            text = stringResource(buttonRes),
-            onClick = onComplete,
-        )
+        Surface(elevation = 8.dp) {
+            RowButton(
+                text = stringResource(buttonRes),
+                onClick = onComplete,
+            )
+        }
         Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
     }
 }
