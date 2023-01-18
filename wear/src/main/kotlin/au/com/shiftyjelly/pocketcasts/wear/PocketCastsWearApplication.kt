@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.wear
 
 import android.app.Application
 import au.com.shiftyjelly.pocketcasts.BuildConfig
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
@@ -14,11 +16,13 @@ class PocketCastsWearApplication : Application() {
 
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var userManager: UserManager
+    @Inject lateinit var settings: Settings
 
     override fun onCreate() {
         super.onCreate()
 
         setupLogging()
+        setupAnalytics()
         setupApp()
     }
 
@@ -30,5 +34,9 @@ class PocketCastsWearApplication : Application() {
 
     private fun setupApp() {
         userManager.beginMonitoringAccountManager(playbackManager)
+    }
+
+    private fun setupAnalytics() {
+        AnalyticsTracker.init(settings)
     }
 }
