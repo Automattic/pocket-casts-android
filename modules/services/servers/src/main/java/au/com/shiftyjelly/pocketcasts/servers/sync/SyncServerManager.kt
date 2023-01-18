@@ -195,9 +195,9 @@ open class SyncServerManager @Inject constructor(
     }
 
     fun episodeSync(request: EpisodeSyncRequest): Completable {
-        return getCacheTokenOrLogin { token ->
+        return getCacheTokenOrLoginCompletable { token ->
             server.episodeProgressSync(addBearer(token), request)
-        }.ignoreElement()
+        }
     }
 
     fun subscriptionStatus(): Single<SubscriptionStatusResponse> {
@@ -349,6 +349,12 @@ open class SyncServerManager @Inject constructor(
             val token = refreshTokenSuspend()
             return serverCall(token)
         }
+    }
+
+    private fun getCacheTokenOrLoginCompletable(serverCall: (token: String) -> Completable): Completable {
+        return getCacheTokenOrLogin { token ->
+            serverCall(token).toSingleDefault(Unit)
+        }.ignoreElement()
     }
 
     private fun <T : Any> getCacheTokenOrLogin(serverCall: (token: String) -> Single<T>): Single<T> {

@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
+import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -76,7 +77,7 @@ interface SyncServer {
     suspend fun historyYear(@Header("Authorization") authorization: String, @Body request: HistoryYearSyncRequest): HistoryYearResponse
 
     @POST("/sync/update_episode")
-    fun episodeProgressSync(@Header("Authorization") authorization: String, @Body request: EpisodeSyncRequest): Single<Void>
+    fun episodeProgressSync(@Header("Authorization") authorization: String, @Body request: EpisodeSyncRequest): Completable
 
     @GET("/subscription/status")
     fun subscriptionStatus(@Header("Authorization") authorization: String): Single<SubscriptionStatusResponse>

@@ -12,6 +12,8 @@
     *   Switched to using the new user login and register endpoints.
         ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
 *   Bug Fixes:
+    *   Improved handling of sync errors
+        ([#711](https://github.com/Automattic/pocket-casts-android/pull/711)).
     *   App does a better job respecting the device's dark/light mode settings
         ([#710](https://github.com/Automattic/pocket-casts-android/pull/710)).
 
