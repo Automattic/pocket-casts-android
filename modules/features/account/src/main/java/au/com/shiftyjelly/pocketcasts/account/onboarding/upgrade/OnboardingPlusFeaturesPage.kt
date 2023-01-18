@@ -1,18 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
-import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
@@ -22,8 +18,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
@@ -45,11 +39,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,9 +49,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.R
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusFeatures.PlusRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.IconRow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -74,8 +65,6 @@ import kotlinx.coroutines.delay
 import java.lang.Long.max
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
-private val background = Color(0xFF121212)
 
 @Composable
 internal fun OnboardingPlusFeaturesPage(
@@ -119,16 +108,10 @@ internal fun OnboardingPlusFeaturesPage(
     BoxWithConstraints(
         Modifier
             .fillMaxHeight()
-            .background(background)
+            .background(OnboardingPlusHelper.backgroundColor)
     ) {
 
-        Box(
-            Modifier
-                .verticalScroll(scrollState)
-        ) {
-
-            Background()
-
+        OnboardingPlusHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
             Column(
                 Modifier
                     .windowInsetsPadding(WindowInsets.statusBars)
@@ -205,7 +188,7 @@ private fun setStatusBarBackground(scrollState: ScrollState) {
     )
 
     val statusBarBackground = if (scrimAlpha > 0) {
-        background.copy(alpha = scrimAlpha)
+        OnboardingPlusHelper.backgroundColor.copy(alpha = scrimAlpha)
     } else {
         Color.Transparent
     }
@@ -228,25 +211,6 @@ private fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
         .calculateBottomPadding()
     val fullHeight = this.maxHeight
     return fullHeight - statusBarPadding - navigationBarPadding
-}
-
-@Composable
-private fun IconRow(modifier: Modifier = Modifier) {
-    Row(modifier) {
-        Icon(
-            painter = painterResource(R.drawable.pocket_casts_white),
-            contentDescription = null,
-            tint = Color.White,
-        )
-
-        Spacer(Modifier.width(8.dp))
-
-        Icon(
-            painter = painterResource(R.drawable.plus_bw),
-            contentDescription = null,
-            tint = Color.White,
-        )
-    }
 }
 
 @Composable
@@ -296,7 +260,7 @@ private fun FeatureItems() {
         modifier = Modifier
             .height(IntrinsicSize.Max)
     ) {
-        FeatureItemContent.values().forEach {
+        PlusUpgradeFeatureItem.values().forEach {
             FeatureItem(it)
         }
     }
@@ -304,7 +268,7 @@ private fun FeatureItems() {
 
 @Composable
 private fun FeatureItem(
-    content: FeatureItemContent,
+    content: PlusUpgradeFeatureItem,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(16.dp)
@@ -348,7 +312,7 @@ private fun FeatureItem(
     }
 }
 
-private enum class FeatureItemContent(
+enum class PlusUpgradeFeatureItem(
     @DrawableRes val image: Int,
     @StringRes val title: Int,
     @StringRes val text: Int,
@@ -378,55 +342,6 @@ private enum class FeatureItemContent(
         title = LR.string.onboarding_plus_feature_themes_icons_title,
         text = LR.string.onboarding_plus_feature_themes_icons_text,
     ),
-}
-
-@Composable
-private fun Background() {
-
-    // Blur only works on Android >=12
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-
-        val height = LocalConfiguration.current.screenHeightDp
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(height.dp) // not using fillMaxHeight because that caused issues in vertically scrollable views
-                .blur(150.dp)
-        ) {
-
-            // Background
-            drawRect(background)
-
-            drawCircle(
-                color = Color(0xFFFFD845),
-                radius = size.width * .5f,
-                center = Offset(size.width * .05f, size.height * .05f),
-            )
-
-            drawCircle(
-                color = Color(0xFFFFB626),
-                radius = size.width * .35f,
-                center = Offset(size.width * .95f, size.height * .18f),
-                alpha = 0.8f,
-            )
-
-            // Overlay
-            drawRect(Color(0xFF121212), alpha = 0.28f)
-        }
-    } else {
-        Column(
-            Modifier
-                .background(background)
-                .fillMaxSize()
-        ) {
-            Image(
-                painterResource(R.drawable.upgrade_background_glows),
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
 }
 
 // Based on https://stackoverflow.com/a/71344813/1910286

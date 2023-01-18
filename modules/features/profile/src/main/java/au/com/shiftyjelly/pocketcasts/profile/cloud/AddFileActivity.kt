@@ -164,7 +164,7 @@ class AddFileActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(theme.activeTheme.resourceId)
+        theme.setupThemeForConfig(this, resources.configuration)
 
         binding = ActivityAddFileBinding.inflate(layoutInflater)
         val view = binding.root
