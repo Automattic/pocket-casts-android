@@ -6,7 +6,6 @@ import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -228,13 +227,10 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     }
 
     private fun retrieveUserIdIfNeededAndRefreshMetadata() {
-        val email = settings.getSyncEmail()
-        val password = settings.getSyncPassword()
         val uuid = settings.getSyncUuid()
-        if (!email.isNullOrEmpty() && !password.isNullOrEmpty() && uuid.isNullOrEmpty()) {
+        if (uuid.isNullOrEmpty()) {
             Timber.e("Missing User ID - Retrieving from the server")
             applicationScope.launch(Dispatchers.IO) {
-                auth.signInWithEmailAndPassword(email, password, SignInSource.PocketCastsApplication)
                 AnalyticsTracker.refreshMetadata()
             }
         } else {

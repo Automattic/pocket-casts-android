@@ -351,7 +351,7 @@ open class SyncServerManager @Inject constructor(
     private suspend fun <T : Any> getCacheTokenOrLoginSuspend(serverCall: suspend (token: String) -> T): T {
         if (settings.isLoggedIn()) {
             return try {
-                val token = settings.getSyncTokenSuspend() ?: refreshTokenSuspend()
+                val token = settings.getSyncAccessTokenSuspend() ?: refreshTokenSuspend()
                 serverCall(token)
             } catch (ex: Exception) {
                 // refresh invalid
@@ -376,7 +376,7 @@ open class SyncServerManager @Inject constructor(
 
     private fun <T : Any> getCacheTokenOrLogin(serverCall: (token: String) -> Single<T>): Single<T> {
         if (settings.isLoggedIn()) {
-            return Single.fromCallable { settings.getSyncToken() ?: throw RuntimeException("Failed to get token") }
+            return Single.fromCallable { settings.getSyncAccessToken() ?: throw RuntimeException("Failed to get token") }
                 .flatMap { token -> serverCall(token) }
                 // refresh invalid
                 .onErrorResumeNext { throwable ->
@@ -402,12 +402,12 @@ open class SyncServerManager @Inject constructor(
 
     private suspend fun refreshTokenSuspend(): String {
         settings.invalidateToken()
-        return settings.getSyncTokenSuspend() ?: throw Exception("Failed to get refresh token")
+        return settings.getSyncAccessTokenSuspend() ?: throw Exception("Failed to get refresh token")
     }
 
     private fun refreshToken(): Single<String> {
         settings.invalidateToken()
-        return Single.fromCallable { settings.getSyncToken() ?: throw RuntimeException("Failed to get token") }
+        return Single.fromCallable { settings.getSyncAccessToken() ?: throw RuntimeException("Failed to get token") }
             .doOnError {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Refresh token threw an error.")
             }

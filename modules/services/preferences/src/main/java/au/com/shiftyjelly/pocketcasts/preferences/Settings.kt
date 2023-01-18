@@ -390,11 +390,11 @@ interface Settings {
     fun setSyncPassword(password: String)
     fun clearEmailAndPassword()
     fun getSyncEmail(): String?
-    fun getSyncPassword(): String?
+    fun getSyncPasswordOrRefreshToken(): String?
     fun getSyncUuid(): String?
-    fun getCachedSyncToken(): String?
-    fun getSyncToken(): String?
-    suspend fun getSyncTokenSuspend(): String?
+    fun getCachedSyncAccessToken(): String?
+    fun getSyncAccessToken(): String?
+    suspend fun getSyncAccessTokenSuspend(): String?
     fun isLoggedIn(): Boolean
     fun clearPlusPreferences()
     fun getUsedAccountManager(): Boolean

@@ -65,7 +65,7 @@ class SonosAppLinkActivity : AppCompatActivity() {
 
         binding.connectBtn.setOnClickListener {
             val email = settings.getSyncEmail()
-            val password = settings.getSyncPassword()
+            val password = settings.getSyncPasswordOrRefreshToken()
             if (email != null && password != null) {
                 connectWithSonos(email, password)
             } else {

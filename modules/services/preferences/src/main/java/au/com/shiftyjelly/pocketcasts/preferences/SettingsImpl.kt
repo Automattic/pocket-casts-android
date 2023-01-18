@@ -590,7 +590,7 @@ class SettingsImpl @Inject constructor(
         return manager.pocketCastsAccount()?.name
     }
 
-    override fun getSyncPassword(): String? {
+    override fun getSyncPasswordOrRefreshToken(): String? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
         return manager.getPassword(account)
@@ -608,15 +608,15 @@ class SettingsImpl @Inject constructor(
         return manager.peekAuthToken(account, AccountConstants.TOKEN_TYPE)
     }
 
-    override fun getCachedSyncToken(): String? {
+    override fun getCachedSyncAccessToken(): String? {
         return peekToken()
     }
 
-    override fun getSyncToken(): String? = runBlocking {
-        getSyncTokenSuspend()
+    override fun getSyncAccessToken(): String? = runBlocking {
+        getSyncAccessTokenSuspend()
     }
 
-    override suspend fun getSyncTokenSuspend(): String? {
+    override suspend fun getSyncAccessTokenSuspend(): String? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
 
@@ -725,7 +725,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun isLoggedIn(): Boolean {
-        return getSyncEmail() != null && getSyncPassword() != null
+        return getSyncEmail() != null && getSyncPasswordOrRefreshToken() != null
     }
 
     override fun getUsedAccountManager(): Boolean {
