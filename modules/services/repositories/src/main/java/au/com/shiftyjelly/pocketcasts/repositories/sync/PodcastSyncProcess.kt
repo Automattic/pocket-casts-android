@@ -26,8 +26,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.FolderResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncOldServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncUpdateResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
@@ -57,7 +56,6 @@ class PodcastSyncProcess(
     var statsManager: StatsManager,
     var fileStorage: FileStorage,
     var playbackManager: PlaybackManager,
-    var syncOldServerManager: SyncOldServerManager,
     var syncServerManager: SyncServerManager,
     var podcastCacheServerManager: PodcastCacheServerManagerImpl,
     var userEpisodeManager: UserEpisodeManager,
@@ -107,7 +105,7 @@ class PodcastSyncProcess(
 
     private fun performIncrementalSync(lastModified: String): Completable {
         val uploadData = uploadChanges()
-        val uploadObservable = syncOldServerManager.syncUpdate(uploadData.first, lastModified)
+        val uploadObservable = syncServerManager.syncUpdate(uploadData.first, lastModified)
         val downloadObservable = uploadObservable.flatMap {
             processServerResponse(it, uploadData.second)
         }.ignoreElement()

@@ -608,7 +608,7 @@ class SettingsImpl @Inject constructor(
         return manager.peekAuthToken(account, AccountConstants.TOKEN_TYPE)
     }
 
-    override fun getSyncRefreshToken(): String? {
+    override fun getCachedSyncToken(): String? {
         return peekToken()
     }
 

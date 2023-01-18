@@ -41,8 +41,7 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncOldServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.UserNotLoggedInException
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.UserNotLoggedInException
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.EntryPoint
@@ -68,7 +67,6 @@ class RefreshPodcastsThread(
         fun playlistManager(): PlaylistManager
         fun statsManager(): StatsManager
         fun fileStorage(): FileStorage
-        fun syncOldServerManager(): SyncOldServerManager
         fun syncServerManager(): SyncServerManager
         fun podcastCacheServerManager(): PodcastCacheServerManagerImpl
         fun userEpisodeManager(): UserEpisodeManager
@@ -249,7 +247,6 @@ class RefreshPodcastsThread(
             statsManager = entryPoint.statsManager(),
             fileStorage = entryPoint.fileStorage(),
             playbackManager = playbackManager,
-            syncOldServerManager = entryPoint.syncOldServerManager(),
             syncServerManager = entryPoint.syncServerManager(),
             podcastCacheServerManager = entryPoint.podcastCacheServerManager(),
             userEpisodeManager = entryPoint.userEpisodeManager(),

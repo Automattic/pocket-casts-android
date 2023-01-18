@@ -13,8 +13,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncUpdateResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncUpdateResponseParser
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -237,7 +237,7 @@ class ServersModule {
     @Provides
     @SyncServerRetrofit
     @Singleton
-    internal fun provideApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    internal fun provideApiRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -281,18 +281,6 @@ class ServersModule {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(Settings.SERVER_CACHE_URL)
-            .client(okHttpClient)
-            .build()
-    }
-
-    @Provides
-    @OldSyncServerRetrofit
-    @Singleton
-    internal fun provideSyncOldRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl(Settings.SERVER_API_URL)
             .client(okHttpClient)
             .build()
     }
@@ -414,10 +402,6 @@ annotation class ListUploadServerRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class SyncServerRetrofit
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class OldSyncServerRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

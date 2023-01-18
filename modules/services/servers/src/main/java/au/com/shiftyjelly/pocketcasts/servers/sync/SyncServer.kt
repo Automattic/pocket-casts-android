@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
@@ -20,6 +21,8 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.FieldMap
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -54,6 +57,10 @@ interface SyncServer {
 
     @POST("/user/named_settings/update")
     suspend fun namedSettings(@Header("Authorization") authorization: String, @Body request: NamedSettingsRequest): NamedSettingsResponse
+
+    @FormUrlEncoded
+    @POST("/sync/update")
+    fun syncUpdate(@FieldMap fields: Map<String, String>): Single<SyncUpdateResponse>
 
     @POST("/up_next/sync")
     fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): Single<UpNextSyncResponse>

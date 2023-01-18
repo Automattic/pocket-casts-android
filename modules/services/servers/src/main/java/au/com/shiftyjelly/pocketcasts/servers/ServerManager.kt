@@ -76,10 +76,6 @@ open class ServerManager @Inject constructor(
         })
     }
 
-    fun forgottenPasswordToSyncServer(email: String, callback: ServerCallback<String>): Call? {
-        return postToSyncServer("/security/forgot_password", email, null, null, true, PostCallbackDefault(callback))
-    }
-
     fun searchForPodcasts(searchTerm: String, callback: ServerCallback<PodcastSearch>): Call? {
         if (searchTerm.isBlank()) {
             callback.dataReturned(PodcastSearch(searchTerm = searchTerm))

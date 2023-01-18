@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.BackpressureStrategy
@@ -70,7 +71,7 @@ open class SyncServerManager @Inject constructor(
     }
 
     suspend fun loginToken(refreshToken: String): LoginTokenResponse {
-        val request = LoginTokenRequest(refreshCode = refreshToken)
+        val request = LoginTokenRequest(refreshToken = refreshToken)
         return server.loginToken(request)
     }
 
@@ -128,6 +129,22 @@ open class SyncServerManager @Inject constructor(
     suspend fun namedSettings(request: NamedSettingsRequest): NamedSettingsResponse {
         return getCacheTokenOrLoginSuspend { token ->
             server.namedSettings(addBearer(token), request)
+        }
+    }
+
+    fun syncUpdate(data: String, lastModified: String): Single<SyncUpdateResponse> {
+        val email = settings.getSyncEmail()
+            ?: return Single.error(Exception("Not logged in"))
+
+        return getCacheTokenOrLogin { token ->
+            val fields = mapOf(
+                "email" to email,
+                "token" to token,
+                "data" to data,
+                "device_utc_time_ms" to System.currentTimeMillis().toString(),
+                "last_modified" to lastModified
+            )
+            server.syncUpdate(fields)
         }
     }
 

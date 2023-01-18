@@ -190,12 +190,24 @@ class AccountAuth @Inject constructor(
         podcastManager.refreshPodcasts("login")
     }
 
-    suspend fun refreshToken(email: String, refreshTokenOrPassword: String, signInSource: SignInSource, signInType: AccountConstants.SignInType): String {
+    suspend fun refreshToken(
+        email: String,
+        refreshTokenOrPassword: String,
+        signInSource: SignInSource,
+        signInType: AccountConstants.SignInType,
+        account: Account,
+        accountManager: AccountManager
+    ): String {
         val properties = mapOf(KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
         try {
             val accessToken = when (signInType) {
                 AccountConstants.SignInType.EmailPassword -> syncServerManager.login(email = email, password = refreshTokenOrPassword).token
-                AccountConstants.SignInType.RefreshToken -> syncServerManager.loginToken(refreshToken = refreshTokenOrPassword).accessToken
+                AccountConstants.SignInType.RefreshToken -> {
+                    val response = syncServerManager.loginToken(refreshToken = refreshTokenOrPassword)
+                    // update the refresh token as the expiry may have been increased
+                    accountManager.setPassword(account, response.refreshToken)
+                    response.accessToken
+                }
             }
             analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
             return accessToken

@@ -392,7 +392,7 @@ interface Settings {
     fun getSyncEmail(): String?
     fun getSyncPassword(): String?
     fun getSyncUuid(): String?
-    fun getSyncRefreshToken(): String?
+    fun getCachedSyncToken(): String?
     fun getSyncToken(): String?
     suspend fun getSyncTokenSuspend(): String?
     fun isLoggedIn(): Boolean

@@ -41,7 +41,9 @@ class PocketCastsAccountAuthenticator(val context: Context, private val accountA
                         email = account.name,
                         refreshTokenOrPassword = accountManager.getPassword(account),
                         signInType = accountManager.getSignInType(account),
-                        signInSource = SignInSource.AccountAuthenticator
+                        signInSource = SignInSource.AccountAuthenticator,
+                        account = account,
+                        accountManager = accountManager
                     )
                 } catch (ex: Exception) {
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to refresh token.")
