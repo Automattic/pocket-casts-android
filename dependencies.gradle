@@ -97,8 +97,8 @@ project.ext {
     versionRoom = '2.4.3'
     versionTest = '1.4.0'
     versionWork = '2.7.1'
-    versionHorologist = '0.1.11'
-    versionMedia3 = '1.0.0-beta02'
+    versionHorologist = '0.2.7'
+    versionMedia3 = '1.0.0-beta03'
 
     // Automattic library versions
     versionTracks = 'trunk-b3655d42123501a1d9a304789b738610ab4403c8'

@@ -184,6 +184,7 @@ private fun UpNextChip(navigateToRoute: (String) -> Unit, numInUpNext: Int) {
     Chip(
         onClick = { navigateToRoute(UpNextScreen.route) },
         colors = ChipDefaults.secondaryChipColors(),
+        border = ChipDefaults.chipBorder(),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
