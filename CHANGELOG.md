@@ -20,6 +20,8 @@
         ([#710](https://github.com/Automattic/pocket-casts-android/pull/710)).
     *   Make it easier to tap newsletter toggle
         ([#714](https://github.com/Automattic/pocket-casts-android/pull/714)).
+    *   Improved unresponsive media notifications
+        ([#709](https://github.com/Automattic/pocket-casts-android/pull/709)).
 
 7.30
 -----
