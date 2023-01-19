@@ -189,9 +189,9 @@ private fun Content(
             RowButton(
                 text = stringResource(buttonRes),
                 onClick = onComplete,
+                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
             )
         }
-        Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
     }
 }
 
