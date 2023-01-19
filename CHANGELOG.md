@@ -1,8 +1,5 @@
 7.31
 -----
-*   Health:
-    *   Switched to using the new user login and register endpoints.
-        ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
 *   New Features:
     *   Add support for HLS streams
         ([#679](https://github.com/Automattic/pocket-casts-android/pull/679)).
@@ -11,6 +8,18 @@
 *   Updates
     *   Update styling of upgrade prompt on account details screen
         ([#706](https://github.com/Automattic/pocket-casts-android/pull/706)).
+*   Health:
+    *   Switched to using the new user login and register endpoints.
+        ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
+    *   Upgraded ExoPlayer to 2.18.2
+        ([#707](https://github.com/Automattic/pocket-casts-android/pull/707)).
+*   Bug Fixes:
+    *   Improved handling of sync errors
+        ([#711](https://github.com/Automattic/pocket-casts-android/pull/711)).
+    *   App does a better job respecting the device's dark/light mode settings
+        ([#710](https://github.com/Automattic/pocket-casts-android/pull/710)).
+    *   Make it easier to tap newsletter toggle
+        ([#714](https://github.com/Automattic/pocket-casts-android/pull/714)).
 
 7.30
 -----

@@ -37,7 +37,7 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(theme.activeTheme.resourceId)
+        theme.setupThemeForConfig(this, resources.configuration)
 
         binding = AccountActivityBinding.inflate(layoutInflater)
         val view = binding.root

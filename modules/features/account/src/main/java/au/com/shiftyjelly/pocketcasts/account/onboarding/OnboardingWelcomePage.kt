@@ -286,7 +286,7 @@ private fun NewsletterSwitch(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = Modifier.clickable { onCheckedChange(!checked) }
     ) {
         Column(
             modifier = Modifier

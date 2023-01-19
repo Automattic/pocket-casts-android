@@ -3,11 +3,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.audio.AudioProcessor
-import com.google.android.exoplayer2.audio.DefaultAudioSink.AudioProcessorChain
+import com.google.android.exoplayer2.audio.AudioProcessorChain
 import com.google.android.exoplayer2.audio.SonicAudioProcessor
 import timber.log.Timber
 
-internal class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) : AudioProcessorChain {
+internal class ShiftyAudioProcessorChain(private val customAudio: ShiftyCustomAudio) :
+    AudioProcessorChain {
     private val lowProcessor = ShiftyTrimSilenceProcessor(
         this::onSkippedFrames,
         416000,
