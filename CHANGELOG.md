@@ -8,6 +8,8 @@
 *   Updates
     *   Update styling of upgrade prompt on account details screen
         ([#706](https://github.com/Automattic/pocket-casts-android/pull/706)).
+    *   Updated Android 13 media notification controls setting to hide custom actions 
+        ([#719](https://github.com/Automattic/pocket-casts-android/pull/719)).
 *   Health:
     *   Switched to using the new user login and register endpoints.
         ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
