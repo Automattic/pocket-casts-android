@@ -301,6 +301,7 @@ interface Settings {
     val keepScreenAwakeFlow: StateFlow<Boolean>
     val openPlayerAutomaticallyFlow: StateFlow<Boolean>
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
+    val maxCustomMediaActionsCountFlow: StateFlow<Int>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -605,4 +606,7 @@ interface Settings {
 
     fun hasCompletedOnboarding(): Boolean
     fun setHasDoneInitialOnboarding()
+
+    fun getVisibleCustomMediaActionsCount(): Int
+    fun setVisibleCustomMediaActionsCount(value: Int)
 }

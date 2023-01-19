@@ -11,6 +11,16 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
@@ -18,9 +28,13 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.MAX_VISIBLE_OPTIONS
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterMediaActionItemBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterMediaActionTitleBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentMediaNotificationControlsBinding
@@ -35,6 +49,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.util.Collections
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -47,7 +62,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
 
     private lateinit var itemTouchHelper: ItemTouchHelper
     private val adapter = MediaActionAdapter(dragListener = this::onMediaActionItemStartDrag)
-    private val mediaTitle = MediaActionTitle(R.string.settings_prioritize_your_notification_actions, R.string.settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player)
+    private val mediaTitle = MediaActionTitle(R.string.settings_media_actions_prioritise, R.string.settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player)
     private val otherActionsTitle = MediaActionTitle(R.string.settings_other_media_actions)
     private var binding: FragmentMediaNotificationControlsBinding? = null
     private var dragStartPosition: Int? = null
@@ -68,7 +83,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         val binding = binding ?: return
 
         val toolbar = binding.toolbar
-        toolbar.setTitle(R.string.settings_rearrange_media_actions)
+        toolbar.setTitle(R.string.settings_media_actions_customise)
         toolbar.setTitleTextColor(toolbar.context.getThemeColor(UR.attr.secondary_text_01))
         toolbar.setNavigationOnClickListener {
             (activity as? FragmentHostListener)?.closeModal(this)
@@ -84,6 +99,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
+        updateMediaActionsVisibility(settings.getVisibleCustomMediaActionsCount() == 0)
 
         val callback = MediaActionTouchCallback(listener = this)
         itemTouchHelper = ItemTouchHelper(callback)
@@ -98,6 +114,50 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
                 items = itemsPlusTitles
                 adapter.submitList(items)
             }
+        }
+
+        with(binding.composeView) {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppThemeWithBackground(theme.activeTheme) {
+                    HideMediaControlsSettingsRow(
+                        shouldHideCustomActions = settings.maxCustomMediaActionsCountFlow.collectAsState().value == 0,
+                        onHideCustomActionsToggled = { hideCustomActions ->
+                            settings.setVisibleCustomMediaActionsCount(if (hideCustomActions) 0 else MAX_VISIBLE_OPTIONS)
+                            updateMediaActionsVisibility(hideCustomActions)
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun HideMediaControlsSettingsRow(
+        shouldHideCustomActions: Boolean,
+        onHideCustomActionsToggled: (Boolean) -> Unit
+    ) {
+        Column {
+            SettingRow(
+                primaryText = stringResource(LR.string.settings_media_actions_hide_title),
+                secondaryText = stringResource(LR.string.settings_media_actions_hide_subtitle),
+                toggle = SettingRowToggle.Switch(checked = shouldHideCustomActions),
+                indent = false,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .toggleable(
+                        value = shouldHideCustomActions,
+                        role = Role.Switch
+                    ) { onHideCustomActionsToggled(!shouldHideCustomActions) }
+            )
+        }
+    }
+
+    private fun updateMediaActionsVisibility(hide: Boolean) {
+        val binding = binding ?: return
+        with(binding) {
+            recyclerView.alpha = if (hide) 0.4f else 1.0f
+            overlay.visibility = if (hide) View.VISIBLE else View.GONE
         }
     }
 

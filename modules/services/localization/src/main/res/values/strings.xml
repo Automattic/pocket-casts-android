@@ -1023,6 +1023,10 @@
     <string name="settings_lock_image">lock image</string>
     <string name="settings_manage_downloads_include_starred">Include starred</string>
     <string name="settings_manage_downloads_total">Total</string>
+    <string name="settings_media_actions_prioritise">Prioritize your custom media actions</string>
+    <string name="settings_media_actions_customise">Customise media actions</string>
+    <string name="settings_media_actions_hide_title">Hide custom media actions</string>
+    <string name="settings_media_actions_hide_subtitle">This will override below settings and hide custom media actions.</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
     <string name="settings_media_notification_controls_title_archive" translatable="false">@string/archive</string>
     <string name="settings_media_notification_controls_title_mark_as_played" translatable="false">@string/mark_as_played</string>
@@ -1065,8 +1069,6 @@
     <string name="settings_podcasts_selected_one">1 podcast</string>
     <string name="settings_podcasts_selected_x">%d podcasts</string>
     <string name="settings_podcasts_selected_zero">No podcasts selected</string>
-    <string name="settings_prioritize_your_notification_actions">Prioritize your notification actions</string>
-    <string name="settings_rearrange_media_actions">Rearrange Media Actions</string>
     <string name="settings_refresh_all_podcast_artwork">Refresh all podcast artwork</string>
     <string name="settings_refresh_artwork_message">Pocket Casts is now refreshing all your podcast images, this will happen in the background and may take a little time.</string>
     <string name="settings_refresh_artwork_ok" translatable="false">@string/ok</string>
