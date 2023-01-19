@@ -131,7 +131,7 @@ internal fun OnboardingCreateAccountPage(
             Spacer(Modifier.weight(1f))
 
             RowButton(
-                text = stringResource(LR.string.onboarding_create_account),
+                text = stringResource(LR.string.create_account),
                 enabled = state.enableSubmissionFields,
                 onClick = { viewModel.createAccount(onAccountCreated) },
             )
