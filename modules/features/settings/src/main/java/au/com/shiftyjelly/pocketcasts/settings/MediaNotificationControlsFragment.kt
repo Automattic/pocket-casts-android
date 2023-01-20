@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.MAX_VISIBLE_OPTIONS
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterMediaActionItemBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterMediaActionTitleBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentMediaNotificationControlsBinding
@@ -62,7 +61,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
 
     private lateinit var itemTouchHelper: ItemTouchHelper
     private val adapter = MediaActionAdapter(dragListener = this::onMediaActionItemStartDrag)
-    private val mediaTitle = MediaActionTitle(R.string.settings_media_actions_prioritise, R.string.settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player)
+    private val mediaTitle = MediaActionTitle(R.string.settings_media_actions_prioritize_title, R.string.settings_media_actions_prioritize_subtitle)
     private val otherActionsTitle = MediaActionTitle(R.string.settings_other_media_actions)
     private var binding: FragmentMediaNotificationControlsBinding? = null
     private var dragStartPosition: Int? = null
@@ -99,7 +98,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         recyclerView.adapter = adapter
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
-        updateMediaActionsVisibility(settings.getVisibleCustomMediaActionsCount() == 0)
+        updateMediaActionsVisibility(settings.areCustomMediaActionsVisible())
 
         val callback = MediaActionTouchCallback(listener = this)
         itemTouchHelper = ItemTouchHelper(callback)
@@ -120,11 +119,11 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 AppThemeWithBackground(theme.activeTheme) {
-                    HideMediaControlsSettingsRow(
-                        shouldHideCustomActions = settings.maxCustomMediaActionsCountFlow.collectAsState().value == 0,
-                        onHideCustomActionsToggled = { hideCustomActions ->
-                            settings.setVisibleCustomMediaActionsCount(if (hideCustomActions) 0 else MAX_VISIBLE_OPTIONS)
-                            updateMediaActionsVisibility(hideCustomActions)
+                    ShowCustomMediaActionsSettingsRow(
+                        shouldShowCustomMediaActions = settings.customMediaActionsVisibilityFlow.collectAsState().value,
+                        onShowCustomMediaActionsToggled = { showCustomActions ->
+                            settings.setCustomMediaActionsVisible(showCustomActions)
+                            updateMediaActionsVisibility(showCustomActions)
                         }
                     )
                 }
@@ -133,31 +132,31 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
     }
 
     @Composable
-    private fun HideMediaControlsSettingsRow(
-        shouldHideCustomActions: Boolean,
-        onHideCustomActionsToggled: (Boolean) -> Unit
+    private fun ShowCustomMediaActionsSettingsRow(
+        shouldShowCustomMediaActions: Boolean,
+        onShowCustomMediaActionsToggled: (Boolean) -> Unit
     ) {
         Column {
             SettingRow(
                 primaryText = stringResource(LR.string.settings_media_actions_hide_title),
                 secondaryText = stringResource(LR.string.settings_media_actions_hide_subtitle),
-                toggle = SettingRowToggle.Switch(checked = shouldHideCustomActions),
+                toggle = SettingRowToggle.Switch(checked = shouldShowCustomMediaActions),
                 indent = false,
                 modifier = Modifier
                     .padding(top = 8.dp)
                     .toggleable(
-                        value = shouldHideCustomActions,
+                        value = shouldShowCustomMediaActions,
                         role = Role.Switch
-                    ) { onHideCustomActionsToggled(!shouldHideCustomActions) }
+                    ) { onShowCustomMediaActionsToggled(!shouldShowCustomMediaActions) }
             )
         }
     }
 
-    private fun updateMediaActionsVisibility(hide: Boolean) {
+    private fun updateMediaActionsVisibility(show: Boolean) {
         val binding = binding ?: return
         with(binding) {
-            recyclerView.alpha = if (hide) 0.4f else 1.0f
-            overlay.visibility = if (hide) View.VISIBLE else View.GONE
+            recyclerView.alpha = if (show) 1.0f else 0.4f
+            overlay.visibility = if (show) View.GONE else View.VISIBLE
         }
     }
 
