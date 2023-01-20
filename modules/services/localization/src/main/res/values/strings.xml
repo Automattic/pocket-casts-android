@@ -1023,6 +1023,11 @@
     <string name="settings_lock_image">lock image</string>
     <string name="settings_manage_downloads_include_starred">Include starred</string>
     <string name="settings_manage_downloads_total">Total</string>
+    <string name="settings_media_actions_prioritize_title">Prioritize your custom media actions</string>
+    <string name="settings_media_actions_prioritize_subtitle">Your top actions will be available.</string>
+    <string name="settings_media_actions_customise">Customise media actions</string>
+    <string name="settings_media_actions_show_title">Show custom media actions</string>
+    <string name="settings_media_actions_show_subtitle">Show custom media actions in Android 13 media notifications and Android Auto.</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
     <string name="settings_media_notification_controls_title_archive" translatable="false">@string/archive</string>
     <string name="settings_media_notification_controls_title_mark_as_played" translatable="false">@string/mark_as_played</string>
@@ -1065,8 +1070,6 @@
     <string name="settings_podcasts_selected_one">1 podcast</string>
     <string name="settings_podcasts_selected_x">%d podcasts</string>
     <string name="settings_podcasts_selected_zero">No podcasts selected</string>
-    <string name="settings_prioritize_your_notification_actions">Prioritize your notification actions</string>
-    <string name="settings_rearrange_media_actions">Rearrange Media Actions</string>
     <string name="settings_refresh_all_podcast_artwork">Refresh all podcast artwork</string>
     <string name="settings_refresh_artwork_message">Pocket Casts is now refreshing all your podcast images, this will happen in the background and may take a little time.</string>
     <string name="settings_refresh_artwork_ok" translatable="false">@string/ok</string>
@@ -1271,7 +1274,6 @@
     <string name="settings_privacy_crash_summary">Allow us to collect crash reports.</string>
     <string name="settings_privacy_crash_link">Link your account to crashes</string>
     <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">Your top actions will be available in your Android 13 notification and Android Auto player.</string>
 
     <string name="whats_new_folders_title_7_20" translatable="false">@string/folders</string>
     <string name="whats_new_folders_7_20">If you love podcasts half as much as we do, you probably have a lot of them. If you\'re a Pocket Casts Plus subscriber, you can now sort these into folders and file them into neat groups.\n\nThanks to your support, your Home Screen has never looked better!</string>

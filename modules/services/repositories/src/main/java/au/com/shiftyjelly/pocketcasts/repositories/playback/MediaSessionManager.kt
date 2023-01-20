@@ -104,12 +104,25 @@ class MediaSessionManager(
 
     fun startObserving() {
         observePlaybackState()
+        observeCustomMediaActionsVisibility()
         observeMediaNotificationControls()
         playbackManager.upNextQueue.changesObservable
             .observeOn(Schedulers.io())
             .doOnNext { updateUpNext(it) }
             .subscribeBy(onError = { Timber.e(it) })
             .addTo(disposables)
+    }
+
+    private fun observeCustomMediaActionsVisibility() {
+        launch {
+            settings.customMediaActionsVisibilityFlow.collect {
+                withContext(Dispatchers.Main) {
+                    val playbackStateCompat = getPlaybackStateCompat(playbackManager.playbackStateRelay.blockingFirst(), currentEpisode = playbackManager.getCurrentEpisode())
+                    // Called to update playback state with updated custom media actions visibility
+                    updatePlaybackState(playbackStateCompat)
+                }
+            }
+        }
     }
 
     private fun observeMediaNotificationControls() {
@@ -336,7 +349,8 @@ class MediaSessionManager(
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
         }
 
-        settings.getMediaNotificationControlItems().take(MediaNotificationControls.MAX_VISIBLE_OPTIONS).forEach { mediaControl ->
+        val visibleCount = if (settings.areCustomMediaActionsVisible()) MediaNotificationControls.MAX_VISIBLE_OPTIONS else 0
+        settings.getMediaNotificationControlItems().take(visibleCount).forEach { mediaControl ->
             when (mediaControl) {
                 MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
                 MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)

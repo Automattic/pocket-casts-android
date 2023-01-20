@@ -72,6 +72,7 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
         private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
+        private const val CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY = "CustomMediaActionsVisibleKey"
     }
 
     private var languageCode: String? = null
@@ -102,6 +103,7 @@ class SettingsImpl @Inject constructor(
     override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
+    override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -1492,5 +1494,13 @@ class SettingsImpl @Inject constructor(
 
     override fun setHasDoneInitialOnboarding() {
         setBoolean(DONE_INITIAL_ONBOARDING_KEY, true)
+    }
+
+    override fun areCustomMediaActionsVisible() =
+        getBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, true)
+
+    override fun setCustomMediaActionsVisible(value: Boolean) {
+        setBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, value)
+        customMediaActionsVisibilityFlow.update { value }
     }
 }
