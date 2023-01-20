@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
@@ -119,6 +120,18 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
             podcastManager.unsubscribeAsync(podcastUuid = uuid, playbackManager = playbackManager)
         } else {
             podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
+        }
+
+        _state.update {
+            it.copy(
+                results = it.results.map { podcast ->
+                    if (podcast.podcast.uuid == uuid) {
+                        podcast.copy(isSubscribed = !podcastResult.isSubscribed)
+                    } else {
+                        podcast
+                    }
+                }
+            )
         }
     }
 }
