@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-09 18:54:04+0000
+Translation-Revision-Date: 2023-01-16 16:54:21+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
@@ -99,7 +99,7 @@ Language: de
     <string name="end_of_year_stories_failed">Deine Geschichten zum Jahresende konnten nicht geladen werden, überprüfe deine Internetverbindung.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Farbe bekennen. Exklusive Icons und Themes nur für Plus-Abonnenten.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes und Icons</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Werbefreies Erlebnis – für mehr Inhalte, die du magst, und weniger Ablenkung</string>
+    <string name="onboarding_plus_feature_hide_ads_text">Werbefreies Entdecken – für mehr Inhalte, die du magst, und weniger Ablenkung</string>
     <string name="onboarding_plus_feature_hide_ads_title">Werbung ausblenden</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Lade deine Dateien in den Cloud-Speicher. Dann kannst du von überall aus darauf zugreifen.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB Cloud-Speicher</string>
