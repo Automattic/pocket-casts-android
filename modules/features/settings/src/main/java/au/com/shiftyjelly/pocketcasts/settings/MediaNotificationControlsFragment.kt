@@ -138,8 +138,8 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
     ) {
         Column {
             SettingRow(
-                primaryText = stringResource(LR.string.settings_media_actions_hide_title),
-                secondaryText = stringResource(LR.string.settings_media_actions_hide_subtitle),
+                primaryText = stringResource(LR.string.settings_media_actions_show_title),
+                secondaryText = stringResource(LR.string.settings_media_actions_show_subtitle),
                 toggle = SettingRowToggle.Switch(checked = shouldShowCustomMediaActions),
                 indent = false,
                 modifier = Modifier

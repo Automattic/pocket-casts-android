@@ -1026,8 +1026,8 @@
     <string name="settings_media_actions_prioritize_title">Prioritize your custom media actions</string>
     <string name="settings_media_actions_prioritize_subtitle">Your top actions will be available.</string>
     <string name="settings_media_actions_customise">Customise media actions</string>
-    <string name="settings_media_actions_hide_title">Show custom media actions</string>
-    <string name="settings_media_actions_hide_subtitle">Show custom media actions in Android 13 media notifications and Android Auto.</string>
+    <string name="settings_media_actions_show_title">Show custom media actions</string>
+    <string name="settings_media_actions_show_subtitle">Show custom media actions in Android 13 media notifications and Android Auto.</string>
     <string name="settings_media_notification_controls">Media notification controls</string>
     <string name="settings_media_notification_controls_title_archive" translatable="false">@string/archive</string>
     <string name="settings_media_notification_controls_title_mark_as_played" translatable="false">@string/mark_as_played</string>
