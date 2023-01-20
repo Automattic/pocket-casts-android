@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-03 20:54:04+0000
+Translation-Revision-Date: 2023-01-18 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="onboarding_recommendations_more">Ulteriori informazioni %s</string>
     <string name="filter_id_or_title">ID filtro o titolo</string>
     <string name="filter_title">Titolo filtro</string>
     <string name="filter_id_description">Un ID univoco che rappresenta il filtro. Può essere utilizzato nell\'azione \"Episodi filtro query\"</string>
@@ -98,7 +99,7 @@ Language: it
     <string name="end_of_year_stories_failed">Impossibile caricare le storie della fine dell\'anno, controlla la connessione Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Mostra i tuoi reali colori. Icone e temi esclusivi solo per chi fa parte del club Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temi e icone</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Esperienza senza pubblicità che offre più di ciò che ami e meno di ciò che non ti piace.</string>
+    <string name="onboarding_plus_feature_hide_ads_text">Scoperta senza pubblicità che offre più di ciò che ami e meno di ciò che non ti piace.</string>
     <string name="onboarding_plus_feature_hide_ads_title">Nascondi pubblicità</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Carica i tuoi file sull\'archiviazione su cloud e rendili disponibili per qualsiasi postazione.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB di archiviazione su cloud</string>

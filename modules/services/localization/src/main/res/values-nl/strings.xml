@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-10 16:54:02+0000
+Translation-Revision-Date: 2023-01-18 08:54:19+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
@@ -99,7 +99,7 @@ Language: nl
     <string name="end_of_year_stories_failed">Kan je eindejaarsverhalen niet laden, controleer je internetverbinding.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Toon je ware aard. Exclusieve pictogrammen en thema\'s voor Plus-abonnees.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Thema\'s en pictogrammen</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Een advertentievrije ervaring die je meer biedt van wat je leuk vindt en minder van wat je niet leuk vindt.</string>
+    <string name="onboarding_plus_feature_hide_ads_text">Advertentievrije discovery die je meer biedt van wat je leuk vindt en minder van wat je niet leuk vindt.</string>
     <string name="onboarding_plus_feature_hide_ads_title">Advertenties verbergen</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Wanneer je je bestanden naar een cloudopslag uploadt, zijn ze overal beschikbaar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB cloudopslag</string>

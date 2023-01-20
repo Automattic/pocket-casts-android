@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-10 10:54:03+0000
+Translation-Revision-Date: 2023-01-17 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
@@ -99,7 +99,7 @@ Language: sv_SE
     <string name="end_of_year_stories_failed">Det gick inte att ladda dina årsslutsberättelser. Kontrollera din anslutning.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Teman och ikoner</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Annonsfri upplevelse som ger dig mer av det du gillar och mindre av det du inte gillar.</string>
+    <string name="onboarding_plus_feature_hide_ads_text">Annonsfri upptäckt som ger dig mer av det du gillar och mindre av det du inte gillar.</string>
     <string name="onboarding_plus_feature_hide_ads_title">Dölj annonser</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB molnlagring</string>

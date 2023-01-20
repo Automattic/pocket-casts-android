@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-11 11:54:03+0000
+Translation-Revision-Date: 2023-01-18 10:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
@@ -99,7 +99,7 @@ Language: zh_CN
     <string name="end_of_year_stories_failed">无法加载年终故事，请检查您的互联网连接。</string>
     <string name="onboarding_plus_feature_themes_icons_text">选择您的真实颜色。 仅面向 Plus 俱乐部的专属图标和主题。</string>
     <string name="onboarding_plus_feature_themes_icons_title">主题和图标</string>
-    <string name="onboarding_plus_feature_hide_ads_text">无广告体验，提供更多您喜欢的内容，并减少您不喜欢内容。</string>
+    <string name="onboarding_plus_feature_hide_ads_text">无广告的发现体验，提供更多您喜欢的内容，并减少您不喜欢内容。</string>
     <string name="onboarding_plus_feature_hide_ads_title">隐藏广告</string>
     <string name="onboarding_plus_feature_cloud_storage_text">将文件上传到云存储空间，在任何地方都能访问这些文件。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10GB 云存储空间</string>
