@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -42,6 +43,7 @@ class AutoArchiveTest {
     val downloadManager = mock<DownloadManager> {}
     val podcastCacheServerManager = mock<PodcastCacheServerManager> {}
     val userEpisodeManager = mock<UserEpisodeManager> {}
+    val episodeAnalytics = mock<EpisodeAnalytics> {}
 
     @Before
     fun setupDb() {
@@ -62,7 +64,7 @@ class AutoArchiveTest {
             on { getAutoArchiveIncludeStarred() } doReturn includeStarred
             on { getAutoArchiveExcludedPodcasts() } doReturn excludedPodcasts
         }
-        return EpisodeManagerImpl(settings, fileStorage, downloadManager, context, db, podcastCacheServerManager, userEpisodeManager)
+        return EpisodeManagerImpl(settings, fileStorage, downloadManager, context, db, podcastCacheServerManager, userEpisodeManager, episodeAnalytics)
     }
 
     private fun podcastManagerThatReturns(podcast: Podcast): PodcastManager {
