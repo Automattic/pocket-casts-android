@@ -60,10 +60,10 @@ class ProfileEpisodeListViewModel @Inject constructor(
     fun episodeSwipeUpNext(episode: Playable) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episode)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = getAnalyticsSource())
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playNext(episode)
+                playbackManager.playNext(episode = episode, source = getAnalyticsSource())
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
@@ -72,10 +72,10 @@ class ProfileEpisodeListViewModel @Inject constructor(
     fun episodeSwipeUpLast(episode: Playable) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episode)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = getAnalyticsSource())
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playLast(episode)
+                playbackManager.playLast(episode = episode, source = getAnalyticsSource())
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }

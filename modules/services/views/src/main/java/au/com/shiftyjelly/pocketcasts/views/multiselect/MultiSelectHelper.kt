@@ -441,7 +441,7 @@ class MultiSelectHelper @Inject constructor(
         val size = min(settings.getMaxUpNextEpisodes(), selectedList.count())
         val trimmedList = selectedList.subList(0, size).toList()
         launch {
-            playbackManager.playEpisodesNext(trimmedList)
+            playbackManager.playEpisodesNext(episodes = trimmedList, source = source)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(size, LR.string.added_to_up_next_singular, LR.string.added_to_up_next_plural)
                 showSnackBar(snackText)
@@ -459,7 +459,7 @@ class MultiSelectHelper @Inject constructor(
         val size = min(settings.getMaxUpNextEpisodes(), selectedList.count())
         val trimmedList = selectedList.subList(0, size).toList()
         launch {
-            playbackManager.playEpisodesLast(trimmedList)
+            playbackManager.playEpisodesLast(episodes = trimmedList, source = source)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(size, LR.string.added_to_up_next_singular, LR.string.added_to_up_next_plural)
                 showSnackBar(snackText)
@@ -508,13 +508,13 @@ class MultiSelectHelper @Inject constructor(
 
     fun moveToTop() {
         val list = selectedList.toList()
-        playbackManager.playEpisodesNext(list)
+        playbackManager.playEpisodesNext(episodes = list, source = source)
         closeMultiSelect()
     }
 
     fun moveToBottom() {
         val list = selectedList.toList()
-        playbackManager.playEpisodesLast(list)
+        playbackManager.playEpisodesLast(episodes = list, source = source)
         closeMultiSelect()
     }
 

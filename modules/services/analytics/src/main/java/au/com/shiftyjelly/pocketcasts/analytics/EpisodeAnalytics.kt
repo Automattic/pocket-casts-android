@@ -38,6 +38,10 @@ class EpisodeAnalytics @Inject constructor(
         analyticsTracker.track(event, AnalyticsProp.uuidMap(uuid))
     }
 
+    fun trackEvent(event: AnalyticsEvent, source: AnalyticsSource, toTop: Boolean) {
+        analyticsTracker.track(event, AnalyticsProp.sourceAndToTopMap(source, toTop))
+    }
+
     fun trackBulkEvent(event: AnalyticsEvent, source: AnalyticsSource, count: Int) {
         analyticsTracker.track(event, AnalyticsProp.bulkMap(source, count))
     }
@@ -50,12 +54,28 @@ class EpisodeAnalytics @Inject constructor(
         analyticsTracker.track(event, AnalyticsProp.bulkMap(source, episodes.size))
     }
 
+    fun trackBulkEvent(
+        event: AnalyticsEvent,
+        source: AnalyticsSource,
+        count: Int,
+        toTop: Boolean,
+    ) {
+        analyticsTracker.track(event, AnalyticsProp.bulkToTopMap(source, count, toTop))
+    }
+
     private object AnalyticsProp {
         private const val source = "source"
         private const val episode_uuid = "episode_uuid"
         private const val count = "count"
+        private const val to_top = "to_top"
         fun sourceAndUuidMap(eventSource: AnalyticsSource, uuid: String) = mapOf(source to eventSource.analyticsValue, episode_uuid to uuid)
         fun uuidMap(uuid: String) = mapOf(episode_uuid to uuid)
+        fun sourceAndToTopMap(eventSource: AnalyticsSource, toTop: Boolean) = mapOf(source to eventSource.analyticsValue, to_top to toTop)
         fun bulkMap(eventSource: AnalyticsSource, count: Int) = mapOf(source to eventSource.analyticsValue, this.count to count)
+        fun bulkToTopMap(eventSource: AnalyticsSource, count: Int, toTop: Boolean) = mapOf(
+            source to eventSource.analyticsValue,
+            this.count to count,
+            to_top to toTop
+        )
     }
 }

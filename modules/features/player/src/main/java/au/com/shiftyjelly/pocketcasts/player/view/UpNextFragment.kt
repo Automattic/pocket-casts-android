@@ -273,7 +273,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         recyclerView.findViewHolderForAdapterPosition(position)?.let {
             episodeItemTouchHelper?.clearView(recyclerView, it)
         }
-        playbackManager.playEpisodesNext(listOf(episode))
+        playbackManager.playEpisodesNext(episodes = listOf(episode), source = AnalyticsSource.UP_NEXT)
         trackSwipeAction(SwipeAction.UP_NEXT_MOVE_TOP)
     }
 
@@ -282,7 +282,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         recyclerView.findViewHolderForAdapterPosition(position)?.let {
             episodeItemTouchHelper?.clearView(recyclerView, it)
         }
-        playbackManager.playEpisodesLast(listOf(episode))
+        playbackManager.playEpisodesLast(episodes = listOf(episode), source = AnalyticsSource.UP_NEXT)
         trackSwipeAction(SwipeAction.UP_NEXT_MOVE_BOTTOM)
     }
 

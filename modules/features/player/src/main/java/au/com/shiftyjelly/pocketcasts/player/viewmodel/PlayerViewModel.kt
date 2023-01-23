@@ -473,7 +473,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun removeFromUpNext(episode: Playable) {
-        playbackManager.removeEpisode(episode)
+        playbackManager.removeEpisode(episodeToRemove = episode, source = source)
     }
 
     private fun calcCustomTimeText(): String {

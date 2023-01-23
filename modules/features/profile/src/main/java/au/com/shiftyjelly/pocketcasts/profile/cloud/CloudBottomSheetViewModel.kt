@@ -97,14 +97,14 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun removeFromUpNext(episode: UserEpisode) {
-        playbackManager.removeEpisode(episode)
+        playbackManager.removeEpisode(episodeToRemove = episode, source = source)
         trackOptionTapped(UP_NEXT_DELETE)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun playNext(episode: UserEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
-            playbackManager.playNext(episode)
+            playbackManager.playNext(episode = episode, source = source)
             trackOptionTapped(UP_NEXT_ADD_TOP)
         }
     }
@@ -112,7 +112,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     fun playLast(episode: UserEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
-            playbackManager.playLast(episode)
+            playbackManager.playLast(episode = episode, source = source)
             trackOptionTapped(UP_NEXT_ADD_BOTTOM)
         }
     }

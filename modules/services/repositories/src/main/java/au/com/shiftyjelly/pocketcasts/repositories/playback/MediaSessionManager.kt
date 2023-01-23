@@ -701,7 +701,7 @@ class MediaSessionManager(
             if (query.startsWith("next episode") || query.startsWith("next podcast")) {
                 val queueEpisodes = playbackManager.upNextQueue.queueEpisodes
                 queueEpisodes.firstOrNull()?.let { episode ->
-                    launch { playbackManager.playNext(episode) }
+                    launch { playbackManager.playNext(episode = episode, source = source) }
                     return@launch
                 }
             }

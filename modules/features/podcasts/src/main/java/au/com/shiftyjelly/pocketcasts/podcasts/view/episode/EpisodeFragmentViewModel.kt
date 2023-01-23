@@ -211,15 +211,15 @@ class EpisodeFragmentViewModel @Inject constructor(
             return if (!isOn) {
                 launch {
                     if (addLast) {
-                        playbackManager.playLast(episode)
+                        playbackManager.playLast(episode = episode, source = source)
                     } else {
-                        playbackManager.playNext(episode)
+                        playbackManager.playNext(episode = episode, source = source)
                     }
                 }
 
                 true
             } else {
-                playbackManager.removeEpisode(episode)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = source)
 
                 false
             }
