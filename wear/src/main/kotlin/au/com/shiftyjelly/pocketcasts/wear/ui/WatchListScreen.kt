@@ -97,7 +97,7 @@ fun WatchListScreen(
             WatchListChip(
                 titleRes = LR.string.player_tab_playing_wide,
                 iconRes = IR.drawable.ic_play_all,
-                secondaryLabel = "A Really Long Podcast Name", // TODO
+                secondaryLabel = (upNextState as? UpNextQueue.State.Loaded)?.episode?.title,
                 onClick = { navigateToRoute(NowPlayingScreen.route) },
             )
         }
