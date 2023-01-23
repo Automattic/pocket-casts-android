@@ -21,13 +21,13 @@ class EpisodeAnalytics @Inject constructor(
     }
 
     fun trackEvent(event: AnalyticsEvent, uuid: String) {
-        if (event == AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED) {
+        if (event == AnalyticsEvent.EPISODE_DOWNLOAD_FINISHED || event == AnalyticsEvent.EPISODE_DOWNLOAD_FAILED) {
             if (downloadEpisodeUuidQueue.contains(uuid)) {
                 downloadEpisodeUuidQueue.remove(uuid)
             } else {
                 return
             }
-        } else if (event == AnalyticsEvent.EPISODE_UPLOAD_FINISHED) {
+        } else if (event == AnalyticsEvent.EPISODE_UPLOAD_FINISHED || event == AnalyticsEvent.EPISODE_UPLOAD_FAILED) {
             if (uploadEpisodeUuidQueue.contains(uuid)) {
                 uploadEpisodeUuidQueue.remove(uuid)
             } else {
@@ -68,10 +68,16 @@ class EpisodeAnalytics @Inject constructor(
         private const val episode_uuid = "episode_uuid"
         private const val count = "count"
         private const val to_top = "to_top"
-        fun sourceAndUuidMap(eventSource: AnalyticsSource, uuid: String) = mapOf(source to eventSource.analyticsValue, episode_uuid to uuid)
+        fun sourceAndUuidMap(eventSource: AnalyticsSource, uuid: String) =
+            mapOf(source to eventSource.analyticsValue, episode_uuid to uuid)
+
         fun uuidMap(uuid: String) = mapOf(episode_uuid to uuid)
-        fun sourceAndToTopMap(eventSource: AnalyticsSource, toTop: Boolean) = mapOf(source to eventSource.analyticsValue, to_top to toTop)
-        fun bulkMap(eventSource: AnalyticsSource, count: Int) = mapOf(source to eventSource.analyticsValue, this.count to count)
+        fun sourceAndToTopMap(eventSource: AnalyticsSource, toTop: Boolean) =
+            mapOf(source to eventSource.analyticsValue, to_top to toTop)
+
+        fun bulkMap(eventSource: AnalyticsSource, count: Int) =
+            mapOf(source to eventSource.analyticsValue, this.count to count)
+
         fun bulkToTopMap(eventSource: AnalyticsSource, count: Int, toTop: Boolean) = mapOf(
             source to eventSource.analyticsValue,
             this.count to count,

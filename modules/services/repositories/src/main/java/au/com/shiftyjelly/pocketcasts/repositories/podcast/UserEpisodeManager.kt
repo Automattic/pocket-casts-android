@@ -473,6 +473,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FINISHED, uuid = userEpisode.uuid)
                             userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
                         } else {
+                            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UPLOAD_FAILED, uuid = userEpisode.uuid)
                             userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, "Upload failed")
                         }
                     }
