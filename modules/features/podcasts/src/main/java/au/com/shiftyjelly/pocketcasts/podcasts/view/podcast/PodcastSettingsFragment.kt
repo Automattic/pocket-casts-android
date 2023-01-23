@@ -10,6 +10,8 @@ import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreference
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -52,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, FilterSelectFragment.Listener, HasBackstack {
     @Inject lateinit var theme: Theme
     @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var preferenceFeedIssueDetected: Preference? = null
     private var preferenceNotifications: SwitchPreference? = null
@@ -207,14 +210,23 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
     private fun setupFeedIssueDetected() {
         preferenceFeedIssueDetected?.setOnPreferenceClickListener {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_TAPPED)
             val dialog = ConfirmationDialog().setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.podcast_feed_issue_dialog_button)))
                 .setTitle(getString(LR.string.podcast_feed_issue_dialog_title))
                 .setSummary(getString(LR.string.podcast_feed_issue_dialog_summary))
                 .setIconId(IR.drawable.ic_failedwarning)
                 .setOnConfirm {
                     launch {
+                        analyticsTracker.track(AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_UPDATE_TAPPED)
                         podcastManager.updateRefreshAvailable(podcastUuid = podcastUuid, refreshAvailable = false)
                         val success = podcastManager.refreshPodcastFeed(podcastUuid = podcastUuid)
+                        analyticsTracker.track(
+                            if (success) {
+                                AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED
+                            } else {
+                                AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED
+                            }
+                        )
                         FirebaseAnalyticsTracker.podcastFeedRefreshed()
                         showFeedUpdateQueued(success = success)
                     }

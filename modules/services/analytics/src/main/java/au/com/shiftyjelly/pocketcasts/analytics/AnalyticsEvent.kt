@@ -201,6 +201,12 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_TOGGLE_SUMMARY("podcast_screen_toggle_summary"),
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
 
+    /* Podcast Settings */
+    PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
+    PODCAST_SETTINGS_FEED_ERROR_UPDATE_TAPPED("podcast_settings_feed_error_update_tapped"),
+    PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED("podcast_settings_feed_error_fix_succeeded"),
+    PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED("podcast_settings_feed_error_fix_failed"),
+
     /* Playback */
     PLAYBACK_PLAY("playback_play"),
     PLAYBACK_PAUSE("playback_pause"),
