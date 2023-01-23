@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -95,11 +95,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
     }
 
     private fun trackSwipeAction(swipeAction: SwipeAction) {
-        val source = when (mode) {
-            ProfileEpisodeListFragment.Mode.Downloaded -> SwipeSource.DOWNLOADS
-            ProfileEpisodeListFragment.Mode.History -> SwipeSource.LISTENING_HISTORY
-            ProfileEpisodeListFragment.Mode.Starred -> SwipeSource.STARRED
-        }
+        val source = getAnalyticsSource()
         analyticsTracker.track(
             AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
             mapOf(
@@ -107,6 +103,12 @@ class ProfileEpisodeListViewModel @Inject constructor(
                 SOURCE_KEY to source.analyticsValue
             )
         )
+    }
+
+    private fun getAnalyticsSource() = when (mode) {
+        ProfileEpisodeListFragment.Mode.Downloaded -> AnalyticsSource.DOWNLOADS
+        ProfileEpisodeListFragment.Mode.History -> AnalyticsSource.LISTENING_HISTORY
+        ProfileEpisodeListFragment.Mode.Starred -> AnalyticsSource.STARRED
     }
 
     companion object {

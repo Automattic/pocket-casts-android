@@ -422,6 +422,7 @@ class PlayerViewModel @Inject constructor(
     private fun archiveConfirmed(episode: Episode) {
         launch {
             episodeManager.archive(episode, playbackManager, true)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
         }
     }
 

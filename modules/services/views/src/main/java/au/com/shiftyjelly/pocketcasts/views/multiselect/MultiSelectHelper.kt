@@ -287,6 +287,7 @@ class MultiSelectHelper @Inject constructor(
             }
 
             episodeManager.archiveAllInList(list, playbackManager)
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, source, list.size)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.archived_episodes_singular, LR.string.archived_episodes_plural)
                 showSnackBar(snackText)
@@ -304,7 +305,8 @@ class MultiSelectHelper @Inject constructor(
         launch {
             val list = selectedList.filterIsInstance<Episode>().toList()
 
-            episodeManager.unarchiveAllInList(list)
+            episodeManager.unarchiveAllInList(episodes = list)
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_UNARCHIVED, source, list.size)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.unarchived_episodes_singular, LR.string.unarchived_episodes_plural)
                 showSnackBar(snackText)

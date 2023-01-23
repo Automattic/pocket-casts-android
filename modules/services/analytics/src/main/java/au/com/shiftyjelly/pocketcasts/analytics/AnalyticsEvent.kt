@@ -307,6 +307,10 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_BULK_STARRED("episode_bulk_starred"),
     EPISODE_UNSTARRED("episode_unstarred"),
     EPISODE_BULK_UNSTARRED("episode_bulk_unstarred"),
+    EPISODE_ARCHIVED("episode_archived"),
+    EPISODE_BULK_ARCHIVED("episode_bulk_archived"),
+    EPISODE_UNARCHIVED("episode_unarchived"),
+    EPISODE_BULK_UNARCHIVED("episode_bulk_unarchived"),
 
     /* Episode Details */
     EPISODE_DETAIL_SHOWN("episode_detail_shown"),

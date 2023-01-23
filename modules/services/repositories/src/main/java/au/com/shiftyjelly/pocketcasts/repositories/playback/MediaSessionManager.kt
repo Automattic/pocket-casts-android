@@ -16,7 +16,9 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.view.KeyEvent
 import androidx.annotation.DrawableRes
 import androidx.core.os.bundleOf
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -58,7 +60,8 @@ class MediaSessionManager(
     val episodeManager: EpisodeManager,
     val playlistManager: PlaylistManager,
     val settings: Settings,
-    val context: Context
+    val context: Context,
+    val episodeAnalytics: EpisodeAnalytics,
 ) : CoroutineScope {
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
@@ -655,6 +658,7 @@ class MediaSessionManager(
                 if (it is Episode) {
                     it.isArchived = true
                     episodeManager.archive(it, playbackManager)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, it.uuid)
                 }
             }
         }

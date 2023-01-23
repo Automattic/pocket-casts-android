@@ -241,8 +241,10 @@ class EpisodeFragmentViewModel @Inject constructor(
             episode?.let { episode ->
                 if (isOn) {
                     episodeManager.archive(episode, playbackManager)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
                 } else {
                     episodeManager.unarchive(episode)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, source, episode.uuid)
                 }
             }
         }

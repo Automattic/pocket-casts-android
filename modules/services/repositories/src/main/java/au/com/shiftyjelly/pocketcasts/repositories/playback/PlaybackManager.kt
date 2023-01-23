@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -99,7 +100,8 @@ open class PlaybackManager @Inject constructor(
     private val syncServerManager: SyncServerManager,
     private val notificationHelper: NotificationHelper,
     private val userEpisodeManager: UserEpisodeManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -156,7 +158,15 @@ open class PlaybackManager @Inject constructor(
 
     var episodeSubscription: Disposable? = null
 
-    var mediaSessionManager = MediaSessionManager(this, podcastManager, episodeManager, playlistManager, settings, application)
+    var mediaSessionManager = MediaSessionManager(
+        playbackManager = this,
+        podcastManager = podcastManager,
+        episodeManager = episodeManager,
+        playlistManager = playlistManager,
+        settings = settings,
+        context = application,
+        episodeAnalytics = episodeAnalytics
+    )
     var sleepAfterEpisode: Boolean = false
 
     var player: Player? = null
