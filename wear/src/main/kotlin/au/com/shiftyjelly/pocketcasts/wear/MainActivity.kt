@@ -81,8 +81,18 @@ fun WearApp(themeType: Theme.ThemeType) {
 
             composable(
                 route = PodcastScreen.route,
-                arguments = listOf(navArgument(PodcastScreen.argument) { type = NavType.StringType }),
-            ) { PodcastScreen() }
+                arguments = listOf(
+                    navArgument(PodcastScreen.argument) {
+                        type = NavType.StringType
+                    }
+                ),
+            ) {
+                PodcastScreen(
+                    onNavigateToNowPlaying = { playableUuid ->
+                        navController.navigate(NowPlayingScreen.navigateRoute(playableUuid))
+                    }
+                )
+            }
 
             composable(FiltersScreen.route) { FiltersScreen() }
             composable(DownloadsScreen.route) { DownloadsScreen() }

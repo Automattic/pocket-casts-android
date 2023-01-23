@@ -12,7 +12,9 @@ import com.google.android.horologist.media.ui.state.PlayerUiController
 import com.google.android.horologist.media.ui.state.PlayerUiState
 
 object NowPlayingScreen {
-    const val route = "now_playing_screen"
+    const val argument = "playableUuid"
+    const val route = "playable/{$argument}"
+    fun navigateRoute(playableUuid: String) = "playable/$playableUuid"
 }
 
 @Composable
