@@ -65,7 +65,12 @@ fun WearApp(themeType: Theme.ThemeType) {
             scrollable(
                 route = UpNextScreen.route,
             ) {
-                UpNextScreen(listState = it.scrollableState)
+                UpNextScreen(
+                    onNavigateToNowPlaying = { playableUuid ->
+                        navController.navigate(NowPlayingScreen.navigateRoute(playableUuid))
+                    },
+                    listState = it.scrollableState,
+                )
             }
 
             scrollable(
