@@ -192,12 +192,16 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun markAsPlayedClicked(isOn: Boolean) {
         launch {
+            val event: AnalyticsEvent
             episode?.let { episode ->
                 if (isOn) {
+                    event = AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
                     episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
                 } else {
+                    event = AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED
                     episodeManager.markAsNotPlayed(episode)
                 }
+                episodeAnalytics.trackEvent(event, source, episode.uuid)
             }
         }
     }

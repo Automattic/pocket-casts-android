@@ -247,6 +247,7 @@ class MultiSelectHelper @Inject constructor(
             }
 
             episodeManager.markAllAsPlayed(list, playbackManager, podcastManager)
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_MARKED_AS_PLAYED, source, list.size)
             launch(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.marked_as_played_singular, LR.string.marked_as_played_plural)
                 showSnackBar(snackText)
@@ -265,6 +266,7 @@ class MultiSelectHelper @Inject constructor(
             val list = selectedList.toList()
 
             episodeManager.markAsUnplayed(list)
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_MARKED_AS_UNPLAYED, source, list.size)
             launch(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.marked_as_unplayed_singular, LR.string.marked_as_unplayed_plural)
                 showSnackBar(snackText)

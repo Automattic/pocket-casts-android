@@ -112,6 +112,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
                 episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episodeUuid)
             }
         }
     }

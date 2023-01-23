@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContr
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
@@ -163,6 +164,7 @@ class MainActivity :
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
     @Inject lateinit var warningsHelper: WarningsHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var episodeAnalytics: EpisodeAnalytics
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -501,7 +503,14 @@ class MainActivity :
     }
 
     override fun onMiniPlayerLongClick() {
-        MiniPlayerDialog(playbackManager, podcastManager, episodeManager, supportFragmentManager, analyticsTracker).show(this)
+        MiniPlayerDialog(
+            playbackManager = playbackManager,
+            podcastManager = podcastManager,
+            episodeManager = episodeManager,
+            fragmentManager = supportFragmentManager,
+            analyticsTracker = analyticsTracker,
+            episodeAnalytics = episodeAnalytics
+        ).show(this)
     }
 
     private fun showUpNextFragment(source: UpNextSource) {

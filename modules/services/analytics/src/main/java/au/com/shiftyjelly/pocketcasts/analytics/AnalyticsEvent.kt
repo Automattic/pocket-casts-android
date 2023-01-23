@@ -311,6 +311,10 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_BULK_ARCHIVED("episode_bulk_archived"),
     EPISODE_UNARCHIVED("episode_unarchived"),
     EPISODE_BULK_UNARCHIVED("episode_bulk_unarchived"),
+    EPISODE_MARKED_AS_PLAYED("episode_marked_as_played"),
+    EPISODE_BULK_MARKED_AS_PLAYED("episode_bulk_marked_as_played"),
+    EPISODE_MARKED_AS_UNPLAYED("episode_marked_as_unplayed"),
+    EPISODE_BULK_MARKED_AS_UNPLAYED("episode_bulk_marked_as_unplayed"),
 
     /* Episode Details */
     EPISODE_DETAIL_SHOWN("episode_detail_shown"),

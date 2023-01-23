@@ -406,6 +406,7 @@ class PlayerViewModel @Inject constructor(
     private fun markAsPlayedConfirmed(episode: Playable) {
         launch {
             episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
         }
     }
 
