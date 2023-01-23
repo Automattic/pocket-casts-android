@@ -277,7 +277,7 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun starClicked() {
         episode?.let { episode ->
-            episodeManager.toggleStarEpisodeAsync(episode)
+            episodeManager.toggleStarEpisodeAsync(episode, source = source)
         }
     }
 

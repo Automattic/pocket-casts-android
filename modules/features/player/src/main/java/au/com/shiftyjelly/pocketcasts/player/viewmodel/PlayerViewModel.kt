@@ -517,7 +517,7 @@ class PlayerViewModel @Inject constructor(
     fun starToggle() {
         playbackManager.upNextQueue.currentEpisode?.let {
             if (it is Episode) {
-                episodeManager.toggleStarEpisodeAsync(episode = it)
+                episodeManager.toggleStarEpisodeAsync(episode = it, source = source)
             }
         }
     }

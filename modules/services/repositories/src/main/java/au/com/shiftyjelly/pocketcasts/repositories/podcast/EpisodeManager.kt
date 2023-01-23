@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import androidx.lifecycle.LiveData
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
@@ -90,9 +91,9 @@ interface EpisodeManager {
     fun rxMarkAsPlayed(episode: Episode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable
     fun markAsPlaybackError(episode: Playable?, errorMessage: String?)
     fun markAsPlaybackError(episode: Playable?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
-    fun starEpisode(episode: Episode, starred: Boolean)
-    suspend fun updateAllStarred(episodes: List<Episode>, starred: Boolean)
-    fun toggleStarEpisodeAsync(episode: Episode)
+    fun starEpisode(episode: Episode, starred: Boolean, source: AnalyticsSource)
+    suspend fun updateAllStarred(episodes: List<Episode>, starred: Boolean, source: AnalyticsSource)
+    fun toggleStarEpisodeAsync(episode: Episode, source: AnalyticsSource)
     fun clearPlaybackError(episode: Playable?)
     fun clearDownloadError(episode: Episode?)
     fun archive(episode: Episode, playbackManager: PlaybackManager, sync: Boolean = true)

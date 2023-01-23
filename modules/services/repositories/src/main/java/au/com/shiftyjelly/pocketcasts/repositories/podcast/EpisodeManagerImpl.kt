@@ -10,6 +10,9 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
@@ -66,7 +69,8 @@ class EpisodeManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val appDatabase: AppDatabase,
     private val podcastCacheServerManager: PodcastCacheServerManager,
-    private val userEpisodeManager: UserEpisodeManager
+    private val userEpisodeManager: UserEpisodeManager,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : EpisodeManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -417,22 +421,26 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun starEpisode(episode: Episode, starred: Boolean) {
+    override fun starEpisode(episode: Episode, starred: Boolean, source: AnalyticsSource) {
         episode.isStarred = starred
+        val event = if (episode.isStarred) AnalyticsEvent.EPISODE_STARRED else AnalyticsEvent.EPISODE_UNSTARRED
+        episodeAnalytics.trackEvent(event, source, episode.uuid)
         episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
     }
 
-    override suspend fun updateAllStarred(episodes: List<Episode>, starred: Boolean) {
+    override suspend fun updateAllStarred(episodes: List<Episode>, starred: Boolean, source: AnalyticsSource) {
         episodes.chunked(500).forEach { episodesChunk ->
+            val event = if (starred) AnalyticsEvent.EPISODE_BULK_STARRED else AnalyticsEvent.EPISODE_BULK_UNSTARRED
+            episodeAnalytics.trackBulkEvent(event, source, episodes.size)
             episodeDao.updateAllStarred(episodesChunk.map { it.uuid }, starred, System.currentTimeMillis())
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    override fun toggleStarEpisodeAsync(episode: Episode) {
+    override fun toggleStarEpisodeAsync(episode: Episode, source: AnalyticsSource) {
         GlobalScope.launch {
             findByUuid(episode.uuid)?.let {
-                starEpisode(episode, !it.isStarred)
+                starEpisode(episode, !it.isStarred, source)
             }
         }
     }

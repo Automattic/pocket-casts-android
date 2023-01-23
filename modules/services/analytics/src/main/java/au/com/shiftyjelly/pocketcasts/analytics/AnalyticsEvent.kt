@@ -303,6 +303,10 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_UPLOAD_QUEUED("episode_upload_queued"),
     EPISODE_UPLOAD_CANCELLED("episode_upload_cancelled"),
     EPISODE_UPLOAD_FINISHED("episode_upload_finished"),
+    EPISODE_STARRED("episode_starred"),
+    EPISODE_BULK_STARRED("episode_bulk_starred"),
+    EPISODE_UNSTARRED("episode_unstarred"),
+    EPISODE_BULK_UNSTARRED("episode_bulk_unstarred"),
 
     /* Episode Details */
     EPISODE_DETAIL_SHOWN("episode_detail_shown"),
