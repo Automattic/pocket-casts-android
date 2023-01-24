@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -99,7 +100,8 @@ open class PlaybackManager @Inject constructor(
     private val syncServerManager: SyncServerManager,
     private val notificationHelper: NotificationHelper,
     private val userEpisodeManager: UserEpisodeManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -156,7 +158,15 @@ open class PlaybackManager @Inject constructor(
 
     var episodeSubscription: Disposable? = null
 
-    var mediaSessionManager = MediaSessionManager(this, podcastManager, episodeManager, playlistManager, settings, application)
+    var mediaSessionManager = MediaSessionManager(
+        playbackManager = this,
+        podcastManager = podcastManager,
+        episodeManager = episodeManager,
+        playlistManager = playlistManager,
+        settings = settings,
+        context = application,
+        episodeAnalytics = episodeAnalytics
+    )
     var sleepAfterEpisode: Boolean = false
 
     var player: Player? = null
@@ -386,19 +396,31 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    suspend fun playNext(episode: Playable) = withContext(Dispatchers.Default) {
+    suspend fun playNext(
+        episode: Playable,
+        source: AnalyticsSource,
+        userInitiated: Boolean = true
+    ) = withContext(Dispatchers.Default) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playNext(episode, downloadManager, null)
-
+        if (userInitiated) {
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true)
+        }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
         }
     }
 
-    suspend fun playLast(episode: Playable) {
+    suspend fun playLast(
+        episode: Playable,
+        source: AnalyticsSource,
+        userInitiated: Boolean = true
+    ) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
         upNextQueue.playLast(episode, downloadManager, null)
-
+        if (userInitiated) {
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false)
+        }
         if (wasEmpty) {
             loadCurrentEpisode(play = false)
         }
@@ -426,7 +448,7 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun playEpisodesLast(episodes: List<Playable>) {
+    fun playEpisodesLast(episodes: List<Playable>, source: AnalyticsSource) {
         if (episodes.isEmpty()) {
             return
         }
@@ -436,13 +458,19 @@ open class PlaybackManager @Inject constructor(
             val wasEmpty: Boolean = upNextQueue.isEmpty
 
             upNextQueue.playAllLast(episodes.filter { it.uuid != currentEpisode }, downloadManager)
+            episodeAnalytics.trackBulkEvent(
+                event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
+                count = episodes.size,
+                toTop = false,
+                source = source
+            )
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
             }
         }
     }
 
-    fun playEpisodesNext(episodes: List<Playable>) {
+    fun playEpisodesNext(episodes: List<Playable>, source: AnalyticsSource) {
         if (episodes.isEmpty()) {
             return
         }
@@ -451,6 +479,12 @@ open class PlaybackManager @Inject constructor(
             val currentEpisode = upNextQueue.currentEpisode?.uuid
             val wasEmpty: Boolean = upNextQueue.isEmpty
             upNextQueue.playAllNext(episodes.filter { it.uuid != currentEpisode }, downloadManager)
+            episodeAnalytics.trackBulkEvent(
+                event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
+                count = episodes.size,
+                toTop = true,
+                source = source
+            )
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
             }
@@ -706,7 +740,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private val removeMutex = Mutex()
-    fun removeEpisode(episodeToRemove: Playable?) {
+    fun removeEpisode(episodeToRemove: Playable?, source: AnalyticsSource, userInitiated: Boolean = true) {
         launch {
             if (episodeToRemove == null) {
                 return@launch
@@ -729,6 +763,9 @@ open class PlaybackManager @Inject constructor(
                 }
 
                 upNextQueue.removeEpisode(episodeToRemove)
+                if (userInitiated) {
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_REMOVED_FROM_UP_NEXT, source, episodeToRemove.uuid)
+                }
 
                 if (isCurrentEpisode) {
                     loadCurrentEpisode(play = isPlaying, playbackSource = AnalyticsSource.AUTO_PLAY)
@@ -1306,7 +1343,7 @@ open class PlaybackManager @Inject constructor(
                 episode.downloadUrl = playbackUrl
             } catch (e: Exception) {
                 onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
-                removeEpisode(episode)
+                removeEpisode(episode, source = playbackSource)
                 return
             }
         }

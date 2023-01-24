@@ -16,7 +16,9 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.view.KeyEvent
 import androidx.annotation.DrawableRes
 import androidx.core.os.bundleOf
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -58,7 +60,8 @@ class MediaSessionManager(
     val episodeManager: EpisodeManager,
     val playlistManager: PlaylistManager,
     val settings: Settings,
-    val context: Context
+    val context: Context,
+    val episodeAnalytics: EpisodeAnalytics,
 ) : CoroutineScope {
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
@@ -592,7 +595,11 @@ class MediaSessionManager(
 
     private fun markAsPlayed() {
         launch {
-            episodeManager.markAsPlayed(playbackManager.getCurrentEpisode(), playbackManager, podcastManager)
+            val episode = playbackManager.getCurrentEpisode()
+            episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+            episode?.let {
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, it.uuid)
+            }
         }
     }
 
@@ -602,6 +609,7 @@ class MediaSessionManager(
                 if (it is Episode) {
                     it.isStarred = true
                     episodeManager.starEpisode(it, true)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_STARRED, source, it.uuid)
                 }
             }
         }
@@ -613,6 +621,7 @@ class MediaSessionManager(
                 if (it is Episode) {
                     it.isStarred = false
                     episodeManager.starEpisode(it, false)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNSTARRED, source, it.uuid)
                 }
             }
         }
@@ -655,6 +664,7 @@ class MediaSessionManager(
                 if (it is Episode) {
                     it.isArchived = true
                     episodeManager.archive(it, playbackManager)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, it.uuid)
                 }
             }
         }
@@ -693,7 +703,7 @@ class MediaSessionManager(
             if (query.startsWith("next episode") || query.startsWith("next podcast")) {
                 val queueEpisodes = playbackManager.upNextQueue.queueEpisodes
                 queueEpisodes.firstOrNull()?.let { episode ->
-                    launch { playbackManager.playNext(episode) }
+                    launch { playbackManager.playNext(episode = episode, source = source) }
                     return@launch
                 }
             }

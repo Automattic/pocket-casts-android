@@ -10,6 +10,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
@@ -66,7 +67,7 @@ class EpisodeManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val appDatabase: AppDatabase,
     private val podcastCacheServerManager: PodcastCacheServerManager,
-    private val userEpisodeManager: UserEpisodeManager
+    private val userEpisodeManager: UserEpisodeManager,
 ) : EpisodeManager, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -465,7 +466,7 @@ class EpisodeManagerImpl @Inject constructor(
         justEpisodes.chunked(500).forEach { episodeDao.updateAllPlayingStatus(it.map { it.uuid }, System.currentTimeMillis(), EpisodePlayingStatus.COMPLETED) }
         archiveAllPlayedEpisodes(justEpisodes, playbackManager, podcastManager)
 
-        justEpisodes.forEach { playbackManager.removeEpisode(it) }
+        justEpisodes.forEach { playbackManager.removeEpisode(episodeToRemove = it, source = AnalyticsSource.UNKNOWN, userInitiated = false) }
 
         userEpisodeManager.markAllAsPlayed(playables.filterIsInstance<UserEpisode>(), playbackManager)
     }
@@ -484,7 +485,7 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override fun markedAsPlayedExternally(episode: Episode, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
-        playbackManager.removeEpisode(episode)
+        playbackManager.removeEpisode(episode, source = AnalyticsSource.UNKNOWN, userInitiated = false)
 
         // Auto archive after playing if the episode isn't already archived
         if (!episode.isArchived) {
@@ -503,7 +504,7 @@ class EpisodeManagerImpl @Inject constructor(
             return
         }
 
-        playbackManager.removeEpisode(episode)
+        playbackManager.removeEpisode(episode, source = AnalyticsSource.UNKNOWN, userInitiated = false)
 
         episode.playingStatus = EpisodePlayingStatus.COMPLETED
 
@@ -541,7 +542,7 @@ class EpisodeManagerImpl @Inject constructor(
 
         // if the episode is currently playing, then stop it. Note: it will not be stopped if coming from the player as it is controlling the playback logic.
         if (removeFromUpNext) {
-            playbackManager?.removeEpisode(episode)
+            playbackManager?.removeEpisode(episode, source = AnalyticsSource.UNKNOWN, userInitiated = false)
         }
 
         cleanUpDownloadFiles(episode)
@@ -587,7 +588,7 @@ class EpisodeManagerImpl @Inject constructor(
     override fun deleteCustomFolderEpisode(episode: Episode?, playbackManager: PlaybackManager) {
         episode ?: return
 
-        playbackManager.removeEpisode(episode)
+        playbackManager.removeEpisode(episode, source = AnalyticsSource.UNKNOWN, userInitiated = false)
 
         episodeDao.delete(episode)
     }
@@ -702,7 +703,7 @@ class EpisodeManagerImpl @Inject constructor(
             downloadManager.removeEpisodeFromQueue(episode, "episode manager")
         }
         deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true)
-        playbackManager.removeEpisode(episode)
+        playbackManager.removeEpisode(episode, source = AnalyticsSource.UNKNOWN, userInitiated = false)
     }
 
     override suspend fun findStaleDownloads(): List<Episode> {

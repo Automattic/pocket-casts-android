@@ -51,10 +51,10 @@ class CloudFilesViewModel @Inject constructor(
     fun episodeSwipeUpNext(episode: Playable) {
         GlobalScope.launch(Dispatchers.Default) {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episode)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILES)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playNext(episode)
+                playbackManager.playNext(episode = episode, source = AnalyticsSource.FILES)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
@@ -64,10 +64,10 @@ class CloudFilesViewModel @Inject constructor(
     fun episodeSwipeUpLast(episode: Playable) {
         GlobalScope.launch(Dispatchers.Default) {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episode)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILES)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playLast(episode)
+                playbackManager.playLast(episode = episode, source = AnalyticsSource.FILES)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }

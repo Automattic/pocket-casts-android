@@ -8,7 +8,9 @@ import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -62,7 +64,8 @@ class PodcastViewModel
     private val castManager: CastManager,
     private val downloadManager: DownloadManager,
     private val userManager: UserManager,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -204,6 +207,7 @@ class PodcastViewModel
             val p = podcast.value ?: return@launch
             val episodes = episodeManager.findEpisodesByPodcastOrdered(p)
             episodeManager.unarchiveAllInList(episodes)
+            trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_UNARCHIVED, episodes.size)
         }
     }
 
@@ -212,6 +216,7 @@ class PodcastViewModel
             val episodeState = episodes.value
             if (episodeState is EpisodeState.Loaded) {
                 episodeManager.archiveAllInList(episodeState.episodes, playbackManager)
+                trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, episodeState.episodes.size)
             }
         }
     }
@@ -262,9 +267,11 @@ class PodcastViewModel
             if (!episode.isArchived) {
                 episodeManager.archive(episode, playbackManager)
                 trackSwipeAction(SwipeAction.ARCHIVE)
+                trackEpisodeEvent(AnalyticsEvent.EPISODE_ARCHIVED, episode)
             } else {
                 episodeManager.unarchive(episode)
                 trackSwipeAction(SwipeAction.UNARCHIVE)
+                trackEpisodeEvent(AnalyticsEvent.EPISODE_UNARCHIVED, episode)
             }
         }
     }
@@ -272,10 +279,10 @@ class PodcastViewModel
     fun episodeSwipeUpNext(episode: Playable) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episode)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.PODCAST_SCREEN)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playNext(episode)
+                playbackManager.playNext(episode = episode, source = AnalyticsSource.PODCAST_SCREEN)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
@@ -284,10 +291,10 @@ class PodcastViewModel
     fun episodeSwipeUpLast(episode: Playable) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episode)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.PODCAST_SCREEN)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playLast(episode)
+                playbackManager.playLast(episode = episode, source = AnalyticsSource.PODCAST_SCREEN)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
@@ -314,6 +321,7 @@ class PodcastViewModel
         launch {
             val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast).filter { it.isFinished }
             episodeManager.archiveAllInList(episodes, playbackManager)
+            trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, episodes.size)
         }
     }
 
@@ -364,6 +372,21 @@ class PodcastViewModel
                 ACTION_KEY to swipeAction.analyticsValue,
                 SOURCE_KEY to SwipeSource.PODCAST_DETAILS.analyticsValue
             )
+        )
+    }
+    private fun trackEpisodeEvent(event: AnalyticsEvent, episode: Episode) {
+        episodeAnalytics.trackEvent(
+            event,
+            source = AnalyticsSource.PODCAST_SCREEN,
+            uuid = episode.uuid
+        )
+    }
+
+    private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
+        episodeAnalytics.trackBulkEvent(
+            event,
+            source = AnalyticsSource.PODCAST_SCREEN,
+            count = count
         )
     }
 

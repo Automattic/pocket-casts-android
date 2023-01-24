@@ -406,6 +406,7 @@ class PlayerViewModel @Inject constructor(
     private fun markAsPlayedConfirmed(episode: Playable) {
         launch {
             episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
         }
     }
 
@@ -422,6 +423,7 @@ class PlayerViewModel @Inject constructor(
     private fun archiveConfirmed(episode: Episode) {
         launch {
             episodeManager.archive(episode, playbackManager, true)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
         }
     }
 
@@ -471,7 +473,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun removeFromUpNext(episode: Playable) {
-        playbackManager.removeEpisode(episode)
+        playbackManager.removeEpisode(episodeToRemove = episode, source = source)
     }
 
     private fun calcCustomTimeText(): String {
@@ -518,6 +520,8 @@ class PlayerViewModel @Inject constructor(
         playbackManager.upNextQueue.currentEpisode?.let {
             if (it is Episode) {
                 episodeManager.toggleStarEpisodeAsync(episode = it)
+                val event = if (it.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
+                episodeAnalytics.trackEvent(event, source, it.uuid)
             }
         }
     }

@@ -97,6 +97,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }.smallPlaceholder()
 
         playButtonListener.source = AnalyticsSource.FILES
+        multiSelectHelper.source = AnalyticsSource.FILES
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
