@@ -519,7 +519,9 @@ class PlayerViewModel @Inject constructor(
     fun starToggle() {
         playbackManager.upNextQueue.currentEpisode?.let {
             if (it is Episode) {
-                episodeManager.toggleStarEpisodeAsync(episode = it, source = source)
+                episodeManager.toggleStarEpisodeAsync(episode = it)
+                val event = if (it.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
+                episodeAnalytics.trackEvent(event, source, it.uuid)
             }
         }
     }

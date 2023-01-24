@@ -325,7 +325,8 @@ class MultiSelectHelper @Inject constructor(
 
         launch {
             val list = selectedList.filterIsInstance<Episode>().toList()
-            episodeManager.updateAllStarred(list, starred = true, source = source)
+            episodeManager.updateAllStarred(list, starred = true)
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_STARRED, source, list.size)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.starred_episodes_singular, LR.string.starred_episodes_plural)
                 showSnackBar(snackText)
@@ -342,7 +343,8 @@ class MultiSelectHelper @Inject constructor(
 
         launch {
             val list = selectedList.filterIsInstance<Episode>().toList()
-            episodeManager.updateAllStarred(list, starred = false, source = source)
+            episodeManager.updateAllStarred(list, starred = false)
+            episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_UNSTARRED, source, list.size)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.unstarred_episodes_singular, LR.string.unstarred_episodes_plural)
                 showSnackBar(snackText)

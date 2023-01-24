@@ -283,7 +283,9 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun starClicked() {
         episode?.let { episode ->
-            episodeManager.toggleStarEpisodeAsync(episode, source = source)
+            episodeManager.toggleStarEpisodeAsync(episode)
+            val event = if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
+            episodeAnalytics.trackEvent(event, source, episode.uuid)
         }
     }
 
