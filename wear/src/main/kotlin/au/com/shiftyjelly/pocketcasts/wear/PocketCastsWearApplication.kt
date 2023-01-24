@@ -10,6 +10,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -37,6 +40,11 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     }
 
     private fun setupApp() {
+        runBlocking {
+            withContext(Dispatchers.Default) {
+                playbackManager.upNextQueue.setup()
+            }
+        }
         userManager.beginMonitoringAccountManager(playbackManager)
     }
 
