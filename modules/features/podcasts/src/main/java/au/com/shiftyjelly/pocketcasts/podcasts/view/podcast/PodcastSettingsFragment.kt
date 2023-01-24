@@ -285,7 +285,12 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
                 if (stringValue.isBlank()) {
                     stringValue = "0"
                 }
-                viewModel.updateStartFrom(stringValue.toInt())
+                val secs = stringValue.toInt()
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SETTINGS_SKIP_FIRST_CHANGED,
+                    mapOf("value" to secs)
+                )
+                viewModel.updateStartFrom(secs)
             } catch (e: NumberFormatException) {
                 Timber.e(e)
             }
@@ -300,7 +305,12 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
                 if (stringValue.isBlank()) {
                     stringValue = "0"
                 }
-                viewModel.updateSkipLast(stringValue.toInt())
+                val secs = stringValue.toInt()
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SETTINGS_SKIP_LAST_CHANGED,
+                    mapOf("value" to secs)
+                )
+                viewModel.updateSkipLast(secs)
             } catch (e: java.lang.NumberFormatException) {
                 Timber.e(e)
             }
@@ -310,7 +320,11 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
     private fun setupNotifications() {
         preferenceNotifications?.setOnPreferenceChangeListener { _, newValue ->
-            viewModel.showNotifications(newValue as Boolean)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED,
+                mapOf("enabled" to (newValue as Boolean))
+            )
+            viewModel.showNotifications(newValue)
             true
         }
     }
@@ -388,7 +402,11 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
         preferenceAddToUpNext?.run {
             isChecked = viewModel.isAutoAddToUpNextOn()
             setOnPreferenceChangeListener { _, isOn ->
-                viewModel.updateAutoAddToUpNext(isOn as Boolean)
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED,
+                    mapOf("enabled" to isOn as Boolean)
+                )
+                viewModel.updateAutoAddToUpNext(isOn)
                 true
             }
         }
@@ -403,13 +421,27 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
             entryValues = arrayOf("1", "2")
             setOnPreferenceChangeListener { _, newValue ->
                 val value = Integer.parseInt(newValue as String)
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED,
+                    mapOf(
+                        "value" to when (value) {
+                            1 -> "play_last"
+                            2 -> "play_next"
+                            else -> "unknown"
+                        }
+                    )
+                )
                 viewModel.updateAutoAddToUpNextOrder(value)
                 true
             }
         }
 
         preferenceAutoDownload?.setOnPreferenceChangeListener { _, newValue ->
-            viewModel.setAutoDownloadEpisodes(newValue as Boolean)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED,
+                mapOf("enabled" to newValue as Boolean)
+            )
+            viewModel.setAutoDownloadEpisodes(newValue)
             true
         }
 

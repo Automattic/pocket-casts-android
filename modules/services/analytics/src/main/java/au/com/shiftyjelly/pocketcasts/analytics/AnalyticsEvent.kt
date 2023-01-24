@@ -206,6 +206,17 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SETTINGS_FEED_ERROR_UPDATE_TAPPED("podcast_settings_feed_error_update_tapped"),
     PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED("podcast_settings_feed_error_fix_succeeded"),
     PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED("podcast_settings_feed_error_fix_failed"),
+    PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED("podcast_settings_auto_download_toggled"),
+    PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED("podcast_settings_notifications_toggled"),
+    PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED("podcast_settings_auto_add_up_next_toggled"),
+    PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED("podcast_settings_auto_add_up_next_position_option_changed"),
+    PODCAST_SETTINGS_CUSTOM_PLAYBACK_EFFECTS_TOGGLED("podcast_settings_custom_playback_effects_toggled"),
+    PODCAST_SETTINGS_SKIP_FIRST_CHANGED("podcast_settings_skip_first_changed"),
+    PODCAST_SETTINGS_SKIP_LAST_CHANGED("podcast_settings_skip_last_changed"),
+    PODCAST_SETTINGS_AUTO_ARCHIVE_TOGGLED("podcast_settings_auto_archive_toggled"),
+    PODCAST_SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED("podcast_settings_auto_archive_played_changed"),
+    PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED("podcast_settings_auto_archive_inactive_changed"),
+    PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED("podcast_settings_auto_archive_episode_limit_changed"),
 
     /* Playback */
     PLAYBACK_PLAY("playback_play"),
