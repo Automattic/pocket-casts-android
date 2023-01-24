@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -45,6 +46,7 @@ class FilterEpisodeListViewModel @Inject constructor(
     val downloadManager: DownloadManager,
     val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : ViewModel(), CoroutineScope {
 
     companion object {
@@ -108,9 +110,11 @@ class FilterEpisodeListViewModel @Inject constructor(
             if (!episode.isArchived) {
                 episodeManager.archive(episode, playbackManager)
                 trackSwipeAction(SwipeAction.ARCHIVE)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, AnalyticsSource.FILTERS, episode.uuid)
             } else {
                 episodeManager.unarchive(episode)
                 trackSwipeAction(SwipeAction.UNARCHIVE)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, AnalyticsSource.FILTERS, episode.uuid)
             }
         }
     }

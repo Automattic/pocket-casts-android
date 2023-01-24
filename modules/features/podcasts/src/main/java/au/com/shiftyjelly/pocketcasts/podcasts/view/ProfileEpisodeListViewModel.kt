@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -24,6 +25,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -47,12 +49,15 @@ class ProfileEpisodeListViewModel @Inject constructor(
         if (episode !is Episode) return
 
         launch {
+            val source = getAnalyticsSource()
             if (!episode.isArchived) {
                 episodeManager.archive(episode, playbackManager)
                 trackSwipeAction(SwipeAction.ARCHIVE)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
             } else {
                 episodeManager.unarchive(episode)
                 trackSwipeAction(SwipeAction.UNARCHIVE)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, source, episode.uuid)
             }
         }
     }
