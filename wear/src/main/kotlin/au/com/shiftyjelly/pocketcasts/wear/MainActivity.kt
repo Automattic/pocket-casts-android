@@ -65,7 +65,12 @@ fun WearApp(themeType: Theme.ThemeType) {
             scrollable(
                 route = UpNextScreen.route,
             ) {
-                UpNextScreen(listState = it.scrollableState)
+                UpNextScreen(
+                    onNavigateToNowPlaying = { playableUuid ->
+                        navController.navigate(NowPlayingScreen.navigateRoute(playableUuid))
+                    },
+                    listState = it.scrollableState,
+                )
             }
 
             scrollable(
@@ -81,8 +86,18 @@ fun WearApp(themeType: Theme.ThemeType) {
 
             composable(
                 route = PodcastScreen.route,
-                arguments = listOf(navArgument(PodcastScreen.argument) { type = NavType.StringType }),
-            ) { PodcastScreen() }
+                arguments = listOf(
+                    navArgument(PodcastScreen.argument) {
+                        type = NavType.StringType
+                    }
+                ),
+            ) {
+                PodcastScreen(
+                    onNavigateToNowPlaying = { playableUuid ->
+                        navController.navigate(NowPlayingScreen.navigateRoute(playableUuid))
+                    }
+                )
+            }
 
             composable(FiltersScreen.route) { FiltersScreen() }
             composable(DownloadsScreen.route) { DownloadsScreen() }
