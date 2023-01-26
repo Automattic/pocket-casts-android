@@ -358,6 +358,9 @@ enum class AnalyticsEvent(val key: String) {
     RECOMMENDATIONS_MORE_TAPPED("recommendations_more_tapped"),
     RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
 
+    /* Podcast List Share */
+    SHARE_PODCASTS_SHOWN("share_podcasts_shown"),
+
     /* End of Year */
     END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),
     END_OF_YEAR_STORIES_SHOWN("end_of_year_stories_shown"),

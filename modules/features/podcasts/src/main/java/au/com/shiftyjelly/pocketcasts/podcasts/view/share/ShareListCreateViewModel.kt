@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
@@ -18,9 +20,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ShareListCreateViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
-    private val listServerManager: ListServerManager
+    private val listServerManager: ListServerManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
-
+    var isFragmentChangingConfigurations: Boolean = false
     data class State(
         val title: String = "",
         val description: String = "",
@@ -100,5 +103,13 @@ class ShareListCreateViewModel @Inject constructor(
                 onFailure()
             }
         }
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
+
+    fun trackShareEvent(event: AnalyticsEvent) {
+        analyticsTracker.track(event)
     }
 }

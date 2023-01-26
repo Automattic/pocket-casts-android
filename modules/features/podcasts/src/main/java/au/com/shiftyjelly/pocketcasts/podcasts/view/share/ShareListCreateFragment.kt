@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,6 +63,10 @@ class ShareListCreateFragment : BaseFragment() {
                     }
                 }
             }
+
+            if (!viewModel.isFragmentChangingConfigurations) {
+                viewModel.trackShareEvent(AnalyticsEvent.SHARE_PODCASTS_SHOWN)
+            }
         }
     }
 
@@ -73,5 +78,10 @@ class ShareListCreateFragment : BaseFragment() {
             onSuccess = { activity?.finish() },
             onFailure = { navController.navigate(NavRoutes.failed) }
         )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 }
