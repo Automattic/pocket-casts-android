@@ -631,10 +631,15 @@ class MediaSessionManager(
         launch {
             val speed = playbackManager.getPlaybackSpeed()
             val newSpeed = when {
+                speed < 1.1 -> 1.1
                 speed < 1.2 -> 1.2
+                speed < 1.3 -> 1.3
                 speed < 1.4 -> 1.4
+                speed < 1.5 -> 1.5
                 speed < 1.6 -> 1.6
+                speed < 1.7 -> 1.7
                 speed < 1.8 -> 1.8
+                speed < 1.9 -> 1.9
                 speed < 2 -> 2.0
                 else -> 1.0
             }
