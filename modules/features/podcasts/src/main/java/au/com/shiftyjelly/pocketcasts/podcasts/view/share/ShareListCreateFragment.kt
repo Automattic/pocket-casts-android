@@ -38,7 +38,13 @@ class ShareListCreateFragment : BaseFragment() {
                     composable(NavRoutes.podcasts) {
                         ShareListCreatePodcastsPage(
                             onCloseClick = { activity?.finish() },
-                            onNextClick = { navController.navigate(NavRoutes.title) },
+                            onNextClick = { selectedPodcastsCount ->
+                                viewModel.trackShareEvent(
+                                    AnalyticsEvent.SHARE_PODCASTS_PODCASTS_SELECTED,
+                                    AnalyticsProp.countMap(selectedPodcastsCount)
+                                )
+                                navController.navigate(NavRoutes.title)
+                            },
                             viewModel = viewModel
                         )
                     }
@@ -84,4 +90,9 @@ class ShareListCreateFragment : BaseFragment() {
         super.onPause()
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
+}
+
+private object AnalyticsProp {
+    private const val count = "count"
+    fun countMap(count: Int) = mapOf(this.count to count)
 }

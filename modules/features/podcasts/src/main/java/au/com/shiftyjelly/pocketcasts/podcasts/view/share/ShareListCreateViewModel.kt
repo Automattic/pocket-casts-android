@@ -109,7 +109,7 @@ class ShareListCreateViewModel @Inject constructor(
         isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
-    fun trackShareEvent(event: AnalyticsEvent) {
-        analyticsTracker.track(event)
+    fun trackShareEvent(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
+        analyticsTracker.track(event, properties)
     }
 }
