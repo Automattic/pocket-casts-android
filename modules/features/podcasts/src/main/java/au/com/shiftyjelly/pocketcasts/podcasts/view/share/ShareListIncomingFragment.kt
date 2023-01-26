@@ -8,6 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentShareIncomingBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -107,6 +108,10 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
         viewModel.subscribedUuids.observe(viewLifecycleOwner) { uuids ->
             adapter.subscribedUuids = uuids.toHashSet()
         }
+
+        if (!viewModel.isFragmentChangingConfigurations) {
+            viewModel.trackShareEvent(AnalyticsEvent.INCOMING_SHARE_LIST_SHOWN)
+        }
     }
 
     override fun onPodcastClick(podcast: Podcast) {
@@ -134,9 +139,23 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
     }
 
     override fun onSubscribeToAllClick(podcasts: List<Podcast>) {
+        viewModel.trackShareEvent(
+            AnalyticsEvent.INCOMING_SHARE_LIST_SUBSCRIBED_ALL,
+            AnalyticsProp.countMap(podcasts.size)
+        )
         for (podcastHeader in podcasts) {
             val uuid = podcastHeader.uuid
             viewModel.subscribeToPodcast(uuid)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
+
+    private object AnalyticsProp {
+        private const val count = "count"
+        fun countMap(count: Int) = mapOf(this.count to count)
     }
 }

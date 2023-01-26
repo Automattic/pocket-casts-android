@@ -365,6 +365,10 @@ enum class AnalyticsEvent(val key: String) {
     SHARE_PODCASTS_LIST_PUBLISH_SUCCEEDED("share_podcasts_list_publish_succeeded"),
     SHARE_PODCASTS_LIST_PUBLISH_FAILED("share_podcasts_list_publish_failed"),
 
+    /* Incoming Share List */
+    INCOMING_SHARE_LIST_SHOWN("incoming_share_list_shown"),
+    INCOMING_SHARE_LIST_SUBSCRIBED_ALL("incoming_share_list_subscribed_all"),
+
     /* End of Year */
     END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),
     END_OF_YEAR_STORIES_SHOWN("end_of_year_stories_shown"),
