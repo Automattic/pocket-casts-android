@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShareBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -45,25 +47,57 @@ class ShareFragment : BaseDialogFragment() {
 
         binding.buttonSharePodcast.setOnClickListener {
             if (podcast != null) {
-                SharePodcastHelper(podcast, null, null, requireContext()).showShareDialogDirect()
+                SharePodcastHelper(
+                    podcast,
+                    null,
+                    null,
+                    requireContext(),
+                    ShareType.PODCAST,
+                    AnalyticsSource.PLAYER,
+                    analyticsTracker
+                ).showShareDialogDirect()
             }
             close()
         }
         binding.buttonShareEpisode.setOnClickListener {
             if (podcast != null && episode is Episode) {
-                SharePodcastHelper(podcast, episode, null, requireContext()).showShareDialogDirect()
+                SharePodcastHelper(
+                    podcast,
+                    episode,
+                    null,
+                    requireContext(),
+                    ShareType.EPISODE,
+                    AnalyticsSource.PLAYER,
+                    analyticsTracker
+                ).showShareDialogDirect()
             }
             close()
         }
         binding.buttonShareCurrentPosition.setOnClickListener {
             if (podcast != null && episode is Episode) {
-                SharePodcastHelper(podcast, episode, episode.playedUpTo, requireContext()).showShareDialogDirect()
+                SharePodcastHelper(
+                    podcast,
+                    episode,
+                    episode.playedUpTo,
+                    requireContext(),
+                    ShareType.CURRENT_TIME,
+                    AnalyticsSource.PLAYER,
+                    analyticsTracker
+                ).showShareDialogDirect()
             }
             close()
         }
         binding.buttonOpenFileIn.setOnClickListener {
             if (podcast != null && episode is Episode) {
-                SharePodcastHelper(podcast, episode, episode.playedUpTo, requireContext()).sendFile()
+                SharePodcastHelper(
+                    podcast,
+                    episode,
+                    episode.playedUpTo,
+                    requireContext(),
+                    ShareType.EPISODE_FILE,
+                    AnalyticsSource.PLAYER,
+                    analyticsTracker
+                ).sendFile()
             }
             close()
         }

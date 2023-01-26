@@ -343,6 +343,7 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_ADDED_TO_UP_NEXT("episode_added_to_up_next"),
     EPISODE_BULK_ADD_TO_UP_NEXT("episode_bulk_add_to_up_next"),
     EPISODE_REMOVED_FROM_UP_NEXT("episode_removed_from_up_next"),
+    PODCAST_SHARED("podcast_shared"),
 
     /* Episode Details */
     EPISODE_DETAIL_SHOWN("episode_detail_shown"),
