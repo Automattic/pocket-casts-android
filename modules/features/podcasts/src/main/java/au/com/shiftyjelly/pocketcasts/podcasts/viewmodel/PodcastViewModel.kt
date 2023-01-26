@@ -184,12 +184,20 @@ class PodcastViewModel
             it.isSubscribed = true
             podcast.value = it
             podcastManager.subscribeToPodcast(podcastUuid = it.uuid, sync = true)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SUBSCRIBED,
+                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = AnalyticsSource.PODCAST_SCREEN)
+            )
         }
     }
 
     fun unsubscribeFromPodcast() {
         podcast.value?.let {
             podcastManager.unsubscribeAsync(podcastUuid = it.uuid, playbackManager = playbackManager)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_UNSUBSCRIBED,
+                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = AnalyticsSource.PODCAST_SCREEN)
+            )
         }
     }
 
@@ -197,7 +205,7 @@ class PodcastViewModel
         launch {
             podcast.value?.let {
                 podcastManager.updateShowArchived(it, !it.showArchived)
-                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_ARCHIVED, mapOf(SHOW_ARCHIVED to !it.showArchived))
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_TOGGLE_ARCHIVED, AnalyticsProp.archiveToggled(!it.showArchived))
             }
         }
     }
@@ -252,7 +260,7 @@ class PodcastViewModel
     fun toggleNotifications(context: Context) {
         val podcast = podcast.value ?: return
         val showNotifications = !podcast.isShowNotifications
-        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, mapOf(ENABLED_KEY to showNotifications))
+        analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_NOTIFICATIONS_TAPPED, AnalyticsProp.notificationEnabled(showNotifications))
         Toast.makeText(context, if (showNotifications) LR.string.podcast_notifications_on else LR.string.podcast_notifications_off, Toast.LENGTH_SHORT).show()
         launch {
             podcastManager.updateShowNotifications(podcast, showNotifications)
@@ -368,10 +376,11 @@ class PodcastViewModel
     private fun trackSwipeAction(swipeAction: SwipeAction) {
         analyticsTracker.track(
             AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
-            mapOf(
-                ACTION_KEY to swipeAction.analyticsValue,
-                SOURCE_KEY to SwipeSource.PODCAST_DETAILS.analyticsValue
+            AnalyticsProp.swipePerformed(
+                action = swipeAction,
+                source = SwipeSource.PODCAST_DETAILS
             )
+
         )
     }
     private fun trackEpisodeEvent(event: AnalyticsEvent, episode: Episode) {
@@ -416,11 +425,20 @@ class PodcastViewModel
         }
     }
 
-    companion object {
+    private object AnalyticsProp {
         private const val ACTION_KEY = "action"
-        private const val SOURCE_KEY = "source"
         private const val ENABLED_KEY = "enabled"
         private const val SHOW_ARCHIVED = "show_archived"
+        private const val SOURCE_KEY = "source"
+        private const val UUID_KEY = "uuid"
+        fun archiveToggled(archived: Boolean) =
+            mapOf(SHOW_ARCHIVED to archived)
+        fun notificationEnabled(show: Boolean) =
+            mapOf(ENABLED_KEY to show)
+        fun podcastSubscribeToggled(source: AnalyticsSource, uuid: String) =
+            mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
+        fun swipePerformed(source: SwipeSource, action: SwipeAction) =
+            mapOf(SOURCE_KEY to source, ACTION_KEY to action.analyticsValue)
     }
 }
 

@@ -188,7 +188,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             analyticsTracker.track(
                 AnalyticsEvent.RECOMMENDATIONS_DISMISSED,
-                mapOf(SUBSCRIPTIONS_PROP to podcastManager.countSubscribed())
+                mapOf(AnalyticsProp.SUBSCRIPTIONS to podcastManager.countSubscribed())
             )
         }
     }
@@ -205,17 +205,21 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             analyticsTracker.track(
                 AnalyticsEvent.RECOMMENDATIONS_CONTINUE_TAPPED,
-                mapOf(SUBSCRIPTIONS_PROP to podcastManager.countSubscribed())
+                mapOf(AnalyticsProp.SUBSCRIPTIONS to podcastManager.countSubscribed())
             )
         }
     }
 
     fun updateSubscribed(podcast: Podcast) {
+        val event: AnalyticsEvent
         if (podcast.isSubscribed) {
+            event = AnalyticsEvent.PODCAST_UNSUBSCRIBED
             podcastManager.unsubscribeAsync(podcastUuid = podcast.uuid, playbackManager = playbackManager)
         } else {
+            event = AnalyticsEvent.PODCAST_SUBSCRIBED
             podcastManager.subscribeToPodcast(podcastUuid = podcast.uuid, sync = true)
         }
+        analyticsTracker.track(event, AnalyticsProp.podcastSubscribeToggled(podcast.uuid))
 
         // Immediately update subscribed state in the UI
         _state.update {
@@ -311,7 +315,15 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     }
 
     companion object {
-        private const val SUBSCRIPTIONS_PROP = "subscriptions"
+        private const val ONBOARDING_RECOMMENDATIONS = "onboarding_recommendations"
+        private object AnalyticsProp {
+            const val SUBSCRIPTIONS = "subscriptions"
+            const val UUID = "uuid"
+            const val SOURCE = "source"
+            fun podcastSubscribeToggled(uuid: String) =
+                mapOf(UUID to uuid, SOURCE to ONBOARDING_RECOMMENDATIONS)
+        }
+
         const val NUM_TO_SHOW_DEFAULT = 6
         private const val NUM_TO_SHOW_INCREASE = 6
     }

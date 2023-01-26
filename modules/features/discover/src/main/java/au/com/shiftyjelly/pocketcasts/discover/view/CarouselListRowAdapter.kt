@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
@@ -47,14 +48,15 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                 onPodcastClicked(podcast, null) // no analytics for carousel
 
                 FirebaseAnalyticsTracker.openedFeaturedPodcast()
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED, mapOf(PODCAST_UUID_KEY to podcast.uuid))
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED, AnalyticsProp.featuredPodcastTapped(podcast.uuid))
             }
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true)
                 onPodcastSubscribe(podcast, null) // no analytics for carousel
 
                 FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, mapOf(PODCAST_UUID_KEY to podcast.uuid))
+                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, AnalyticsProp.featuredPodcastSubscribed(podcast.uuid))
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SUBSCRIBED, AnalyticsProp.podcastSubscribed(AnalyticsSource.DISCOVER, podcast.uuid))
             }
         } else {
             holder.podcast = null
@@ -62,6 +64,14 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
     }
 
     companion object {
-        private const val PODCAST_UUID_KEY = "podcast_uuid"
+        private object AnalyticsProp {
+            private const val PODCAST_UUID_KEY = "podcast_uuid"
+            private const val SOURCE_KEY = "source"
+            private const val UUID_KEY = "uuid"
+            fun featuredPodcastTapped(uuid: String) = mapOf(PODCAST_UUID_KEY to uuid)
+            fun featuredPodcastSubscribed(uuid: String) = mapOf(PODCAST_UUID_KEY to uuid)
+            fun podcastSubscribed(source: AnalyticsSource, uuid: String) =
+                mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
+        }
     }
 }

@@ -218,6 +218,10 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED("podcast_settings_auto_archive_inactive_changed"),
     PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED("podcast_settings_auto_archive_episode_limit_changed"),
 
+    /* Podcast subscribed/ Unsubscribed */
+    PODCAST_SUBSCRIBED("podcast_subscribed"),
+    PODCAST_UNSUBSCRIBED("podcast_unsubscribed"),
+
     /* Playback */
     PLAYBACK_PLAY("playback_play"),
     PLAYBACK_PAUSE("playback_pause"),

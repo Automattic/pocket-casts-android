@@ -12,12 +12,15 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.SOURCE_KEY
+import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewModel
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -124,6 +127,7 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
         listUuid?.let {
             FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
             analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SUBSCRIBED, mapOf(SOURCE_KEY to AnalyticsSource.DISCOVER, UUID_KEY to podcastUuid))
         }
         podcastManager.subscribeToPodcast(podcastUuid, sync = true)
     }
