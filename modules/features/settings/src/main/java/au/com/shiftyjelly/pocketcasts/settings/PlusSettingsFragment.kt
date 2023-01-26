@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -41,10 +43,13 @@ class PlusSettingsFragment : BaseFragment() {
     @Inject lateinit var subscriptionManager: SubscriptionManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var binding: FragmentPlusSettingsBinding? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_PLUS_SHOWN)
+
         val rootView = inflater.inflate(R.layout.fragment_plus_settings, container, false)
 
         val binding = FragmentPlusSettingsBinding.inflate(inflater, container, false)
@@ -85,16 +90,25 @@ class PlusSettingsFragment : BaseFragment() {
                 upgrade
             )
 
-            val onAccountUpgradeClick: (() -> Unit) = {
-                val flow = if (settings.isLoggedIn()) {
-                    OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.PLUS_DETAILS)
-                } else {
-                    OnboardingFlow.PlusAccountUpgradeNeedsLogin
+            val adapter = PlusAdapter(
+                onAccountUpgradeClick = {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED)
+                    val flow = if (settings.isLoggedIn()) {
+                        OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.PLUS_DETAILS)
+                    } else {
+                        OnboardingFlow.PlusAccountUpgradeNeedsLogin
+                    }
+                    OnboardingLauncher.openOnboardingFlow(activity, flow)
+                },
+                onLearnMoreClick = { targetLink ->
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_PLUS_LEARN_MORE_TAPPED)
+                    context?.let { context ->
+                        val intent =
+                            WebViewActivity.newInstance(context, "Learn More", targetLink)
+                        context.startActivity(intent)
+                    }
                 }
-                OnboardingLauncher.openOnboardingFlow(activity, flow)
-            }
-
-            val adapter = PlusAdapter(onAccountUpgradeClick)
+            )
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(rootView.context, LinearLayoutManager.VERTICAL, false)
 
@@ -141,7 +155,10 @@ private val SECTION_DIFF = object : DiffUtil.ItemCallback<PlusSection>() {
     }
 }
 
-private class PlusAdapter(val onAccountUpgradeClick: () -> Unit) : ListAdapter<PlusSection, RecyclerView.ViewHolder>(SECTION_DIFF) {
+private class PlusAdapter(
+    val onAccountUpgradeClick: () -> Unit,
+    private val onLearnMoreClick: (String) -> Unit
+) : ListAdapter<PlusSection, RecyclerView.ViewHolder>(SECTION_DIFF) {
     class FeatureViewHolder(val root: View) : RecyclerView.ViewHolder(root) {
         private val imgIcon = root.findViewById<GradientIcon>(R.id.imgIcon)
         private val lblTitle = root.findViewById<TextView>(R.id.lblTitle)
@@ -222,7 +239,10 @@ private class PlusAdapter(val onAccountUpgradeClick: () -> Unit) : ListAdapter<P
         }
     }
 
-    class LinkBlockHolder(root: View) : RecyclerView.ViewHolder(root) {
+    class LinkBlockHolder(
+        root: View,
+        private val onLinkClick: (String) -> Unit
+    ) : RecyclerView.ViewHolder(root) {
         private val imgLogo = root.findViewById<ImageView>(R.id.imgLogo)
         private val lblBody = root.findViewById<TextView>(R.id.lblBody)
         private val lblLink = root.findViewById<TextView>(R.id.lblLink)
@@ -230,10 +250,7 @@ private class PlusAdapter(val onAccountUpgradeClick: () -> Unit) : ListAdapter<P
         fun bind(linkBlock: PlusSection.LinkBlock) {
             lblBody.setText(linkBlock.body)
             lblLink.setText(linkBlock.linkText)
-            lblLink.setOnClickListener {
-                val intent = WebViewActivity.newInstance(lblLink.context, "Learn More", linkBlock.link)
-                lblLink.context?.startActivity(intent)
-            }
+            lblLink.setOnClickListener { onLinkClick(linkBlock.link) }
             imgLogo.setImageResource(linkBlock.icon)
         }
     }
@@ -258,7 +275,7 @@ private class PlusAdapter(val onAccountUpgradeClick: () -> Unit) : ListAdapter<P
             R.layout.adapter_plus_upgrade_button -> UpgradeViewHolder(itemView, onAccountUpgradeClick)
             R.layout.adapter_plus_header -> HeaderViewHolder(itemView)
             R.layout.adapter_plus_text_block -> TextBlockHolder(itemView)
-            R.layout.adapter_plus_link_block -> LinkBlockHolder(itemView)
+            R.layout.adapter_plus_link_block -> LinkBlockHolder(itemView, onLearnMoreClick)
             R.layout.adapter_plus_divider -> DividerHolder(itemView)
             else -> throw IllegalStateException("Unknown view type in plus settings")
         }

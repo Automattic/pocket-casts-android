@@ -380,5 +380,10 @@ enum class AnalyticsEvent(val key: String) {
     CANCEL_CONFIRMATION_VIEW_SHOWN("cancel_confirmation_view_shown"),
     CANCEL_CONFIRMATION_VIEW_DISMISSED("cancel_confirmation_view_dismissed"),
     CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("cancel_confirmation_stay_button_tapped"),
-    CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped")
+    CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped"),
+
+    /* Settings - Plus */
+    SETTINGS_PLUS_SHOWN("settings_plus_shown"),
+    SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED("settings_plus_upgrade_button_tapped"),
+    SETTINGS_PLUS_LEARN_MORE_TAPPED("settings_plus_learn_more_tapped"),
 }
