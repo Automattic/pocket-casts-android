@@ -9,7 +9,7 @@ class MultiSelectTouchCallback(
     interface ItemTouchHelperAdapter {
         fun onItemMove(fromPosition: Int, toPosition: Int)
         fun onItemStartDrag(viewHolder: MultiSelectAdapter.ItemViewHolder)
-        fun onItemTouchFinished()
+        fun onItemTouchFinished(position: Int)
     }
 
     interface ItemTouchHelperViewHolder {
@@ -58,7 +58,7 @@ class MultiSelectTouchCallback(
         if (viewHolder is ItemTouchHelperViewHolder) {
             viewHolder.onItemClear()
         }
-        listener.onItemTouchFinished()
+        listener.onItemTouchFinished(viewHolder.bindingAdapterPosition)
     }
 
     override fun isItemViewSwipeEnabled(): Boolean {

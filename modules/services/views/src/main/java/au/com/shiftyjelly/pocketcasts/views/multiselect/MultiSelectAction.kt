@@ -10,84 +10,102 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-sealed class MultiSelectAction(val groupId: Int, val actionId: Int, @StringRes val title: Int, @DrawableRes val iconRes: Int) {
+sealed class MultiSelectAction(
+    val groupId: Int,
+    val actionId: Int,
+    @StringRes val title: Int,
+    @DrawableRes val iconRes: Int,
+    val analyticsValue: String,
+) {
     object DeleteDownload : MultiSelectAction(
         R.id.menu_download,
         UR.id.menu_undownload,
         LR.string.delete_download,
-        IR.drawable.ic_undownload
+        IR.drawable.ic_undownload,
+        "remove_download"
     )
     object Download : MultiSelectAction(
         R.id.menu_download,
         R.id.menu_download,
         LR.string.download,
-        IR.drawable.ic_download
+        IR.drawable.ic_download,
+        "download"
     )
 
     object Archive : MultiSelectAction(
         R.id.menu_archive,
         R.id.menu_archive,
         LR.string.archive,
-        IR.drawable.ic_archive
+        IR.drawable.ic_archive,
+        "archive"
     )
     object Unarchive : MultiSelectAction(
         R.id.menu_archive,
         UR.id.menu_unarchive,
         LR.string.unarchive,
-        IR.drawable.ic_unarchive
+        IR.drawable.ic_unarchive,
+        "unarchive"
     )
     object DeleteUserEpisode : MultiSelectAction(
         R.id.menu_archive,
         R.id.menu_delete,
         LR.string.delete,
-        R.drawable.ic_delete
+        R.drawable.ic_delete,
+        "delete"
     )
 
     object MarkAsUnplayed : MultiSelectAction(
         R.id.menu_mark_played,
         UR.id.menu_markasunplayed,
         LR.string.mark_as_unplayed,
-        IR.drawable.ic_markasunplayed
+        IR.drawable.ic_markasunplayed,
+        "mark_as_unplayed"
     )
     object MarkAsPlayed : MultiSelectAction(
         R.id.menu_mark_played,
         R.id.menu_mark_played,
         LR.string.mark_as_played,
-        IR.drawable.ic_markasplayed
+        IR.drawable.ic_markasplayed,
+        "mark_as_played"
     )
 
     object PlayNext : MultiSelectAction(
         R.id.menu_playnext,
         R.id.menu_playnext,
         LR.string.play_next,
-        IR.drawable.ic_upnext_playnext
+        IR.drawable.ic_upnext_playnext,
+        "play_next"
     )
 
     object PlayLast : MultiSelectAction(
         R.id.menu_playlast,
         R.id.menu_playlast,
         LR.string.play_last,
-        IR.drawable.ic_upnext_playlast
+        IR.drawable.ic_upnext_playlast,
+        "play_last"
     )
 
     object Unstar : MultiSelectAction(
         R.id.menu_star,
         UR.id.menu_unstar,
         LR.string.unstar,
-        IR.drawable.ic_unstar
+        IR.drawable.ic_unstar,
+        "unstar"
     )
     object Star : MultiSelectAction(
         R.id.menu_star,
         R.id.menu_star,
         LR.string.star,
-        IR.drawable.ic_star
+        IR.drawable.ic_star,
+        "star"
     )
 
     object SelectAll : MultiSelectAction(
         R.id.menu_select_all,
         R.id.menu_select_all,
         LR.string.select_all,
-        IR.drawable.ic_selectall_up
+        IR.drawable.ic_selectall_up,
+        "select_all"
     )
 
     companion object {

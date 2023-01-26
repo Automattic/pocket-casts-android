@@ -4,9 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentMultiselectBinding
@@ -23,6 +27,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHelperAdapter {
     @Inject lateinit var settings: Settings
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    private val source: String
+        get() = arguments?.getString(ARG_SOURCE) ?: AnalyticsSource.UNKNOWN.analyticsValue
 
     private val adapter = MultiSelectAdapter(editable = true, listener = null, dragListener = this::onItemStartDrag)
     private lateinit var itemTouchHelper: ItemTouchHelper
@@ -30,6 +37,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
     private val shortcutTitle = MultiSelectAdapter.Title(LR.string.multiselect_actions_shown)
     private val overflowTitle = MultiSelectAdapter.Title(LR.string.multiselect_actions_hidden)
     private var binding: FragmentMultiselectBinding? = null
+    private var dragStartPosition: Int? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentMultiselectBinding.inflate(inflater, container, false)
@@ -50,7 +58,10 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
         toolbar.setup(
             title = getString(LR.string.rearrange_actions),
             navigationIcon = NavigationIcon.BackArrow,
-            onNavigationClick = { (activity as? FragmentHostListener)?.closeModal(this) },
+            onNavigationClick = {
+                trackRearrangeFinishedEvent()
+                (activity as? FragmentHostListener)?.closeModal(this)
+            },
             activity = activity,
             theme = theme
         )
@@ -74,6 +85,11 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
                 items = multiSelectActions.toList()
                 adapter.submitList(multiSelectActions.toList())
             }
+    }
+
+    override fun onBackPressed(): Boolean {
+        trackRearrangeFinishedEvent()
+        return super.onBackPressed()
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int) {
@@ -105,10 +121,72 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
     }
 
     override fun onItemStartDrag(viewHolder: MultiSelectAdapter.ItemViewHolder) {
+        dragStartPosition = viewHolder.bindingAdapterPosition
         itemTouchHelper.startDrag(viewHolder)
     }
 
-    override fun onItemTouchFinished() {
+    override fun onItemTouchFinished(position: Int) {
         settings.setMultiSelectItems(items.filterIsInstance<MultiSelectAction>().map { it.groupId })
+        trackItemMovedEvent(position)
+    }
+
+    private fun sectionTitleAt(position: Int) =
+        if (position < MultiSelectToolbar.MAX_ICONS) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+
+    private fun trackRearrangeFinishedEvent() {
+        analyticsTracker.track(
+            AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_FINISHED,
+            mapOf(AnalyticsProp.Key.SOURCE to source)
+        )
+    }
+
+    private fun trackItemMovedEvent(position: Int) {
+        dragStartPosition?.let {
+            val title = (items[position] as? MultiSelectAction)?.analyticsValue
+                ?: AnalyticsProp.Value.UNKNOWN
+            val movedFrom = sectionTitleAt(it)
+            val movedTo = sectionTitleAt(position)
+            val newPosition = if (movedTo == AnalyticsProp.Value.SHELF) {
+                position - 1
+            } else {
+                position - (items.indexOf(MultiSelectToolbar.MAX_ICONS) + 1)
+            }
+            analyticsTracker.track(
+                AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_ACTION_MOVED,
+                mapOf(
+                    AnalyticsProp.Key.ACTION to title,
+                    AnalyticsProp.Key.POSITION to newPosition, // it is the new position in section it was moved to
+                    AnalyticsProp.Key.MOVED_FROM to movedFrom,
+                    AnalyticsProp.Key.MOVED_TO to movedTo,
+                    AnalyticsProp.Key.SOURCE to source,
+                )
+            )
+            dragStartPosition = null
+        }
+    }
+
+    private object AnalyticsProp {
+        object Key {
+            const val ACTION = "action"
+            const val MOVED_FROM = "moved_from"
+            const val MOVED_TO = "moved_to"
+            const val POSITION = "position"
+            const val SOURCE = "source"
+        }
+
+        object Value {
+            const val SHELF = "shelf"
+            const val OVERFLOW_MENU = "overflow_menu"
+            const val UNKNOWN = "unknown"
+        }
+    }
+
+    companion object {
+        private const val ARG_SOURCE = "source"
+        fun newInstance(source: AnalyticsSource) = MultiSelectFragment().apply {
+            arguments = bundleOf(
+                ARG_SOURCE to source.analyticsValue,
+            )
+        }
     }
 }
