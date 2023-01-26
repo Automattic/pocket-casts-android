@@ -28,10 +28,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterMediaActionItemBinding
@@ -58,15 +59,22 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
 
     @Inject
     lateinit var settings: Settings
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private lateinit var itemTouchHelper: ItemTouchHelper
     private val adapter = MediaActionAdapter(dragListener = this::onMediaActionItemStartDrag)
-    private val mediaTitle = MediaActionTitle(R.string.settings_media_actions_prioritize_title, R.string.settings_media_actions_prioritize_subtitle)
-    private val otherActionsTitle = MediaActionTitle(R.string.settings_other_media_actions)
+    private val mediaTitle = MediaActionTitle(LR.string.settings_media_actions_prioritize_title, LR.string.settings_media_actions_prioritize_subtitle)
+    private val otherActionsTitle = MediaActionTitle(LR.string.settings_other_media_actions)
     private var binding: FragmentMediaNotificationControlsBinding? = null
-    private var dragStartPosition: Int? = null
+    private var mediaActionMove: MediaActionMove? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN)
         binding = FragmentMediaNotificationControlsBinding.inflate(inflater, container, false)
         return binding?.root
     }
@@ -82,7 +90,7 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         val binding = binding ?: return
 
         val toolbar = binding.toolbar
-        toolbar.setTitle(R.string.settings_media_actions_customise)
+        toolbar.setTitle(LR.string.settings_media_actions_customise)
         toolbar.setTitleTextColor(toolbar.context.getThemeColor(UR.attr.secondary_text_01))
         toolbar.setNavigationOnClickListener {
             (activity as? FragmentHostListener)?.closeModal(this)
@@ -92,7 +100,10 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         val backgroundColor = view.context.getThemeColor(UR.attr.primary_ui_01)
 
         view.setBackgroundColor(backgroundColor)
-        adapter.selectedBackground = ColorUtils.calculateCombinedColor(backgroundColor, view.context.getThemeColor(UR.attr.primary_ui_02_selected))
+        adapter.selectedBackground = ColorUtils.calculateCombinedColor(
+            backgroundColor,
+            view.context.getThemeColor(UR.attr.primary_ui_02_selected)
+        )
 
         val recyclerView = binding.recyclerView
         recyclerView.adapter = adapter
@@ -147,7 +158,13 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
                     .toggleable(
                         value = shouldShowCustomMediaActions,
                         role = Role.Switch
-                    ) { onShowCustomMediaActionsToggled(!shouldShowCustomMediaActions) }
+                    ) {
+                        analyticsTracker.track(
+                            AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED,
+                            mapOf("enabled" to it)
+                        )
+                        onShowCustomMediaActionsToggled(it)
+                    }
             )
         }
     }
@@ -161,44 +178,116 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
     }
 
     override fun onMediaActionItemMove(fromPosition: Int, toPosition: Int) {
-        val listData = items.toMutableList()
 
-        Timber.d("Swapping $fromPosition to $toPosition")
-        Timber.d("List: $listData")
+        val updatedItems = items.toMutableList()
 
         if (fromPosition < toPosition) {
             for (index in fromPosition until toPosition) {
-                Collections.swap(listData, index, index + 1)
+                Collections.swap(updatedItems, index, index + 1)
             }
         } else {
             for (index in fromPosition downTo toPosition + 1) {
-                Collections.swap(listData, index, index - 1)
+                Collections.swap(updatedItems, index, index - 1)
             }
         }
 
         // Make sure the titles are in the right spot
-        listData.remove(otherActionsTitle)
-        listData.remove(mediaTitle)
-        listData.add(3, otherActionsTitle)
-        listData.add(0, mediaTitle)
+        updatedItems.remove(otherActionsTitle)
+        updatedItems.remove(mediaTitle)
+        updatedItems.add(3, otherActionsTitle)
+        updatedItems.add(0, mediaTitle)
 
-        adapter.submitList(listData)
-        items = listData.toList()
-
-        Timber.d("Swapped: $items")
+        updateMediaActionMove(
+            fromPosition = fromPosition,
+            originalItems = items,
+            updatedItems = updatedItems
+        )
+        adapter.submitList(updatedItems)
+        items = updatedItems.toList()
     }
 
+    private fun updateMediaActionMove(
+        fromPosition: Int,
+        originalItems: List<Any>,
+        updatedItems: List<Any>
+    ) {
+        mediaActionMove = mediaActionMove.let { mediaActionMove ->
+            when (mediaActionMove) {
+                null -> {
+                    val movedControl = originalItems[fromPosition] as? Settings.MediaNotificationControls
+                    if (movedControl == null) {
+                        // This should never happen
+                        Timber.e("Cannot track move because could not identify control being moved.")
+                        null
+                    } else {
+                        MediaActionMove(
+                            item = movedControl,
+                            fromPosition = positionOfControl(originalItems, movedControl),
+                            toPosition = positionOfControl(updatedItems, movedControl)
+                        )
+                    }
+                }
+
+                else -> {
+                    // Update end position
+                    mediaActionMove.copy(
+                        toPosition = positionOfControl(updatedItems, mediaActionMove.item)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun trackMove() {
+        mediaActionMove?.let { mediaActionMove ->
+            if (mediaActionMove.fromPosition == mediaActionMove.toPosition) {
+                Timber.d("Not tracking move because position did not change")
+                return
+            }
+
+            analyticsTracker.track(
+                AnalyticsEvent.SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED,
+                mapOf(
+                    "item" to when (mediaActionMove.item) {
+                        Settings.MediaNotificationControls.Archive -> "archive"
+                        Settings.MediaNotificationControls.MarkAsPlayed -> "mark_as_played"
+                        Settings.MediaNotificationControls.PlayNext -> "play_next"
+                        Settings.MediaNotificationControls.PlaybackSpeed -> "playback_speed"
+                        Settings.MediaNotificationControls.Star -> "star"
+                    },
+                    "previous_position" to mediaActionMove.fromPosition,
+                    "updated_position" to mediaActionMove.toPosition,
+                )
+            )
+        } ?: Timber.e("Attempted to track move but mediaActionMove was null")
+    }
+
+    private fun positionOfControl(list: List<Any>, item: Settings.MediaNotificationControls) =
+        list.toMutableList().apply {
+            remove(otherActionsTitle)
+            remove(mediaTitle)
+        }.indexOf(item)
+
     override fun onMediaActionItemStartDrag(viewHolder: MediaActionAdapter.ItemViewHolder) {
-        dragStartPosition = viewHolder.bindingAdapterPosition
         itemTouchHelper.startDrag(viewHolder)
     }
 
     override fun onMediaActionItemTouchHelperFinished(position: Int) {
+        trackMove()
+        // Reset mediaActionMove now that we've tracked it
+        mediaActionMove = null
+
         settings.setMediaNotificationControlItems(items.filterIsInstance<Settings.MediaNotificationControls>().map { it.key })
     }
 }
 
-data class MediaActionTitle(@StringRes val title: Int, @StringRes val subTitle: Int? = null)
+private data class MediaActionMove(
+    val item: Settings.MediaNotificationControls,
+    val fromPosition: Int,
+    val toPosition: Int,
+)
+
+private data class MediaActionTitle(@StringRes val title: Int, @StringRes val subTitle: Int? = null)
 
 private val MEDIA_ACTION_ITEM_DIFF = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
@@ -242,8 +331,7 @@ class MediaActionAdapter(val listener: ((Settings.MediaNotificationControls) -> 
             }
         }
 
-        override fun onItemSwipe() {
-        }
+        override fun onItemSwipe() {}
 
         override fun onItemClear() {
             AnimatorSet().apply {
