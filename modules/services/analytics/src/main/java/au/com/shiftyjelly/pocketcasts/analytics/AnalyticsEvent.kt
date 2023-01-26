@@ -361,6 +361,9 @@ enum class AnalyticsEvent(val key: String) {
     /* Podcast List Share */
     SHARE_PODCASTS_SHOWN("share_podcasts_shown"),
     SHARE_PODCASTS_PODCASTS_SELECTED("share_podcasts_podcasts_selected"),
+    SHARE_PODCASTS_LIST_PUBLISH_STARTED("share_podcasts_list_publish_started"),
+    SHARE_PODCASTS_LIST_PUBLISH_SUCCEEDED("share_podcasts_list_publish_succeeded"),
+    SHARE_PODCASTS_LIST_PUBLISH_FAILED("share_podcasts_list_publish_failed"),
 
     /* End of Year */
     END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),

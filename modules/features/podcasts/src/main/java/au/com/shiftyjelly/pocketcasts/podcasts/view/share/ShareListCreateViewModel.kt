@@ -82,6 +82,10 @@ class ShareListCreateViewModel @Inject constructor(
         val description = stateValue.description
 
         val selectedPodcasts = stateValue.selectedPodcastsOrdered
+        trackShareEvent(
+            AnalyticsEvent.SHARE_PODCASTS_LIST_PUBLISH_STARTED,
+            AnalyticsProp.countMap(selectedPodcasts.size)
+        )
         onBefore()
         viewModelScope.launch {
             try {
@@ -96,10 +100,18 @@ class ShareListCreateViewModel @Inject constructor(
                     putExtra(Intent.EXTRA_TEXT, url)
                 }
                 startActivity(context, Intent.createChooser(intent, label), null)
+                trackShareEvent(
+                    AnalyticsEvent.SHARE_PODCASTS_LIST_PUBLISH_SUCCEEDED,
+                    AnalyticsProp.countMap(selectedPodcasts.size)
+                )
 
                 onSuccess()
             } catch (ex: Exception) {
                 Timber.e(ex)
+                trackShareEvent(
+                    AnalyticsEvent.SHARE_PODCASTS_LIST_PUBLISH_FAILED,
+                    AnalyticsProp.countMap(selectedPodcasts.size)
+                )
                 onFailure()
             }
         }
@@ -111,5 +123,10 @@ class ShareListCreateViewModel @Inject constructor(
 
     fun trackShareEvent(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         analyticsTracker.track(event, properties)
+    }
+
+    private object AnalyticsProp {
+        private const val count = "count"
+        fun countMap(count: Int) = mapOf(this.count to count)
     }
 }
