@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -19,6 +20,10 @@ class SearchViewModel @Inject constructor(
 
     fun setOnlySearchRemote(remote: Boolean) {
         searchHandler.setOnlySearchRemote(remote)
+    }
+
+    fun setSource(source: AnalyticsSource) {
+        searchHandler.setSource(source)
     }
 }
 

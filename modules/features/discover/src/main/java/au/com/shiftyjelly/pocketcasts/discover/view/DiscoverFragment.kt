@@ -105,7 +105,11 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     }
 
     override fun onSearchClicked() {
-        val searchFragment = SearchFragment.newInstance(floating = true, onlySearchRemote = true)
+        val searchFragment = SearchFragment.newInstance(
+            floating = true,
+            onlySearchRemote = true,
+            source = AnalyticsSource.DISCOVER
+        )
         (activity as FragmentHostListener).addFragment(searchFragment, onTop = true)
         binding?.recyclerView?.smoothScrollToPosition(0)
     }

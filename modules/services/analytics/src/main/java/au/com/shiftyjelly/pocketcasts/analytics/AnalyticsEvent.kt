@@ -424,4 +424,8 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_PLUS_SHOWN("settings_plus_shown"),
     SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED("settings_plus_upgrade_button_tapped"),
     SETTINGS_PLUS_LEARN_MORE_TAPPED("settings_plus_learn_more_tapped"),
+
+    /* Search */
+    SEARCH_PERFORMED("search_performed"),
+    SEARCH_FAILED("search_failed"),
 }
