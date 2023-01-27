@@ -131,7 +131,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
     }
 
     private fun sectionTitleAt(position: Int) =
-        if (position < MultiSelectToolbar.MAX_ICONS) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+        if (position <= MultiSelectToolbar.MAX_ICONS) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
 
     private fun trackRearrangeFinishedEvent() {
         analyticsTracker.track(
