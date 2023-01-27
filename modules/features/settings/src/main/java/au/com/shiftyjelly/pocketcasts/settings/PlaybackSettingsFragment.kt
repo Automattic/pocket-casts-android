@@ -170,6 +170,11 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
                     )
 
+                    SeekToAccuracy(
+                        saved = settings.seekToAccuracyFlow.collectAsState().value,
+                        onSave = settings::setSeekToAccuracy
+                    )
+
                     KeepScreenAwake(
                         saved = settings.keepScreenAwakeFlow.collectAsState().value,
                         onSave = settings::setKeepScreenAwake
@@ -386,6 +391,15 @@ class PlaybackSettingsFragment : BaseFragment() {
             if (int.isPositive()) int else null
         }
     }
+
+    @Composable
+    private fun SeekToAccuracy(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(LR.string.settings_seek_to_accuracy),
+            secondaryText = stringResource(LR.string.settings_seek_to_accuracy_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+        )
 
     @Composable
     private fun KeepScreenAwake(saved: Boolean, onSave: (Boolean) -> Unit) =

@@ -699,7 +699,13 @@ class AddFileActivity :
             .setUserAgent("Pocket Casts")
             .setAllowCrossProtocolRedirects(true)
         val dataSourceFactory = DefaultDataSource.Factory(this, httpDataSourceFactory)
-        val extractorsFactory = DefaultExtractorsFactory().setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING)
+        val extractorsFactory = DefaultExtractorsFactory().setMp3ExtractorFlags(
+            if (settings.seekToAccuracy()) {
+                Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING
+            } else {
+                Mp3Extractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING
+            }
+        )
         val source = ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory).createMediaSource(MediaItem.fromUri(uri))
         player.setMediaSource(source)
         player.prepare()

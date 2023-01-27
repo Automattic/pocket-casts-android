@@ -96,6 +96,7 @@ interface Settings {
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
+        const val PREFERENCE_SEEK_TO_ACCURACY = "seekToAccuracy"
 
         const val PREFERENCE_AUTO_PLAY_ON_EMPTY = "autoUpNextEmpty"
         const val PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY = "autoSubscribeToPlayed"
@@ -302,6 +303,7 @@ interface Settings {
     val openPlayerAutomaticallyFlow: StateFlow<Boolean>
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
     val customMediaActionsVisibilityFlow: StateFlow<Boolean>
+    val seekToAccuracyFlow: StateFlow<Boolean>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -412,6 +414,9 @@ interface Settings {
 
     fun keepScreenAwake(): Boolean
     fun setKeepScreenAwake(newValue: Boolean)
+
+    fun seekToAccuracy(): Boolean
+    fun setSeekToAccuracy(newValue: Boolean)
 
     fun openPlayerAutomatically(): Boolean
     fun setOpenPlayerAutomatically(newValue: Boolean)

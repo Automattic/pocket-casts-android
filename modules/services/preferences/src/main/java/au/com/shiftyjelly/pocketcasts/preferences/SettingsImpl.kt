@@ -104,6 +104,7 @@ class SettingsImpl @Inject constructor(
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
     override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
+    override val seekToAccuracyFlow = MutableStateFlow(seekToAccuracy())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -783,6 +784,15 @@ class SettingsImpl @Inject constructor(
     override fun setStreamingMode(newValue: Boolean) {
         setBoolean(Settings.PREFERENCE_GLOBAL_STREAMING_MODE, newValue)
         rowActionObservable.accept(newValue)
+    }
+
+    override fun seekToAccuracy(): Boolean {
+        return sharedPreferences.getBoolean(Settings.PREFERENCE_SEEK_TO_ACCURACY, false)
+    }
+
+    override fun setSeekToAccuracy(newValue: Boolean) {
+        setBoolean(Settings.PREFERENCE_SEEK_TO_ACCURACY, newValue)
+        seekToAccuracyFlow.update { newValue }
     }
 
     override fun keepScreenAwake(): Boolean {

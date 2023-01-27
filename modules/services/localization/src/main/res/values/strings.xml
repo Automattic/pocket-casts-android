@@ -1078,6 +1078,8 @@
     <string name="settings_row_action_download" translatable="false">@string/download</string>
     <string name="settings_row_action_play" translatable="false">@string/play</string>
     <string name="settings_row_action_summary">For episodes that aren\'t downloaded yet, lists will show %s buttons.</string>
+    <string name="settings_seek_to_accuracy">Seek to accuracy</string>
+    <string name="settings_seek_to_accuracy_summary">If on, seeking will be more accurate but it can make seeking slower.</string>
     <string name="settings_show_archived" translatable="false">@string/show_archived</string>
     <string name="settings_show_archived_action_hide">Hide</string>
     <string name="settings_show_archived_action_show">Show</string>

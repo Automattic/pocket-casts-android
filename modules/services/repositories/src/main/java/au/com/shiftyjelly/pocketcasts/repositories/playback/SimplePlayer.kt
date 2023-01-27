@@ -230,7 +230,13 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             .setUserAgent("Pocket Casts")
             .setAllowCrossProtocolRedirects(true)
         val dataSourceFactory = DefaultDataSource.Factory(context, httpDataSourceFactory)
-        val extractorsFactory = DefaultExtractorsFactory().setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING)
+        val extractorsFactory = DefaultExtractorsFactory().setMp3ExtractorFlags(
+            if (settings.seekToAccuracy()) {
+                Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING
+            } else {
+                Mp3Extractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING
+            }
+        )
         val location = episodeLocation
         if (location == null) {
             onError(PlayerEvent.PlayerError("Episode has no source"))
