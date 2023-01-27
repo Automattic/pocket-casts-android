@@ -171,10 +171,22 @@ class SearchFragment : BaseFragment() {
         val searchAdapter = PodcastSearchAdapter(
             theme = theme,
             onPodcastClick = { podcast ->
+                viewModel.trackSearchResultTapped(
+                    source = source,
+                    uuid = podcast.uuid,
+                    onlySearchRemote = onlySearchRemote,
+                    isFolder = false
+                )
                 listener?.onSearchPodcastClick(podcast.uuid)
                 UiUtil.hideKeyboard(searchView)
             },
             onFolderClick = { folder ->
+                viewModel.trackSearchResultTapped(
+                    source = source,
+                    uuid = folder.uuid,
+                    onlySearchRemote = onlySearchRemote,
+                    isFolder = true
+                )
                 listener?.onSearchFolderClick(folder.uuid)
                 UiUtil.hideKeyboard(searchView)
             }

@@ -428,4 +428,5 @@ enum class AnalyticsEvent(val key: String) {
     /* Search */
     SEARCH_PERFORMED("search_performed"),
     SEARCH_FAILED("search_failed"),
+    SEARCH_RESULT_TAPPED("search_result_tapped"),
 }
