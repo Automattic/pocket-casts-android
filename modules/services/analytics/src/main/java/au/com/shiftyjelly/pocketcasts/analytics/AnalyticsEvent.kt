@@ -402,5 +402,26 @@ enum class AnalyticsEvent(val key: String) {
     CANCEL_CONFIRMATION_VIEW_SHOWN("cancel_confirmation_view_shown"),
     CANCEL_CONFIRMATION_VIEW_DISMISSED("cancel_confirmation_view_dismissed"),
     CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("cancel_confirmation_stay_button_tapped"),
-    CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped")
+    CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped"),
+
+    /* Settings - General */
+    SETTINGS_GENERAL_SHOWN("settings_general_shown"),
+    SETTINGS_GENERAL_ROW_ACTION_CHANGED("settings_general_row_action_changed"),
+    SETTINGS_GENERAL_EPISODE_GROUPING_CHANGED("settings_general_episode_grouping_changed"),
+    SETTINGS_GENERAL_ARCHIVED_EPISODES_CHANGED("settings_general_archived_episodes_changed"),
+    SETTINGS_GENERAL_UP_NEXT_SWIPE_CHANGED("settings_general_up_next_swipe_changed"),
+    SETTINGS_GENERAL_SKIP_FORWARD_CHANGED("settings_general_skip_forward_changed"),
+    SETTINGS_GENERAL_SKIP_BACK_CHANGED("settings_general_skip_back_changed"),
+    SETTINGS_GENERAL_KEEP_SCREEN_AWAKE_TOGGLED("settings_general_keep_screen_awake_toggled"),
+    SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED("settings_general_open_player_automatically_toggled"),
+    SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED("settings_general_intelligent_playback_toggled"),
+    SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED("settings_general_play_up_next_on_tap_toggled"),
+    SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN("settings_general_media_notification_controls_shown"),
+    SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
+    SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
+
+    /* Settings - Plus */
+    SETTINGS_PLUS_SHOWN("settings_plus_shown"),
+    SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED("settings_plus_upgrade_button_tapped"),
+    SETTINGS_PLUS_LEARN_MORE_TAPPED("settings_plus_learn_more_tapped"),
 }
