@@ -309,6 +309,12 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_ACTION_MOVED("player_shelf_overflow_menu_rearrange_action_moved"),
     PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_FINISHED("player_shelf_overflow_menu_rearrange_finished"),
 
+    /* Multi Select View */
+    MULTI_SELECT_VIEW_OVERFLOW_MENU_SHOWN("multi_select_view_overflow_menu_shown"),
+    MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_STARTED("multi_select_view_overflow_menu_rearrange_started"),
+    MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_ACTION_MOVED("multi_select_view_overflow_menu_rearrange_action_moved"),
+    MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_FINISHED("multi_select_view_overflow_menu_rearrange_finished"),
+
     /* Episode */
     EPISODE_DOWNLOAD_DELETED("episode_download_deleted"),
     EPISODE_BULK_DOWNLOAD_DELETED("episode_bulk_download_deleted"),
