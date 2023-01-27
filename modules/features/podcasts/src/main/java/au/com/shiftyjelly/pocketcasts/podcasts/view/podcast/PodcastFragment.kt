@@ -753,7 +753,15 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         val context = context ?: return
         viewModel.podcast.value?.let { podcast ->
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHARE_TAPPED)
-            SharePodcastHelper(podcast, null, null, context).showShareDialogDirect()
+            SharePodcastHelper(
+                podcast,
+                null,
+                null,
+                context,
+                SharePodcastHelper.ShareType.PODCAST,
+                AnalyticsSource.PODCAST_SCREEN,
+                analyticsTracker
+            ).showShareDialogDirect()
         }
     }
 

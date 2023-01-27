@@ -218,6 +218,10 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED("podcast_settings_auto_archive_inactive_changed"),
     PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED("podcast_settings_auto_archive_episode_limit_changed"),
 
+    /* Podcast subscribed/ Unsubscribed */
+    PODCAST_SUBSCRIBED("podcast_subscribed"),
+    PODCAST_UNSUBSCRIBED("podcast_unsubscribed"),
+
     /* Playback */
     PLAYBACK_PLAY("playback_play"),
     PLAYBACK_PAUSE("playback_pause"),
@@ -343,6 +347,7 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_ADDED_TO_UP_NEXT("episode_added_to_up_next"),
     EPISODE_BULK_ADD_TO_UP_NEXT("episode_bulk_add_to_up_next"),
     EPISODE_REMOVED_FROM_UP_NEXT("episode_removed_from_up_next"),
+    PODCAST_SHARED("podcast_shared"),
 
     /* Episode Details */
     EPISODE_DETAIL_SHOWN("episode_detail_shown"),
@@ -357,6 +362,17 @@ enum class AnalyticsEvent(val key: String) {
     RECOMMENDATIONS_IMPORT_TAPPED("recommendations_import_tapped"),
     RECOMMENDATIONS_MORE_TAPPED("recommendations_more_tapped"),
     RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
+
+    /* Podcast List Share */
+    SHARE_PODCASTS_SHOWN("share_podcasts_shown"),
+    SHARE_PODCASTS_PODCASTS_SELECTED("share_podcasts_podcasts_selected"),
+    SHARE_PODCASTS_LIST_PUBLISH_STARTED("share_podcasts_list_publish_started"),
+    SHARE_PODCASTS_LIST_PUBLISH_SUCCEEDED("share_podcasts_list_publish_succeeded"),
+    SHARE_PODCASTS_LIST_PUBLISH_FAILED("share_podcasts_list_publish_failed"),
+
+    /* Incoming Share List */
+    INCOMING_SHARE_LIST_SHOWN("incoming_share_list_shown"),
+    INCOMING_SHARE_LIST_SUBSCRIBED_ALL("incoming_share_list_subscribed_all"),
 
     /* End of Year */
     END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),

@@ -5,6 +5,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -29,6 +31,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val searchHandler: SearchHandler,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -115,12 +118,16 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     }
 
     fun toggleSubscribed(podcastResult: PodcastResult) {
+        val event: AnalyticsEvent
         val uuid = podcastResult.podcast.uuid
         if (podcastResult.isSubscribed) {
+            event = AnalyticsEvent.PODCAST_UNSUBSCRIBED
             podcastManager.unsubscribeAsync(podcastUuid = uuid, playbackManager = playbackManager)
         } else {
+            event = AnalyticsEvent.PODCAST_SUBSCRIBED
             podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
         }
+        analyticsTracker.track(event, AnalyticsProp.podcastSubscribeToggled(uuid))
 
         _state.update {
             it.copy(
@@ -132,6 +139,16 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                     }
                 }
             )
+        }
+    }
+
+    companion object {
+        private const val ONBOARDING_RECOMMENDATIONS_SEARCH = "onboarding_recommendations_search"
+        private object AnalyticsProp {
+            const val UUID = "uuid"
+            const val SOURCE = "source"
+            fun podcastSubscribeToggled(uuid: String) =
+                mapOf(UUID to uuid, SOURCE to ONBOARDING_RECOMMENDATIONS_SEARCH)
         }
     }
 }

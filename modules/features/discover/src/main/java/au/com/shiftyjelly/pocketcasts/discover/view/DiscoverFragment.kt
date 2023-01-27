@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
@@ -52,6 +53,10 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     override fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?) {
         viewModel.subscribeToPodcast(podcast)
+        analyticsTracker.track(
+            AnalyticsEvent.PODCAST_SUBSCRIBED,
+            mapOf(SOURCE_KEY to AnalyticsSource.DISCOVER.analyticsValue, UUID_KEY to podcast.uuid)
+        )
     }
 
     override fun onPodcastListClicked(list: NetworkLoadableList) {
@@ -192,5 +197,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         const val LIST_ID_KEY = "list_id"
         const val PODCAST_UUID_KEY = "podcast_uuid"
         const val EPISODE_UUID_KEY = "episode_uuid"
+        const val SOURCE_KEY = "source"
+        const val UUID_KEY = "uuid"
     }
 }

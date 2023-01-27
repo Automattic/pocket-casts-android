@@ -5,6 +5,8 @@ enum class AnalyticsSource(val analyticsValue: String) {
     FILTERS("filters"),
     DISCOVER("discover"),
     DISCOVER_PODCAST_LIST("discover_podcast_list"),
+    DISCOVER_RANKED_LIST("discover_ranked_list"),
+    DISCOVER_PLAIN_LIST("discover_plain_list"),
     DOWNLOADS("downloads"),
     FILES("files"),
     STARRED("starred"),
