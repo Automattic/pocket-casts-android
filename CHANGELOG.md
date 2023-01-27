@@ -1,6 +1,8 @@
 7.32
 -----
-
+*   Bug Fixes:
+    *   Added a new setting to enable more accurate seeking
+        ([#733](https://github.com/Automattic/pocket-casts-android/pull/733)). 
 
 7.31
 -----
