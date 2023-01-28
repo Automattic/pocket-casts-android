@@ -1050,7 +1050,7 @@
     <string name="settings_notification_vibrate">Vibrate when</string>
     <string name="settings_notification_vibrate_new_episodes">New episodes</string>
     <string name="settings_notification_vibrate_in_silent">Only in silent mode</string>
-    <string name="settings_notification_vibrate_never">New episodes</string>
+    <string name="settings_notification_vibrate_never">Never</string>
     <string name="settings_open_player_automatically">Open player automatically</string>
     <string name="settings_open_player_automatically_summary">If on, the full-screen player will open when you start playing a podcast episode.</string>
     <string name="settings_other_media_actions">Other media actions</string>
