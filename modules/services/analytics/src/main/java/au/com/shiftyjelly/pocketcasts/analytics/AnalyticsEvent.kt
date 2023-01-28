@@ -420,6 +420,17 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
 
+    /* Settings - Notifications */
+    SETTINGS_NOTIFICATIONS_SHOWN("settings_notifications_shown"),
+    SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED("settings_notifications_new_episodes_toggled"),
+    SETTINGS_NOTIFICATIONS_PODCASTS_CHANGED("settings_notifications_podcasts_changed"),
+    SETTINGS_NOTIFICATIONS_ACTIONS_CHANGED("settings_notifications_actions_changed"),
+    SETTINGS_NOTIFICATIONS_ADVANCED_SETTINGS_TAPPED("settings_notifications_advanced_settings_tapped"),
+    SETTINGS_NOTIFICATIONS_PLAY_OVER_NOTIFICATIONS_TOGGLED("settings_notifications_play_over_notifications_toggled"),
+    SETTINGS_NOTIFICATIONS_HIDE_PLAYBACK_NOTIFICATION_ON_PAUSE("settings_notifications_hide_playback_notification_on_pause"),
+    SETTINGS_NOTIFICATIONS_SOUND_CHANGED("settings_notifications_sound_changed"),
+    SETTINGS_NOTIFICATIONS_VIBRATION_CHANGED("settings_notifications_vibration_changed"),
+
     /* Settings - Plus */
     SETTINGS_PLUS_SHOWN("settings_plus_shown"),
     SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED("settings_plus_upgrade_button_tapped"),

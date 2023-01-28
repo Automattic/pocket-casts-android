@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -62,6 +64,7 @@ class PodcastSelectFragment : BaseFragment() {
     private var userChanged = false
 
     @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     val disposables = CompositeDisposable()
 
     override fun onAttach(context: Context) {
@@ -148,6 +151,9 @@ class PodcastSelectFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         disposables.clear()
+        if (userChanged) {
+            analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PODCASTS_CHANGED)
+        }
         binding = null
     }
 
