@@ -75,6 +75,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                             (activity as? AppCompatActivity)?.let {
                                 theme.updateTheme(it, afterThemeType)
                                 binding.swtSystemTheme.isChecked = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
+                                viewModel.onThemeChanged(afterThemeType)
                             }
                         } else {
                             viewModel.updateChangeThemeType(Pair(beforeThemeType, afterThemeType))
@@ -155,7 +156,7 @@ class AppearanceSettingsFragment : BaseFragment() {
 
         binding.swtSystemTheme.isChecked = theme.getUseSystemTheme()
         binding.swtSystemTheme.setOnCheckedChangeListener { _, isChecked ->
-            theme.setUseSystemTheme(isChecked, activity as? AppCompatActivity)
+            viewModel.useAndroidLightDarkMode(isChecked, activity as? AppCompatActivity)
         }
 
         binding.swtShowArtwork.isChecked = viewModel.showArtworkOnLockScreen.value ?: false
@@ -186,6 +187,8 @@ class AppearanceSettingsFragment : BaseFragment() {
             settings.setUpgradeClosedAppearSettings(true)
             binding.upgradeGroup.isVisible = false
         }
+
+        viewModel.onShown()
     }
 
     private fun openOnboardingFlow() {
@@ -207,6 +210,7 @@ class AppearanceSettingsFragment : BaseFragment() {
     }
 
     private fun refreshArtwork() {
+        viewModel.onRefreshArtwork()
         val activity = activity ?: return
         AlertDialog.Builder(activity)
             .setTitle(LR.string.settings_refresh_artwork_title)
