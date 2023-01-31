@@ -13,6 +13,9 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.adapter.PodcastSearchAdapter
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -22,14 +25,17 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val ARG_FLOATING = "arg_floating"
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
+private const val ARG_SOURCE = "arg_source"
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     interface Listener {
         fun onSearchPodcastClick(podcastUuid: String)
@@ -37,11 +43,16 @@ class SearchFragment : BaseFragment() {
     }
 
     companion object {
-        fun newInstance(floating: Boolean, onlySearchRemote: Boolean): SearchFragment {
+        fun newInstance(
+            floating: Boolean = false,
+            onlySearchRemote: Boolean = false,
+            source: AnalyticsSource
+        ): SearchFragment {
             val fragment = SearchFragment()
             val arguments = Bundle().apply {
                 putBoolean(ARG_FLOATING, floating)
                 putBoolean(ARG_ONLY_SEARCH_REMOTE, onlySearchRemote)
+                putString(ARG_SOURCE, source.analyticsValue)
             }
             fragment.arguments = arguments
             return fragment
@@ -56,6 +67,8 @@ class SearchFragment : BaseFragment() {
         get() = arguments?.getBoolean(ARG_FLOATING) ?: false
     val onlySearchRemote: Boolean
         get() = arguments?.getBoolean(ARG_ONLY_SEARCH_REMOTE) ?: false
+    val source: AnalyticsSource
+        get() = AnalyticsSource.fromString(arguments?.getString(ARG_SOURCE))
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {}
@@ -112,6 +125,7 @@ class SearchFragment : BaseFragment() {
             @Suppress("DEPRECATION")
             activity?.onBackPressed()
         }
+        viewModel.setSource(source)
 
         // hack as Search View ignores text size
         val searchView = binding.searchView
@@ -158,10 +172,24 @@ class SearchFragment : BaseFragment() {
         val searchAdapter = PodcastSearchAdapter(
             theme = theme,
             onPodcastClick = { podcast ->
+                viewModel.trackSearchResultTapped(
+                    source = source,
+                    uuid = podcast.uuid,
+                    type = if (onlySearchRemote || !podcast.isSubscribed) {
+                        SearchResultType.PODCAST_REMOTE_RESULT
+                    } else {
+                        SearchResultType.PODCAST_LOCAL_RESULT
+                    }
+                )
                 listener?.onSearchPodcastClick(podcast.uuid)
                 UiUtil.hideKeyboard(searchView)
             },
             onFolderClick = { folder ->
+                viewModel.trackSearchResultTapped(
+                    source = source,
+                    uuid = folder.uuid,
+                    type = SearchResultType.FOLDER,
+                )
                 listener?.onSearchFolderClick(folder.uuid)
                 UiUtil.hideKeyboard(searchView)
             }
