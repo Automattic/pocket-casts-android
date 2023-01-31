@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.adapter.PodcastSearchAdapter
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -174,8 +175,11 @@ class SearchFragment : BaseFragment() {
                 viewModel.trackSearchResultTapped(
                     source = source,
                     uuid = podcast.uuid,
-                    onlySearchRemote = onlySearchRemote,
-                    isFolder = false
+                    type = if (onlySearchRemote || !podcast.isSubscribed) {
+                        SearchResultType.PODCAST_REMOTE_RESULT
+                    } else {
+                        SearchResultType.PODCAST_LOCAL_RESULT
+                    }
                 )
                 listener?.onSearchPodcastClick(podcast.uuid)
                 UiUtil.hideKeyboard(searchView)
@@ -184,8 +188,7 @@ class SearchFragment : BaseFragment() {
                 viewModel.trackSearchResultTapped(
                     source = source,
                     uuid = folder.uuid,
-                    onlySearchRemote = onlySearchRemote,
-                    isFolder = true
+                    type = SearchResultType.FOLDER,
                 )
                 listener?.onSearchFolderClick(folder.uuid)
                 UiUtil.hideKeyboard(searchView)
