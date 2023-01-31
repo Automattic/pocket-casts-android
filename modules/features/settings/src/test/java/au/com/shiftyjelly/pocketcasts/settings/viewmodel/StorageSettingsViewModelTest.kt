@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
@@ -53,6 +54,9 @@ class StorageSettingsViewModelTest {
     private lateinit var settings: Settings
 
     @Mock
+    private lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    @Mock
     @ApplicationContext
     private lateinit var context: Context
     private lateinit var viewModel: StorageSettingsViewModel
@@ -75,6 +79,7 @@ class StorageSettingsViewModelTest {
             fileStorage,
             fileUtil,
             settings,
+            analyticsTracker,
             context
         )
     }
@@ -83,29 +88,29 @@ class StorageSettingsViewModelTest {
     fun `given sdk version less than 29, when fragment resumed, then custom folder choice is added`() {
         startViewModelAndResumeFragment(folderLocations = emptyList(), sdkVersion = 28)
 
-        val (_, folderPaths) = viewModel.state.value.storageChoiceState.choices
+        val choices = viewModel.state.value.storageChoiceState.choices
 
-        assertEquals(folderPaths.last(), Settings.STORAGE_ON_CUSTOM_FOLDER)
+        assertEquals(choices.last().filePath, Settings.STORAGE_ON_CUSTOM_FOLDER)
     }
 
     @Test
     fun `given sdk version at least 29, when fragment resumed, then custom folder choice is not added`() {
         startViewModelAndResumeFragment(folderLocations = emptyList(), sdkVersion = 29)
 
-        val (_, folderPaths) = viewModel.state.value.storageChoiceState.choices
+        val choices = viewModel.state.value.storageChoiceState.choices
 
-        assertTrue(folderPaths.isEmpty())
+        assertTrue(choices.isEmpty())
     }
 
     @Test
     fun `given sdk version less than 29, when storage choice is custom folder, then custom folder path is shown`() {
-        val folderLocation = FolderLocation(Settings.STORAGE_ON_CUSTOM_FOLDER, CUSTOM_FOLDER_LABEL)
+        val folderLocation = FolderLocation(Settings.STORAGE_ON_CUSTOM_FOLDER, CUSTOM_FOLDER_LABEL, "")
         startViewModelAndResumeFragment(folderLocations = listOf(folderLocation), sdkVersion = 28)
         val file = File(folderLocation.filePath)
         whenever(fileStorage.baseStorageDirectory).thenReturn(file)
         whenever(settings.usingCustomFolderStorage()).thenReturn(true)
 
-        viewModel.state.value.storageChoiceState.onStateChange(folderLocation.filePath)
+        viewModel.state.value.storageChoiceState.onStateChange(folderLocation)
 
         verify(settings).setStorageCustomFolder(file.absolutePath)
         assertTrue(viewModel.state.value.storageFolderState.isVisible)
@@ -113,12 +118,12 @@ class StorageSettingsViewModelTest {
 
     @Test
     fun `given sdk version less than 29, when storage choice is not custom folder, then custom folder path is not shown`() {
-        val folderLocation = FolderLocation("/path", "Phone")
+        val folderLocation = FolderLocation("/path", "Phone", "")
         startViewModelAndResumeFragment(folderLocations = listOf(folderLocation), sdkVersion = 28)
         whenever(settings.usingCustomFolderStorage()).thenReturn(false)
         whenever(settings.getStorageChoice()).thenReturn(folderLocation.filePath)
 
-        viewModel.state.value.storageChoiceState.onStateChange(folderLocation.filePath)
+        viewModel.state.value.storageChoiceState.onStateChange(folderLocation)
 
         verify(settings).setStorageChoice(folderLocation.filePath, folderLocation.label)
         assertFalse(viewModel.state.value.storageFolderState.isVisible)
@@ -169,7 +174,7 @@ class StorageSettingsViewModelTest {
         permissionGranted: Boolean,
         testBody: () -> Unit
     ) = runTest {
-        val folderLocation = FolderLocation(Settings.STORAGE_ON_CUSTOM_FOLDER, CUSTOM_FOLDER_LABEL)
+        val folderLocation = FolderLocation(Settings.STORAGE_ON_CUSTOM_FOLDER, CUSTOM_FOLDER_LABEL, "")
         startViewModelAndResumeFragment(
             folderLocations = listOf(folderLocation),
             sdkVersion = 28,

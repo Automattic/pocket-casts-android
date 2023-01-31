@@ -65,8 +65,9 @@ class StorageOptions {
                 "folderLocations can not be null"
             }.add(
                 FolderLocation(
-                    firstMountPoint,
-                    resources.getString(R.string.settings_storage_phone)
+                    filePath = firstMountPoint,
+                    label = resources.getString(R.string.settings_storage_phone),
+                    analyticsLabel = "phone",
                 )
             )
         } else {
@@ -74,8 +75,9 @@ class StorageOptions {
                 "folderLocations can not be null"
             }.add(
                 FolderLocation(
-                    firstMountPoint,
-                    resources.getString(R.string.settings_storage_sd_card)
+                    filePath = firstMountPoint,
+                    label = resources.getString(R.string.settings_storage_sd_card),
+                    analyticsLabel = "sd_card"
                 )
             )
             externalSDCardCount++
@@ -93,7 +95,13 @@ class StorageOptions {
             }
             requireNotNull(folderLocations) {
                 "folderLocations can not be null"
-            }.add(FolderLocation(mountPoint, label))
+            }.add(
+                FolderLocation(
+                    filePath = mountPoint,
+                    label = label,
+                    analyticsLabel = "sd_card"
+                )
+            )
             externalSDCardCount++
         }
     }

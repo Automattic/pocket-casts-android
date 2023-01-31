@@ -444,4 +444,12 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_PLUS_SHOWN("settings_plus_shown"),
     SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED("settings_plus_upgrade_button_tapped"),
     SETTINGS_PLUS_LEARN_MORE_TAPPED("settings_plus_learn_more_tapped"),
+
+    /* Settings - Storage & Data Use */
+    SETTINGS_STORAGE_SHOWN("settings_storage_shown"),
+    SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE("settings_storage_clear_download_cache"),
+    SETTINGS_STORAGE_LOCATION("settings_storage_location"),
+    SETTINGS_STORAGE_SET_FOLDER_LOCATION("settings_storage_set_folder_location"),
+    SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED("settings_storage_background_refresh_toggled"),
+    SETTINGS_STORAGE_WARN_BEFORE_USING_DATA_TOGGLED("settings_storage_warn_before_using_data_toggled"),
 }

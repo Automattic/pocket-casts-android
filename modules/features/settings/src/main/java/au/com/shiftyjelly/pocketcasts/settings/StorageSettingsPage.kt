@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.delay
 import java.util.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -182,27 +183,35 @@ private fun StorageChoiceRow(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val (storageLabels, storagePaths) = storageChoiceState.choices
     val defaultStorageFolderLabel = stringResource(LR.string.settings_storage_phone)
+    val choices = storageChoiceState.choices
     SettingRadioDialogRow(
         primaryText = stringResource(LR.string.settings_storage_store_on),
         modifier = modifier,
         secondaryText = storageChoiceState.summary,
-        options = storageLabels.asList(),
+        options = choices.map { it.label },
         savedOption = storageChoiceState.summary,
         optionToLocalisedString = {
             val label = it ?: defaultStorageFolderLabel
-            val path = storagePaths[storageLabels.indexOf(it)]
+            val folderLocation = choices
+                .find { folderLocation ->
+                    it == folderLocation.label
+                }
+            val path = folderLocation?.filePath
             if (path == Settings.STORAGE_ON_CUSTOM_FOLDER) {
                 "$label…"
             } else {
                 mapToStringWithStorageSpace(label, path, context)
             }
         },
-        onSave = {
-            storageChoiceState.onStateChange(
-                storagePaths[storageLabels.indexOf(it)]
-            )
+        onSave = { label ->
+            val folderLocation = choices
+                .find { it.label == label }
+            if (folderLocation == null) {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Could not find folder location for label $label")
+            } else {
+                storageChoiceState.onStateChange(folderLocation)
+            }
         }
     )
 }
