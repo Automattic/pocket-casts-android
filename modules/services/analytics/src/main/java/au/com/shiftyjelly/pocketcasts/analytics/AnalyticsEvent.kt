@@ -413,6 +413,12 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED("settings_appearance_use_embedded_artwork_toggled"),
     SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED("settings_appearance_show_artwork_on_lock_screen_toggled"),
 
+    /* Settings - Auto archive */
+    SETTINGS_AUTO_ARCHIVE_SHOWN("settings_auto_archive_shown"),
+    SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED("settings_auto_archive_played_changed"),
+    SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED("settings_auto_archive_inactive_changed"),
+    SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED("settings_auto_archive_include_starred_toggled"),
+
     /* Settings - General */
     SETTINGS_GENERAL_SHOWN("settings_general_shown"),
     SETTINGS_GENERAL_ROW_ACTION_CHANGED("settings_general_row_action_changed"),
