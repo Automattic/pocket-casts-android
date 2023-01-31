@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -55,6 +56,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     )
 
     init {
+        searchHandler.setSource(AnalyticsSource.ONBOARDING_RECOMMENDATIONS_SEARCH)
         searchHandler.setOnlySearchRemote(true)
         viewModelScope.launch {
 
@@ -143,12 +145,11 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     }
 
     companion object {
-        private const val ONBOARDING_RECOMMENDATIONS_SEARCH = "onboarding_recommendations_search"
         private object AnalyticsProp {
             const val UUID = "uuid"
             const val SOURCE = "source"
             fun podcastSubscribeToggled(uuid: String) =
-                mapOf(UUID to uuid, SOURCE to ONBOARDING_RECOMMENDATIONS_SEARCH)
+                mapOf(UUID to uuid, SOURCE to AnalyticsSource.ONBOARDING_RECOMMENDATIONS_SEARCH)
         }
     }
 }

@@ -452,4 +452,9 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_STORAGE_SET_FOLDER_LOCATION("settings_storage_set_folder_location"),
     SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED("settings_storage_background_refresh_toggled"),
     SETTINGS_STORAGE_WARN_BEFORE_USING_DATA_TOGGLED("settings_storage_warn_before_using_data_toggled"),
+
+    /* Search */
+    SEARCH_PERFORMED("search_performed"),
+    SEARCH_FAILED("search_failed"),
+    SEARCH_RESULT_TAPPED("search_result_tapped"),
 }
