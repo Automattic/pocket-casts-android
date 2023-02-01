@@ -101,7 +101,6 @@ class StorageSettingsViewModel
                     )
                 }
         }
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_SHOWN)
     }
 
     private fun initState() = State(
@@ -411,6 +410,10 @@ class StorageSettingsViewModel
             )
         )
     )
+
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_SHOWN)
+    }
 
     data class State(
         val downloadedFilesState: DownloadedFilesState,

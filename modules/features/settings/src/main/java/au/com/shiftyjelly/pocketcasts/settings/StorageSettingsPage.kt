@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
@@ -78,6 +79,11 @@ fun StorageSettingsPage(
             onDismiss = { showProgressDialog = false }
         )
     }
+
+    CallOnce {
+        viewModel.onShown()
+    }
+
     LaunchedEffect(Unit) {
         viewModel.progressDialog
             .collect { showDialog ->
