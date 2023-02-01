@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
@@ -79,8 +80,11 @@ internal fun OnboardingLoginOrSignUpPage(
     val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
-    LaunchedEffect(Unit) {
+    CallOnce {
         viewModel.onShown(flow)
+    }
+
+    LaunchedEffect(Unit) {
         systemUiController.apply {
             setStatusBarColor(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), darkIcons = !theme.darkTheme)
             setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)

@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusH
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -97,7 +98,7 @@ internal fun OnboardingPlusFeaturesPage(
         onBackPressed()
     }
 
-    LaunchedEffect(Unit) {
+    CallOnce {
         viewModel.onShown(flow, source)
     }
 
