@@ -4,14 +4,17 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoArchiveFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -19,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPreferences.OnSharedPreferenceChangeListener {
     @Inject lateinit var settings: Settings
     @Inject lateinit var theme: Theme
+
+    private val viewModel: AutoArchiveFragmentViewModel by viewModels()
 
     val toolbar: Toolbar?
         get() = view?.findViewById(R.id.toolbar)
@@ -30,8 +35,8 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         toolbar?.setup(title = getString(LR.string.settings_title_auto_archive), navigationIcon = BackArrow, activity = activity, theme = theme)
+        viewModel.onViewCreated()
     }
 
     override fun onResume() {
@@ -42,6 +47,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
     override fun onPause() {
         super.onPause()
         preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     private fun updateStarredSummary() {
@@ -51,8 +57,18 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key == Settings.AUTO_ARCHIVE_INCLUDE_STARRED) {
-            updateStarredSummary()
+        when (key) {
+            Settings.AUTO_ARCHIVE_INCLUDE_STARRED -> {
+                updateStarredSummary()
+                viewModel.onStarredChanged()
+            }
+            Settings.AUTO_ARCHIVE_PLAYED_EPISODES_AFTER -> {
+                viewModel.onPlayedEpisodesAfterChanged()
+            }
+            Settings.AUTO_ARCHIVE_INACTIVE -> {
+                viewModel.onInactiveChanged()
+            }
+            else -> Timber.d("Unknown preference changed: $key")
         }
     }
 
