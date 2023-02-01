@@ -4,11 +4,11 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoArchiveFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -22,7 +22,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPreferences.OnSharedPreferenceChangeListener {
     @Inject lateinit var settings: Settings
     @Inject lateinit var theme: Theme
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
+    private val viewModel: AutoArchiveFragmentViewModel by viewModels()
 
     val toolbar: Toolbar?
         get() = view?.findViewById(R.id.toolbar)
@@ -35,7 +36,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar?.setup(title = getString(LR.string.settings_title_auto_archive), navigationIcon = BackArrow, activity = activity, theme = theme)
-        analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_SHOWN)
+        viewModel.onViewCreated()
     }
 
     override fun onResume() {
@@ -46,6 +47,7 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
     override fun onPause() {
         super.onPause()
         preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     private fun updateStarredSummary() {
@@ -58,40 +60,13 @@ class AutoArchiveFragment : PreferenceFragmentCompat(), HasBackstack, SharedPref
         when (key) {
             Settings.AUTO_ARCHIVE_INCLUDE_STARRED -> {
                 updateStarredSummary()
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED,
-                    mapOf("enabled" to settings.getAutoArchiveIncludeStarred())
-                )
+                viewModel.onStarredChanged()
             }
             Settings.AUTO_ARCHIVE_PLAYED_EPISODES_AFTER -> {
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
-                    mapOf(
-                        "value" to when (settings.getAutoArchiveAfterPlaying()) {
-                            Settings.AutoArchiveAfterPlaying.Never -> "never"
-                            Settings.AutoArchiveAfterPlaying.AfterPlaying -> "after_playing"
-                            Settings.AutoArchiveAfterPlaying.Hours24 -> "after_24_hours"
-                            Settings.AutoArchiveAfterPlaying.Days2 -> "after_2_days"
-                            Settings.AutoArchiveAfterPlaying.Weeks1 -> "after_1_week"
-                        }
-                    )
-                )
+                viewModel.onPlayedEpisodesAfterChanged()
             }
             Settings.AUTO_ARCHIVE_INACTIVE -> {
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
-                    mapOf(
-                        "value" to when (settings.getAutoArchiveInactive()) {
-                            Settings.AutoArchiveInactive.Never -> "never"
-                            Settings.AutoArchiveInactive.Hours24 -> "after_24_hours"
-                            Settings.AutoArchiveInactive.Days2 -> "after_2_days"
-                            Settings.AutoArchiveInactive.Weeks1 -> "after_1_week"
-                            Settings.AutoArchiveInactive.Weeks2 -> "after_2_weeks"
-                            Settings.AutoArchiveInactive.Days30 -> "after_30_days"
-                            Settings.AutoArchiveInactive.Days90 -> "after 3 months"
-                        }
-                    )
-                )
+                viewModel.onInactiveChanged()
             }
             else -> Timber.d("Unknown preference changed: $key")
         }
