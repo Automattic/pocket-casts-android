@@ -340,7 +340,10 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
     private fun setupFilters() {
         preferenceFilters?.setOnPreferenceClickListener {
-            val fragment = FilterSelectFragment.newInstance(shouldFilterPlaylistsWithAllPodcasts = true)
+            val fragment = FilterSelectFragment.newInstance(
+                source = FilterSelectFragment.Source.PODCAST_SETTINGS,
+                shouldFilterPlaylistsWithAllPodcasts = true
+            )
             childFragmentManager.beginTransaction()
                 .replace(UR.id.frameChildFragment, fragment)
                 .addToBackStack("filterSelect")

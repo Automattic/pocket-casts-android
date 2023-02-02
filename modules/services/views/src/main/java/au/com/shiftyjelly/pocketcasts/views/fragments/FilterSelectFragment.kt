@@ -7,14 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
 import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentFilterSelectBinding
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowFilterBinding
 import au.com.shiftyjelly.pocketcasts.views.helper.PlaylistHelper
+import au.com.shiftyjelly.pocketcasts.views.viewmodels.FilterSelectViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,26 +30,41 @@ import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val ARG_FILTER_ALL_PODCAST_FILTERS = "allPodcastsFilters"
-
 @AndroidEntryPoint
-class FilterSelectFragment : BaseFragment() {
+class FilterSelectFragment private constructor() : BaseFragment() {
     interface Listener {
         fun filterSelectFragmentSelectionChanged(newSelection: List<String>)
         fun filterSelectFragmentGetCurrentSelection(): List<String>
     }
 
-    companion object {
-        fun newInstance(shouldFilterPlaylistsWithAllPodcasts: Boolean = false): Fragment {
-            val fragment = FilterSelectFragment()
-            fragment.arguments = bundleOf(ARG_FILTER_ALL_PODCAST_FILTERS to shouldFilterPlaylistsWithAllPodcasts)
-            return fragment
-        }
+    enum class Source {
+        AUTO_DOWNLOAD,
+        PODCAST_SETTINGS,
     }
+
+    companion object {
+
+        private const val ARG_FILTER_ALL_PODCAST_FILTERS = "allPodcastsFilters"
+        private const val ARG_FILTER_SOURCE = "source"
+
+        fun newInstance(
+            source: Source,
+            shouldFilterPlaylistsWithAllPodcasts: Boolean = false
+        ): Fragment =
+            FilterSelectFragment().apply {
+                arguments = bundleOf(
+                    ARG_FILTER_ALL_PODCAST_FILTERS to shouldFilterPlaylistsWithAllPodcasts,
+                    ARG_FILTER_SOURCE to source
+                )
+            }
+    }
+
+    private val viewModel: FilterSelectViewModel by viewModels()
 
     private lateinit var listener: Listener
     private var adapter: FilterSelectAdapter? = null
     private var binding: FragmentFilterSelectBinding? = null
+    private var hasChanged = false
 
     @Inject lateinit var playlistManager: PlaylistManager
 
@@ -90,6 +108,7 @@ class FilterSelectFragment : BaseFragment() {
                         val selectedList = it.map { it.uuid }
                         binding?.lblFiltersChosen?.text = resources.getStringPlural(count = selectedList.size, singular = LR.string.filters_chosen_singular, plural = LR.string.filters_chosen_plural)
                         listener.filterSelectFragmentSelectionChanged(selectedList)
+                        hasChanged = true
                     }
 
                     val selected = it.filter { it.selected }
@@ -127,6 +146,12 @@ class FilterSelectFragment : BaseFragment() {
         super.onDestroyView()
         disposables.clear()
         binding = null
+        if (hasChanged) {
+            val source = arguments?.getSerializableCompat(ARG_FILTER_SOURCE, Source::class.java)
+            if (source != null) {
+                viewModel.trackFilterChange(source)
+            }
+        }
     }
 
     fun selectAll() {
