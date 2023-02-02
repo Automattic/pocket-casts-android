@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
@@ -56,8 +57,11 @@ internal fun OnboardingLoginPage(
     val viewModel = hiltViewModel<OnboardingLogInViewModel>()
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
+    CallOnce {
         viewModel.onShown()
+    }
+
+    LaunchedEffect(Unit) {
         systemUiController.apply {
             setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
             setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
