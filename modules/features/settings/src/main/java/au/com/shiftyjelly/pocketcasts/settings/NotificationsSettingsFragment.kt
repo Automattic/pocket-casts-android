@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import com.afollestad.materialdialogs.MaterialDialog
@@ -184,7 +185,7 @@ class NotificationsSettingsFragment :
     }
 
     private fun openSelectPodcasts() {
-        val fragment = PodcastSelectFragment()
+        val fragment = PodcastSelectFragment.newInstance(source = PodcastSelectFragmentSource.NOTIFICATIONS)
         childFragmentManager.beginTransaction()
             .replace(UR.id.frameChildFragment, fragment)
             .addToBackStack("podcastSelect")

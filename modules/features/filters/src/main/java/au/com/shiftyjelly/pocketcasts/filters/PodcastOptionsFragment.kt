@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,7 +88,10 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
             podcastSelectDisabled.isVisible = playlist.allPodcasts
             switchAllPodcasts.isChecked = playlist.allPodcasts
 
-            val fragment = PodcastSelectFragment.newInstance(color)
+            val fragment = PodcastSelectFragment.newInstance(
+                tintColor = color,
+                source = PodcastSelectFragmentSource.FILTERS
+            )
             childFragmentManager.commit {
                 add(R.id.podcastSelectFrame, fragment)
             }

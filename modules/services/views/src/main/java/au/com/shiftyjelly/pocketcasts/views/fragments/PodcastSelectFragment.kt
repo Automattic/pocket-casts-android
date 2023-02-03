@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts.views.fragments
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,26 +32,41 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private const val ARG_TINT_COLOR = "tintColor"
-private const val ARG_TOOLBAR = "toolbar"
-
 @AndroidEntryPoint
 class PodcastSelectFragment : BaseFragment() {
     companion object {
-        fun newInstance(@ColorInt tintColor: Int?, showToolbar: Boolean = false): PodcastSelectFragment {
-            val bundle = Bundle()
-            if (tintColor != null) {
-                bundle.putInt(ARG_TINT_COLOR, tintColor)
-                bundle.putBoolean(ARG_TOOLBAR, showToolbar)
+        private const val NEW_INSTANCE_ARG = "tintColor"
+
+        fun newInstance(
+            @ColorInt tintColor: Int? = null,
+            showToolbar: Boolean = false,
+            source: PodcastSelectFragmentSource
+        ): PodcastSelectFragment =
+            PodcastSelectFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(
+                        NEW_INSTANCE_ARG,
+                        PodcastSelectFragmentArgs(
+                            tintColor = tintColor,
+                            showToolbar = showToolbar,
+                            source = source,
+                        )
+                    )
+                }
             }
-            val fragment = PodcastSelectFragment()
-            fragment.arguments = bundle
-            return fragment
-        }
+
+        private fun extractArgs(bundle: Bundle?): PodcastSelectFragmentArgs? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                bundle?.getParcelable(NEW_INSTANCE_ARG, PodcastSelectFragmentArgs::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                bundle?.getParcelable(NEW_INSTANCE_ARG) as PodcastSelectFragmentArgs?
+            }
     }
 
     interface Listener {
@@ -60,12 +77,13 @@ class PodcastSelectFragment : BaseFragment() {
     lateinit var listener: Listener
     private var adapter: PodcastSelectAdapter? = null
     private var binding: SettingsFragmentPodcastSelectBinding? = null
+    private var source: PodcastSelectFragmentSource? = null
 
     private var userChanged = false
 
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-    val disposables = CompositeDisposable()
+    private val disposables = CompositeDisposable()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -86,15 +104,18 @@ class PodcastSelectFragment : BaseFragment() {
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
-        val tintColor = arguments?.getInt(ARG_TINT_COLOR)
-        val imageLoader = PodcastImageLoaderThemed(view.context)
+        val args = extractArgs(arguments)
+            ?: throw IllegalStateException("${this::class.java.simpleName} is missing arguments. It must be created with newInstance function")
 
-        binding.toolbarLayout.isVisible = arguments?.getBoolean(ARG_TOOLBAR, false) ?: false
+        source = args.source
+
+        val imageLoader = PodcastImageLoaderThemed(view.context)
+        binding.toolbarLayout.isVisible = args.showToolbar
         if (binding.toolbarLayout.isVisible) {
             (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
         }
-        if (tintColor != null) {
-            binding.btnSelect.setTextColor(tintColor)
+        if (args.tintColor != null) {
+            binding.btnSelect.setTextColor(args.tintColor)
         }
         podcastManager.findSubscribedRx()
             .zipWith(Single.fromCallable { listener.podcastSelectFragmentGetCurrentSelection() })
@@ -110,15 +131,17 @@ class PodcastSelectFragment : BaseFragment() {
             .subscribeBy(
                 onError = { Timber.e(it) },
                 onSuccess = {
-                    val adapter = PodcastSelectAdapter(it, tintColor, imageLoader) {
+                    val adapter = PodcastSelectAdapter(it, args.tintColor, imageLoader) {
                         val selectedList = it.map { it.uuid }
-                        binding.lblPodcastsChosen.text = resources.getStringPluralPodcastsSelected(selectedList.size)
+                        binding.lblPodcastsChosen.text =
+                            resources.getStringPluralPodcastsSelected(selectedList.size)
                         listener.podcastSelectFragmentSelectionChanged(selectedList)
                         userChanged = true
                     }
 
                     val selected = it.filter { it.selected }
-                    binding.lblPodcastsChosen.text = resources.getStringPluralPodcastsSelected(selected.size)
+                    binding.lblPodcastsChosen.text =
+                        resources.getStringPluralPodcastsSelected(selected.size)
                     binding.recyclerView.layoutManager = layoutManager
                     binding.recyclerView.adapter = adapter
 
@@ -151,10 +174,40 @@ class PodcastSelectFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         disposables.clear()
-        if (userChanged) {
-            analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PODCASTS_CHANGED)
-        }
+        trackChange()
         binding = null
+    }
+
+    private fun trackChange() {
+        if (userChanged) {
+            val props = buildMap {
+                adapter?.selectedPodcasts?.size?.let {
+                    put("number_selected", it)
+                }
+            }
+            when (source) {
+
+                PodcastSelectFragmentSource.AUTO_ADD -> {
+                    // TODO
+                }
+
+                PodcastSelectFragmentSource.NOTIFICATIONS -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PODCASTS_CHANGED, props)
+                }
+
+                PodcastSelectFragmentSource.DOWNLOADS -> {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_PODCASTS_CHANGED, props)
+                }
+
+                PodcastSelectFragmentSource.FILTERS -> {
+                    // Do not track because the filter_updated event was tracked when the change was persisted
+                }
+
+                null -> {
+                    Timber.e("No source set for ${this::class.java.simpleName}")
+                }
+            }
+        }
     }
 
     fun selectAll() {
@@ -226,4 +279,18 @@ private class PodcastSelectAdapter(val list: List<SelectablePodcast>, @ColorInt 
         notifyDataSetChanged()
         onSelectionChanged(selectedPodcasts)
     }
+}
+
+@Parcelize
+private data class PodcastSelectFragmentArgs(
+    val tintColor: Int?,
+    val showToolbar: Boolean,
+    val source: PodcastSelectFragmentSource,
+) : Parcelable
+
+enum class PodcastSelectFragmentSource {
+    AUTO_ADD,
+    DOWNLOADS,
+    NOTIFICATIONS,
+    FILTERS,
 }

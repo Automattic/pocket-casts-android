@@ -419,6 +419,17 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED("settings_auto_archive_inactive_changed"),
     SETTINGS_AUTO_ARCHIVE_INCLUDE_STARRED_TOGGLED("settings_auto_archive_include_starred_toggled"),
 
+    /* Settings - Auto download */
+    SETTINGS_AUTO_DOWNLOAD_SHOWN("settings_auto_download_shown"),
+    SETTINGS_AUTO_DOWNLOAD_UP_NEXT_TOGGLED("settings_auto_download_up_next_toggled"),
+    SETTINGS_AUTO_DOWNLOAD_NEW_EPISODES_TOGGLED("settings_auto_download_new_episodes_toggled"),
+    SETTINGS_AUTO_DOWNLOAD_PODCASTS_CHANGED("settings_auto_download_podcasts_changed"),
+    SETTINGS_AUTO_DOWNLOAD_FILTERS_CHANGED("settings_auto_download_filters_changed"),
+    SETTINGS_AUTO_DOWNLOAD_ONLY_ON_WIFI_TOGGLED("settings_auto_download_only_on_wifi_toggled"),
+    SETTINGS_AUTO_DOWNLOAD_ONLY_WHEN_CHARGING_TOGGLED("settings_auto_download_only_when_charging_toggled"),
+    SETTINGS_AUTO_DOWNLOAD_STOP_ALL_DOWNLOADS("settings_auto_download_stop_all_downloads"),
+    SETTINGS_AUTO_DOWNLOAD_CLEAR_DOWNLOAD_ERRORS("settings_auto_download_clear_download_errors"),
+
     /* Settings - General */
     SETTINGS_GENERAL_SHOWN("settings_general_shown"),
     SETTINGS_GENERAL_ROW_ACTION_CHANGED("settings_general_row_action_changed"),

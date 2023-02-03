@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -134,7 +135,11 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
     }
 
     private fun openPodcastsList() {
-        val fragment = PodcastSelectFragment.newInstance(ThemeColor.primaryInteractive01(theme.activeTheme), showToolbar = true)
+        val fragment = PodcastSelectFragment.newInstance(
+            tintColor = ThemeColor.primaryInteractive01(theme.activeTheme),
+            showToolbar = true,
+            source = PodcastSelectFragmentSource.AUTO_ADD
+        )
         fragment.listener = this
         (activity as? FragmentHostListener)?.addFragment(fragment)
     }

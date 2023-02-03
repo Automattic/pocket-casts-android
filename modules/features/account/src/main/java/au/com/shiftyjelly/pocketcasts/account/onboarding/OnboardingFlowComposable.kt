@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
-import android.os.Build
-import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import java.io.Serializable
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
 
 @Composable
 fun OnboardingFlowComposable(
@@ -218,21 +216,6 @@ fun OnboardingFlowComposable(
         }
     }
 }
-
-private fun <T : Serializable> Bundle.getSerializableCompat(key: String, clazz: Class<T>): T? =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getSerializable(key, clazz)
-    } else {
-        @Suppress("DEPRECATION")
-        getSerializable(key)?.let { result ->
-            if (clazz.isInstance(result)) {
-                @Suppress("UNCHECKED_CAST")
-                result as T
-            } else {
-                null
-            }
-        }
-    }
 
 private object OnboardingNavRoute {
 
