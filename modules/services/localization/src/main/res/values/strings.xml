@@ -500,7 +500,7 @@
     <string name="episode_short_episode">E%d</string>
     <string name="episode_added_to_up_next">Added to up next</string>
     <string name="episode_removed_from_up_next">Removed from up next</string>
-    <string name="episode_status_up_next">Episode queued for up next</string>
+    <string name="episode_status_up_next">Episode in up next queue</string>
 
     <!-- Supporter -->
 
