@@ -354,10 +354,10 @@ class Support @Inject constructor(
     }
 
     private fun autoAddToUpNextToString(autoAddToUpNext: Int): String {
-        return when (autoAddToUpNext) {
-            Podcast.AUTO_ADD_TO_UP_NEXT_OFF -> "off"
-            Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_NEXT -> "to top (play next)"
-            Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_LAST -> "to bottom (play last)"
+        return when (Podcast.AutoAddUpNext.fromInt(autoAddToUpNext)) {
+            Podcast.AutoAddUpNext.OFF -> "off"
+            Podcast.AutoAddUpNext.PLAY_NEXT -> "to top (play next)"
+            Podcast.AutoAddUpNext.PLAY_LAST -> "to bottom (play last)"
             else -> "unknown value $autoAddToUpNext"
         }
     }

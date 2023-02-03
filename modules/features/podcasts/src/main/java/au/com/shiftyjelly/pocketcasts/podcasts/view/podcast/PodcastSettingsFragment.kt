@@ -164,7 +164,7 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
             preferenceAddToUpNext?.isChecked = !podcast.isAutoAddToUpNextOff
             preferenceAddToUpNextOrder?.isVisible = !podcast.isAutoAddToUpNextOff
-            preferenceAddToUpNextOrder?.summary = if (podcast.autoAddToUpNext == Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_NEXT) getString(LR.string.play_next) else getString(LR.string.play_last)
+            preferenceAddToUpNextOrder?.summary = if (podcast.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT.databaseInt) getString(LR.string.play_next) else getString(LR.string.play_last)
             preferenceAddToUpNextOrder?.setValueIndex(if (podcast.isAutoAddToUpNextOff) 0 else podcast.autoAddToUpNext - 1)
             preferenceAddToUpNextGlobal?.isVisible = preferenceAddToUpNextOrder?.isVisible ?: false
 
@@ -423,18 +423,20 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
             )
             entryValues = arrayOf("1", "2")
             setOnPreferenceChangeListener { _, newValue ->
-                val value = Integer.parseInt(newValue as String)
-                analyticsTracker.track(
-                    AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED,
-                    mapOf(
-                        "value" to when (value) {
-                            1 -> "play_last"
-                            2 -> "play_next"
-                            else -> "unknown"
-                        }
+                when (newValue) {
+                    "1" -> Podcast.AutoAddUpNext.PLAY_LAST
+                    "2" -> Podcast.AutoAddUpNext.PLAY_NEXT
+                    else -> {
+                        Timber.e("Unknown value for auto add to up next order: $newValue")
+                        null
+                    }
+                }?.let { value ->
+                    viewModel.updateAutoAddToUpNextOrder(value)
+                    analyticsTracker.track(
+                        AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED,
+                        mapOf("value" to value.analyticsValue)
                     )
-                )
-                viewModel.updateAutoAddToUpNextOrder(value)
+                }
                 true
             }
         }

@@ -250,9 +250,9 @@ abstract class PodcastDao {
     abstract suspend fun updateAutoAddToUpNext(autoAddToUpNext: Int, uuid: String)
 
     @Transaction
-    open suspend fun updateAutoAddToUpNexts(autoAddToUpNext: Int, podcastUuids: List<String>) {
+    open suspend fun updateAutoAddToUpNexts(autoAddToUpNext: Podcast.AutoAddUpNext, podcastUuids: List<String>) {
         for (uuid in podcastUuids) {
-            updateAutoAddToUpNext(autoAddToUpNext = autoAddToUpNext, uuid = uuid)
+            updateAutoAddToUpNext(autoAddToUpNext = autoAddToUpNext.databaseInt, uuid = uuid)
         }
     }
 

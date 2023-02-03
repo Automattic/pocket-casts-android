@@ -560,16 +560,20 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateAutoDownloadStatus(autoDownloadStatus, podcast.uuid)
     }
 
-    override suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Int) {
-        podcastDao.updateAutoAddToUpNext(autoAddToUpNext, podcast.uuid)
+    override suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext) {
+        podcastDao.updateAutoAddToUpNext(autoAddToUpNext.databaseInt, podcast.uuid)
     }
 
-    override suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Int) {
+    override suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Podcast.AutoAddUpNext) {
         podcastDao.updateAutoAddToUpNexts(autoAddToUpNext, podcastUuids)
     }
 
-    override suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Int, onlyIfValue: Int) {
-        podcastDao.updateAutoAddToUpNextsIf(podcastUuids, newValue, onlyIfValue)
+    override suspend fun updateAutoAddToUpNextsIf(
+        podcastUuids: List<String>,
+        newValue: Podcast.AutoAddUpNext,
+        onlyIfValue: Podcast.AutoAddUpNext
+    ) {
+        podcastDao.updateAutoAddToUpNextsIf(podcastUuids, newValue.databaseInt, onlyIfValue.databaseInt)
     }
 
     override fun updateExcludeFromAutoArchive(podcast: Podcast, excludeFromAutoArchive: Boolean) {
