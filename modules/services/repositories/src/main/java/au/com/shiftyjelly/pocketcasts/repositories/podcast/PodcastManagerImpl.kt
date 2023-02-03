@@ -78,7 +78,7 @@ class PodcastManagerImpl @Inject constructor(
                     podcast.syncStatus = Podcast.SYNC_STATUS_NOT_SYNCED
                     podcast.isShowNotifications = false
                     podcast.autoDownloadStatus = Podcast.AUTO_DOWNLOAD_OFF
-                    podcast.autoAddToUpNext = 0
+                    podcast.autoAddToUpNext = Podcast.AutoAddUpNext.OFF
                     podcast.autoArchiveAfterPlaying = 0
                     podcast.autoArchiveInactive = 0
                     podcast.autoArchiveEpisodeLimit = null
@@ -561,7 +561,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext) {
-        podcastDao.updateAutoAddToUpNext(autoAddToUpNext.databaseInt, podcast.uuid)
+        podcastDao.updateAutoAddToUpNext(autoAddToUpNext, podcast.uuid)
     }
 
     override suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Podcast.AutoAddUpNext) {

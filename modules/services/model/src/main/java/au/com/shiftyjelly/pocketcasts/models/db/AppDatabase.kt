@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodePlayingStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodeStatusEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.EpisodesSortTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.PodcastAutoUpNextConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
@@ -55,16 +56,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     exportSchema = true
 )
 @TypeConverters(
+    AnonymousBumpStat.CustomEventPropsTypeConverter::class,
+    BundlePaidTypeConverter::class,
     DateTypeConverter::class,
     EpisodePlayingStatusConverter::class,
     EpisodeStatusEnumConverter::class,
-    UserEpisodeServerStatusConverter::class,
-    PodcastLicensingEnumConverter::class,
-    BundlePaidTypeConverter::class,
-    TrimModeTypeConverter::class,
-    PodcastsSortTypeConverter::class,
     EpisodesSortTypeConverter::class,
-    AnonymousBumpStat.CustomEventPropsTypeConverter::class
+    PodcastAutoUpNextConverter::class,
+    PodcastLicensingEnumConverter::class,
+    PodcastsSortTypeConverter::class,
+    UserEpisodeServerStatusConverter::class,
+    TrimModeTypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao

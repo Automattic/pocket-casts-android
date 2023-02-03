@@ -66,12 +66,12 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
                 .setTitle(getString(LR.string.settings_auto_up_next_add_to))
                 .addCheckedOption(
                     titleString = getString(LR.string.settings_auto_up_next_top),
-                    checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT.databaseInt,
+                    checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT,
                     click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_NEXT) }
                 )
                 .addCheckedOption(
                     titleString = getString(LR.string.settings_auto_up_next_bottom),
-                    checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_LAST.databaseInt,
+                    checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_LAST,
                     click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_LAST) }
                 )
                 .show(childFragmentManager, "autoadd_options")
@@ -278,10 +278,10 @@ class AutoAddPodcastAdapter(val imageLoader: PodcastImageLoader, val onClick: (P
             imageLoader.load(podcast).into(imageView)
             lblTitle.text = podcast.title
             val resources = holder.itemView.resources
-            lblSubtitle.text = when (Podcast.AutoAddUpNext.fromInt(podcast.autoAddToUpNext)) {
+            lblSubtitle.text = when (podcast.autoAddToUpNext) {
                 Podcast.AutoAddUpNext.PLAY_NEXT -> resources.getString(LR.string.settings_auto_up_next_to_top)
                 Podcast.AutoAddUpNext.PLAY_LAST -> resources.getString(LR.string.settings_auto_up_next_to_bottom)
-                Podcast.AutoAddUpNext.OFF, null -> null
+                Podcast.AutoAddUpNext.OFF -> null
             }
             root.setOnClickListener { onClick(podcast) }
         }

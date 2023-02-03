@@ -51,7 +51,7 @@ data class Podcast(
     @ColumnInfo(name = "subscribed") var isSubscribed: Boolean = false,
     @ColumnInfo(name = "show_notifications") var isShowNotifications: Boolean = false,
     @ColumnInfo(name = "auto_download_status") var autoDownloadStatus: Int = 0,
-    @ColumnInfo(name = "auto_add_to_up_next") var autoAddToUpNext: Int = 0,
+    @ColumnInfo(name = "auto_add_to_up_next") var autoAddToUpNext: AutoAddUpNext = AutoAddUpNext.OFF,
     @ColumnInfo(name = "most_popular_color") var backgroundColor: Int = 0,
     @ColumnInfo(name = "primary_color") var tintColorForLightBg: Int = 0,
     @ColumnInfo(name = "secondary_color") var tintColorForDarkBg: Int = 0,
@@ -89,7 +89,7 @@ data class Podcast(
         PLAY_NEXT(2, "add_first");
 
         companion object {
-            fun fromInt(int: Int) = values().firstOrNull { it.databaseInt == int }
+            fun fromDatabaseInt(int: Int?) = values().firstOrNull { it.databaseInt == int }
         }
     }
 
@@ -110,13 +110,13 @@ data class Podcast(
         get() = autoDownloadStatus == AUTO_DOWNLOAD_NEW_EPISODES
 
     val isAutoAddToUpNextOff: Boolean
-        get() = autoAddToUpNext == AutoAddUpNext.OFF.databaseInt
+        get() = autoAddToUpNext == AutoAddUpNext.OFF
 
     val isAutoAddToUpNextPlayLast: Boolean
-        get() = autoAddToUpNext == AutoAddUpNext.PLAY_LAST.databaseInt
+        get() = autoAddToUpNext == AutoAddUpNext.PLAY_LAST
 
     val isAutoAddToUpNextPlayNext: Boolean
-        get() = autoAddToUpNext == AutoAddUpNext.PLAY_NEXT.databaseInt
+        get() = autoAddToUpNext == AutoAddUpNext.PLAY_NEXT
 
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits

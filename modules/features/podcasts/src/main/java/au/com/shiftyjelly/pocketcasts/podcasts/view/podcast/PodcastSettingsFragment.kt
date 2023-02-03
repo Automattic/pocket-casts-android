@@ -164,8 +164,8 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
             preferenceAddToUpNext?.isChecked = !podcast.isAutoAddToUpNextOff
             preferenceAddToUpNextOrder?.isVisible = !podcast.isAutoAddToUpNextOff
-            preferenceAddToUpNextOrder?.summary = if (podcast.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT.databaseInt) getString(LR.string.play_next) else getString(LR.string.play_last)
-            preferenceAddToUpNextOrder?.setValueIndex(if (podcast.isAutoAddToUpNextOff) 0 else podcast.autoAddToUpNext - 1)
+            preferenceAddToUpNextOrder?.summary = if (podcast.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT) getString(LR.string.play_next) else getString(LR.string.play_last)
+            preferenceAddToUpNextOrder?.setValueIndex(if (podcast.isAutoAddToUpNextOff) 0 else podcast.autoAddToUpNext.databaseInt - 1)
             preferenceAddToUpNextGlobal?.isVisible = preferenceAddToUpNextOrder?.isVisible ?: false
 
             preferenceSkipFirst?.text = podcast.startFromSecs.toString()
