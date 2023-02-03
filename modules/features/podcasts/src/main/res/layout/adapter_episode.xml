@@ -46,7 +46,6 @@
                         android:padding="23dp"
                         android:layout_gravity="center_vertical|right"
                         android:src="@drawable/ic_upnext_playlast"
-                        android:contentLabel="@string/episode_status_up_next"
                         app:tint="@android:color/white"/>
             </FrameLayout>
             <FrameLayout
@@ -169,6 +168,7 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_upnext"
+                    android:contentLabel="@string/episode_status_up_next"
                     android:layout_gravity="center"
                     android:layout_marginEnd="4dp"
                     android:visibility="@{inUpNext}"
