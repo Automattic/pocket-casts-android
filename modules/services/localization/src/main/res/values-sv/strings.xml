@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-17 10:54:03+0000
+Translation-Revision-Date: 2023-01-24 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_media_actions_show_subtitle">Visa anpassade mediaåtgärder i mediaaviseringar för Android 13 och Android Auto.</string>
+    <string name="settings_media_actions_show_title">Visa anpassade mediaåtgärder</string>
+    <string name="settings_media_actions_customise">Anpassa mediaåtgärder</string>
+    <string name="settings_media_actions_prioritize_subtitle">Dina vanligaste åtgärder kommer att vara tillgängliga.</string>
+    <string name="settings_media_actions_prioritize_title">Prioritera dina anpassade mediaåtgärder</string>
+    <string name="plus_take_your_podcasting_to_next_level">Ta din podcastupplevelse till nästa nivå med exklusiv tillgång till funktioner och anpassningsalternativ.</string>
     <string name="onboarding_recommendations_more">Mer %s</string>
     <string name="filter_id_or_title">Filter-ID eller -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -57,9 +63,6 @@ Language: sv_SE
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">ditt utgångsdatum</string>
     <string name="profile_cancel_confirm_sub_expiry">Din nuvarande prenumeration förblir aktiv till %1$s.</string>
     <string name="profile_cancel_confirm_subtitle">Detta kommer att ändra ditt paket till ett gratiskonto.</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">Dina favoritåtgärder kommer att vara tillgängliga i din Android 13-avisering och Android Auto-spelare.</string>
-    <string name="settings_rearrange_media_actions">Arrangera om mediaåtgärder</string>
-    <string name="settings_prioritize_your_notification_actions">Prioritera dina aviseringsåtgärder</string>
     <string name="settings_other_media_actions">Övriga mediaåtgärder</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Anpassa knapparna som visas i Android 13-uppspelningsaviseringar och Android Auto.</string>
     <string name="podcast_not_subscribed">Prenumererar inte</string>
@@ -628,7 +631,6 @@ Language: sv_SE
     <string name="settings_podcast_artwork">Podcastomslag</string>
     <string name="settings_playback_resumption_summary">Om detta är aktiverat kommer Pocket Casts att hoppa bakåt lite i avsnitt där du återupptar ditt lyssnande, så att du kan fortsätta utan att missa något.</string>
     <string name="settings_playback_resumption">Intelligent återupptagning av uppspelning</string>
-    <string name="settings_notification_vibrate_never">Nya avsnitt</string>
     <string name="settings_notification_vibrate_in_silent">Endast i tyst läge</string>
     <string name="settings_notification_vibrate_new_episodes">Nya avsnitt</string>
     <string name="settings_notification_vibrate">Vibrera när</string>
