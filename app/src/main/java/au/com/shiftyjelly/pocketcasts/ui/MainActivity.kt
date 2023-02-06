@@ -1,12 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.ui
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,7 +15,6 @@ import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
@@ -217,7 +215,7 @@ class MainActivity :
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            //sendNotification(this)
+            // sendNotification(this)
 
             // Permission is granted. Continue the action or workflow in your
             // app.
@@ -230,7 +228,7 @@ class MainActivity :
         }
     }
 
-    private fun notifPermissionCheck(){
+    private fun notifPermissionCheck() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
                 ContextCompat.checkSelfPermission(
@@ -238,7 +236,7 @@ class MainActivity :
                 ) == PackageManager.PERMISSION_GRANTED -> {
                     // You can use the API that requires the permission.
                     Timber.tag("NOTIFICATION").e("onCreate: PERMISSION GRANTED")
-                    //sendNotification(this)
+                    // sendNotification(this)
                 }
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     Snackbar.make(
@@ -263,7 +261,6 @@ class MainActivity :
             }
         }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
