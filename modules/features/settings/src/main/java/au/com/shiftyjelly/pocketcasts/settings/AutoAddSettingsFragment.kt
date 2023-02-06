@@ -43,6 +43,11 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
     private val binding get() = _binding!!
     val viewModel by activityViewModels<AutoAddSettingsViewModel>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.onShown()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentAutoAddSettingsBinding.inflate(inflater, container, false)
         return binding.root
@@ -136,8 +141,6 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
 
             autoAddAdapter.submitList(podcasts)
         }
-
-        viewModel.onShown()
     }
 
     override fun onPause() {
