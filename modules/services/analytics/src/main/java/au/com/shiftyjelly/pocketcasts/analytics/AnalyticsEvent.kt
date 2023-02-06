@@ -446,6 +446,9 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
 
+    /* Settings - Help */
+    SETTINGS_HELP_SHOWN("settings_help_shown"),
+
     /* Settings - Notifications */
     SETTINGS_NOTIFICATIONS_SHOWN("settings_notifications_shown"),
     SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED("settings_notifications_new_episodes_toggled"),
