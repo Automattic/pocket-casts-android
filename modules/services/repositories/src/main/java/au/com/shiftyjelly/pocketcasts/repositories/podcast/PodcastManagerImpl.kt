@@ -78,7 +78,7 @@ class PodcastManagerImpl @Inject constructor(
                     podcast.syncStatus = Podcast.SYNC_STATUS_NOT_SYNCED
                     podcast.isShowNotifications = false
                     podcast.autoDownloadStatus = Podcast.AUTO_DOWNLOAD_OFF
-                    podcast.autoAddToUpNext = 0
+                    podcast.autoAddToUpNext = Podcast.AutoAddUpNext.OFF
                     podcast.autoArchiveAfterPlaying = 0
                     podcast.autoArchiveInactive = 0
                     podcast.autoArchiveEpisodeLimit = null
@@ -560,16 +560,20 @@ class PodcastManagerImpl @Inject constructor(
         podcastDao.updateAutoDownloadStatus(autoDownloadStatus, podcast.uuid)
     }
 
-    override suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Int) {
+    override suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext) {
         podcastDao.updateAutoAddToUpNext(autoAddToUpNext, podcast.uuid)
     }
 
-    override suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Int) {
+    override suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Podcast.AutoAddUpNext) {
         podcastDao.updateAutoAddToUpNexts(autoAddToUpNext, podcastUuids)
     }
 
-    override suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Int, onlyIfValue: Int) {
-        podcastDao.updateAutoAddToUpNextsIf(podcastUuids, newValue, onlyIfValue)
+    override suspend fun updateAutoAddToUpNextsIf(
+        podcastUuids: List<String>,
+        newValue: Podcast.AutoAddUpNext,
+        onlyIfValue: Podcast.AutoAddUpNext
+    ) {
+        podcastDao.updateAutoAddToUpNextsIf(podcastUuids, newValue.databaseInt, onlyIfValue.databaseInt)
     }
 
     override fun updateExcludeFromAutoArchive(podcast: Podcast, excludeFromAutoArchive: Boolean) {

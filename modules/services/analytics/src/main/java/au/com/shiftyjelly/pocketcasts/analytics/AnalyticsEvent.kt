@@ -413,6 +413,13 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED("settings_appearance_use_embedded_artwork_toggled"),
     SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED("settings_appearance_show_artwork_on_lock_screen_toggled"),
 
+    /* Settings - Auto add */
+    SETTINGS_AUTO_ADD_UP_NEXT_SHOWN("settings_auto_add_up_next_shown"),
+    SETTINGS_AUTO_ADD_UP_NEXT_AUTO_ADD_LIMIT_CHANGED("settings_auto_add_up_next_auto_add_limit_changed"),
+    SETTINGS_AUTO_ADD_UP_NEXT_LIMIT_REACHED_CHANGED("settings_auto_add_up_next_limit_reached_changed"),
+    SETTINGS_AUTO_ADD_UP_NEXT_PODCASTS_CHANGED("settings_auto_add_up_next_podcasts_changed"),
+    SETTINGS_AUTO_ADD_UP_NEXT_PODCAST_POSITION_OPTION_CHANGED("settings_auto_add_up_next_podcast_position_option_changed"),
+
     /* Settings - Auto archive */
     SETTINGS_AUTO_ARCHIVE_SHOWN("settings_auto_archive_shown"),
     SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED("settings_auto_archive_played_changed"),
