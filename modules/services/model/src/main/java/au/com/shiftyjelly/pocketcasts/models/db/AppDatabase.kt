@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.SearchHistoryDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
@@ -33,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -47,11 +49,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Playlist::class,
         PlaylistEpisode::class,
         Podcast::class,
+        SearchHistoryItem::class,
         UpNextChange::class,
         UpNextEpisode::class,
         UserEpisode::class,
     ],
-    version = 73,
+    version = 74,
     exportSchema = true
 )
 @TypeConverters(
@@ -75,6 +78,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userEpisodeDao(): UserEpisodeDao
     abstract fun folderDao(): FolderDao
     abstract fun bumpStatsDao(): BumpStatsDao
+    abstract fun searchHistoryDao(): SearchHistoryDao
 
     companion object {
         // This seems dodgy but I got it from Google, https://github.com/googlesamples/android-sunflower/blob/master/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt
