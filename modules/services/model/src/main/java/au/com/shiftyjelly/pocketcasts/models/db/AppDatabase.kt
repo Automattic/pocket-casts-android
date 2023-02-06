@@ -378,6 +378,33 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_73_74 = addMigration(73, 74) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS search_history (
+                        _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        modified INTEGER NOT NULL,
+                        term TEXT,
+                        podcast_uuid TEXT,
+                        podcast_title TEXT,
+                        podcast_author TEXT,
+                        folder_uuid TEXT,
+                        folder_title TEXT,
+                        folder_color INTEGER,
+                        folder_podcastIds TEXT,
+                        episode_uuid TEXT,
+                        episode_title TEXT,
+                        episode_publishedDate INTEGER,
+                        episode_duration REAL
+                    );
+                """.trimIndent()
+            )
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_term` ON search_history (`term`)")
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_podcast_uuid` ON search_history (`podcast_uuid`);")
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_folder_uuid` ON search_history (`folder_uuid`)")
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_episode_uuid` ON search_history (`episode_uuid`)")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -740,7 +767,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_69_70,
                 MIGRATION_70_71,
                 MIGRATION_71_72,
-                MIGRATION_72_73
+                MIGRATION_72_73,
+                MIGRATION_73_74
             )
         }
 
