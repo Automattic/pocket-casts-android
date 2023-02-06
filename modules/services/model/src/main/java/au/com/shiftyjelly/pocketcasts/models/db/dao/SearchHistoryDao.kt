@@ -5,14 +5,12 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 
 @Dao
 abstract class SearchHistoryDao {
-    @Transaction
-    @Query("SELECT * FROM search_history ORDER BY modified DESC")
-    abstract fun findAll(): List<SearchHistoryItem>
+    @Query("SELECT * FROM search_history ORDER BY modified DESC LIMIT :limit")
+    abstract fun findAll(limit: Int = 10): List<SearchHistoryItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(searchHistoryItem: SearchHistoryItem)
