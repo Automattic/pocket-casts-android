@@ -230,49 +230,44 @@ class MainActivity :
         }
     }
 
+    private fun notifPermissionCheck(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // You can use the API that requires the permission.
+                    Timber.tag("NOTIFICATION").e("onCreate: PERMISSION GRANTED")
+                    //sendNotification(this)
+                }
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    Snackbar.make(
+                        findViewById(R.id.root),
+                        "Notification blocked",
+                        5000
+                    ).setAction("Settings") {
+                        // Responds to click on the action
+                        val intent = Intent(AndroidProviderSettings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        val uri: Uri = Uri.fromParts("package", packageName, null)
+                        intent.data = uri
+                        startActivity(intent)
+                    }.show()
+                }
+                else -> {
+                    Log.e("NOTIFICATION", "onCreate: ask for permissions")
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                }
+            }
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
         super.onCreate(savedInstanceState)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        when {
-            ContextCompat.checkSelfPermission(
-                this, Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                // You can use the API that requires the permission.
-                Timber.tag("NOTIFICATION").e("onCreate: PERMISSION GRANTED")
-                //sendNotification(this)
-            }
-            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
-                Snackbar.make(
-                    findViewById(R.id.root),
-                    "Notification blocked",
-                    Snackbar.LENGTH_LONG
-                ).setAction("Settings") {
-                    // Responds to click on the action
-                    val intent = Intent(AndroidProviderSettings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    val uri: Uri = Uri.fromParts("package", packageName, null)
-                    intent.data = uri
-                    startActivity(intent)
-                }.show()
-                //  Toast.makeText(this, "NOT ALLOWED", Toast.LENGTH_SHORT).show()
-            }
-            else -> {
-                Log.e("NOTIFICATION", "onCreate: ask for permissions")
-                // You can directly ask for the permission.
-                // The registered ActivityResultCallback gets the result of this request.
-                //  if (Build.VERSION.SDK_INT >= 33) {
-                //   Log.e(TAG, "onCreate: 33" )
-
-                requestPermissionLauncher.launch(
-                    Manifest.permission.POST_NOTIFICATIONS
-                )
-
-                // }
-            }
-        }
-        }
         theme.setupThemeForConfig(this, resources.configuration)
 
         val showOnboarding = !settings.hasCompletedOnboarding() && !settings.isLoggedIn()
@@ -284,6 +279,7 @@ class MainActivity :
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        notifPermissionCheck()
 
         lifecycleScope.launchWhenCreated {
             val isEligible = viewModel.isEndOfYearStoriesEligible()
