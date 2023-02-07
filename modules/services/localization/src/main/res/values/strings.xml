@@ -640,7 +640,7 @@
     <string name="profile_cloud_add_to_up_next" translatable="false">@string/add_to_up_next</string>
     <string name="profile_cloud_after_playing">After playing</string>
     <string name="profile_cloud_all_files_added">All files added to your files will be added to Up Next.</string>
-    <string name="profile_cloud_auto_add_to_up_next">Auto Add To Up Next</string>
+    <string name="profile_cloud_auto_add_to_up_next">Auto add to Up Next</string>
     <string name="profile_cloud_auto_download_from_cloud">Auto download from cloud</string>
     <string name="profile_cloud_auto_upload_to_cloud">Auto upload to cloud</string>
     <string name="profile_cloud_cancel_upload">Cancel upload</string>
