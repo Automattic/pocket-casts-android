@@ -10,13 +10,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 @Dao
 abstract class SearchHistoryDao {
     @Query("SELECT * FROM search_history ORDER BY modified DESC LIMIT :limit")
-    abstract fun findAll(limit: Int = 10): List<SearchHistoryItem>
+    abstract suspend fun findAll(limit: Int = 10): List<SearchHistoryItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(searchHistoryItem: SearchHistoryItem)
 
     @Delete
-    abstract fun delete(result: SearchHistoryItem)
+    abstract suspend fun delete(result: SearchHistoryItem)
 
     @Query("DELETE FROM search_history")
     abstract suspend fun deleteAll()
