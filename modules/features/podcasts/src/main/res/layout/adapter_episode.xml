@@ -33,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
+            android:importantForAccessibility="noHideDescendants">
             <FrameLayout
                 android:id="@id/leftRightItem2"
                 android:layout_width="match_parent"
@@ -167,11 +168,12 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:src="@drawable/ic_upnext"
-                    android:contentDescription="@string/episode_status_up_next"
                     android:layout_gravity="center"
                     android:layout_marginEnd="4dp"
                     android:visibility="@{inUpNext}"
-                    app:tint="?attr/support_01" />
+                    app:tint="?attr/support_01"
+                    android:contentDescription="@string/episode_status_up_next"
+                    android:importantForAccessibility="yes" />
                 <ImageView
                     android:id="@+id/imgIcon"
                     android:layout_width="16dp"
