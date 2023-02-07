@@ -86,37 +86,37 @@ class CloudSettingsFragment : BaseFragment() {
         with(binding.swtAutoAddToUpNext) {
             isChecked = settings.getCloudAddToUpNext()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudAddToUpNext(isChecked)
+                viewModel.setAddToUpNext(isChecked)
             }
         }
         with(binding.swtDeleteLocalFileAfterPlaying) {
-            isChecked = settings.getCloudDeleteAfterPlaying()
+            isChecked = settings.getDeleteLocalFileAfterPlaying()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudDeleteAfterPlaying(isChecked)
+                viewModel.setDeleteLocalFileAfterPlaying(isChecked)
             }
         }
         with(binding.swtDeleteCloudFileAfterPlaying) {
-            isChecked = settings.getCloudDeleteCloudAfterPlaying()
+            isChecked = settings.getDeleteCloudFileAfterPlaying()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudDeleteCloudAfterPlaying(isChecked)
+                viewModel.setDeleteCloudFileAfterPlaying(isChecked)
             }
         }
         with(binding.swtAutoUploadToCloud) {
             isChecked = settings.getCloudAutoUpload()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudAutoUpload(isChecked)
+                viewModel.setCloudAutoUpload(isChecked)
             }
         }
         with(binding.swtAutoDownloadFromCloud) {
             isChecked = settings.getCloudAutoDownload()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudAutoDownload(isChecked)
+                viewModel.setCloudAutoDownload(isChecked)
             }
         }
         with(binding.swtCloudOnlyOnWiFi) {
             isChecked = settings.getCloudOnlyWifi()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudOnlyWifi(isChecked)
+                viewModel.setCloudOnlyWifi(isChecked)
             }
         }
 
