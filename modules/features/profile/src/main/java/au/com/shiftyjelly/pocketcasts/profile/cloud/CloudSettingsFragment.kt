@@ -32,8 +32,13 @@ class CloudSettingsFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
 
-    private val viewModel: AddFileViewModel by viewModels()
+    private val viewModel by viewModels<CloudSettingsViewModel>()
     private var binding: FragmentCloudSettingsBinding? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.onShown()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentCloudSettingsBinding.inflate(inflater, container, false)
@@ -128,6 +133,11 @@ class CloudSettingsFragment : BaseFragment() {
         ).forEach {
             it.setOnClickListener { openUpgradeSheet() }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     private fun openUpgradeSheet() {

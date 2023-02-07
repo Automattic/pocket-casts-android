@@ -437,6 +437,9 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_DOWNLOAD_STOP_ALL_DOWNLOADS("settings_auto_download_stop_all_downloads"),
     SETTINGS_AUTO_DOWNLOAD_CLEAR_DOWNLOAD_ERRORS("settings_auto_download_clear_download_errors"),
 
+    /* Settings - Files */
+    SETTINGS_FILES_SHOWN("settings_files_shown"),
+
     /* Settings - General */
     SETTINGS_GENERAL_SHOWN("settings_general_shown"),
     SETTINGS_GENERAL_ROW_ACTION_CHANGED("settings_general_row_action_changed"),
