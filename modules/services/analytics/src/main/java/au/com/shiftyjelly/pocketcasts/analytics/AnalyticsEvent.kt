@@ -456,6 +456,13 @@ enum class AnalyticsEvent(val key: String) {
     /* Settings - Help */
     SETTINGS_HELP_SHOWN("settings_help_shown"),
 
+    /* Settings - Import */
+    SETTINGS_IMPORT_SHOWN("settings_import_shown"),
+    SETTINGS_IMPORT_SELECT_FILE("settings_import_select_file"),
+    SETTINGS_IMPORT_BY_URL("settings_import_by_url"),
+    SETTINGS_IMPORT_EXPORT_EMAIL_TAPPED("settings_import_export_email_tapped"),
+    SETTINGS_IMPORT_EXPORT_FILE_TAPPED("settings_import_export_file_tapped"),
+
     /* Settings - Notifications */
     SETTINGS_NOTIFICATIONS_SHOWN("settings_notifications_shown"),
     SETTINGS_NOTIFICATIONS_NEW_EPISODES_TOGGLED("settings_notifications_new_episodes_toggled"),

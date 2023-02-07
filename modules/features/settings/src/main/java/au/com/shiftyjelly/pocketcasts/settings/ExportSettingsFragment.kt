@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.viewModels
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -11,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ExportSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -28,7 +30,13 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var theme: Theme
 
+    private val viewModel by viewModels<ExportSettingsViewModel>()
     private var exporter: OpmlExporter? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.onCreate()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,30 +49,39 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
 
         val activity = activity ?: return
 
-        findPreference<Preference>("importPodcasts")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        findPreference<Preference>("importPodcasts")?.setOnPreferenceClickListener {
             showOpmlFilePicker()
+            viewModel.onImportSelectFile()
             true
         }
 
-        findPreference<EditTextPreference>("importPodcastsByUrl")?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-            val url = newValue.toString()
-            if (url.isNotBlank()) {
-                OpmlImportTask.run(url, requireActivity())
+        findPreference<EditTextPreference>("importPodcastsByUrl")?.apply {
+            setOnPreferenceClickListener {
+                viewModel.onImportByUrlClicked()
+                false
             }
-            false
+            setOnPreferenceChangeListener { _, newValue ->
+                val url = newValue.toString()
+                if (url.isNotBlank()) {
+                    OpmlImportTask.run(url, activity)
+                }
+                false
+            }
         }
 
-        findPreference<Preference>("exportSendEmail")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        findPreference<Preference>("exportSendEmail")?.setOnPreferenceClickListener {
             exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, settings, activity).apply {
                 sendEmail()
             }
+            viewModel.onExportByEmail()
             true
         }
 
-        findPreference<Preference>("exportSaveFile")?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        findPreference<Preference>("exportSaveFile")?.setOnPreferenceClickListener {
             exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, settings, activity).apply {
                 saveFile()
             }
+            viewModel.onExportFile()
             true
         }
     }
@@ -91,6 +108,11 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
             val data = resultData.data ?: return
             exporter?.exportToUri(data)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     companion object {
