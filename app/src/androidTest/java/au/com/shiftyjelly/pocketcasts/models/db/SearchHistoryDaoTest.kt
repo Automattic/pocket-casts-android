@@ -87,9 +87,8 @@ class SearchHistoryDaoTest {
 
             val result = searchHistoryDao.findAll()
             assertEquals("Insert should replace, count should be 1", 1, result.size)
-            assertEquals(
+            assertTrue(
                 "Replaced search term should be on top",
-                true,
                 result.first().modified > modifiedPrevious
             )
         }
@@ -121,9 +120,8 @@ class SearchHistoryDaoTest {
 
             val result = searchHistoryDao.findAll()
             assertEquals("Same podcast search insert should replace, count should be 1", 1, result.size)
-            assertEquals(
+            assertTrue(
                 "Replaced podcast search history item should be on top",
-                true,
                 result.first().modified > modifiedPrevious
             )
         }
@@ -157,9 +155,8 @@ class SearchHistoryDaoTest {
 
             val result = searchHistoryDao.findAll()
             assertEquals("Same folder search insert should replace, count should be 1", 1, result.size)
-            assertEquals(
+            assertTrue(
                 "Replaced folder search should be on top",
-                true,
                 result.first().modified > modifiedPrevious
             )
         }
@@ -193,9 +190,8 @@ class SearchHistoryDaoTest {
 
             val result = searchHistoryDao.findAll()
             assertEquals("Same episode insert should replace, count should be 1", 1, result.size)
-            assertEquals(
+            assertTrue(
                 "Replaced episode search should be on top",
-                true,
                 result.first().modified > modifiedPrevious
             )
         }
