@@ -15,6 +15,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -45,11 +48,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltWorker
 class OpmlImportTask @AssistedInject constructor(
-    @Assisted val context: Context,
-    @Assisted val parameters: WorkerParameters,
+    @Assisted context: Context,
+    @Assisted parameters: WorkerParameters,
     var podcastManager: PodcastManager,
     var refreshServerManager: RefreshServerManager,
-    var notificationHelper: NotificationHelper
+    var notificationHelper: NotificationHelper,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : CoroutineWorker(context, parameters) {
 
     companion object {
@@ -67,6 +71,7 @@ class OpmlImportTask @AssistedInject constructor(
         }
 
         private fun run(data: Data, context: Context) {
+            AnalyticsTracker.track(AnalyticsEvent.OPML_IMPORT_STARTED)
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -146,20 +151,44 @@ class OpmlImportTask @AssistedInject constructor(
         try {
             val url = inputData.getString(INPUT_URL)
             if (!url.isNullOrBlank()) {
-                processUrl(URL(url))
+                val numberProcessed = processUrl(URL(url))
+                trackProcessed(numberProcessed)
                 return Result.success()
             }
 
-            val uri = Uri.parse(inputData.getString(INPUT_URI)) ?: return Result.failure()
-            processFile(uri)
+            val uri = Uri.parse(inputData.getString(INPUT_URI))
+            if (uri == null) {
+                trackFailure(reason = "no_input_found")
+                return Result.failure()
+            }
+            val numberProcessed = processFile(uri)
+            trackProcessed(numberProcessed)
             return Result.success()
         } catch (t: Throwable) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, t, "OPML import failed.")
+            trackFailure(reason = "unknown")
             return Result.failure()
         }
     }
 
-    private suspend fun processUrl(url: URL) {
+    private fun trackProcessed(numberParsed: Int) {
+        analyticsTracker.track(
+            AnalyticsEvent.OPML_IMPORT_FINISHED,
+            mapOf("number" to numberParsed)
+        )
+    }
+
+    fun trackFailure(reason: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.OPML_IMPORT_FAILED,
+            mapOf("reason" to reason)
+        )
+    }
+
+    /**
+     * Returns the number of urls found in the input url
+     */
+    private suspend fun processUrl(url: URL): Int {
         var urls = emptyList<String>()
 
         try {
@@ -173,9 +202,13 @@ class OpmlImportTask @AssistedInject constructor(
         }
 
         processUrls(urls)
+        return urls.size
     }
 
-    private suspend fun processFile(uri: Uri) {
+    /**
+     * Returns the number of urls found in the input file
+     */
+    private suspend fun processFile(uri: Uri): Int {
         var urls = emptyList<String>()
 
         val resolver = applicationContext.contentResolver
@@ -190,6 +223,7 @@ class OpmlImportTask @AssistedInject constructor(
         }
 
         processUrls(urls)
+        return urls.size
     }
 
     private suspend fun processUrls(urls: List<String>) {
