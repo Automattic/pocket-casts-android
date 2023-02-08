@@ -557,7 +557,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun deletePlayedEpisodeIfReq(episode: UserEpisode, playbackManager: PlaybackManager) {
-        if (settings.getCloudDeleteAfterPlaying()) {
+        if (settings.getDeleteLocalFileAfterPlaying()) {
             deleteFilesForEpisode(episode)
             userEpisodeDao.updateEpisodeStatus(episode.uuid, EpisodeStatusEnum.NOT_DOWNLOADED)
 
@@ -566,7 +566,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             }
         }
 
-        if (settings.getCloudDeleteCloudAfterPlaying() && episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
+        if (settings.getDeleteCloudFileAfterPlaying() && episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
             removeFromCloud(episode)
             if (!episode.isDownloaded) {
                 delete(episode, playbackManager)

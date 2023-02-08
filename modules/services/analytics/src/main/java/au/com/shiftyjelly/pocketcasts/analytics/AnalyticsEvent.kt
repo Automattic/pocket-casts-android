@@ -437,6 +437,15 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_DOWNLOAD_STOP_ALL_DOWNLOADS("settings_auto_download_stop_all_downloads"),
     SETTINGS_AUTO_DOWNLOAD_CLEAR_DOWNLOAD_ERRORS("settings_auto_download_clear_download_errors"),
 
+    /* Settings - Files */
+    SETTINGS_FILES_SHOWN("settings_files_shown"),
+    SETTINGS_FILES_AUTO_ADD_UP_NEXT_TOGGLED("settings_files_auto_add_up_next_toggled"),
+    SETTINGS_FILES_DELETE_LOCAL_FILE_AFTER_PLAYING_TOGGLED("settings_files_delete_local_file_after_playing_toggled"),
+    SETTINGS_FILES_DELETE_CLOUD_FILE_AFTER_PLAYING_TOGGLED("settings_files_delete_cloud_file_after_playing_toggled"),
+    SETTINGS_FILES_AUTO_UPLOAD_TO_CLOUD_TOGGLED("settings_files_auto_upload_to_cloud_toggled"),
+    SETTINGS_FILES_AUTO_DOWNLOAD_FROM_CLOUD_TOGGLED("settings_files_auto_download_from_cloud_toggled"),
+    SETTINGS_FILES_ONLY_ON_WIFI_TOGGLED("settings_files_only_on_wifi_toggled"),
+
     /* Settings - General */
     SETTINGS_GENERAL_SHOWN("settings_general_shown"),
     SETTINGS_GENERAL_ROW_ACTION_CHANGED("settings_general_row_action_changed"),
