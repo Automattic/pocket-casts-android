@@ -404,6 +404,9 @@ enum class AnalyticsEvent(val key: String) {
     CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("cancel_confirmation_stay_button_tapped"),
     CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped"),
 
+    /* Settings - About */
+    SETTINGS_ABOUT_SHOWN("settings_about_shown"),
+
     /* Settings - Appearance */
     SETTINGS_APPEARANCE_SHOWN("settings_appearance_shown"),
     SETTINGS_APPEARANCE_FOLLOW_SYSTEM_THEME_TOGGLED("settings_appearance_follow_system_theme_toggled"),
