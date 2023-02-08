@@ -70,18 +70,18 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
         }
 
         findPreference<Preference>("exportSendEmail")?.setOnPreferenceClickListener {
-            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, settings, activity).apply {
+            viewModel.onExportByEmail()
+            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, settings, activity, viewModel.analyticsTracker).apply {
                 sendEmail()
             }
-            viewModel.onExportByEmail()
             true
         }
 
         findPreference<Preference>("exportSaveFile")?.setOnPreferenceClickListener {
-            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, settings, activity).apply {
+            viewModel.onExportFile()
+            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, settings, activity, viewModel.analyticsTracker).apply {
                 saveFile()
             }
-            viewModel.onExportFile()
             true
         }
     }

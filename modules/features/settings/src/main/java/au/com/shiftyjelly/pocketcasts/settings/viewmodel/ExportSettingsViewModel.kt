@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExportSettingsViewModel @Inject constructor(
-    private val analyticsTracker: AnalyticsTrackerWrapper,
+    val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     private var isFragmentChangingConfigurations: Boolean = false
