@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.adapter.PodcastSearchAdapter
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
+import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -153,6 +155,7 @@ class SearchFragment : BaseFragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.updateSearchQuery(query)
+                binding.searchHistoryPanel.visibility = View.GONE
                 UiUtil.hideKeyboard(searchView)
                 return true
             }
@@ -165,6 +168,7 @@ class SearchFragment : BaseFragment() {
                     return true
                 }
                 viewModel.updateSearchQuery(query)
+                binding.searchHistoryPanel.visibility = View.GONE
                 return true
             }
         })
@@ -201,6 +205,12 @@ class SearchFragment : BaseFragment() {
         recyclerView.adapter = searchAdapter
         recyclerView.itemAnimator = null
         recyclerView.addOnScrollListener(onScrollListener)
+
+        binding.searchHistoryPanel.setContent {
+            AppTheme(theme.activeTheme) {
+                SearchHistoryPage()
+            }
+        }
 
         val noResultsView = binding.noResults
         val searchFailedView = binding.searchFailed
