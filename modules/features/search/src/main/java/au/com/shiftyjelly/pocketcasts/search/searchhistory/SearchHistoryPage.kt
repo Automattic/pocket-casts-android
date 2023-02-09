@@ -12,23 +12,28 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImageSmall
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.UUID
@@ -57,7 +62,10 @@ fun SearchHistoryView(
                 when (entry) {
                     is SearchHistoryEntry.Episode -> Unit // TODO
 
-                    is SearchHistoryEntry.Folder -> Unit // TODO
+                    is SearchHistoryEntry.Folder -> SearchHistoryRow(
+                        content = { SearchHistoryFolderView(entry) },
+                        onCloseClick = { onCloseClick(entry) }
+                    )
 
                     is SearchHistoryEntry.Podcast -> SearchHistoryRow(
                         content = { SearchHistoryPodcastView(entry) },
@@ -109,6 +117,62 @@ private fun CloseButton(
 }
 
 @Composable
+fun SearchHistoryFolderView(
+    entry: SearchHistoryEntry.Folder,
+    modifier: Modifier = Modifier,
+) {
+    val color = MaterialTheme.theme.colors.getFolderColor(entry.color)
+    Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.theme.colors.primaryUi01)
+                .padding(horizontal = 16.dp)
+
+        ) {
+            Box(modifier = Modifier.padding(top = 4.dp, end = 12.dp, bottom = 4.dp)) {
+                FolderImageSmall(
+                    color = color,
+                    podcastUuids = entry.podcastIds,
+                    folderImageSize = 54.dp,
+                    podcastImageSize = 22.dp
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = entry.title,
+                    fontSize = 16.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+                val podcastCount = if (entry.podcastIds.size == 1) {
+                    stringResource(R.string.podcasts_singular)
+                } else {
+                    stringResource(
+                        R.string.podcasts_plural,
+                        entry.podcastIds.size
+                    )
+                }
+                Text(
+                    text = podcastCount,
+                    fontSize = 13.sp,
+                    letterSpacing = 0.2.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun SearchHistoryPodcastView(
     entry: SearchHistoryEntry.Podcast,
     modifier: Modifier = Modifier,
@@ -155,6 +219,12 @@ fun SearchHistoryViewPreview(
         SearchHistoryView(
             state = SearchHistoryViewModel.State(
                 entries = listOf(
+                    SearchHistoryEntry.Folder(
+                        uuid = UUID.randomUUID().toString(),
+                        title = "Folder",
+                        color = 0,
+                        podcastIds = emptyList()
+                    ),
                     SearchHistoryEntry.Podcast(
                         uuid = UUID.randomUUID().toString(),
                         title = "Title",

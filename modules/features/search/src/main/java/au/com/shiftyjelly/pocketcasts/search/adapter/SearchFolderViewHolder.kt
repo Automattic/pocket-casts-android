@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 class SearchFolderViewHolder(
     val composeView: ComposeView,
     val theme: Theme,
-    val onFolderClick: (Folder) -> Unit
+    val onFolderClick: (Folder, List<Podcast>) -> Unit
 ) : RecyclerView.ViewHolder(composeView) {
 
     init {
@@ -24,7 +24,7 @@ class SearchFolderViewHolder(
     fun bind(folder: Folder, podcasts: List<Podcast>) {
         composeView.setContent {
             AppTheme(theme.activeTheme) {
-                SearchFolderRow(folder, podcasts, onClick = { onFolderClick(folder) })
+                SearchFolderRow(folder, podcasts, onClick = { onFolderClick(folder, podcasts) })
             }
         }
     }

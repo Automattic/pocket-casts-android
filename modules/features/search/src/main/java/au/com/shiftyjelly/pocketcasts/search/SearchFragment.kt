@@ -99,6 +99,7 @@ class SearchFragment : BaseFragment() {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner { viewLifecycleOwner.lifecycle }
         viewModel.setOnlySearchRemote(onlySearchRemote)
+        searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
         binding.viewModel = viewModel
         binding.floating = floating
 
@@ -192,12 +193,13 @@ class SearchFragment : BaseFragment() {
                 listener?.onSearchPodcastClick(podcast.uuid)
                 UiUtil.hideKeyboard(searchView)
             },
-            onFolderClick = { folder ->
+            onFolderClick = { folder, podcasts ->
                 viewModel.trackSearchResultTapped(
                     source = source,
                     uuid = folder.uuid,
                     type = SearchResultType.FOLDER,
                 )
+                searchHistoryViewModel.add(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
                 listener?.onSearchFolderClick(folder.uuid)
                 UiUtil.hideKeyboard(searchView)
             }
