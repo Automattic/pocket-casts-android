@@ -9,8 +9,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 
 @Dao
 abstract class SearchHistoryDao {
-    @Query("SELECT * FROM search_history ORDER BY modified DESC LIMIT :limit")
-    abstract suspend fun findAll(limit: Int = 10): List<SearchHistoryItem>
+    @Query(
+        "SELECT * FROM search_history " +
+            "WHERE CASE when :showFolders then 1 else folder_uuid is NULL END " +
+            "ORDER BY modified DESC " +
+            "LIMIT :limit"
+    )
+    abstract suspend fun findAll(showFolders: Boolean, limit: Int): List<SearchHistoryItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(searchHistoryItem: SearchHistoryItem)
