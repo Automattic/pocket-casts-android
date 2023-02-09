@@ -128,7 +128,7 @@ class SearchHandler @Inject constructor(
 
     private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localResults, serverSearchResults, loading ->
         if (searchTerm.string.isBlank()) {
-            SearchState.Results(list = emptyList(), loading = loading, error = null)
+            SearchState.Results(searchTerm = searchTerm.string, list = emptyList(), loading = loading, error = null)
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverResults = serverSearchResults.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -143,16 +143,21 @@ class SearchHandler @Inject constructor(
                 serverSearchResults.error?.let {
                     analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
                 }
-                SearchState.Results(list = searchResults, loading = loading, error = serverSearchResults.error)
+                SearchState.Results(
+                    searchTerm = searchTerm.string,
+                    list = searchResults,
+                    loading = loading,
+                    error = serverSearchResults.error
+                )
             } else {
-                SearchState.NoResults
+                SearchState.NoResults(searchTerm = searchTerm.string)
             }
         }
     }
         .doOnError { Timber.e(it) }
         .onErrorReturn { exception ->
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
-            SearchState.Results(list = emptyList(), loading = false, error = exception)
+            SearchState.Results(searchTerm = searchQuery.value?.string ?: "", list = emptyList(), loading = false, error = exception)
         }
         .observeOn(AndroidSchedulers.mainThread())
         .toFlowable(BackpressureStrategy.LATEST)
