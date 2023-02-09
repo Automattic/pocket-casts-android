@@ -113,6 +113,7 @@ class SearchFragment : BaseFragment() {
         binding?.let {
             UiUtil.hideKeyboard(it.searchView)
         }
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -159,7 +160,7 @@ class SearchFragment : BaseFragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.updateSearchQuery(query)
-                binding.searchHistoryPanel.visibility = View.GONE
+                binding.searchHistoryPanel.hide()
                 UiUtil.hideKeyboard(searchView)
                 return true
             }
@@ -172,7 +173,11 @@ class SearchFragment : BaseFragment() {
                     return true
                 }
                 viewModel.updateSearchQuery(query)
-                binding.searchHistoryPanel.visibility = View.GONE
+                if (characterCount > 0) {
+                    binding.searchHistoryPanel.hide()
+                } else {
+                    binding.searchHistoryPanel.show()
+                }
                 return true
             }
         })
@@ -215,6 +220,9 @@ class SearchFragment : BaseFragment() {
         binding.searchHistoryPanel.setContent {
             AppTheme(theme.activeTheme) {
                 SearchHistoryPage(searchHistoryViewModel)
+                if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
+                    binding.searchHistoryPanel.show()
+                }
             }
         }
 

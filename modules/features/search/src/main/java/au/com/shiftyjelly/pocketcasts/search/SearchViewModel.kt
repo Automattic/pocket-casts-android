@@ -19,10 +19,14 @@ class SearchViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
-
+    var isFragmentChangingConfigurations: Boolean = false
+    var showSearchHistory: Boolean = true
     val searchResults = searchHandler.searchResults.map { searchState ->
         val isSearchStarted = (loading.value == true)
-        if (isSearchStarted) saveSearchTerm(searchState.searchTerm)
+        if (isSearchStarted) {
+            saveSearchTerm(searchState.searchTerm)
+            showSearchHistory = false
+        }
         searchState
     }
     val loading = searchHandler.loading
@@ -43,6 +47,10 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             searchHistoryManager.add(SearchHistoryEntry.SearchTerm(term = term))
         }
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
     fun trackSearchResultTapped(
