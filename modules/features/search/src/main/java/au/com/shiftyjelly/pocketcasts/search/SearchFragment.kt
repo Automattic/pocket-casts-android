@@ -16,10 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.adapter.PodcastSearchAdapter
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
+import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -62,6 +64,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private val viewModel: SearchViewModel by viewModels()
+    private val searchHistoryViewModel: SearchHistoryViewModel by viewModels()
     private var listener: Listener? = null
     private var binding: FragmentSearchBinding? = null
 
@@ -185,6 +188,7 @@ class SearchFragment : BaseFragment() {
                         SearchResultType.PODCAST_LOCAL_RESULT
                     }
                 )
+                searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
                 listener?.onSearchPodcastClick(podcast.uuid)
                 UiUtil.hideKeyboard(searchView)
             },
@@ -208,7 +212,7 @@ class SearchFragment : BaseFragment() {
 
         binding.searchHistoryPanel.setContent {
             AppTheme(theme.activeTheme) {
-                SearchHistoryPage()
+                SearchHistoryPage(searchHistoryViewModel)
             }
         }
 
