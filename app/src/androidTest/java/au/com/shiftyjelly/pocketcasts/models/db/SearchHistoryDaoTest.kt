@@ -243,6 +243,27 @@ class SearchHistoryDaoTest {
         }
     }
 
+    /* SHOW FOLDERS FILTER */
+    @Test
+    fun testFoldersShownInSearchHistory() {
+        val uuid = UUID.randomUUID().toString()
+        runTest {
+            searchHistoryDao.insert(createFolderSearchHistoryItem(uuid))
+
+            assertTrue(findSearchHistory(showFolders = true).size == 1)
+        }
+    }
+
+    @Test
+    fun testFoldersHiddenInSearchHistory() {
+        val uuid = UUID.randomUUID().toString()
+        runTest {
+            searchHistoryDao.insert(createFolderSearchHistoryItem(uuid))
+
+            assertTrue(findSearchHistory(showFolders = false).isEmpty())
+        }
+    }
+
     /* HELPER FUNCTIONS */
     private fun createTermSearchHistoryItem(term: String) =
         SearchHistoryItem(term = term)
