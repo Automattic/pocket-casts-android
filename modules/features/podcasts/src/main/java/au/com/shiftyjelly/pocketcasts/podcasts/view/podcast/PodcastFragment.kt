@@ -504,7 +504,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 activity?.onBackPressed()
             }
             val iconColor = it.context.getThemeColor(UR.attr.contrast_01)
-            it.menu.setupChromeCastButton(context)
+            it.menu.setupChromeCastButton(context) {
+                chromeCastAnalytics.trackChromeCastViewShown()
+            }
             it.menu.tintIcons(iconColor)
             it.navigationIcon?.setTint(iconColor)
             it.navigationContentDescription = getString(LR.string.back)
