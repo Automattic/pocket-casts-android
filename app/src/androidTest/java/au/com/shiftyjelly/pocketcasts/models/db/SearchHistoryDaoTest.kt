@@ -20,6 +20,7 @@ import java.util.UUID
 
 private const val SEARCH_TERM_TEST1 = "test1"
 private const val SEARCH_TERM_TEST2 = "test2"
+private const val SEARCH_HISTORY_LIMIT = 5
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -44,7 +45,7 @@ class SearchHistoryDaoTest {
     fun testInsertSearchTerm() = runTest {
         searchHistoryDao.insert(createTermSearchHistoryItem(SEARCH_TERM_TEST1))
 
-        assertTrue(searchHistoryDao.findAll().first().term == SEARCH_TERM_TEST1)
+        assertTrue(findSearchHistory().first().term == SEARCH_TERM_TEST1)
     }
 
     @Test
@@ -53,7 +54,7 @@ class SearchHistoryDaoTest {
         runTest {
             searchHistoryDao.insert(createPodcastSearchHistoryItem(uuid))
 
-            assertTrue(searchHistoryDao.findAll().first().podcast?.uuid == uuid)
+            assertTrue(findSearchHistory().first().podcast?.uuid == uuid)
         }
     }
 
@@ -63,7 +64,7 @@ class SearchHistoryDaoTest {
         runTest {
             searchHistoryDao.insert(createFolderSearchHistoryItem(uuid))
 
-            assertTrue(searchHistoryDao.findAll().first().folder?.uuid == uuid)
+            assertTrue(findSearchHistory().first().folder?.uuid == uuid)
         }
     }
 
@@ -73,7 +74,7 @@ class SearchHistoryDaoTest {
         runTest {
             searchHistoryDao.insert(createEpisodeSearchHistoryItem(uuid))
 
-            assertTrue(searchHistoryDao.findAll().first().episode?.uuid == uuid)
+            assertTrue(findSearchHistory().first().episode?.uuid == uuid)
         }
     }
 
@@ -82,10 +83,10 @@ class SearchHistoryDaoTest {
     fun testMultipleInsertSameSearchTerms() {
         runTest {
             searchHistoryDao.insert(createTermSearchHistoryItem(SEARCH_TERM_TEST1))
-            val modifiedPrevious = searchHistoryDao.findAll().first().modified
+            val modifiedPrevious = findSearchHistory().first().modified
             searchHistoryDao.insert(createTermSearchHistoryItem(SEARCH_TERM_TEST1))
 
-            val result = searchHistoryDao.findAll()
+            val result = findSearchHistory()
             assertEquals("Insert should replace, count should be 1", 1, result.size)
             assertTrue(
                 "Replaced search term should be on top",
@@ -100,7 +101,7 @@ class SearchHistoryDaoTest {
             searchHistoryDao.insert(createTermSearchHistoryItem(SEARCH_TERM_TEST1))
             searchHistoryDao.insert(createTermSearchHistoryItem(SEARCH_TERM_TEST2))
 
-            val result = searchHistoryDao.findAll()
+            val result = findSearchHistory()
             assertEquals("Unique search terms should be inserted, count should be 2", 2, result.size)
             assertEquals(
                 "Last search term inserted should be on top",
@@ -115,10 +116,10 @@ class SearchHistoryDaoTest {
         val uuid = UUID.randomUUID().toString()
         runTest {
             searchHistoryDao.insert(createPodcastSearchHistoryItem(uuid = uuid))
-            val modifiedPrevious = searchHistoryDao.findAll().first().modified
+            val modifiedPrevious = findSearchHistory().first().modified
             searchHistoryDao.insert(createPodcastSearchHistoryItem(uuid = uuid))
 
-            val result = searchHistoryDao.findAll()
+            val result = findSearchHistory()
             assertEquals("Same podcast search insert should replace, count should be 1", 1, result.size)
             assertTrue(
                 "Replaced podcast search history item should be on top",
@@ -135,7 +136,7 @@ class SearchHistoryDaoTest {
             searchHistoryDao.insert(createPodcastSearchHistoryItem(uuid1))
             searchHistoryDao.insert(createPodcastSearchHistoryItem(uuid2))
 
-            val result = searchHistoryDao.findAll()
+            val result = findSearchHistory()
             assertEquals("Unique podcast search history should be inserted, count should be 2", 2, result.size)
             assertEquals(
                 "Last podcast search history inserted should be on top",
@@ -150,10 +151,10 @@ class SearchHistoryDaoTest {
         val uuid = UUID.randomUUID().toString()
         runTest {
             searchHistoryDao.insert(createFolderSearchHistoryItem(uuid))
-            val modifiedPrevious = searchHistoryDao.findAll().first().modified
+            val modifiedPrevious = findSearchHistory().first().modified
             searchHistoryDao.insert(createFolderSearchHistoryItem(uuid))
 
-            val result = searchHistoryDao.findAll()
+            val result = findSearchHistory()
             assertEquals("Same folder search insert should replace, count should be 1", 1, result.size)
             assertTrue(
                 "Replaced folder search should be on top",
@@ -170,7 +171,7 @@ class SearchHistoryDaoTest {
             searchHistoryDao.insert(createFolderSearchHistoryItem(uuid1))
             searchHistoryDao.insert(createFolderSearchHistoryItem(uuid2))
 
-            val result = searchHistoryDao.findAll()
+            val result = findSearchHistory()
             assertEquals("Unique folder search history should be inserted, count should be 2", 2, result.size)
             assertEquals(
                 "Last folder search history inserted should be on top",
@@ -185,10 +186,10 @@ class SearchHistoryDaoTest {
         val uuid = UUID.randomUUID().toString()
         runTest {
             searchHistoryDao.insert(createEpisodeSearchHistoryItem(uuid))
-            val modifiedPrevious = searchHistoryDao.findAll().first().modified
+            val modifiedPrevious = findSearchHistory().first().modified
             searchHistoryDao.insert(createEpisodeSearchHistoryItem(uuid))
 
-            val result = searchHistoryDao.findAll()
+            val result = findSearchHistory()
             assertEquals("Same episode insert should replace, count should be 1", 1, result.size)
             assertTrue(
                 "Replaced episode search should be on top",
@@ -205,7 +206,7 @@ class SearchHistoryDaoTest {
             searchHistoryDao.insert(createEpisodeSearchHistoryItem(uuid1))
             searchHistoryDao.insert(createEpisodeSearchHistoryItem(uuid2))
 
-            val result = searchHistoryDao.findAll()
+            val result = findSearchHistory()
             assertEquals("Unique episode search history should be inserted, count should be 2", 2, result.size)
             assertEquals(
                 "Last episode search history inserted should be on top",
@@ -221,9 +222,9 @@ class SearchHistoryDaoTest {
         runTest {
             searchHistoryDao.insert(createTermSearchHistoryItem(SEARCH_TERM_TEST1))
 
-            searchHistoryDao.delete(searchHistoryDao.findAll().first())
+            searchHistoryDao.delete(findSearchHistory().first())
 
-            assertTrue(searchHistoryDao.findAll().isEmpty())
+            assertTrue(findSearchHistory().isEmpty())
         }
     }
 
@@ -238,7 +239,28 @@ class SearchHistoryDaoTest {
 
             searchHistoryDao.deleteAll()
 
-            assertTrue(searchHistoryDao.findAll().isEmpty())
+            assertTrue(findSearchHistory().isEmpty())
+        }
+    }
+
+    /* SHOW FOLDERS FILTER */
+    @Test
+    fun testFoldersShownInSearchHistory() {
+        val uuid = UUID.randomUUID().toString()
+        runTest {
+            searchHistoryDao.insert(createFolderSearchHistoryItem(uuid))
+
+            assertTrue(findSearchHistory(showFolders = true).size == 1)
+        }
+    }
+
+    @Test
+    fun testFoldersHiddenInSearchHistory() {
+        val uuid = UUID.randomUUID().toString()
+        runTest {
+            searchHistoryDao.insert(createFolderSearchHistoryItem(uuid))
+
+            assertTrue(findSearchHistory(showFolders = false).isEmpty())
         }
     }
 
@@ -267,4 +289,9 @@ class SearchHistoryDaoTest {
                 duration = 0.0,
             )
         )
+
+    private suspend fun findSearchHistory(
+        showFolders: Boolean = true,
+        limit: Int = SEARCH_HISTORY_LIMIT,
+    ) = searchHistoryDao.findAll(showFolders, limit)
 }

@@ -1,20 +1,34 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val searchHandler: SearchHandler,
+    private val searchHistoryManager: SearchHistoryManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
-
-    val searchResults = searchHandler.searchResults
+    var isFragmentChangingConfigurations: Boolean = false
+    var showSearchHistory: Boolean = true
+    val searchResults = searchHandler.searchResults.map { searchState ->
+        val isSearchStarted = (loading.value == true)
+        if (isSearchStarted) {
+            saveSearchTerm(searchState.searchTerm)
+            showSearchHistory = false
+        }
+        searchState
+    }
     val loading = searchHandler.loading
 
     fun updateSearchQuery(query: String) {
@@ -27,6 +41,16 @@ class SearchViewModel @Inject constructor(
 
     fun setSource(source: AnalyticsSource) {
         searchHandler.setSource(source)
+    }
+
+    private fun saveSearchTerm(term: String) {
+        viewModelScope.launch {
+            searchHistoryManager.add(SearchHistoryEntry.SearchTerm(term = term))
+        }
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
     fun trackSearchResultTapped(
@@ -56,6 +80,12 @@ class SearchViewModel @Inject constructor(
 }
 
 sealed class SearchState {
-    object NoResults : SearchState()
-    data class Results(val list: List<FolderItem>, val loading: Boolean, val error: Throwable?) : SearchState()
+    abstract val searchTerm: String
+    data class NoResults(override val searchTerm: String) : SearchState()
+    data class Results(
+        override val searchTerm: String,
+        val list: List<FolderItem>,
+        val loading: Boolean,
+        val error: Throwable?,
+    ) : SearchState()
 }

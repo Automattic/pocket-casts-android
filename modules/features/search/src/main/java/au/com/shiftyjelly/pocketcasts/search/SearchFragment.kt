@@ -15,9 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.adapter.PodcastSearchAdapter
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
+import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
+import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -60,6 +64,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private val viewModel: SearchViewModel by viewModels()
+    private val searchHistoryViewModel: SearchHistoryViewModel by viewModels()
     private var listener: Listener? = null
     private var binding: FragmentSearchBinding? = null
 
@@ -94,6 +99,7 @@ class SearchFragment : BaseFragment() {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner { viewLifecycleOwner.lifecycle }
         viewModel.setOnlySearchRemote(onlySearchRemote)
+        searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
         binding.viewModel = viewModel
         binding.floating = floating
 
@@ -107,6 +113,7 @@ class SearchFragment : BaseFragment() {
         binding?.let {
             UiUtil.hideKeyboard(it.searchView)
         }
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -153,6 +160,7 @@ class SearchFragment : BaseFragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.updateSearchQuery(query)
+                binding.searchHistoryPanel.hide()
                 UiUtil.hideKeyboard(searchView)
                 return true
             }
@@ -165,6 +173,11 @@ class SearchFragment : BaseFragment() {
                     return true
                 }
                 viewModel.updateSearchQuery(query)
+                if (characterCount > 0) {
+                    binding.searchHistoryPanel.hide()
+                } else {
+                    binding.searchHistoryPanel.show()
+                }
                 return true
             }
         })
@@ -181,15 +194,17 @@ class SearchFragment : BaseFragment() {
                         SearchResultType.PODCAST_LOCAL_RESULT
                     }
                 )
+                searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
                 listener?.onSearchPodcastClick(podcast.uuid)
                 UiUtil.hideKeyboard(searchView)
             },
-            onFolderClick = { folder ->
+            onFolderClick = { folder, podcasts ->
                 viewModel.trackSearchResultTapped(
                     source = source,
                     uuid = folder.uuid,
                     type = SearchResultType.FOLDER,
                 )
+                searchHistoryViewModel.add(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
                 listener?.onSearchFolderClick(folder.uuid)
                 UiUtil.hideKeyboard(searchView)
             }
@@ -201,6 +216,15 @@ class SearchFragment : BaseFragment() {
         recyclerView.adapter = searchAdapter
         recyclerView.itemAnimator = null
         recyclerView.addOnScrollListener(onScrollListener)
+
+        binding.searchHistoryPanel.setContent {
+            AppTheme(theme.activeTheme) {
+                SearchHistoryPage(searchHistoryViewModel)
+                if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
+                    binding.searchHistoryPanel.show()
+                }
+            }
+        }
 
         val noResultsView = binding.noResults
         val searchFailedView = binding.searchFailed

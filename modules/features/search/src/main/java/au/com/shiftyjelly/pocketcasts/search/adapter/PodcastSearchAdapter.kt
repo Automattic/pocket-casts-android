@@ -13,7 +13,7 @@ import au.com.shiftyjelly.pocketcasts.views.adapter.FolderItemDiffCallback
 class PodcastSearchAdapter(
     val theme: Theme,
     val onPodcastClick: (Podcast) -> Unit,
-    val onFolderClick: (Folder) -> Unit
+    val onFolderClick: (Folder, List<Podcast>) -> Unit
 ) : ListAdapter<FolderItem, RecyclerView.ViewHolder>(FolderItemDiffCallback()) {
 
     override fun getItemId(position: Int): Long {

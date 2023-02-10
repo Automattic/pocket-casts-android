@@ -73,7 +73,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
             ) { subscribedUuids, searchState ->
 
                 val podcasts = when (searchState) {
-                    SearchState.NoResults -> emptyList()
+                    is SearchState.NoResults -> emptyList()
                     is SearchState.Results -> {
 
                         // TODO handle loading
