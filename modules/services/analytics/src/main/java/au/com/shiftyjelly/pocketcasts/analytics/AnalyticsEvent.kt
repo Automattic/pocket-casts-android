@@ -509,4 +509,9 @@ enum class AnalyticsEvent(val key: String) {
     SEARCH_PERFORMED("search_performed"),
     SEARCH_FAILED("search_failed"),
     SEARCH_RESULT_TAPPED("search_result_tapped"),
+
+    /* Chromecast */
+    CHROMECAST_VIEW_SHOWN("chromecast_view_shown"),
+    CHROMECAST_STARTED_CASTING("chromecast_started_casting"),
+    CHROMECAST_STOPPED_CASTING("chromecast_stopped_casting"),
 }
