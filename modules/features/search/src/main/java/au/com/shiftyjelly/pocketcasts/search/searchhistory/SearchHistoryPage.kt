@@ -29,15 +29,18 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImageSmall
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.UUID
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val IconSize = 64.dp
 @Composable
@@ -47,7 +50,8 @@ internal fun SearchHistoryPage(
     val state by viewModel.state.collectAsState()
     SearchHistoryView(
         state = state,
-        onCloseClick = { viewModel.remove(it) }
+        onCloseClick = { viewModel.remove(it) },
+        onClearAllClick = { viewModel.clearAll() }
     )
     viewModel.start()
 }
@@ -56,8 +60,34 @@ internal fun SearchHistoryPage(
 fun SearchHistoryView(
     state: SearchHistoryViewModel.State,
     onCloseClick: (SearchHistoryEntry) -> Unit,
+    onClearAllClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    LazyColumn {
+    LazyColumn(
+        modifier = modifier.background(color = MaterialTheme.theme.colors.primaryUi01)
+    ) {
+        if (state.entries.isNotEmpty()) {
+            item {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextH20(
+                        text = stringResource(LR.string.search_history_recent_searches),
+                        color = MaterialTheme.theme.colors.primaryText01,
+                        modifier = modifier.weight(1f)
+
+                    )
+                    TextH40(
+                        text = stringResource(LR.string.clear_all).uppercase(),
+                        color = MaterialTheme.theme.colors.support03,
+                        modifier = modifier.clickable { onClearAllClick() }
+                    )
+                }
+            }
+        }
         state.entries.forEach { entry ->
             item {
                 when (entry) {
@@ -89,9 +119,7 @@ fun SearchHistoryRow(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {},
 ) {
-    Column(
-        modifier = modifier.background(color = MaterialTheme.theme.colors.primaryUi01)
-    ) {
+    Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
@@ -155,10 +183,10 @@ fun SearchHistoryFolderView(
                     modifier = Modifier.padding(bottom = 2.dp)
                 )
                 val podcastCount = if (entry.podcastIds.size == 1) {
-                    stringResource(R.string.podcasts_singular)
+                    stringResource(LR.string.podcasts_singular)
                 } else {
                     stringResource(
-                        R.string.podcasts_plural,
+                        LR.string.podcasts_plural,
                         entry.podcastIds.size
                     )
                 }
@@ -232,7 +260,7 @@ fun SearchHistoryTermView(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(id = au.com.shiftyjelly.pocketcasts.images.R.drawable.ic_search),
+                    painter = painterResource(id = IR.drawable.ic_search),
                     contentDescription = null,
                     tint = MaterialTheme.theme.colors.primaryIcon02
                 )
@@ -275,7 +303,8 @@ fun SearchHistoryViewPreview(
                     ),
                 )
             ),
-            onCloseClick = {}
+            onCloseClick = {},
+            onClearAllClick = {},
         )
     }
 }

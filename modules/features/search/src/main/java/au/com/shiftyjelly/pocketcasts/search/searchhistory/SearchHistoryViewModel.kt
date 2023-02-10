@@ -65,4 +65,11 @@ class SearchHistoryViewModel @Inject constructor(
             loadSearchHistory()
         }
     }
+
+    fun clearAll() {
+        viewModelScope.launch {
+            searchHistoryManager.clearAll()
+            loadSearchHistory()
+        }
+    }
 }
