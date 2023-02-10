@@ -45,13 +45,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private val IconSize = 64.dp
 @Composable
 internal fun SearchHistoryPage(
-    viewModel: SearchHistoryViewModel
+    viewModel: SearchHistoryViewModel,
+    onClick: (SearchHistoryEntry) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     SearchHistoryView(
         state = state,
         onCloseClick = { viewModel.remove(it) },
-        onClearAllClick = { viewModel.clearAll() }
+        onClearAllClick = { viewModel.clearAll() },
+        onRowClick = onClick,
     )
     viewModel.start()
 }
@@ -61,6 +63,7 @@ fun SearchHistoryView(
     state: SearchHistoryViewModel.State,
     onCloseClick: (SearchHistoryEntry) -> Unit,
     onClearAllClick: () -> Unit,
+    onRowClick: (SearchHistoryEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -95,17 +98,20 @@ fun SearchHistoryView(
 
                     is SearchHistoryEntry.Folder -> SearchHistoryRow(
                         content = { SearchHistoryFolderView(entry) },
-                        onCloseClick = { onCloseClick(entry) }
+                        onCloseClick = { onCloseClick(entry) },
+                        onRowClick = { onRowClick(entry) },
                     )
 
                     is SearchHistoryEntry.Podcast -> SearchHistoryRow(
                         content = { SearchHistoryPodcastView(entry) },
-                        onCloseClick = { onCloseClick(entry) }
+                        onCloseClick = { onCloseClick(entry) },
+                        onRowClick = { onRowClick(entry) },
                     )
 
                     is SearchHistoryEntry.SearchTerm -> SearchHistoryRow(
                         content = { SearchHistoryTermView(entry) },
-                        onCloseClick = { onCloseClick(entry) }
+                        onCloseClick = { onCloseClick(entry) },
+                        onRowClick = { onRowClick(entry) },
                     )
                 }
             }
@@ -116,6 +122,7 @@ fun SearchHistoryView(
 @Composable
 fun SearchHistoryRow(
     onCloseClick: () -> Unit,
+    onRowClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {},
 ) {
@@ -123,7 +130,7 @@ fun SearchHistoryRow(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
-                .clickable { /*TODO*/ }
+                .clickable { onRowClick() }
                 .fillMaxWidth()
         ) {
             Box(Modifier.weight(weight = 1f, fill = true)) {
@@ -305,6 +312,7 @@ fun SearchHistoryViewPreview(
             ),
             onCloseClick = {},
             onClearAllClick = {},
+            onRowClick = {},
         )
     }
 }

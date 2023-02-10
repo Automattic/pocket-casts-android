@@ -116,6 +116,15 @@ class SearchFragment : BaseFragment() {
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
+    private fun navigateFromSearchHistoryEntry(entry: SearchHistoryEntry) {
+        when (entry) {
+            is SearchHistoryEntry.Episode -> Unit // TODO
+            is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
+            is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
+            is SearchHistoryEntry.SearchTerm -> binding?.searchView?.setQuery(entry.term, true)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -219,7 +228,10 @@ class SearchFragment : BaseFragment() {
 
         binding.searchHistoryPanel.setContent {
             AppTheme(theme.activeTheme) {
-                SearchHistoryPage(searchHistoryViewModel)
+                SearchHistoryPage(
+                    viewModel = searchHistoryViewModel,
+                    onClick = ::navigateFromSearchHistoryEntry
+                )
                 if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
                     binding.searchHistoryPanel.show()
                 }
