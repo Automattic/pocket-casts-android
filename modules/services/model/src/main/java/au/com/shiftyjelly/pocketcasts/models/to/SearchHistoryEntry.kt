@@ -127,7 +127,9 @@ sealed class SearchHistoryEntry(
                 )
             }
 
-            else -> SearchTerm(id = item.id, term = item.term ?: "")
+            item.term != null -> SearchTerm(id = item.id, term = item.term as String)
+
+            else -> throw IllegalStateException("Unknown search history item")
         }
     }
 }
