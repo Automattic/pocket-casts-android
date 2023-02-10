@@ -54,7 +54,7 @@ sealed class SearchHistoryEntry(
                 uuid = uuid,
                 title = title,
                 color = color,
-                podcastIds = podcastIds.joinToString()
+                podcastIds = podcastIds.joinToString(separator = ",")
             )
         )
 
