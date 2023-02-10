@@ -194,6 +194,7 @@
     <string name="search_no_podcasts_found_summary">Try more general or different keywords.</string>
     <string name="search_podcasts">Search podcasts</string>
     <string name="search_hint">Search by podcast name</string>
+    <string name="search_history_clear_all_confirmation_message">Are you sure you want to clear all your search history?</string>
     <string name="search_history_recent_searches">Recent searches</string>
 
     <string name="time_short_hours">%dh</string>

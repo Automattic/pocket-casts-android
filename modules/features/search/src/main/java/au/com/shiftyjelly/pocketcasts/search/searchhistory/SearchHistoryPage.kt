@@ -43,16 +43,24 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val IconSize = 64.dp
+private const val CLEAR_ALL_THRESHOLD = 3
 @Composable
 internal fun SearchHistoryPage(
     viewModel: SearchHistoryViewModel,
     onClick: (SearchHistoryEntry) -> Unit,
+    onShowClearAllConfirmation: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     SearchHistoryView(
         state = state,
         onCloseClick = { viewModel.remove(it) },
-        onClearAllClick = { viewModel.clearAll() },
+        onClearAllClick = {
+            if (state.entries.size > CLEAR_ALL_THRESHOLD) {
+                onShowClearAllConfirmation()
+            } else {
+                viewModel.clearAll()
+            }
+        },
         onRowClick = onClick,
     )
     viewModel.start()

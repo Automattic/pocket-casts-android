@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.adapter.PodcastSearchAdapter
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
+import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAllConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -36,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 private const val ARG_FLOATING = "arg_floating"
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
 private const val ARG_SOURCE = "arg_source"
+private const val SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG = "search_history_clear_all_confirmation_dialog"
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
@@ -230,7 +232,13 @@ class SearchFragment : BaseFragment() {
             AppTheme(theme.activeTheme) {
                 SearchHistoryPage(
                     viewModel = searchHistoryViewModel,
-                    onClick = ::navigateFromSearchHistoryEntry
+                    onClick = ::navigateFromSearchHistoryEntry,
+                    onShowClearAllConfirmation = {
+                        SearchHistoryClearAllConfirmationDialog(
+                            context = this@SearchFragment.requireContext(),
+                            onConfirm = { searchHistoryViewModel.clearAll() }
+                        ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
+                    }
                 )
                 if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
                     binding.searchHistoryPanel.show()
