@@ -121,7 +121,7 @@ sealed class SearchHistoryEntry(
                     uuid = folder.uuid,
                     title = folder.title,
                     color = folder.color,
-                    podcastIds = folder.podcastIds.split(","),
+                    podcastIds = folder.podcastIds.takeIf { it.isNotEmpty() }?.split(",") ?: emptyList(),
                 )
             }
 
