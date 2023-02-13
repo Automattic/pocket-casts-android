@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,19 +19,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImageSmall
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -42,8 +40,9 @@ import java.util.UUID
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private val IconSize = 64.dp
+private val IconSize = 48.dp
 private const val CLEAR_ALL_THRESHOLD = 3
+
 @Composable
 internal fun SearchHistoryPage(
     viewModel: SearchHistoryViewModel,
@@ -82,7 +81,7 @@ fun SearchHistoryView(
                 Row(
                     modifier = modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 4.dp),
+                        .padding(start = 16.dp, top = 8.dp, end = 4.dp, bottom = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextH20(
@@ -91,10 +90,13 @@ fun SearchHistoryView(
                         modifier = modifier.weight(1f)
 
                     )
-                    TextH40(
+                    TextP60(
                         text = stringResource(LR.string.clear_all).uppercase(),
                         color = MaterialTheme.theme.colors.support03,
-                        modifier = modifier.clickable { onClearAllClick() }
+                        fontWeight = FontWeight.W700,
+                        modifier = modifier
+                            .clickable { onClearAllClick() }
+                            .padding(12.dp)
                     )
                 }
             }
@@ -171,31 +173,29 @@ fun SearchHistoryFolderView(
     val color = MaterialTheme.theme.colors.getFolderColor(entry.color)
     Column {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
-                .padding(horizontal = 16.dp)
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
 
         ) {
-            Box(modifier = Modifier.padding(top = 4.dp, end = 12.dp, bottom = 4.dp)) {
-                FolderImageSmall(
-                    color = color,
-                    podcastUuids = entry.podcastIds,
-                    folderImageSize = 54.dp,
-                    podcastImageSize = 22.dp
-                )
-            }
+            FolderImageSmall(
+                color = color,
+                podcastUuids = entry.podcastIds,
+                folderImageSize = IconSize,
+                podcastImageSize = 20.dp
+            )
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = modifier
+                    .padding(start = 12.dp)
+                    .weight(1f)
             ) {
-                Text(
+                TextH40(
                     text = entry.title,
-                    fontSize = 16.sp,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.theme.colors.primaryText01,
-                    modifier = Modifier.padding(bottom = 2.dp)
+                    modifier = modifier.padding(bottom = 2.dp)
                 )
                 val podcastCount = if (entry.podcastIds.size == 1) {
                     stringResource(LR.string.podcasts_singular)
@@ -205,12 +205,9 @@ fun SearchHistoryFolderView(
                         entry.podcastIds.size
                     )
                 }
-                Text(
+                TextH50(
                     text = podcastCount,
-                    fontSize = 13.sp,
-                    letterSpacing = 0.2.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier.padding(top = 2.dp)
                 )
@@ -226,31 +223,31 @@ fun SearchHistoryPodcastView(
 ) {
     Column {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
         ) {
             PodcastImage(
                 uuid = entry.uuid,
                 modifier = modifier
                     .size(IconSize)
-                    .padding(top = 4.dp, end = 12.dp, bottom = 4.dp)
             )
             Column(
                 modifier = modifier
-                    .padding(end = 16.dp)
+                    .padding(start = 8.dp)
                     .weight(1f)
             ) {
-                TextP40(
+                TextH40(
                     text = entry.title,
-                    maxLines = 1,
+                    maxLines = 2,
                     color = MaterialTheme.theme.colors.primaryText01
                 )
-                TextP50(
+                TextH50(
                     text = entry.author,
                     maxLines = 1,
-                    color = MaterialTheme.theme.colors.primaryText02
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = modifier.padding(top = 2.dp)
                 )
             }
         }
@@ -264,11 +261,11 @@ fun SearchHistoryTermView(
 ) {
     Column {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
-                .padding(horizontal = 16.dp)
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
         ) {
             Box(
                 modifier = modifier.size(IconSize),
@@ -280,15 +277,14 @@ fun SearchHistoryTermView(
                     tint = MaterialTheme.theme.colors.primaryIcon02
                 )
             }
-            Box(
-                modifier = modifier.weight(1f)
-            ) {
-                TextP40(
-                    text = entry.term,
-                    color = MaterialTheme.theme.colors.primaryText01,
-                    modifier = modifier.padding(vertical = 20.dp)
-                )
-            }
+            TextH40(
+                text = entry.term,
+                color = MaterialTheme.theme.colors.primaryText01,
+                maxLines = 2,
+                modifier = modifier
+                    .padding(start = 12.dp)
+                    .weight(1f)
+            )
         }
     }
 }
