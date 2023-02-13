@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationChannel
@@ -1502,5 +1503,12 @@ class SettingsImpl @Inject constructor(
     override fun setCustomMediaActionsVisible(value: Boolean) {
         setBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, value)
         customMediaActionsVisibilityFlow.update { value }
+    }
+
+    override fun isNotificationsDisabledMessageShown() =
+        getBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, false)
+
+    override fun setNotificationsDisabledMessageShown(value: Boolean) {
+        setBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, value)
     }
 }

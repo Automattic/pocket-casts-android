@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,7 +10,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
@@ -122,6 +122,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -140,6 +141,7 @@ import com.google.android.material.R as MR
 
 private const val SAVEDSTATE_PLAYER_OPEN = "player_open"
 private const val SAVEDSTATE_MINIPLAYER_SHOWN = "miniplayer_shown"
+private const val EXTRA_LONG_SNACKBAR_DURATION_MS: Int = 5000
 
 @AndroidEntryPoint
 class MainActivity :
@@ -211,39 +213,28 @@ class MainActivity :
             }
         }
     }
-    private val requestPermissionLauncher = registerForActivityResult(
+
+    private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            // sendNotification(this)
+    ) {}
 
-            // Permission is granted. Continue the action or workflow in your
-            // app.
-        } else {
-            // Explain to the user that the feature is unavailable because the
-            // features requires a permission that the user has denied. At the
-            // same time, respect the user's decision. Don't link to system
-            // settings in an effort to convince the user to change their
-            // decision.
-        }
-    }
-
-    private fun notifPermissionCheck() {
+    @SuppressLint("WrongConstant") // for custom snackbar duration constant
+    private fun checkForNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
                 ContextCompat.checkSelfPermission(
                     this, Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    // You can use the API that requires the permission.
-                    Timber.tag("NOTIFICATION").e("onCreate: PERMISSION GRANTED")
-                    // sendNotification(this)
-                }
+                ) == PackageManager.PERMISSION_GRANTED -> Unit // Do nothing
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    if (settings.isNotificationsDisabledMessageShown()) return
                     Snackbar.make(
                         findViewById(R.id.root),
-                        "Notification blocked",
-                        5000
-                    ).setAction("Settings") {
+                        getString(LR.string.notifications_blocked_warning),
+                        EXTRA_LONG_SNACKBAR_DURATION_MS
+                    ).setAction(
+                        getString(LR.string.notifications_blocked_warning_snackbar_action)
+                            .uppercase(Locale.getDefault())
+                    ) {
                         // Responds to click on the action
                         val intent = Intent(AndroidProviderSettings.ACTION_APPLICATION_DETAILS_SETTINGS)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -251,10 +242,10 @@ class MainActivity :
                         intent.data = uri
                         startActivity(intent)
                     }.show()
+                    settings.setNotificationsDisabledMessageShown(true)
                 }
                 else -> {
-                    Log.e("NOTIFICATION", "onCreate: ask for permissions")
-                    requestPermissionLauncher.launch(
+                    notificationPermissionLauncher.launch(
                         Manifest.permission.POST_NOTIFICATIONS
                     )
                 }
@@ -276,7 +267,7 @@ class MainActivity :
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        notifPermissionCheck()
+        checkForNotificationPermission()
 
         lifecycleScope.launchWhenCreated {
             val isEligible = viewModel.isEndOfYearStoriesEligible()
