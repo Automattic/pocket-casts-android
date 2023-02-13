@@ -206,7 +206,7 @@ fun SearchHistoryFolderView(
                     )
                 }
                 TextH50(
-                    text = podcastCount,
+                    text = stringResource(LR.string.search_history_row_type_folder_subtitle, podcastCount),
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier.padding(top = 2.dp)
@@ -233,6 +233,11 @@ fun SearchHistoryPodcastView(
                 modifier = modifier
                     .size(IconSize)
             )
+            val subTitle = if (entry.author.isNotEmpty()) {
+                stringResource(LR.string.search_history_row_type_podcast_subtitle, entry.author)
+            } else {
+                stringResource(LR.string.podcast)
+            }
             Column(
                 modifier = modifier
                     .padding(start = 8.dp)
@@ -244,7 +249,7 @@ fun SearchHistoryPodcastView(
                     color = MaterialTheme.theme.colors.primaryText01
                 )
                 TextH50(
-                    text = entry.author,
+                    text = subTitle,
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
                     modifier = modifier.padding(top = 2.dp)
