@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastModel
 
 sealed class SearchHistoryEntry(
     val id: Long? = null,
+    open val isSubscribed: Boolean = false,
 ) {
     class Episode(
         id: Long? = null,
@@ -19,18 +20,20 @@ sealed class SearchHistoryEntry(
 
     class Folder(
         id: Long? = null,
+        override val isSubscribed: Boolean,
         val uuid: String,
         val title: String,
         val color: Int,
         val podcastIds: List<String>,
-    ) : SearchHistoryEntry(id = id)
+    ) : SearchHistoryEntry(id = id, isSubscribed = isSubscribed)
 
     class Podcast(
         id: Long? = null,
+        override val isSubscribed: Boolean,
         val uuid: String,
         val title: String,
         val author: String,
-    ) : SearchHistoryEntry(id = id)
+    ) : SearchHistoryEntry(id = id, isSubscribed = isSubscribed)
 
     class SearchTerm(
         id: Long? = null,
@@ -50,6 +53,7 @@ sealed class SearchHistoryEntry(
 
         is Folder -> SearchHistoryItem(
             id = id,
+            isSubscribed = isSubscribed,
             folder = SearchHistoryItem.Folder(
                 uuid = uuid,
                 title = title,
@@ -60,6 +64,7 @@ sealed class SearchHistoryEntry(
 
         is Podcast -> SearchHistoryItem(
             id = id,
+            isSubscribed = isSubscribed,
             podcast = SearchHistoryItem.Podcast(
                 uuid = uuid,
                 title = title,
@@ -85,13 +90,15 @@ sealed class SearchHistoryEntry(
             uuid = folder.uuid,
             title = folder.name,
             color = folder.color,
-            podcastIds = podcastIds
+            podcastIds = podcastIds,
+            isSubscribed = true,
         )
 
         fun fromPodcast(podcast: PodcastModel) = Podcast(
             uuid = podcast.uuid,
             title = podcast.title,
-            author = podcast.author
+            author = podcast.author,
+            isSubscribed = podcast.isSubscribed
         )
 
         fun fromSearchHistoryItem(item: SearchHistoryItem) = when {
@@ -110,10 +117,11 @@ sealed class SearchHistoryEntry(
                 val folder = item.folder as SearchHistoryItem.Folder
                 Folder(
                     id = item.id,
+                    isSubscribed = item.isSubscribed,
                     uuid = folder.uuid,
                     title = folder.title,
                     color = folder.color,
-                    podcastIds = folder.podcastIds.split(",")
+                    podcastIds = folder.podcastIds.split(","),
                 )
             }
 
@@ -121,6 +129,7 @@ sealed class SearchHistoryEntry(
                 val podcast = item.podcast as SearchHistoryItem.Podcast
                 Podcast(
                     id = item.id,
+                    isSubscribed = item.isSubscribed,
                     uuid = podcast.uuid,
                     title = podcast.title,
                     author = podcast.author

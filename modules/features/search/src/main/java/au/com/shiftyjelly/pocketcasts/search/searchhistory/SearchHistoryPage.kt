@@ -107,18 +107,21 @@ fun SearchHistoryView(
                     is SearchHistoryEntry.Episode -> Unit // TODO
 
                     is SearchHistoryEntry.Folder -> SearchHistoryRow(
+                        entry = entry,
                         content = { SearchHistoryFolderView(entry) },
                         onCloseClick = { onCloseClick(entry) },
                         onRowClick = { onRowClick(entry) },
                     )
 
                     is SearchHistoryEntry.Podcast -> SearchHistoryRow(
+                        entry = entry,
                         content = { SearchHistoryPodcastView(entry) },
                         onCloseClick = { onCloseClick(entry) },
                         onRowClick = { onRowClick(entry) },
                     )
 
                     is SearchHistoryEntry.SearchTerm -> SearchHistoryRow(
+                        entry = entry,
                         content = { SearchHistoryTermView(entry) },
                         onCloseClick = { onCloseClick(entry) },
                         onRowClick = { onRowClick(entry) },
@@ -131,6 +134,7 @@ fun SearchHistoryView(
 
 @Composable
 fun SearchHistoryRow(
+    entry: SearchHistoryEntry,
     onCloseClick: () -> Unit,
     onRowClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -146,9 +150,28 @@ fun SearchHistoryRow(
             Box(Modifier.weight(weight = 1f, fill = true)) {
                 content.invoke()
             }
+            SubscribedIcon(entry)
             CloseButton(onCloseClick)
         }
         HorizontalDivider(startIndent = 16.dp)
+    }
+}
+
+@Composable
+private fun SubscribedIcon(
+    entry: SearchHistoryEntry,
+    modifier: Modifier = Modifier,
+) {
+    if (entry.isSubscribed) {
+        Icon(
+            painter = painterResource(IR.drawable.ic_tick),
+            contentDescription = stringResource(LR.string.podcast_subscribed),
+            tint = MaterialTheme.theme.colors.support02,
+            modifier = modifier
+                .size(IconSize)
+                .padding(start = 16.dp)
+
+        )
     }
 }
 
@@ -304,12 +327,14 @@ fun SearchHistoryViewPreview(
             state = SearchHistoryViewModel.State(
                 entries = listOf(
                     SearchHistoryEntry.Folder(
+                        isSubscribed = true,
                         uuid = UUID.randomUUID().toString(),
                         title = "Folder",
                         color = 0,
                         podcastIds = emptyList()
                     ),
                     SearchHistoryEntry.Podcast(
+                        isSubscribed = true,
                         uuid = UUID.randomUUID().toString(),
                         title = "Title",
                         author = "Author",
