@@ -266,7 +266,7 @@ fun SearchHistoryTermView(
 ) {
     Column {
         Row(
-            verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
