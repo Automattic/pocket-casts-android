@@ -333,11 +333,6 @@ enum class PlusUpgradeFeatureItem(
         title = LR.string.onboarding_plus_feature_cloud_storage_title,
         text = LR.string.onboarding_plus_feature_cloud_storage_text,
     ),
-    HideAds(
-        image = IR.drawable.ads_disabled,
-        title = LR.string.onboarding_plus_feature_hide_ads_title,
-        text = LR.string.onboarding_plus_feature_hide_ads_text,
-    ),
     ThemesIcons(
         image = IR.drawable.themes_icons,
         title = LR.string.onboarding_plus_feature_themes_icons_title,
