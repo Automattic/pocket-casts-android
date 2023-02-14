@@ -4,9 +4,11 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.localization.R
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.util.Arrays
@@ -93,8 +95,16 @@ object IntentUtil {
         var urlFound: String = url ?: return true
         val urlLower = urlFound.lowercase()
         if (urlLower.startsWith("http://") || urlLower.startsWith("https://") || urlLower.startsWith("ftp://") || urlLower.startsWith("market://")) {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlFound)))
-            return true
+            try {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(urlFound)))
+                return true
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.error_opening_links_activity_not_found),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
         if (urlFound.startsWith("mailto:")) {
             try {
