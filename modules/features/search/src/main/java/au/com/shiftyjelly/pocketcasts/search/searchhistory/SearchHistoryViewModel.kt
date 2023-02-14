@@ -12,8 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
 
-private const val SEARCH_HISTORY_LIMIT = 5
-
 @HiltViewModel
 class SearchHistoryViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
@@ -47,7 +45,6 @@ class SearchHistoryViewModel @Inject constructor(
 
     private suspend fun loadSearchHistory() {
         val entries = searchHistoryManager.findAll(
-            limit = SEARCH_HISTORY_LIMIT,
             showFolders = isSignedAsPlus && !onlySearchRemote
         )
         mutableState.value = mutableState.value.copy(entries = entries)
