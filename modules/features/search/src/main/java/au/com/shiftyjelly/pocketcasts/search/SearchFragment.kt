@@ -238,7 +238,8 @@ class SearchFragment : BaseFragment() {
                             context = this@SearchFragment.requireContext(),
                             onConfirm = { searchHistoryViewModel.clearAll() }
                         ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
-                    }
+                    },
+                    onScroll = { UiUtil.hideKeyboard(recyclerView) }
                 )
                 if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
                     binding.searchHistoryPanel.show()
