@@ -383,7 +383,6 @@ abstract class AppDatabase : RoomDatabase() {
                 """
                     CREATE TABLE IF NOT EXISTS search_history (
                         _id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        subscribed INTEGER NOT NULL, 
                         modified INTEGER NOT NULL,
                         term TEXT,
                         podcast_uuid TEXT,

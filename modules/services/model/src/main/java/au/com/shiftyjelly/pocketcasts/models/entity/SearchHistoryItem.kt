@@ -19,7 +19,6 @@ import java.util.Date
 data class SearchHistoryItem(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "_id") var id: Long? = null,
     @ColumnInfo(name = "modified") var modified: Long = System.currentTimeMillis(),
-    @ColumnInfo(name = "subscribed") var isSubscribed: Boolean = false,
     @ColumnInfo(name = "term") var term: String? = null,
     @Embedded(prefix = "podcast_") var podcast: Podcast? = null,
     @Embedded(prefix = "folder_") var folder: Folder? = null,

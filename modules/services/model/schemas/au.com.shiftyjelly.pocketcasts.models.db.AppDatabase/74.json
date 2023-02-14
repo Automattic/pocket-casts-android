@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 74,
-    "identityHash": "df6021921bda23e872baace09d7c1ee7",
+    "identityHash": "aafaa8a64ee28bafd44a4e2e3bace027",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -950,7 +950,7 @@
       },
       {
         "tableName": "search_history",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `modified` INTEGER NOT NULL, `subscribed` INTEGER NOT NULL, `term` TEXT, `podcast_uuid` TEXT, `podcast_title` TEXT, `podcast_author` TEXT, `folder_uuid` TEXT, `folder_title` TEXT, `folder_color` INTEGER, `folder_podcastIds` TEXT, `episode_uuid` TEXT, `episode_title` TEXT, `episode_publishedDate` INTEGER, `episode_duration` REAL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `modified` INTEGER NOT NULL, `term` TEXT, `podcast_uuid` TEXT, `podcast_title` TEXT, `podcast_author` TEXT, `folder_uuid` TEXT, `folder_title` TEXT, `folder_color` INTEGER, `folder_podcastIds` TEXT, `episode_uuid` TEXT, `episode_title` TEXT, `episode_publishedDate` INTEGER, `episode_duration` REAL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -961,12 +961,6 @@
           {
             "fieldPath": "modified",
             "columnName": "modified",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isSubscribed",
-            "columnName": "subscribed",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -1394,7 +1388,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'df6021921bda23e872baace09d7c1ee7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aafaa8a64ee28bafd44a4e2e3bace027')"
     ]
   }
 }
