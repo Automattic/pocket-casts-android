@@ -17,7 +17,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyBoolean
-import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.eq
@@ -60,7 +59,7 @@ class SearchHistoryViewModelTest {
 
             viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(true), limit = anyInt())
+            verify(searchHistoryManager).findAll(showFolders = eq(true))
         }
 
     @Test
@@ -70,7 +69,7 @@ class SearchHistoryViewModelTest {
 
             viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(false), limit = anyInt())
+            verify(searchHistoryManager).findAll(showFolders = eq(false))
         }
 
     @Test
@@ -80,7 +79,7 @@ class SearchHistoryViewModelTest {
 
             viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(false), limit = anyInt())
+            verify(searchHistoryManager).findAll(showFolders = eq(false))
         }
 
     @Test
@@ -90,7 +89,7 @@ class SearchHistoryViewModelTest {
 
             viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(false), limit = anyInt())
+            verify(searchHistoryManager).findAll(showFolders = eq(false))
         }
 
     private suspend fun initViewModel(
@@ -106,7 +105,7 @@ class SearchHistoryViewModelTest {
                     )
                 )
             )
-        whenever(searchHistoryManager.findAll(showFolders = anyBoolean(), limit = anyInt()))
+        whenever(searchHistoryManager.findAll(showFolders = anyBoolean()))
             .thenReturn(mock())
         val viewModel = SearchHistoryViewModel(searchHistoryManager, userManager)
         viewModel.setOnlySearchRemote(isOnlySearchRemote)

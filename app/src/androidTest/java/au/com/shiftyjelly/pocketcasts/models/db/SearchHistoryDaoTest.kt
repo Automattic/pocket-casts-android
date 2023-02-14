@@ -15,12 +15,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.Date
 import java.util.UUID
 
 private const val SEARCH_TERM_TEST1 = "test1"
 private const val SEARCH_TERM_TEST2 = "test2"
-private const val SEARCH_HISTORY_LIMIT = 5
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -285,13 +283,14 @@ class SearchHistoryDaoTest {
             episode = SearchHistoryItem.Episode(
                 uuid = uuid,
                 title = "",
-                publishedDate = Date(),
                 duration = 0.0,
+                podcastUuid = "",
+                podcastTitle = "",
+                artworkUrl = ""
             )
         )
 
     private suspend fun findSearchHistory(
         showFolders: Boolean = true,
-        limit: Int = SEARCH_HISTORY_LIMIT,
-    ) = searchHistoryDao.findAll(showFolders, limit)
+    ) = searchHistoryDao.findAll(showFolders)
 }
