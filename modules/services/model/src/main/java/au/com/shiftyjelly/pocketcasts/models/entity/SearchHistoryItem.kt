@@ -5,7 +5,6 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(
     tableName = "search_history",
@@ -38,7 +37,9 @@ data class SearchHistoryItem(
     data class Episode(
         val uuid: String,
         val title: String,
-        val publishedDate: Date,
-        val duration: Double
+        val duration: Double,
+        val podcastUuid: String,
+        val podcastTitle: String,
+        val artworkUrl: String? = null,
     )
 }
