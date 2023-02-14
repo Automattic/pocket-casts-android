@@ -1,7 +1,7 @@
 7.32
 -----
 * Bug Fixes:
-    *    Notifications Blocked on Android 13
+    *    Ask notifications permission for newly-installed apps on Android 13
          ([#723](https://github.com/Automattic/pocket-casts-android/issues/723)).
 
 7.31
