@@ -31,6 +31,8 @@
     <string name="more">More</string>
     <string name="more_options">More options</string>
     <string name="next_episode">Next episode</string>
+    <string name="notifications_blocked_warning">Notifications are blocked. You can update permission through Settings.</string>
+    <string name="notifications_blocked_warning_snackbar_action" translatable="false">@string/update</string>
     <string name="ok">OK</string>
     <string name="options">Options</string>
     <string name="pause">Pause</string>

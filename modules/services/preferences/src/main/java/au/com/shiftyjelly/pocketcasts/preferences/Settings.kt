@@ -129,6 +129,8 @@ interface Settings {
         const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"
 
         const val LOG_TAG_AUTO = "PocketCastsAuto"
+
+        const val NOTIFICATIONS_DISABLED_MESSAGE_SHOWN = "notificationsDisabledMessageShown"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -609,4 +611,7 @@ interface Settings {
 
     fun areCustomMediaActionsVisible(): Boolean
     fun setCustomMediaActionsVisible(value: Boolean)
+
+    fun isNotificationsDisabledMessageShown(): Boolean
+    fun setNotificationsDisabledMessageShown(value: Boolean)
 }
