@@ -49,9 +49,9 @@ class DiscoverViewModel @Inject constructor(
     fun loadData(resources: Resources) {
         val feed = repository.getDiscoverFeed()
 
-        feed.toFlowable().combineLatest(userManager.getSignInState())
+        feed.toFlowable()
             .subscribeBy(
-                onNext = { (it, subscriptionState) ->
+                onNext = {
                     val region = it.regions[currentRegionCode ?: it.defaultRegionCode] ?: it.regions[it.defaultRegionCode]
                     if (region == null) {
                         val message = "Could not get region $currentRegionCode"
@@ -68,8 +68,10 @@ class DiscoverViewModel @Inject constructor(
                         it.regionCodeToken to region.code,
                         it.regionNameToken to region.name
                     )
-                    val updatedList = it.layout.transformWithRegion(region, replacements, resources) // Update the list with the correct region substituted in where needed
-                        .filter { !subscriptionState.isSignedInAsPlusPaid || !it.sponsored } // Remove sponsored posts for paid users
+
+                    // Update the list with the correct region substituted in where needed
+                    val updatedList = it.layout.transformWithRegion(region, replacements, resources)
+
                     state.postValue(DiscoverState.DataLoaded(updatedList, region, it.regions.values.toList()))
                 },
                 onError = { throwable ->
