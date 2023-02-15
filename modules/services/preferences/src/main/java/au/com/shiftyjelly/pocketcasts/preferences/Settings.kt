@@ -396,8 +396,8 @@ interface Settings {
     fun getSyncPassword(): String?
     fun getSyncUuid(): String?
     fun getSyncRefreshToken(): String?
-    fun getSyncToken(): String?
-    suspend fun getSyncTokenSuspend(): String?
+    fun getSyncToken(tokenErrorUiTracker: TokenErrorUiTracker): String?
+    suspend fun getSyncTokenSuspend(tokenErrorUiTracker: TokenErrorUiTracker): String?
     fun isLoggedIn(): Boolean
     fun clearPlusPreferences()
     fun getUsedAccountManager(): Boolean
@@ -615,3 +615,5 @@ interface Settings {
     fun isNotificationsDisabledMessageShown(): Boolean
     fun setNotificationsDisabledMessageShown(value: Boolean)
 }
+
+data class TokenErrorUiTracker(val onShowError: () -> Unit)

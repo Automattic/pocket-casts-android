@@ -615,11 +615,11 @@ class SettingsImpl @Inject constructor(
         return peekToken()
     }
 
-    override fun getSyncToken(): String? = runBlocking {
-        getSyncTokenSuspend()
+    override fun getSyncToken(tokenErrorUiTracker: TokenErrorUiTracker): String? = runBlocking {
+        getSyncTokenSuspend(tokenErrorUiTracker)
     }
 
-    override suspend fun getSyncTokenSuspend(): String? {
+    override suspend fun getSyncTokenSuspend(tokenErrorUiTracker: TokenErrorUiTracker): String? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
 
@@ -643,7 +643,7 @@ class SettingsImpl @Inject constructor(
                         @Suppress("DEPRECATION")
                         bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
                     }
-                    intent?.let { showSignInErrorNotification(it) }
+                    intent?.let { showSignInErrorNotification(it, tokenErrorUiTracker) }
                     throw SecurityException("Token could not be refreshed")
                 } else {
                     token
@@ -655,7 +655,8 @@ class SettingsImpl @Inject constructor(
         }
     }
 
-    private fun showSignInErrorNotification(intent: Intent) {
+    private fun showSignInErrorNotification(intent: Intent, tokenErrorUiTracker: TokenErrorUiTracker) {
+        tokenErrorUiTracker.onShowError()
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
         val notification = NotificationCompat.Builder(context, NotificationChannel.NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR.id)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

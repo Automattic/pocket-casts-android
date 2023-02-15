@@ -19,6 +19,9 @@ enum class AnalyticsEvent(val key: String) {
     USER_ACCOUNT_CREATION_FAILED("user_account_creation_failed"),
     USER_SIGNED_OUT("user_signed_out"),
 
+    /* Signed out alert */
+    SIGNED_OUT_ALERT_SHOWN("signed_out_alert_shown"),
+
     /* Plus Upsell */
     PLUS_PROMOTION_SHOWN("plus_promotion_shown"),
     PLUS_PROMOTION_DISMISSED("plus_promotion_dismissed"),
