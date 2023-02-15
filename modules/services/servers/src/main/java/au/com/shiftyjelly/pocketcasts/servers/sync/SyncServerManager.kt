@@ -327,12 +327,6 @@ open class SyncServerManager @Inject constructor(
         cache.evictAll()
     }
 
-    fun cancelSupporterSubscription(subscriptionUuid: String): Single<Response<Void>> {
-        return getCacheTokenOrLogin {
-            server.cancelSubscription(addBearer(it), SupporterCancelRequest(subscriptionUuid))
-        }
-    }
-
     private suspend fun <T : Any> getCacheTokenOrLoginSuspend(serverCall: suspend (token: String) -> T): T {
         if (settings.isLoggedIn()) {
             return try {
