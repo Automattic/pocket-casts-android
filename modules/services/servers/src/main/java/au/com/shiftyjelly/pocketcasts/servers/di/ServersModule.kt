@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatusMoshiAdapt
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.TokenErrorUiTracker
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
@@ -163,19 +162,22 @@ class ServersModule {
     @Provides
     @TokenInterceptor
     @Singleton
-    internal fun provideTokenInterceptor(settings: Settings, tokenErrorUiTracker: TokenErrorUiTracker): Interceptor {
+    internal fun provideTokenInterceptor(
+        settings: Settings,
+        @OnTokenErrorUiShown onTokenErrorUiShown: () -> Unit
+    ): Interceptor {
         val unauthenticatedEndpoints = setOf("security") // Don't attach a token to these methods because they get the token
         return Interceptor { chain ->
             val original = chain.request()
             if (unauthenticatedEndpoints.contains(original.url.encodedPathSegments.firstOrNull())) {
                 chain.proceed(original)
             } else {
-                val token = settings.getSyncToken(tokenErrorUiTracker)
+                val token = settings.getSyncToken(onTokenErrorUiShown)
                 return@Interceptor if (token != null) {
                     val response = chain.proceed(buildRequestWithToken(original, token))
                     if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
                         settings.invalidateToken()
-                        val newToken = settings.getSyncToken(tokenErrorUiTracker)
+                        val newToken = settings.getSyncToken(onTokenErrorUiShown)
                         chain.proceed(buildRequestWithToken(original, newToken))
                     } else {
                         response
@@ -188,8 +190,9 @@ class ServersModule {
     }
 
     @Provides
-    internal fun provideTokenErrorUiTracker(analyticsTracker: AnalyticsTrackerWrapper) =
-        TokenErrorUiTracker(onShowError = { analyticsTracker.track(AnalyticsEvent.SIGNED_OUT_ALERT_SHOWN) })
+    @OnTokenErrorUiShown
+    internal fun provideTokenErrorUiTracker(analyticsTracker: AnalyticsTrackerWrapper): () -> Unit =
+        { analyticsTracker.track(AnalyticsEvent.SIGNED_OUT_ALERT_SHOWN) }
 
     @Provides
     @CachedTokenedOkHttpClient
@@ -437,3 +440,7 @@ annotation class NoCacheOkHttpClientBuilder
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class TokenInterceptor
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class OnTokenErrorUiShown
