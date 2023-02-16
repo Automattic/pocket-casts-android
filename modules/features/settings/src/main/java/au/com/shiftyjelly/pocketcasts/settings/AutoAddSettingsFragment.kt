@@ -43,6 +43,11 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
     private val binding get() = _binding!!
     val viewModel by activityViewModels<AutoAddSettingsViewModel>()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.onShown()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentAutoAddSettingsBinding.inflate(inflater, container, false)
         return binding.root
@@ -64,8 +69,16 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
         val autoAddAdapter = AutoAddPodcastAdapter(PodcastImageLoaderThemed(view.context)) {
             OptionsDialog()
                 .setTitle(getString(LR.string.settings_auto_up_next_add_to))
-                .addCheckedOption(titleString = getString(LR.string.settings_auto_up_next_top), checked = it.autoAddToUpNext == Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_NEXT) { viewModel.updatePodcast(it, Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_NEXT) }
-                .addCheckedOption(titleString = getString(LR.string.settings_auto_up_next_bottom), checked = it.autoAddToUpNext == Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_LAST) { viewModel.updatePodcast(it, Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_LAST) }
+                .addCheckedOption(
+                    titleString = getString(LR.string.settings_auto_up_next_top),
+                    checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT,
+                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_NEXT) }
+                )
+                .addCheckedOption(
+                    titleString = getString(LR.string.settings_auto_up_next_bottom),
+                    checked = it.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_LAST,
+                    click = { viewModel.updatePodcast(it, Podcast.AutoAddUpNext.PLAY_LAST) }
+                )
                 .show(childFragmentManager, "autoadd_options")
         }
 
@@ -85,13 +98,13 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
                 val currentLimit = settings.getAutoAddUpNextLimit()
                 OptionsDialog()
                     .setTitle(getString(LR.string.settings_auto_up_next_limit))
-                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 10), checked = currentLimit == 10) { settings.setAutoAddUpNextLimit(10) }
-                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 20), checked = currentLimit == 20) { settings.setAutoAddUpNextLimit(20) }
-                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 50), checked = currentLimit == 50) { settings.setAutoAddUpNextLimit(50) }
-                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 100), checked = currentLimit == 100) { settings.setAutoAddUpNextLimit(100) }
-                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 200), checked = currentLimit == 200) { settings.setAutoAddUpNextLimit(200) }
-                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 500), checked = currentLimit == 500) { settings.setAutoAddUpNextLimit(500) }
-                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 1000), checked = currentLimit == 1000) { settings.setAutoAddUpNextLimit(1000) }
+                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 10), checked = currentLimit == 10) { viewModel.autoAddUpNextLimitChanged(10) }
+                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 20), checked = currentLimit == 20) { viewModel.autoAddUpNextLimitChanged(20) }
+                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 50), checked = currentLimit == 50) { viewModel.autoAddUpNextLimitChanged(50) }
+                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 100), checked = currentLimit == 100) { viewModel.autoAddUpNextLimitChanged(100) }
+                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 200), checked = currentLimit == 200) { viewModel.autoAddUpNextLimitChanged(200) }
+                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 500), checked = currentLimit == 500) { viewModel.autoAddUpNextLimitChanged(500) }
+                    .addCheckedOption(titleString = getString(LR.string.episodes_plural, 1000), checked = currentLimit == 1000) { viewModel.autoAddUpNextLimitChanged(1000) }
                     .show(childFragmentManager, "autoadd_options")
             }
 
@@ -104,14 +117,10 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
                 OptionsDialog()
                     .setTitle(getString(LR.string.settings_auto_up_next_add_to))
                     .addCheckedOption(titleId = LR.string.settings_auto_up_next_limit_reached_stop, checked = state.behaviour == Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING) {
-                        settings.setAutoAddUpNextLimitBehaviour(
-                            Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING
-                        )
+                        viewModel.autoAddUpNextLimitBehaviorChanged(Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING)
                     }
                     .addCheckedOption(titleId = LR.string.settings_auto_up_next_limit_reached_top, checked = state.behaviour == Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP) {
-                        settings.setAutoAddUpNextLimitBehaviour(
-                            Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP
-                        )
+                        viewModel.autoAddUpNextLimitBehaviorChanged(Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP)
                     }
                     .show(childFragmentManager, "autoadd_options")
             }
@@ -132,6 +141,11 @@ class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
 
             autoAddAdapter.submitList(podcasts)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     private fun openPodcastsList() {
@@ -268,9 +282,9 @@ class AutoAddPodcastAdapter(val imageLoader: PodcastImageLoader, val onClick: (P
             lblTitle.text = podcast.title
             val resources = holder.itemView.resources
             lblSubtitle.text = when (podcast.autoAddToUpNext) {
-                Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_NEXT -> resources.getString(LR.string.settings_auto_up_next_to_top)
-                Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_LAST -> resources.getString(LR.string.settings_auto_up_next_to_bottom)
-                else -> null
+                Podcast.AutoAddUpNext.PLAY_NEXT -> resources.getString(LR.string.settings_auto_up_next_to_top)
+                Podcast.AutoAddUpNext.PLAY_LAST -> resources.getString(LR.string.settings_auto_up_next_to_bottom)
+                Podcast.AutoAddUpNext.OFF -> null
             }
             root.setOnClickListener { onClick(podcast) }
         }

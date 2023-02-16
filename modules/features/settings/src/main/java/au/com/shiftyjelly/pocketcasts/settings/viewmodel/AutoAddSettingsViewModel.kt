@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -16,17 +18,38 @@ import javax.inject.Inject
 data class AutoAddSettingsState(val autoAddPodcasts: List<Podcast>, val limit: Int, val behaviour: Settings.AutoAddUpNextLimitBehaviour)
 
 @HiltViewModel
-class AutoAddSettingsViewModel @Inject constructor(val podcastManager: PodcastManager, val settings: Settings) : ViewModel() {
+class AutoAddSettingsViewModel @Inject constructor(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val podcastManager: PodcastManager,
+    private val settings: Settings,
+) : ViewModel() {
+
+    private var isFragmentChangingConfigurations: Boolean = false
+
+    fun onShown() {
+        if (!isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_SHOWN)
+        }
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
+
     val autoAddPodcasts = LiveDataReactiveStreams.fromPublisher(
         podcastManager.observeAutoAddToUpNextPodcasts()
             .combineLatest(settings.autoAddUpNextLimit.toFlowable(BackpressureStrategy.LATEST), settings.autoAddUpNextLimitBehaviour.toFlowable(BackpressureStrategy.LATEST))
             .map { AutoAddSettingsState(it.first, it.second, it.third) }
     )
 
-    fun updatePodcast(podcast: Podcast, autoAddOption: Int) {
+    fun updatePodcast(podcast: Podcast, autoAddOption: Podcast.AutoAddUpNext) {
         viewModelScope.launch {
-            podcastManager.updateAutoAddToUpNext(podcast, autoAddOption)
             Timber.d("Updating ${podcast.title} to $autoAddOption")
+            podcastManager.updateAutoAddToUpNext(podcast, autoAddOption)
+            analyticsTracker.track(
+                AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_PODCAST_POSITION_OPTION_CHANGED,
+                mapOf("value" to autoAddOption.analyticsValue)
+            )
         }
     }
 
@@ -35,8 +58,29 @@ class AutoAddSettingsViewModel @Inject constructor(val podcastManager: PodcastMa
             val currentUuids = podcastManager.findAutoAddToUpNextPodcasts().map { it.uuid }
             val removedUuids = currentUuids - newSelection
 
-            podcastManager.updateAutoAddToUpNextsIf(podcastUuids = newSelection, newValue = Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_LAST, onlyIfValue = Podcast.AUTO_ADD_TO_UP_NEXT_OFF)
-            podcastManager.updateAutoAddToUpNexts(podcastUuids = removedUuids, autoAddToUpNext = Podcast.AUTO_ADD_TO_UP_NEXT_OFF)
+            podcastManager.updateAutoAddToUpNextsIf(podcastUuids = newSelection, newValue = Podcast.AutoAddUpNext.PLAY_LAST, onlyIfValue = Podcast.AutoAddUpNext.OFF)
+            podcastManager.updateAutoAddToUpNexts(podcastUuids = removedUuids, autoAddToUpNext = Podcast.AutoAddUpNext.OFF)
         }
+    }
+
+    fun autoAddUpNextLimitChanged(limit: Int) {
+        settings.setAutoAddUpNextLimit(limit)
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_AUTO_ADD_LIMIT_CHANGED,
+            mapOf("value" to limit)
+        )
+    }
+
+    fun autoAddUpNextLimitBehaviorChanged(behavior: Settings.AutoAddUpNextLimitBehaviour) {
+        settings.setAutoAddUpNextLimitBehaviour(behavior)
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_LIMIT_REACHED_CHANGED,
+            mapOf(
+                "value" to when (behavior) {
+                    Settings.AutoAddUpNextLimitBehaviour.STOP_ADDING -> "stop_adding"
+                    Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> "only_add_top"
+                }
+            )
+        )
     }
 }

@@ -68,13 +68,13 @@ class PodcastSettingsViewModel @Inject constructor(
 
     fun updateAutoAddToUpNext(isOn: Boolean) {
         val podcast = this.podcast.value ?: return
-        val value = if (isOn) Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_LAST else Podcast.AUTO_ADD_TO_UP_NEXT_OFF
+        val value = if (isOn) Podcast.AutoAddUpNext.PLAY_LAST else Podcast.AutoAddUpNext.OFF
         launch {
             podcastManager.updateAutoAddToUpNext(podcast, value)
         }
     }
 
-    fun updateAutoAddToUpNextOrder(value: Int) {
+    fun updateAutoAddToUpNextOrder(value: Podcast.AutoAddUpNext) {
         val podcast = this.podcast.value ?: return
         launch {
             podcastManager.updateAutoAddToUpNext(podcast, value)

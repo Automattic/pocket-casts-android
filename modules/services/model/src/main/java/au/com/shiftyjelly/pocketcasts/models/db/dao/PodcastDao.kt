@@ -247,10 +247,10 @@ abstract class PodcastDao {
     }
 
     @Query("UPDATE podcasts SET auto_add_to_up_next = :autoAddToUpNext WHERE uuid = :uuid")
-    abstract suspend fun updateAutoAddToUpNext(autoAddToUpNext: Int, uuid: String)
+    abstract suspend fun updateAutoAddToUpNext(autoAddToUpNext: Podcast.AutoAddUpNext, uuid: String)
 
     @Transaction
-    open suspend fun updateAutoAddToUpNexts(autoAddToUpNext: Int, podcastUuids: List<String>) {
+    open suspend fun updateAutoAddToUpNexts(autoAddToUpNext: Podcast.AutoAddUpNext, podcastUuids: List<String>) {
         for (uuid in podcastUuids) {
             updateAutoAddToUpNext(autoAddToUpNext = autoAddToUpNext, uuid = uuid)
         }

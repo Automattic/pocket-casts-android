@@ -39,15 +39,16 @@ fun Menu.tintIcons(@ColorInt color: Int, excludeMenuItems: List<Int>? = null) {
     }
 }
 
-fun Menu.findChromeCastItem(): MenuItem? {
+private fun Menu.findChromeCastItem(): MenuItem? {
     return this.children.firstOrNull { it.actionView is MediaRouteButton }
 }
 
-fun Menu.setupChromeCastButton(context: Context?) {
+fun Menu.setupChromeCastButton(context: Context?, onClick: () -> Unit) {
     context ?: return
     try {
         val menuItem = findChromeCastItem() ?: return
         CastButtonFactory.setUpMediaRouteButton(context, this, menuItem.itemId)
+        menuItem.actionView?.setOnClickListener { onClick() }
     } catch (e: Throwable) {
         Timber.e(e)
     }

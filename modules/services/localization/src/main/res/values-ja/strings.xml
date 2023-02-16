@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-17 10:54:03+0000
+Translation-Revision-Date: 2023-01-25 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_media_actions_show_subtitle">Android 13のメディア通知と Android Auto でカスタムメディアアクションを表示します。</string>
+    <string name="settings_media_actions_show_title">カスタムメディアアクションを表示</string>
+    <string name="settings_media_actions_customise">メディアアクションをカスタマイズ</string>
+    <string name="settings_media_actions_prioritize_subtitle">上位のアクションを利用できます。</string>
+    <string name="settings_media_actions_prioritize_title">カスタムメディアアクションに優先順位を設定</string>
+    <string name="plus_take_your_podcasting_to_next_level">専用の機能やカスタマイズオプションを使用して、あなたのポッドキャスト体験をさらなるレベルに引き上げることができます。</string>
     <string name="onboarding_recommendations_more">%sをもっと見る</string>
     <string name="filter_id_or_title">フィルター ID またはタイトル</string>
     <string name="filter_title">フィルタータイトル</string>
@@ -57,9 +63,6 @@ Language: ja_JP
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">有効期限</string>
     <string name="profile_cancel_confirm_sub_expiry">現在のサブスクリプションは%1$sまで有効です。</string>
     <string name="profile_cancel_confirm_subtitle">これにより、お客様のプランが無料アカウントに変更されます。</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">上位のアクションは Android 13の通知と Android Auto プレイヤーで利用できます。</string>
-    <string name="settings_rearrange_media_actions">メディアアクションを並べ替える</string>
-    <string name="settings_prioritize_your_notification_actions">通知アクションに優先順位を設定する</string>
     <string name="settings_other_media_actions">その他のメディアアクション</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Android 13の再生通知と Android Auto に表示されるボタンをカスタマイズします。</string>
     <string name="podcast_not_subscribed">購読していません</string>
@@ -628,7 +631,6 @@ Language: ja_JP
     <string name="settings_podcast_artwork">ポッドキャストのアートワーク</string>
     <string name="settings_playback_resumption_summary">オンにすると、Pocket Casts でエピソードを再開したときに少し巻き戻されて再生されるため、内容に入りやすくなります。</string>
     <string name="settings_playback_resumption">スマートに再生再開</string>
-    <string name="settings_notification_vibrate_never">新規エピソード</string>
     <string name="settings_notification_vibrate_in_silent">サイレントモードでのみ</string>
     <string name="settings_notification_vibrate_new_episodes">新規エピソード</string>
     <string name="settings_notification_vibrate">次の場合にバイブレート</string>

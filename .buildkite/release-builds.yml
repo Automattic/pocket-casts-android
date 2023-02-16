@@ -11,6 +11,7 @@ steps:
   - label: "Gradle Wrapper Validation"
     command: |
       validate_gradle_wrapper
+    priority: 1
     plugins: *common_plugins
 
   # Wait for Gradle Wrapper to be validated before running any other jobs
@@ -18,6 +19,7 @@ steps:
 
   - label: "🛠 Release Build"
     command: ".buildkite/commands/release-build.sh"
+    priority: 1
     plugins: *common_plugins
     notify:
       - slack: "#build-and-ship"
