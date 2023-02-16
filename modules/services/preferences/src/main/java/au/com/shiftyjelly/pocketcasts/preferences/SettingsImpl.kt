@@ -77,6 +77,7 @@ class SettingsImpl @Inject constructor(
     }
 
     private var languageCode: String? = null
+    private var lastSignInErrorNotification: Long? = null
 
     private val firebaseRemoteConfig: FirebaseRemoteConfig by lazy { setupFirebaseConfig() }
 
@@ -656,7 +657,8 @@ class SettingsImpl @Inject constructor(
     }
 
     private fun showSignInErrorNotification(intent: Intent, onTokenErrorUiShown: () -> Unit) {
-        onTokenErrorUiShown()
+        onShowSignInErrorNotificationDebounced(onTokenErrorUiShown)
+
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
         val notification = NotificationCompat.Builder(context, NotificationChannel.NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR.id)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -669,6 +671,19 @@ class SettingsImpl @Inject constructor(
             .build()
         NotificationManagerCompat.from(context)
             .notify(NotificationId.SIGN_IN_ERROR.value, notification)
+    }
+
+    // Avoid invoking the passed function multiple times in a short period of time
+    @Synchronized
+    private fun onShowSignInErrorNotificationDebounced(onTokenErrorUiShown: () -> Unit) {
+        val now = System.currentTimeMillis()
+        // Do not invoke this method more than once every 2 seconds
+        val shouldInvoke = lastSignInErrorNotification == null ||
+            lastSignInErrorNotification!! < now - (2 * 1000)
+        if (shouldInvoke) {
+            onTokenErrorUiShown()
+        }
+        lastSignInErrorNotification = now
     }
 
     override fun invalidateToken() {
