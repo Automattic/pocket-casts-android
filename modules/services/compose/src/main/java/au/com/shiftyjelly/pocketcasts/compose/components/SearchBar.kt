@@ -41,7 +41,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun SearchBar(
     text: String,
     onTextChanged: (String) -> Unit,
-    placeholder: String = stringResource(LR.string.search_podcasts),
+    placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
     onSearch: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
