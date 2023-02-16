@@ -474,4 +474,9 @@ enum class AnalyticsEvent(val key: String) {
     SEARCH_PERFORMED("search_performed"),
     SEARCH_FAILED("search_failed"),
     SEARCH_RESULT_TAPPED("search_result_tapped"),
+
+    /* Search History */
+    SEARCH_HISTORY_CLEARED("search_history_cleared"),
+    SEARCH_HISTORY_ITEM_TAPPED("search_history_item_tapped"),
+    SEARCH_HISTORY_ITEM_DELETE_BUTTON_TAPPED("search_history_item_delete_button_tapped"),
 }
