@@ -48,7 +48,6 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
 
     override fun onResume() {
         super.onResume()
-        viewModel.onShown()
     }
 
     override fun onPause() {
@@ -130,6 +129,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         if (viewModel.state.value !is DiscoverState.DataLoaded) {
             viewModel.loadData(resources)
         }
+
+        viewModel.onShown()
 
         return binding?.root
     }

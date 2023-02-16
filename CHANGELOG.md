@@ -347,4 +347,3 @@
         ([#3148](https://github.com/shiftyjelly/pocketcasts-android/issues/3148)).
     *   Fix create account next button not working when using 1Password
         ([#3167](https://github.com/shiftyjelly/pocketcasts-android/issues/3167)).
-
