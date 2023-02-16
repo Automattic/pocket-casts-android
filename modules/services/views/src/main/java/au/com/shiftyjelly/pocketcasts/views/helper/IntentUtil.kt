@@ -6,9 +6,9 @@ import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.localization.R
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
 import java.util.Arrays
