@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.ui.di.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,6 +18,7 @@ import javax.inject.Inject
 class SearchHistoryViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     userManager: UserManager,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val signInState = userManager.getSignInState().asFlow()
     private var isSignedAsPlus = false
@@ -35,7 +38,7 @@ class SearchHistoryViewModel @Inject constructor(
     }
 
     fun start() {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             signInState.collect { signInState ->
                 isSignedAsPlus = signInState.isSignedInAsPlus
                 loadSearchHistory()
@@ -51,20 +54,20 @@ class SearchHistoryViewModel @Inject constructor(
     }
 
     fun add(entry: SearchHistoryEntry) {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             searchHistoryManager.add(entry)
         }
     }
 
     fun remove(entry: SearchHistoryEntry) {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             searchHistoryManager.remove(entry)
             loadSearchHistory()
         }
     }
 
     fun clearAll() {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             searchHistoryManager.clearAll()
             loadSearchHistory()
         }
