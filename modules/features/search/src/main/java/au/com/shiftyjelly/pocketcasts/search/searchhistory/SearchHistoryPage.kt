@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -118,29 +119,30 @@ fun SearchHistoryView(
                 }
             }
         }
-        state.entries.forEach { entry ->
-            item {
-                when (entry) {
-                    is SearchHistoryEntry.Episode -> Unit // TODO
+        items(
+            items = state.entries,
+            key = { requireNotNull(it.id) },
+        ) { entry ->
+            when (entry) {
+                is SearchHistoryEntry.Episode -> Unit // TODO
 
-                    is SearchHistoryEntry.Folder -> SearchHistoryRow(
-                        content = { SearchHistoryFolderView(entry) },
-                        onCloseClick = { onCloseClick(entry) },
-                        onRowClick = { onRowClick(entry) },
-                    )
+                is SearchHistoryEntry.Folder -> SearchHistoryRow(
+                    content = { SearchHistoryFolderView(entry) },
+                    onCloseClick = { onCloseClick(entry) },
+                    onRowClick = { onRowClick(entry) },
+                )
 
-                    is SearchHistoryEntry.Podcast -> SearchHistoryRow(
-                        content = { SearchHistoryPodcastView(entry) },
-                        onCloseClick = { onCloseClick(entry) },
-                        onRowClick = { onRowClick(entry) },
-                    )
+                is SearchHistoryEntry.Podcast -> SearchHistoryRow(
+                    content = { SearchHistoryPodcastView(entry) },
+                    onCloseClick = { onCloseClick(entry) },
+                    onRowClick = { onRowClick(entry) },
+                )
 
-                    is SearchHistoryEntry.SearchTerm -> SearchHistoryRow(
-                        content = { SearchHistoryTermView(entry) },
-                        onCloseClick = { onCloseClick(entry) },
-                        onRowClick = { onRowClick(entry) },
-                    )
-                }
+                is SearchHistoryEntry.SearchTerm -> SearchHistoryRow(
+                    content = { SearchHistoryTermView(entry) },
+                    onCloseClick = { onCloseClick(entry) },
+                    onRowClick = { onRowClick(entry) },
+                )
             }
         }
     }
