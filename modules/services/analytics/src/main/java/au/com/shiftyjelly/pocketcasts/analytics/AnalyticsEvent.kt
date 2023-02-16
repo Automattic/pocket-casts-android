@@ -471,6 +471,8 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_STORAGE_WARN_BEFORE_USING_DATA_TOGGLED("settings_storage_warn_before_using_data_toggled"),
 
     /* Search */
+    SEARCH_SHOWN("search_shown"),
+    SEARCH_DISMISSED("search_dismissed"),
     SEARCH_PERFORMED("search_performed"),
     SEARCH_FAILED("search_failed"),
     SEARCH_RESULT_TAPPED("search_result_tapped"),

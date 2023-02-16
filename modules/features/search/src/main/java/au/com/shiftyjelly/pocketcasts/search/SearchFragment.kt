@@ -98,6 +98,11 @@ class SearchFragment : BaseFragment() {
         listener = null
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_SHOWN, source)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner { viewLifecycleOwner.lifecycle }
@@ -271,5 +276,10 @@ class SearchFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_DISMISSED, source)
+        return super.onBackPressed()
     }
 }

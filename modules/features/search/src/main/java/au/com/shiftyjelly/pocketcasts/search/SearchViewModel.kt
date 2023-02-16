@@ -64,6 +64,16 @@ class SearchViewModel @Inject constructor(
         )
     }
 
+    fun trackSearchShownOrDismissed(
+        event: AnalyticsEvent,
+        source: AnalyticsSource,
+    ) {
+        analyticsTracker.track(
+            event,
+            AnalyticsProp.searchShownOrDismissed(source = source)
+        )
+    }
+
     enum class SearchResultType(val value: String) {
         PODCAST_LOCAL_RESULT("podcast_local_result"),
         PODCAST_REMOTE_RESULT("podcast_remote_result"),
@@ -76,6 +86,9 @@ class SearchViewModel @Inject constructor(
         private const val RESULT_TYPE = "result_type"
         fun searchResultTapped(source: AnalyticsSource, uuid: String, type: SearchResultType) =
             mapOf(SOURCE to source.analyticsValue, UUID to uuid, RESULT_TYPE to type.value)
+
+        fun searchShownOrDismissed(source: AnalyticsSource) =
+            mapOf(SOURCE to source.analyticsValue)
     }
 }
 
