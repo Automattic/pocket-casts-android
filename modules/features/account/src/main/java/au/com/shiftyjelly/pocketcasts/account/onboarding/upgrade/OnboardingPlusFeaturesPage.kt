@@ -88,7 +88,7 @@ internal fun OnboardingPlusFeaturesPage(
 
     @Suppress("NAME_SHADOWING")
     val onNotNowPressed = {
-        viewModel.onDismiss(flow, source)
+        viewModel.onNotNow(flow, source)
         onNotNowPressed()
     }
 
