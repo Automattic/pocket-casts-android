@@ -30,6 +30,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.mediarouter.media.MediaControlIntent
+import androidx.mediarouter.media.MediaRouteSelector
+import androidx.mediarouter.media.MediaRouter
 import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
@@ -183,6 +186,12 @@ class MainActivity :
     private val disposables = CompositeDisposable()
     private var videoPlayerShown: Boolean = false
     private var overrideNextRefreshTimer: Boolean = false
+
+    private var mediaRouter: MediaRouter? = null
+    private val mediaRouterCallback = object : MediaRouter.Callback() {}
+    private val mediaRouteSelector = MediaRouteSelector.Builder()
+        .addControlCategory(MediaControlIntent.CATEGORY_REMOTE_PLAYBACK)
+        .build()
 
     private val childrenWithBackStack: List<HasBackstack>
         get() = supportFragmentManager.fragments.filterIsInstance<HasBackstack>()
@@ -359,6 +368,8 @@ class MainActivity :
         handleIntent(intent, savedInstanceState)
 
         updateSystemColors()
+
+        mediaRouter = MediaRouter.getInstance(this)
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
@@ -374,6 +385,17 @@ class MainActivity :
                 videoPlayerShown = false
             }
         }
+
+        // Tell media router to discover routes
+        mediaRouter?.addCallback(mediaRouteSelector, mediaRouterCallback, MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Remove the callback flag CALLBACK_FLAG_REQUEST_DISCOVERY on stop by calling
+        // addCallback() again in order to tell the media router that it no longer
+        // needs to invest effort trying to discover routes of these kinds for now.
+        mediaRouter?.addCallback(mediaRouteSelector, mediaRouterCallback, 0)
     }
 
     private fun openFullscreenViewPlayer() {
@@ -450,8 +472,8 @@ class MainActivity :
 
     override fun onDestroy() {
         super.onDestroy()
-
         disposables.clear()
+        mediaRouter?.removeCallback(mediaRouterCallback)
     }
 
     @Suppress("DEPRECATION")
