@@ -43,7 +43,19 @@ class CloudFilesViewModel @Inject constructor(
     val accountUsage = LiveDataReactiveStreams.fromPublisher(userEpisodeManager.observeAccountUsage())
     val signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
 
-    fun refreshFiles() {
+    fun refreshFiles(userInitiated: Boolean) {
+        if (userInitiated) {
+            analyticsTracker.track(
+                AnalyticsEvent.PULLED_TO_REFRESH,
+                mapOf(
+                    "source" to when (cloudFilesList.value?.isEmpty()) {
+                        true -> "no_files"
+                        false -> "files"
+                        else -> "unknown"
+                    }
+                )
+            )
+        }
         userEpisodeManager.syncFilesInBackground(playbackManager)
     }
 
