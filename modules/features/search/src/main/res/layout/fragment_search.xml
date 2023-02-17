@@ -30,7 +30,7 @@
                 android:id="@+id/searchView"
                 android:layout_width="match_parent"
                 android:layout_height="?android:attr/actionBarSize"
-                android:hint="@string/search_podcasts"
+                android:hint="@string/search_podcasts_or_add_url"
                 android:textColorHint="?attr/secondary_text_02"
                 android:paddingStart="40dp"
                 android:paddingEnd="8dp"

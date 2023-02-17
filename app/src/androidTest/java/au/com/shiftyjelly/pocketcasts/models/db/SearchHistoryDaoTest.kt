@@ -15,12 +15,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.Date
 import java.util.UUID
 
 private const val SEARCH_TERM_TEST1 = "test1"
 private const val SEARCH_TERM_TEST2 = "test2"
-private const val SEARCH_HISTORY_LIMIT = 5
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -216,6 +214,38 @@ class SearchHistoryDaoTest {
         }
     }
 
+    @Test
+    fun testInsertTooManyItemsKeepsMostRecent() = runTest {
+        val oldSearch = createTermSearchHistoryItem("old_search", modified = 0)
+        val recentSearch = createTermSearchHistoryItem("recent_search", modified = 1)
+        assertTrue(
+            "second search occurred after first search",
+            recentSearch.modified > oldSearch.modified
+        )
+
+        searchHistoryDao.deleteAll()
+        searchHistoryDao.insert(oldSearch)
+        searchHistoryDao.insert(recentSearch)
+        assertEquals(
+            "results contain both searches before truncation",
+            2,
+            findSearchHistory().size
+        )
+
+        val limit = 1
+        searchHistoryDao.truncateHistory(limit)
+        val results = findSearchHistory()
+        assertEquals(
+            "truncation reduces number of items to limit",
+            limit,
+            results.size
+        )
+        assertTrue(
+            "truncated results should contain most recent search item (${recentSearch.term}), but instead has (${results.map { it.term }})",
+            results.first().term == recentSearch.term
+        )
+    }
+
     /* DELETE */
     @Test
     fun testDeleteSearchHistoryItem() {
@@ -265,8 +295,10 @@ class SearchHistoryDaoTest {
     }
 
     /* HELPER FUNCTIONS */
-    private fun createTermSearchHistoryItem(term: String) =
-        SearchHistoryItem(term = term)
+    private fun createTermSearchHistoryItem(
+        term: String,
+        modified: Long = System.currentTimeMillis()
+    ) = SearchHistoryItem(term = term, modified = modified)
 
     private fun createPodcastSearchHistoryItem(uuid: String) =
         SearchHistoryItem(
@@ -285,13 +317,14 @@ class SearchHistoryDaoTest {
             episode = SearchHistoryItem.Episode(
                 uuid = uuid,
                 title = "",
-                publishedDate = Date(),
                 duration = 0.0,
+                podcastUuid = "",
+                podcastTitle = "",
+                artworkUrl = ""
             )
         )
 
     private suspend fun findSearchHistory(
         showFolders: Boolean = true,
-        limit: Int = SEARCH_HISTORY_LIMIT,
-    ) = searchHistoryDao.findAll(showFolders, limit)
+    ) = searchHistoryDao.findAll(showFolders)
 }

@@ -7,6 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
+private const val MAX_HISTORY_COUNT = 250
+
 class SearchHistoryManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
 ) : SearchHistoryManager, CoroutineScope {
@@ -17,14 +19,14 @@ class SearchHistoryManagerImpl @Inject constructor(
 
     override suspend fun findAll(
         showFolders: Boolean,
-        limit: Int,
     ): List<SearchHistoryEntry> {
-        val items = searchHistoryDao.findAll(showFolders, limit)
+        val items = searchHistoryDao.findAll(showFolders)
         return items.map { SearchHistoryEntry.fromSearchHistoryItem(it) }
     }
 
     override suspend fun add(entry: SearchHistoryEntry) {
         searchHistoryDao.insert(entry.toSearchHistoryItem())
+        truncateHistory(MAX_HISTORY_COUNT)
     }
 
     override suspend fun remove(entry: SearchHistoryEntry) {
@@ -33,5 +35,9 @@ class SearchHistoryManagerImpl @Inject constructor(
 
     override suspend fun clearAll() {
         searchHistoryDao.deleteAll()
+    }
+
+    override suspend fun truncateHistory(limit: Int) {
+        searchHistoryDao.truncateHistory(limit)
     }
 }

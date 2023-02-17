@@ -396,8 +396,10 @@ abstract class AppDatabase : RoomDatabase() {
                         folder_podcastIds TEXT,
                         episode_uuid TEXT,
                         episode_title TEXT,
-                        episode_publishedDate INTEGER,
-                        episode_duration REAL
+                        episode_duration REAL,
+                        episode_podcastUuid TEXT, 
+                        episode_podcastTitle TEXT, 
+                        episode_artworkUrl TEXT
                     );
                 """.trimIndent()
             )

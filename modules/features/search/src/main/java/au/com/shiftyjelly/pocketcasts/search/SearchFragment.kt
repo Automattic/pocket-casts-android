@@ -123,7 +123,14 @@ class SearchFragment : BaseFragment() {
             is SearchHistoryEntry.Episode -> Unit // TODO
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
-            is SearchHistoryEntry.SearchTerm -> binding?.searchView?.setQuery(entry.term, true)
+            is SearchHistoryEntry.SearchTerm -> {
+                viewModel.updateSearchQuery(query = entry.term, immediate = true)
+                binding?.let {
+                    it.searchView.setQuery(entry.term, true)
+                    it.searchHistoryPanel.hide()
+                    UiUtil.hideKeyboard(it.searchView)
+                }
+            }
         }
     }
 
@@ -156,7 +163,7 @@ class SearchFragment : BaseFragment() {
 
         val searchManager = view.context.getSystemService(Activity.SEARCH_SERVICE) as SearchManager
         activity?.let { searchView.setSearchableInfo(searchManager.getSearchableInfo(it.componentName)) }
-        searchView.queryHint = getString(LR.string.search_podcasts)
+        searchView.queryHint = getString(LR.string.search_podcasts_or_add_url)
         searchView.imeOptions = searchView.imeOptions or EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_FULLSCREEN
         searchView.setIconifiedByDefault(false)
         // seems like a more reliable focus using a post
@@ -238,7 +245,8 @@ class SearchFragment : BaseFragment() {
                             context = this@SearchFragment.requireContext(),
                             onConfirm = { searchHistoryViewModel.clearAll() }
                         ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
-                    }
+                    },
+                    onScroll = { UiUtil.hideKeyboard(recyclerView) }
                 )
                 if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
                     binding.searchHistoryPanel.show()

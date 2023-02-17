@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
-import java.util.Date
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode as EpisodeModel
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder as FolderModel
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastModel
@@ -13,8 +12,10 @@ sealed class SearchHistoryEntry(
         id: Long? = null,
         val uuid: String,
         val title: String,
-        val publishedDate: Date,
         val duration: Double,
+        val podcastUuid: String,
+        val podcastTitle: String,
+        val artworkUrl: String? = null,
     ) : SearchHistoryEntry(id = id)
 
     class Folder(
@@ -43,8 +44,10 @@ sealed class SearchHistoryEntry(
             episode = SearchHistoryItem.Episode(
                 uuid = uuid,
                 title = title,
-                publishedDate = publishedDate,
-                duration = duration
+                duration = duration,
+                podcastUuid = podcastUuid,
+                podcastTitle = podcastTitle,
+                artworkUrl = artworkUrl,
             )
         )
 
@@ -74,11 +77,17 @@ sealed class SearchHistoryEntry(
     }
 
     companion object {
-        fun fromEpisode(episode: EpisodeModel) = Episode(
+        fun fromEpisode(
+            episode: EpisodeModel,
+            podcastTitle: String,
+            artworkUrl: String? = null
+        ) = Episode(
             uuid = episode.uuid,
             title = episode.title,
-            publishedDate = episode.publishedDate,
-            duration = episode.duration
+            duration = episode.duration,
+            podcastUuid = episode.podcastUuid,
+            podcastTitle = podcastTitle,
+            artworkUrl = artworkUrl
         )
 
         fun fromFolder(folder: FolderModel, podcastIds: List<String>) = Folder(
@@ -101,8 +110,10 @@ sealed class SearchHistoryEntry(
                     id = item.id,
                     uuid = episode.uuid,
                     title = episode.title,
-                    publishedDate = episode.publishedDate,
-                    duration = episode.duration
+                    duration = episode.duration,
+                    podcastUuid = episode.podcastUuid,
+                    podcastTitle = episode.podcastTitle,
+                    artworkUrl = episode.artworkUrl,
                 )
             }
 
@@ -113,7 +124,7 @@ sealed class SearchHistoryEntry(
                     uuid = folder.uuid,
                     title = folder.title,
                     color = folder.color,
-                    podcastIds = folder.podcastIds.split(",")
+                    podcastIds = folder.podcastIds.takeIf { it.isNotEmpty() }?.split(",") ?: emptyList(),
                 )
             }
 

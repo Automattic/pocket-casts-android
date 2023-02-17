@@ -950,7 +950,7 @@
       },
       {
         "tableName": "search_history",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `modified` INTEGER NOT NULL, `term` TEXT, `podcast_uuid` TEXT, `podcast_title` TEXT, `podcast_author` TEXT, `folder_uuid` TEXT, `folder_title` TEXT, `folder_color` INTEGER, `folder_podcastIds` TEXT, `episode_uuid` TEXT, `episode_title` TEXT, `episode_publishedDate` INTEGER, `episode_duration` REAL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `modified` INTEGER NOT NULL, `term` TEXT, `podcast_uuid` TEXT, `podcast_title` TEXT, `podcast_author` TEXT, `folder_uuid` TEXT, `folder_title` TEXT, `folder_color` INTEGER, `folder_podcastIds` TEXT, `episode_uuid` TEXT, `episode_title` TEXT, `episode_duration` REAL, `episode_podcastUuid` TEXT, `episode_podcastTitle` TEXT, `episode_artworkUrl` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -1025,15 +1025,27 @@
             "notNull": false
           },
           {
-            "fieldPath": "episode.publishedDate",
-            "columnName": "episode_publishedDate",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
             "fieldPath": "episode.duration",
             "columnName": "episode_duration",
             "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "episode.podcastUuid",
+            "columnName": "episode_podcastUuid",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "episode.podcastTitle",
+            "columnName": "episode_podcastTitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "episode.artworkUrl",
+            "columnName": "episode_artworkUrl",
+            "affinity": "TEXT",
             "notNull": false
           }
         ],

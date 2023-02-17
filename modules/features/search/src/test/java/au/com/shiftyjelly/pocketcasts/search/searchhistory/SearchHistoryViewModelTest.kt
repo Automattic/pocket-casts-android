@@ -8,16 +8,12 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import io.reactivex.Flowable
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyBoolean
-import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.eq
@@ -48,11 +44,6 @@ class SearchHistoryViewModelTest {
 
     private val subscriptionStatusFree = SubscriptionStatus.Free()
 
-    @Before
-    fun setUp() = runTest {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
     @Test
     fun `given plus user and local + remote search, when search history shown, then folders included`() =
         runTest {
@@ -60,7 +51,7 @@ class SearchHistoryViewModelTest {
 
             viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(true), limit = anyInt())
+            verify(searchHistoryManager).findAll(showFolders = eq(true))
         }
 
     @Test
@@ -70,7 +61,7 @@ class SearchHistoryViewModelTest {
 
             viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(false), limit = anyInt())
+            verify(searchHistoryManager).findAll(showFolders = eq(false))
         }
 
     @Test
@@ -80,7 +71,7 @@ class SearchHistoryViewModelTest {
 
             viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(false), limit = anyInt())
+            verify(searchHistoryManager).findAll(showFolders = eq(false))
         }
 
     @Test
@@ -90,7 +81,7 @@ class SearchHistoryViewModelTest {
 
             viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(false), limit = anyInt())
+            verify(searchHistoryManager).findAll(showFolders = eq(false))
         }
 
     private suspend fun initViewModel(
@@ -106,9 +97,10 @@ class SearchHistoryViewModelTest {
                     )
                 )
             )
-        whenever(searchHistoryManager.findAll(showFolders = anyBoolean(), limit = anyInt()))
+        whenever(searchHistoryManager.findAll(showFolders = anyBoolean()))
             .thenReturn(mock())
-        val viewModel = SearchHistoryViewModel(searchHistoryManager, userManager)
+        val viewModel =
+            SearchHistoryViewModel(searchHistoryManager, userManager, UnconfinedTestDispatcher())
         viewModel.setOnlySearchRemote(isOnlySearchRemote)
         return viewModel
     }
