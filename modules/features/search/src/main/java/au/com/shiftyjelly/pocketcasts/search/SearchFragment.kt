@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -243,21 +244,24 @@ class SearchFragment : BaseFragment() {
         recyclerView.itemAnimator = null
         recyclerView.addOnScrollListener(onScrollListener)
 
-        binding.searchHistoryPanel.setContent {
-            AppTheme(theme.activeTheme) {
-                SearchHistoryPage(
-                    viewModel = searchHistoryViewModel,
-                    onClick = ::navigateFromSearchHistoryEntry,
-                    onShowClearAllConfirmation = {
-                        SearchHistoryClearAllConfirmationDialog(
-                            context = this@SearchFragment.requireContext(),
-                            onConfirm = { searchHistoryViewModel.clearAll() }
-                        ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
-                    },
-                    onScroll = { UiUtil.hideKeyboard(recyclerView) }
-                )
-                if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
-                    binding.searchHistoryPanel.show()
+        binding.searchHistoryPanel.apply {
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            setContent {
+                AppTheme(theme.activeTheme) {
+                    SearchHistoryPage(
+                        viewModel = searchHistoryViewModel,
+                        onClick = ::navigateFromSearchHistoryEntry,
+                        onShowClearAllConfirmation = {
+                            SearchHistoryClearAllConfirmationDialog(
+                                context = this@SearchFragment.requireContext(),
+                                onConfirm = { searchHistoryViewModel.clearAll() }
+                            ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
+                        },
+                        onScroll = { UiUtil.hideKeyboard(recyclerView) }
+                    )
+                    if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
+                        binding.searchHistoryPanel.show()
+                    }
                 }
             }
         }
