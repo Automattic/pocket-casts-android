@@ -2,7 +2,9 @@
 -----
 * Bug Fixes:
     *    App no longer crashes when the device browser has been disabled
-         ([#762](https://github.com/Automattic/pocket-casts-android/issues/762)).
+         ([#762](https://github.com/Automattic/pocket-casts-android/issues/762)).    
+    *    Improve discovery of chromecast devices
+         ([#780](https://github.com/Automattic/pocket-casts-android/issues/780)).
 
 7.32
 -----
