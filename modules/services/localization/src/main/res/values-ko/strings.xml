@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-02 16:54:29+0000
+Translation-Revision-Date: 2023-02-07 16:54:22+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
@@ -102,7 +102,6 @@ Language: ko_KR
     <string name="end_of_year_stories_failed">연말 스토리를 로드할 수 없습니다. 인터넷 연결을 확인하세요.</string>
     <string name="onboarding_plus_feature_themes_icons_text">트루 컬러를 이용하세요. Plus 클럽 전용 아이콘과 테마입니다.</string>
     <string name="onboarding_plus_feature_themes_icons_title">테마 및 아이콘</string>
-    <string name="onboarding_plus_feature_hide_ads_title">광고 숨기기</string>
     <string name="onboarding_plus_feature_cloud_storage_text">파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">클라우드 저장 공간 10GB</string>
     <string name="onboarding_plus_feature_folders_text">팟캐스트를 폴더로 정리하고 모든 기기에서 동기화 상태를 유지하세요.</string>
@@ -114,7 +113,6 @@ Language: ko_KR
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">즐겨 찾는 팟캐스트 찾기</string>
-    <string name="onboarding_plus_feature_hide_ads_text">좋아하는 것은 많이 제공하고 좋아하지 않는 것은 적게 제공하는 광고 없는 검색 기능입니다.</string>
     <string name="onboarding_upgrade_unlock_all_features">모든 기능 잠금 해제</string>
     <string name="not_now">지금 안 함</string>
     <string name="settings_open_player_automatically_summary">설정하면 팟캐스트 에피소드 재생을 시작할 때 전체 화면 플레이어가 열립니다.</string>
@@ -751,6 +749,7 @@ Language: ko_KR
     <string name="plus_description_title">고급 청취자를 위한 향상된 기능</string>
     <string name="plus_description_body">한꺼번에 개인화하고 배포하세요. 개인 오디오 파일을 클라우드 서버에 업로드하고, 웹 플레이어를 통해 계정에 접근하고, 앱을 나만의 것으로 만드세요.</string>
     <string name="plus_create_marketing_features"> 모든 것</string>
+    <string name="settings_notification_vibrate_never">안 함</string>
     <string name="plus_cloud_storage_limit">클라우드 저장 공간 %dGB</string>
     <string name="plus_cloud_storage_body">강의 속도를 높이세요. 다른 콘텐츠를 압도하세요. 고유한 팟캐스트 DJ가 되세요.</string>
     <string name="plus_cloud_storage">클라우드 저장 공간</string>

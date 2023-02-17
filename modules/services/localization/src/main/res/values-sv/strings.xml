@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-24 14:54:03+0000
+Translation-Revision-Date: 2023-02-06 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
@@ -102,8 +102,6 @@ Language: sv_SE
     <string name="end_of_year_stories_failed">Det gick inte att ladda dina årsslutsberättelser. Kontrollera din anslutning.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Teman och ikoner</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Annonsfri upptäckt som ger dig mer av det du gillar och mindre av det du inte gillar.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Dölj annonser</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB molnlagring</string>
     <string name="onboarding_plus_feature_folders_text">Organisera dina podcasts i mappar och håll dem synkroniserade på alla dina enheter.</string>
@@ -631,6 +629,7 @@ Language: sv_SE
     <string name="settings_podcast_artwork">Podcastomslag</string>
     <string name="settings_playback_resumption_summary">Om detta är aktiverat kommer Pocket Casts att hoppa bakåt lite i avsnitt där du återupptar ditt lyssnande, så att du kan fortsätta utan att missa något.</string>
     <string name="settings_playback_resumption">Intelligent återupptagning av uppspelning</string>
+    <string name="settings_notification_vibrate_never">Aldrig</string>
     <string name="settings_notification_vibrate_in_silent">Endast i tyst läge</string>
     <string name="settings_notification_vibrate_new_episodes">Nya avsnitt</string>
     <string name="settings_notification_vibrate">Vibrera när</string>

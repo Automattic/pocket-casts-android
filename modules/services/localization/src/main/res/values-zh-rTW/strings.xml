@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-31 13:54:04+0000
+Translation-Revision-Date: 2023-02-07 08:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
@@ -102,8 +102,6 @@ Language: zh_TW
     <string name="end_of_year_stories_failed">無法載入你的年終故事，請檢查網際網路連線</string>
     <string name="onboarding_plus_feature_themes_icons_text">展現你最真實的色彩。 僅供 Plus 社群使用的獨家圖示和主題。</string>
     <string name="onboarding_plus_feature_themes_icons_title">佈景主題和圖示</string>
-    <string name="onboarding_plus_feature_hide_ads_text">不含廣告的搜尋體驗，可顯示更多你喜愛的內容，並減少你不感興趣的內容。</string>
-    <string name="onboarding_plus_feature_hide_ads_title">隱藏廣告</string>
     <string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB 雲端儲存空間</string>
     <string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並在所有裝置間同步。</string>
@@ -631,6 +629,7 @@ Language: zh_TW
     <string name="settings_podcast_artwork">Podcast 封面作品</string>
     <string name="settings_playback_resumption_summary">開啟此功能時，Pocket Casts 會在你繼續播放單集時稍微回放，讓你能更輕鬆跟上進度。</string>
     <string name="settings_playback_resumption">智慧型繼續播放</string>
+    <string name="settings_notification_vibrate_never">永不</string>
     <string name="settings_notification_vibrate_in_silent">只在靜音模式時</string>
     <string name="settings_notification_vibrate_new_episodes">新單集</string>
     <string name="settings_notification_vibrate">在以下情況振動：</string>

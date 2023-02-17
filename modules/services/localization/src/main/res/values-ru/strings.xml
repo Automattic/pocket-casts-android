@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-24 09:54:05+0000
+Translation-Revision-Date: 2023-02-09 12:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
@@ -102,8 +102,6 @@ Language: ru
     <string name="end_of_year_stories_failed">Не удаётся загрузить итоги года, проверьте подключение к Интернету</string>
     <string name="onboarding_plus_feature_themes_icons_text">Покажите себя во всей красе. Эксклюзивные темы и значки только для членов клуба Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Темы и значки</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Когда на странице нет рекламы, на ней помещается больше контента, который вам нравится.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Скрыть рекламу</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Загрузите файлы в облачное хранилище и пользуйтесь ими, где бы вы ни находились.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Облачное хранилище 10 ГБ</string>
     <string name="onboarding_plus_feature_folders_text">Распределите подкасты по папкам и синхронизируйте их на всех устройствах.</string>
@@ -631,6 +629,7 @@ Language: ru
     <string name="settings_podcast_artwork">Тема подкаста</string>
     <string name="settings_playback_resumption_summary">Если опция включена, Pocket Casts вернется немного назад в возобновляемых выпусках, чтобы вам было удобнее наверстать упущенное.</string>
     <string name="settings_playback_resumption">Умное возобновление воспроизведения</string>
+    <string name="settings_notification_vibrate_never">Никогда</string>
     <string name="settings_notification_vibrate_in_silent">Только без звука</string>
     <string name="settings_notification_vibrate_new_episodes">Следующие выпуски</string>
     <string name="settings_notification_vibrate">Вибрация при</string>
