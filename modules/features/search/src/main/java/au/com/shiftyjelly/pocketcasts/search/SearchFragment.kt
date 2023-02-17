@@ -13,6 +13,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -97,11 +98,17 @@ class SearchFragment : BaseFragment() {
         listener = null
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_SHOWN, source)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner { viewLifecycleOwner.lifecycle }
         viewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
+        searchHistoryViewModel.setSource(source)
         binding.viewModel = viewModel
         binding.floating = floating
 
@@ -119,6 +126,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun navigateFromSearchHistoryEntry(entry: SearchHistoryEntry) {
+        searchHistoryViewModel.trackEventForEntry(AnalyticsEvent.SEARCH_HISTORY_ITEM_TAPPED, entry)
         when (entry) {
             is SearchHistoryEntry.Episode -> Unit // TODO
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
@@ -275,5 +283,10 @@ class SearchFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_DISMISSED, source)
+        return super.onBackPressed()
     }
 }

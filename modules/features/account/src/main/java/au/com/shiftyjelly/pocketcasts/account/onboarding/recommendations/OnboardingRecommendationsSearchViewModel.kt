@@ -100,6 +100,10 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                 _state.value = it
             }
         }
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_SHOWN,
+            mapOf(AnalyticsProp.SOURCE to AnalyticsSource.ONBOARDING_RECOMMENDATIONS.analyticsValue)
+        )
     }
 
     fun updateSearchQuery(searchQuery: String) {
@@ -142,6 +146,13 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun onBackPressed() {
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_DISMISSED,
+            mapOf(AnalyticsProp.SOURCE to AnalyticsSource.ONBOARDING_RECOMMENDATIONS.analyticsValue)
+        )
     }
 
     companion object {
