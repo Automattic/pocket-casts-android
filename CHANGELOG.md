@@ -1,6 +1,8 @@
 7.33
 -----
-
+*   New Features:
+    *    Added search history 
+         ([#784](https://github.com/Automattic/pocket-casts-android/pull/784)).
 
 7.32
 -----
