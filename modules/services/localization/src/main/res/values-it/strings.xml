@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-23 16:54:03+0000
+Translation-Revision-Date: 2023-02-06 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
@@ -102,8 +102,6 @@ Language: it
     <string name="end_of_year_stories_failed">Impossibile caricare le storie della fine dell\'anno, controlla la connessione Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Mostra i tuoi reali colori. Icone e temi esclusivi solo per chi fa parte del club Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temi e icone</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Scoperta senza pubblicità che offre più di ciò che ami e meno di ciò che non ti piace.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Nascondi pubblicità</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Carica i tuoi file sull\'archiviazione su cloud e rendili disponibili per qualsiasi postazione.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB di archiviazione su cloud</string>
     <string name="onboarding_plus_feature_folders_text">Organizza i tuoi podcast in cartelle e sincronizzali su tutti i dispositivi.</string>
@@ -631,6 +629,7 @@ Language: it
     <string name="settings_podcast_artwork">Illustrazione del podcast</string>
     <string name="settings_playback_resumption_summary">Se attivato, Pocket Casts riprenderà la riproduzione dell\'episodio che avevi interrotto qualche secondo prima, per aiutarti a ricordarlo senza difficoltà.</string>
     <string name="settings_playback_resumption">Ripresa intelligente della riproduzione</string>
+    <string name="settings_notification_vibrate_never">Mai</string>
     <string name="settings_notification_vibrate_in_silent">Solo in modalità silenziosa</string>
     <string name="settings_notification_vibrate_new_episodes">Nuovi episodi</string>
     <string name="settings_notification_vibrate">Vibra quando</string>

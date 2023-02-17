@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-23 19:54:03+0000
+Translation-Revision-Date: 2023-02-06 20:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
@@ -102,8 +102,6 @@ Language: pt_BR
     <string name="end_of_year_stories_failed">Não é possível carregar seus stories de fim de ano. Verifique sua conexão com a Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Expresse sua individualidade. Temas e ícones exclusivos para o Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temas e ícones</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Guia Explorar sem publicidade, para se alinhar mais ao seu gosto.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Ocultar anúncios</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Faça upload dos seus arquivos na nuvem para acessá-los em qualquer lugar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB de armazenamento na nuvem</string>
     <string name="onboarding_plus_feature_folders_text">Organize seus podcasts em pastas e mantenha a sincronização em todos os seus dispositivos.</string>
@@ -631,6 +629,7 @@ Language: pt_BR
     <string name="settings_podcast_artwork">Arte do podcast</string>
     <string name="settings_playback_resumption_summary">Se ativada, o Pocket Casts volta um pouco os episódios quando você os retoma para que você acompanhe melhor.</string>
     <string name="settings_playback_resumption">Retomada inteligente de reprodução</string>
+    <string name="settings_notification_vibrate_never">Nunca</string>
     <string name="settings_notification_vibrate_in_silent">Apenas no modo silencioso</string>
     <string name="settings_notification_vibrate_new_episodes">Novos episódios</string>
     <string name="settings_notification_vibrate">Vibrar quando</string>

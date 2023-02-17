@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-27 16:54:24+0000
+Translation-Revision-Date: 2023-02-08 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
@@ -102,8 +102,6 @@ Language: es
     <string name="end_of_year_stories_failed">No se han podido cargar las historias de final de año, comprueba tu conexión a Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Muéstrate tal y como eres. Iconos y temas exclusivos solo para miembros Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temas e iconos</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Descubrimiento sin anuncios que te da más de lo que te encanta y menos de lo que te desagrada.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Ocultar anuncios</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Carga tus archivos en el almacenamiento en la nube para que estén disponibles desde cualquier lugar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Almacenamiento en la nube de 10 GB</string>
     <string name="onboarding_plus_feature_folders_text">Organiza tus pódcast en carpetas y mantenlos sincronizados en todos tus dispositivos.</string>
@@ -631,6 +629,7 @@ Language: es
     <string name="settings_podcast_artwork">Carátula del podcast</string>
     <string name="settings_playback_resumption_summary">Si está activado, Pocket Casts retrocederá un poco los episodios que reanudes para que puedas ponerte al día fácilmente.</string>
     <string name="settings_playback_resumption">Reanudación inteligente de la reproducción</string>
+    <string name="settings_notification_vibrate_never">Nunca</string>
     <string name="settings_notification_vibrate_in_silent">Solo en modo silencioso</string>
     <string name="settings_notification_vibrate_new_episodes">Nuevos episodios</string>
     <string name="settings_notification_vibrate">Vibrar en estas situaciones</string>

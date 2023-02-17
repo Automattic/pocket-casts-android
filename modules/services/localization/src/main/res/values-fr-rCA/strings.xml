@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-25 15:54:04+0000
+Translation-Revision-Date: 2023-02-06 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
@@ -102,8 +102,6 @@ Language: fr
     <string name="end_of_year_stories_failed">Impossible de charger vos stories de fin d’année. Vérifiez votre connexion Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Affichez vos véritables couleurs. Des icônes et des thèmes exclusifs pour le club Plus uniquement.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Thèmes et icônes</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Une expérience sans publicité qui vous permet de profiter pleinement de ce que vous aimez et d’éliminer ce qui ne vous intéresse pas.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Masquer les annonces</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Chargez vos fichiers dans le stockage Cloud afin de pouvoir y accéder n’importe où.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 Go de stockage Cloud</string>
     <string name="onboarding_plus_feature_folders_text">Organisez vos podcasts dans des dossiers et synchronisez-les sur tous vos appareils.</string>
@@ -631,6 +629,7 @@ Language: fr
     <string name="settings_podcast_artwork">Illustration du podcast</string>
     <string name="settings_playback_resumption_summary">Si cette fonction est activée, Pocket Casts reviendra un peu en arrière dans les épisodes que vous reprenez afin que vous puissiez combler votre retard plus confortablement.</string>
     <string name="settings_playback_resumption">Reprise intelligente de la lecture</string>
+    <string name="settings_notification_vibrate_never">Jamais</string>
     <string name="settings_notification_vibrate_in_silent">Uniquement en mode silencieux</string>
     <string name="settings_notification_vibrate_new_episodes">Nouveaux épisodes</string>
     <string name="settings_notification_vibrate">Vibrer quand</string>

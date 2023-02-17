@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-25 09:54:03+0000
+Translation-Revision-Date: 2023-02-07 08:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
@@ -102,8 +102,6 @@ Language: ja_JP
     <string name="end_of_year_stories_failed">年末のストーリーを読み込めません。インターネット接続を確認してください。</string>
     <string name="onboarding_plus_feature_themes_icons_text">あなたの個性を表現しましょう。 Plus クラブ限定の特別なアイコンとテーマ。</string>
     <string name="onboarding_plus_feature_themes_icons_title">テーマとアイコン</string>
-    <string name="onboarding_plus_feature_hide_ads_text">広告非表示の検出では気に入ったコンテンツを増やし、気に入らないコンテンツは減らすことができます。</string>
-    <string name="onboarding_plus_feature_hide_ads_title">広告を非表示</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10GB のクラウドストレージ</string>
     <string name="onboarding_plus_feature_folders_text">ポッドキャストをフォルダーに整理し、すべてのデバイス間で同期させます。</string>
@@ -631,6 +629,7 @@ Language: ja_JP
     <string name="settings_podcast_artwork">ポッドキャストのアートワーク</string>
     <string name="settings_playback_resumption_summary">オンにすると、Pocket Casts でエピソードを再開したときに少し巻き戻されて再生されるため、内容に入りやすくなります。</string>
     <string name="settings_playback_resumption">スマートに再生再開</string>
+    <string name="settings_notification_vibrate_never">なし</string>
     <string name="settings_notification_vibrate_in_silent">サイレントモードでのみ</string>
     <string name="settings_notification_vibrate_new_episodes">新規エピソード</string>
     <string name="settings_notification_vibrate">次の場合にバイブレート</string>
