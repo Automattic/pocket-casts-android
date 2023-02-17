@@ -31,6 +31,8 @@
     <string name="more">More</string>
     <string name="more_options">More options</string>
     <string name="next_episode">Next episode</string>
+    <string name="notifications_blocked_warning">Notifications are blocked. You can update permission through Settings.</string>
+    <string name="notifications_blocked_warning_snackbar_action" translatable="false">@string/update</string>
     <string name="ok">OK</string>
     <string name="options">Options</string>
     <string name="pause">Pause</string>
@@ -646,7 +648,7 @@
     <string name="profile_cloud_add_to_up_next" translatable="false">@string/add_to_up_next</string>
     <string name="profile_cloud_after_playing">After playing</string>
     <string name="profile_cloud_all_files_added">All files added to your files will be added to Up Next.</string>
-    <string name="profile_cloud_auto_add_to_up_next">Auto Add To Up Next</string>
+    <string name="profile_cloud_auto_add_to_up_next">Auto add to Up Next</string>
     <string name="profile_cloud_auto_download_from_cloud">Auto download from cloud</string>
     <string name="profile_cloud_auto_upload_to_cloud">Auto upload to cloud</string>
     <string name="profile_cloud_cancel_upload">Cancel upload</string>
@@ -1504,8 +1506,6 @@
     <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10GB Cloud Storage</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Hide Ads</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Ad-free discovery which gives you more of what you love and less of what you don\'t.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_themes_icons_text">Fly your true colors. Exclusive icons and themes for the Plus club only.</string>
     <string name="onboarding_plus_become_a_plus_member">Become a Plus member and unlock all Pocket&#160;Casts features</string>

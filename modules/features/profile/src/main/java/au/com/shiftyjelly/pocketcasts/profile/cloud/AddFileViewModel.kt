@@ -20,9 +20,6 @@ class AddFileViewModel @Inject constructor(
     val userEpisodeManager: UserEpisodeManager
 ) : ViewModel() {
 
-    val isSignedIn: Boolean
-        get() = signInState.value?.isSignedIn ?: false
-
     val signInState: LiveData<SignInState> = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
 
     suspend fun updateImageOnServer(userEpisode: UserEpisode, imageFile: File) = withContext(Dispatchers.IO) {

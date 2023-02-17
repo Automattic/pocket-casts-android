@@ -71,9 +71,9 @@ interface PodcastManager {
     fun updateAllShowNotifications(showNotifications: Boolean)
     fun updateAllShowNotificationsRx(showNotifications: Boolean): Completable
     fun updateAutoDownloadStatus(podcast: Podcast, autoDownloadStatus: Int)
-    suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Int)
-    suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Int)
-    suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Int, onlyIfValue: Int)
+    suspend fun updateAutoAddToUpNext(podcast: Podcast, autoAddToUpNext: Podcast.AutoAddUpNext)
+    suspend fun updateAutoAddToUpNexts(podcastUuids: List<String>, autoAddToUpNext: Podcast.AutoAddUpNext)
+    suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Podcast.AutoAddUpNext, onlyIfValue: Podcast.AutoAddUpNext)
     fun updateExcludeFromAutoArchive(podcast: Podcast, excludeFromAutoArchive: Boolean)
     fun updateOverrideGlobalEffects(podcast: Podcast, override: Boolean)
     fun updateTrimMode(podcast: Podcast, trimMode: TrimMode)

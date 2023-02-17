@@ -1,14 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -16,6 +21,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -107,6 +113,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.WhatsNew
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
@@ -123,15 +130,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import android.provider.Settings as AndroidProviderSettings
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 import com.google.android.material.R as MR
 
 private const val SAVEDSTATE_PLAYER_OPEN = "player_open"
 private const val SAVEDSTATE_MINIPLAYER_SHOWN = "miniplayer_shown"
+private const val EXTRA_LONG_SNACKBAR_DURATION_MS: Int = 5000
 
 @AndroidEntryPoint
 class MainActivity :
@@ -204,6 +214,45 @@ class MainActivity :
         }
     }
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {}
+
+    @SuppressLint("WrongConstant") // for custom snackbar duration constant
+    private fun checkForNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> Unit // Do nothing
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    if (settings.isNotificationsDisabledMessageShown()) return
+                    Snackbar.make(
+                        findViewById(R.id.root),
+                        getString(LR.string.notifications_blocked_warning),
+                        EXTRA_LONG_SNACKBAR_DURATION_MS
+                    ).setAction(
+                        getString(LR.string.notifications_blocked_warning_snackbar_action)
+                            .uppercase(Locale.getDefault())
+                    ) {
+                        // Responds to click on the action
+                        val intent = Intent(AndroidProviderSettings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        val uri: Uri = Uri.fromParts("package", packageName, null)
+                        intent.data = uri
+                        startActivity(intent)
+                    }.show()
+                    settings.setNotificationsDisabledMessageShown(true)
+                }
+                else -> {
+                    notificationPermissionLauncher.launch(
+                        Manifest.permission.POST_NOTIFICATIONS
+                    )
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
         super.onCreate(savedInstanceState)
@@ -218,6 +267,7 @@ class MainActivity :
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        checkForNotificationPermission()
 
         lifecycleScope.launchWhenCreated {
             val isEligible = viewModel.isEndOfYearStoriesEligible()

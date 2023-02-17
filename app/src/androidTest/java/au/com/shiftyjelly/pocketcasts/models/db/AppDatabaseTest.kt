@@ -6,6 +6,7 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -91,7 +92,7 @@ class AppDatabaseTest {
         assertEquals(true, podcast?.isSubscribed)
         assertEquals(true, podcast?.isShowNotifications)
         assertEquals(2, podcast?.autoDownloadStatus)
-        assertEquals(1, podcast?.autoAddToUpNext)
+        assertEquals(Podcast.AutoAddUpNext.PLAY_LAST, podcast?.autoAddToUpNext)
         assertEquals(0xF00000, podcast?.backgroundColor)
         assertEquals(0xFF0000, podcast?.tintColorForLightBg)
         assertEquals(0xFFF000, podcast?.tintColorForDarkBg)

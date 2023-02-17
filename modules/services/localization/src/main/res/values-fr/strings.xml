@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-16 16:54:21+0000
+Translation-Revision-Date: 2023-01-25 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_media_actions_show_subtitle">Affichez les actions de médias personnalisées dans les notifications des médias et Android Auto.</string>
+    <string name="settings_media_actions_show_title">Afficher les actions de médias personnalisées</string>
+    <string name="settings_media_actions_customise">Personnaliser les actions de médias</string>
+    <string name="settings_media_actions_prioritize_subtitle">Vos principales actions seront disponibles.</string>
+    <string name="settings_media_actions_prioritize_title">Prioriser vos actions de médias personnalisées</string>
+    <string name="plus_take_your_podcasting_to_next_level">Faites passer votre expérience d’écoute de podcasts au niveau supérieur avec un accès exclusif à des fonctionnalités et à des options de personnalisation.</string>
     <string name="onboarding_recommendations_more">Plus %s</string>
     <string name="filter_id_or_title">ID ou titre du filtre</string>
     <string name="filter_title">Titre du filtre</string>
@@ -57,9 +63,6 @@ Language: fr
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">votre date d’expiration</string>
     <string name="profile_cancel_confirm_sub_expiry">Votre abonnement actuel restera actif jusqu’au %1$s.</string>
     <string name="profile_cancel_confirm_subtitle">Votre plan passera à un compte gratuit.</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">Vos principales actions seront disponibles dans votre notification Android 13 et le lecteur Android Auto.</string>
-    <string name="settings_rearrange_media_actions">Réorganiser les actions des médias</string>
-    <string name="settings_prioritize_your_notification_actions">Prioriser vos actions de notification</string>
     <string name="settings_other_media_actions">Autres actions de médias</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Personnalisez les boutons qui s’affichent dans les notifications de lecture Android 13 et Android Auto.</string>
     <string name="podcast_not_subscribed">Pas d’abonnement</string>
@@ -628,7 +631,6 @@ Language: fr
     <string name="settings_podcast_artwork">Illustration du podcast</string>
     <string name="settings_playback_resumption_summary">Si cette fonction est activée, Pocket Casts reviendra un peu en arrière dans les épisodes que vous reprenez afin que vous puissiez combler votre retard plus confortablement.</string>
     <string name="settings_playback_resumption">Reprise intelligente de la lecture</string>
-    <string name="settings_notification_vibrate_never">Nouveaux épisodes</string>
     <string name="settings_notification_vibrate_in_silent">Uniquement en mode silencieux</string>
     <string name="settings_notification_vibrate_new_episodes">Nouveaux épisodes</string>
     <string name="settings_notification_vibrate">Vibrer quand</string>

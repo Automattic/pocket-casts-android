@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-18 08:54:19+0000
+Translation-Revision-Date: 2023-01-24 17:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="settings_media_actions_show_subtitle">Aangepaste media-actes weergeven in Android 13-mediameldingen en Android Auto.</string>
+    <string name="settings_media_actions_show_title">Aangepaste media-acties weergeven</string>
+    <string name="settings_media_actions_customise">Media-acties aanpassen</string>
+    <string name="settings_media_actions_prioritize_subtitle">Uw belangrijkste acties zullen beschikbaar zijn</string>
+    <string name="settings_media_actions_prioritize_title">Uw aangepaste media-acties prioriteren</string>
+    <string name="plus_take_your_podcasting_to_next_level">Til je podcast-ervaring naar het volgende niveau met exclusieve toegang tot functies en aanpassingsmogelijkheden.</string>
     <string name="onboarding_recommendations_more">Meer %s</string>
     <string name="filter_id_or_title">Filter-ID of -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -57,9 +63,6 @@ Language: nl
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">je vervaldatum</string>
     <string name="profile_cancel_confirm_sub_expiry">Je huidige abonnement blijft actief tot %1$s.</string>
     <string name="profile_cancel_confirm_subtitle">Hierdoor wordt je abonnement aangepast naar een gratis account.</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">Jouw topacties zijn beschikbaar in je Android 13-meldingen en Android Auto-speler.</string>
-    <string name="settings_rearrange_media_actions">Media-acties herschikken</string>
-    <string name="settings_prioritize_your_notification_actions">Je meldingsacties prioriteren</string>
     <string name="settings_other_media_actions">Andere media-acties</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Pas de knoppen aan die worden weergegeven in Android 13-afspeelmeldingen en Android Auto.</string>
     <string name="podcast_not_subscribed">Niet geabonneerd</string>
@@ -628,7 +631,6 @@ Language: nl
     <string name="settings_podcast_artwork">Podcast-artwork</string>
     <string name="settings_playback_resumption_summary">Als deze optie is ingeschakeld, spoelt Pocket Casts een stukje terug in afleveringen die je hervat, zodat je iets aangenamer begint.</string>
     <string name="settings_playback_resumption">Intelligent hervatten van afspelen</string>
-    <string name="settings_notification_vibrate_never">Nieuwe afleveringen</string>
     <string name="settings_notification_vibrate_in_silent">Alleen in stille modus</string>
     <string name="settings_notification_vibrate_new_episodes">Nieuwe afleveringen</string>
     <string name="settings_notification_vibrate">Trillen wanneer</string>

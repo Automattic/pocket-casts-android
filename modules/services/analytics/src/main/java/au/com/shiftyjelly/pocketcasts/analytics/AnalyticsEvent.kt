@@ -200,6 +200,8 @@ enum class AnalyticsEvent(val key: String) {
     PODCAST_SCREEN_TOGGLE_ARCHIVED("podcast_screen_toggle_archived"),
     PODCAST_SCREEN_TOGGLE_SUMMARY("podcast_screen_toggle_summary"),
     PODCAST_SCREEN_SHARE_TAPPED("podcast_screen_share_tapped"),
+    PODCASTS_SCREEN_SORT_ORDER_CHANGED("podcasts_screen_sort_order_changed"),
+    PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED("podcasts_screen_episode_grouping_changed"),
 
     /* Podcast Settings */
     PODCAST_SETTINGS_FEED_ERROR_TAPPED("podcast_settings_feed_error_tapped"),
@@ -404,6 +406,9 @@ enum class AnalyticsEvent(val key: String) {
     CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED("cancel_confirmation_stay_button_tapped"),
     CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED("cancel_confirmation_cancel_button_tapped"),
 
+    /* Settings - About */
+    SETTINGS_ABOUT_SHOWN("settings_about_shown"),
+
     /* Settings - Appearance */
     SETTINGS_APPEARANCE_SHOWN("settings_appearance_shown"),
     SETTINGS_APPEARANCE_FOLLOW_SYSTEM_THEME_TOGGLED("settings_appearance_follow_system_theme_toggled"),
@@ -412,6 +417,13 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_APPEARANCE_REFRESH_ALL_ARTWORK_TAPPED("settings_appearance_refresh_all_artwork_tapped"),
     SETTINGS_APPEARANCE_USE_EMBEDDED_ARTWORK_TOGGLED("settings_appearance_use_embedded_artwork_toggled"),
     SETTINGS_APPEARANCE_SHOW_ARTWORK_ON_LOCK_SCREEN_TOGGLED("settings_appearance_show_artwork_on_lock_screen_toggled"),
+
+    /* Settings - Auto add */
+    SETTINGS_AUTO_ADD_UP_NEXT_SHOWN("settings_auto_add_up_next_shown"),
+    SETTINGS_AUTO_ADD_UP_NEXT_AUTO_ADD_LIMIT_CHANGED("settings_auto_add_up_next_auto_add_limit_changed"),
+    SETTINGS_AUTO_ADD_UP_NEXT_LIMIT_REACHED_CHANGED("settings_auto_add_up_next_limit_reached_changed"),
+    SETTINGS_AUTO_ADD_UP_NEXT_PODCASTS_CHANGED("settings_auto_add_up_next_podcasts_changed"),
+    SETTINGS_AUTO_ADD_UP_NEXT_PODCAST_POSITION_OPTION_CHANGED("settings_auto_add_up_next_podcast_position_option_changed"),
 
     /* Settings - Auto archive */
     SETTINGS_AUTO_ARCHIVE_SHOWN("settings_auto_archive_shown"),
@@ -430,6 +442,15 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_AUTO_DOWNLOAD_STOP_ALL_DOWNLOADS("settings_auto_download_stop_all_downloads"),
     SETTINGS_AUTO_DOWNLOAD_CLEAR_DOWNLOAD_ERRORS("settings_auto_download_clear_download_errors"),
 
+    /* Settings - Files */
+    SETTINGS_FILES_SHOWN("settings_files_shown"),
+    SETTINGS_FILES_AUTO_ADD_UP_NEXT_TOGGLED("settings_files_auto_add_up_next_toggled"),
+    SETTINGS_FILES_DELETE_LOCAL_FILE_AFTER_PLAYING_TOGGLED("settings_files_delete_local_file_after_playing_toggled"),
+    SETTINGS_FILES_DELETE_CLOUD_FILE_AFTER_PLAYING_TOGGLED("settings_files_delete_cloud_file_after_playing_toggled"),
+    SETTINGS_FILES_AUTO_UPLOAD_TO_CLOUD_TOGGLED("settings_files_auto_upload_to_cloud_toggled"),
+    SETTINGS_FILES_AUTO_DOWNLOAD_FROM_CLOUD_TOGGLED("settings_files_auto_download_from_cloud_toggled"),
+    SETTINGS_FILES_ONLY_ON_WIFI_TOGGLED("settings_files_only_on_wifi_toggled"),
+
     /* Settings - General */
     SETTINGS_GENERAL_SHOWN("settings_general_shown"),
     SETTINGS_GENERAL_ROW_ACTION_CHANGED("settings_general_row_action_changed"),
@@ -445,6 +466,22 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN("settings_general_media_notification_controls_shown"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
+
+    /* Settings - Help */
+    SETTINGS_HELP_SHOWN("settings_help_shown"),
+
+    /* Settings - Import - Export */
+    SETTINGS_IMPORT_SHOWN("settings_import_shown"),
+    SETTINGS_IMPORT_SELECT_FILE("settings_import_select_file"),
+    SETTINGS_IMPORT_BY_URL("settings_import_by_url"),
+    SETTINGS_IMPORT_EXPORT_EMAIL_TAPPED("settings_import_export_email_tapped"),
+    SETTINGS_IMPORT_EXPORT_FILE_TAPPED("settings_import_export_file_tapped"),
+    SETTINGS_IMPORT_EXPORT_STARTED("settings_import_export_started"),
+    SETTINGS_IMPORT_EXPORT_FINISHED("settings_import_export_finished"),
+    SETTINGS_IMPORT_EXPORT_FAILED("settings_import_export_failed"),
+    OPML_IMPORT_STARTED("opml_import_started"),
+    OPML_IMPORT_FAILED("opml_import_failed"),
+    OPML_IMPORT_FINISHED("opml_import_finished"),
 
     /* Settings - Notifications */
     SETTINGS_NOTIFICATIONS_SHOWN("settings_notifications_shown"),
@@ -481,4 +518,9 @@ enum class AnalyticsEvent(val key: String) {
     SEARCH_HISTORY_CLEARED("search_history_cleared"),
     SEARCH_HISTORY_ITEM_TAPPED("search_history_item_tapped"),
     SEARCH_HISTORY_ITEM_DELETE_BUTTON_TAPPED("search_history_item_delete_button_tapped"),
+
+    /* Chromecast */
+    CHROMECAST_VIEW_SHOWN("chromecast_view_shown"),
+    CHROMECAST_STARTED_CASTING("chromecast_started_casting"),
+    CHROMECAST_STOPPED_CASTING("chromecast_stopped_casting"),
 }

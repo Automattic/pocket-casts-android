@@ -245,6 +245,19 @@ class PodcastViewModel
         launch {
             podcast.value?.let {
                 podcastManager.updateEpisodesSortType(it, episodesSortType)
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCASTS_SCREEN_SORT_ORDER_CHANGED,
+                    mapOf(
+                        "sort_order" to when (episodesSortType) {
+                            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> "oldest_to_newest"
+                            EpisodesSortType.EPISODES_SORT_BY_DATE_DESC -> "newest_to_oldest"
+                            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> "shortest_to_longest"
+                            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> "longest_to_shortest"
+                            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> "title_a_to_z"
+                            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> "title_z_to_a"
+                        }
+                    )
+                )
             }
         }
     }
@@ -253,6 +266,18 @@ class PodcastViewModel
         launch {
             podcast.value?.let {
                 podcastManager.updateGrouping(it, grouping)
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCASTS_SCREEN_EPISODE_GROUPING_CHANGED,
+                    mapOf(
+                        "value" to when (grouping) {
+                            PodcastGrouping.None -> "none"
+                            PodcastGrouping.Downloaded -> "downloaded"
+                            PodcastGrouping.Season -> "season"
+                            PodcastGrouping.Unplayed -> "unplayed"
+                            PodcastGrouping.Starred -> "starred"
+                        }
+                    )
+                )
             }
         }
     }

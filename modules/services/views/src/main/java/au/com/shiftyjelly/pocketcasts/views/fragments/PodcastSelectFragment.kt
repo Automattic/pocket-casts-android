@@ -188,7 +188,7 @@ class PodcastSelectFragment : BaseFragment() {
             when (source) {
 
                 PodcastSelectFragmentSource.AUTO_ADD -> {
-                    // TODO
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_ADD_UP_NEXT_PODCASTS_CHANGED, props)
                 }
 
                 PodcastSelectFragmentSource.NOTIFICATIONS -> {
