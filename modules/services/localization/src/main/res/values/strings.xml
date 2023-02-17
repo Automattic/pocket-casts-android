@@ -194,8 +194,13 @@
 
     <string name="search_no_podcasts_found">No podcasts found</string>
     <string name="search_no_podcasts_found_summary">Try more general or different keywords.</string>
-    <string name="search_podcasts">Search podcasts</string>
+    <string name="search_podcasts_or_add_url">Search podcasts or add RSS URL</string>
     <string name="search_hint">Search by podcast name</string>
+    <string name="search_history_clear_all_confirm_button_title">Clear Search History</string>
+    <string name="search_history_clear_all_confirmation_message">Are you sure you want to clear all your search history?</string>
+    <string name="search_history_recent_searches">Recent searches</string>
+    <string name="search_history_row_type_folder_subtitle">Folder \u2022 %s</string>
+    <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
 
     <string name="time_short_hours">%dh</string>
     <string name="time_short_hours_minutes">%1$dh %2$dm</string>
@@ -373,6 +378,7 @@
 
     <!-- Podcast -->
 
+    <string name="podcast">Podcast</string>
     <string name="podcast_archive_all">Archive all</string>
     <string name="podcast_archive_all_played">Archive all played</string>
     <string name="podcast_archive_played">You should only do this if you don\'t want to see them anymore.</string>

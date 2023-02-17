@@ -66,6 +66,7 @@ fun OnboardingRecommendationsSearchPage(
     }
 
     BackHandler {
+        viewModel.onBackPressed()
         onBackPressed()
     }
 
@@ -77,7 +78,10 @@ fun OnboardingRecommendationsSearchPage(
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.onboarding_find_podcasts),
-            onNavigationClick = onBackPressed
+            onNavigationClick = {
+                viewModel.onBackPressed()
+                onBackPressed()
+            }
         )
 
         SearchBar(

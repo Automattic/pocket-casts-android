@@ -1,6 +1,9 @@
 7.33
 -----
-* Bug Fixes:
+*   New Features:
+    *    Added search history 
+         ([#784](https://github.com/Automattic/pocket-casts-android/pull/784)).
+*   Bug Fixes:
     *    App no longer crashes when the device browser has been disabled
          ([#762](https://github.com/Automattic/pocket-casts-android/issues/762)).    
     *    Improve discovery of chromecast devices
@@ -8,7 +11,7 @@
 
 7.32
 -----
-* Bug Fixes:
+*   Bug Fixes:
     *    Ask notifications permission for newly-installed apps on Android 13
          ([#723](https://github.com/Automattic/pocket-casts-android/issues/723)).
 

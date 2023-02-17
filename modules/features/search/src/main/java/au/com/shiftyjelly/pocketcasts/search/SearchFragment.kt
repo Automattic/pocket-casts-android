@@ -10,14 +10,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.adapter.PodcastSearchAdapter
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
+import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAllConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
+import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -32,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 private const val ARG_FLOATING = "arg_floating"
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
 private const val ARG_SOURCE = "arg_source"
+private const val SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG = "search_history_clear_all_confirmation_dialog"
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
@@ -60,6 +68,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private val viewModel: SearchViewModel by viewModels()
+    private val searchHistoryViewModel: SearchHistoryViewModel by viewModels()
     private var listener: Listener? = null
     private var binding: FragmentSearchBinding? = null
 
@@ -90,10 +99,17 @@ class SearchFragment : BaseFragment() {
         listener = null
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_SHOWN, source)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner { viewLifecycleOwner.lifecycle }
         viewModel.setOnlySearchRemote(onlySearchRemote)
+        searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
+        searchHistoryViewModel.setSource(source)
         binding.viewModel = viewModel
         binding.floating = floating
 
@@ -106,6 +122,24 @@ class SearchFragment : BaseFragment() {
         super.onPause()
         binding?.let {
             UiUtil.hideKeyboard(it.searchView)
+        }
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
+
+    private fun navigateFromSearchHistoryEntry(entry: SearchHistoryEntry) {
+        searchHistoryViewModel.trackEventForEntry(AnalyticsEvent.SEARCH_HISTORY_ITEM_TAPPED, entry)
+        when (entry) {
+            is SearchHistoryEntry.Episode -> Unit // TODO
+            is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
+            is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
+            is SearchHistoryEntry.SearchTerm -> {
+                viewModel.updateSearchQuery(query = entry.term, immediate = true)
+                binding?.let {
+                    it.searchView.setQuery(entry.term, true)
+                    it.searchHistoryPanel.hide()
+                    UiUtil.hideKeyboard(it.searchView)
+                }
+            }
         }
     }
 
@@ -138,7 +172,7 @@ class SearchFragment : BaseFragment() {
 
         val searchManager = view.context.getSystemService(Activity.SEARCH_SERVICE) as SearchManager
         activity?.let { searchView.setSearchableInfo(searchManager.getSearchableInfo(it.componentName)) }
-        searchView.queryHint = getString(LR.string.search_podcasts)
+        searchView.queryHint = getString(LR.string.search_podcasts_or_add_url)
         searchView.imeOptions = searchView.imeOptions or EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_FULLSCREEN
         searchView.setIconifiedByDefault(false)
         // seems like a more reliable focus using a post
@@ -153,6 +187,7 @@ class SearchFragment : BaseFragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.updateSearchQuery(query)
+                binding.searchHistoryPanel.hide()
                 UiUtil.hideKeyboard(searchView)
                 return true
             }
@@ -165,6 +200,11 @@ class SearchFragment : BaseFragment() {
                     return true
                 }
                 viewModel.updateSearchQuery(query)
+                if (characterCount > 0) {
+                    binding.searchHistoryPanel.hide()
+                } else {
+                    binding.searchHistoryPanel.show()
+                }
                 return true
             }
         })
@@ -181,15 +221,17 @@ class SearchFragment : BaseFragment() {
                         SearchResultType.PODCAST_LOCAL_RESULT
                     }
                 )
+                searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
                 listener?.onSearchPodcastClick(podcast.uuid)
                 UiUtil.hideKeyboard(searchView)
             },
-            onFolderClick = { folder ->
+            onFolderClick = { folder, podcasts ->
                 viewModel.trackSearchResultTapped(
                     source = source,
                     uuid = folder.uuid,
                     type = SearchResultType.FOLDER,
                 )
+                searchHistoryViewModel.add(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
                 listener?.onSearchFolderClick(folder.uuid)
                 UiUtil.hideKeyboard(searchView)
             }
@@ -201,6 +243,28 @@ class SearchFragment : BaseFragment() {
         recyclerView.adapter = searchAdapter
         recyclerView.itemAnimator = null
         recyclerView.addOnScrollListener(onScrollListener)
+
+        binding.searchHistoryPanel.apply {
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            setContent {
+                AppTheme(theme.activeTheme) {
+                    SearchHistoryPage(
+                        viewModel = searchHistoryViewModel,
+                        onClick = ::navigateFromSearchHistoryEntry,
+                        onShowClearAllConfirmation = {
+                            SearchHistoryClearAllConfirmationDialog(
+                                context = this@SearchFragment.requireContext(),
+                                onConfirm = { searchHistoryViewModel.clearAll() }
+                            ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
+                        },
+                        onScroll = { UiUtil.hideKeyboard(recyclerView) }
+                    )
+                    if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
+                        binding.searchHistoryPanel.show()
+                    }
+                }
+            }
+        }
 
         val noResultsView = binding.noResults
         val searchFailedView = binding.searchFailed
@@ -223,5 +287,10 @@ class SearchFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_DISMISSED, source)
+        return super.onBackPressed()
     }
 }
