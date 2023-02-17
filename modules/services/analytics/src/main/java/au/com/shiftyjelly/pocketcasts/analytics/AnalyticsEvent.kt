@@ -19,10 +19,17 @@ enum class AnalyticsEvent(val key: String) {
     USER_ACCOUNT_CREATION_FAILED("user_account_creation_failed"),
     USER_SIGNED_OUT("user_signed_out"),
 
+    /* Signed out alert */
+    SIGNED_OUT_ALERT_SHOWN("signed_out_alert_shown"),
+
     /* Plus Upsell */
     PLUS_PROMOTION_SHOWN("plus_promotion_shown"),
     PLUS_PROMOTION_DISMISSED("plus_promotion_dismissed"),
     PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED("plus_promotion_upgrade_button_tapped"),
+    PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED("plus_promotion_not_now_button_tapped"),
+
+    /* Pull to refresh */
+    PULLED_TO_REFRESH("pulled_to_refresh"),
 
     /* Setup Account */
     SETUP_ACCOUNT_SHOWN("setup_account_shown"),

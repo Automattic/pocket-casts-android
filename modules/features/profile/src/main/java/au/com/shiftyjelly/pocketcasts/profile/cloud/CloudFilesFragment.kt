@@ -165,11 +165,11 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
         )
 
-        viewModel.refreshFiles()
+        viewModel.refreshFiles(userInitiated = false)
 
         binding?.swipeRefreshLayout?.let {
             it.setOnRefreshListener {
-                viewModel.refreshFiles()
+                viewModel.refreshFiles(userInitiated = true)
                 it.isRefreshing = false
             }
         }
