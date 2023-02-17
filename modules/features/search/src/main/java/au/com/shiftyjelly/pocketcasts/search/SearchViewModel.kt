@@ -31,8 +31,8 @@ class SearchViewModel @Inject constructor(
     }
     val loading = searchHandler.loading
 
-    fun updateSearchQuery(query: String) {
-        searchHandler.updateSearchQuery(query)
+    fun updateSearchQuery(query: String, immediate: Boolean = false) {
+        searchHandler.updateSearchQuery(query, immediate)
     }
 
     fun setOnlySearchRemote(remote: Boolean) {

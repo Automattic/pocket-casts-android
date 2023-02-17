@@ -131,7 +131,14 @@ class SearchFragment : BaseFragment() {
             is SearchHistoryEntry.Episode -> Unit // TODO
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
-            is SearchHistoryEntry.SearchTerm -> binding?.searchView?.setQuery(entry.term, true)
+            is SearchHistoryEntry.SearchTerm -> {
+                viewModel.updateSearchQuery(query = entry.term, immediate = true)
+                binding?.let {
+                    it.searchView.setQuery(entry.term, true)
+                    it.searchHistoryPanel.hide()
+                    UiUtil.hideKeyboard(it.searchView)
+                }
+            }
         }
     }
 
