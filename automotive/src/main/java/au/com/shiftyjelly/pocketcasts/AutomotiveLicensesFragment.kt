@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
+import au.com.shiftyjelly.pocketcasts.extensions.openUrl
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
@@ -51,11 +51,8 @@ class AutomotiveLicensesFragment : Fragment() {
                 libs.copy(libs.libraries.distinctBy { "${it.name}##${it.author}" })
             },
             onLibraryClick = { library ->
-                val website = library.website
-                val activity = activity
-                if (website != null && activity != null) {
-                    activity.startActivityViewUrl(website)
-                }
+                val website = library.website ?: return@LibrariesContainer
+                openUrl(website)
             }
         )
     }
