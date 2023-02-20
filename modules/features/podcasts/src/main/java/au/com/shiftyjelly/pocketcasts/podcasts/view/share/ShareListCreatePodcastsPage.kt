@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ShareListCreatePodcastsPage(
     onCloseClick: () -> Unit,
-    onNextClick: () -> Unit,
+    onNextClick: (Int) -> Unit,
     viewModel: ShareListCreateViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -32,7 +32,10 @@ fun ShareListCreatePodcastsPage(
             navigationButton = NavigationButton.Close,
             onNavigationClick = onCloseClick,
             actions = {
-                IconButton(onClick = onNextClick, enabled = state.selectedPodcasts.isNotEmpty()) {
+                IconButton(
+                    onClick = { onNextClick(state.selectedPodcasts.size) },
+                    enabled = state.selectedPodcasts.isNotEmpty()
+                ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowForward,
                         contentDescription = stringResource(LR.string.next)

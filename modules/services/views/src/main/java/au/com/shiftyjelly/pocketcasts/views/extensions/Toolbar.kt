@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
@@ -23,7 +24,7 @@ fun Toolbar.updateColors(toolbarColors: ToolbarColors, navigationIcon: Navigatio
 fun Toolbar.setup(
     title: String? = null,
     @MenuRes menu: Int? = null,
-    setupChromeCast: Boolean = false,
+    chromeCastButton: ChromeCastButton = ChromeCastButton.None,
     navigationIcon: NavigationIcon = None,
     onNavigationClick: (() -> Unit)? = null,
     activity: Activity?,
@@ -37,8 +38,12 @@ fun Toolbar.setup(
         this.menu.clear()
         inflateMenu(menu)
     }
-    if (setupChromeCast) {
-        setupChromeCastButton(context)
+    when (chromeCastButton) {
+        ChromeCastButton.None -> {}
+        is ChromeCastButton.Shown ->
+            setupChromeCastButton(context) {
+                chromeCastButton.chromeCastAnalytics.trackChromeCastViewShown()
+            }
     }
     if (toolbarColors != null) {
         updateColors(toolbarColors = toolbarColors, navigationIcon = navigationIcon)
@@ -64,6 +69,6 @@ fun Toolbar.setup(
     }
 }
 
-fun Toolbar.setupChromeCastButton(context: Context?) {
-    menu.setupChromeCastButton(context)
+fun Toolbar.setupChromeCastButton(context: Context?, onClick: () -> Unit) {
+    menu.setupChromeCastButton(context, onClick)
 }

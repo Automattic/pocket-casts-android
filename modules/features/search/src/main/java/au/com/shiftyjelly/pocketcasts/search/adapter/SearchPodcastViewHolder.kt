@@ -30,6 +30,7 @@ class SearchPodcastViewHolder(
                 PodcastItem(
                     podcast = podcast,
                     subscribed = podcast.isSubscribed,
+                    showSubscribed = true,
                     onClick = { onPodcastClick(podcast) },
                     modifier = Modifier
                         .background(color = MaterialTheme.theme.colors.primaryUi01)

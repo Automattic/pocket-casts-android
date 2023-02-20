@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-10 13:54:03+0000
+Translation-Revision-Date: 2023-02-09 12:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="settings_media_actions_show_subtitle">Отображение пользовательских действий с медиафайлами в соответствующих уведомлениях в Android 13 и Android Auto.</string>
+    <string name="settings_media_actions_show_title">Показывать пользовательские действия с медиафайлами</string>
+    <string name="settings_media_actions_customise">Настроить действия с медиафайлами</string>
+    <string name="settings_media_actions_prioritize_subtitle">Будут отображаться основные действия.</string>
+    <string name="settings_media_actions_prioritize_title">Расставьте действия с медиафайлами в приоритетном порядке</string>
+    <string name="plus_take_your_podcasting_to_next_level">Получите доступ к эксклюзивным функциям и опциям настройки и выйдите на новый уровень прослушивания подкастов.</string>
     <string name="onboarding_recommendations_more">Другие %s</string>
     <string name="filter_id_or_title">ID или название фильтра</string>
     <string name="filter_title">Название фильтра</string>
@@ -57,9 +63,6 @@ Language: ru
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">срок действия</string>
     <string name="profile_cancel_confirm_sub_expiry">Ваша текущая подписка будет действовать до %1$s.</string>
     <string name="profile_cancel_confirm_subtitle">При этом ваш тарифный план изменится на бесплатный.</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">Ваши самые частые действия будут доступны в уведомлении Android 13 и в плеере Android Auto.</string>
-    <string name="settings_rearrange_media_actions">Изменить порядок действий с медиафайлами</string>
-    <string name="settings_prioritize_your_notification_actions">Изменить приоритет действий с уведомлениями</string>
     <string name="settings_other_media_actions">Другие действия с медиафайлами</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Настроить кнопки, отображаемые в уведомлениях о воспроизведении Android 13 и в Android Auto.</string>
     <string name="podcast_not_subscribed">Нет подписки</string>
@@ -99,8 +102,6 @@ Language: ru
     <string name="end_of_year_stories_failed">Не удаётся загрузить итоги года, проверьте подключение к Интернету</string>
     <string name="onboarding_plus_feature_themes_icons_text">Покажите себя во всей красе. Эксклюзивные темы и значки только для членов клуба Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Темы и значки</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Без рекламы у вас будет больше того, что вам нравится, и меньше того, что вам не нравится.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Скрыть рекламу</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Загрузите файлы в облачное хранилище и пользуйтесь ими, где бы вы ни находились.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Облачное хранилище 10 ГБ</string>
     <string name="onboarding_plus_feature_folders_text">Распределите подкасты по папкам и синхронизируйте их на всех устройствах.</string>
@@ -628,7 +629,7 @@ Language: ru
     <string name="settings_podcast_artwork">Тема подкаста</string>
     <string name="settings_playback_resumption_summary">Если опция включена, Pocket Casts вернется немного назад в возобновляемых выпусках, чтобы вам было удобнее наверстать упущенное.</string>
     <string name="settings_playback_resumption">Умное возобновление воспроизведения</string>
-    <string name="settings_notification_vibrate_never">Следующие выпуски</string>
+    <string name="settings_notification_vibrate_never">Никогда</string>
     <string name="settings_notification_vibrate_in_silent">Только без звука</string>
     <string name="settings_notification_vibrate_new_episodes">Следующие выпуски</string>
     <string name="settings_notification_vibrate">Вибрация при</string>

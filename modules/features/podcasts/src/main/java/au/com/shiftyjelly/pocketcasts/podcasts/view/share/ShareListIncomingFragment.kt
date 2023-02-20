@@ -8,6 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentShareIncomingBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -107,6 +108,10 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
         viewModel.subscribedUuids.observe(viewLifecycleOwner) { uuids ->
             adapter.subscribedUuids = uuids.toHashSet()
         }
+
+        if (!viewModel.isFragmentChangingConfigurations) {
+            viewModel.trackShareEvent(AnalyticsEvent.INCOMING_SHARE_LIST_SHOWN)
+        }
     }
 
     override fun onPodcastClick(podcast: Podcast) {
@@ -116,6 +121,10 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
 
     override fun onSubscribeClick(podcast: Podcast) {
         viewModel.subscribeToPodcast(podcast.uuid)
+        viewModel.trackShareEvent(
+            AnalyticsEvent.PODCAST_SUBSCRIBED,
+            AnalyticsProp.subscribeToggledMap(uuid = podcast.uuid)
+        )
     }
 
     override fun onUnsubscribeClick(podcast: Podcast) {
@@ -126,6 +135,10 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
                 titleId = LR.string.unsubscribe,
                 click = {
                     viewModel.unsubscribeFromPodcast(uuid)
+                    viewModel.trackShareEvent(
+                        AnalyticsEvent.PODCAST_UNSUBSCRIBED,
+                        AnalyticsProp.subscribeToggledMap(uuid = uuid)
+                    )
                 }
             )
         activity?.supportFragmentManager?.let {
@@ -134,9 +147,31 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
     }
 
     override fun onSubscribeToAllClick(podcasts: List<Podcast>) {
+        viewModel.trackShareEvent(
+            AnalyticsEvent.INCOMING_SHARE_LIST_SUBSCRIBED_ALL,
+            AnalyticsProp.countMap(podcasts.size)
+        )
         for (podcastHeader in podcasts) {
             val uuid = podcastHeader.uuid
             viewModel.subscribeToPodcast(uuid)
+            viewModel.trackShareEvent(
+                AnalyticsEvent.PODCAST_SUBSCRIBED,
+                AnalyticsProp.subscribeToggledMap(uuid = uuid)
+            )
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
+
+    private object AnalyticsProp {
+        private const val count = "count"
+        private const val source = "source"
+        private const val uuid = "uuid"
+        fun countMap(count: Int) = mapOf(this.count to count)
+        fun subscribeToggledMap(uuid: String) =
+            mapOf(this.source to "incoming_share_list", this.uuid to uuid)
     }
 }

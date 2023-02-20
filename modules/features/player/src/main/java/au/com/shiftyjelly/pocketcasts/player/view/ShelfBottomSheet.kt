@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShelfBottomShee
 import au.com.shiftyjelly.pocketcasts.player.view.ShelfFragment.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
+import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.views.extensions.applyColor
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class ShelfBottomSheet : BaseDialogFragment() {
     @Inject lateinit var castManager: CastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
 
     override val statusBarColor: StatusBarColor? = null
 
@@ -66,6 +68,9 @@ class ShelfBottomSheet : BaseDialogFragment() {
         }
 
         CastButtonFactory.setUpMediaRouteButton(view.context, binding.mediaRouteButton)
+        binding.mediaRouteButton.setOnClickListener {
+            chromeCastAnalytics.trackChromeCastViewShown()
+        }
     }
 
     private fun onClick(item: ShelfItem) {

@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 import android.content.res.Resources
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -38,20 +40,32 @@ class DiscoverViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
-    val userManager: UserManager
+    val userManager: UserManager,
+    val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val playbackSource = AnalyticsSource.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.getDiscoveryCountryCode()
     var replacements = emptyMap<String, String>()
+    private var isFragmentChangingConfigurations: Boolean = false
+
+    fun onShown() {
+        if (!isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOWN)
+        }
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
 
     fun loadData(resources: Resources) {
         val feed = repository.getDiscoverFeed()
 
-        feed.toFlowable().combineLatest(userManager.getSignInState())
+        feed.toFlowable()
             .subscribeBy(
-                onNext = { (it, subscriptionState) ->
+                onNext = {
                     val region = it.regions[currentRegionCode ?: it.defaultRegionCode] ?: it.regions[it.defaultRegionCode]
                     if (region == null) {
                         val message = "Could not get region $currentRegionCode"
@@ -68,8 +82,10 @@ class DiscoverViewModel @Inject constructor(
                         it.regionCodeToken to region.code,
                         it.regionNameToken to region.name
                     )
-                    val updatedList = it.layout.transformWithRegion(region, replacements, resources) // Update the list with the correct region substituted in where needed
-                        .filter { !subscriptionState.isSignedInAsPlusPaid || !it.sponsored } // Remove sponsored posts for paid users
+
+                    // Update the list with the correct region substituted in where needed
+                    val updatedList = it.layout.transformWithRegion(region, replacements, resources)
+
                     state.postValue(DiscoverState.DataLoaded(updatedList, region, it.regions.values.toList()))
                 },
                 onError = { throwable ->

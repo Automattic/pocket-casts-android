@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -31,6 +34,7 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
     }
 
     @Inject lateinit var castManager: CastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     var multiSelectHelper: MultiSelectHelper? = null
 
@@ -70,7 +74,12 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
         }
 
         binding.btnEdit.setOnClickListener {
-            (activity as FragmentHostListener).showModal(MultiSelectFragment())
+            val source = (multiSelectHelper?.source ?: AnalyticsSource.UNKNOWN)
+            analyticsTracker.track(
+                AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_REARRANGE_STARTED,
+                AnalyticsProp.sourceMap(source)
+            )
+            (activity as FragmentHostListener).showModal(MultiSelectFragment.newInstance(source))
             dismiss()
         }
     }
@@ -78,5 +87,12 @@ class MultiSelectBottomSheet : BaseDialogFragment() {
     private fun onClick(item: MultiSelectAction) {
         multiSelectHelper?.onMenuItemSelected(item.actionId, resources, childFragmentManager)
         dismiss()
+    }
+
+    private object AnalyticsProp {
+        private const val source = "source"
+
+        fun sourceMap(eventSource: AnalyticsSource) =
+            mapOf(source to eventSource.analyticsValue)
     }
 }

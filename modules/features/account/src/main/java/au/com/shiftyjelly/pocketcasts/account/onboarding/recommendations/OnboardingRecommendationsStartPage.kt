@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.Section
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingRecommendationsStartPageViewModel.SectionId
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
@@ -76,8 +78,11 @@ fun OnboardingRecommendationsStartPage(
     val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
-    LaunchedEffect(Unit) {
+    CallOnce {
         viewModel.onShown()
+    }
+
+    LaunchedEffect(Unit) {
         systemUiController.apply {
             setStatusBarColor(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), darkIcons = !theme.darkTheme)
             setNavigationBarColor(Color.Transparent, darkIcons = !theme.darkTheme)
@@ -184,11 +189,13 @@ private fun Content(
             }
         }
 
-        RowButton(
-            text = stringResource(buttonRes),
-            onClick = onComplete,
-        )
-        Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
+        Surface(elevation = 8.dp) {
+            RowButton(
+                text = stringResource(buttonRes),
+                onClick = onComplete,
+                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+            )
+        }
     }
 }
 

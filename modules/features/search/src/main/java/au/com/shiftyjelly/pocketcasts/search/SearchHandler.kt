@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -28,8 +31,10 @@ class SearchHandler @Inject constructor(
     val podcastManager: PodcastManager,
     val userManager: UserManager,
     val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     folderManager: FolderManager
 ) {
+    private var source: AnalyticsSource = AnalyticsSource.UNKNOWN
     private val searchQuery = BehaviorRelay.create<Query>().apply {
         accept(Query(""))
     }
@@ -111,6 +116,7 @@ class SearchHandler @Inject constructor(
             if (it.length <= 1) {
                 Observable.just(PodcastSearch())
             } else {
+                analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
                 loadingObservable.accept(true)
                 serverManager.searchForPodcastsRx(it).toObservable()
                     .onErrorReturn { exception ->
@@ -122,7 +128,7 @@ class SearchHandler @Inject constructor(
 
     private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localResults, serverSearchResults, loading ->
         if (searchTerm.string.isBlank()) {
-            SearchState.Results(list = emptyList(), loading = loading, error = null)
+            SearchState.Results(searchTerm = searchTerm.string, list = emptyList(), loading = loading, error = null)
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverResults = serverSearchResults.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -134,14 +140,25 @@ class SearchHandler @Inject constructor(
             val searchResults = (localResults + serverResults).distinctBy { it.uuid }
 
             if (serverSearchResults.searchTerm.isEmpty() || searchResults.isNotEmpty() || serverSearchResults.error != null) {
-                SearchState.Results(list = searchResults, loading = loading, error = serverSearchResults.error)
+                serverSearchResults.error?.let {
+                    analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
+                }
+                SearchState.Results(
+                    searchTerm = searchTerm.string,
+                    list = searchResults,
+                    loading = loading,
+                    error = serverSearchResults.error
+                )
             } else {
-                SearchState.NoResults
+                SearchState.NoResults(searchTerm = searchTerm.string)
             }
         }
     }
         .doOnError { Timber.e(it) }
-        .onErrorReturn { exception -> SearchState.Results(list = emptyList(), loading = false, error = exception) }
+        .onErrorReturn { exception ->
+            analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
+            SearchState.Results(searchTerm = searchQuery.value?.string ?: "", list = emptyList(), loading = false, error = exception)
+        }
         .observeOn(AndroidSchedulers.mainThread())
         .toFlowable(BackpressureStrategy.LATEST)
 
@@ -156,5 +173,14 @@ class SearchHandler @Inject constructor(
         onlySearchRemoteObservable.accept(remote)
     }
 
+    fun setSource(source: AnalyticsSource) {
+        this.source = source
+    }
+
     private data class Query(val string: String, val immediate: Boolean = false)
+
+    private object AnalyticsProp {
+        private const val SOURCE = "source"
+        fun sourceMap(source: AnalyticsSource) = mapOf(SOURCE to source.analyticsValue)
+    }
 }

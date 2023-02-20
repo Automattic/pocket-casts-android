@@ -10,6 +10,7 @@ import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -174,7 +175,11 @@ class VersionMigrationsJob : JobService() {
         val podcast: Podcast = podcastManager.findPodcastByUuid(customPodcastUuid) ?: return
         val episodes: List<Episode> = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
         episodes.forEach { episode ->
-            playbackManager.removeEpisode(episode)
+            playbackManager.removeEpisode(
+                episodeToRemove = episode,
+                source = AnalyticsSource.UNKNOWN,
+                userInitiated = false
+            )
             appDatabase.episodeDao().delete(episode)
         }
         appDatabase.podcastDao().deleteByUuid(customPodcastUuid)

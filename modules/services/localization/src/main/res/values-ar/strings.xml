@@ -400,7 +400,6 @@ Language: ar
     <string name="settings_podcast_artwork">العمل الفني للبث الصوتي</string>
     <string name="settings_playback_resumption_summary">إذا كان قيد التشغيل، فسيرجع Pocket Casts إلى الخلف قليلاً في الحلقات التي تستكملها بحيث تتمكن من الحصول على المزيد بشكل مريح.</string>
     <string name="settings_playback_resumption">استكمال التشغيل الذكي</string>
-    <string name="settings_notification_vibrate_never">حلقات جديدة</string>
     <string name="settings_notification_vibrate_in_silent">فقط في الوضع الصامت</string>
     <string name="settings_notification_vibrate_new_episodes">حلقات جديدة</string>
     <string name="settings_notification_vibrate">الاهتزاز عند</string>

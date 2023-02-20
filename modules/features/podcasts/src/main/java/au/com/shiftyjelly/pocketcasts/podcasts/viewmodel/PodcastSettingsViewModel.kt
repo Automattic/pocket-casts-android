@@ -3,6 +3,9 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -27,6 +30,7 @@ class PodcastSettingsViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val playlistManager: PlaylistManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     settings: Settings
 ) : ViewModel(), CoroutineScope {
 
@@ -64,13 +68,13 @@ class PodcastSettingsViewModel @Inject constructor(
 
     fun updateAutoAddToUpNext(isOn: Boolean) {
         val podcast = this.podcast.value ?: return
-        val value = if (isOn) Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_LAST else Podcast.AUTO_ADD_TO_UP_NEXT_OFF
+        val value = if (isOn) Podcast.AutoAddUpNext.PLAY_LAST else Podcast.AutoAddUpNext.OFF
         launch {
             podcastManager.updateAutoAddToUpNext(podcast, value)
         }
     }
 
-    fun updateAutoAddToUpNextOrder(value: Int) {
+    fun updateAutoAddToUpNextOrder(value: Podcast.AutoAddUpNext) {
         val podcast = this.podcast.value ?: return
         launch {
             podcastManager.updateAutoAddToUpNext(podcast, value)
@@ -111,6 +115,10 @@ class PodcastSettingsViewModel @Inject constructor(
         val podcast = this.podcast.value ?: return
         launch {
             podcastManager.unsubscribe(podcast.uuid, playbackManager)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_UNSUBSCRIBED,
+                AnalyticsProp.podcastUnsubscribed(AnalyticsSource.PODCAST_SETTINGS, podcast.uuid)
+            )
         }
     }
 
@@ -144,5 +152,12 @@ class PodcastSettingsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private object AnalyticsProp {
+        private const val SOURCE_KEY = "source"
+        private const val UUID_KEY = "uuid"
+        fun podcastUnsubscribed(source: AnalyticsSource, uuid: String) =
+            mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
     }
 }

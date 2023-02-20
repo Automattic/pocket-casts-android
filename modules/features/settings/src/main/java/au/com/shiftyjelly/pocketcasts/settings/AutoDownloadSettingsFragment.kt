@@ -9,6 +9,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
@@ -18,16 +19,19 @@ import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcastsSelected
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.PodcastSelectFragmentSource
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,8 +57,6 @@ private const val ARG_SHOW_TOOLBAR = "show_toolbar"
 @AndroidEntryPoint
 class AutoDownloadSettingsFragment :
     PreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener,
-    Preference.OnPreferenceClickListener,
     CoroutineScope,
     PodcastSelectFragment.Listener,
     FilterSelectFragment.Listener,
@@ -85,8 +87,9 @@ class AutoDownloadSettingsFragment :
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var playlistManager: PlaylistManager
     @Inject lateinit var settings: Settings
-    @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var theme: Theme
+
+    private val viewModel: AutoDownloadSettingsViewModel by viewModels()
 
     private var podcastsCategory: PreferenceCategory? = null
     private var upNextPreference: SwitchPreference? = null
@@ -113,52 +116,86 @@ class AutoDownloadSettingsFragment :
             listContainer.updateLayoutParams<FrameLayout.LayoutParams> { topMargin = 0 }
             childContainer.updateLayoutParams<FrameLayout.LayoutParams> { topMargin = 0 }
         }
+
+        viewModel.onShown()
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_auto_download, rootKey)
 
         podcastsCategory = preferenceManager.findPreference(PREFERENCE_PODCASTS_CATEGORY)
-        upNextPreference = preferenceManager.findPreference(PREFERENCE_UP_NEXT)
-        newEpisodesPreference = preferenceManager.findPreference(PREFERENCE_NEW_EPISODES)
-        podcastsPreference = preferenceManager.findPreference(PREFERENCE_CHOOSE_PODCASTS)
-        filtersPreference = preferenceManager.findPreference(PREFERENCE_CHOOSE_FILTERS)
+        upNextPreference = preferenceManager.findPreference<SwitchPreference>(PREFERENCE_UP_NEXT)
+            ?.apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    viewModel.onUpNextChange(newValue as Boolean)
+                    true
+                }
+            }
+        newEpisodesPreference = preferenceManager.findPreference<SwitchPreference>(PREFERENCE_NEW_EPISODES)
+            ?.apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    if (newValue is Boolean) {
+                        onChangeNewEpisodes(newValue)
+                        viewModel.onNewEpisodesChange(newValue)
+                    }
+                    true
+                }
+            }
+        podcastsPreference = preferenceManager.findPreference<Preference>(PREFERENCE_CHOOSE_PODCASTS)
+            ?.apply {
+                setOnPreferenceClickListener {
+                    openPodcastsActivity()
+                    true
+                }
+            }
+        filtersPreference = preferenceManager.findPreference<Preference>(PREFERENCE_CHOOSE_FILTERS)
+            ?.apply {
+                setOnPreferenceClickListener {
+                    openPlaylistActivity()
+                    true
+                }
+            }
 
         updateView()
 
-        newEpisodesPreference?.onPreferenceChangeListener = this
-        podcastsPreference?.onPreferenceClickListener = this
-        filtersPreference?.onPreferenceClickListener = this
+        preferenceManager.findPreference<Preference>(PREFERENCE_CANCEL_ALL)
+            ?.setOnPreferenceClickListener {
+                context?.let {
+                    Toast.makeText(it, LR.string.settings_auto_download_stopping_all, Toast.LENGTH_SHORT).show()
+                }
+                viewModel.stopAllDownloads()
+                true
+            }
+        preferenceManager.findPreference<Preference>(PREFERENCE_CLEAR_DOWNLOAD_ERRORS)
+            ?.setOnPreferenceClickListener {
+                context?.let {
+                    Toast.makeText(it, LR.string.settings_auto_download_clearing_errors, Toast.LENGTH_SHORT).show()
+                }
+                viewModel.clearDownloadErrors()
+                true
+            }
 
-        preferenceManager.findPreference<Preference>(PREFERENCE_CANCEL_ALL)?.setOnPreferenceClickListener {
-            downloadManager.stopAllDownloads()
-            context?.let {
-                Toast.makeText(it, LR.string.settings_auto_download_stopping_all, Toast.LENGTH_SHORT).show()
+        preferenceManager.findPreference<SwitchPreference>(PREFERENCE_PODCAST_AUTO_DOWNLOAD_ON_UNMETERED)
+            ?.setOnPreferenceChangeListener { _, newValue ->
+                (newValue as? Boolean)?.let {
+                    viewModel.onDownloadOnlyOnUnmeteredChange(it)
+                }
+                true
             }
-            true
-        }
-        preferenceManager.findPreference<Preference>(PREFERENCE_CLEAR_DOWNLOAD_ERRORS)?.setOnPreferenceClickListener {
-            lifecycleScope.launch(Dispatchers.Default) {
-                podcastManager.clearAllDownloadErrors()
+
+        preferenceManager.findPreference<SwitchPreference>(PREFERENCE_PODCAST_AUTO_DOWNLOAD_WHEN_CHARGING)
+            ?.setOnPreferenceChangeListener { _, newValue ->
+                (newValue as? Boolean)?.let {
+                    viewModel.onDownloadOnlyWhenChargingChange(it)
+                }
+                true
             }
-            context?.let {
-                Toast.makeText(it, LR.string.settings_auto_download_clearing_errors, Toast.LENGTH_SHORT).show()
-            }
-            true
-        }
     }
 
     override fun onResume() {
         super.onResume()
 
         updateView()
-    }
-
-    override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
-        when (preference.key) {
-            PREFERENCE_NEW_EPISODES -> if (newValue is Boolean) onChangeNewEpisodes(newValue)
-        }
-        return true
     }
 
     private fun onChangeNewEpisodes(on: Boolean) {
@@ -169,14 +206,6 @@ class AutoDownloadSettingsFragment :
             updateNewEpisodesSwitch(on)
             updatePodcastsSummary()
         }
-    }
-
-    override fun onPreferenceClick(preference: Preference): Boolean {
-        when (preference.key) {
-            PREFERENCE_CHOOSE_PODCASTS -> openPodcastsActivity()
-            PREFERENCE_CHOOSE_FILTERS -> openPlaylistActivity()
-        }
-        return true
     }
 
     private fun updateNewEpisodesSwitch(on: Boolean) {
@@ -190,7 +219,7 @@ class AutoDownloadSettingsFragment :
     }
 
     private fun openPodcastsActivity() {
-        val fragment = PodcastSelectFragment()
+        val fragment = PodcastSelectFragment.newInstance(source = PodcastSelectFragmentSource.DOWNLOADS)
         childFragmentManager.beginTransaction()
             .replace(UR.id.frameChildFragment, fragment)
             .addToBackStack("podcastSelect")
@@ -224,7 +253,7 @@ class AutoDownloadSettingsFragment :
     }
 
     private fun openPlaylistActivity() {
-        val fragment = FilterSelectFragment()
+        val fragment = FilterSelectFragment.newInstance(FilterSelectFragment.Source.AUTO_DOWNLOAD)
         childFragmentManager.beginTransaction()
             .replace(UR.id.frameChildFragment, fragment)
             .addToBackStack("filterSelect")
@@ -327,5 +356,10 @@ class AutoDownloadSettingsFragment :
 
     override fun getBackstackCount(): Int {
         return childFragmentManager.backStackEntryCount
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 }

@@ -43,6 +43,10 @@ class OnboardingPlusFeaturesViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, analyticsProps(flow, source))
     }
 
+    fun onNotNow(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED, analyticsProps(flow, source))
+    }
+
     fun onUpgradePressed(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
     }

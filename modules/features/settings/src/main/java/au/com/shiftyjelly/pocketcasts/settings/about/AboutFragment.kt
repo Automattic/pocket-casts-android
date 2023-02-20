@@ -51,7 +51,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -66,15 +69,22 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class AboutFragment : BaseFragment() {
 
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return ComposeView(requireContext()).apply {
             setContent {
+                CallOnce {
+                    analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHOWN)
+                }
+
                 AppThemeWithBackground(theme.activeTheme) {
                     AboutPage(onBackPressed = { closeFragment() })
                 }

@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.player.view.dialog
 import android.content.Context
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -23,6 +25,7 @@ class MiniPlayerDialog(
     private val episodeManager: EpisodeManager,
     private val fragmentManager: FragmentManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val episodeAnalytics: EpisodeAnalytics,
 ) {
     private var isOptionClicked = false
     fun show(context: Context) {
@@ -71,6 +74,7 @@ class MiniPlayerDialog(
     private fun markAsPlayed() {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
         episodeManager.markAsPlayedAsync(episode, playbackManager, podcastManager)
+        episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, AnalyticsSource.MINIPLAYER, episode.uuid)
     }
 
     companion object {

@@ -36,13 +36,13 @@ class ShiftyRenderersFactory(context: Context?, statsManager: StatsManager, priv
 
     override fun buildAudioSink(context: Context, enableFloatOutput: Boolean, enableAudioTrackPlaybackParams: Boolean, enableOffload: Boolean): AudioSink {
         processorChain = ShiftyAudioProcessorChain(customAudio)
-        return DefaultAudioSink(
-            AudioCapabilities.getCapabilities(context),
-            processorChain!!,
-            enableFloatOutput,
-            enableAudioTrackPlaybackParams,
-            if (enableOffload) DefaultAudioSink.OFFLOAD_MODE_ENABLED_GAPLESS_REQUIRED else DefaultAudioSink.OFFLOAD_MODE_DISABLED
-        )
+        return DefaultAudioSink.Builder()
+            .setAudioCapabilities(AudioCapabilities.getCapabilities(context))
+            .setAudioProcessorChain(processorChain!!)
+            .setEnableFloatOutput(enableFloatOutput)
+            .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
+            .setOffloadMode(if (enableOffload) DefaultAudioSink.OFFLOAD_MODE_ENABLED_GAPLESS_REQUIRED else DefaultAudioSink.OFFLOAD_MODE_DISABLED)
+            .build()
     }
 
     override fun buildAudioRenderers(
