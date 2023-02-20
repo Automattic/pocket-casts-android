@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -28,7 +29,7 @@ class SearchViewModel @Inject constructor(
             showSearchHistory = false
         }
         searchState
-    }
+    }.asFlow()
     val loading = searchHandler.loading
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {

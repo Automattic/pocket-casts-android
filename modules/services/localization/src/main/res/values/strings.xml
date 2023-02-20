@@ -201,6 +201,7 @@
     <string name="search_history_recent_searches">Recent searches</string>
     <string name="search_history_row_type_folder_subtitle">Folder \u2022 %s</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
+    <string name="search_show_all">Show all</string>
 
     <string name="time_short_hours">%dh</string>
     <string name="time_short_hours_minutes">%1$dh %2$dm</string>
