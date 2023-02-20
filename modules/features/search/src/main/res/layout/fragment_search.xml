@@ -71,45 +71,6 @@
                 android:visibility="gone"/>
 
             <LinearLayout
-                android:id="@+id/noResults"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:importantForAccessibility="no"
-                    android:paddingTop="32dp"
-                    android:paddingBottom="16dp"
-                    app:tint="?attr/primary_icon_01"
-                    app:srcCompat="@drawable/search" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingBottom="8dp"
-                    android:gravity="center"
-                    style="?attr/textH2"
-                    android:text="@string/search_no_podcasts_found" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:gravity="center"
-                    style="?attr/textBody2"
-                    android:textColor="?attr/primary_text_02"
-                    android:text="@string/search_no_podcasts_found_summary" />
-
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/searchFailed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

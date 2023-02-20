@@ -1,20 +1,32 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -25,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderRow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import java.util.UUID
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SearchResultsPage(
@@ -43,7 +56,7 @@ fun SearchResultsPage(
         )
     )
     when (state.value) {
-        is SearchState.NoResults -> Unit // TODO
+        is SearchState.NoResults -> NoResultsView()
         is SearchState.Results -> {
             val result = state.value as SearchState.Results
             if (result.error == null || !onlySearchRemote || result.loading) {
@@ -109,6 +122,36 @@ private fun SearchResultsView(
     }
 }
 
+@Composable
+private fun NoResultsView(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.search),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
+            modifier = modifier
+                .size(96.dp)
+                .padding(top = 32.dp, bottom = 16.dp)
+        )
+        TextH20(
+            text = stringResource(LR.string.search_no_podcasts_found),
+            modifier = modifier
+                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+        )
+        TextP50(
+            text = stringResource(LR.string.search_no_podcasts_found_summary),
+            modifier = modifier
+                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+            color = MaterialTheme.theme.colors.primaryText02
+        )
+    }
+}
+
 @Preview
 @Composable
 fun SearchResultsViewPreview(
@@ -143,5 +186,15 @@ fun SearchResultsViewPreview(
             onFolderClick = { _, _ -> },
             onScroll = {},
         )
+    }
+}
+
+@Preview
+@Composable
+fun NoResultsViewPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        NoResultsView()
     }
 }

@@ -238,16 +238,14 @@ class SearchFragment : BaseFragment() {
             }
         }
 
-        val noResultsView = binding.noResults
         val searchFailedView = binding.searchFailed
         val searchResults = binding.searchResults
         viewModel.searchResults.observe(viewLifecycleOwner) {
-            noResultsView.hide()
             searchFailedView.hide()
             searchResults.hide()
             when (it) {
                 is SearchState.NoResults -> {
-                    noResultsView.show()
+                    searchResults.show()
                 }
                 is SearchState.Results -> {
                     if (it.error == null || !onlySearchRemote || it.loading) {
