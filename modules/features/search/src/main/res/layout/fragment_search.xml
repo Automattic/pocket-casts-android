@@ -62,13 +62,12 @@
             android:background="?attr/primary_ui_01"
             android:orientation="vertical">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/searchResults"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
-                android:clipToPadding="false"
                 android:visibility="gone"/>
 
             <LinearLayout

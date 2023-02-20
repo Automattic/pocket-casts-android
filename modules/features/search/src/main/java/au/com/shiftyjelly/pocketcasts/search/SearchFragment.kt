@@ -12,15 +12,15 @@ import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.models.entity.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
-import au.com.shiftyjelly.pocketcasts.search.adapter.PodcastSearchAdapter
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAllConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
@@ -78,16 +78,6 @@ class SearchFragment : BaseFragment() {
         get() = arguments?.getBoolean(ARG_ONLY_SEARCH_REMOTE) ?: false
     val source: AnalyticsSource
         get() = AnalyticsSource.fromString(arguments?.getString(ARG_SOURCE))
-
-    private val onScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {}
-
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                UiUtil.hideKeyboard(recyclerView)
-            }
-        }
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -208,42 +198,6 @@ class SearchFragment : BaseFragment() {
                 return true
             }
         })
-
-        val searchAdapter = PodcastSearchAdapter(
-            theme = theme,
-            onPodcastClick = { podcast ->
-                viewModel.trackSearchResultTapped(
-                    source = source,
-                    uuid = podcast.uuid,
-                    type = if (onlySearchRemote || !podcast.isSubscribed) {
-                        SearchResultType.PODCAST_REMOTE_RESULT
-                    } else {
-                        SearchResultType.PODCAST_LOCAL_RESULT
-                    }
-                )
-                searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
-                listener?.onSearchPodcastClick(podcast.uuid)
-                UiUtil.hideKeyboard(searchView)
-            },
-            onFolderClick = { folder, podcasts ->
-                viewModel.trackSearchResultTapped(
-                    source = source,
-                    uuid = folder.uuid,
-                    type = SearchResultType.FOLDER,
-                )
-                searchHistoryViewModel.add(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
-                listener?.onSearchFolderClick(folder.uuid)
-                UiUtil.hideKeyboard(searchView)
-            }
-        )
-
-        val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        val recyclerView = binding.recyclerView
-        recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = searchAdapter
-        recyclerView.itemAnimator = null
-        recyclerView.addOnScrollListener(onScrollListener)
-
         binding.searchHistoryPanel.apply {
             ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             setContent {
@@ -257,7 +211,7 @@ class SearchFragment : BaseFragment() {
                                 onConfirm = { searchHistoryViewModel.clearAll() }
                             ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
                         },
-                        onScroll = { UiUtil.hideKeyboard(recyclerView) }
+                        onScroll = { UiUtil.hideKeyboard(searchView) }
                     )
                     if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
                         binding.searchHistoryPanel.show()
@@ -265,28 +219,71 @@ class SearchFragment : BaseFragment() {
                 }
             }
         }
+        binding.searchResults.apply {
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            setContent {
+                AppThemeWithBackground(theme.activeTheme) {
+                    SearchResultsPage(
+                        viewModel = viewModel,
+                        onPodcastClick = { podcast ->
+                            onPodcastClick(podcast)
+                        },
+                        onFolderClick = { folder, podcasts ->
+                            onFolderClick(folder, podcasts)
+                        },
+                        onScroll = { UiUtil.hideKeyboard(searchView) },
+                        onlySearchRemote = onlySearchRemote
+                    )
+                }
+            }
+        }
 
         val noResultsView = binding.noResults
         val searchFailedView = binding.searchFailed
+        val searchResults = binding.searchResults
         viewModel.searchResults.observe(viewLifecycleOwner) {
             noResultsView.hide()
             searchFailedView.hide()
-            recyclerView.hide()
+            searchResults.hide()
             when (it) {
                 is SearchState.NoResults -> {
-                    searchAdapter.submitList(emptyList())
                     noResultsView.show()
                 }
                 is SearchState.Results -> {
-                    searchAdapter.submitList(it.list)
                     if (it.error == null || !onlySearchRemote || it.loading) {
-                        recyclerView.show()
+                        searchResults.show()
                     } else {
                         searchFailedView.show()
                     }
                 }
             }
         }
+    }
+
+    private fun onPodcastClick(podcast: Podcast) {
+        viewModel.trackSearchResultTapped(
+            source = source,
+            uuid = podcast.uuid,
+            type = if (onlySearchRemote || !podcast.isSubscribed) {
+                SearchResultType.PODCAST_REMOTE_RESULT
+            } else {
+                SearchResultType.PODCAST_LOCAL_RESULT
+            }
+        )
+        searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
+        listener?.onSearchPodcastClick(podcast.uuid)
+        binding?.searchView?.let { UiUtil.hideKeyboard(it) }
+    }
+
+    private fun onFolderClick(folder: Folder, podcasts: List<Podcast>) {
+        viewModel.trackSearchResultTapped(
+            source = source,
+            uuid = folder.uuid,
+            type = SearchResultType.FOLDER,
+        )
+        searchHistoryViewModel.add(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
+        listener?.onSearchFolderClick(folder.uuid)
+        binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
 
     override fun onBackPressed(): Boolean {
