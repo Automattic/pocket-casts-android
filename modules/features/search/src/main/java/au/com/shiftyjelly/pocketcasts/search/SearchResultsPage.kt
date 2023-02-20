@@ -2,12 +2,14 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.asFlow
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
@@ -47,6 +50,7 @@ fun SearchResultsPage(
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onScroll: () -> Unit,
     onlySearchRemote: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val state = viewModel.searchNewResults.collectAsState(
         SearchState.Results(
@@ -56,19 +60,35 @@ fun SearchResultsPage(
             loading = false
         )
     )
-    when (state.value) {
-        is SearchState.NoResults -> NoResultsView()
-        is SearchState.Results -> {
-            val result = state.value as SearchState.Results
-            if (result.error == null || !onlySearchRemote || result.loading) {
-                SearchResultsView(
-                    state = state.value as SearchState.Results,
-                    onPodcastClick = onPodcastClick,
-                    onFolderClick = onFolderClick,
-                    onScroll = onScroll,
+    val loading = viewModel.loading.asFlow().collectAsState(false)
+    Column {
+        when (state.value) {
+            is SearchState.NoResults -> NoResultsView()
+            is SearchState.Results -> {
+                val result = state.value as SearchState.Results
+                if (result.error == null || !onlySearchRemote || result.loading) {
+                    SearchResultsView(
+                        state = state.value as SearchState.Results,
+                        onPodcastClick = onPodcastClick,
+                        onFolderClick = onFolderClick,
+                        onScroll = onScroll,
+                    )
+                } else {
+                    SearchFailedView()
+                }
+            }
+        }
+        if (loading.value) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth()
+            ) {
+                CircularProgressIndicator(
+                    modifier = modifier.size(24.dp),
+                    color = MaterialTheme.theme.colors.secondaryIcon01,
                 )
-            } else {
-                SearchFailedView()
             }
         }
     }

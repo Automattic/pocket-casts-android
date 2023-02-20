@@ -100,7 +100,6 @@ class SearchFragment : BaseFragment() {
         viewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setSource(source)
-        binding.viewModel = viewModel
         binding.floating = floating
 
         this.binding = binding
@@ -142,8 +141,6 @@ class SearchFragment : BaseFragment() {
             @Suppress("DEPRECATION")
             activity?.onBackPressed()
         }
-        binding.resultPanel.alpha = 0.0f
-        binding.resultPanel.animate().setDuration(500L).alpha(1.0f).start()
 
         binding.backButton.setOnClickListener {
             @Suppress("DEPRECATION")
