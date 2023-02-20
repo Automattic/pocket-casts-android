@@ -2,8 +2,10 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,6 +23,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Velocity
@@ -30,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -67,12 +71,18 @@ fun SearchResultsPage(
             is SearchState.Results -> {
                 val result = state.value as SearchState.Results
                 if (result.error == null || !onlySearchRemote || result.loading) {
-                    SearchResultsView(
-                        state = state.value as SearchState.Results,
-                        onPodcastClick = onPodcastClick,
-                        onFolderClick = onFolderClick,
-                        onScroll = onScroll,
-                    )
+                    if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
+                        if (result.list.isNotEmpty()) {
+                            SearchResultsView()
+                        }
+                    } else {
+                        OldSearchResultsView(
+                            state = state.value as SearchState.Results,
+                            onPodcastClick = onPodcastClick,
+                            onFolderClick = onFolderClick,
+                            onScroll = onScroll,
+                        )
+                    }
                 } else {
                     SearchFailedView()
                 }
@@ -95,7 +105,42 @@ fun SearchResultsPage(
 }
 
 @Composable
-private fun SearchResultsView(
+private fun SearchResultsView() {
+    Column {
+        SearchResultsHeaderView(title = stringResource(LR.string.podcasts))
+        SearchResultsHeaderView(title = stringResource(LR.string.episodes))
+    }
+}
+
+@Composable
+private fun SearchResultsHeaderView(
+    title: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, top = 8.dp, end = 4.dp,),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextH20(
+            text = title,
+            color = MaterialTheme.theme.colors.primaryText01,
+            modifier = modifier.weight(1f)
+        )
+        TextP60(
+            text = stringResource(LR.string.search_show_all).uppercase(),
+            color = MaterialTheme.theme.colors.support03,
+            fontWeight = FontWeight.W700,
+            modifier = modifier
+                .clickable { /* TODO */ }
+                .padding(12.dp)
+        )
+    }
+}
+
+@Composable
+private fun OldSearchResultsView(
     state: SearchState.Results,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
@@ -209,7 +254,17 @@ fun SearchResultsViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        SearchResultsView(
+        SearchResultsView()
+    }
+}
+
+@Preview
+@Composable
+fun OldSearchResultsViewPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        OldSearchResultsView(
             state = SearchState.Results(
                 list = listOf(
                     FolderItem.Folder(
