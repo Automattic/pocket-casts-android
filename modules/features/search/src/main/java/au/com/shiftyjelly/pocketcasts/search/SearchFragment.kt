@@ -237,25 +237,6 @@ class SearchFragment : BaseFragment() {
                 }
             }
         }
-
-        val searchFailedView = binding.searchFailed
-        val searchResults = binding.searchResults
-        viewModel.searchResults.observe(viewLifecycleOwner) {
-            searchFailedView.hide()
-            searchResults.hide()
-            when (it) {
-                is SearchState.NoResults -> {
-                    searchResults.show()
-                }
-                is SearchState.Results -> {
-                    if (it.error == null || !onlySearchRemote || it.loading) {
-                        searchResults.show()
-                    } else {
-                        searchFailedView.show()
-                    }
-                }
-            }
-        }
     }
 
     private fun onPodcastClick(podcast: Podcast) {

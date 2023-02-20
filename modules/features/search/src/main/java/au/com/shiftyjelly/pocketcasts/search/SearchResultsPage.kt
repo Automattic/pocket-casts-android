@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderRow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import java.util.UUID
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -67,7 +68,7 @@ fun SearchResultsPage(
                     onScroll = onScroll,
                 )
             } else {
-                // TODO
+                SearchFailedView()
             }
         }
     }
@@ -152,6 +153,36 @@ private fun NoResultsView(
     }
 }
 
+@Composable
+private fun SearchFailedView(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            painter = painterResource(id = IR.drawable.search_failed),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
+            modifier = modifier
+                .size(96.dp)
+                .padding(top = 32.dp, bottom = 16.dp)
+        )
+        TextH20(
+            text = stringResource(LR.string.error_search_failed),
+            modifier = modifier
+                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+        )
+        TextP50(
+            text = stringResource(LR.string.search_no_podcasts_found_summary),
+            modifier = modifier
+                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+            color = MaterialTheme.theme.colors.primaryText02
+        )
+    }
+}
+
 @Preview
 @Composable
 fun SearchResultsViewPreview(
@@ -196,5 +227,15 @@ fun NoResultsViewPreview(
 ) {
     AppThemeWithBackground(themeType) {
         NoResultsView()
+    }
+}
+
+@Preview
+@Composable
+fun SearchFailedViewPreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        SearchFailedView()
     }
 }
