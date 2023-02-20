@@ -29,10 +29,8 @@ class SearchViewModel @Inject constructor(
             showSearchHistory = false
         }
         searchState
-    }
+    }.asFlow()
     val loading = searchHandler.loading
-
-    val searchNewResults = searchResults.asFlow()
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
         searchHandler.updateSearchQuery(query, immediate)

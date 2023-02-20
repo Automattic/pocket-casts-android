@@ -58,7 +58,7 @@ fun SearchResultsPage(
     onlySearchRemote: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val state = viewModel.searchNewResults.collectAsState(
+    val state = viewModel.searchResults.collectAsState(
         SearchState.Results(
             searchTerm = "",
             list = emptyList(),
