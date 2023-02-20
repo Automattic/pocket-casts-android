@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -189,45 +191,36 @@ private fun OldSearchResultsView(
 }
 
 @Composable
-private fun NoResultsView(
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.search),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
-            modifier = modifier
-                .size(96.dp)
-                .padding(top = 32.dp, bottom = 16.dp)
-        )
-        TextH20(
-            text = stringResource(LR.string.search_no_podcasts_found),
-            modifier = modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-        )
-        TextP50(
-            text = stringResource(LR.string.search_no_podcasts_found_summary),
-            modifier = modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.theme.colors.primaryText02
-        )
-    }
+private fun NoResultsView() {
+    MessageView(
+        imageResId = R.drawable.search,
+        titleResId = LR.string.search_no_podcasts_found,
+        summaryResId = LR.string.search_no_podcasts_found_summary,
+    )
 }
 
 @Composable
-private fun SearchFailedView(
-    modifier: Modifier = Modifier,
+private fun SearchFailedView() {
+    MessageView(
+        imageResId = IR.drawable.search_failed,
+        titleResId = LR.string.error_search_failed,
+        summaryResId = LR.string.error_check_your_internet_connection,
+    )
+}
+
+@Composable
+private fun MessageView(
+    @DrawableRes imageResId: Int,
+    @StringRes titleResId: Int,
+    @StringRes summaryResId: Int,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = painterResource(id = IR.drawable.search_failed),
+            painter = painterResource(id = imageResId),
             contentDescription = null,
             colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
             modifier = modifier
@@ -235,12 +228,12 @@ private fun SearchFailedView(
                 .padding(top = 32.dp, bottom = 16.dp)
         )
         TextH20(
-            text = stringResource(LR.string.error_search_failed),
+            text = stringResource(titleResId),
             modifier = modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
         )
         TextP50(
-            text = stringResource(LR.string.search_no_podcasts_found_summary),
+            text = stringResource(summaryResId),
             modifier = modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
             color = MaterialTheme.theme.colors.primaryText02
