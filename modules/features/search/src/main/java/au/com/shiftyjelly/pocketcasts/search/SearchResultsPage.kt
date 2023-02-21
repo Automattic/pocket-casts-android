@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asFlow
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastItem
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
@@ -164,6 +165,11 @@ private fun SearchResultsView(
                     }
                 }
             }
+            HorizontalDivider(
+                startIndent = 16.dp,
+                modifier = modifier.padding(top = 20.dp, bottom = 4.dp)
+
+            )
         }
         item { SearchResultsHeaderView(title = stringResource(LR.string.episodes)) }
         state.episodes.forEach {
