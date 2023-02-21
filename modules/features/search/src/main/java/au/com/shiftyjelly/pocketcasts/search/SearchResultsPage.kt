@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.search.component.SearchEpisodeItem
+import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderItem
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderRow
 import au.com.shiftyjelly.pocketcasts.search.component.SearchPodcastItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -116,7 +117,6 @@ fun SearchResultsPage(
     }
 }
 
-@Suppress("UNUSED_PARAMETER")
 @Composable
 private fun SearchResultsView(
     state: SearchState.Results,
@@ -146,6 +146,11 @@ private fun SearchResultsView(
                 ) { folderItem ->
                     when (folderItem) {
                         is FolderItem.Folder -> {
+                            SearchFolderItem(
+                                folder = folderItem.folder,
+                                podcasts = folderItem.podcasts,
+                                onClick = { onFolderClick(folderItem.folder, folderItem.podcasts) }
+                            )
                         }
 
                         is FolderItem.Podcast -> {
