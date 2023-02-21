@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -17,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
-import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
@@ -26,19 +24,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val MAX_ITEM_COUNT = 20
-val dummyEpisodeItem = EpisodeItem(
-    uuid = "6946de68-7fa7-48b0-9066-a7d6e1be2c07",
-    title = "Society's Challenges",
-    duration = 4004.0,
-    publishedAt = "2022-10-28T03:00:00Z".parseIsoDate() ?: Date(),
-    podcastUuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
-    podcastTitle = "Material"
-)
 class SearchHandler @Inject constructor(
     val serverManager: ServerManager,
     val podcastManager: PodcastManager,

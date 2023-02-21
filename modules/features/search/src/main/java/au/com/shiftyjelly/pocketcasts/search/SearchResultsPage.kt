@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.search.component.SearchEpisodeItem
@@ -49,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderItem
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderRow
 import au.com.shiftyjelly.pocketcasts.search.component.SearchPodcastItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import java.util.Date
 import java.util.UUID
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -328,7 +330,16 @@ fun SearchResultsViewPreview(
                         podcast = Podcast(uuid = UUID.randomUUID().toString(), title = "Podcast", author = "Author")
                     )
                 ),
-                episodes = listOf(dummyEpisodeItem),
+                episodes = listOf(
+                    EpisodeItem(
+                        uuid = "6946de68-7fa7-48b0-9066-a7d6e1be2c07",
+                        title = "Society's Challenges",
+                        duration = 4004.0,
+                        publishedAt = "2022-10-28T03:00:00Z".parseIsoDate() ?: Date(),
+                        podcastUuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
+                        podcastTitle = "Material"
+                    )
+                ),
                 error = null,
                 loading = false,
                 searchTerm = ""
