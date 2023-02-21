@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -15,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
@@ -23,9 +25,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+val dummyEpisodeItem = EpisodeItem(
+    uuid = "6946de68-7fa7-48b0-9066-a7d6e1be2c07",
+    title = "Society's Challenges",
+    duration = 4004.0,
+    publishedAt = "2022-10-28T03:00:00Z".parseIsoDate() ?: Date(),
+    podcastUuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
+    podcastTitle = "Material"
+)
 class SearchHandler @Inject constructor(
     val serverManager: ServerManager,
     val podcastManager: PodcastManager,
@@ -128,7 +139,7 @@ class SearchHandler @Inject constructor(
 
     private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localResults, serverSearchResults, loading ->
         if (searchTerm.string.isBlank()) {
-            SearchState.Results(searchTerm = searchTerm.string, list = emptyList(), loading = loading, error = null)
+            SearchState.Results(searchTerm = searchTerm.string, list = emptyList(), episodeItems = emptyList(), loading = loading, error = null)
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverResults = serverSearchResults.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -146,6 +157,7 @@ class SearchHandler @Inject constructor(
                 SearchState.Results(
                     searchTerm = searchTerm.string,
                     list = searchResults,
+                    episodeItems = listOf(dummyEpisodeItem),
                     loading = loading,
                     error = serverSearchResults.error
                 )
@@ -157,7 +169,13 @@ class SearchHandler @Inject constructor(
         .doOnError { Timber.e(it) }
         .onErrorReturn { exception ->
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
-            SearchState.Results(searchTerm = searchQuery.value?.string ?: "", list = emptyList(), loading = false, error = exception)
+            SearchState.Results(
+                searchTerm = searchQuery.value?.string ?: "",
+                list = emptyList(),
+                episodeItems = emptyList(),
+                loading = false,
+                error = exception
+            )
         }
         .observeOn(AndroidSchedulers.mainThread())
         .toFlowable(BackpressureStrategy.LATEST)

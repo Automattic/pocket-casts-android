@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.search.component.SearchEpisodeItem
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderRow
 import au.com.shiftyjelly.pocketcasts.search.component.SearchPodcastItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -64,6 +66,7 @@ fun SearchResultsPage(
         SearchState.Results(
             searchTerm = "",
             list = emptyList(),
+            episodeItems = emptyList(),
             error = null,
             loading = false
         )
@@ -136,7 +139,7 @@ private fun SearchResultsView(
     ) {
         item { SearchResultsHeaderView(title = stringResource(LR.string.podcasts)) }
         item {
-            LazyRow {
+            LazyRow(contentPadding = PaddingValues(horizontal = 8.dp),) {
                 items(
                     items = state.list,
                     key = { it.adapterId }
@@ -156,6 +159,14 @@ private fun SearchResultsView(
             }
         }
         item { SearchResultsHeaderView(title = stringResource(LR.string.episodes)) }
+        state.episodeItems.forEach {
+            item {
+                SearchEpisodeItem(
+                    episode = it,
+                    onClick = {},
+                )
+            }
+        }
     }
 }
 
@@ -312,6 +323,7 @@ fun SearchResultsViewPreview(
                         podcast = Podcast(uuid = UUID.randomUUID().toString(), title = "Podcast", author = "Author")
                     )
                 ),
+                episodeItems = listOf(dummyEpisodeItem),
                 error = null,
                 loading = false,
                 searchTerm = ""
@@ -349,6 +361,7 @@ fun OldSearchResultsViewPreview(
                         podcast = Podcast(uuid = UUID.randomUUID().toString(), title = "Podcast", author = "Author")
                     )
                 ),
+                episodeItems = emptyList(),
                 error = null,
                 loading = false,
                 searchTerm = ""

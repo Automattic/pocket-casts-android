@@ -306,6 +306,26 @@ fun TextH70(
 }
 
 @Composable
+fun TextC50(
+    text: String,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE
+) {
+    Text(
+        text = text.uppercase(Locale.getDefault()),
+        color = MaterialTheme.theme.colors.primaryText02,
+        fontFamily = FontFamily.SansSerif,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold,
+        lineHeight = 19.sp,
+        letterSpacing = 0.6.sp,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+    )
+}
+
+@Composable
 fun TextC70(
     text: String,
     modifier: Modifier = Modifier,
