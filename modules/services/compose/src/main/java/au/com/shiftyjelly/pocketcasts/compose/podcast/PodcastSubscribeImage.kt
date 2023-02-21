@@ -21,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -35,20 +36,28 @@ fun PodcastSubscribeImage(
     podcastTitle: String,
     podcastSubscribed: Boolean,
     onSubscribeClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subscribeButtonSize: Dp = 20.dp,
+    shadowSize: Dp = 1.dp,
+    subscribeOnPodcastTap: Boolean = true,
 ) {
-    BoxWithConstraints(
-        modifier = modifier
-            .aspectRatio(1f)
+    val onClickLabel = if (podcastSubscribed) {
+        stringResource(LR.string.unsubscribe)
+    } else {
+        stringResource(LR.string.subscribe)
+    }
+    var rootModifier = modifier
+        .aspectRatio(1f)
+        .semantics(mergeDescendants = true) {}
+    if (subscribeOnPodcastTap) {
+        rootModifier = rootModifier
             .clickable(
-                onClickLabel = if (podcastSubscribed) {
-                    stringResource(LR.string.unsubscribe)
-                } else {
-                    stringResource(LR.string.subscribe)
-                },
+                onClickLabel = onClickLabel,
                 onClick = onSubscribeClick
             )
-            .semantics(mergeDescendants = true) {},
+    }
+    BoxWithConstraints(
+        modifier = rootModifier,
         contentAlignment = Alignment.Center
     ) {
         PodcastImage(
@@ -59,16 +68,27 @@ fun PodcastSubscribeImage(
         )
 
         val buttonBackgroundColor = Color.Black.copy(alpha = 0.4f)
+
+        val iconSize = subscribeButtonSize / 1.25f
+        var iconModifier = Modifier.size(iconSize)
+        if (!subscribeOnPodcastTap) {
+            iconModifier = iconModifier.clickable(
+                onClickLabel = onClickLabel,
+                onClick = onSubscribeClick
+            )
+        }
         Box(
             contentAlignment = Alignment.BottomEnd,
-            modifier = Modifier.fillMaxSize().padding(8.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
         ) {
             if (podcastSubscribed) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .shadow(2.dp, shape = CircleShape)
-                        .size(20.dp)
+                        .shadow(shadowSize, shape = CircleShape)
+                        .size(subscribeButtonSize)
                         .clip(CircleShape)
                         .background(buttonBackgroundColor)
                 ) {
@@ -76,15 +96,15 @@ fun PodcastSubscribeImage(
                         painter = painterResource(IR.drawable.ic_tick),
                         contentDescription = stringResource(LR.string.podcast_subscribed),
                         tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = iconModifier
                     )
                 }
             } else {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .shadow(1.dp, shape = CircleShape)
-                        .size(20.dp)
+                        .shadow(shadowSize, shape = CircleShape)
+                        .size(subscribeButtonSize)
                         .clip(CircleShape)
                         .background(buttonBackgroundColor)
                 ) {
@@ -92,7 +112,7 @@ fun PodcastSubscribeImage(
                         painter = painterResource(IR.drawable.ic_add_black_24dp),
                         contentDescription = stringResource(LR.string.podcast_not_subscribed),
                         tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                        modifier = iconModifier
                     )
                 }
             }

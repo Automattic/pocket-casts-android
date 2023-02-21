@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -43,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderRow
+import au.com.shiftyjelly.pocketcasts.search.component.SearchPodcastItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import java.util.UUID
@@ -75,7 +77,12 @@ fun SearchResultsPage(
                 if (result.error == null || !onlySearchRemote || result.loading) {
                     if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
                         if (result.list.isNotEmpty()) {
-                            SearchResultsView()
+                            SearchResultsView(
+                                state = state.value as SearchState.Results,
+                                onPodcastClick = onPodcastClick,
+                                onFolderClick = onFolderClick,
+                                onScroll = onScroll,
+                            )
                         }
                     } else {
                         OldSearchResultsView(
@@ -106,11 +113,49 @@ fun SearchResultsPage(
     }
 }
 
+@Suppress("UNUSED_PARAMETER")
 @Composable
-private fun SearchResultsView() {
-    Column {
-        SearchResultsHeaderView(title = stringResource(LR.string.podcasts))
-        SearchResultsHeaderView(title = stringResource(LR.string.episodes))
+private fun SearchResultsView(
+    state: SearchState.Results,
+    onPodcastClick: (Podcast) -> Unit,
+    onFolderClick: (Folder, List<Podcast>) -> Unit,
+    onScroll: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                onScroll()
+                return super.onPostFling(consumed, available)
+            }
+        }
+    }
+    LazyColumn(
+        modifier = modifier
+            .nestedScroll(nestedScrollConnection)
+    ) {
+        item { SearchResultsHeaderView(title = stringResource(LR.string.podcasts)) }
+        item {
+            LazyRow {
+                items(
+                    items = state.list,
+                    key = { it.adapterId }
+                ) { folderItem ->
+                    when (folderItem) {
+                        is FolderItem.Folder -> {
+                        }
+
+                        is FolderItem.Podcast -> {
+                            SearchPodcastItem(
+                                podcast = folderItem.podcast,
+                                onClick = { onPodcastClick(folderItem.podcast) },
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        item { SearchResultsHeaderView(title = stringResource(LR.string.episodes)) }
     }
 }
 
@@ -247,7 +292,34 @@ fun SearchResultsViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        SearchResultsView()
+        SearchResultsView(
+            state = SearchState.Results(
+                list = listOf(
+                    FolderItem.Folder(
+                        folder = Folder(
+                            uuid = UUID.randomUUID().toString(),
+                            name = "Folder",
+                            color = 0,
+                            addedDate = Date(),
+                            podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+                            deleted = false,
+                            syncModified = 0L,
+                            sortPosition = 0,
+                        ),
+                        podcasts = listOf(Podcast(uuid = UUID.randomUUID().toString()))
+                    ),
+                    FolderItem.Podcast(
+                        podcast = Podcast(uuid = UUID.randomUUID().toString(), title = "Podcast", author = "Author")
+                    )
+                ),
+                error = null,
+                loading = false,
+                searchTerm = ""
+            ),
+            onPodcastClick = {},
+            onFolderClick = { _, _ -> },
+            onScroll = {},
+        )
     }
 }
 
