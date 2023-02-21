@@ -60,7 +60,7 @@ class SearchHandler @Inject constructor(
     }
     private val signInStateObservable = userManager.getSignInState().startWith(SignInState.SignedOut()).toObservable()
 
-    private val localResults = Observable
+    private val localPodcastsResults = Observable
         .combineLatest(searchQuery, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->
             Pair(if (onlySearchRemoteObservable) "" else searchQuery.string, signInState)
         }
@@ -154,27 +154,28 @@ class SearchHandler @Inject constructor(
         }
         .doOnNext { loadingObservable.accept(false) }
 
-    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localResults, serverSearchResults, loading ->
+    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
         if (searchTerm.string.isBlank()) {
             SearchState.Results(searchTerm = searchTerm.string, podcasts = emptyList(), episodes = emptyList(), loading = loading, error = null)
         } else {
             // set if the podcast is subscribed so we can show a tick
-            val serverResults = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
-            serverResults.forEach {
+            val serverPodcastsResult = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
+            serverPodcastsResult.forEach {
                 if (subscribedPodcastUuids.contains(it.podcast.uuid)) {
                     it.podcast.isSubscribed = true
                 }
             }
-            val searchResults = (localResults + serverResults).distinctBy { it.uuid }
+            val searchPodcastsResult = (localPodcastsResult + serverPodcastsResult).distinctBy { it.uuid }
+            val searchEpisodesResult = serverSearchResults.episodeSearch.episodes
 
-            if (serverSearchResults.searchTerm.isEmpty() || searchResults.isNotEmpty() || serverSearchResults.error != null) {
+            if (serverSearchResults.searchTerm.isEmpty() || searchPodcastsResult.isNotEmpty() || serverSearchResults.error != null) {
                 serverSearchResults.error?.let {
                     analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
                 }
                 SearchState.Results(
                     searchTerm = searchTerm.string,
-                    podcasts = searchResults,
-                    episodes = serverSearchResults.episodeSearch.episodes,
+                    podcasts = searchPodcastsResult,
+                    episodes = searchEpisodesResult,
                     loading = loading,
                     error = serverSearchResults.error
                 )
