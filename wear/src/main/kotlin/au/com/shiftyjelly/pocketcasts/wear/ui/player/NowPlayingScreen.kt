@@ -47,7 +47,7 @@ fun PlayerScreenPodcastControlButtons(
         onPauseButtonClick = { playerUiController.pause() },
         playPauseButtonEnabled = playerUiState.playPauseEnabled,
         playing = playerUiState.playing,
-        percent = playerUiState.trackPosition?.percent ?: 0f,
+        trackPositionUiModel = playerUiState.trackPositionUiModel,
         onSeekBackButtonClick = { playerUiController.seekBack() },
         seekBackButtonEnabled = playerUiState.seekBackEnabled,
         onSeekForwardButtonClick = { playerUiController.seekForward() },
