@@ -15,7 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
+import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.BackpressureStrategy
@@ -42,6 +43,7 @@ class SearchHandler @Inject constructor(
     val podcastManager: PodcastManager,
     val userManager: UserManager,
     val settings: Settings,
+    private val cacheServerManager: PodcastCacheServerManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     folderManager: FolderManager
 ) {
@@ -125,13 +127,28 @@ class SearchHandler @Inject constructor(
         .map { it.string }
         .switchMap {
             if (it.length <= 1) {
-                Observable.just(PodcastSearch())
+                Observable.just(GlobalServerSearch())
             } else {
                 analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
                 loadingObservable.accept(true)
-                serverManager.searchForPodcastsRx(it).toObservable()
-                    .onErrorReturn { exception ->
-                        PodcastSearch(error = exception)
+                val podcastServerSearch = serverManager
+                    .searchForPodcastsRx(it)
+                    .subscribeOn(Schedulers.io())
+                    .toObservable()
+
+                val episodesServerSearch = cacheServerManager
+                    .searchEpisodes(it)
+                    .subscribeOn(Schedulers.io())
+                    .toObservable()
+
+                podcastServerSearch
+                    .zipWith(episodesServerSearch) { podcastsSearch, episodesSearch ->
+                        GlobalServerSearch(
+                            searchTerm = it,
+                            error = podcastsSearch.error,
+                            podcastSearch = podcastsSearch,
+                            episodeSearch = episodesSearch
+                        )
                     }
             }
         }
@@ -142,7 +159,7 @@ class SearchHandler @Inject constructor(
             SearchState.Results(searchTerm = searchTerm.string, list = emptyList(), episodeItems = emptyList(), loading = loading, error = null)
         } else {
             // set if the podcast is subscribed so we can show a tick
-            val serverResults = serverSearchResults.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
+            val serverResults = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
             serverResults.forEach {
                 if (subscribedPodcastUuids.contains(it.podcast.uuid)) {
                     it.podcast.isSubscribed = true
@@ -157,7 +174,7 @@ class SearchHandler @Inject constructor(
                 SearchState.Results(
                     searchTerm = searchTerm.string,
                     list = searchResults,
-                    episodeItems = listOf(dummyEpisodeItem),
+                    episodeItems = serverSearchResults.episodeSearch.episodes,
                     loading = loading,
                     error = serverSearchResults.error
                 )
