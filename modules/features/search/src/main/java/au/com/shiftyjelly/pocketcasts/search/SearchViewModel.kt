@@ -99,8 +99,8 @@ sealed class SearchState {
     data class NoResults(override val searchTerm: String) : SearchState()
     data class Results(
         override val searchTerm: String,
-        val list: List<FolderItem>,
-        val episodeItems: List<EpisodeItem>,
+        val podcasts: List<FolderItem>,
+        val episodes: List<EpisodeItem>,
         val loading: Boolean,
         val error: Throwable?,
     ) : SearchState()

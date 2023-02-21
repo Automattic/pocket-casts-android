@@ -66,8 +66,8 @@ fun SearchResultsPage(
     val state = viewModel.searchResults.collectAsState(
         SearchState.Results(
             searchTerm = "",
-            list = emptyList(),
-            episodeItems = emptyList(),
+            podcasts = emptyList(),
+            episodes = emptyList(),
             error = null,
             loading = false
         )
@@ -80,7 +80,7 @@ fun SearchResultsPage(
                 val result = state.value as SearchState.Results
                 if (result.error == null || !onlySearchRemote || result.loading) {
                     if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
-                        if (result.list.isNotEmpty()) {
+                        if (result.podcasts.isNotEmpty()) {
                             SearchResultsView(
                                 state = state.value as SearchState.Results,
                                 onPodcastClick = onPodcastClick,
@@ -141,7 +141,7 @@ private fun SearchResultsView(
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = 8.dp),) {
                 items(
-                    items = state.list,
+                    items = state.podcasts,
                     key = { it.adapterId }
                 ) { folderItem ->
                     when (folderItem) {
@@ -164,7 +164,7 @@ private fun SearchResultsView(
             }
         }
         item { SearchResultsHeaderView(title = stringResource(LR.string.episodes)) }
-        state.episodeItems.forEach {
+        state.episodes.forEach {
             item {
                 SearchEpisodeItem(
                     episode = it,
@@ -224,7 +224,7 @@ private fun OldSearchResultsView(
             .nestedScroll(nestedScrollConnection)
     ) {
         items(
-            items = state.list,
+            items = state.podcasts,
             key = { it.adapterId }
         ) { folderItem ->
             when (folderItem) {
@@ -310,7 +310,7 @@ fun SearchResultsViewPreview(
     AppThemeWithBackground(themeType) {
         SearchResultsView(
             state = SearchState.Results(
-                list = listOf(
+                podcasts = listOf(
                     FolderItem.Folder(
                         folder = Folder(
                             uuid = UUID.randomUUID().toString(),
@@ -328,7 +328,7 @@ fun SearchResultsViewPreview(
                         podcast = Podcast(uuid = UUID.randomUUID().toString(), title = "Podcast", author = "Author")
                     )
                 ),
-                episodeItems = listOf(dummyEpisodeItem),
+                episodes = listOf(dummyEpisodeItem),
                 error = null,
                 loading = false,
                 searchTerm = ""
@@ -348,7 +348,7 @@ fun OldSearchResultsViewPreview(
     AppThemeWithBackground(themeType) {
         OldSearchResultsView(
             state = SearchState.Results(
-                list = listOf(
+                podcasts = listOf(
                     FolderItem.Folder(
                         folder = Folder(
                             uuid = UUID.randomUUID().toString(),
@@ -366,7 +366,7 @@ fun OldSearchResultsViewPreview(
                         podcast = Podcast(uuid = UUID.randomUUID().toString(), title = "Podcast", author = "Author")
                     )
                 ),
-                episodeItems = emptyList(),
+                episodes = emptyList(),
                 error = null,
                 loading = false,
                 searchTerm = ""

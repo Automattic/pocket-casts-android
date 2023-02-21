@@ -156,7 +156,7 @@ class SearchHandler @Inject constructor(
 
     private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localResults, serverSearchResults, loading ->
         if (searchTerm.string.isBlank()) {
-            SearchState.Results(searchTerm = searchTerm.string, list = emptyList(), episodeItems = emptyList(), loading = loading, error = null)
+            SearchState.Results(searchTerm = searchTerm.string, podcasts = emptyList(), episodes = emptyList(), loading = loading, error = null)
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverResults = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -173,8 +173,8 @@ class SearchHandler @Inject constructor(
                 }
                 SearchState.Results(
                     searchTerm = searchTerm.string,
-                    list = searchResults,
-                    episodeItems = serverSearchResults.episodeSearch.episodes,
+                    podcasts = searchResults,
+                    episodes = serverSearchResults.episodeSearch.episodes,
                     loading = loading,
                     error = serverSearchResults.error
                 )
@@ -188,8 +188,8 @@ class SearchHandler @Inject constructor(
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
             SearchState.Results(
                 searchTerm = searchQuery.value?.string ?: "",
-                list = emptyList(),
-                episodeItems = emptyList(),
+                podcasts = emptyList(),
+                episodes = emptyList(),
                 loading = false,
                 error = exception
             )
