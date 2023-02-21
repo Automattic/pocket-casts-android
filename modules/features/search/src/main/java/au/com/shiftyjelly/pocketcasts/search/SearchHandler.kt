@@ -30,6 +30,7 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+private const val MAX_ITEM_COUNT = 20
 val dummyEpisodeItem = EpisodeItem(
     uuid = "6946de68-7fa7-48b0-9066-a7d6e1be2c07",
     title = "Society's Challenges",
@@ -174,8 +175,20 @@ class SearchHandler @Inject constructor(
                 }
                 SearchState.Results(
                     searchTerm = searchTerm.string,
-                    podcasts = searchPodcastsResult,
-                    episodes = searchEpisodesResult,
+                    podcasts = searchPodcastsResult.take(
+                        if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
+                            minOf(MAX_ITEM_COUNT, searchPodcastsResult.size)
+                        } else {
+                            searchPodcastsResult.size
+                        }
+                    ),
+                    episodes = searchEpisodesResult.take(
+                        if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
+                            minOf(MAX_ITEM_COUNT, searchEpisodesResult.size)
+                        } else {
+                            searchEpisodesResult.size
+                        }
+                    ),
                     loading = loading,
                     error = serverSearchResults.error
                 )
