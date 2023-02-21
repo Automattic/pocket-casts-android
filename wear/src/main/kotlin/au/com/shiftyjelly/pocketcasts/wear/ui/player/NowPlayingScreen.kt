@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Scaffold
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.AnimatedPlayerScreenMediaDisplay
+import com.google.android.horologist.audio.ui.ExperimentalHorologistAudioUiApi
 import com.google.android.horologist.media.ui.components.PodcastControlButtons
 import com.google.android.horologist.media.ui.screens.player.PlayerScreen
 import com.google.android.horologist.media.ui.state.PlayerUiController
@@ -20,19 +21,22 @@ object NowPlayingScreen {
 @Composable
 fun NowPlayingScreen(
     modifier: Modifier = Modifier,
-    viewModel: NowPlayingViewModel = hiltViewModel(),
+    playerViewModel: NowPlayingViewModel = hiltViewModel(),
+    volumeViewModel: PCVolumeViewModel = hiltViewModel(),
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
     ) {
+        @OptIn(ExperimentalHorologistAudioUiApi::class)
         PlayerScreen(
-            playerViewModel = viewModel,
+            playerViewModel = playerViewModel,
+            volumeViewModel = volumeViewModel,
             mediaDisplay = { playerUiState ->
                 AnimatedPlayerScreenMediaDisplay(playerUiState)
             },
             controlButtons = { playerUiController, playerUiState ->
                 PlayerScreenPodcastControlButtons(playerUiController, playerUiState)
-            }
+            },
         )
     }
 }
