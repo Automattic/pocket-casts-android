@@ -27,7 +27,7 @@ private val IconSize = 56.dp
 @Composable
 fun SearchEpisodeItem(
     episode: EpisodeItem,
-    onClick: (() -> Unit)?,
+    onClick: (EpisodeItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -38,7 +38,7 @@ fun SearchEpisodeItem(
             verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
-                .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
+                .clickable { onClick(episode) }
                 .padding(16.dp)
         ) {
             PodcastImage(

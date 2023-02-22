@@ -61,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun SearchResultsPage(
     viewModel: SearchViewModel,
+    onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onScroll: () -> Unit,
@@ -78,6 +79,7 @@ fun SearchResultsPage(
                     if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
                         SearchResultsView(
                             state = state as SearchState.Results,
+                            onEpisodeClick = onEpisodeClick,
                             onPodcastClick = onPodcastClick,
                             onFolderClick = onFolderClick,
                             onSubscribeToPodcast = { viewModel.onSubscribeToPodcast(it) },
@@ -115,6 +117,7 @@ fun SearchResultsPage(
 @Composable
 private fun SearchResultsView(
     state: SearchState.Results,
+    onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onSubscribeToPodcast: (Podcast) -> Unit,
@@ -177,7 +180,7 @@ private fun SearchResultsView(
         ) {
             SearchEpisodeItem(
                 episode = it,
-                onClick = {},
+                onClick = onEpisodeClick,
             )
         }
     }
@@ -354,6 +357,7 @@ fun SearchResultsViewPreview(
                 loading = false,
                 searchTerm = ""
             ),
+            onEpisodeClick = {},
             onPodcastClick = {},
             onFolderClick = { _, _ -> },
             onSubscribeToPodcast = {},

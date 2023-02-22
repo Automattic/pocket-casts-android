@@ -10,6 +10,7 @@ enum class EpisodeViewSource(val value: String) {
     UP_NEXT("up_next"),
     SHARE("share"),
     NOTIFICATION("notification"),
+    SEARCH("search"),
     UNKNOWN("unknown");
 
     companion object {
