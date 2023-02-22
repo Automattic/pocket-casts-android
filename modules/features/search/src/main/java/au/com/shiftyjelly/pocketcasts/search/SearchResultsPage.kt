@@ -83,14 +83,12 @@ fun SearchResultsPage(
                 val result = state.value as SearchState.Results
                 if (result.error == null || !onlySearchRemote || result.loading) {
                     if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
-                        if (result.podcasts.isNotEmpty()) {
-                            SearchResultsView(
-                                state = state.value as SearchState.Results,
-                                onPodcastClick = onPodcastClick,
-                                onFolderClick = onFolderClick,
-                                onScroll = onScroll,
-                            )
-                        }
+                        SearchResultsView(
+                            state = state.value as SearchState.Results,
+                            onPodcastClick = onPodcastClick,
+                            onFolderClick = onFolderClick,
+                            onScroll = onScroll,
+                        )
                     } else {
                         OldSearchResultsView(
                             state = state.value as SearchState.Results,
@@ -140,7 +138,9 @@ private fun SearchResultsView(
         modifier = modifier
             .nestedScroll(nestedScrollConnection)
     ) {
-        item { SearchResultsHeaderView(title = stringResource(LR.string.podcasts)) }
+        if (state.podcasts.isNotEmpty()) {
+            item { SearchResultsHeaderView(title = stringResource(LR.string.podcasts)) }
+        }
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = 8.dp)) {
                 items(
@@ -165,13 +165,16 @@ private fun SearchResultsView(
                     }
                 }
             }
-            HorizontalDivider(
-                startIndent = 16.dp,
-                modifier = modifier.padding(top = 20.dp, bottom = 4.dp)
-
-            )
         }
-        item { SearchResultsHeaderView(title = stringResource(LR.string.episodes)) }
+        if (state.episodes.isNotEmpty()) {
+            item {
+                HorizontalDivider(
+                    startIndent = 16.dp,
+                    modifier = modifier.padding(top = 20.dp, bottom = 4.dp)
+                )
+                SearchResultsHeaderView(title = stringResource(LR.string.episodes))
+            }
+        }
         items(
             items = state.episodes,
             key = { it.uuid }
