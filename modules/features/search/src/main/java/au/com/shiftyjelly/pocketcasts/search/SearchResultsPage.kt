@@ -142,7 +142,7 @@ private fun SearchResultsView(
     ) {
         item { SearchResultsHeaderView(title = stringResource(LR.string.podcasts)) }
         item {
-            LazyRow(contentPadding = PaddingValues(horizontal = 8.dp),) {
+            LazyRow(contentPadding = PaddingValues(horizontal = 8.dp)) {
                 items(
                     items = state.podcasts,
                     key = { it.adapterId }
@@ -172,13 +172,14 @@ private fun SearchResultsView(
             )
         }
         item { SearchResultsHeaderView(title = stringResource(LR.string.episodes)) }
-        state.episodes.forEach {
-            item {
-                SearchEpisodeItem(
-                    episode = it,
-                    onClick = {},
-                )
-            }
+        items(
+            items = state.episodes,
+            key = { it.uuid }
+        ) {
+            SearchEpisodeItem(
+                episode = it,
+                onClick = {},
+            )
         }
     }
 }
@@ -191,7 +192,7 @@ private fun SearchResultsHeaderView(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, top = 8.dp, end = 4.dp,),
+            .padding(start = 16.dp, top = 8.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextH20(
@@ -282,7 +283,7 @@ private fun MessageView(
     @DrawableRes imageResId: Int,
     @StringRes titleResId: Int,
     @StringRes summaryResId: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -333,7 +334,11 @@ fun SearchResultsViewPreview(
                         podcasts = listOf(Podcast(uuid = UUID.randomUUID().toString()))
                     ),
                     FolderItem.Podcast(
-                        podcast = Podcast(uuid = UUID.randomUUID().toString(), title = "Podcast", author = "Author")
+                        podcast = Podcast(
+                            uuid = UUID.randomUUID().toString(),
+                            title = "Podcast",
+                            author = "Author"
+                        )
                     )
                 ),
                 episodes = listOf(
@@ -380,7 +385,11 @@ fun OldSearchResultsViewPreview(
                         podcasts = listOf(Podcast(uuid = UUID.randomUUID().toString()))
                     ),
                     FolderItem.Podcast(
-                        podcast = Podcast(uuid = UUID.randomUUID().toString(), title = "Podcast", author = "Author")
+                        podcast = Podcast(
+                            uuid = UUID.randomUUID().toString(),
+                            title = "Podcast",
+                            author = "Author"
+                        )
                     )
                 ),
                 episodes = emptyList(),
