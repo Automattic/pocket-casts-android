@@ -23,6 +23,7 @@ private val PodcastItemIconSize = 156.dp
 fun SearchPodcastItem(
     podcast: Podcast,
     onClick: (() -> Unit)?,
+    onSubscribeClick: (Podcast) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -36,7 +37,7 @@ fun SearchPodcastItem(
             podcastUuid = podcast.uuid,
             podcastTitle = "",
             podcastSubscribed = podcast.isSubscribed,
-            onSubscribeClick = { /*TODO*/ },
+            onSubscribeClick = { onSubscribeClick(podcast) },
             subscribeButtonSize = 32.dp,
             shadowSize = 0.dp,
             subscribeOnPodcastTap = false

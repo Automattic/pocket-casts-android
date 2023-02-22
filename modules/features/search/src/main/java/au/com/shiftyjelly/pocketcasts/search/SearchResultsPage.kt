@@ -19,6 +19,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,32 +67,25 @@ fun SearchResultsPage(
     onlySearchRemote: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val state = viewModel.searchResults.collectAsState(
-        SearchState.Results(
-            searchTerm = "",
-            podcasts = emptyList(),
-            episodes = emptyList(),
-            error = null,
-            loading = false
-        )
-    )
+    val state by viewModel.state.collectAsState()
     val loading = viewModel.loading.asFlow().collectAsState(false)
     Column {
-        when (state.value) {
+        when (state) {
             is SearchState.NoResults -> NoResultsView()
             is SearchState.Results -> {
-                val result = state.value as SearchState.Results
+                val result = state as SearchState.Results
                 if (result.error == null || !onlySearchRemote || result.loading) {
                     if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
                         SearchResultsView(
-                            state = state.value as SearchState.Results,
+                            state = state as SearchState.Results,
                             onPodcastClick = onPodcastClick,
                             onFolderClick = onFolderClick,
+                            onSubscribeToPodcast = { viewModel.onSubscribeToPodcast(it) },
                             onScroll = onScroll,
                         )
                     } else {
                         OldSearchResultsView(
-                            state = state.value as SearchState.Results,
+                            state = state as SearchState.Results,
                             onPodcastClick = onPodcastClick,
                             onFolderClick = onFolderClick,
                             onScroll = onScroll,
@@ -123,6 +117,7 @@ private fun SearchResultsView(
     state: SearchState.Results,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
+    onSubscribeToPodcast: (Podcast) -> Unit,
     onScroll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -160,6 +155,7 @@ private fun SearchResultsView(
                             SearchPodcastItem(
                                 podcast = folderItem.podcast,
                                 onClick = { onPodcastClick(folderItem.podcast) },
+                                onSubscribeClick = onSubscribeToPodcast
                             )
                         }
                     }
@@ -360,6 +356,7 @@ fun SearchResultsViewPreview(
             ),
             onPodcastClick = {},
             onFolderClick = { _, _ -> },
+            onSubscribeToPodcast = {},
             onScroll = {},
         )
     }
