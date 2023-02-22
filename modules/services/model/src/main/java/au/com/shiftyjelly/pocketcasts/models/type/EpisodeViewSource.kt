@@ -11,6 +11,7 @@ enum class EpisodeViewSource(val value: String) {
     SHARE("share"),
     NOTIFICATION("notification"),
     SEARCH("search"),
+    SEARCH_HISTORY("search_history"),
     UNKNOWN("unknown");
 
     companion object {

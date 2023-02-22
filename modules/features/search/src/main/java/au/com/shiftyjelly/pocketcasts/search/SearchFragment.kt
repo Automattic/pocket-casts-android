@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
@@ -49,7 +48,7 @@ class SearchFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     interface Listener {
-        fun onSearchEpisodeClick(episode: Episode, source: EpisodeViewSource)
+        fun onSearchEpisodeClick(episodeUuid: String, podcastUuid: String, source: EpisodeViewSource)
         fun onSearchPodcastClick(podcastUuid: String)
         fun onSearchFolderClick(folderUuid: String)
     }
@@ -122,7 +121,11 @@ class SearchFragment : BaseFragment() {
     private fun navigateFromSearchHistoryEntry(entry: SearchHistoryEntry) {
         searchHistoryViewModel.trackEventForEntry(AnalyticsEvent.SEARCH_HISTORY_ITEM_TAPPED, entry)
         when (entry) {
-            is SearchHistoryEntry.Episode -> Unit // TODO
+            is SearchHistoryEntry.Episode -> listener?.onSearchEpisodeClick(
+                episodeUuid = entry.uuid,
+                podcastUuid = entry.podcastUuid,
+                source = EpisodeViewSource.SEARCH_HISTORY
+            )
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
             is SearchHistoryEntry.SearchTerm -> {
@@ -244,7 +247,11 @@ class SearchFragment : BaseFragment() {
     private fun onEpisodeClick(episodeItem: EpisodeItem) {
         val episode = episodeItem.toEpisode()
         searchHistoryViewModel.add(SearchHistoryEntry.fromEpisode(episode, episodeItem.podcastTitle))
-        listener?.onSearchEpisodeClick(episode, EpisodeViewSource.SEARCH)
+        listener?.onSearchEpisodeClick(
+            episodeUuid = episode.uuid,
+            podcastUuid = episode.podcastUuid,
+            source = EpisodeViewSource.SEARCH
+        )
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
 

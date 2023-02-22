@@ -963,11 +963,15 @@ class MainActivity :
         return true
     }
 
-    override fun onSearchEpisodeClick(episode: Episode, source: EpisodeViewSource) {
+    override fun onSearchEpisodeClick(
+        episodeUuid: String,
+        podcastUuid: String,
+        source: EpisodeViewSource
+    ) {
         openEpisodeDialog(
-            episodeUuid = episode.uuid,
+            episodeUuid = episodeUuid,
             source = source,
-            podcastUuid = episode.podcastUuid,
+            podcastUuid = podcastUuid,
             forceDark = false
         )
     }
