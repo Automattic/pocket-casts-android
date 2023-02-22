@@ -316,7 +316,7 @@ fun TextC50(
         color = MaterialTheme.theme.colors.primaryText02,
         fontFamily = FontFamily.SansSerif,
         fontSize = 13.sp,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.W700,
         lineHeight = 19.sp,
         letterSpacing = 0.6.sp,
         maxLines = maxLines,
@@ -373,6 +373,7 @@ private fun TextStylesPreview() {
         TextP50("P50")
         TextP60("P60")
         TextH70("H70")
+        TextC50("C50")
         TextC70("C70")
     }
 }
