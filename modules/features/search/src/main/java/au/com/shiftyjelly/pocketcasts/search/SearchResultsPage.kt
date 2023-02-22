@@ -19,6 +19,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,40 +61,33 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun SearchResultsPage(
     viewModel: SearchViewModel,
+    onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onScroll: () -> Unit,
     onlySearchRemote: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val state = viewModel.searchResults.collectAsState(
-        SearchState.Results(
-            searchTerm = "",
-            podcasts = emptyList(),
-            episodes = emptyList(),
-            error = null,
-            loading = false
-        )
-    )
+    val state by viewModel.state.collectAsState()
     val loading = viewModel.loading.asFlow().collectAsState(false)
     Column {
-        when (state.value) {
+        when (state) {
             is SearchState.NoResults -> NoResultsView()
             is SearchState.Results -> {
-                val result = state.value as SearchState.Results
+                val result = state as SearchState.Results
                 if (result.error == null || !onlySearchRemote || result.loading) {
                     if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
-                        if (result.podcasts.isNotEmpty()) {
-                            SearchResultsView(
-                                state = state.value as SearchState.Results,
-                                onPodcastClick = onPodcastClick,
-                                onFolderClick = onFolderClick,
-                                onScroll = onScroll,
-                            )
-                        }
+                        SearchResultsView(
+                            state = state as SearchState.Results,
+                            onEpisodeClick = onEpisodeClick,
+                            onPodcastClick = onPodcastClick,
+                            onFolderClick = onFolderClick,
+                            onSubscribeToPodcast = { viewModel.onSubscribeToPodcast(it) },
+                            onScroll = onScroll,
+                        )
                     } else {
                         OldSearchResultsView(
-                            state = state.value as SearchState.Results,
+                            state = state as SearchState.Results,
                             onPodcastClick = onPodcastClick,
                             onFolderClick = onFolderClick,
                             onScroll = onScroll,
@@ -123,8 +117,10 @@ fun SearchResultsPage(
 @Composable
 private fun SearchResultsView(
     state: SearchState.Results,
+    onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
+    onSubscribeToPodcast: (Podcast) -> Unit,
     onScroll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -140,7 +136,9 @@ private fun SearchResultsView(
         modifier = modifier
             .nestedScroll(nestedScrollConnection)
     ) {
-        item { SearchResultsHeaderView(title = stringResource(LR.string.podcasts)) }
+        if (state.podcasts.isNotEmpty()) {
+            item { SearchResultsHeaderView(title = stringResource(LR.string.podcasts)) }
+        }
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = 8.dp)) {
                 items(
@@ -160,25 +158,29 @@ private fun SearchResultsView(
                             SearchPodcastItem(
                                 podcast = folderItem.podcast,
                                 onClick = { onPodcastClick(folderItem.podcast) },
+                                onSubscribeClick = onSubscribeToPodcast
                             )
                         }
                     }
                 }
             }
-            HorizontalDivider(
-                startIndent = 16.dp,
-                modifier = modifier.padding(top = 20.dp, bottom = 4.dp)
-
-            )
         }
-        item { SearchResultsHeaderView(title = stringResource(LR.string.episodes)) }
+        if (state.episodes.isNotEmpty()) {
+            item {
+                HorizontalDivider(
+                    startIndent = 16.dp,
+                    modifier = modifier.padding(top = 20.dp, bottom = 4.dp)
+                )
+                SearchResultsHeaderView(title = stringResource(LR.string.episodes))
+            }
+        }
         items(
             items = state.episodes,
             key = { it.uuid }
         ) {
             SearchEpisodeItem(
                 episode = it,
-                onClick = {},
+                onClick = onEpisodeClick,
             )
         }
     }
@@ -355,8 +357,10 @@ fun SearchResultsViewPreview(
                 loading = false,
                 searchTerm = ""
             ),
+            onEpisodeClick = {},
             onPodcastClick = {},
             onFolderClick = { _, _ -> },
+            onSubscribeToPodcast = {},
             onScroll = {},
         )
     }

@@ -199,6 +199,7 @@
     <string name="search_history_clear_all_confirm_button_title">Clear Search History</string>
     <string name="search_history_clear_all_confirmation_message">Are you sure you want to clear all your search history?</string>
     <string name="search_history_recent_searches">Recent searches</string>
+    <string name="search_history_row_type_episode_subtitle">Episode \u2022 %s \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">Folder \u2022 %s</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
     <string name="search_show_all">Show all</string>
