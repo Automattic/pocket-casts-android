@@ -245,6 +245,11 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun onEpisodeClick(episodeItem: EpisodeItem) {
+        viewModel.trackSearchResultTapped(
+            source = source,
+            uuid = episodeItem.uuid,
+            type = SearchResultType.EPISODE,
+        )
         val episode = episodeItem.toEpisode()
         searchHistoryViewModel.add(SearchHistoryEntry.fromEpisode(episode, episodeItem.podcastTitle))
         listener?.onSearchEpisodeClick(

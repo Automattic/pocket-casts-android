@@ -41,6 +41,7 @@ class SearchViewModel @Inject constructor(
         searchState
     }
     val loading = searchHandler.loading
+    private var source: AnalyticsSource = AnalyticsSource.UNKNOWN
 
     private val _state: MutableStateFlow<SearchState> = MutableStateFlow(
         SearchState.Results(
@@ -97,6 +98,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun setSource(source: AnalyticsSource) {
+        this.source = source
         searchHandler.setSource(source)
     }
 
@@ -121,6 +123,10 @@ class SearchViewModel @Inject constructor(
                 }
             }
         )?.let { _state.value = it }
+        analyticsTracker.track(
+            AnalyticsEvent.PODCAST_SUBSCRIBED,
+            AnalyticsProp.podcastSubscribed(uuid = podcast.uuid, source = source)
+        )
     }
 
     fun onFragmentPause(isChangingConfigurations: Boolean?) {
@@ -152,6 +158,7 @@ class SearchViewModel @Inject constructor(
         PODCAST_LOCAL_RESULT("podcast_local_result"),
         PODCAST_REMOTE_RESULT("podcast_remote_result"),
         FOLDER("folder"),
+        EPISODE("episode"),
     }
 
     private object AnalyticsProp {
@@ -163,6 +170,9 @@ class SearchViewModel @Inject constructor(
 
         fun searchShownOrDismissed(source: AnalyticsSource) =
             mapOf(SOURCE to source.analyticsValue)
+
+        fun podcastSubscribed(source: AnalyticsSource, uuid: String) =
+            mapOf(SOURCE to "${source.analyticsValue}_search", UUID to uuid)
     }
 }
 
