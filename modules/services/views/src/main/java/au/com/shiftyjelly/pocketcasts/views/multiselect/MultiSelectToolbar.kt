@@ -10,13 +10,19 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@AndroidEntryPoint
 class MultiSelectToolbar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -30,6 +36,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
     private var overflowItems: List<MultiSelectAction> = emptyList()
     private var fragmentManager: FragmentManager? = null
     private var multiSelectHelper: MultiSelectHelper? = null
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     fun setup(
         lifecycleOwner: LifecycleOwner,
@@ -74,6 +81,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
 
         setOnMenuItemClickListener {
             if (it.itemId == R.id.menu_overflow) {
+                analyticsTracker.track(AnalyticsEvent.MULTI_SELECT_VIEW_OVERFLOW_MENU_SHOWN, AnalyticsProp.sourceMap(multiSelectHelper.source))
                 showOverflowBottomSheet()
                 true
             } else {
@@ -107,5 +115,12 @@ class MultiSelectToolbar @JvmOverloads constructor(
         val tintedIcon = DrawableCompat.wrap(icon)
         DrawableCompat.setTint(tintedIcon.mutate(), context.getThemeColor(UR.attr.primary_interactive_02))
         super.setNavigationIcon(tintedIcon)
+    }
+
+    private object AnalyticsProp {
+        private const val source = "source"
+
+        fun sourceMap(eventSource: AnalyticsSource) =
+            mapOf(source to eventSource.analyticsValue)
     }
 }

@@ -6,6 +6,8 @@ import android.os.Build
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -37,6 +39,7 @@ class StorageSettingsViewModel
     private val fileStorage: FileStorage,
     private val fileUtil: FileUtilWrapper,
     private val settings: Settings,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(initState())
@@ -105,21 +108,42 @@ class StorageSettingsViewModel
         storageChoiceState = State.StorageChoiceState(
             title = settings.getStorageChoice(),
             summary = storageChoiceSummary,
-            onStateChange = { onStorageChoiceChange(it) }
+            onStateChange = { folderLocation ->
+                onStorageChoiceChange(folderLocation.filePath)
+                analyticsTracker.track(
+                    AnalyticsEvent.SETTINGS_STORAGE_LOCATION,
+                    mapOf("location" to folderLocation.analyticsLabel),
+                )
+            }
         ),
         storageFolderState = State.StorageFolderState(
             isVisible = settings.usingCustomFolderStorage(),
             summary = storageFolderSummary,
-            onStateChange = { onStorageFolderChange(it) }
+            onStateChange = {
+                onStorageFolderChange(it)
+                analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_SET_FOLDER_LOCATION)
+            }
         ),
         backgroundRefreshState = State.BackgroundRefreshState(
             summary = backgroundRefreshSummary,
             isChecked = settings.refreshPodcastsAutomatically(),
-            onCheckedChange = { onBackgroundRefreshCheckedChange(it) }
+            onCheckedChange = {
+                onBackgroundRefreshCheckedChange(it)
+                analyticsTracker.track(
+                    AnalyticsEvent.SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED,
+                    mapOf("enabled" to it)
+                )
+            }
         ),
         storageDataWarningState = State.StorageDataWarningState(
             isChecked = settings.warnOnMeteredNetwork(),
-            onCheckedChange = { onStorageDataWarningCheckedChange(it) }
+            onCheckedChange = {
+                onStorageDataWarningCheckedChange(it)
+                analyticsTracker.track(
+                    AnalyticsEvent.SETTINGS_STORAGE_WARN_BEFORE_USING_DATA_TOGGLED,
+                    mapOf("enabled" to it)
+                )
+            }
         ),
     )
 
@@ -133,6 +157,7 @@ class StorageSettingsViewModel
             fileUtil.deleteDirectoryContents(tempPath.absolutePath)
             mutableSnackbarMessage.emit(LR.string.settings_storage_clear_cache)
         }
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_CLEAR_DOWNLOAD_CACHE)
     }
 
     private fun onStorageDataWarningCheckedChange(isChecked: Boolean) {
@@ -165,26 +190,24 @@ class StorageSettingsViewModel
     private fun setupStorage() {
         /* Find all the places the user might want to store their podcasts, but still give them a custom folder option on sdk version < 29 */
         foldersAvailable = folderLocations()
-        var optionsCount = foldersAvailable.size
-        if (sdkVersion < 29) {
-            optionsCount++
-        }
 
-        val entries = arrayOfNulls<String>(optionsCount)
-        val entryValues = arrayOfNulls<String>(optionsCount)
-        foldersAvailable.mapIndexed { index, folderLocation ->
-            entries[index] = folderLocation.label
-            entryValues[index] = folderLocation.filePath
-        }
+        val choices = buildList {
+            addAll(foldersAvailable)
 
-        if (sdkVersion < 29) {
-            entries[foldersAvailable.size] = context.getString(LR.string.settings_storage_custom_folder)
-            entryValues[foldersAvailable.size] = Settings.STORAGE_ON_CUSTOM_FOLDER
+            if (sdkVersion < 29) {
+                add(
+                    FolderLocation(
+                        label = context.getString(LR.string.settings_storage_custom_folder),
+                        filePath = Settings.STORAGE_ON_CUSTOM_FOLDER,
+                        analyticsLabel = "custom"
+                    )
+                )
+            }
         }
 
         mutableState.value = mutableState.value.copy(
             storageChoiceState = mutableState.value.storageChoiceState.copy(
-                choices = Pair(entries, entryValues)
+                choices = choices,
             )
         )
 
@@ -229,7 +252,7 @@ class StorageSettingsViewModel
         }
 
         if (sdkVersion >= 29 && settings.usingCustomFolderStorage()) {
-            val (_, folderPaths) = mutableState.value.storageChoiceState.choices
+            val folderPaths = mutableState.value.storageChoiceState.choices.map { it.filePath }
             mutableState.value = mutableState.value.copy(
                 storageChoiceState = mutableState.value.storageChoiceState.copy(
                     summary = folderPaths.firstOrNull() ?: ""
@@ -388,6 +411,10 @@ class StorageSettingsViewModel
         )
     )
 
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_STORAGE_SHOWN)
+    }
+
     data class State(
         val downloadedFilesState: DownloadedFilesState,
         val storageChoiceState: StorageChoiceState,
@@ -402,8 +429,8 @@ class StorageSettingsViewModel
         data class StorageChoiceState(
             val title: String? = null,
             val summary: String? = null,
-            val choices: Pair<Array<String?>, Array<String?>> = Pair(emptyArray(), emptyArray()),
-            val onStateChange: (String?) -> Unit
+            val choices: List<FolderLocation> = emptyList(),
+            val onStateChange: (FolderLocation) -> Unit
         )
 
         data class StorageFolderState(

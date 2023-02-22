@@ -5,6 +5,9 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
@@ -28,6 +32,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val searchHandler: SearchHandler,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -51,6 +56,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     )
 
     init {
+        searchHandler.setSource(AnalyticsSource.ONBOARDING_RECOMMENDATIONS_SEARCH)
         searchHandler.setOnlySearchRemote(true)
         viewModelScope.launch {
 
@@ -67,7 +73,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
             ) { subscribedUuids, searchState ->
 
                 val podcasts = when (searchState) {
-                    SearchState.NoResults -> emptyList()
+                    is SearchState.NoResults -> emptyList()
                     is SearchState.Results -> {
 
                         // TODO handle loading
@@ -94,6 +100,10 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                 _state.value = it
             }
         }
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_SHOWN,
+            mapOf(AnalyticsProp.SOURCE to AnalyticsSource.ONBOARDING_RECOMMENDATIONS.analyticsValue)
+        )
     }
 
     fun updateSearchQuery(searchQuery: String) {
@@ -114,11 +124,43 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
     }
 
     fun toggleSubscribed(podcastResult: PodcastResult) {
+        val event: AnalyticsEvent
         val uuid = podcastResult.podcast.uuid
         if (podcastResult.isSubscribed) {
+            event = AnalyticsEvent.PODCAST_UNSUBSCRIBED
             podcastManager.unsubscribeAsync(podcastUuid = uuid, playbackManager = playbackManager)
         } else {
+            event = AnalyticsEvent.PODCAST_SUBSCRIBED
             podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
+        }
+        analyticsTracker.track(event, AnalyticsProp.podcastSubscribeToggled(uuid))
+
+        _state.update {
+            it.copy(
+                results = it.results.map { podcast ->
+                    if (podcast.podcast.uuid == uuid) {
+                        podcast.copy(isSubscribed = !podcastResult.isSubscribed)
+                    } else {
+                        podcast
+                    }
+                }
+            )
+        }
+    }
+
+    fun onBackPressed() {
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_DISMISSED,
+            mapOf(AnalyticsProp.SOURCE to AnalyticsSource.ONBOARDING_RECOMMENDATIONS.analyticsValue)
+        )
+    }
+
+    companion object {
+        private object AnalyticsProp {
+            const val UUID = "uuid"
+            const val SOURCE = "source"
+            fun podcastSubscribeToggled(uuid: String) =
+                mapOf(UUID to uuid, SOURCE to AnalyticsSource.ONBOARDING_RECOMMENDATIONS_SEARCH)
         }
     }
 }

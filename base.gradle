@@ -31,6 +31,7 @@ android {
         // Feature Flags
         buildConfigField "boolean", "END_OF_YEAR_ENABLED", "false"
         buildConfigField "boolean", "SINGLE_SIGN_ON_ENABLED", "false"
+        buildConfigField "boolean", "SEARCH_IMPROVEMENTS_ENABLED", "false"
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
@@ -282,6 +283,7 @@ dependencies {
     androidTestImplementation(libs.barista) {
         exclude group: 'org.jetbrains.kotlin'
     }
+    androidTestImplementation androidLibs.accessibilityTestFramework
 
     coreLibraryDesugaring androidLibs.desugarJdk
 }

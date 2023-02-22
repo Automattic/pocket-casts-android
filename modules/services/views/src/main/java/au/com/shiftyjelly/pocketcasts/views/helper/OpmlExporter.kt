@@ -10,6 +10,8 @@ import android.net.Uri
 import android.util.Xml
 import androidx.core.text.HtmlCompat
 import androidx.preference.PreferenceFragmentCompat
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
@@ -27,7 +29,14 @@ import java.io.FileOutputStream
 import java.io.FileWriter
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val serverManager: ServerManager, private val podcastManager: PodcastManager, private val settings: Settings, private val context: Context) {
+class OpmlExporter(
+    private val fragment: PreferenceFragmentCompat,
+    private val serverManager: ServerManager,
+    private val podcastManager: PodcastManager,
+    private val settings: Settings,
+    private val context: Context,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+) {
 
     companion object {
         const val EXPORT_PICKER_REQUEST_CODE = 43
@@ -85,6 +94,7 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun exportPodcasts() {
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_STARTED)
         showProgressDialog()
 
         GlobalScope.launch(Dispatchers.IO) {
@@ -101,18 +111,25 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
                         serverMessage: String?,
                         throwable: Throwable?
                     ) {
+                        trackFailure(reason = "server_call_failure")
                         UiUtil.hideProgressDialog(progressDialog)
                     }
 
                     override fun dataReturned(result: Map<String, String>?) {
                         try {
                             opmlFile = if (result == null) null else exportOpml(uuidToTitle, result, context)
+                            analyticsTracker.track(AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FINISHED)
                             UiUtil.hideProgressDialog(progressDialog)
                             val opmlFile = opmlFile
                             if (opmlFile != null && opmlFile.exists()) {
-                                if (sendAsEmail) sendIntentEmail(opmlFile) else sendIntentFile(opmlFile)
+                                if (sendAsEmail) {
+                                    sendIntentEmail(opmlFile)
+                                } else {
+                                    sendIntentFile(opmlFile)
+                                }
                             }
                         } catch (e: Exception) {
+                            trackFailure(reason = "unknown")
                             UiUtil.hideProgressDialog(progressDialog)
                             Timber.e(e)
                         }
@@ -120,6 +137,13 @@ class OpmlExporter(private val fragment: PreferenceFragmentCompat, private val s
                 }
             )
         }
+    }
+
+    private fun trackFailure(reason: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETTINGS_IMPORT_EXPORT_FAILED,
+            mapOf("reason" to reason),
+        )
     }
 
     private fun sendIntentFile(file: File) {

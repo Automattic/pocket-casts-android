@@ -18,7 +18,6 @@ class PlaylistUpdateAnalytics @Inject constructor(
         userPlaylistUpdate: UserPlaylistUpdate?,
         isCreatingFilter: Boolean
     ) {
-
         when {
             isCreatingFilter -> sendPlaylistCreatedEvent(playlist)
 

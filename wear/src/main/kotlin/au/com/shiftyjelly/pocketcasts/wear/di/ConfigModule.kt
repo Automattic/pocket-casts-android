@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
 import android.os.Build
+import android.os.Vibrator
 import au.com.shiftyjelly.pocketcasts.wear.ui.AppConfig
 import com.google.android.horologist.audio.SystemAudioRepository
 import com.google.android.horologist.media3.audio.AudioOutputSelector
@@ -38,4 +39,11 @@ object ConfigModule {
         @ApplicationContext application: Context
     ): SystemAudioRepository =
         SystemAudioRepository.fromContext(application)
+
+    @Singleton
+    @Provides
+    fun vibrator(
+        @ApplicationContext application: Context
+    ): Vibrator =
+        application.getSystemService(Vibrator::class.java)
 }

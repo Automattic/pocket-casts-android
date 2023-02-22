@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-09 18:54:04+0000
+Translation-Revision-Date: 2023-02-06 16:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="settings_media_actions_show_subtitle">Zeige individuelle Medienaktionen in den Medienbenachrichtigungen von Android 13 und Android Auto an.</string>
+    <string name="settings_media_actions_show_title">Individuelle Medienaktionen anzeigen</string>
+    <string name="settings_media_actions_customise">Medienaktionen anpassen</string>
+    <string name="settings_media_actions_prioritize_subtitle">Deine häufigsten Aktionen werden verfügbar sein.</string>
+    <string name="settings_media_actions_prioritize_title">Deine individuellen Medienaktionen priorisieren</string>
+    <string name="plus_take_your_podcasting_to_next_level">Bringe dein Podcast-Erlebnis auf die nächste Ebene mit exklusivem Zugriff auf Funktionen und Anpassungsoptionen.</string>
     <string name="onboarding_recommendations_more">Mehr %s</string>
     <string name="filter_id_or_title">Filter-ID oder -titel</string>
     <string name="filter_title">Filtertitel</string>
@@ -57,9 +63,6 @@ Language: de
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">zu deinem Ablaufdatum</string>
     <string name="profile_cancel_confirm_sub_expiry">Dein aktuelles Abonnement bleibt aktiv bis %1$s.</string>
     <string name="profile_cancel_confirm_subtitle">Dadurch wird dein Tarif auf ein kostenloses Konto geändert.</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">Deine häufigsten Aktionen werden in deiner Android 13-Benachrichtigung und im Android Auto-Player verfügbar sein.</string>
-    <string name="settings_rearrange_media_actions">Medienaktionen neu anordnen</string>
-    <string name="settings_prioritize_your_notification_actions">Deine Benachrichtigungsaktionen priorisieren</string>
     <string name="settings_other_media_actions">Weitere Medienaktionen</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Passe die Buttons an, die in den Android 13-Wiedergabebenachrichtigungen und in Android Auto angezeigt werden.</string>
     <string name="podcast_not_subscribed">Nicht abonniert</string>
@@ -99,8 +102,6 @@ Language: de
     <string name="end_of_year_stories_failed">Deine Geschichten zum Jahresende konnten nicht geladen werden, überprüfe deine Internetverbindung.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Farbe bekennen. Exklusive Icons und Themes nur für Plus-Abonnenten.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes und Icons</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Werbefreies Erlebnis – für mehr Inhalte, die du magst, und weniger Ablenkung</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Werbung ausblenden</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Lade deine Dateien in den Cloud-Speicher. Dann kannst du von überall aus darauf zugreifen.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB Cloud-Speicher</string>
     <string name="onboarding_plus_feature_folders_text">Verwalte deine Podcasts in Ordnern und halte sie auf all deinen Geräten synchron.</string>
@@ -628,7 +629,7 @@ Language: de
     <string name="settings_podcast_artwork">Podcast-Covers</string>
     <string name="settings_playback_resumption_summary">Wenn diese Funktion aktiviert ist, springt Pocket Casts in der fortgesetzten Folge ein Stück zurück, damit du leichter den Anschluss findest.</string>
     <string name="settings_playback_resumption">Intelligente Wiedergabefortsetzung</string>
-    <string name="settings_notification_vibrate_never">Neue Folgen</string>
+    <string name="settings_notification_vibrate_never">Nie</string>
     <string name="settings_notification_vibrate_in_silent">Nur im Stumm-Modus</string>
     <string name="settings_notification_vibrate_new_episodes">Neue Folgen</string>
     <string name="settings_notification_vibrate">Vibrieren wenn</string>

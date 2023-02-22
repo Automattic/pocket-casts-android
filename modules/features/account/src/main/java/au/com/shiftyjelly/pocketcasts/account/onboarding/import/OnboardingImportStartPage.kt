@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -50,8 +51,12 @@ fun OnboardingImportStartPage(
 ) {
     val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
-    LaunchedEffect(Unit) {
+
+    CallOnce {
         onShown()
+    }
+
+    LaunchedEffect(Unit) {
         systemUiController.apply {
             // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
             setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)

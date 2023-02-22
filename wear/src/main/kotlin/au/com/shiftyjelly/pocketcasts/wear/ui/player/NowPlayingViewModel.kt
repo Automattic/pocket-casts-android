@@ -10,10 +10,8 @@ import com.google.android.horologist.media.model.Media
 import com.google.android.horologist.media.ui.state.PlayerViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -35,11 +33,6 @@ class NowPlayingViewModel
             playable?.let {
                 withContext(Dispatchers.Main) {
                     play(playable)
-                    // update the track position while app is in foreground
-                    while (isActive) {
-                        delay(UPDATE_DELAY)
-                        playerRepository.updatePosition()
-                    }
                 }
             }
         }
@@ -56,7 +49,6 @@ class NowPlayingViewModel
             playbackManager.upNextQueue.playNow(playable) {
                 launch(Dispatchers.Main) {
                     playerRepository.setMedia(media)
-                    playerRepository.prepare()
                     playerRepository.play()
                 }
             }

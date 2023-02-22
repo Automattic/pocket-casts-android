@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.R
-import com.google.android.horologist.media.ui.components.InfoMediaDisplay
-import com.google.android.horologist.media.ui.components.LoadingMediaDisplay
+import com.google.android.horologist.media.ui.components.display.LoadingMediaDisplay
+import com.google.android.horologist.media.ui.components.display.MessageMediaDisplay
 import com.google.android.horologist.media.ui.state.PlayerUiState
 @Composable
 fun AnimatedPlayerScreenMediaDisplay(
@@ -22,7 +22,7 @@ fun AnimatedPlayerScreenMediaDisplay(
             artist = media.subtitle
         )
     } else {
-        InfoMediaDisplay(
+        MessageMediaDisplay(
             message = stringResource(R.string.nothing_playing),
             modifier = modifier
         )

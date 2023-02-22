@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
+import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationChannel
@@ -72,9 +73,11 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_SHOW_BADGE_2022_KEY = "EndOfYearShowBadge2022Key"
         private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
+        private const val CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY = "CustomMediaActionsVisibleKey"
     }
 
     private var languageCode: String? = null
+    private var lastSignInErrorNotification: Long? = null
 
     private val firebaseRemoteConfig: FirebaseRemoteConfig by lazy { setupFirebaseConfig() }
 
@@ -102,6 +105,7 @@ class SettingsImpl @Inject constructor(
     override val openPlayerAutomaticallyFlow = MutableStateFlow(openPlayerAutomatically())
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
+    override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -612,11 +616,11 @@ class SettingsImpl @Inject constructor(
         return peekToken()
     }
 
-    override fun getSyncToken(): String? = runBlocking {
-        getSyncTokenSuspend()
+    override fun getSyncToken(onTokenErrorUiShown: () -> Unit): String? = runBlocking {
+        getSyncTokenSuspend(onTokenErrorUiShown)
     }
 
-    override suspend fun getSyncTokenSuspend(): String? {
+    override suspend fun getSyncTokenSuspend(onTokenErrorUiShown: () -> Unit): String? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
 
@@ -640,7 +644,7 @@ class SettingsImpl @Inject constructor(
                         @Suppress("DEPRECATION")
                         bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
                     }
-                    intent?.let { showSignInErrorNotification(it) }
+                    intent?.let { showSignInErrorNotification(it, onTokenErrorUiShown) }
                     throw SecurityException("Token could not be refreshed")
                 } else {
                     token
@@ -652,7 +656,9 @@ class SettingsImpl @Inject constructor(
         }
     }
 
-    private fun showSignInErrorNotification(intent: Intent) {
+    private fun showSignInErrorNotification(intent: Intent, onTokenErrorUiShown: () -> Unit) {
+        onShowSignInErrorNotificationDebounced(onTokenErrorUiShown)
+
         val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
         val notification = NotificationCompat.Builder(context, NotificationChannel.NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR.id)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -665,6 +671,19 @@ class SettingsImpl @Inject constructor(
             .build()
         NotificationManagerCompat.from(context)
             .notify(NotificationId.SIGN_IN_ERROR.value, notification)
+    }
+
+    // Avoid invoking the passed function multiple times in a short period of time
+    @Synchronized
+    private fun onShowSignInErrorNotificationDebounced(onTokenErrorUiShown: () -> Unit) {
+        val now = System.currentTimeMillis()
+        // Do not invoke this method more than once every 2 seconds
+        val shouldInvoke = lastSignInErrorNotification == null ||
+            lastSignInErrorNotification!! < now - (2 * 1000)
+        if (shouldInvoke) {
+            onTokenErrorUiShown()
+        }
+        lastSignInErrorNotification = now
     }
 
     override fun invalidateToken() {
@@ -737,7 +756,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun clearPlusPreferences() {
-        setCloudDeleteCloudAfterPlaying(false)
+        setDeleteCloudFileAfterPlaying(false)
         setCloudAutoUpload(false)
         setCloudAutoDownload(false)
         setCloudOnlyWifi(false)
@@ -1241,19 +1260,19 @@ class SettingsImpl @Inject constructor(
         setBoolean("cloudUpNext", value)
     }
 
-    override fun getCloudDeleteAfterPlaying(): Boolean {
+    override fun getDeleteLocalFileAfterPlaying(): Boolean {
         return getBoolean("cloudDeleteAfterPlaying", false)
     }
 
-    override fun setCloudDeleteAfterPlaying(value: Boolean) {
+    override fun setDeleteLocalFileAfterPlaying(value: Boolean) {
         setBoolean("cloudDeleteAfterPlaying", value)
     }
 
-    override fun getCloudDeleteCloudAfterPlaying(): Boolean {
+    override fun getDeleteCloudFileAfterPlaying(): Boolean {
         return getBoolean("cloudDeleteCloudAfterPlaying", false)
     }
 
-    override fun setCloudDeleteCloudAfterPlaying(value: Boolean) {
+    override fun setDeleteCloudFileAfterPlaying(value: Boolean) {
         setBoolean("cloudDeleteCloudAfterPlaying", value)
     }
 
@@ -1492,5 +1511,20 @@ class SettingsImpl @Inject constructor(
 
     override fun setHasDoneInitialOnboarding() {
         setBoolean(DONE_INITIAL_ONBOARDING_KEY, true)
+    }
+
+    override fun areCustomMediaActionsVisible() =
+        getBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, true)
+
+    override fun setCustomMediaActionsVisible(value: Boolean) {
+        setBoolean(CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY, value)
+        customMediaActionsVisibilityFlow.update { value }
+    }
+
+    override fun isNotificationsDisabledMessageShown() =
+        getBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, false)
+
+    override fun setNotificationsDisabledMessageShown(value: Boolean) {
+        setBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, value)
     }
 }

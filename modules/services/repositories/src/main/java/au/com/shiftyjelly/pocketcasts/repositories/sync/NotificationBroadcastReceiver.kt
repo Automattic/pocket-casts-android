@@ -4,7 +4,9 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -26,6 +28,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     @Inject lateinit var episodeManager: EpisodeManager
     @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var playbackManager: PlaybackManager
+    @Inject lateinit var episodeAnalytics: EpisodeAnalytics
 
     private val source = AnalyticsSource.NOTIFICATION
 
@@ -109,6 +112,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
                 episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episodeUuid)
             }
         }
     }
@@ -117,6 +121,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
         launch {
             episodeManager.findByUuid(episodeUuid)?.let { episode ->
                 episodeManager.archive(episode, playbackManager, true)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episodeUuid)
             }
         }
     }
@@ -124,7 +129,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun playNext(episodeUuid: String) {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNext(episode)
+                playbackManager.playNext(episode = episode, source = source)
             }
         }
     }
@@ -132,7 +137,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun playLast(episodeUuid: String, playNext: Boolean) {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playLast(episode)
+                playbackManager.playLast(episode = episode, source = source)
                 if (playNext) {
                     playbackManager.playNextInQueue(playbackSource = source)
                 }
@@ -147,7 +152,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
                 val downloadedEpisode = playbackManager.upNextQueue.queueEpisodes[downloadedIndex]
                 val undownloadedEpisodes = playbackManager.upNextQueue.queueEpisodes.subList(0, downloadedIndex)
                 playbackManager.upNextQueue.currentEpisode?.let {
-                    playbackManager.playEpisodesLast(listOf(it) + undownloadedEpisodes)
+                    playbackManager.playEpisodesLast(episodes = listOf(it) + undownloadedEpisodes, source = source)
                 }
 
                 playbackManager.playNow(downloadedEpisode)

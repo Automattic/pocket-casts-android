@@ -174,10 +174,15 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.videoView.playbackManager = playbackManager
         binding.videoView.setOnClickListener { onFullScreenVideoClick() }
 
-        CastButtonFactory.setUpMediaRouteButton(binding.root.context, binding.castButton)
-        binding.castButton.setAlwaysVisible(true)
-        binding.castButton.updateColor(ThemeColor.playerContrast03(theme.activeTheme))
-        binding.castButton.setOnClickListener { trackShelfAction(ShelfItem.Cast.analyticsValue) }
+        with(binding.castButton) {
+            CastButtonFactory.setUpMediaRouteButton(binding.root.context, this)
+            setAlwaysVisible(true)
+            updateColor(ThemeColor.playerContrast03(theme.activeTheme))
+            setOnClickListener {
+                trackShelfAction(ShelfItem.Cast.analyticsValue)
+                chromeCastAnalytics.trackChromeCastViewShown()
+            }
+        }
 
         setupUpNextDrag(view, binding.topView)
 

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 
@@ -27,17 +28,21 @@ private val gradientBottom = Color(0xFF000000)
 private val topPodcastImageGradient = listOf(Color(0x00000000), Color(0x16000000))
 private val bottomPodcastImageGradient = listOf(Color(0x16000000), Color(0x33000000))
 
+private val FolderImageSize = 64.dp
+private val PodcastImageSize = 26.dp
 @Composable
 fun FolderImageSmall(
     color: Color,
     podcastUuids: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    folderImageSize: Dp = FolderImageSize,
+    podcastImageSize: Dp = PodcastImageSize,
 ) {
     Card(
         elevation = 2.dp,
         shape = RoundedCornerShape(4.dp),
         backgroundColor = color,
-        modifier = modifier.size(64.dp)
+        modifier = modifier.size(folderImageSize)
     ) {
         Box(
             contentAlignment = Alignment.Center
@@ -53,24 +58,23 @@ fun FolderImageSmall(
                             )
                         )
                     )
-                    .size(64.dp)
+                    .size(folderImageSize)
             ) {}
             Row(horizontalArrangement = Arrangement.Center) {
-                val imageSize = 26.dp
                 val imagePadding = 2.dp
                 Column(horizontalAlignment = Alignment.End) {
                     FolderPodcastImage(
                         uuid = podcastUuids.getOrNull(0),
                         color = color,
                         gradientColor = topPodcastImageGradient,
-                        modifier = Modifier.size(imageSize)
+                        modifier = Modifier.size(podcastImageSize)
                     )
                     Spacer(modifier = Modifier.height(imagePadding))
                     FolderPodcastImage(
                         uuid = podcastUuids.getOrNull(2),
                         color = color,
                         gradientColor = bottomPodcastImageGradient,
-                        modifier = Modifier.size(imageSize)
+                        modifier = Modifier.size(podcastImageSize)
                     )
                 }
                 Spacer(modifier = Modifier.width(imagePadding))
@@ -79,14 +83,14 @@ fun FolderImageSmall(
                         uuid = podcastUuids.getOrNull(1),
                         color = color,
                         gradientColor = topPodcastImageGradient,
-                        modifier = Modifier.size(imageSize)
+                        modifier = Modifier.size(podcastImageSize)
                     )
                     Spacer(modifier = Modifier.height(imagePadding))
                     FolderPodcastImage(
                         uuid = podcastUuids.getOrNull(3),
                         color = color,
                         gradientColor = bottomPodcastImageGradient,
-                        modifier = Modifier.size(imageSize)
+                        modifier = Modifier.size(podcastImageSize)
                     )
                 }
             }

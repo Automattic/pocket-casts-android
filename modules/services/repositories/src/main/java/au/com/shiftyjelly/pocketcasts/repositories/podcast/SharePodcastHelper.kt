@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
 import android.content.Intent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -16,7 +19,10 @@ data class SharePodcastHelper(
     val podcast: Podcast, // Share just a podcast.
     val episode: Episode? = null, // Share an episode of a podcast.
     val upToInSeconds: Double? = null, // Share a position in an episode of a podcast.
-    val context: Context
+    val context: Context,
+    private val shareType: ShareType,
+    private val source: AnalyticsSource,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) {
 
     private var shareEpisodeTask: Call? = null
@@ -34,6 +40,10 @@ data class SharePodcastHelper(
             url = "$host/podcast/${podcast.uuid}"
         }
         sendText(url)
+
+        if (shouldTrackShareEvent()) {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SHARED, AnalyticsProp.shareMap(shareType, source))
+        }
     }
 
     private fun sendText(shareLink: String?) {
@@ -56,5 +66,22 @@ data class SharePodcastHelper(
         } catch (e: Exception) {
             Timber.e(e)
         }
+    }
+
+    private fun shouldTrackShareEvent() =
+        source != AnalyticsSource.PODCAST_SCREEN // Podcast screen has it's own share event
+
+    private object AnalyticsProp {
+        const val SOURCE = "source"
+        const val TYPE = "type"
+        fun shareMap(type: ShareType, source: AnalyticsSource) =
+            mapOf(TYPE to type.value, SOURCE to source.analyticsValue)
+    }
+
+    enum class ShareType(val value: String) {
+        PODCAST("podcast"),
+        EPISODE("episode"),
+        EPISODE_FILE("episode_file"),
+        CURRENT_TIME("current_time")
     }
 }

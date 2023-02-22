@@ -585,7 +585,8 @@ class EpisodeFragment : BaseDialogFragment() {
             state.episode,
             parentFragmentManager,
             context,
-            shouldShowPodcast = false
+            shouldShowPodcast = false,
+            analyticsTracker = analyticsTracker,
         ).show()
     }
 }

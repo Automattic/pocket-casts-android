@@ -6,11 +6,11 @@ import android.graphics.BitmapFactory
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.metadata.id3.ApicFrame
 import com.google.android.exoplayer2.metadata.id3.ChapterFrame
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame
 import com.google.android.exoplayer2.metadata.id3.UrlLinkFrame
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.BufferedOutputStream
@@ -36,22 +36,22 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
     var embeddedTitle: String? = null
     var embeddedLength: Long? = null
 
-    fun read(trackSelections: TrackSelectionArray?, settings: Settings, context: Context) {
-        return read(trackSelections, settings.getUseEmbeddedArtwork(), context)
+    fun read(tracks: Tracks?, settings: Settings, context: Context) {
+        return read(tracks, settings.getUseEmbeddedArtwork(), context)
     }
 
-    fun read(trackSelections: TrackSelectionArray?, loadArtwork: Boolean, context: Context) {
+    fun read(tracks: Tracks?, loadArtwork: Boolean, context: Context) {
         val newChapters = mutableListOf<Chapter>()
         embeddedArtworkPath = null
 
-        if (trackSelections == null) {
+        if (tracks == null) {
             return
         }
         try {
-            for (i in 0 until trackSelections.length) {
-                val selection = trackSelections.get(i) ?: continue
-                for (j in 0 until selection.length()) {
-                    val metadata = selection.getFormat(j).metadata ?: continue
+            for (i in 0 until tracks.groups.size) {
+                val group = tracks.groups[i] ?: continue
+                for (j in 0 until tracks.groups.size) {
+                    val metadata = group.getTrackFormat(j).metadata ?: continue
                     for (k in 0 until metadata.length()) {
                         val frame = metadata.get(k)
                         if (frame is ChapterFrame) {

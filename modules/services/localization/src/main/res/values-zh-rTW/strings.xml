@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-10 08:54:03+0000
+Translation-Revision-Date: 2023-02-07 08:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="settings_media_actions_show_subtitle">在 Android 13 媒體通知和 Android Auto 中顯示自訂媒體動作。</string>
+    <string name="settings_media_actions_show_title">顯示自訂媒體動作</string>
+    <string name="settings_media_actions_customise">自訂媒體動作</string>
+    <string name="settings_media_actions_prioritize_subtitle">你將可使用你的常用動作。</string>
+    <string name="settings_media_actions_prioritize_title">為你的自訂媒體動作排定優先順序</string>
+    <string name="plus_take_your_podcasting_to_next_level">運用專屬功能和自訂選項，讓你的 Podcast 體驗更上一層樓。</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="filter_id_or_title">篩選 ID 或標題</string>
     <string name="filter_title">篩選標題</string>
@@ -57,9 +63,6 @@ Language: zh_TW
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">你的到期日</string>
     <string name="profile_cancel_confirm_sub_expiry">目前訂閱有效期限至 %1$s。</string>
     <string name="profile_cancel_confirm_subtitle">這樣做會將你的方案變更為免費帳號。</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">你的常用動作會顯示在你的 Android 13 通知和 Android Auto 播放器中。</string>
-    <string name="settings_rearrange_media_actions">重新排列媒體動作</string>
-    <string name="settings_prioritize_your_notification_actions">優先排列你的通知動作</string>
     <string name="settings_other_media_actions">其他媒體動作</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">自訂 Android 13 播放通知和 Android Auto 中顯示的按鈕。</string>
     <string name="podcast_not_subscribed">未訂閱</string>
@@ -99,8 +102,6 @@ Language: zh_TW
     <string name="end_of_year_stories_failed">無法載入你的年終故事，請檢查網際網路連線</string>
     <string name="onboarding_plus_feature_themes_icons_text">展現你最真實的色彩。 僅供 Plus 社群使用的獨家圖示和主題。</string>
     <string name="onboarding_plus_feature_themes_icons_title">佈景主題和圖示</string>
-    <string name="onboarding_plus_feature_hide_ads_text">不含廣告體驗提供你更多喜歡的內容，並減少不喜歡的內容。</string>
-    <string name="onboarding_plus_feature_hide_ads_title">隱藏廣告</string>
     <string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10 GB 雲端儲存空間</string>
     <string name="onboarding_plus_feature_folders_text">在資料夾中整理你的 Podcast，並在所有裝置間同步。</string>
@@ -628,7 +629,7 @@ Language: zh_TW
     <string name="settings_podcast_artwork">Podcast 封面作品</string>
     <string name="settings_playback_resumption_summary">開啟此功能時，Pocket Casts 會在你繼續播放單集時稍微回放，讓你能更輕鬆跟上進度。</string>
     <string name="settings_playback_resumption">智慧型繼續播放</string>
-    <string name="settings_notification_vibrate_never">新單集</string>
+    <string name="settings_notification_vibrate_never">永不</string>
     <string name="settings_notification_vibrate_in_silent">只在靜音模式時</string>
     <string name="settings_notification_vibrate_new_episodes">新單集</string>
     <string name="settings_notification_vibrate">在以下情況振動：</string>

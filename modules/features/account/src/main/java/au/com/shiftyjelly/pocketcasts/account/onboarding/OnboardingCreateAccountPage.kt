@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingCreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
@@ -51,8 +52,11 @@ internal fun OnboardingCreateAccountPage(
     val systemUiController = rememberSystemUiController()
     val pocketCastsTheme = MaterialTheme.theme
 
-    LaunchedEffect(Unit) {
+    CallOnce {
         viewModel.onShown()
+    }
+
+    LaunchedEffect(Unit) {
         systemUiController.apply {
             // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
             setStatusBarColor(pocketCastsTheme.colors.secondaryUi01, darkIcons = !theme.defaultLightIcons)
@@ -131,7 +135,7 @@ internal fun OnboardingCreateAccountPage(
             Spacer(Modifier.weight(1f))
 
             RowButton(
-                text = stringResource(LR.string.onboarding_create_account),
+                text = stringResource(LR.string.create_account),
                 enabled = state.enableSubmissionFields,
                 onClick = { viewModel.createAccount(onAccountCreated) },
             )
