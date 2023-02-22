@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
@@ -98,7 +99,8 @@ sealed class SearchState {
     data class NoResults(override val searchTerm: String) : SearchState()
     data class Results(
         override val searchTerm: String,
-        val list: List<FolderItem>,
+        val podcasts: List<FolderItem>,
+        val episodes: List<EpisodeItem>,
         val loading: Boolean,
         val error: Throwable?,
     ) : SearchState()
