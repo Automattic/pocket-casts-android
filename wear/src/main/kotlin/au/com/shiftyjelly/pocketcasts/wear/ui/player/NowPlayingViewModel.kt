@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.player
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -57,8 +56,7 @@ class NowPlayingViewModel @Inject constructor(
             State.Loaded(
                 title = playbackState.title,
                 subtitle = playbackManager.getCurrentEpisode()?.let { episode ->
-                    val podcastUuid = if (episode is Episode) episode.podcastUuid else null
-                    val podcast = podcastUuid?.let { podcastManager.findPodcastByUuidSuspend(it) }
+                    val podcast = playbackState.podcast
                     episode.displaySubtitle(podcast)
                 },
                 playing = playbackState.isPlaying,
