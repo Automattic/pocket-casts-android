@@ -93,8 +93,6 @@ dependencies {
 
     implementation androidLibs.media3DatasourceOkhttp
 
-    wearApp project(":wear")
-
     implementation androidLibs.horologistComposeLayout
 
     implementation project(':modules:services:analytics')
