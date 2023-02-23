@@ -66,9 +66,7 @@ fun WearApp(themeType: Theme.ThemeType) {
                 route = UpNextScreen.route,
             ) {
                 UpNextScreen(
-                    onNavigateToNowPlaying = { playableUuid ->
-                        navController.navigate(NowPlayingScreen.navigateRoute(playableUuid))
-                    },
+                    navigateToNowPlaying = { navController.navigate(NowPlayingScreen.route) },
                     listState = it.scrollableState,
                 )
             }
@@ -78,7 +76,7 @@ fun WearApp(themeType: Theme.ThemeType) {
             ) {
                 PodcastsScreen(
                     listState = it.scrollableState,
-                    onNavigateToPodcast = { podcastUuid ->
+                    navigateToPodcast = { podcastUuid ->
                         navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
                     }
                 )
@@ -93,9 +91,7 @@ fun WearApp(themeType: Theme.ThemeType) {
                 ),
             ) {
                 PodcastScreen(
-                    onNavigateToNowPlaying = { playableUuid ->
-                        navController.navigate(NowPlayingScreen.navigateRoute(playableUuid))
-                    }
+                    navigateToNowPlaying = { navController.navigate(NowPlayingScreen.route) }
                 )
             }
 

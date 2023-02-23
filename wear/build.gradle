@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+apply plugin: 'com.google.gms.google-services'
+
 apply from: "../base.gradle"
 
 android {
@@ -97,14 +99,16 @@ dependencies {
 
     implementation project(':modules:services:analytics')
     implementation project(':modules:services:compose')
+    implementation project(':modules:services:images')
     implementation project(':modules:services:localization')
+    implementation project(':modules:services:model')
     implementation project(':modules:services:preferences')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:servers')
     implementation project(':modules:services:ui')
     implementation project(':modules:services:utils')
-    implementation project(':modules:services:images')
-    implementation project(':modules:services:repositories')
-    implementation project(':modules:services:model')
+
     implementation project(':modules:features:account')
-    implementation project(':modules:features:profile')
     implementation project(':modules:features:podcasts')
+    implementation project(':modules:features:profile')
 }
