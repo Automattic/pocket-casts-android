@@ -46,6 +46,15 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
     private var adapter: DiscoverAdapter? = null
     private var binding: FragmentDiscoverBinding? = null
 
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
+
     override fun onPodcastClicked(podcast: DiscoverPodcast, listUuid: String?) {
         val fragment = PodcastFragment.newInstance(podcastUuid = podcast.uuid, fromListUuid = listUuid)
         (activity as FragmentHostListener).addFragment(fragment)
@@ -120,6 +129,8 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         if (viewModel.state.value !is DiscoverState.DataLoaded) {
             viewModel.loadData(resources)
         }
+
+        viewModel.onShown()
 
         return binding?.root
     }

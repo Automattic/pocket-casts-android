@@ -963,6 +963,19 @@ class MainActivity :
         return true
     }
 
+    override fun onSearchEpisodeClick(
+        episodeUuid: String,
+        podcastUuid: String,
+        source: EpisodeViewSource
+    ) {
+        openEpisodeDialog(
+            episodeUuid = episodeUuid,
+            source = source,
+            podcastUuid = podcastUuid,
+            forceDark = false
+        )
+    }
+
     override fun onSearchPodcastClick(podcastUuid: String) {
         val fragment = PodcastFragment.newInstance(podcastUuid)
         addFragment(fragment)

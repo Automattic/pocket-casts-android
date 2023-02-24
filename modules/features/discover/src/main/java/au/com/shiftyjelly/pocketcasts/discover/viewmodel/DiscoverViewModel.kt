@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 import android.content.res.Resources
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -38,13 +40,25 @@ class DiscoverViewModel @Inject constructor(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
     val playbackManager: PlaybackManager,
-    val userManager: UserManager
+    val userManager: UserManager,
+    val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val playbackSource = AnalyticsSource.DISCOVER
     val state = MutableLiveData<DiscoverState>().apply { value = DiscoverState.Loading }
     var currentRegionCode: String? = settings.getDiscoveryCountryCode()
     var replacements = emptyMap<String, String>()
+    private var isFragmentChangingConfigurations: Boolean = false
+
+    fun onShown() {
+        if (!isFragmentChangingConfigurations) {
+            analyticsTracker.track(AnalyticsEvent.DISCOVER_SHOWN)
+        }
+    }
+
+    fun onFragmentPause(isChangingConfigurations: Boolean?) {
+        isFragmentChangingConfigurations = isChangingConfigurations ?: false
+    }
 
     fun loadData(resources: Resources) {
         val feed = repository.getDiscoverFeed()

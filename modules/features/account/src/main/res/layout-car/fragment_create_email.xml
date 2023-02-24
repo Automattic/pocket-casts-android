@@ -61,9 +61,9 @@
         android:layout_marginStart="220dp"
         android:layout_marginTop="96dp"
         android:layout_marginEnd="220dp"
+        app:hintTextAppearance="@style/TextAppearanceCarHint"
         app:layout_constraintBottom_toTopOf="@+id/passwordLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lblSignIn">
 
@@ -88,9 +88,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
+        app:hintTextAppearance="@style/TextAppearanceCarHint"
         app:layout_constraintBottom_toTopOf="@+id/lblPasswordRequirements"
         app:layout_constraintEnd_toEndOf="@id/emailLayout"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/emailLayout"
         app:layout_constraintTop_toBottomOf="@+id/emailLayout"
         app:passwordToggleEnabled="true">
@@ -136,7 +136,6 @@
         app:cornerRadius="12dp"
         app:layout_constraintTop_toBottomOf="@id/lblPasswordRequirements"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

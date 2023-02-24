@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.servers.di.PodcastCacheServerRetrofit
+import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -26,5 +27,11 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
 
     override fun searchEpisodes(podcastUuid: String, searchTerm: String): Single<List<String>> {
         return server.searchPodcastForEpisodes(SearchBody(podcastUuid, searchTerm)).map { it.episodes.map { it.uuid } }
+    }
+
+    override fun searchEpisodes(searchTerm: String): Single<EpisodeSearch> {
+        return server.searchEpisodes(SearchEpisodesBody(searchTerm)).map {
+            EpisodeSearch(it.episodes.map { result -> result.toEpisodeItem() })
+        }
     }
 }

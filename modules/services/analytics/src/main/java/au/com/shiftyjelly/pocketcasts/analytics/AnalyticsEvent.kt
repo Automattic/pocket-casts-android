@@ -263,6 +263,7 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_UPDATED("filter_updated"),
 
     /* Discover */
+    DISCOVER_SHOWN("discover_shown"),
     DISCOVER_CATEGORY_SHOWN("discover_category_shown"),
     DISCOVER_FEATURED_PODCAST_TAPPED("discover_featured_podcast_tapped"),
     DISCOVER_FEATURED_PODCAST_SUBSCRIBED("discover_featured_podcast_subscribed"),

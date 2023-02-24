@@ -1,3 +1,9 @@
+7.34
+-----
+*   Updates
+    *   Improved the Automotive account page styles
+        ([#798](https://github.com/Automattic/pocket-casts-android/pull/798)).
+
 7.33
 -----
 *   New Features:
@@ -354,4 +360,3 @@
         ([#3148](https://github.com/shiftyjelly/pocketcasts-android/issues/3148)).
     *   Fix create account next button not working when using 1Password
         ([#3167](https://github.com/shiftyjelly/pocketcasts-android/issues/3167)).
-

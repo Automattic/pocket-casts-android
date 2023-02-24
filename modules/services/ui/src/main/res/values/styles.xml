@@ -164,4 +164,8 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="TextAppearanceCarHint">
+        <item name="android:textSize">20sp</item>
+    </style>
 </resources>

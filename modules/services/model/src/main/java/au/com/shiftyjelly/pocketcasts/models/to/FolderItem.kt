@@ -9,13 +9,15 @@ sealed class FolderItem(
     val uuid: String,
     val title: String,
     val addedDate: Date,
-    val sortPosition: Int
+    val sortPosition: Int,
+    val subscribed: Boolean,
 ) {
     data class Podcast(val podcast: PodcastModel) : FolderItem(
         uuid = podcast.uuid,
         title = podcast.title,
         addedDate = podcast.addedDate ?: Date(Long.MIN_VALUE),
-        sortPosition = podcast.sortPosition
+        sortPosition = podcast.sortPosition,
+        subscribed = podcast.isSubscribed,
     ) {
         companion object {
             const val viewTypeId = 0
@@ -25,7 +27,8 @@ sealed class FolderItem(
         uuid = folder.uuid,
         title = folder.name,
         addedDate = folder.addedDate,
-        sortPosition = folder.sortPosition
+        sortPosition = folder.sortPosition,
+        subscribed = true,
     ) {
         companion object {
             const val viewTypeId = 1
