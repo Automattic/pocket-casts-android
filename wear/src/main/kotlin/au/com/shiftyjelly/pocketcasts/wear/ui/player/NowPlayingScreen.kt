@@ -1,19 +1,24 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.MarqueeTextMediaDisplay
+import com.google.android.horologist.compose.rotaryinput.onRotaryInputAccumulated
 import com.google.android.horologist.media.ui.components.PodcastControlButtons
 import com.google.android.horologist.media.ui.components.display.MessageMediaDisplay
 import com.google.android.horologist.media.ui.screens.player.PlayerScreen
@@ -87,9 +92,20 @@ fun NowPlayingScreen(
                     )
                 }
             },
-            modifier = Modifier,
             background = {},
-            onVolumeChangeByScroll = volumeViewModel::onVolumeChangeByScroll,
+            modifier = Modifier
+                .onVolumeChangeByScroll(
+                    focusRequester = rememberActiveFocusRequester(),
+                    onVolumeChangeByScroll = volumeViewModel::onVolumeChangeByScroll
+                )
         )
     }
 }
+
+private fun Modifier.onVolumeChangeByScroll(
+    focusRequester: FocusRequester,
+    onVolumeChangeByScroll: (scrollPixels: Float) -> Unit
+) =
+    onRotaryInputAccumulated(onValueChange = onVolumeChangeByScroll)
+        .focusRequester(focusRequester)
+        .focusable()
