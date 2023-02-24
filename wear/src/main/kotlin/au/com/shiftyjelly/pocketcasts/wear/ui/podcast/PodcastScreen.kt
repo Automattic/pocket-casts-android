@@ -30,7 +30,7 @@ object PodcastScreen {
 
 @Composable
 fun PodcastScreen(
-    onNavigateToNowPlaying: (String) -> Unit,
+    navigateToNowPlaying: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PodcastViewModel = hiltViewModel(),
 ) {
@@ -67,7 +67,10 @@ fun PodcastScreen(
         items(viewModel.uiState.episodes) { item ->
             EpisodeChip(
                 episode = item,
-                onClick = onNavigateToNowPlaying
+                onClick = {
+                    viewModel.play(item)
+                    navigateToNowPlaying()
+                }
             )
         }
     }

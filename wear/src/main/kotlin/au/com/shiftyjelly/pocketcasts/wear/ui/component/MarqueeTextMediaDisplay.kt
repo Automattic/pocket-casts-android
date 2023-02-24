@@ -37,7 +37,7 @@ fun MarqueeTextMediaDisplay(
             textAlign = TextAlign.Center,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.caption3
         )
     }
 }

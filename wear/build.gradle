@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+apply plugin: 'com.google.gms.google-services'
+
 apply from: "../base.gradle"
 
 android {
@@ -91,20 +93,37 @@ dependencies {
 
     implementation androidLibs.media3DatasourceOkhttp
 
-    wearApp project(":wear")
-
     implementation androidLibs.horologistComposeLayout
 
     implementation project(':modules:services:analytics')
     implementation project(':modules:services:compose')
+    implementation project(':modules:services:images')
     implementation project(':modules:services:localization')
+    implementation project(':modules:services:model')
     implementation project(':modules:services:preferences')
+    implementation project(':modules:services:repositories')
+    implementation project(':modules:services:servers')
     implementation project(':modules:services:ui')
     implementation project(':modules:services:utils')
-    implementation project(':modules:services:images')
-    implementation project(':modules:services:repositories')
-    implementation project(':modules:services:model')
+
     implementation project(':modules:features:account')
-    implementation project(':modules:features:profile')
     implementation project(':modules:features:podcasts')
+    implementation project(':modules:features:profile')
 }
+
+task useGoogleServicesDebugFile {
+    description 'Copies the debug google-services.json file if file is missing.'
+    doLast {
+        def googleServicesFile = "google-services.json"
+        if (!file("${project.projectDir}/$googleServicesFile").exists()) {
+            def debugOnlyFile = "google-services.json_debug-only"
+            println "$googleServicesFile file is missing. Copying $debugOnlyFile"
+            copy {
+                from "${project.projectDir}/$debugOnlyFile"
+                into project.projectDir
+                rename { googleServicesFile }
+            }
+        }
+    }
+}
+preBuild.dependsOn(useGoogleServicesDebugFile)

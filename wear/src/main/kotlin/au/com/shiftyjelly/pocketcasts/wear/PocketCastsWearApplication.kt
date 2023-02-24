@@ -5,10 +5,13 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -41,8 +44,12 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     private fun setupApp() {
         runBlocking {
+            FirebaseAnalyticsTracker.setup(
+                analytics = FirebaseAnalytics.getInstance(this@PocketCastsWearApplication),
+                settings = settings
+            )
             withContext(Dispatchers.Default) {
-                playbackManager.upNextQueue.setup()
+                playbackManager.setup()
             }
         }
         userManager.beginMonitoringAccountManager(playbackManager)
@@ -50,6 +57,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     private fun setupAnalytics() {
         AnalyticsTracker.init(settings)
+        FirebaseApp.initializeApp(this)
     }
 
     override fun getWorkManagerConfiguration(): Configuration {

@@ -6,8 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +21,9 @@ import javax.inject.Inject
 @HiltViewModel
 class PodcastViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
+    private val playbackManager: PlaybackManager,
+    private val podcastManager: PodcastManager,
 ) : ViewModel() {
 
     private val podcastUuid: String = savedStateHandle[PodcastScreen.argument] ?: ""
@@ -41,6 +45,15 @@ class PodcastViewModel @Inject constructor(
             uiState = UiState(
                 podcast = podcast,
                 episodes = episodes
+            )
+        }
+    }
+
+    fun play(playable: Playable) {
+        viewModelScope.launch {
+            playbackManager.playNowSync(
+                episode = playable,
+                playbackSource = AnalyticsSource.WATCH_UP_NEXT,
             )
         }
     }

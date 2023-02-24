@@ -25,7 +25,7 @@ fun PodcastsScreen(
     modifier: Modifier = Modifier,
     viewModel: PodcastsViewModel = hiltViewModel(),
     listState: ScalingLazyListState,
-    onNavigateToPodcast: (String) -> Unit
+    navigateToPodcast: (String) -> Unit
 ) {
     val uiState = viewModel.uiState
 
@@ -35,7 +35,7 @@ fun PodcastsScreen(
     ) {
         items(uiState.items) { item ->
             if (item is FolderItem.Podcast) {
-                PodcastChip(podcast = item, onClick = onNavigateToPodcast)
+                PodcastChip(podcast = item, onClick = navigateToPodcast)
             }
         }
     }
