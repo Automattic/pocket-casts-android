@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.ui.BuildConfig
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import javax.inject.Inject
 import javax.inject.Singleton
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -229,7 +230,7 @@ class Theme @Inject constructor(
     }
 
     fun setupThemeForConfig(activity: AppCompatActivity, configuration: Configuration) {
-        if (getUseSystemTheme()) {
+        if (getUseSystemTheme() && !Util.isAutomotive(activity)) {
             val theme = when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
                 Configuration.UI_MODE_NIGHT_NO -> {
                     getPreferredLightFromPreferences()

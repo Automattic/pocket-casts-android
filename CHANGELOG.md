@@ -1,6 +1,8 @@
 7.34
 -----
-
+*   Updates
+    *   Improved the Automotive account page styles
+        ([#798](https://github.com/Automattic/pocket-casts-android/pull/798)).
 
 7.33
 -----
