@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
@@ -22,12 +23,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
 import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAllConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -70,7 +73,7 @@ class SearchFragment : BaseFragment() {
         }
     }
 
-    private val viewModel: SearchViewModel by viewModels()
+    private val viewModel: SearchViewModel by activityViewModels()
     private val searchHistoryViewModel: SearchHistoryViewModel by viewModels()
     private var listener: Listener? = null
     private var binding: FragmentSearchBinding? = null
@@ -230,12 +233,9 @@ class SearchFragment : BaseFragment() {
                     SearchResultsPage(
                         viewModel = viewModel,
                         onEpisodeClick = ::onEpisodeClick,
-                        onPodcastClick = { podcast ->
-                            onPodcastClick(podcast)
-                        },
-                        onFolderClick = { folder, podcasts ->
-                            onFolderClick(folder, podcasts)
-                        },
+                        onPodcastClick = ::onPodcastClick,
+                        onFolderClick = ::onFolderClick,
+                        onShowAllCLick = ::onShowAllClick,
                         onScroll = { UiUtil.hideKeyboard(searchView) },
                         onlySearchRemote = onlySearchRemote
                     )
@@ -284,6 +284,11 @@ class SearchFragment : BaseFragment() {
         searchHistoryViewModel.add(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
         listener?.onSearchFolderClick(folder.uuid)
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
+    }
+
+    private fun onShowAllClick(resultsType: ResultsType) {
+        val fragment = SearchResultsFragment.newInstance(resultsType)
+        (activity as? FragmentHostListener)?.addFragment(fragment)
     }
 
     override fun onBackPressed(): Boolean {
