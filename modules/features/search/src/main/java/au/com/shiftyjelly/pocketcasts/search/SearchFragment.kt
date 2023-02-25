@@ -287,7 +287,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun onShowAllClick(resultsType: ResultsType) {
-        val fragment = SearchResultsFragment.newInstance(resultsType)
+        val fragment = SearchResultsFragment.newInstance(resultsType, onlySearchRemote, source)
         (activity as? FragmentHostListener)?.addFragment(fragment)
     }
 

@@ -32,6 +32,7 @@ fun PodcastItem(
     showSubscribed: Boolean = false,
     showPlusIfUnsubscribed: Boolean = false,
     showDivider: Boolean = true,
+    onSubscribeClick: (() -> Unit)? = null,
 ) {
     Column {
         Row(
@@ -72,7 +73,10 @@ fun PodcastItem(
                 Icon(
                     painter = painterResource(IR.drawable.plus_simple),
                     contentDescription = stringResource(LR.string.subscribe),
-                    tint = MaterialTheme.theme.colors.primaryIcon02
+                    tint = MaterialTheme.theme.colors.primaryIcon02,
+                    modifier = modifier
+                        .then(if (onSubscribeClick == null) Modifier else Modifier.clickable { onSubscribeClick() })
+
                 )
             }
         }
