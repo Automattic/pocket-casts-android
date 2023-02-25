@@ -37,6 +37,7 @@ import androidx.transition.Slide
 import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
+import au.com.shiftyjelly.pocketcasts.account.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
@@ -178,6 +179,7 @@ class MainActivity :
     @Inject lateinit var warningsHelper: WarningsHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
+    @Inject lateinit var watchSync: WatchSync
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -711,6 +713,12 @@ class MainActivity :
                 showBottomSheet(trialFinished)
 
                 settings.setTrialFinishedSeen(true)
+            }
+
+            lifecycleScope.launch {
+                // FIXME This gets called every time MainActivity resumes. Can we reduce how often this is called?
+                //   But if that gets fixed we may want to also start calling this explicitly in onCreate
+                watchSync.sendAuthToDataLayer(this@MainActivity)
             }
         }
 

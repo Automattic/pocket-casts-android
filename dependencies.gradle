@@ -185,7 +185,8 @@ project.ext {
 
             wearComposeMaterial: "androidx.wear.compose:compose-material:$versionComposeWear",
             wearComposeFoundation: "androidx.wear.compose:compose-foundation:$versionComposeWear",
-            wearComposeNavigation:  "androidx.wear.compose:compose-navigation:$versionComposeWear",
+            wearComposeNavigation: "androidx.wear.compose:compose-navigation:$versionComposeWear",
+            wearPlayServices: "com.google.android.gms:play-services-wearable:18.0.0",
 
             horologistComposeLayout: "com.google.android.horologist:horologist-compose-layout:$versionHorologist",
             horologistMedia: "com.google.android.horologist:horologist-media:$versionHorologist",

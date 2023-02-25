@@ -60,6 +60,30 @@ class AccountAuth @Inject constructor(
         return authResult
     }
 
+    // TODO extract logic this method shares with signInWithGoogle
+    suspend fun signInWithToken(
+        refreshToken: String,
+        signInSource: SignInSource,
+    ): AuthResult {
+        val authResult = try {
+            val response = syncServerManager.loginToken(refreshToken)
+            val result = AuthResultModel(token = response.refreshToken, uuid = response.uuid, isNewAccount = response.isNew)
+            signInSuccessful(
+                email = response.email,
+                refreshTokenOrPassword = response.refreshToken,
+                accessToken = response.accessToken,
+                userUuid = response.uuid,
+                signInType = AccountConstants.SignInType.RefreshToken
+            )
+            AuthResult.Success(result)
+        } catch (ex: Exception) {
+            Timber.e(ex, "Failed to sign in with token")
+            exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
+        }
+        trackSignIn(authResult, signInSource)
+        return authResult
+    }
+
     suspend fun signInWithEmailAndPassword(
         email: String,
         password: String,
@@ -109,6 +133,10 @@ class AccountAuth @Inject constructor(
         trackRegister(authResult)
         return authResult
     }
+
+    // FIXME need a better name
+    suspend fun getTokensWithEmailAndPassword(email: String, password: String) =
+        syncServerManager.loginPocketCasts(email, password)
 
     private fun trackRegister(authResult: AuthResult) {
         when (authResult) {
@@ -220,4 +248,5 @@ enum class SignInSource(val analyticsValue: String) {
     SignInViewModel("sign_in_view_model"),
     Onboarding("onboarding"),
     PocketCastsApplication("pocketcasts_application"),
+    WatchPhoneSync("watch_phone_sync"),
 }
