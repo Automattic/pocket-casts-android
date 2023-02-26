@@ -6,8 +6,11 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.setAccessToken
+import au.com.shiftyjelly.pocketcasts.preferences.setRefreshToken
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
@@ -43,10 +46,10 @@ class AccountAuth @Inject constructor(
     ): AuthResult {
         val authResult = try {
             val response = syncServerManager.loginGoogle(idToken)
-            val result = AuthResultModel(token = response.refreshToken, uuid = response.uuid, isNewAccount = response.isNew)
+            val result = AuthResultModel(token = response.accessToken, uuid = response.uuid, isNewAccount = response.isNew)
             signInSuccessful(
                 email = response.email,
-                refreshTokenOrPassword = response.refreshToken,
+                refreshTokenOrPassword = response.refreshToken.value,
                 accessToken = response.accessToken,
                 userUuid = response.uuid,
                 signInType = AccountConstants.SignInType.RefreshToken
@@ -169,15 +172,21 @@ class AccountAuth @Inject constructor(
         }
     }
 
-    private suspend fun signInSuccessful(email: String, refreshTokenOrPassword: String, accessToken: String, userUuid: String, signInType: AccountConstants.SignInType) {
+    private suspend fun signInSuccessful(
+        email: String,
+        refreshTokenOrPassword: String,
+        accessToken: AccessToken,
+        userUuid: String,
+        signInType: AccountConstants.SignInType
+    ) {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully to $email")
         // Store details in android account manager
         val account = Account(email, AccountConstants.ACCOUNT_TYPE)
         val accountManager = AccountManager.get(context)
         accountManager.addAccountExplicitly(account, refreshTokenOrPassword, null)
-        accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken)
+        accountManager.setAccessToken(account, AccountConstants.TOKEN_TYPE, accessToken)
         accountManager.setUserData(account, AccountConstants.UUID, userUuid)
-        accountManager.setUserData(account, AccountConstants.SIGN_IN_TYPE_KEY, signInType.toString())
+        accountManager.setUserData(account, AccountConstants.SIGN_IN_TYPE_KEY, signInType.value)
 
         settings.setUsedAccountManager(true)
         startPodcastRefresh()
@@ -190,14 +199,14 @@ class AccountAuth @Inject constructor(
         podcastManager.refreshPodcasts("login")
     }
 
-    suspend fun refreshToken(
+    suspend fun accessToken(
         email: String,
         refreshTokenOrPassword: String,
         signInSource: SignInSource,
         signInType: AccountConstants.SignInType,
         account: Account,
         accountManager: AccountManager
-    ): String {
+    ): AccessToken {
         val properties = mapOf(KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
         try {
             val accessToken = when (signInType) {
@@ -205,7 +214,7 @@ class AccountAuth @Inject constructor(
                 AccountConstants.SignInType.RefreshToken -> {
                     val response = syncServerManager.loginToken(refreshToken = refreshTokenOrPassword)
                     // update the refresh token as the expiry may have been increased
-                    accountManager.setPassword(account, response.refreshToken)
+                    accountManager.setRefreshToken(account, response.refreshToken)
                     response.accessToken
                 }
             }

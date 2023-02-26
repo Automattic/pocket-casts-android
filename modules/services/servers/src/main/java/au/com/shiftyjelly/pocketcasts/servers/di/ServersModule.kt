@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatusMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
+import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
@@ -106,6 +108,8 @@ class ServersModule {
             .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
             .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
             .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
+            .add(AccessToken::class.java, AccessToken.Adapter)
+            .add(RefreshToken::class.java, RefreshToken.Adapter)
     }
 
     @Provides
@@ -149,10 +153,10 @@ class ServersModule {
         return okHttpClientBuilder.build()
     }
 
-    private fun buildRequestWithToken(original: Request, token: String?): Request {
+    private fun buildRequestWithToken(original: Request, token: AccessToken?): Request {
         val builder = original.newBuilder()
         if (token != null) {
-            builder.addHeader("Authorization", "Bearer $token")
+            builder.addHeader("Authorization", "Bearer ${token.value}")
         }
         return builder.build()
     }
