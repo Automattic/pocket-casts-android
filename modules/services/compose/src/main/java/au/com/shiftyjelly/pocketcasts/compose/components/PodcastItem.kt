@@ -33,6 +33,7 @@ fun PodcastItem(
     showPlusIfUnsubscribed: Boolean = false,
     showDivider: Boolean = true,
     onSubscribeClick: (() -> Unit)? = null,
+    maxLines: Int = 1,
 ) {
     Column {
         Row(
@@ -54,7 +55,7 @@ fun PodcastItem(
             ) {
                 TextH40(
                     text = podcast.title,
-                    maxLines = 1,
+                    maxLines = maxLines,
                     color = MaterialTheme.theme.colors.primaryText01
                 )
                 TextH50(

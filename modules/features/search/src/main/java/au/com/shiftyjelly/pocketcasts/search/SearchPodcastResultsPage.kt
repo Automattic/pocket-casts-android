@@ -69,6 +69,7 @@ private fun SearchPodcastResultsView(
                         subscribed = folderItem.podcast.isSubscribed,
                         showSubscribed = true,
                         showPlusIfUnsubscribed = true,
+                        maxLines = 2,
                         onClick = { onPodcastClick(folderItem.podcast) },
                         onSubscribeClick = { onSubscribeClick(folderItem.podcast) },
                         modifier = Modifier
