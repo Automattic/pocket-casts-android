@@ -606,21 +606,17 @@ class SettingsImpl @Inject constructor(
         return manager.getUserData(account, AccountConstants.UUID)
     }
 
-    private fun peekToken(): String? {
+    override fun getCachedSyncAccessToken(): AccessToken? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
-        return manager.peekAuthToken(account, AccountConstants.TOKEN_TYPE)
+        return manager.peekAccessToken(account, AccountConstants.TOKEN_TYPE)
     }
 
-    override fun getCachedSyncAccessToken(): String? {
-        return peekToken()
-    }
-
-    override fun getSyncAccessToken(onTokenErrorUiShown: () -> Unit): String? = runBlocking {
+    override fun getSyncAccessToken(onTokenErrorUiShown: () -> Unit): AccessToken? = runBlocking {
         getSyncAccessTokenSuspend(onTokenErrorUiShown)
     }
 
-    override suspend fun getSyncAccessTokenSuspend(onTokenErrorUiShown: () -> Unit): String? {
+    override suspend fun getSyncAccessTokenSuspend(onTokenErrorUiShown: () -> Unit): AccessToken? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
 
@@ -647,7 +643,7 @@ class SettingsImpl @Inject constructor(
                     intent?.let { showSignInErrorNotification(it, onTokenErrorUiShown) }
                     throw SecurityException("Token could not be refreshed")
                 } else {
-                    token
+                    AccessToken(token)
                 }
             } catch (e: Exception) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not get token")
@@ -687,10 +683,7 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun invalidateToken() {
-        val manager = AccountManager.get(context)
-        val account = manager.pocketCastsAccount() ?: return
-        val token = manager.peekAuthToken(account, AccountConstants.TOKEN_TYPE)
-        manager.invalidateAuthToken(AccountConstants.ACCOUNT_TYPE, token)
+        AccountManager.get(context).invalidateAccessToken()
     }
 
     @SuppressLint("HardwareIds")

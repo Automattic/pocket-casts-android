@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.OnTokenErrorUiShown
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
@@ -141,7 +142,7 @@ open class SyncServerManager @Inject constructor(
         return getCacheTokenOrLogin { token ->
             val fields = mapOf(
                 "email" to email,
-                "token" to token,
+                "token" to token.value,
                 "data" to data,
                 "device_utc_time_ms" to System.currentTimeMillis().toString(),
                 "last_modified" to lastModified
@@ -344,7 +345,7 @@ open class SyncServerManager @Inject constructor(
         cache.evictAll()
     }
 
-    private suspend fun <T : Any> getCacheTokenOrLoginSuspend(serverCall: suspend (token: String) -> T): T {
+    private suspend fun <T : Any> getCacheTokenOrLoginSuspend(serverCall: suspend (token: AccessToken) -> T): T {
         if (settings.isLoggedIn()) {
             return try {
                 val token = settings.getSyncAccessTokenSuspend(onTokenErrorUiShown) ?: refreshTokenSuspend()
@@ -364,13 +365,13 @@ open class SyncServerManager @Inject constructor(
         }
     }
 
-    private fun getCacheTokenOrLoginCompletable(serverCall: (token: String) -> Completable): Completable {
+    private fun getCacheTokenOrLoginCompletable(serverCall: (token: AccessToken) -> Completable): Completable {
         return getCacheTokenOrLogin { token ->
             serverCall(token).toSingleDefault(Unit)
         }.ignoreElement()
     }
 
-    private fun <T : Any> getCacheTokenOrLogin(serverCall: (token: String) -> Single<T>): Single<T> {
+    private fun <T : Any> getCacheTokenOrLogin(serverCall: (token: AccessToken) -> Single<T>): Single<T> {
         if (settings.isLoggedIn()) {
             return Single.fromCallable { settings.getSyncAccessToken(onTokenErrorUiShown) ?: throw RuntimeException("Failed to get token") }
                 .flatMap { token -> serverCall(token) }
@@ -396,12 +397,12 @@ open class SyncServerManager @Inject constructor(
         )
     }
 
-    private suspend fun refreshTokenSuspend(): String {
+    private suspend fun refreshTokenSuspend(): AccessToken {
         settings.invalidateToken()
         return settings.getSyncAccessTokenSuspend(onTokenErrorUiShown) ?: throw Exception("Failed to get refresh token")
     }
 
-    private fun refreshToken(): Single<String> {
+    private fun refreshToken(): Single<AccessToken> {
         settings.invalidateToken()
         return Single.fromCallable { settings.getSyncAccessToken(onTokenErrorUiShown) ?: throw RuntimeException("Failed to get token") }
             .doOnError {
@@ -413,7 +414,7 @@ open class SyncServerManager @Inject constructor(
         return throwable is HttpException && throwable.code() == 401
     }
 
-    private fun addBearer(token: String): String {
-        return "Bearer $token"
+    private fun addBearer(token: AccessToken): String {
+        return "Bearer ${token.value}"
     }
 }

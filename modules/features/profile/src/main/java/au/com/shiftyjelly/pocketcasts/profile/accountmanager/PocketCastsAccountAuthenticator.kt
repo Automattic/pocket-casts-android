@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.getSignInType
+import au.com.shiftyjelly.pocketcasts.preferences.peekAccessToken
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -32,12 +33,16 @@ class PocketCastsAccountAuthenticator(val context: Context, private val accountA
 
     override fun getAuthToken(response: AccountAuthenticatorResponse?, account: Account?, authTokenType: String?, options: Bundle?): Bundle {
         val accountManager = AccountManager.get(context)
-        var authToken = accountManager.peekAuthToken(account, authTokenType)
-        if (authToken.isNullOrEmpty() && account != null) {
+
+        var accessToken = if (account != null && authTokenType != null) {
+            accountManager.peekAccessToken(account, authTokenType)
+        } else null
+
+        if (accessToken != null && account != null) {
             runBlocking {
                 Timber.d("Refreshing the access token")
                 try {
-                    authToken = accountAuth.refreshToken(
+                    accessToken = accountAuth.accessToken(
                         email = account.name,
                         refreshTokenOrPassword = accountManager.getPassword(account),
                         signInType = accountManager.getSignInType(account),
@@ -49,12 +54,14 @@ class PocketCastsAccountAuthenticator(val context: Context, private val accountA
                     LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to refresh token.")
                 }
             }
+        }
 
-            if (authToken != null) {
+        accessToken?.value?.let { tokenValue ->
+            if (account != null) {
                 return bundleOf(
                     AccountManager.KEY_ACCOUNT_NAME to account.name,
                     AccountManager.KEY_ACCOUNT_TYPE to account.type,
-                    AccountManager.KEY_AUTHTOKEN to authToken
+                    AccountManager.KEY_AUTHTOKEN to tokenValue
                 )
             }
         }
