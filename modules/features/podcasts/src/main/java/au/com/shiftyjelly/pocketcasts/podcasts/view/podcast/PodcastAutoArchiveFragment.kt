@@ -10,6 +10,8 @@ import androidx.preference.ListPreference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -25,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @AndroidEntryPoint
 class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
     @Inject lateinit var theme: Theme
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: PodcastAutoArchiveViewModel by viewModels()
     private lateinit var toolbar: Toolbar
@@ -100,13 +103,30 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
         }
 
         preferenceCustomForPodcast?.setOnPreferenceChangeListener { _, newValue ->
-            viewModel.updateGlobalOverride(newValue as Boolean)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_TOGGLED,
+                mapOf("enabled" to (newValue as Boolean))
+            )
+            viewModel.updateGlobalOverride(newValue)
             true
         }
 
         preferenceAutoArchivePodcastPlayedEpisodes?.setOnPreferenceChangeListener { _, newValue ->
             val stringVal = newValue as? String ?: return@setOnPreferenceChangeListener false
             val index = max(afterPlayingValues.indexOf(stringVal), 0) // Returns -1 on not found, default it to 0
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
+                mapOf(
+                    "value" to when (index) {
+                        0 -> "never"
+                        1 -> "after_playing"
+                        2 -> "after_24_hours"
+                        3 -> "after_2_days"
+                        4 -> "after_1_week"
+                        else -> "unknown"
+                    }
+                )
+            )
             viewModel.updateAfterPlaying(index)
             true
         }
@@ -114,6 +134,21 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
         preferenceAutoArchivePodcastInactiveEpisodes?.setOnPreferenceChangeListener { _, newValue ->
             val stringVal = newValue as? String ?: return@setOnPreferenceChangeListener false
             val index = max(inactiveValues.indexOf(stringVal), 0) // Returns -1 on not found, default it to 0
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
+                mapOf(
+                    "value" to when (index) {
+                        0 -> "never"
+                        1 -> "after_24_hours"
+                        2 -> "after_2_days"
+                        3 -> "after_1_week"
+                        4 -> "after_2_weeks"
+                        5 -> "after_30_days"
+                        6 -> "after_3_months"
+                        else -> "unknown"
+                    }
+                )
+            )
             viewModel.updateInactive(index)
             true
         }
@@ -122,6 +157,19 @@ class PodcastAutoArchiveFragment : PreferenceFragmentCompat() {
             val stringVal = newValue as? String ?: return@setOnPreferenceChangeListener false
             val index = max(episodeLimitValues.indexOf(stringVal), 0)
             episodeLimitIndex = index
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED,
+                mapOf(
+                    "value" to when (index) {
+                        0 -> "none"
+                        1 -> 1
+                        2 -> 2
+                        3 -> 5
+                        4 -> 10
+                        else -> "unknown"
+                    }
+                )
+            )
             true
         }
     }

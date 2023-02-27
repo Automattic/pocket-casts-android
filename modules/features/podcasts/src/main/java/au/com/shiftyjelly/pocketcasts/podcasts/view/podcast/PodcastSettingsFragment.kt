@@ -10,6 +10,8 @@ import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreference
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -52,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, FilterSelectFragment.Listener, HasBackstack {
     @Inject lateinit var theme: Theme
     @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private var preferenceFeedIssueDetected: Preference? = null
     private var preferenceNotifications: SwitchPreference? = null
@@ -161,8 +164,8 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
             preferenceAddToUpNext?.isChecked = !podcast.isAutoAddToUpNextOff
             preferenceAddToUpNextOrder?.isVisible = !podcast.isAutoAddToUpNextOff
-            preferenceAddToUpNextOrder?.summary = if (podcast.autoAddToUpNext == Podcast.AUTO_ADD_TO_UP_NEXT_PLAY_NEXT) getString(LR.string.play_next) else getString(LR.string.play_last)
-            preferenceAddToUpNextOrder?.setValueIndex(if (podcast.isAutoAddToUpNextOff) 0 else podcast.autoAddToUpNext - 1)
+            preferenceAddToUpNextOrder?.summary = if (podcast.autoAddToUpNext == Podcast.AutoAddUpNext.PLAY_NEXT) getString(LR.string.play_next) else getString(LR.string.play_last)
+            preferenceAddToUpNextOrder?.setValueIndex(if (podcast.isAutoAddToUpNextOff) 0 else podcast.autoAddToUpNext.databaseInt - 1)
             preferenceAddToUpNextGlobal?.isVisible = preferenceAddToUpNextOrder?.isVisible ?: false
 
             preferenceSkipFirst?.text = podcast.startFromSecs.toString()
@@ -207,14 +210,23 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
     private fun setupFeedIssueDetected() {
         preferenceFeedIssueDetected?.setOnPreferenceClickListener {
+            analyticsTracker.track(AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_TAPPED)
             val dialog = ConfirmationDialog().setButtonType(ConfirmationDialog.ButtonType.Normal(getString(LR.string.podcast_feed_issue_dialog_button)))
                 .setTitle(getString(LR.string.podcast_feed_issue_dialog_title))
                 .setSummary(getString(LR.string.podcast_feed_issue_dialog_summary))
                 .setIconId(IR.drawable.ic_failedwarning)
                 .setOnConfirm {
                     launch {
+                        analyticsTracker.track(AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_UPDATE_TAPPED)
                         podcastManager.updateRefreshAvailable(podcastUuid = podcastUuid, refreshAvailable = false)
                         val success = podcastManager.refreshPodcastFeed(podcastUuid = podcastUuid)
+                        analyticsTracker.track(
+                            if (success) {
+                                AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_FIX_SUCCEEDED
+                            } else {
+                                AnalyticsEvent.PODCAST_SETTINGS_FEED_ERROR_FIX_FAILED
+                            }
+                        )
                         FirebaseAnalyticsTracker.podcastFeedRefreshed()
                         showFeedUpdateQueued(success = success)
                     }
@@ -273,7 +285,12 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
                 if (stringValue.isBlank()) {
                     stringValue = "0"
                 }
-                viewModel.updateStartFrom(stringValue.toInt())
+                val secs = stringValue.toInt()
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SETTINGS_SKIP_FIRST_CHANGED,
+                    mapOf("value" to secs)
+                )
+                viewModel.updateStartFrom(secs)
             } catch (e: NumberFormatException) {
                 Timber.e(e)
             }
@@ -288,7 +305,12 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
                 if (stringValue.isBlank()) {
                     stringValue = "0"
                 }
-                viewModel.updateSkipLast(stringValue.toInt())
+                val secs = stringValue.toInt()
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SETTINGS_SKIP_LAST_CHANGED,
+                    mapOf("value" to secs)
+                )
+                viewModel.updateSkipLast(secs)
             } catch (e: java.lang.NumberFormatException) {
                 Timber.e(e)
             }
@@ -298,7 +320,11 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
     private fun setupNotifications() {
         preferenceNotifications?.setOnPreferenceChangeListener { _, newValue ->
-            viewModel.showNotifications(newValue as Boolean)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED,
+                mapOf("enabled" to (newValue as Boolean))
+            )
+            viewModel.showNotifications(newValue)
             true
         }
     }
@@ -314,7 +340,10 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
 
     private fun setupFilters() {
         preferenceFilters?.setOnPreferenceClickListener {
-            val fragment = FilterSelectFragment.newInstance(shouldFilterPlaylistsWithAllPodcasts = true)
+            val fragment = FilterSelectFragment.newInstance(
+                source = FilterSelectFragment.Source.PODCAST_SETTINGS,
+                shouldFilterPlaylistsWithAllPodcasts = true
+            )
             childFragmentManager.beginTransaction()
                 .replace(UR.id.frameChildFragment, fragment)
                 .addToBackStack("filterSelect")
@@ -376,7 +405,11 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
         preferenceAddToUpNext?.run {
             isChecked = viewModel.isAutoAddToUpNextOn()
             setOnPreferenceChangeListener { _, isOn ->
-                viewModel.updateAutoAddToUpNext(isOn as Boolean)
+                analyticsTracker.track(
+                    AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED,
+                    mapOf("enabled" to isOn as Boolean)
+                )
+                viewModel.updateAutoAddToUpNext(isOn)
                 true
             }
         }
@@ -390,14 +423,30 @@ class PodcastSettingsFragment : BasePreferenceFragment(), CoroutineScope, Filter
             )
             entryValues = arrayOf("1", "2")
             setOnPreferenceChangeListener { _, newValue ->
-                val value = Integer.parseInt(newValue as String)
-                viewModel.updateAutoAddToUpNextOrder(value)
+                when (newValue) {
+                    "1" -> Podcast.AutoAddUpNext.PLAY_LAST
+                    "2" -> Podcast.AutoAddUpNext.PLAY_NEXT
+                    else -> {
+                        Timber.e("Unknown value for auto add to up next order: $newValue")
+                        null
+                    }
+                }?.let { value ->
+                    viewModel.updateAutoAddToUpNextOrder(value)
+                    analyticsTracker.track(
+                        AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED,
+                        mapOf("value" to value.analyticsValue)
+                    )
+                }
                 true
             }
         }
 
         preferenceAutoDownload?.setOnPreferenceChangeListener { _, newValue ->
-            viewModel.setAutoDownloadEpisodes(newValue as Boolean)
+            analyticsTracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED,
+                mapOf("enabled" to newValue as Boolean)
+            )
+            viewModel.setAutoDownloadEpisodes(newValue)
             true
         }
 

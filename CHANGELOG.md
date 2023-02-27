@@ -1,8 +1,28 @@
+7.34
+-----
+*   Updates
+    *   Improved the Automotive account page styles
+        ([#798](https://github.com/Automattic/pocket-casts-android/pull/798)).
+
+7.33
+-----
+*   New Features:
+    *    Added search history 
+         ([#784](https://github.com/Automattic/pocket-casts-android/pull/784)).
+*   Bug Fixes:
+    *    App no longer crashes when the device browser has been disabled
+         ([#762](https://github.com/Automattic/pocket-casts-android/issues/762)).    
+    *    Improve discovery of chromecast devices
+         ([#780](https://github.com/Automattic/pocket-casts-android/issues/780)).
+
+7.32
+-----
+*   Bug Fixes:
+    *    Ask notifications permission for newly-installed apps on Android 13
+         ([#723](https://github.com/Automattic/pocket-casts-android/issues/723)).
+
 7.31
 -----
-*   Health:
-    *   Switched to using the new user login and register endpoints.
-        ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
 *   New Features:
     *   Add support for HLS streams
         ([#679](https://github.com/Automattic/pocket-casts-android/pull/679)).
@@ -11,9 +31,22 @@
 *   Updates
     *   Update styling of upgrade prompt on account details screen
         ([#706](https://github.com/Automattic/pocket-casts-android/pull/706)).
+    *   Updated Android 13 media notification controls setting to hide custom actions 
+        ([#719](https://github.com/Automattic/pocket-casts-android/pull/719)).
+*   Health:
+    *   Switched to using the new user login and register endpoints.
+        ([#685](https://github.com/Automattic/pocket-casts-android/pull/685)).
+    *   Upgraded ExoPlayer to 2.18.2
+        ([#707](https://github.com/Automattic/pocket-casts-android/pull/707)).
 *   Bug Fixes:
     *   Improved handling of sync errors
         ([#711](https://github.com/Automattic/pocket-casts-android/pull/711)).
+    *   App does a better job respecting the device's dark/light mode settings
+        ([#710](https://github.com/Automattic/pocket-casts-android/pull/710)).
+    *   Make it easier to tap newsletter toggle
+        ([#714](https://github.com/Automattic/pocket-casts-android/pull/714)).
+    *   Improved unresponsive media notifications
+        ([#709](https://github.com/Automattic/pocket-casts-android/pull/709)).
 
 7.30
 -----
@@ -327,4 +360,3 @@
         ([#3148](https://github.com/shiftyjelly/pocketcasts-android/issues/3148)).
     *   Fix create account next button not working when using 1Password
         ([#3167](https://github.com/shiftyjelly/pocketcasts-android/issues/3167)).
-

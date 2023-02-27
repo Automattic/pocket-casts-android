@@ -35,6 +35,8 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
@@ -64,11 +66,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 class PlaybackSettingsFragment : BaseFragment() {
 
-    @Inject
-    lateinit var settings: Settings
-
-    @Inject
-    lateinit var podcastManager: PodcastManager
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,6 +93,11 @@ class PlaybackSettingsFragment : BaseFragment() {
         settings: Settings,
         onBackClick: () -> Unit,
     ) {
+
+        LaunchedEffect(Unit) {
+            analyticsTracker.track(AnalyticsEvent.SETTINGS_GENERAL_SHOWN)
+        }
+
         Column {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_playback),
@@ -109,19 +114,53 @@ class PlaybackSettingsFragment : BaseFragment() {
                         saved = settings.rowActionObservable
                             .subscribeAsState(settings.streamingMode())
                             .value,
-                        onSave = settings::setStreamingMode
+                        onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_ROW_ACTION_CHANGED,
+                                mapOf(
+                                    "value" to when (it) {
+                                        true -> "play"
+                                        false -> "download"
+                                    }
+                                )
+                            )
+                            settings.setStreamingMode(it)
+                        }
                     )
 
                     UpNextSwipe(
                         saved = settings.upNextSwipeActionObservable
                             .subscribeAsState(settings.getUpNextSwipeAction())
                             .value,
-                        onSave = settings::setUpNextSwipeAction
+                        onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_UP_NEXT_SWIPE_CHANGED,
+                                mapOf(
+                                    "value" to when (it) {
+                                        Settings.UpNextAction.PLAY_NEXT -> "play_next"
+                                        Settings.UpNextAction.PLAY_LAST -> "play_last"
+                                    }
+                                )
+                            )
+                            settings.setUpNextSwipeAction(it)
+                        }
                     )
 
                     PodcastEpisodeGrouping(
                         saved = settings.defaultPodcastGroupingFlow.collectAsState().value,
                         onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_EPISODE_GROUPING_CHANGED,
+                                mapOf(
+                                    "value" to when (it) {
+                                        PodcastGrouping.Downloaded -> "downloaded"
+                                        PodcastGrouping.None -> "none"
+                                        PodcastGrouping.Season -> "season"
+                                        PodcastGrouping.Starred -> "starred"
+                                        PodcastGrouping.Unplayed -> "unplayed"
+                                    }
+                                )
+                            )
                             settings.setDefaultPodcastGrouping(it)
                             showSetAllGroupingDialog(it)
                         }
@@ -130,6 +169,15 @@ class PlaybackSettingsFragment : BaseFragment() {
                     ShowArchived(
                         saved = settings.defaultShowArchivedFlow.collectAsState().value,
                         onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_ARCHIVED_EPISODES_CHANGED,
+                                mapOf(
+                                    "value" to when (it) {
+                                        true -> "show"
+                                        false -> "hide"
+                                    }
+                                )
+                            )
                             settings.setDefaultShowArchived(it)
                             showSetAllArchiveDialog(it)
                         }
@@ -153,6 +201,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                             .subscribeAsState(settings.getSkipForwardInSecs())
                             .value,
                         onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_SKIP_FORWARD_CHANGED,
+                                mapOf("value" to it)
+                            )
                             settings.setSkipForwardNeedsSync(true)
                             settings.setSkipForwardInSec(it)
                         }
@@ -165,6 +217,10 @@ class PlaybackSettingsFragment : BaseFragment() {
                             .subscribeAsState(settings.getSkipBackwardInSecs())
                             .value,
                         onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_SKIP_BACK_CHANGED,
+                                mapOf("value" to it)
+                            )
                             settings.setSkipBackNeedsSync(true)
                             settings.setSkipBackwardInSec(it)
                         }
@@ -172,22 +228,46 @@ class PlaybackSettingsFragment : BaseFragment() {
 
                     KeepScreenAwake(
                         saved = settings.keepScreenAwakeFlow.collectAsState().value,
-                        onSave = settings::setKeepScreenAwake
+                        onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_KEEP_SCREEN_AWAKE_TOGGLED,
+                                mapOf("enabled" to it)
+                            )
+                            settings.setKeepScreenAwake(it)
+                        }
                     )
 
                     OpenPlayerAutomatically(
                         saved = settings.openPlayerAutomaticallyFlow.collectAsState().value,
-                        onSave = settings::setOpenPlayerAutomatically
+                        onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_OPEN_PLAYER_AUTOMATICALLY_TOGGLED,
+                                mapOf("enabled" to it)
+                            )
+                            settings.setOpenPlayerAutomatically(it)
+                        }
                     )
 
                     IntelligentPlaybackResumption(
                         saved = settings.intelligentPlaybackResumptionFlow.collectAsState().value,
-                        onSave = settings::setIntelligentPlaybackResumption
+                        onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_INTELLIGENT_PLAYBACK_TOGGLED,
+                                mapOf("enabled" to it)
+                            )
+                            settings.setIntelligentPlaybackResumption(it)
+                        }
                     )
 
                     PlayUpNextOnTap(
                         saved = settings.tapOnUpNextShouldPlayFlow.collectAsState().value,
-                        onSave = settings::setTapOnUpNextShouldPlay
+                        onSave = {
+                            analyticsTracker.track(
+                                AnalyticsEvent.SETTINGS_GENERAL_PLAY_UP_NEXT_ON_TAP_TOGGLED,
+                                mapOf("enabled" to it)
+                            )
+                            settings.setTapOnUpNextShouldPlay(it)
+                        }
                     )
                 }
             }

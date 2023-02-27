@@ -37,14 +37,20 @@ class AccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(theme.activeTheme.resourceId)
+        theme.setupThemeForConfig(this, resources.configuration)
 
         binding = AccountActivityBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
 
+        val navController = findNavController(R.id.nav_host_fragment)
+        binding.carHeader?.btnClose?.setOnClickListener {
+            if (!navController.popBackStack()) {
+                finish()
+            }
+        }
+
         if (savedInstanceState == null) {
-            val navController = findNavController(R.id.nav_host_fragment)
             val navInflater = navController.navInflater
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
@@ -78,7 +84,6 @@ class AccountActivity : AppCompatActivity() {
             val navConfiguration = AppBarConfiguration(navController.graph)
             binding.toolbar?.setupWithNavController(navController, navConfiguration)
             binding.toolbar?.setNavigationOnClickListener { _ -> onBackPressed() }
-            binding.carHeader?.btnClose?.setOnClickListener { onBackPressed() }
 
             navController.addOnDestinationChangedListener { _, destination, _ ->
                 destination.trackShown()

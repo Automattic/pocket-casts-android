@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -160,7 +162,10 @@ class ServersModule {
     @Provides
     @TokenInterceptor
     @Singleton
-    internal fun provideTokenInterceptor(settings: Settings): Interceptor {
+    internal fun provideTokenInterceptor(
+        settings: Settings,
+        @OnTokenErrorUiShown onTokenErrorUiShown: () -> Unit
+    ): Interceptor {
         val unauthenticatedEndpoints = setOf("security") // Don't attach a token to these methods because they get the token
         return Interceptor { chain ->
             val original = chain.request()
@@ -183,6 +188,11 @@ class ServersModule {
             }
         }
     }
+
+    @Provides
+    @OnTokenErrorUiShown
+    internal fun provideTokenErrorUiTracker(analyticsTracker: AnalyticsTrackerWrapper): () -> Unit =
+        { analyticsTracker.track(AnalyticsEvent.SIGNED_OUT_ALERT_SHOWN) }
 
     @Provides
     @CachedTokenedOkHttpClient
@@ -414,3 +424,7 @@ annotation class NoCacheOkHttpClientBuilder
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class TokenInterceptor
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class OnTokenErrorUiShown

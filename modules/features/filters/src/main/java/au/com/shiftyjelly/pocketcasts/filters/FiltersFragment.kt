@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -69,7 +70,7 @@ class FiltersFragment : BaseFragment(), CoroutineScope, Toolbar.OnMenuItemClickL
             toolbar = binding.toolbar,
             title = getString(LR.string.filters),
             menu = R.menu.menu_filters,
-            setupChromeCast = true,
+            chromeCastButton = Shown(chromeCastAnalytics),
             navigationIcon = None
         )
         binding.toolbar.setOnMenuItemClickListener(this)

@@ -32,8 +32,13 @@ class CloudSettingsFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
 
-    private val viewModel: AddFileViewModel by viewModels()
+    private val viewModel by viewModels<CloudSettingsViewModel>()
     private var binding: FragmentCloudSettingsBinding? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.onShown()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentCloudSettingsBinding.inflate(inflater, container, false)
@@ -81,37 +86,37 @@ class CloudSettingsFragment : BaseFragment() {
         with(binding.swtAutoAddToUpNext) {
             isChecked = settings.getCloudAddToUpNext()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudAddToUpNext(isChecked)
+                viewModel.setAddToUpNext(isChecked)
             }
         }
         with(binding.swtDeleteLocalFileAfterPlaying) {
-            isChecked = settings.getCloudDeleteAfterPlaying()
+            isChecked = settings.getDeleteLocalFileAfterPlaying()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudDeleteAfterPlaying(isChecked)
+                viewModel.setDeleteLocalFileAfterPlaying(isChecked)
             }
         }
         with(binding.swtDeleteCloudFileAfterPlaying) {
-            isChecked = settings.getCloudDeleteCloudAfterPlaying()
+            isChecked = settings.getDeleteCloudFileAfterPlaying()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudDeleteCloudAfterPlaying(isChecked)
+                viewModel.setDeleteCloudFileAfterPlaying(isChecked)
             }
         }
         with(binding.swtAutoUploadToCloud) {
             isChecked = settings.getCloudAutoUpload()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudAutoUpload(isChecked)
+                viewModel.setCloudAutoUpload(isChecked)
             }
         }
         with(binding.swtAutoDownloadFromCloud) {
             isChecked = settings.getCloudAutoDownload()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudAutoDownload(isChecked)
+                viewModel.setCloudAutoDownload(isChecked)
             }
         }
         with(binding.swtCloudOnlyOnWiFi) {
             isChecked = settings.getCloudOnlyWifi()
             setOnCheckedChangeListener { _, isChecked ->
-                settings.setCloudOnlyWifi(isChecked)
+                viewModel.setCloudOnlyWifi(isChecked)
             }
         }
 
@@ -128,6 +133,11 @@ class CloudSettingsFragment : BaseFragment() {
         ).forEach {
             it.setOnClickListener { openUpgradeSheet() }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.onFragmentPause(activity?.isChangingConfigurations)
     }
 
     private fun openUpgradeSheet() {

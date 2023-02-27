@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusH
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -87,7 +88,7 @@ internal fun OnboardingPlusFeaturesPage(
 
     @Suppress("NAME_SHADOWING")
     val onNotNowPressed = {
-        viewModel.onDismiss(flow, source)
+        viewModel.onNotNow(flow, source)
         onNotNowPressed()
     }
 
@@ -97,7 +98,7 @@ internal fun OnboardingPlusFeaturesPage(
         onBackPressed()
     }
 
-    LaunchedEffect(Unit) {
+    CallOnce {
         viewModel.onShown(flow, source)
     }
 
@@ -331,11 +332,6 @@ enum class PlusUpgradeFeatureItem(
         image = IR.drawable.cloud_storage,
         title = LR.string.onboarding_plus_feature_cloud_storage_title,
         text = LR.string.onboarding_plus_feature_cloud_storage_text,
-    ),
-    HideAds(
-        image = IR.drawable.ads_disabled,
-        title = LR.string.onboarding_plus_feature_hide_ads_title,
-        text = LR.string.onboarding_plus_feature_hide_ads_text,
     ),
     ThemesIcons(
         image = IR.drawable.themes_icons,

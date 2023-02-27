@@ -1,10 +1,9 @@
-* New Features:
-    *   Add tappable links to podcast description
-        ([#657](https://github.com/Automattic/pocket-casts-android/pull/657)).
-    *   Added new Tasker "Query Podcasts", "Query Podcast Episodes", "Query Filter", "Query Filter Episodes" and "Add To Up Next" actions.
-        ([#583](https://github.com/Automattic/pocket-casts-android/pull/583)).
-    *   Add categories to recommendations screen
-        ([#675](https://github.com/Automattic/pocket-casts-android/pull/675)).
-    *   Improved the Android Automotive search
-        ([#681](https://github.com/Automattic/pocket-casts-android/pull/681)).
+*   New Features:
+    *    Added search history 
+         ([#784](https://github.com/Automattic/pocket-casts-android/pull/784)).
+*   Bug Fixes:
+    *    App no longer crashes when the device browser has been disabled
+         ([#762](https://github.com/Automattic/pocket-casts-android/issues/762)).    
+    *    Improve discovery of chromecast devices
+         ([#780](https://github.com/Automattic/pocket-casts-android/issues/780)).
 

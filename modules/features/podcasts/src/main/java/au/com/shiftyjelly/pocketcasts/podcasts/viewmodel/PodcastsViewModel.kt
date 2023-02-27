@@ -218,6 +218,10 @@ class PodcastsViewModel
     }
 
     fun refreshPodcasts() {
+        analyticsTracker.track(
+            AnalyticsEvent.PULLED_TO_REFRESH,
+            mapOf("source" to "podcasts_list")
+        )
         podcastManager.refreshPodcasts("Pull down")
     }
 

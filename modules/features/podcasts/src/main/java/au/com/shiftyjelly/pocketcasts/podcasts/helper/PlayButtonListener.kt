@@ -77,7 +77,7 @@ class PlayButtonListener @Inject constructor(
     override fun onPlayNext(episodeUuid: String) {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNext(episode)
+                playbackManager.playNext(episode = episode, source = source)
             }
         }
     }
@@ -85,7 +85,7 @@ class PlayButtonListener @Inject constructor(
     override fun onPlayLast(episodeUuid: String) {
         launch {
             episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playLast(episode)
+                playbackManager.playLast(episode = episode, source = source)
             }
         }
     }

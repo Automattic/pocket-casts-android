@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
@@ -187,7 +188,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             toolbar = toolbar,
             title = arguments?.getString(ARG_PLAYLIST_TITLE),
             menu = R.menu.menu_filter,
-            setupChromeCast = true,
+            chromeCastButton = Shown(chromeCastAnalytics),
             navigationIcon = BackArrow,
             toolbarColors = null
         )

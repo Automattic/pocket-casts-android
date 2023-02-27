@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.di.OnTokenErrorUiShown
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
@@ -46,7 +47,8 @@ open class SyncServerManager @Inject constructor(
     @SyncServerRetrofit retrofit: Retrofit,
     val settings: Settings,
     @SyncServerCache val cache: Cache,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    @OnTokenErrorUiShown private val onTokenErrorUiShown: () -> Unit,
 ) {
 
     companion object {
@@ -340,12 +342,6 @@ open class SyncServerManager @Inject constructor(
 
     fun signOut() {
         cache.evictAll()
-    }
-
-    fun cancelSupporterSubscription(subscriptionUuid: String): Single<Response<Void>> {
-        return getCacheTokenOrLogin {
-            server.cancelSubscription(addBearer(it), SupporterCancelRequest(subscriptionUuid))
-        }
     }
 
     private suspend fun <T : Any> getCacheTokenOrLoginSuspend(serverCall: suspend (token: String) -> T): T {

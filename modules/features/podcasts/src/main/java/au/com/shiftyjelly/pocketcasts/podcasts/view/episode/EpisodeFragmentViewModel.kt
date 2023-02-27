@@ -192,12 +192,16 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     fun markAsPlayedClicked(isOn: Boolean) {
         launch {
+            val event: AnalyticsEvent
             episode?.let { episode ->
                 if (isOn) {
+                    event = AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
                     episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
                 } else {
+                    event = AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED
                     episodeManager.markAsNotPlayed(episode)
                 }
+                episodeAnalytics.trackEvent(event, source, episode.uuid)
             }
         }
     }
@@ -207,15 +211,15 @@ class EpisodeFragmentViewModel @Inject constructor(
             return if (!isOn) {
                 launch {
                     if (addLast) {
-                        playbackManager.playLast(episode)
+                        playbackManager.playLast(episode = episode, source = source)
                     } else {
-                        playbackManager.playNext(episode)
+                        playbackManager.playNext(episode = episode, source = source)
                     }
                 }
 
                 true
             } else {
-                playbackManager.removeEpisode(episode)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = source)
 
                 false
             }
@@ -241,8 +245,10 @@ class EpisodeFragmentViewModel @Inject constructor(
             episode?.let { episode ->
                 if (isOn) {
                     episodeManager.archive(episode, playbackManager)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
                 } else {
                     episodeManager.unarchive(episode)
+                    episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, source, episode.uuid)
                 }
             }
         }
@@ -278,6 +284,8 @@ class EpisodeFragmentViewModel @Inject constructor(
     fun starClicked() {
         episode?.let { episode ->
             episodeManager.toggleStarEpisodeAsync(episode)
+            val event = if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
+            episodeAnalytics.trackEvent(event, source, episode.uuid)
         }
     }
 

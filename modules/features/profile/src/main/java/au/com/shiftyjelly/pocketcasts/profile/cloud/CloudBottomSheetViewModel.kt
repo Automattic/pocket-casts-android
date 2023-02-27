@@ -97,14 +97,14 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun removeFromUpNext(episode: UserEpisode) {
-        playbackManager.removeEpisode(episode)
+        playbackManager.removeEpisode(episodeToRemove = episode, source = source)
         trackOptionTapped(UP_NEXT_DELETE)
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     fun playNext(episode: UserEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
-            playbackManager.playNext(episode)
+            playbackManager.playNext(episode = episode, source = source)
             trackOptionTapped(UP_NEXT_ADD_TOP)
         }
     }
@@ -112,7 +112,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     fun playLast(episode: UserEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
-            playbackManager.playLast(episode)
+            playbackManager.playLast(episode = episode, source = source)
             trackOptionTapped(UP_NEXT_ADD_BOTTOM)
         }
     }
@@ -120,6 +120,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun markAsPlayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
             episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
             trackOptionTapped(MARK_PLAYED)
         }
     }
@@ -127,6 +128,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun markAsUnplayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
             episodeManager.markAsNotPlayed(episode)
+            episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED, source, episode.uuid)
             trackOptionTapped(MARK_UNPLAYED)
         }
     }

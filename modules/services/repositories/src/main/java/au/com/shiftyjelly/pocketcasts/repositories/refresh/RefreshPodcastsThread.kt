@@ -14,6 +14,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -334,16 +335,16 @@ class RefreshPodcastsThread(
             episodesToAddToUpNext.forEach {
                 if (playbackManager.upNextQueue.queueEpisodes.size < upNextLimit) {
                     when (it.first) {
-                        AddToUpNext.Next -> playbackManager.playNext(it.second)
-                        AddToUpNext.Last -> playbackManager.playLast(it.second)
+                        AddToUpNext.Next -> playbackManager.playNext(it.second, source = AnalyticsSource.UNKNOWN, userInitiated = false)
+                        AddToUpNext.Last -> playbackManager.playLast(it.second, source = AnalyticsSource.UNKNOWN, userInitiated = false)
                     }
                 } else if (playbackManager.upNextQueue.queueEpisodes.size >= upNextLimit &&
                     settings.getAutoAddUpNextLimitBehaviour() == Settings.AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP &&
                     it.first == AddToUpNext.Next
                 ) {
-                    playbackManager.playNext(it.second)
+                    playbackManager.playNext(it.second, source = AnalyticsSource.UNKNOWN, userInitiated = false)
                     playbackManager.upNextQueue.queueEpisodes.lastOrNull()?.let { lastEpisode ->
-                        playbackManager.removeEpisode(lastEpisode)
+                        playbackManager.removeEpisode(lastEpisode, source = AnalyticsSource.UNKNOWN, userInitiated = false)
                     }
                 }
             }

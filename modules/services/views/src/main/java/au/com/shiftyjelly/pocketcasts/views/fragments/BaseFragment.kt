@@ -7,12 +7,14 @@ import androidx.annotation.ColorInt
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.None
@@ -30,6 +32,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
     open var statusBarColor: StatusBarColor = StatusBarColor.Light
 
     @Inject lateinit var theme: Theme
+    @Inject lateinit var chromeCastAnalytics: ChromeCastAnalytics
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
@@ -72,7 +75,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         toolbar: Toolbar,
         title: String? = null,
         @MenuRes menu: Int? = null,
-        setupChromeCast: Boolean = false,
+        chromeCastButton: ChromeCastButton = ChromeCastButton.None,
         navigationIcon: NavigationIcon = None,
         onNavigationClick: (() -> Unit)? = null,
         toolbarColors: ToolbarColors? = ToolbarColors.Theme(theme = theme, context = toolbar.context)
@@ -80,7 +83,7 @@ open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
         toolbar.setup(
             title = title,
             menu = menu,
-            setupChromeCast = setupChromeCast,
+            chromeCastButton = chromeCastButton,
             navigationIcon = navigationIcon,
             onNavigationClick = onNavigationClick,
             activity = activity,

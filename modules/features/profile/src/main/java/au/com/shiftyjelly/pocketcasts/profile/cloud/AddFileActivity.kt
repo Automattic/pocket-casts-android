@@ -55,11 +55,10 @@ import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.extractor.mp3.Mp3Extractor
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import dagger.hilt.android.AndroidEntryPoint
@@ -165,7 +164,7 @@ class AddFileActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(theme.activeTheme.resourceId)
+        theme.setupThemeForConfig(this, resources.configuration)
 
         binding = ActivityAddFileBinding.inflate(layoutInflater)
         val view = binding.root
@@ -672,10 +671,9 @@ class AddFileActivity :
         val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(0, 0, 0, 0).build()
         val player = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
         player.addListener(object : Player.Listener {
-            @Deprecated("Deprecated. Use onTracksInfoChanged(TracksInfo) instead.")
-            override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
+            override fun onTracksChanged(tracks: Tracks) {
                 val episodeMetadata = EpisodeFileMetadata()
-                episodeMetadata.read(trackSelections, true, this@AddFileActivity)
+                episodeMetadata.read(tracks, true, this@AddFileActivity)
                 episodeMetadata.embeddedArtworkPath?.let {
                     val artworkUri = Uri.parse(it)
                     loadImageFromUri(artworkUri, isFile = true)
@@ -690,8 +688,7 @@ class AddFileActivity :
                 }
             }
 
-            @Deprecated("Deprecated. Use onPlaybackStateChanged(int) and onPlayWhenReadyChanged(boolean, int) instead.")
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+            override fun onPlaybackStateChanged(@Player.State playbackState: Int) {
                 if (playbackState == ExoPlayer.STATE_READY) {
                     length = player.duration
                 }

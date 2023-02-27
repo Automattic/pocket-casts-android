@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -82,11 +83,11 @@ class UpNextEpisodeViewModel
     }
 
     fun playNext() {
-        episode.value?.let { launch { playbackManager.playNext(episode = it) } }
+        episode.value?.let { launch { playbackManager.playNext(episode = it, source = AnalyticsSource.UP_NEXT) } }
     }
 
     fun removeFromUpNext() {
-        episode.value?.let { playbackManager.removeEpisode(episodeToRemove = it) }
+        episode.value?.let { playbackManager.removeEpisode(episodeToRemove = it, source = AnalyticsSource.UP_NEXT) }
     }
 
     fun markPlayed() {

@@ -22,7 +22,7 @@
         android:layout_margin="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:contentDescription="@string/search_podcasts"
+        android:contentDescription="@string/search_podcasts_or_add_url"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingTop="12dp"
@@ -40,7 +40,7 @@
             style="?attr/textBody1"
             android:importantForAccessibility="no"
             android:textColor="?attr/contrast_01"
-            android:text="@string/search_podcasts"/>
+            android:text="@string/search_podcasts_or_add_url"/>
     </LinearLayout>
 
     <au.com.shiftyjelly.pocketcasts.views.component.PagerIndicator

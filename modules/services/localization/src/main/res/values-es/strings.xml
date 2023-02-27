@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-01-10 08:54:03+0000
+Translation-Revision-Date: 2023-02-08 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="settings_media_actions_show_subtitle">Muestra acciones de medios personalizadas en las notificaciones de medios de Android 13 y Android Auto.</string>
+    <string name="settings_media_actions_show_title">Mostrar acciones de medios personalizadas</string>
+    <string name="settings_media_actions_customise">Personalizar acciones de medios</string>
+    <string name="settings_media_actions_prioritize_subtitle">Tus acciones principales estarán disponibles.</string>
+    <string name="settings_media_actions_prioritize_title">Dar prioridad a las acciones de medios personalizadas</string>
+    <string name="plus_take_your_podcasting_to_next_level">Lleva tu experiencia con los pódcast al siguiente nivel con acceso exclusivo a funciones y opciones de personalización.</string>
     <string name="onboarding_recommendations_more">Más %s</string>
     <string name="filter_id_or_title">Título o ID del filtro</string>
     <string name="filter_title">Título del filtro</string>
@@ -57,9 +63,6 @@ Language: es
     <string name="profile_cancel_confirm_sub_expiry_date_fallback">la fecha de caducidad</string>
     <string name="profile_cancel_confirm_sub_expiry">Tu suscripción actual estará activa hasta el %1$s.</string>
     <string name="profile_cancel_confirm_subtitle">Esto cambiará tu plan a una cuenta gratuita.</string>
-    <string name="settings_your_top_actions_will_be_available_in_your_notif_and_android_auto_player">Tendrás a tu disposición las acciones principales gracias a las notificaciones de Android 13 y el reproductor Android Auto.</string>
-    <string name="settings_rearrange_media_actions">Reorganizar acciones de medios</string>
-    <string name="settings_prioritize_your_notification_actions">Dar prioridad a tus acciones de notificación</string>
     <string name="settings_other_media_actions">Otras acciones de medios</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Personaliza los botones que se muestran en las notificaciones de reproducción de Android 13 y Android Auto.</string>
     <string name="podcast_not_subscribed">No te has suscrito</string>
@@ -99,8 +102,6 @@ Language: es
     <string name="end_of_year_stories_failed">No se han podido cargar las historias de final de año, comprueba tu conexión a Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Muéstrate tal y como eres. Iconos y temas exclusivos solo para miembros Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temas e iconos</string>
-    <string name="onboarding_plus_feature_hide_ads_text">Experiencia sin anuncios que te da más de lo que te encanta y menos de lo que te desagrada.</string>
-    <string name="onboarding_plus_feature_hide_ads_title">Ocultar anuncios</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Carga tus archivos en el almacenamiento en la nube para que estén disponibles desde cualquier lugar.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">Almacenamiento en la nube de 10 GB</string>
     <string name="onboarding_plus_feature_folders_text">Organiza tus pódcast en carpetas y mantenlos sincronizados en todos tus dispositivos.</string>
@@ -628,7 +629,7 @@ Language: es
     <string name="settings_podcast_artwork">Carátula del podcast</string>
     <string name="settings_playback_resumption_summary">Si está activado, Pocket Casts retrocederá un poco los episodios que reanudes para que puedas ponerte al día fácilmente.</string>
     <string name="settings_playback_resumption">Reanudación inteligente de la reproducción</string>
-    <string name="settings_notification_vibrate_never">Nuevos episodios</string>
+    <string name="settings_notification_vibrate_never">Nunca</string>
     <string name="settings_notification_vibrate_in_silent">Solo en modo silencioso</string>
     <string name="settings_notification_vibrate_new_episodes">Nuevos episodios</string>
     <string name="settings_notification_vibrate">Vibrar en estas situaciones</string>

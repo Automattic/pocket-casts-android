@@ -399,6 +399,7 @@ class DownloadManagerImpl @Inject constructor(
                     result.errorMessage?.split(":")?.last()
                         ?: "Download failed"
                 )
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_DOWNLOAD_FAILED, uuid = episode.uuid)
             }
         } catch (t: Throwable) {
             Timber.e(t)

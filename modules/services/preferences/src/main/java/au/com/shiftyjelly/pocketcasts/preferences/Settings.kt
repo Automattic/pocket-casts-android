@@ -129,6 +129,8 @@ interface Settings {
         const val INTENT_LINK_PROMO_CODE = "pktc://redeem/promo/"
 
         const val LOG_TAG_AUTO = "PocketCastsAuto"
+
+        const val NOTIFICATIONS_DISABLED_MESSAGE_SHOWN = "notificationsDisabledMessageShown"
     }
 
     enum class NotificationChannel(val id: String) {
@@ -301,6 +303,7 @@ interface Settings {
     val keepScreenAwakeFlow: StateFlow<Boolean>
     val openPlayerAutomaticallyFlow: StateFlow<Boolean>
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
+    val customMediaActionsVisibilityFlow: StateFlow<Boolean>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -521,16 +524,16 @@ interface Settings {
     fun getCloudSortOrder(): CloudSortOrder
     fun getCloudAddToUpNext(): Boolean
     fun setCloudAddToUpNext(value: Boolean)
-    fun getCloudDeleteAfterPlaying(): Boolean
-    fun setCloudDeleteAfterPlaying(value: Boolean)
+    fun getDeleteLocalFileAfterPlaying(): Boolean
+    fun setDeleteLocalFileAfterPlaying(value: Boolean)
+    fun getDeleteCloudFileAfterPlaying(): Boolean
+    fun setDeleteCloudFileAfterPlaying(value: Boolean)
     fun getCloudAutoUpload(): Boolean
     fun setCloudAutoUpload(value: Boolean)
     fun getCloudAutoDownload(): Boolean
     fun setCloudAutoDownload(value: Boolean)
     fun getCachedSubscription(): SubscriptionStatus?
     fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?)
-    fun getCloudDeleteCloudAfterPlaying(): Boolean
-    fun setCloudDeleteCloudAfterPlaying(value: Boolean)
     fun getCloudOnlyWifi(): Boolean
     fun setCloudOnlyWifi(value: Boolean)
     fun getAppIconId(): String?
@@ -605,4 +608,10 @@ interface Settings {
 
     fun hasCompletedOnboarding(): Boolean
     fun setHasDoneInitialOnboarding()
+
+    fun areCustomMediaActionsVisible(): Boolean
+    fun setCustomMediaActionsVisible(value: Boolean)
+
+    fun isNotificationsDisabledMessageShown(): Boolean
+    fun setNotificationsDisabledMessageShown(value: Boolean)
 }
