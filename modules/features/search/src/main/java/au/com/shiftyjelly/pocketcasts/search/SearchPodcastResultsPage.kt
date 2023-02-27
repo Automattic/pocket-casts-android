@@ -52,14 +52,14 @@ private fun SearchPodcastResultsView(
     LazyColumn {
         items(
             items = state.podcasts,
-            key = { it.adapterId }
+            key = { it.adapterId },
         ) { folderItem ->
             when (folderItem) {
                 is FolderItem.Folder -> {
                     SearchFolderRow(
                         folder = folderItem.folder,
                         podcasts = folderItem.podcasts,
-                        onClick = { onFolderClick(folderItem.folder, folderItem.podcasts) }
+                        onClick = { onFolderClick(folderItem.folder, folderItem.podcasts) },
                     )
                 }
 

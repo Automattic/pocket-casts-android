@@ -40,7 +40,7 @@ fun PodcastItem(
             modifier = modifier
                 .fillMaxWidth()
                 .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             PodcastImage(
                 uuid = podcast.uuid,
@@ -52,15 +52,16 @@ fun PodcastItem(
                     .padding(end = 16.dp)
                     .weight(1f)
             ) {
-                TextP40(
+                TextH40(
                     text = podcast.title,
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText01
                 )
-                TextP50(
+                TextH50(
                     text = podcast.author,
                     maxLines = 1,
-                    color = MaterialTheme.theme.colors.primaryText02
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.padding(top = 2.dp)
                 )
             }
             if (subscribed && showSubscribed) {
@@ -81,7 +82,7 @@ fun PodcastItem(
             }
         }
         if (showDivider) {
-            HorizontalDivider()
+            HorizontalDivider(startIndent = 16.dp)
         }
     }
 }
