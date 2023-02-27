@@ -195,6 +195,7 @@
     <string name="search_no_podcasts_found">No podcasts found</string>
     <string name="search_no_podcasts_found_summary">Try more general or different keywords.</string>
     <string name="search_podcasts_or_add_url">Search podcasts or add RSS URL</string>
+    <string name="search_podcasts">Search podcasts </string>
     <string name="search_hint">Search by podcast name</string>
     <string name="search_history_clear_all_confirm_button_title">Clear Search History</string>
     <string name="search_history_clear_all_confirmation_message">Are you sure you want to clear all your search history?</string>

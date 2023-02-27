@@ -142,6 +142,7 @@ private fun SearchSortBar(searchText: String, onSearchTextChanged: (String) -> U
     ) {
         SearchBar(
             text = searchText,
+            placeholder = stringResource(LR.string.search_podcasts),
             onTextChanged = onSearchTextChanged,
             modifier = Modifier
                 .padding(start = 16.dp)
