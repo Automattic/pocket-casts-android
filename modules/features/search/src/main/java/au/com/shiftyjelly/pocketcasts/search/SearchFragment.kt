@@ -225,11 +225,11 @@ class SearchFragment : BaseFragment() {
                 }
             }
         }
-        binding.searchResults.apply {
+        binding.searchInlineResults.apply {
             ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             setContent {
                 AppThemeWithBackground(theme.activeTheme) {
-                    SearchResultsPage(
+                    SearchInlineResultsPage(
                         viewModel = viewModel,
                         onEpisodeClick = ::onEpisodeClick,
                         onPodcastClick = ::onPodcastClick,
@@ -288,7 +288,7 @@ class SearchFragment : BaseFragment() {
     private fun onShowAllClick(resultsType: ResultsType) {
         val fragment = SearchResultsFragment.newInstance(resultsType, onlySearchRemote, source)
         childFragmentManager.beginTransaction()
-            .replace(UR.id.frameChildFragment, fragment)
+            .replace(R.id.searchResults, fragment)
             .addToBackStack(SEARCH_RESULTS_TAG)
             .commit()
     }
