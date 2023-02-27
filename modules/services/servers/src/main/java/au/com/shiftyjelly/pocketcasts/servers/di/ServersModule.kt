@@ -172,12 +172,12 @@ class ServersModule {
             if (unauthenticatedEndpoints.contains(original.url.encodedPathSegments.firstOrNull())) {
                 chain.proceed(original)
             } else {
-                val token = settings.getSyncAccessToken()
+                val token = settings.getSyncAccessToken(onTokenErrorUiShown)
                 return@Interceptor if (token != null) {
                     val response = chain.proceed(buildRequestWithToken(original, token))
                     if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
                         settings.invalidateToken()
-                        val newToken = settings.getSyncAccessToken()
+                        val newToken = settings.getSyncAccessToken(onTokenErrorUiShown)
                         chain.proceed(buildRequestWithToken(original, newToken))
                     } else {
                         response

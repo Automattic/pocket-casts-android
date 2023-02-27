@@ -616,11 +616,11 @@ class SettingsImpl @Inject constructor(
         return peekToken()
     }
 
-    override fun getSyncAccessToken(): String? = runBlocking {
-        getSyncAccessTokenSuspend()
+    override fun getSyncAccessToken(onTokenErrorUiShown: () -> Unit): String? = runBlocking {
+        getSyncAccessTokenSuspend(onTokenErrorUiShown)
     }
 
-    override suspend fun getSyncAccessTokenSuspend(): String? {
+    override suspend fun getSyncAccessTokenSuspend(onTokenErrorUiShown: () -> Unit): String? {
         val manager = AccountManager.get(context)
         val account = manager.pocketCastsAccount() ?: return null
 

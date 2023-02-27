@@ -396,8 +396,8 @@ interface Settings {
     fun getSyncPasswordOrRefreshToken(): String?
     fun getSyncUuid(): String?
     fun getCachedSyncAccessToken(): String?
-    fun getSyncAccessToken(): String?
-    suspend fun getSyncAccessTokenSuspend(): String?
+    fun getSyncAccessToken(onTokenErrorUiShown: () -> Unit): String?
+    suspend fun getSyncAccessTokenSuspend(onTokenErrorUiShown: () -> Unit): String?
     fun isLoggedIn(): Boolean
     fun clearPlusPreferences()
     fun getUsedAccountManager(): Boolean
