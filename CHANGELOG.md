@@ -3,6 +3,8 @@
 *   Updates
     *   Improved the Automotive account page styles
         ([#798](https://github.com/Automattic/pocket-casts-android/pull/798)).
+    *   When Automotive doesn't have a browser, the URL and a QR code are shown instead.
+        ([#800](https://github.com/Automattic/pocket-casts-android/pull/800)).
 
 7.33
 -----
