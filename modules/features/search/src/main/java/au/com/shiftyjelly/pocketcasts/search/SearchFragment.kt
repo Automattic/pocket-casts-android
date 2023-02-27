@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
@@ -30,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAll
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -45,6 +43,7 @@ private const val ARG_FLOATING = "arg_floating"
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
 private const val ARG_SOURCE = "arg_source"
 private const val SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG = "search_history_clear_all_confirmation_dialog"
+private const val SEARCH_RESULTS_TAG = "search_results"
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
@@ -73,7 +72,7 @@ class SearchFragment : BaseFragment() {
         }
     }
 
-    private val viewModel: SearchViewModel by activityViewModels()
+    private val viewModel: SearchViewModel by viewModels()
     private val searchHistoryViewModel: SearchHistoryViewModel by viewModels()
     private var listener: Listener? = null
     private var binding: FragmentSearchBinding? = null
@@ -288,7 +287,10 @@ class SearchFragment : BaseFragment() {
 
     private fun onShowAllClick(resultsType: ResultsType) {
         val fragment = SearchResultsFragment.newInstance(resultsType, onlySearchRemote, source)
-        (activity as? FragmentHostListener)?.addFragment(fragment)
+        childFragmentManager.beginTransaction()
+            .replace(UR.id.frameChildFragment, fragment)
+            .addToBackStack(SEARCH_RESULTS_TAG)
+            .commit()
     }
 
     override fun onBackPressed(): Boolean {

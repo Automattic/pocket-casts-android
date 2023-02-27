@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -24,7 +23,7 @@ private const val ARG_SOURCE = "arg_source"
 private const val ARG_TYPE = "arg_type"
 @AndroidEntryPoint
 class SearchResultsFragment : BaseFragment() {
-    private val viewModel by activityViewModels<SearchViewModel>()
+    private val viewModel by viewModels<SearchViewModel>({ requireParentFragment() })
     private val searchHistoryViewModel by viewModels<SearchHistoryViewModel>()
     private var listener: SearchFragment.Listener? = null
 
@@ -117,8 +116,7 @@ class SearchResultsFragment : BaseFragment() {
     }
 
     private fun onBackClick() {
-        @Suppress("DEPRECATION")
-        activity?.onBackPressed()
+        parentFragmentManager.popBackStack()
     }
 
     companion object {
