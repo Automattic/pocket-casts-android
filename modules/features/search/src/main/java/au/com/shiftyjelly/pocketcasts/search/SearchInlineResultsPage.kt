@@ -59,6 +59,7 @@ import java.util.UUID
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+private const val MAX_ITEM_COUNT = 20
 @Composable
 fun SearchInlineResultsPage(
     viewModel: SearchViewModel,
@@ -79,7 +80,7 @@ fun SearchInlineResultsPage(
                 val result = state as SearchState.Results
                 if (result.error == null || !onlySearchRemote || result.loading) {
                     if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
-                        SearchPodcastResultsView(
+                        SearchResultsView(
                             state = state as SearchState.Results,
                             onEpisodeClick = onEpisodeClick,
                             onPodcastClick = onPodcastClick,
@@ -118,7 +119,7 @@ fun SearchInlineResultsPage(
 }
 
 @Composable
-private fun SearchPodcastResultsView(
+private fun SearchResultsView(
     state: SearchState.Results,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
@@ -151,7 +152,7 @@ private fun SearchPodcastResultsView(
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = 8.dp)) {
                 items(
-                    items = state.podcasts,
+                    items = state.podcasts.take(minOf(MAX_ITEM_COUNT, state.podcasts.size)),
                     key = { it.adapterId }
                 ) { folderItem ->
                     when (folderItem) {
@@ -191,7 +192,7 @@ private fun SearchPodcastResultsView(
             }
         }
         items(
-            items = state.episodes,
+            items = state.episodes.take(minOf(MAX_ITEM_COUNT, state.episodes.size)),
             key = { it.uuid }
         ) {
             SearchEpisodeItem(
@@ -336,7 +337,7 @@ fun SearchResultsViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        SearchPodcastResultsView(
+        SearchResultsView(
             state = SearchState.Results(
                 podcasts = listOf(
                     FolderItem.Folder(
