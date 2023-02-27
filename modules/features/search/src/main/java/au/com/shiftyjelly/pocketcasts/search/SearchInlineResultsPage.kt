@@ -167,7 +167,11 @@ private fun SearchPodcastResultsView(
                             SearchPodcastItem(
                                 podcast = folderItem.podcast,
                                 onClick = { onPodcastClick(folderItem.podcast) },
-                                onSubscribeClick = onSubscribeToPodcast
+                                onSubscribeClick = if (!folderItem.podcast.isSubscribed) {
+                                    { onSubscribeToPodcast(folderItem.podcast) }
+                                } else {
+                                    null
+                                }
                             )
                         }
                     }
