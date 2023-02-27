@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.search
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -16,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
@@ -73,6 +75,13 @@ class SearchResultsFragment : BaseFragment() {
                     ResultsType.UNKNOWN -> throw IllegalStateException("Unknown search results type")
                 }
             }
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.post {
+            UiUtil.hideKeyboard(view)
         }
     }
 
