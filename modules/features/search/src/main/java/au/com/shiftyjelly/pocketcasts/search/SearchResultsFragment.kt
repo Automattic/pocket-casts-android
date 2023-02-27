@@ -67,6 +67,7 @@ class SearchResultsFragment : BaseFragment() {
                         SearchEpisodeResultsPage(
                             viewModel = viewModel,
                             onBackClick = ::onBackClick,
+                            onEpisodeClick = ::onEpisodeClick
                         )
                     }
 
