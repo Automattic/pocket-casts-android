@@ -131,7 +131,6 @@ class SearchFragment : BaseFragment() {
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid)
             is SearchHistoryEntry.SearchTerm -> {
-                viewModel.updateSearchQuery(query = entry.term, immediate = true)
                 binding?.let {
                     it.searchView.setQuery(entry.term, true)
                     it.searchHistoryPanel.hide()
@@ -182,7 +181,7 @@ class SearchFragment : BaseFragment() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                viewModel.updateSearchQuery(query)
+                viewModel.updateSearchQuery(query, immediate = true)
                 binding.searchHistoryPanel.hide()
                 UiUtil.hideKeyboard(searchView)
                 return true
