@@ -179,12 +179,16 @@ private fun SearchResultsView(
                 }
             }
         }
-        if (state.episodes.isNotEmpty()) {
+        if (state.podcasts.isNotEmpty() && state.episodes.isNotEmpty()) {
             item {
                 HorizontalDivider(
                     startIndent = 16.dp,
                     modifier = modifier.padding(top = 20.dp, bottom = 4.dp)
                 )
+            }
+        }
+        if (state.episodes.isNotEmpty()) {
+            item {
                 SearchResultsHeaderView(
                     title = stringResource(LR.string.episodes),
                     onShowAllCLick = { onShowAllCLick(ResultsType.EPISODES) },

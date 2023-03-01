@@ -120,28 +120,37 @@ class SearchHandler @Inject constructor(
             } else {
                 analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
                 loadingObservable.accept(true)
+
+                var globalSearch = GlobalServerSearch(searchTerm = it)
                 val podcastServerSearch = serverManager
                     .searchForPodcastsRx(it)
+                    .map { podcastSearch ->
+                        globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
+                        globalSearch
+                    }
                     .subscribeOn(Schedulers.io())
                     .toObservable()
 
                 val episodesServerSearch = cacheServerManager
                     .searchEpisodes(it)
+                    .map { episodeSearch ->
+                        globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
+                        globalSearch
+                    }
                     .subscribeOn(Schedulers.io())
                     .toObservable()
 
                 podcastServerSearch
-                    .zipWith(episodesServerSearch) { podcastsSearch, episodesSearch ->
-                        GlobalServerSearch(
-                            searchTerm = it,
-                            error = podcastsSearch.error,
-                            podcastSearch = podcastsSearch,
-                            episodeSearch = episodesSearch
-                        )
+                    .mergeWith(episodesServerSearch)
+                    .subscribeOn(Schedulers.io())
+                    .onErrorReturn { exception ->
+                        GlobalServerSearch(error = exception)
+                    }
+                    .doFinally {
+                        loadingObservable.accept(false)
                     }
             }
         }
-        .doOnNext { loadingObservable.accept(false) }
 
     private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
         if (searchTerm.string.isBlank()) {
@@ -157,7 +166,7 @@ class SearchHandler @Inject constructor(
             val searchPodcastsResult = (localPodcastsResult + serverPodcastsResult).distinctBy { it.uuid }
             val searchEpisodesResult = serverSearchResults.episodeSearch.episodes
 
-            if (serverSearchResults.searchTerm.isEmpty() || searchPodcastsResult.isNotEmpty() || serverSearchResults.error != null) {
+            if (serverSearchResults.searchTerm.isEmpty() || (searchPodcastsResult.isNotEmpty() || searchEpisodesResult.isNotEmpty()) || serverSearchResults.error != null) {
                 serverSearchResults.error?.let {
                     analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
                 }
