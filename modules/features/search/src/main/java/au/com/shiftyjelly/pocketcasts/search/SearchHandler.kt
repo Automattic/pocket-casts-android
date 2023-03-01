@@ -131,17 +131,20 @@ class SearchHandler @Inject constructor(
                     .subscribeOn(Schedulers.io())
                     .toObservable()
 
-                val episodesServerSearch = cacheServerManager
-                    .searchEpisodes(it)
-                    .map { episodeSearch ->
-                        globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
-                        globalSearch
-                    }
-                    .subscribeOn(Schedulers.io())
-                    .toObservable()
+                if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
+                    val episodesServerSearch = cacheServerManager
+                        .searchEpisodes(it)
+                        .map { episodeSearch ->
+                            globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
+                            globalSearch
+                        }
+                        .subscribeOn(Schedulers.io())
+                        .toObservable()
 
-                podcastServerSearch
-                    .mergeWith(episodesServerSearch)
+                    podcastServerSearch.mergeWith(episodesServerSearch)
+                } else {
+                    podcastServerSearch
+                }
                     .subscribeOn(Schedulers.io())
                     .onErrorReturn { exception ->
                         GlobalServerSearch(error = exception)
