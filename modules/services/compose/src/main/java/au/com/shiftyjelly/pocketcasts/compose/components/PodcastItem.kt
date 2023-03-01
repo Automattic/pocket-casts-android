@@ -20,7 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-private val PodcastItemIconSize = 64.dp
+private val PodcastItemIconSize = 56.dp
 
 @Composable
 fun PodcastItem(
@@ -45,12 +45,11 @@ fun PodcastItem(
         ) {
             PodcastImage(
                 uuid = podcast.uuid,
-                modifier = modifier.size(iconSize)
-                    .padding(top = 4.dp, end = 12.dp, bottom = 4.dp)
+                modifier = modifier.size(iconSize),
             )
             Column(
                 modifier = modifier
-                    .padding(end = 16.dp)
+                    .padding(start = 12.dp, end = 16.dp)
                     .weight(1f)
             ) {
                 TextH40(

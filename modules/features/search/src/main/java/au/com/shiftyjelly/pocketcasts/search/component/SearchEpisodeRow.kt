@@ -43,13 +43,11 @@ fun SearchEpisodeItem(
         ) {
             PodcastImage(
                 uuid = episode.podcastUuid,
-                modifier = modifier
-                    .size(IconSize)
-                    .padding(top = 4.dp, end = 12.dp, bottom = 4.dp)
+                modifier = modifier.size(IconSize),
             )
             Column(
                 modifier = modifier
-                    .padding(end = 16.dp)
+                    .padding(start = 12.dp, end = 16.dp)
                     .weight(1f)
             ) {
                 TextC50(
