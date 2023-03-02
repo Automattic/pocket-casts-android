@@ -125,6 +125,7 @@ interface PodcastManager {
 
     fun refreshPodcastsIfRequired(fromLog: String)
     fun refreshPodcasts(fromLog: String)
+    suspend fun refreshPodcastsAfterSignIn()
     fun refreshPodcastInBackground(existingPodcast: Podcast, playbackManager: PlaybackManager)
     fun reloadFoldersFromServer()
 

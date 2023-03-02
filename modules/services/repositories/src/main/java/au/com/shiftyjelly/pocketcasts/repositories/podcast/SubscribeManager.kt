@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
@@ -37,7 +38,8 @@ class SubscribeManager @Inject constructor(
     val appDatabase: AppDatabase,
     val podcastCacheServerManager: PodcastCacheServerManager,
     val syncServerManager: SyncServerManager,
-    val staticServerManager: StaticServerManager,
+    private val staticServerManager: StaticServerManager,
+    private val syncAccountManager: SyncAccountManager,
     @ApplicationContext val context: Context,
     val settings: Settings
 ) {
@@ -174,7 +176,7 @@ class SubscribeManager @Inject constructor(
             }
         )
         // add sync information
-        if (settings.isLoggedIn()) {
+        if (syncAccountManager.isLoggedIn()) {
             val syncPodcastObservable = syncServerManager.getPodcastEpisodes(podcastUuid).subscribeOn(Schedulers.io())
             return Single.zip(cleanPodcastObservable, syncPodcastObservable, BiFunction<Podcast, PodcastEpisodesResponse, Podcast>(this::mergeSyncPodcast))
                 .onErrorResumeNext(cleanPodcastObservable)

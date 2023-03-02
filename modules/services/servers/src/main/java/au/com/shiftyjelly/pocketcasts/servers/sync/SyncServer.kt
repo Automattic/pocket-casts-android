@@ -8,11 +8,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -31,8 +29,8 @@ import retrofit2.http.Path
 import retrofit2.http.Url
 
 interface SyncServer {
-    @POST("/user/login")
-    suspend fun login(@Body request: LoginRequest): LoginResponse
+    @POST("/user/login_pocket_casts")
+    suspend fun login(@Body request: LoginRequest): LoginTokenResponse
 
     @POST("/user/login_google")
     suspend fun loginGoogle(@Body request: LoginGoogleRequest): LoginTokenResponse
@@ -40,8 +38,8 @@ interface SyncServer {
     @POST("/user/token")
     suspend fun loginToken(@Body request: LoginTokenRequest): LoginTokenResponse
 
-    @POST("/user/register")
-    suspend fun register(@Body request: RegisterRequest): RegisterResponse
+    @POST("/user/register_pocket_casts")
+    suspend fun register(@Body request: RegisterRequest): LoginTokenResponse
 
     @POST("/user/forgot_password")
     suspend fun forgotPassword(@Body request: ForgotPasswordRequest): ForgotPasswordResponse

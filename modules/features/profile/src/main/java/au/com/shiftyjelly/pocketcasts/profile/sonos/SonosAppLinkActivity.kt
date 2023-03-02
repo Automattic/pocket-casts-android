@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.databinding.ActivitySonosAppLinkBinding
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
@@ -38,6 +39,7 @@ class SonosAppLinkActivity : AppCompatActivity() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var theme: Theme
     @Inject lateinit var serverManager: ServerManager
+    @Inject lateinit var syncAccountManager: SyncAccountManager
 
     private lateinit var sonosState: String
     private lateinit var binding: ActivitySonosAppLinkBinding
@@ -63,15 +65,16 @@ class SonosAppLinkActivity : AppCompatActivity() {
             sonosState = it
         } ?: run { finish() }
 
-        binding.connectBtn.setOnClickListener {
-            val email = settings.getSyncEmail()
-            val password = settings.getSyncPasswordOrRefreshToken()
-            if (email != null && password != null) {
-                connectWithSonos(email, password)
-            } else {
-                setupSyncing()
-            }
-        }
+        // TODO: figure out how to link the sync account to Sonos
+//        binding.connectBtn.setOnClickListener {
+//            val email = settings.getSyncEmail()
+//            val password = settings.getSyncPasswordOrRefreshToken()
+//            if (email != null && password != null) {
+//                connectWithSonos(email, password)
+//            } else {
+//                setupSyncing()
+//            }
+//        }
     }
 
     override fun onResume() {
@@ -79,7 +82,7 @@ class SonosAppLinkActivity : AppCompatActivity() {
 
         binding.sonosImage.setImageResource(if (theme.isDarkTheme) IR.drawable.sonos_dark else IR.drawable.sonos_light)
 
-        if (settings.isLoggedIn()) {
+        if (syncAccountManager.isLoggedIn()) {
             binding.explanationText.setText(LR.string.profile_sonos_connect_account)
             binding.connectBtn.setText(LR.string.profile_sonos_connect)
         } else {

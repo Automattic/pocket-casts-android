@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class ChangePwdViewModel
 @Inject constructor(
     private val syncServerManager: SyncServerManager,
-    private val settings: Settings
+    private val syncAccountManager: SyncAccountManager
 ) : AccountViewModel() {
 
     val pwdCurrent = MutableLiveData<String>().apply { postValue("") }
@@ -102,7 +102,11 @@ class ChangePwdViewModel
             .doOnSuccess { response ->
                 val success = response.success ?: false
                 if (success) {
-                    settings.setSyncPassword(pwdNewString)
+                    // TODO can't implement this until we have a way to get the refresh token
+//                    val refreshToken = response.refreshToken
+//                    if (refreshToken != null) {
+//                        syncAccountManager.setRefreshToken(refreshToken)
+//                    }
                     changePasswordState.postValue(ChangePasswordState.Success("OK"))
                 } else {
                     val errors = mutableSetOf(ChangePasswordError.SERVER)

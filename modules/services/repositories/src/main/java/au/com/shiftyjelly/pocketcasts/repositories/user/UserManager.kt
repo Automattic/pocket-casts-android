@@ -8,15 +8,14 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.pocketCastsAccount
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -40,6 +39,7 @@ class UserManagerImpl @Inject constructor(
     val subscriptionManager: SubscriptionManager,
     val podcastManager: PodcastManager,
     val userEpisodeManager: UserEpisodeManager,
+    val syncAccountManager: SyncAccountManager,
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : UserManager {
 
@@ -51,15 +51,10 @@ class UserManagerImpl @Inject constructor(
         val accountListener = OnAccountsUpdateListener {
             try {
                 // Handle sign out from outside of the app
-                if (settings.getUsedAccountManager()) {
-                    val accountManager = AccountManager.get(application)
-                    if (accountManager.pocketCastsAccount() == null && settings.isLoggedIn()) {
-                        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out because no account manager account found")
-                        signOut(playbackManager, wasInitiatedByUser = false)
-                    }
+                if (!syncAccountManager.isLoggedIn()) {
+                    LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out because no account manager account found")
+                    signOut(playbackManager, wasInitiatedByUser = false)
                 }
-
-                (settings.isLoggedInObservable as? BehaviorRelay<Boolean>)?.accept(settings.isLoggedIn())
             } catch (t: Throwable) {
                 SentryHelper.recordException("Account monitoring crash.", t)
             }
@@ -70,7 +65,7 @@ class UserManagerImpl @Inject constructor(
     }
 
     override fun getSignInState(): Flowable<SignInState> {
-        return settings.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
+        return syncAccountManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
             .switchMap { isLoggedIn ->
                 if (isLoggedIn) {
                     subscriptionManager.observeSubscriptionStatus()
@@ -84,11 +79,11 @@ class UserManagerImpl @Inject constructor(
                         }
                         .map {
                             analyticsTracker.refreshMetadata()
-                            SignInState.SignedIn(email = settings.getSyncEmail() ?: "", subscriptionStatus = it)
+                            SignInState.SignedIn(email = syncAccountManager.getEmail() ?: "", subscriptionStatus = it)
                         }
                         .onErrorReturn {
                             Timber.e(it, "Error getting subscription state")
-                            SignInState.SignedIn(settings.getSyncEmail() ?: "", SubscriptionStatus.Free())
+                            SignInState.SignedIn(syncAccountManager.getEmail() ?: "", SubscriptionStatus.Free())
                         }
                 } else {
                     Flowable.just(SignInState.SignedOut())
@@ -114,8 +109,6 @@ class UserManagerImpl @Inject constructor(
         analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()
 
-        val accountManager = AccountManager.get(application)
-        val account = accountManager.pocketCastsAccount() ?: return
-        accountManager.removeAccountExplicitly(account)
+        syncAccountManager.signOut()
     }
 }

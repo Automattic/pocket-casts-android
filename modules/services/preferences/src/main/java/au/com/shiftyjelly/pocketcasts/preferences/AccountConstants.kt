@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
-import android.accounts.Account
-import android.accounts.AccountManager
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
@@ -13,48 +11,16 @@ object AccountConstants {
     const val SIGN_IN_TYPE_KEY = "sign_in"
 
     sealed class SignInType(val value: String) {
-        object EmailPassword : SignInType("EmailPassword")
-        object RefreshToken : SignInType("RefreshToken")
+        object Password : SignInType("Password")
+        object Tokens : SignInType("Tokens")
 
         override fun toString() = value
 
         companion object {
             fun fromString(value: String?): SignInType {
-                return if (value != null && value == RefreshToken.value) RefreshToken else EmailPassword
+                return if (value != null && value == Tokens.value) Tokens else Password
             }
         }
-    }
-}
-
-fun AccountManager.pocketCastsAccount(): Account? {
-    return getAccountsByType(AccountConstants.ACCOUNT_TYPE).firstOrNull()
-}
-
-fun AccountManager.getSignInType(account: Account): AccountConstants.SignInType {
-    return AccountConstants.SignInType.fromString(getUserData(account, AccountConstants.SIGN_IN_TYPE_KEY))
-}
-
-fun AccountManager.setRefreshToken(account: Account, refreshToken: RefreshToken) {
-    setPassword(account, refreshToken.value)
-}
-
-fun AccountManager.setAccessToken(account: Account, authTokenType: String, accessToken: AccessToken) {
-    setAuthToken(account, authTokenType, accessToken.value)
-}
-
-fun AccountManager.peekAccessToken(account: Account, authTokenType: String): AccessToken? =
-    peekAuthToken(account, authTokenType)?.let {
-        if (it.isNotEmpty()) {
-            AccessToken(it)
-        } else {
-            null
-        }
-    }
-
-fun AccountManager.invalidateAccessToken() {
-    val account = pocketCastsAccount() ?: return
-    peekAccessToken(account, AccountConstants.TOKEN_TYPE)?.let { token ->
-        invalidateAuthToken(AccountConstants.ACCOUNT_TYPE, token.value)
     }
 }
 

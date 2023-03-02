@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
@@ -62,9 +63,9 @@ class UpNextSyncJob : JobService() {
 
     companion object {
         @JvmStatic
-        fun run(settings: Settings, context: Context) {
+        fun run(syncAccountManager: SyncAccountManager, context: Context) {
             // Don't run the job if Up Next syncing is turned off
-            if (!settings.isLoggedIn()) {
+            if (!syncAccountManager.isLoggedIn()) {
                 return
             }
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncJob - scheduled")

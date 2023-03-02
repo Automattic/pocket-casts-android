@@ -4,7 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
@@ -19,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPod
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +34,7 @@ class EndOfYearManagerImpl @Inject constructor(
     private val podcastManager: PodcastManager,
     private val syncServerManager: SyncServerManager,
     private val historyManager: HistoryManager,
-    private val settings: Settings,
+    private val syncAccountManager: SyncAccountManager,
 ) : EndOfYearManager, CoroutineScope {
 
     companion object {
@@ -58,7 +58,7 @@ class EndOfYearManagerImpl @Inject constructor(
      * Download the year's listening history.
      */
     override suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit) {
-        if (!settings.isLoggedIn()) {
+        if (!syncAccountManager.isLoggedIn()) {
             return
         }
         // check for an episode interacted with before this year and assume they have the full listening history if they exist

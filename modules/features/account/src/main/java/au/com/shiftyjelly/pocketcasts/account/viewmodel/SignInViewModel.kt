@@ -2,9 +2,11 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.SignInSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SignInSource
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -12,8 +14,10 @@ import javax.inject.Inject
 @HiltViewModel
 class SignInViewModel
 @Inject constructor(
-    private val auth: AccountAuth,
-    private val subscriptionManager: SubscriptionManager
+    private val syncAccountManager: SyncAccountManager,
+    private val syncServerManager: SyncServerManager,
+    private val subscriptionManager: SubscriptionManager,
+    private val podcastManager: PodcastManager
 ) : AccountViewModel() {
 
     val signInState = MutableLiveData<SignInState>().apply { value = SignInState.Empty }
@@ -66,12 +70,18 @@ class SignInViewModel
 
         subscriptionManager.clearCachedStatus()
         viewModelScope.launch {
-            val result = auth.signInWithEmailAndPassword(emailString, pwdString, SignInSource.SignInViewModel)
+            val result = syncAccountManager.signInWithEmailAndPassword(
+                email = emailString,
+                password = pwdString,
+                syncServerManager = syncServerManager,
+                signInSource = SignInSource.SignInViewModel
+            )
             when (result) {
-                is AccountAuth.AuthResult.Success -> {
+                is SyncAccountManager.SignInResult.Success -> {
+                    podcastManager.refreshPodcastsAfterSignIn()
                     signInState.postValue(SignInState.Success)
                 }
-                is AccountAuth.AuthResult.Failed -> {
+                is SyncAccountManager.SignInResult.Failed -> {
                     val message = result.message
                     val errors = mutableSetOf(SignInError.SERVER)
                     signInState.postValue(SignInState.Failure(errors, message))

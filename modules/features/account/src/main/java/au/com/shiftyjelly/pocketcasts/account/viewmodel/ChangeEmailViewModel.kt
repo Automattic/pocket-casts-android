@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -15,10 +16,11 @@ import javax.inject.Inject
 class ChangeEmailViewModel
 @Inject constructor(
     private val syncServerManager: SyncServerManager,
+    private val syncAccountManager: SyncAccountManager,
     private val settings: Settings
 ) : AccountViewModel() {
 
-    var existingEmail = settings.getSyncEmail()
+    var existingEmail = syncAccountManager.getEmail()
 
     val changeEmailState = MutableLiveData<ChangeEmailState>().apply { value = ChangeEmailState.Empty }
     private val disposables = CompositeDisposable()
@@ -53,7 +55,7 @@ class ChangeEmailViewModel
 
     fun clearValues() {
         confirmationMessages.value = Pair("", "")
-        existingEmail = settings.getSyncEmail()
+        existingEmail = syncAccountManager.getEmail()
         updateEmail("")
         updatePassword("")
     }
@@ -75,7 +77,7 @@ class ChangeEmailViewModel
             .doOnSuccess { response ->
                 val success = response.success ?: false
                 if (success) {
-                    settings.setSyncEmail(emailString)
+                    syncAccountManager.setEmail(emailString)
                     existingEmail = emailString
                     changeEmailState.postValue(ChangeEmailState.Success("OK"))
                 } else {

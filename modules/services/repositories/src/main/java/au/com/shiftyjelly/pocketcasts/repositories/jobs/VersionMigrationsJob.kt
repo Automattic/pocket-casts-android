@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.jobs
 
-import android.accounts.Account
-import android.accounts.AccountManager
 import android.annotation.SuppressLint
 import android.app.job.JobInfo
 import android.app.job.JobParameters
@@ -9,18 +7,17 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
-import android.os.Bundle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
-import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,18 +29,18 @@ import javax.inject.Inject
 class VersionMigrationsJob : JobService() {
 
     companion object {
-        fun run(podcastManager: PodcastManager, settings: Settings, context: Context) {
-            runSync(podcastManager, settings)
+        fun run(podcastManager: PodcastManager, settings: Settings, syncAccountManager: SyncAccountManager, context: Context) {
+            runSync(podcastManager, settings, syncAccountManager)
             runAsync(settings, context)
         }
 
         /**
          * Run short migrations straight away.
          */
-        private fun runSync(podcastManager: PodcastManager, settings: Settings) {
+        private fun runSync(podcastManager: PodcastManager, settings: Settings, syncAccountManager: SyncAccountManager) {
             performUpdateIfRequired(updateKey = "run_v7_20", settings = settings) {
                 // Upgrading to version 7.20.0 requires the folders from the servers to be added to the existing podcasts. In case the user doesn't have internet this is done as part of the regular sync process.
-                if (settings.isLoggedIn()) {
+                if (syncAccountManager.isLoggedIn()) {
                     podcastManager.reloadFoldersFromServer()
                 }
             }
@@ -147,9 +144,6 @@ class VersionMigrationsJob : JobService() {
         if (previousVersionCode < 1257) {
             performV7Migration()
         }
-        if (!settings.getUsedAccountManager()) {
-            performAccountManagerMigration(application)
-        }
 
         removeCustomEpisodes()
         removeOldTempPodcastDirectory()
@@ -207,25 +201,6 @@ class VersionMigrationsJob : JobService() {
             }
         } catch (e: Exception) {
             Timber.e(e)
-        }
-    }
-
-    private fun performAccountManagerMigration(context: Context) {
-        val oldDetails = settings.getOldSyncDetails()
-        val email = oldDetails.first
-        val password = oldDetails.second
-
-        if (email != null && password != null) {
-            val am = AccountManager.get(context)
-            val account = Account(email, AccountConstants.ACCOUNT_TYPE)
-            am.addAccountExplicitly(account, password, null)
-
-            val result = am.getAuthToken(account, AccountConstants.TOKEN_TYPE, Bundle(), false, null, null).result
-            val token = result.getString(AccountManager.KEY_AUTHTOKEN) // Force a token refresh
-            Timber.d("Migrated token $token")
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Migrated to account manager")
-        } else {
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "No account found to migrate")
         }
     }
 

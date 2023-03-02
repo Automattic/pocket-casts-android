@@ -2,10 +2,12 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +20,11 @@ import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class OnboardingCreateAccountViewModel @Inject constructor(
-    private val auth: AccountAuth,
+    private val syncAccountManager: SyncAccountManager,
+    private val syncServerManager: SyncServerManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
+    private val podcastManager: PodcastManager
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -64,16 +68,19 @@ class OnboardingCreateAccountViewModel @Inject constructor(
         subscriptionManager.clearCachedStatus()
 
         viewModelScope.launch {
-
-            val result = auth.createUserWithEmailAndPassword(state.email, state.password)
+            val result = syncAccountManager.createUserWithEmailAndPassword(
+                email = state.email,
+                password = state.password,
+                syncServerManager = syncServerManager
+            )
             when (result) {
-
-                is AccountAuth.AuthResult.Success -> {
+                is SyncAccountManager.SignInResult.Success -> {
+                    podcastManager.refreshPodcastsAfterSignIn()
                     analyticsTracker.refreshMetadata()
                     onAccountCreated()
                 }
 
-                is AccountAuth.AuthResult.Failed -> {
+                is SyncAccountManager.SignInResult.Failed -> {
                     _stateFlow.update {
                         it.copy(
                             isCallInProgress = false,

@@ -9,7 +9,9 @@ import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
+import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.di.OnTokenErrorUiShown
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerCache
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServerRetrofit
@@ -19,11 +21,9 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -50,6 +50,7 @@ open class SyncServerManager @Inject constructor(
     @SyncServerCache val cache: Cache,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     @OnTokenErrorUiShown private val onTokenErrorUiShown: () -> Unit,
+    private val syncAccountManager: SyncAccountManager
 ) {
 
     companion object {
@@ -58,12 +59,12 @@ open class SyncServerManager @Inject constructor(
 
     private val server: SyncServer = retrofit.create(SyncServer::class.java)
 
-    suspend fun register(email: String, password: String): RegisterResponse {
+    suspend fun register(email: String, password: String): LoginTokenResponse {
         val request = RegisterRequest(email = email, password = password, scope = SCOPE_MOBILE)
         return server.register(request)
     }
 
-    suspend fun login(email: String, password: String): LoginResponse {
+    suspend fun login(email: String, password: String): LoginTokenResponse {
         val request = LoginRequest(email = email, password = password, scope = SCOPE_MOBILE)
         return server.login(request)
     }
@@ -73,7 +74,7 @@ open class SyncServerManager @Inject constructor(
         return server.loginGoogle(request)
     }
 
-    suspend fun loginToken(refreshToken: String): LoginTokenResponse {
+    suspend fun loginToken(refreshToken: RefreshToken): LoginTokenResponse {
         val request = LoginTokenRequest(refreshToken = refreshToken)
         return server.loginToken(request)
     }
@@ -136,7 +137,7 @@ open class SyncServerManager @Inject constructor(
     }
 
     fun syncUpdate(data: String, lastModified: String): Single<SyncUpdateResponse> {
-        val email = settings.getSyncEmail()
+        val email = syncAccountManager.getEmail()
             ?: return Single.error(Exception("Not logged in"))
 
         return getCacheTokenOrLogin { token ->
@@ -346,9 +347,9 @@ open class SyncServerManager @Inject constructor(
     }
 
     private suspend fun <T : Any> getCacheTokenOrLoginSuspend(serverCall: suspend (token: AccessToken) -> T): T {
-        if (settings.isLoggedIn()) {
+        if (syncAccountManager.isLoggedIn()) {
             return try {
-                val token = settings.getSyncAccessTokenSuspend(onTokenErrorUiShown) ?: refreshTokenSuspend()
+                val token = syncAccountManager.getAccessTokenSuspend(onTokenErrorUiShown) ?: refreshTokenSuspend()
                 serverCall(token)
             } catch (ex: Exception) {
                 // refresh invalid
@@ -372,8 +373,8 @@ open class SyncServerManager @Inject constructor(
     }
 
     private fun <T : Any> getCacheTokenOrLogin(serverCall: (token: AccessToken) -> Single<T>): Single<T> {
-        if (settings.isLoggedIn()) {
-            return Single.fromCallable { settings.getSyncAccessToken(onTokenErrorUiShown) ?: throw RuntimeException("Failed to get token") }
+        if (syncAccountManager.isLoggedIn()) {
+            return Single.fromCallable { syncAccountManager.getAccessTokenBlocking(onTokenErrorUiShown) ?: throw RuntimeException("Failed to get token") }
                 .flatMap { token -> serverCall(token) }
                 // refresh invalid
                 .onErrorResumeNext { throwable ->
@@ -385,9 +386,9 @@ open class SyncServerManager @Inject constructor(
                         Single.error(throwable)
                     }
                 }
+        } else {
+            return refreshToken().flatMap { token -> serverCall(token) }
         }
-
-        return refreshToken().flatMap { token -> serverCall(token) }
     }
 
     private fun buildBasicRequest(): BasicRequest {
@@ -398,13 +399,13 @@ open class SyncServerManager @Inject constructor(
     }
 
     private suspend fun refreshTokenSuspend(): AccessToken {
-        settings.invalidateToken()
-        return settings.getSyncAccessTokenSuspend(onTokenErrorUiShown) ?: throw Exception("Failed to get refresh token")
+        syncAccountManager.invalidateAccessToken()
+        return syncAccountManager.getAccessTokenSuspend(onTokenErrorUiShown) ?: throw Exception("Failed to get refresh token")
     }
 
     private fun refreshToken(): Single<AccessToken> {
-        settings.invalidateToken()
-        return Single.fromCallable { settings.getSyncAccessToken(onTokenErrorUiShown) ?: throw RuntimeException("Failed to get token") }
+        syncAccountManager.invalidateAccessToken()
+        return Single.fromCallable { syncAccountManager.getAccessTokenBlocking(onTokenErrorUiShown) ?: throw RuntimeException("Failed to get token") }
             .doOnError {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Refresh token threw an error.")
             }

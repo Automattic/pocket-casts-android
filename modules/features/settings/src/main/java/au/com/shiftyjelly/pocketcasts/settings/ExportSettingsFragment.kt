@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ExportSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
@@ -29,6 +30,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var theme: Theme
+    @Inject lateinit var syncAccountManager: SyncAccountManager
 
     private val viewModel by viewModels<ExportSettingsViewModel>()
     private var exporter: OpmlExporter? = null
@@ -71,7 +73,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("exportSendEmail")?.setOnPreferenceClickListener {
             viewModel.onExportByEmail()
-            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, settings, activity, viewModel.analyticsTracker).apply {
+            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, syncAccountManager, activity, viewModel.analyticsTracker).apply {
                 sendEmail()
             }
             true
@@ -79,7 +81,7 @@ class ExportSettingsFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("exportSaveFile")?.setOnPreferenceClickListener {
             viewModel.onExportFile()
-            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, settings, activity, viewModel.analyticsTracker).apply {
+            exporter = OpmlExporter(this@ExportSettingsFragment, serverManager, podcastManager, syncAccountManager, activity, viewModel.analyticsTracker).apply {
                 saveFile()
             }
             true

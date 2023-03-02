@@ -1,21 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.preferences
 
-import android.accounts.AccountManager
-import android.accounts.AccountManagerFuture
 import android.annotation.SuppressLint
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.util.Base64
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -27,22 +20,16 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationChannel
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isScreenReaderOn
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.nio.charset.Charset
 import java.util.Date
@@ -54,8 +41,6 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
 import kotlin.math.max
-import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class SettingsImpl @Inject constructor(
     @PublicSharedPreferences private val sharedPreferences: SharedPreferences,
@@ -77,11 +62,10 @@ class SettingsImpl @Inject constructor(
     }
 
     private var languageCode: String? = null
-    private var lastSignInErrorNotification: Long? = null
 
     private val firebaseRemoteConfig: FirebaseRemoteConfig by lazy { setupFirebaseConfig() }
 
-    override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply { accept(isLoggedIn()) }
+    // override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply { accept(isLoggedIn()) }
     override val podcastLayoutObservable = BehaviorRelay.create<Int>().apply { accept(getPodcastsLayout()) }
     override val skipForwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipForwardInSecs()) }
     override val skipBackwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipBackwardInSecs()) }
@@ -557,133 +541,11 @@ class SettingsImpl @Inject constructor(
         setString("deviceUuid", getUniqueDeviceId())
     }
 
-    override fun setSyncEmail(email: String) {
-        val manager = AccountManager.get(context)
-        val account = manager.pocketCastsAccount() ?: return
-        manager.renameAccount(account, email, null, null)
-        isLoggedInObservable.accept(isLoggedIn())
-    }
-
-    override fun setSyncPassword(password: String) {
-        val manager = AccountManager.get(context)
-        val account = manager.pocketCastsAccount() ?: return
-        manager.setPassword(account, password)
-        isLoggedInObservable.accept(isLoggedIn())
-    }
-
     override fun getOldSyncDetails(): Pair<String?, String?> {
         val email = privatePreferences.getString("syncEmail", null)
         val password = decrypt(privatePreferences.getString("syncPassword", null))
 
         return Pair(email, password)
-    }
-
-    override fun clearEmailAndPassword() {
-        val editor = privatePreferences.edit()
-        editor.remove("syncEmail")
-        editor.remove("syncPassword")
-        editor.remove("syncToken")
-        editor.remove("syncApiToken")
-        editor.remove(Settings.PREFERENCE_FIRST_SYNC_RUN)
-        editor.apply()
-        isLoggedInObservable.accept(false)
-    }
-
-    override fun getSyncEmail(): String? {
-        val manager = AccountManager.get(context)
-        return manager.pocketCastsAccount()?.name
-    }
-
-    override fun getSyncPasswordOrRefreshToken(): String? {
-        val manager = AccountManager.get(context)
-        val account = manager.pocketCastsAccount() ?: return null
-        return manager.getPassword(account)
-    }
-
-    override fun getSyncUuid(): String? {
-        val manager = AccountManager.get(context)
-        val account = manager.pocketCastsAccount() ?: return null
-        return manager.getUserData(account, AccountConstants.UUID)
-    }
-
-    override fun getCachedSyncAccessToken(): AccessToken? {
-        val manager = AccountManager.get(context)
-        val account = manager.pocketCastsAccount() ?: return null
-        return manager.peekAccessToken(account, AccountConstants.TOKEN_TYPE)
-    }
-
-    override fun getSyncAccessToken(onTokenErrorUiShown: () -> Unit): AccessToken? = runBlocking {
-        getSyncAccessTokenSuspend(onTokenErrorUiShown)
-    }
-
-    override suspend fun getSyncAccessTokenSuspend(onTokenErrorUiShown: () -> Unit): AccessToken? {
-        val manager = AccountManager.get(context)
-        val account = manager.pocketCastsAccount() ?: return null
-
-        return withContext(Dispatchers.IO) {
-            try {
-                val resultFuture: AccountManagerFuture<Bundle> = manager.getAuthToken(
-                    account,
-                    AccountConstants.TOKEN_TYPE,
-                    Bundle(),
-                    false,
-                    null,
-                    null
-                )
-                val bundle: Bundle = resultFuture.result // This call will block until the result is available.
-                val token = bundle.getString(AccountManager.KEY_AUTHTOKEN)
-                // Token failed to refresh
-                if (token == null) {
-                    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        bundle.getParcelable(AccountManager.KEY_INTENT, Intent::class.java)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
-                    }
-                    intent?.let { showSignInErrorNotification(it, onTokenErrorUiShown) }
-                    throw SecurityException("Token could not be refreshed")
-                } else {
-                    AccessToken(token)
-                }
-            } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Could not get token")
-                throw e // Rethrow the exception so it carries on
-            }
-        }
-    }
-
-    private fun showSignInErrorNotification(intent: Intent, onTokenErrorUiShown: () -> Unit) {
-        onShowSignInErrorNotificationDebounced(onTokenErrorUiShown)
-
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT.or(PendingIntent.FLAG_IMMUTABLE))
-        val notification = NotificationCompat.Builder(context, NotificationChannel.NOTIFICATION_CHANNEL_ID_SIGN_IN_ERROR.id)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentTitle(context.getString(LR.string.token_refresh_sign_in_error_title))
-            .setContentText(context.getString(LR.string.token_refresh_sign_in_error_description))
-            .setAutoCancel(true)
-            .setSmallIcon(IR.drawable.ic_failedwarning)
-            .setOnlyAlertOnce(true)
-            .setContentIntent(pendingIntent)
-            .build()
-        NotificationManagerCompat.from(context)
-            .notify(NotificationId.SIGN_IN_ERROR.value, notification)
-    }
-
-    // Avoid invoking the passed function multiple times in a short period of time
-    @Synchronized
-    private fun onShowSignInErrorNotificationDebounced(onTokenErrorUiShown: () -> Unit) {
-        val now = System.currentTimeMillis()
-        // Do not invoke this method more than once every 2 seconds
-        val shouldInvoke = lastSignInErrorNotification == null ||
-            lastSignInErrorNotification!! < now - (2 * 1000)
-        if (shouldInvoke) {
-            onTokenErrorUiShown()
-        }
-        lastSignInErrorNotification = now
-    }
-
-    override fun invalidateToken() {
-        AccountManager.get(context).invalidateAccessToken()
     }
 
     @SuppressLint("HardwareIds")
@@ -734,18 +596,6 @@ class SettingsImpl @Inject constructor(
             Timber.e(e)
             return null
         }
-    }
-
-    override fun isLoggedIn(): Boolean {
-        return getSyncEmail() != null && getSyncPasswordOrRefreshToken() != null
-    }
-
-    override fun getUsedAccountManager(): Boolean {
-        return getBoolean("accountmanager", false)
-    }
-
-    override fun setUsedAccountManager(value: Boolean) {
-        setBoolean("accountmanager", value)
     }
 
     override fun clearPlusPreferences() {

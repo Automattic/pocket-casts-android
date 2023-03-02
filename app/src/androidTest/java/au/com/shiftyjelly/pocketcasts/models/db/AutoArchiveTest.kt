@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -75,7 +76,8 @@ class AutoArchiveTest {
     private fun upNextQueueFor(db: AppDatabase, episodeManager: EpisodeManager): UpNextQueue {
         val settings = mock<Settings> {}
         val context = mock<Context> {}
-        return UpNextQueueImpl(db, settings, episodeManager, context)
+        val syncAccountManager = mock<SyncAccountManager>()
+        return UpNextQueueImpl(db, settings, episodeManager, syncAccountManager, context)
     }
 
     @Test

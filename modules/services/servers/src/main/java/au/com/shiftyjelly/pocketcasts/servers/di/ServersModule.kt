@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
@@ -167,7 +168,7 @@ class ServersModule {
     @TokenInterceptor
     @Singleton
     internal fun provideTokenInterceptor(
-        settings: Settings,
+        syncAccountManager: SyncAccountManager,
         @OnTokenErrorUiShown onTokenErrorUiShown: () -> Unit
     ): Interceptor {
         val unauthenticatedEndpoints = setOf("security") // Don't attach a token to these methods because they get the token
@@ -176,12 +177,12 @@ class ServersModule {
             if (unauthenticatedEndpoints.contains(original.url.encodedPathSegments.firstOrNull())) {
                 chain.proceed(original)
             } else {
-                val token = settings.getSyncAccessToken(onTokenErrorUiShown)
+                val token = syncAccountManager.getAccessTokenBlocking(onTokenErrorUiShown)
                 return@Interceptor if (token != null) {
                     val response = chain.proceed(buildRequestWithToken(original, token))
                     if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                        settings.invalidateToken()
-                        val newToken = settings.getSyncAccessToken(onTokenErrorUiShown)
+                        syncAccountManager.invalidateAccessToken()
+                        val newToken = syncAccountManager.getAccessTokenBlocking(onTokenErrorUiShown)
                         chain.proceed(buildRequestWithToken(original, newToken))
                     } else {
                         response

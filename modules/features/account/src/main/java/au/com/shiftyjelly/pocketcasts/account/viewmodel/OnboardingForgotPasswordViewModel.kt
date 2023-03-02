@@ -2,9 +2,10 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class OnboardingForgotPasswordViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val auth: AccountAuth
+    private val syncAccountManager: SyncAccountManager,
+    private val syncServerManager: SyncServerManager
 ) : ViewModel() {
 
     private val _stateFlow = MutableStateFlow(
@@ -51,8 +53,9 @@ class OnboardingForgotPasswordViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            auth.forgotPassword(
+            syncAccountManager.forgotPassword(
                 email = emailString,
+                syncServerManager = syncServerManager,
                 onSuccess = onCompleted,
                 onError = { message ->
                     _stateFlow.update {

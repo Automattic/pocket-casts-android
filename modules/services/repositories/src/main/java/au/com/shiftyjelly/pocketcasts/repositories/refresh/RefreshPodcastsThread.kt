@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.UserNotLoggedInException
@@ -79,6 +80,7 @@ class RefreshPodcastsThread(
         fun downloadManager(): DownloadManager
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
+        fun syncAccountManager(): SyncAccountManager
     }
 
     @Volatile
@@ -252,7 +254,8 @@ class RefreshPodcastsThread(
             podcastCacheServerManager = entryPoint.podcastCacheServerManager(),
             userEpisodeManager = entryPoint.userEpisodeManager(),
             subscriptionManager = entryPoint.subscriptionManager(),
-            folderManager = entryPoint.folderManager()
+            folderManager = entryPoint.folderManager(),
+            syncAccountManager = entryPoint.syncAccountManager()
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()

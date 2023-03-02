@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.toServerPostFile
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
@@ -102,6 +103,7 @@ open class PlaybackManager @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
+    private val syncAccountManager: SyncAccountManager,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -254,7 +256,7 @@ open class PlaybackManager @Inject constructor(
         syncTimerDisposable?.dispose()
         syncTimerDisposable = playbackStateRelay.sample(settings.getPeriodicSaveTimeMs(), TimeUnit.MILLISECONDS)
             .concatMap {
-                if (it.isPlaying && settings.isLoggedIn()) {
+                if (it.isPlaying && syncAccountManager.isLoggedIn()) {
                     syncEpisodeProgress(it)
                         .toObservable<EpisodeSyncResponse>()
                         .onErrorResumeNext(Observable.empty())
@@ -1014,7 +1016,7 @@ open class PlaybackManager @Inject constructor(
             }
 
             // Sync played to server straight away
-            if (settings.isLoggedIn()) {
+            if (syncAccountManager.isLoggedIn()) {
                 if (episode is Episode) {
                     val syncRequest =
                         EpisodeSyncRequest(

@@ -5,8 +5,8 @@ import android.content.res.Resources
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.parseErrorResponse
@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PromoCodeViewModel @Inject constructor(
     private val syncServerManager: SyncServerManager,
-    private val settings: Settings,
+    private val syncAccountManager: SyncAccountManager,
     private val subscriptionManager: SubscriptionManager
 ) : ViewModel() {
     sealed class ViewState {
@@ -52,7 +52,7 @@ class PromoCodeViewModel @Inject constructor(
             .toFlowable()
 
         disposable?.dispose()
-        disposable = settings.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
+        disposable = syncAccountManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
             .observeOn(Schedulers.io())
             .takeUntil { it } // Once we are signed in we don't want to be notified for other changes to the account like being upgraded to plus
             .switchMap { signedIn ->

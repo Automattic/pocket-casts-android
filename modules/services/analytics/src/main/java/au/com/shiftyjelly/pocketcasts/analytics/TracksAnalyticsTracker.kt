@@ -25,7 +25,7 @@ class TracksAnalyticsTracker @Inject constructor(
 
     private val predefinedEventProperties: Map<String, Any>
         get() {
-            val isLoggedIn = settings.isLoggedIn()
+            val isLoggedIn = false // settings.isLoggedIn()
             val hasSubscription = plusSubscription != null
             val hasLifetime = plusSubscription?.isLifetimePlus
                 ?: false
@@ -77,20 +77,20 @@ class TracksAnalyticsTracker @Inject constructor(
     }
 
     override fun refreshMetadata() {
-        val uuid = settings.getSyncUuid()
-        if (!uuid.isNullOrEmpty()) {
-            userId = uuid
-            // Re-unify the user
-            if (anonID != null) {
-                tracksClient?.trackAliasUser(userId, anonID, TracksClient.NosaraUserType.POCKETCASTS)
-                clearAnonID()
-            }
-        } else {
-            userId = null
-            if (anonID == null) {
-                generateNewAnonID()
-            }
-        }
+//        val uuid = settings.getSyncUuid()
+//        if (!uuid.isNullOrEmpty()) {
+//            userId = uuid
+//            // Re-unify the user
+//            if (anonID != null) {
+//                tracksClient?.trackAliasUser(userId, anonID, TracksClient.NosaraUserType.POCKETCASTS)
+//                clearAnonID()
+//            }
+//        } else {
+//            userId = null
+//            if (anonID == null) {
+//                generateNewAnonID()
+//            }
+//        }
     }
 
     override fun flush() {

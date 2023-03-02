@@ -9,16 +9,16 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
-import au.com.shiftyjelly.pocketcasts.preferences.getSignInType
-import au.com.shiftyjelly.pocketcasts.preferences.peekAccessToken
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
-class PocketCastsAccountAuthenticator(val context: Context, private val accountAuth: AccountAuth) : AbstractAccountAuthenticator(context) {
+class PocketCastsAccountAuthenticator(
+    val context: Context,
+    private val syncAccountManager: SyncAccountManager,
+    private val syncServerManager: SyncServerManager,
+) : AbstractAccountAuthenticator(context) {
     override fun getAuthTokenLabel(authTokenType: String?): String {
         return AccountConstants.TOKEN_TYPE
     }
@@ -32,43 +32,29 @@ class PocketCastsAccountAuthenticator(val context: Context, private val accountA
     }
 
     override fun getAuthToken(response: AccountAuthenticatorResponse?, account: Account?, authTokenType: String?, options: Bundle?): Bundle {
-        val accountManager = AccountManager.get(context)
-
-        var accessToken = if (account != null && authTokenType != null) {
-            accountManager.peekAccessToken(account, authTokenType)
-        } else null
-
-        if (accessToken != null && account != null) {
-            runBlocking {
-                Timber.d("Refreshing the access token")
-                try {
-                    accessToken = accountAuth.accessToken(
-                        email = account.name,
-                        refreshTokenOrPassword = accountManager.getPassword(account),
-                        signInType = accountManager.getSignInType(account),
-                        signInSource = SignInSource.AccountAuthenticator,
-                        account = account,
-                        accountManager = accountManager
-                    )
-                } catch (ex: Exception) {
-                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to refresh token.")
-                }
-            }
+        if (account == null) {
+            return buildSignInIntent(response)
         }
 
-        accessToken?.value?.let { tokenValue ->
-            if (account != null) {
-                return bundleOf(
-                    AccountManager.KEY_ACCOUNT_NAME to account.name,
-                    AccountManager.KEY_ACCOUNT_TYPE to account.type,
-                    AccountManager.KEY_AUTHTOKEN to tokenValue
-                )
-            }
-        }
+        val accessToken = syncAccountManager.peekAccessToken(account)
+            ?: runBlocking { syncAccountManager.refreshAccessToken(account, syncServerManager) }
 
+        return if (accessToken == null) {
+            buildSignInIntent(response)
+        } else {
+            bundleOf(
+                AccountManager.KEY_ACCOUNT_NAME to account.name,
+                AccountManager.KEY_ACCOUNT_TYPE to account.type,
+                AccountManager.KEY_AUTHTOKEN to accessToken.value
+            )
+        }
+    }
+
+    private fun buildSignInIntent(response: AccountAuthenticatorResponse?): Bundle {
         // Could not get auth token so display sign in sign up screens
-        val intent = Intent(context, AccountActivity::class.java)
-        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
+        val intent = Intent(context, AccountActivity::class.java).apply {
+            putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
+        }
         return bundleOf(AccountManager.KEY_INTENT to intent)
     }
 
@@ -81,8 +67,9 @@ class PocketCastsAccountAuthenticator(val context: Context, private val accountA
     }
 
     override fun addAccount(response: AccountAuthenticatorResponse?, accountType: String?, authTokenType: String?, requiredFeatures: Array<out String>?, options: Bundle?): Bundle {
-        val intent = Intent(context, AccountActivity::class.java)
-        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
+        val intent = Intent(context, AccountActivity::class.java).apply {
+            putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response)
+        }
         return bundleOf(AccountManager.KEY_INTENT to intent)
     }
 }

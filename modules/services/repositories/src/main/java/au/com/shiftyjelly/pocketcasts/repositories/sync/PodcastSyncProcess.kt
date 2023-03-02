@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.FolderResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastResponse
@@ -60,13 +61,14 @@ class PodcastSyncProcess(
     var podcastCacheServerManager: PodcastCacheServerManagerImpl,
     var userEpisodeManager: UserEpisodeManager,
     var subscriptionManager: SubscriptionManager,
-    var folderManager: FolderManager
+    var folderManager: FolderManager,
+    var syncAccountManager: SyncAccountManager
 ) : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
     fun run(): Completable {
-        if (!settings.isLoggedIn()) {
+        if (!syncAccountManager.isLoggedIn()) {
             playlistManager.deleteSynced()
 
             Timber.i("SyncProcess: User not logged in")
@@ -233,7 +235,7 @@ class PodcastSyncProcess(
     private fun syncUpNext(): Completable {
         return Completable.fromAction {
             val startTime = SystemClock.elapsedRealtime()
-            UpNextSyncJob.run(settings, context)
+            UpNextSyncJob.run(syncAccountManager, context)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync up next - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
         }
     }
