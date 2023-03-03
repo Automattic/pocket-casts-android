@@ -501,6 +501,7 @@ interface Settings {
     fun getPeriodicSaveTimeMs(): Long
     fun getPodcastSearchDebounceMs(): Long
     fun getEpisodeSearchDebounceMs(): Long
+    fun isFeatureFlagSearchImprovementsEnabled(): Boolean
     fun defaultPodcastGrouping(): PodcastGrouping
     fun setDefaultPodcastGrouping(podcastGrouping: PodcastGrouping)
     fun setSkipForwardInSec(value: Int)
