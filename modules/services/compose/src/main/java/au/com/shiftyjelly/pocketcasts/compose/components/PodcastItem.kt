@@ -32,7 +32,7 @@ fun PodcastItem(
     showSubscribed: Boolean = false,
     showPlusIfUnsubscribed: Boolean = false,
     showDivider: Boolean = true,
-    onSubscribeClick: (() -> Unit)? = null,
+    onPlusClick: (() -> Unit)? = null,
     maxLines: Int = 1,
 ) {
     Column {
@@ -77,7 +77,7 @@ fun PodcastItem(
                     contentDescription = stringResource(LR.string.subscribe),
                     tint = MaterialTheme.theme.colors.primaryIcon02,
                     modifier = modifier
-                        .then(if (onSubscribeClick == null) Modifier else Modifier.clickable { onSubscribeClick() })
+                        .then(if (onPlusClick == null) Modifier else Modifier.clickable { onPlusClick() })
 
                 )
             }

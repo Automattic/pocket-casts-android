@@ -71,7 +71,7 @@ private fun SearchPodcastResultsView(
                         showPlusIfUnsubscribed = true,
                         maxLines = 2,
                         onClick = { onPodcastClick(folderItem.podcast) },
-                        onSubscribeClick = { onSubscribeClick(folderItem.podcast) },
+                        onPlusClick = { onSubscribeClick(folderItem.podcast) },
                         modifier = Modifier
                             .background(color = MaterialTheme.theme.colors.primaryUi01)
                     )
