@@ -128,7 +128,6 @@ class SearchHandler @Inject constructor(
                         globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
                         globalSearch
                     }
-                    .subscribeOn(Schedulers.io())
                     .toObservable()
 
                 if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
@@ -138,8 +137,6 @@ class SearchHandler @Inject constructor(
                             globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
                             globalSearch
                         }
-                        .subscribeOn(Schedulers.io())
-                        .toObservable()
 
                     podcastServerSearch.mergeWith(episodesServerSearch)
                 } else {
