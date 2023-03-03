@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-06 16:54:03+0000
+Translation-Revision-Date: 2023-02-28 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="search_history_row_type_episode_subtitle">Folge \u2022 %s \u2022 %s</string>
+    <string name="search_show_all">Alle zeigen</string>
+    <string name="podcast">Podcast</string>
+    <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">Ordner \u2022 %s</string>
+    <string name="search_history_recent_searches">Aktuelle Suchen</string>
+    <string name="search_history_clear_all_confirmation_message">Möchtest du deinen gesamten Suchverlauf wirklich löschen?</string>
+    <string name="search_history_clear_all_confirm_button_title">Suchverlauf löschen</string>
+    <string name="search_podcasts_or_add_url">Podcasts suchen oder RSS-URL hinzufügen</string>
+    <string name="error_opening_links_activity_not_found">Scheinbar hast du keine App, die diesen Inhalt anzeigen kann.</string>
+    <string name="notifications_blocked_warning">Benachrichtigungen sind blockiert. In den Einstellungen kannst du die Berechtigung aktualisieren.</string>
     <string name="settings_media_actions_show_subtitle">Zeige individuelle Medienaktionen in den Medienbenachrichtigungen von Android 13 und Android Auto an.</string>
     <string name="settings_media_actions_show_title">Individuelle Medienaktionen anzeigen</string>
     <string name="settings_media_actions_customise">Medienaktionen anpassen</string>
@@ -1278,7 +1289,6 @@ Language: de
     <string name="time_short_hours_minutes">%1$d Std. %2$d Min.</string>
     <string name="time_short_hours">%d Std.</string>
     <string name="search_hint">Nach Podcast-Name suchen</string>
-    <string name="search_podcasts">Podcasts durchsuchen</string>
     <string name="stream_warning_button">Trotzdem streamen</string>
     <string name="profile_cloud_upload_warning_button">Jetzt hochladen</string>
     <string name="profile_cloud_upload_warning_summary">Beim Hochladen dieser Folge werden mobile Daten verbraucht.</string>
