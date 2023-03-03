@@ -27,7 +27,6 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-private const val MAX_ITEM_COUNT = 20
 class SearchHandler @Inject constructor(
     val serverManager: ServerManager,
     val podcastManager: PodcastManager,
@@ -164,20 +163,8 @@ class SearchHandler @Inject constructor(
                 }
                 SearchState.Results(
                     searchTerm = searchTerm.string,
-                    podcasts = searchPodcastsResult.take(
-                        if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
-                            minOf(MAX_ITEM_COUNT, searchPodcastsResult.size)
-                        } else {
-                            searchPodcastsResult.size
-                        }
-                    ),
-                    episodes = searchEpisodesResult.take(
-                        if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
-                            minOf(MAX_ITEM_COUNT, searchEpisodesResult.size)
-                        } else {
-                            searchEpisodesResult.size
-                        }
-                    ),
+                    podcasts = searchPodcastsResult,
+                    episodes = searchEpisodesResult,
                     loading = loading,
                     error = serverSearchResults.error
                 )
