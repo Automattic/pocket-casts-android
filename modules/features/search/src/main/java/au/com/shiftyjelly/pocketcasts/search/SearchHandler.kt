@@ -169,7 +169,11 @@ class SearchHandler @Inject constructor(
             val searchPodcastsResult = (localPodcastsResult + serverPodcastsResult).distinctBy { it.uuid }
             val searchEpisodesResult = serverSearchResults.episodeSearch.episodes
 
-            if (serverSearchResults.searchTerm.isEmpty() || (searchPodcastsResult.isNotEmpty() || searchEpisodesResult.isNotEmpty()) || serverSearchResults.error != null) {
+            val hasResults =
+                serverSearchResults.searchTerm.isEmpty() || // if the search term is empty, we don't have "no results"
+                    (searchPodcastsResult.isNotEmpty() || searchEpisodesResult.isNotEmpty()) || // check if there are any results
+                    serverSearchResults.error != null // an error is a result
+            if (hasResults) {
                 serverSearchResults.error?.let {
                     analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
                 }
