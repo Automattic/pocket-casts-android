@@ -47,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import au.com.shiftyjelly.pocketcasts.search.component.SearchEpisodeItem
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderItem
@@ -69,6 +70,7 @@ fun SearchInlineResultsPage(
     onShowAllCLick: (ResultsType) -> Unit,
     onScroll: () -> Unit,
     onlySearchRemote: Boolean,
+    settings: Settings,
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.state.collectAsState()
@@ -79,7 +81,7 @@ fun SearchInlineResultsPage(
             is SearchState.Results -> {
                 val result = state as SearchState.Results
                 if (result.error == null || !onlySearchRemote || result.loading) {
-                    if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
+                    if (settings.isFeatureFlagSearchImprovementsEnabled()) {
                         SearchResultsView(
                             state = state as SearchState.Results,
                             onEpisodeClick = onEpisodeClick,

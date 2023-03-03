@@ -130,7 +130,7 @@ class SearchHandler @Inject constructor(
                     }
                     .toObservable()
 
-                if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
+                if (settings.isFeatureFlagSearchImprovementsEnabled()) {
                     val episodesServerSearch = cacheServerManager
                         .searchEpisodes(it)
                         .map { episodeSearch ->
