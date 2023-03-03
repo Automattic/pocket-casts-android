@@ -1,13 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,7 +21,6 @@ class ChangePwdViewModel
     val pwdConfirm = MutableLiveData<String>().apply { postValue("") }
 
     val changePasswordState = MutableLiveData<ChangePasswordState>().apply { value = ChangePasswordState.Empty }
-    private val disposables = CompositeDisposable()
 
     private fun pwdCurrentValid(): Boolean {
         return isPasswordValid(pwdCurrent.value)
@@ -97,29 +94,17 @@ class ChangePwdViewModel
 
         changePasswordState.postValue(ChangePasswordState.Loading)
 
-        syncServerManager.pwdChange(pwdNewString, pwdCurrentString)
-            .subscribeOn(Schedulers.io())
-            .doOnSuccess { response ->
-                val success = response.success ?: false
-                if (success) {
-                    // TODO can't implement this until we have a way to get the refresh token
-//                    val refreshToken = response.refreshToken
-//                    if (refreshToken != null) {
-//                        syncAccountManager.setRefreshToken(refreshToken)
-//                    }
-                    changePasswordState.postValue(ChangePasswordState.Success("OK"))
-                } else {
-                    val errors = mutableSetOf(ChangePasswordError.SERVER)
-                    changePasswordState.postValue(ChangePasswordState.Failure(errors, response.message))
-                }
+        viewModelScope.launch {
+            try {
+                val response = syncServerManager.updatePassword(pwdNewString, pwdCurrentString)
+                syncAccountManager.setRefreshToken(response.refreshToken)
+                syncAccountManager.setAccessToken(response.accessToken)
+                changePasswordState.postValue(ChangePasswordState.Success("OK"))
+            } catch (ex: Exception) {
+                Timber.e(ex, "Failed update password")
+                changePasswordState.postValue(ChangePasswordState.Failure(errors = setOf(ChangePasswordError.SERVER), message = null))
             }
-            .subscribeBy(onError = { Timber.e(it) })
-            .addTo(disposables)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
+        }
     }
 }
 
@@ -134,5 +119,5 @@ sealed class ChangePasswordState {
     object Empty : ChangePasswordState()
     object Loading : ChangePasswordState()
     data class Success(val result: String) : ChangePasswordState()
-    data class Failure(val errors: MutableSet<ChangePasswordError>, val message: String?) : ChangePasswordState()
+    data class Failure(val errors: Set<ChangePasswordError>, val message: String?) : ChangePasswordState()
 }

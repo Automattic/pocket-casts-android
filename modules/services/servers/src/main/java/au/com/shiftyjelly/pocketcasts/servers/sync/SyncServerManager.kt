@@ -108,14 +108,12 @@ open class SyncServerManager @Inject constructor(
             }
         }
 
-    fun pwdChange(pwdNew: String, pwdOld: String): Single<PwdChangeResponse> {
-        return getCacheTokenOrLogin { token ->
-            val request = PwdChangeRequest(pwdNew, pwdOld, SCOPE_MOBILE)
-            server.pwdChange(addBearer(token), request)
-        }.doOnSuccess {
-            if (it.success == true) {
-                analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_UPDATED)
-            }
+    suspend fun updatePassword(newPassword: String, oldPassword: String): LoginTokenResponse {
+        return getCacheTokenOrLoginSuspend { token ->
+            val request = UpdatePasswordRequest(newPassword = newPassword, oldPassword = oldPassword, scope = SCOPE_MOBILE)
+            val response = server.updatePassword(authorization = addBearer(token), request = request)
+            analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_UPDATED)
+            response
         }
     }
 

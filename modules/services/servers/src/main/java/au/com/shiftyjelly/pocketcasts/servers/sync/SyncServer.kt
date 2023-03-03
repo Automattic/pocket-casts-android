@@ -50,8 +50,8 @@ interface SyncServer {
     @POST("/user/delete_account")
     fun deleteAccount(@Header("Authorization") authorization: String): Single<UserChangeResponse>
 
-    @POST("/user/change_password")
-    fun pwdChange(@Header("Authorization") authorization: String, @Body request: PwdChangeRequest): Single<PwdChangeResponse>
+    @POST("/user/update_password")
+    suspend fun updatePassword(@Header("Authorization") authorization: String, @Body request: UpdatePasswordRequest): LoginTokenResponse
 
     @POST("/user/named_settings/update")
     suspend fun namedSettings(@Header("Authorization") authorization: String, @Body request: NamedSettingsRequest): NamedSettingsResponse
