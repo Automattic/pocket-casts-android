@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -42,24 +42,24 @@ class PodcastSettingsViewModel @Inject constructor(
     lateinit var includedFilters: LiveData<List<Playlist>>
     lateinit var availableFilters: LiveData<List<Playlist>>
 
-    val globalSettings = LiveDataReactiveStreams.fromPublisher(
+    val globalSettings =
         settings.autoAddUpNextLimit.toFlowable(BackpressureStrategy.LATEST)
             .combineLatest(settings.autoAddUpNextLimitBehaviour.toFlowable(BackpressureStrategy.LATEST))
-    )
+            .toLiveData()
 
     fun loadPodcast(uuid: String) {
         this.podcastUuid = uuid
-        podcast = LiveDataReactiveStreams.fromPublisher(podcastManager.observePodcastByUuid(uuid).subscribeOn(Schedulers.io()))
+        podcast = podcastManager.observePodcastByUuid(uuid).subscribeOn(Schedulers.io()).toLiveData()
 
         val filters = playlistManager.observeAll().map {
             it.filter { filter -> filter.podcastUuidList.contains(uuid) }
         }
-        includedFilters = LiveDataReactiveStreams.fromPublisher(filters)
+        includedFilters = filters.toLiveData()
 
         val availablePodcastFilters = playlistManager.observeAll().map {
             it.filter { filter -> !filter.allPodcasts }
         }
-        availableFilters = LiveDataReactiveStreams.fromPublisher(availablePodcastFilters)
+        availableFilters = availablePodcastFilters.toLiveData()
     }
 
     fun isAutoAddToUpNextOn(): Boolean {

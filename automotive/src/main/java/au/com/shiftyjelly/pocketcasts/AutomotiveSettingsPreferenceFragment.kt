@@ -4,8 +4,8 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
+import androidx.lifecycle.toLiveData
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -63,13 +63,13 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedP
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        refreshObservable = LiveDataReactiveStreams.fromPublisher(
+        refreshObservable =
             settings.refreshStateObservable
                 .toFlowable(BackpressureStrategy.LATEST)
                 .switchMap { state ->
                     Flowable.interval(500, TimeUnit.MILLISECONDS).switchMap { Flowable.just(state) }
-                }
-        )
+                }.toLiveData()
+
         refreshObservable?.observe(viewLifecycleOwner, this)
     }
 

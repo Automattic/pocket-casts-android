@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.databinding.FragmentAutomotiveSettingsBinding
 import au.com.shiftyjelly.pocketcasts.profile.AccountDetailsFragment
@@ -30,7 +30,7 @@ class AutomotiveSettingsFragment : Fragment() {
 
         val userView = binding.userView
 
-        LiveDataReactiveStreams.fromPublisher(userManager.getSignInState()).observe(viewLifecycleOwner) { signInState ->
+        userManager.getSignInState().toLiveData().observe(viewLifecycleOwner) { signInState ->
             val loggedIn = signInState.isSignedIn
 
             if ((userView.signedInState != null && userView.signedInState?.isSignedIn == false) && loggedIn) {

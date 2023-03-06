@@ -5,9 +5,9 @@ import android.content.res.Resources
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -80,7 +80,7 @@ class MultiSelectHelper @Inject constructor(
     val selectedListLive = Transformations.map(_selectedListLive) { it }
     val selectedCount = Transformations.map(_selectedListLive) { it.size }
 
-    private val settingsToolbarActions = LiveDataReactiveStreams.fromPublisher(settings.multiSelectItemsObservable.toFlowable(BackpressureStrategy.LATEST).map { MultiSelectAction.listFromIds(it) })
+    private val settingsToolbarActions = settings.multiSelectItemsObservable.toFlowable(BackpressureStrategy.LATEST).map { MultiSelectAction.listFromIds(it) }.toLiveData()
     val toolbarActions = Transformations.map(settingsToolbarActions.combineLatest(selectedListLive)) { (actions, selectedEpisodes) ->
         actions.mapNotNull {
             MultiSelectAction.actionForGroup(it.groupId, selectedEpisodes)

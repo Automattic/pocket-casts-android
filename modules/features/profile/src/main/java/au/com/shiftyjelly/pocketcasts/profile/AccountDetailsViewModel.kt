@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -58,19 +58,18 @@ class AccountDetailsViewModel
             Optional.empty()
         }
     }
-    val signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
-    val viewState: LiveData<Triple<SignInState, Subscription?, DeleteAccountState>> = LiveDataReactiveStreams
-        .fromPublisher(userManager.getSignInState().combineLatest(subscription))
+    val signInState = userManager.getSignInState().toLiveData()
+    val viewState: LiveData<Triple<SignInState, Subscription?, DeleteAccountState>> = userManager.getSignInState().combineLatest(subscription).toLiveData()
         .combineLatest(deleteAccountState)
         .map { Triple(it.first.first, it.first.second.get(), it.second) }
 
     val accountStartDate: LiveData<Date> = MutableLiveData<Date>().apply { value = Date(statsManager.statsStartTime) }
 
-    val marketingOptInState: LiveData<Boolean> = LiveDataReactiveStreams.fromPublisher(
+    val marketingOptInState: LiveData<Boolean> =
         settings.marketingOptObservable
             .distinctUntilChanged()
             .toFlowable(BackpressureStrategy.LATEST)
-    )
+            .toLiveData()
 
     fun deleteAccount() {
         syncServerManager.deleteAccount()

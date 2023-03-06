@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -24,18 +24,17 @@ class ProfileViewModel @Inject constructor(
     private val endOfYearManager: EndOfYearManager
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
-    val podcastCount: LiveData<Int> = LiveDataReactiveStreams.fromPublisher(podcastManager.observeCountSubscribed())
+    val podcastCount: LiveData<Int> = podcastManager.observeCountSubscribed().toLiveData()
     val daysListenedCount: MutableLiveData<Long> = MutableLiveData()
     val daysSavedCount: MutableLiveData<Long> = MutableLiveData()
 
     val isSignedIn: Boolean
         get() = signInState.value?.isSignedIn ?: false
 
-    val signInState: LiveData<SignInState> = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
-    val refreshObservable: LiveData<RefreshState> = LiveDataReactiveStreams.fromPublisher(
-        settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST)
-    )
+    val refreshObservable: LiveData<RefreshState> =
+        settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 

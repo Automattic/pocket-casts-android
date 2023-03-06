@@ -3,25 +3,23 @@ package au.com.shiftyjelly.pocketcasts.wear
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.WatchSync
-import com.google.android.gms.wearable.DataClient
+import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class WearMainActivityViewModel @Inject constructor(
-    private val watchSync: WatchSync
+    private val watchSync: WatchSync,
+    private val tokenBundleRepository: TokenBundleRepository<String>
 ) : ViewModel() {
 
-    val phoneSyncDataListener = DataClient.OnDataChangedListener { dataEventBuffer ->
+    fun startMonitoringAuth() {
         viewModelScope.launch {
-            watchSync.processDataChange(dataEventBuffer)
-        }
-    }
-
-    fun checkLatestSyncData() {
-        viewModelScope.launch {
-            watchSync.processLatestData()
+            tokenBundleRepository.flow
+                .collect {
+                    watchSync.processAuthDataChange(it)
+                }
         }
     }
 }

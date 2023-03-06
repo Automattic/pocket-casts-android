@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.toLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -57,7 +57,7 @@ class PlusSettingsFragment : BaseFragment() {
 
         val recyclerView = binding.recyclerView
 
-        LiveDataReactiveStreams.fromPublisher(subscriptionManager.observeProductDetails()).observe(viewLifecycleOwner) { productDetailsState ->
+        subscriptionManager.observeProductDetails().toLiveData().observe(viewLifecycleOwner) { productDetailsState ->
             val subscriptions = when (productDetailsState) {
                 is ProductDetailsState.Error -> null
                 is ProductDetailsState.Loaded -> productDetailsState.productDetails.mapNotNull {
@@ -128,8 +128,7 @@ class PlusSettingsFragment : BaseFragment() {
 
         binding?.toolbar?.setup(title = getString(LR.string.pocket_casts_plus), navigationIcon = BackArrow, activity = activity, theme = theme)
 
-        LiveDataReactiveStreams
-            .fromPublisher(userManager.getSignInState())
+            userManager.getSignInState().toLiveData()
             .observe(viewLifecycleOwner) { signInState ->
                 // If the user has gone through the upgraded to Plus, we no longer want
                 // to present this screen since it is asking them to sign up for Plus

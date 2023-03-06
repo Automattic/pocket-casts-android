@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.profile.cloud
 
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -39,9 +39,9 @@ class CloudFilesViewModel @Inject constructor(
 
     val sortOrderRelay = BehaviorRelay.create<Settings.CloudSortOrder>().apply { accept(settings.getCloudSortOrder()) }
     val sortedCloudFiles = sortOrderRelay.toFlowable(BackpressureStrategy.LATEST).switchMap { userEpisodeManager.observeUserEpisodesSorted(it) }
-    val cloudFilesList = LiveDataReactiveStreams.fromPublisher(sortedCloudFiles)
-    val accountUsage = LiveDataReactiveStreams.fromPublisher(userEpisodeManager.observeAccountUsage())
-    val signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    val cloudFilesList = sortedCloudFiles.toLiveData()
+    val accountUsage = userEpisodeManager.observeAccountUsage().toLiveData()
+    val signInState = userManager.getSignInState().toLiveData()
 
     fun refreshFiles(userInitiated: Boolean) {
         if (userInitiated) {

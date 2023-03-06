@@ -11,6 +11,8 @@ apply from: "../base.gradle"
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
+    compileSdkPreview = "UpsideDownCake"
+
     namespace 'au.com.shiftyjelly.pocketcasts'
 
     defaultConfig {
@@ -96,7 +98,7 @@ dependencies {
     implementation project(':modules:features:taskerplugin')
     implementation project(':modules:features:endofyear')
 
-    wearApp project(':wear')
+    implementation androidLibs.liveDataReactiveStreams
 }
 
 task appStart(type: Exec, dependsOn: 'installDebug') {

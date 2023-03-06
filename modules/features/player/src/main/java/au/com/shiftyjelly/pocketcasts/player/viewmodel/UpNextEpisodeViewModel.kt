@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
@@ -41,7 +41,7 @@ class UpNextEpisodeViewModel
     private var episodeUuid: String? = null
     val episode = MutableLiveData<Playable>()
     val podcast = MutableLiveData<Podcast>()
-    val isNextEpisode: LiveData<Boolean> = LiveDataReactiveStreams.fromPublisher(
+    val isNextEpisode: LiveData<Boolean> =
         playbackManager.upNextQueue.changesObservable.map { upNext ->
             if (upNext is UpNextQueue.State.Loaded) {
                 upNext.queue.indexOfFirst { it.uuid == episodeUuid } == 0
@@ -49,8 +49,9 @@ class UpNextEpisodeViewModel
                 false
             }
         }.toFlowable(BackpressureStrategy.LATEST)
-    )
-    val isPlayingEpisode: LiveData<Boolean> = LiveDataReactiveStreams.fromPublisher(
+            .toLiveData()
+
+    val isPlayingEpisode: LiveData<Boolean> =
         playbackManager.upNextQueue.changesObservable.map { upNext ->
             if (upNext is UpNextQueue.State.Loaded) {
                 upNext.episode.uuid == episodeUuid
@@ -58,7 +59,8 @@ class UpNextEpisodeViewModel
                 false
             }
         }.toFlowable(BackpressureStrategy.LATEST)
-    )
+            .toLiveData()
+
 
     fun loadEpisode(episodeUuid: String) {
         this.episodeUuid = episodeUuid

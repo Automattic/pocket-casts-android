@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -54,9 +54,9 @@ class PodcastsViewModel
         val isSignedInAsPlus: Boolean
     )
 
-    val signInState: LiveData<SignInState> = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
-    val folderState: LiveData<FolderState> = LiveDataReactiveStreams.fromPublisher(
+    val folderState: LiveData<FolderState> =
         combineLatest(
             // monitor all subscribed podcasts, get the podcast in 'Episode release date' as the rest can be done in memory
             podcastManager.observePodcastsOrderByLatestEpisode(),
@@ -120,7 +120,7 @@ class PodcastsViewModel
             }
         }
             .doOnNext { adapterState = it.items.toMutableList() }
-    )
+            .toLiveData()
 
     val folder: Folder?
         get() = folderState.value?.folder
@@ -167,7 +167,6 @@ class PodcastsViewModel
     }
 
     val podcastUuidToBadge: LiveData<Map<String, Int>> =
-        LiveDataReactiveStreams.fromPublisher(
             settings.podcastBadgeTypeObservable
                 .toFlowable(BackpressureStrategy.LATEST)
                 .switchMap { badgeType ->
@@ -177,12 +176,12 @@ class PodcastsViewModel
                         else -> Flowable.just(emptyMap())
                     }
                 }
-        )
+                .toLiveData()
 
     // We only want the current badge type when loading for this observable or else it will rebind the adapter every time the badge changes. We use take(1) for this.
-    val layoutChangedLiveData = LiveDataReactiveStreams.fromPublisher(Observables.combineLatest(settings.podcastLayoutObservable, settings.podcastBadgeTypeObservable.take(1)).toFlowable(BackpressureStrategy.LATEST))
+    val layoutChangedLiveData = Observables.combineLatest(settings.podcastLayoutObservable, settings.podcastBadgeTypeObservable.take(1)).toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
-    val refreshObservable: LiveData<RefreshState> = LiveDataReactiveStreams.fromPublisher(settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST))
+    val refreshObservable: LiveData<RefreshState> = settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
     private var adapterState: MutableList<FolderItem> = mutableListOf()
 

@@ -27,9 +27,9 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.toLiveData
 import androidx.mediarouter.media.MediaControlIntent
 import androidx.mediarouter.media.MediaRouteSelector
 import androidx.mediarouter.media.MediaRouter
@@ -673,7 +673,7 @@ class MainActivity :
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toFlowable(BackpressureStrategy.LATEST)
-        observeUpNext = LiveDataReactiveStreams.fromPublisher(upNextQueueObservable)
+        observeUpNext = upNextQueueObservable.toLiveData()
         observeUpNext.observe(this) { upNext ->
             binding.playerBottomSheet.setUpNext(
                 upNext = upNext,
@@ -718,7 +718,7 @@ class MainActivity :
             lifecycleScope.launch {
                 // FIXME This gets called every time MainActivity resumes. Can we reduce how often this is called?
                 //   But if that gets fixed we may want to also start calling this explicitly in onCreate
-                watchSync.sendAuthToDataLayer(this@MainActivity)
+                watchSync.sendAuthToDataLayer()
             }
         }
 

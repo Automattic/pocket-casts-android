@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.filters
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -133,17 +133,17 @@ class CreateFilterViewModel @Inject constructor(
         }
 
         playlist = if (playlistUUID != null) {
-            LiveDataReactiveStreams.fromPublisher(playlistManager.findByUuidRx(playlistUUID).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).toFlowable())
+            playlistManager.findByUuidRx(playlistUUID).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).toFlowable().toLiveData()
         } else {
             val newFilter = createFilter("", 0, 0)
-            LiveDataReactiveStreams.fromPublisher(playlistManager.observeByUuid(newFilter.uuid))
+            playlistManager.observeByUuid(newFilter.uuid).toLiveData()
         }
 
         hasBeenInitialised = true
     }
 
     fun observeFilter(filter: Playlist): LiveData<List<Episode>> {
-        return LiveDataReactiveStreams.fromPublisher(playlistManager.observeEpisodesPreview(filter, episodeManager, playbackManager))
+        return playlistManager.observeEpisodesPreview(filter, episodeManager, playbackManager).toLiveData()
     }
 
     fun updateDownloadLimit(limit: Int) {

@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.os.Build
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -21,7 +21,7 @@ class VideoViewModel @Inject constructor(
     private val playbackManager: PlaybackManager
 ) : ViewModel() {
 
-    val playbackState: LiveData<PlaybackState> = LiveDataReactiveStreams.fromPublisher(playbackManager.playbackStateRelay.toFlowable(BackpressureStrategy.LATEST))
+    val playbackState: LiveData<PlaybackState> = playbackManager.playbackStateRelay.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
     private var hideControlsTimer: Disposable? = null
     private var lastTimeHidingControls = 0L

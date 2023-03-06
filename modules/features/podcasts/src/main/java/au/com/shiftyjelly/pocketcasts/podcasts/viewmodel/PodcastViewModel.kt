@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.res.Resources
 import android.widget.Toast
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -75,18 +75,17 @@ class PodcastViewModel
     lateinit var podcastUuid: String
     lateinit var episodes: LiveData<EpisodeState>
     val groupedEpisodes: MutableLiveData<List<List<Episode>>> = MutableLiveData()
-    val signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    val signInState = userManager.getSignInState().toLiveData()
 
     val tintColor = MutableLiveData<Int>()
     val observableHeaderExpanded = MutableLiveData<Boolean>()
     private val searchQueryRelay = BehaviorRelay.create<String>()
         .apply { accept("") }
 
-    val castConnected = LiveDataReactiveStreams.fromPublisher(
+    val castConnected =
         castManager.isConnectedObservable.toFlowable(
             BackpressureStrategy.LATEST
-        )
-    )
+        ).toLiveData()
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -166,7 +165,7 @@ class PodcastViewModel
             }
             .observeOn(AndroidSchedulers.mainThread())
 
-        episodes = LiveDataReactiveStreams.fromPublisher(episodeStateFlowable)
+        episodes = episodeStateFlowable.toLiveData()
     }
 
     override fun onCleared() {
