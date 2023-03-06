@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-06 13:54:03+0000
+Translation-Revision-Date: 2023-03-01 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="search_history_row_type_episode_subtitle">Avsnitt \u2022 %s \u2022 %s</string>
+    <string name="search_show_all">Visa alla</string>
+    <string name="podcast">Podcast</string>
+    <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">Mapp \u2022 %s</string>
+    <string name="search_history_recent_searches">Senaste sökningar</string>
+    <string name="search_history_clear_all_confirmation_message">Är du säker på att du vill rensa all din sökhistorik?</string>
+    <string name="search_history_clear_all_confirm_button_title">Rensa sökhistorik</string>
+    <string name="search_podcasts_or_add_url">Sök efter podcasts eller lägg till RSS-URL</string>
+    <string name="error_opening_links_activity_not_found">Det verkar som att du inte har någon app som kan visa detta innehåll.</string>
+    <string name="notifications_blocked_warning">Notiser har blockerats. Du kan uppdatera behörigheterna via Inställningar.</string>
     <string name="settings_media_actions_show_subtitle">Visa anpassade mediaåtgärder i mediaaviseringar för Android 13 och Android Auto.</string>
     <string name="settings_media_actions_show_title">Visa anpassade mediaåtgärder</string>
     <string name="settings_media_actions_customise">Anpassa mediaåtgärder</string>
@@ -1278,7 +1289,6 @@ Language: sv_SE
     <string name="time_short_hours_minutes">%1$dt %2$dm</string>
     <string name="time_short_hours">%dt</string>
     <string name="search_hint">Sök efter podcastnamn</string>
-    <string name="search_podcasts">Sök podcasts</string>
     <string name="stream_warning_button">Streama ändå</string>
     <string name="profile_cloud_upload_warning_button">Ladda upp nu</string>
     <string name="profile_cloud_upload_warning_summary">Att ladda upp det här avsnittet använder data.</string>
