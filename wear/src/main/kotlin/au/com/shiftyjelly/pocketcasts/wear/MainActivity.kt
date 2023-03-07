@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
-import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeFlowGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
@@ -105,7 +105,7 @@ fun WearApp(themeType: Theme.ThemeType) {
                 )
             }
 
-            episodeFlowGraph(
+            episodeGraph(
                 navigateToPodcast = { podcastUuid ->
                     navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
                 },

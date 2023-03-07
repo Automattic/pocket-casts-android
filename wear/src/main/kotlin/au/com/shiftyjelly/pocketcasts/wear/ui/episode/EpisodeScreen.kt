@@ -37,6 +37,7 @@ fun EpisodeScreen(
     columnState: ScalingLazyColumnState,
     navigateToPodcast: (podcastUuid: String) -> Unit,
     navigateToUpNextOptions: () -> Unit,
+    navigateToConfirmDeleteDownload: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<EpisodeViewModel>()
@@ -87,7 +88,13 @@ fun EpisodeScreen(
                     .replace("-", stringResource(LR.string.podcasts_download_download))
                 DownloadButton(
                     tint = state.tintColor,
-                    onClick = viewModel::onDownloadClicked,
+                    onClick = {
+                        if (episode.isDownloaded) {
+                            navigateToConfirmDeleteDownload()
+                        } else {
+                            viewModel.downloadEpisode()
+                        }
+                    },
                     downloadButtonState = when (episode.episodeStatus) {
                         EpisodeStatusEnum.NOT_DOWNLOADED -> DownloadButtonState.NotDownloaded(
                             downloadSize

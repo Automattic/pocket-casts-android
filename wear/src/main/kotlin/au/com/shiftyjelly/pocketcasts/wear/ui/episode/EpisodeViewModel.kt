@@ -151,38 +151,35 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    fun onDownloadClicked() {
+    fun downloadEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
-        if (episode.isDownloaded) {
-            deleteDownloadedEpisode(episode)
-        } else {
-            viewModelScope.launch {
-                val fromString = "wear episode screen"
+        viewModelScope.launch {
+            val fromString = "wear episode screen"
 
-                if (episode.downloadTaskId != null) {
-                    episodeManager.stopDownloadAndCleanUp(episode, fromString)
+            if (episode.downloadTaskId != null) {
+                episodeManager.stopDownloadAndCleanUp(episode, fromString)
 
-                    episodeAnalytics.trackEvent(
-                        event = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED,
-                        source = analyticsSource,
-                        uuid = episode.uuid
-                    )
-                } else if (!episode.isDownloaded) {
-                    episode.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
-                    downloadManager.addEpisodeToQueue(episode, fromString, true)
+                episodeAnalytics.trackEvent(
+                    event = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED,
+                    source = analyticsSource,
+                    uuid = episode.uuid
+                )
+            } else if (!episode.isDownloaded) {
+                episode.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+                downloadManager.addEpisodeToQueue(episode, fromString, true)
 
-                    episodeAnalytics.trackEvent(
-                        event = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
-                        source = analyticsSource,
-                        uuid = episode.uuid
-                    )
-                }
-                episodeManager.clearPlaybackError(episode)
+                episodeAnalytics.trackEvent(
+                    event = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
+                    source = analyticsSource,
+                    uuid = episode.uuid
+                )
             }
+            episodeManager.clearPlaybackError(episode)
         }
     }
 
-    private fun deleteDownloadedEpisode(episode: Episode) {
+    fun deleteDownloadedEpisode() {
+        val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch(Dispatchers.IO) {
             episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, removeFromUpNext = true)
             episodeAnalytics.trackEvent(
