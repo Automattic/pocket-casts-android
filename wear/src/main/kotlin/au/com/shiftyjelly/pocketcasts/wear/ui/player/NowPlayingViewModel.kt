@@ -32,6 +32,7 @@ class NowPlayingViewModel @Inject constructor(
             val title: String,
             val subtitle: String?,
             val playing: Boolean,
+            val episodeUuid: String,
             val seekBackwardIncrement: SeekButtonIncrement,
             val seekForwardIncrement: SeekButtonIncrement,
             val trackPositionUiModel: TrackPositionUiModel.Actual,
@@ -59,6 +60,7 @@ class NowPlayingViewModel @Inject constructor(
                     val podcast = playbackState.podcast
                     episode.displaySubtitle(podcast)
                 },
+                episodeUuid = playbackState.episodeUuid,
                 playing = playbackState.isPlaying,
                 seekBackwardIncrement = SeekButtonIncrement.Known(skipBackwardSecs),
                 seekForwardIncrement = SeekButtonIncrement.Known(skipForwardSecs),

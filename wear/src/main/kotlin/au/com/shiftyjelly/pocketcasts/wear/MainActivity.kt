@@ -61,7 +61,11 @@ fun WearApp(themeType: Theme.ThemeType) {
 
             composable(NowPlayingScreen.route) { viewModel ->
                 viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
-                NowPlayingScreen()
+                NowPlayingScreen(
+                    navigateToEpisode = { episodeUuid ->
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
+                    },
+                )
             }
 
             scrollable(

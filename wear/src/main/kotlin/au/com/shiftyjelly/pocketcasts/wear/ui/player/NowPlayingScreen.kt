@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -32,6 +33,7 @@ fun NowPlayingScreen(
     modifier: Modifier = Modifier,
     playerViewModel: NowPlayingViewModel = hiltViewModel(),
     volumeViewModel: PCVolumeViewModel = hiltViewModel(),
+    navigateToEpisode: (episodeUuid: String) -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -51,9 +53,10 @@ fun NowPlayingScreen(
 
                     is NowPlayingViewModel.State.Loaded -> {
                         MarqueeTextMediaDisplay(
-                            modifier = modifier,
                             title = state.title,
                             artist = state.subtitle,
+                            modifier = modifier
+                                .clickable { navigateToEpisode(state.episodeUuid) },
                         )
                     }
                 }
