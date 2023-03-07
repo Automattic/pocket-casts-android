@@ -1,6 +1,8 @@
 7.35
 -----
-
+*   Updates
+    *   The Automotive skip forward and backward time settings were improved.
+        ([#817](https://github.com/Automattic/pocket-casts-android/pull/817)).
 
 7.34
 -----
