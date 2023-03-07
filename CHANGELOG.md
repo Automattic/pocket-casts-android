@@ -3,6 +3,8 @@
 *   Updates
     *   The Automotive skip forward and backward time settings were improved.
         ([#817](https://github.com/Automattic/pocket-casts-android/pull/817)).
+    *   Fixed Automotive Up Next podcast images not loading.
+        ([#819](https://github.com/Automattic/pocket-casts-android/pull/819)).
 
 7.34
 -----
