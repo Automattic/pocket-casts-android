@@ -117,7 +117,6 @@ fun WearApp(themeType: Theme.ThemeType) {
             ) {
                 EpisodeScreen(
                     columnState = it.columnState,
-                    navigateToNowPlaying = { navController.navigate(NowPlayingScreen.route) },
                     navigateToPodcast = { podcastUuid ->
                         navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
                     },

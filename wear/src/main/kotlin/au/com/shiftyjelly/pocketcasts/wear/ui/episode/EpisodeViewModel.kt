@@ -26,12 +26,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -53,6 +53,7 @@ class EpisodeViewModel @Inject constructor(
         data class Loaded(
             val episode: Episode,
             val podcast: Podcast,
+            val isPlayingEpisode: Boolean,
             val inUpNext: Boolean,
             val tintColor: Color,
             val upNextOptions: List<UpNextOption>,
@@ -96,36 +97,35 @@ class EpisodeViewModel @Inject constructor(
             podcastManager.findPodcastByUuidSuspend(it.podcastUuid)
         }
 
+        val isPlayingEpisodeFlow = playbackManager.playbackStateRelay.asFlow()
+            .filter { it.episodeUuid == episodeUuid }
+            .map { it.isPlaying }
+            .onStart { emit(false) }
+
         val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow()
 
         viewModelScope.launch {
 
-            val downloadProgressFlow = run {
-                val updates = combine(
-                    episodeFlow,
-                    downloadManager.progressUpdateRelay.asFlow()
-                ) { episode, downloadProgressUpdate ->
-                    (episode to downloadProgressUpdate)
-                }.filter { (episode, downloadProgressUpdate) ->
-                    episode.uuid == downloadProgressUpdate.episodeUuid
-                }.map { (_, downloadProgressUpdate) ->
-                    downloadProgressUpdate.downloadProgress
-                }
-
-                // Give an initial value to the flow, otherwise, so that the combine function
-                // below will emit even if there are no download progress updates
-                merge(
-                    updates,
-                    flowOf(null)
-                )
+            val downloadProgressFlow = combine(
+                episodeFlow,
+                downloadManager.progressUpdateRelay.asFlow()
+            ) { episode, downloadProgressUpdate ->
+                (episode to downloadProgressUpdate)
+            }.filter { (episode, downloadProgressUpdate) ->
+                episode.uuid == downloadProgressUpdate.episodeUuid
+            }.map { (_, downloadProgressUpdate) ->
+                downloadProgressUpdate.downloadProgress
+            }.onStart<Float?> {
+                emit(null)
             }
 
             combine(
                 episodeFlow,
                 podcastFlow,
+                isPlayingEpisodeFlow,
                 inUpNextFlow,
                 downloadProgressFlow
-            ) { episode, podcast, upNext, downloadProgress ->
+            ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress ->
                 if (podcast != null) {
                     val podcastTint = podcast.getTintColor(theme.isDarkTheme)
 
@@ -140,6 +140,7 @@ class EpisodeViewModel @Inject constructor(
                     State.Loaded(
                         episode = episode,
                         podcast = podcast,
+                        isPlayingEpisode = isPlayingEpisode,
                         downloadProgress = downloadProgress,
                         inUpNext = inUpNext,
                         tintColor = tintColor,
@@ -197,13 +198,23 @@ class EpisodeViewModel @Inject constructor(
     }
 
     fun play() {
-        (stateFlow.value as? State.Loaded)?.episode?.let { episode ->
-            viewModelScope.launch {
-                playbackManager.playNowSync(
-                    episode = episode,
-                    playbackSource = AnalyticsSource.WATCH_UP_NEXT,
-                )
-            }
+        val episode = (stateFlow.value as? State.Loaded)?.episode
+            ?: return
+        viewModelScope.launch {
+            playbackManager.playNowSync(
+                episode = episode,
+                playbackSource = analyticsSource,
+            )
+        }
+    }
+
+    fun pause() {
+        if ((stateFlow.value as? State.Loaded)?.isPlayingEpisode != true) {
+            Timber.e("Attempted to pause when not playing")
+            return
+        }
+        viewModelScope.launch {
+            playbackManager.pause(playbackSource = analyticsSource)
         }
     }
 

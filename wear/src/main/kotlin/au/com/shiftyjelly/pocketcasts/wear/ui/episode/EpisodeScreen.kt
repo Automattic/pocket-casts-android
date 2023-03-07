@@ -62,7 +62,6 @@ object EpisodeScreen {
 @Composable
 fun EpisodeScreen(
     columnState: ScalingLazyColumnState,
-    navigateToNowPlaying: () -> Unit,
     navigateToPodcast: (podcastUuid: String) -> Unit,
 ) {
 
@@ -80,7 +79,6 @@ fun EpisodeScreen(
             viewModel = viewModel,
             state = state,
             columnState = columnState,
-            navigateToNowPlaying = navigateToNowPlaying,
             navigateToPodcast = navigateToPodcast,
         )
     }
@@ -89,7 +87,6 @@ fun EpisodeScreen(
 @Composable
 fun MainEpisodeScreen(
     columnState: ScalingLazyColumnState,
-    navigateToNowPlaying: () -> Unit,
     navigateToPodcast: (podcastUuid: String) -> Unit,
     viewModel: EpisodeViewModel,
     state: EpisodeViewModel.State.Loaded,
@@ -145,7 +142,10 @@ fun MainEpisodeScreen(
                         EpisodeStatusEnum.QUEUED,
                         EpisodeStatusEnum.WAITING_FOR_WIFI,
                         EpisodeStatusEnum.WAITING_FOR_POWER -> DownloadButtonState.Queued
-                        EpisodeStatusEnum.DOWNLOADING -> DownloadButtonState.Downloading(state.downloadProgress ?: 0f)
+                        EpisodeStatusEnum.DOWNLOADING -> DownloadButtonState.Downloading(
+                            state.downloadProgress
+                                ?: 0f
+                        )
                         EpisodeStatusEnum.DOWNLOADED -> DownloadButtonState.Downloaded(downloadSize)
                         EpisodeStatusEnum.DOWNLOAD_FAILED -> DownloadButtonState.Errored
                     },
@@ -155,9 +155,13 @@ fun MainEpisodeScreen(
                 PlayButton(
                     backgroundColor = state.tintColor,
                     onClick = {
-                        viewModel.play()
-                        navigateToNowPlaying()
-                    }
+                        if (state.isPlayingEpisode) {
+                            viewModel.pause()
+                        } else {
+                            viewModel.play()
+                        }
+                    },
+                    isPlaying = state.isPlayingEpisode,
                 )
 
                 QueueButton(
@@ -301,8 +305,12 @@ private fun DownloadButton(
     downloadButtonState: DownloadButtonState,
     modifier: Modifier = Modifier,
 ) {
-
-    Box(modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.clickable(
+            onClick = onClick,
+        ),
+    ) {
 
         when (downloadButtonState) {
             is DownloadButtonState.Downloading -> downloadButtonState.progressPercent
@@ -320,42 +328,27 @@ private fun DownloadButton(
             )
         }
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.clickable(
-                onClick = onClick,
-            ),
-        ) {
-            Icon(
-                painter = painterResource(
-                    when (downloadButtonState) {
-                        is DownloadButtonState.Downloaded -> IR.drawable.ic_downloaded
-                        DownloadButtonState.Queued,
-                        is DownloadButtonState.Downloading -> IR.drawable.ic_downloading
-                        DownloadButtonState.Errored -> IR.drawable.ic_retry
-                        is DownloadButtonState.NotDownloaded -> IR.drawable.ic_download
-                    }
-                ),
-                tint = tint,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp)
-            )
+        Icon(
+            painter = painterResource(
+                when (downloadButtonState) {
+                    is DownloadButtonState.Downloaded -> IR.drawable.ic_downloaded
+                    DownloadButtonState.Queued,
+                    is DownloadButtonState.Downloading -> IR.drawable.ic_downloading
 
-            TextC70(
-                text = when (downloadButtonState) {
-                    is DownloadButtonState.Downloading -> "${downloadButtonState.progressPercent}"
-                    DownloadButtonState.Errored -> stringResource(LR.string.podcasts_download_retry)
-                    is DownloadButtonState.Downloaded -> downloadButtonState.downloadSize
-                    is DownloadButtonState.NotDownloaded -> downloadButtonState.downloadSize
-                    DownloadButtonState.Queued -> stringResource(LR.string.podcasts_download_queued)
-                },
-            )
-        }
+                    DownloadButtonState.Errored -> IR.drawable.ic_retry
+                    is DownloadButtonState.NotDownloaded -> IR.drawable.ic_download
+                }
+            ),
+            tint = tint,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
     }
 }
 
 @Composable
 private fun PlayButton(
+    isPlaying: Boolean,
     backgroundColor: Color,
     onClick: () -> Unit,
 ) {
@@ -368,7 +361,13 @@ private fun PlayButton(
             .clickable { onClick() }
     ) {
         Image(
-            painter = painterResource(IR.drawable.button_play),
+            painter = painterResource(
+                if (isPlaying) {
+                    IR.drawable.button_pause
+                } else {
+                    IR.drawable.button_play
+                }
+            ),
             contentDescription = stringResource(LR.string.play),
             modifier = Modifier.size(52.dp)
         )
