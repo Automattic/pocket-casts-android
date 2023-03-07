@@ -84,6 +84,7 @@ object EpisodeScreenFlow {
             }
 
             composable(deleteDownloadNotificationScreen) {
+                it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
                     text = stringResource(LR.string.removed),
                     onClick = { navController.popBackStack() },

@@ -224,6 +224,7 @@ private fun EpisodeListChip(episodeScreenItem: EpisodeScreenItem) {
         onClick = episodeScreenItem.onClick,
         modifier = Modifier
             .padding(bottom = 4.dp)
+            .fillMaxWidth()
     )
 }
 
