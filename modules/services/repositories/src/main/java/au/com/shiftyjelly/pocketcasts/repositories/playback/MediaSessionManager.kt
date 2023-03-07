@@ -226,7 +226,7 @@ class MediaSessionManager(
         }
     }
 
-    fun updateUpNext(upNext: UpNextQueue.State) {
+    private fun updateUpNext(upNext: UpNextQueue.State) {
         try {
             mediaSession.setQueueTitle("Up Next")
             if (upNext is UpNextQueue.State.Loaded) {
@@ -236,11 +236,13 @@ class MediaSessionManager(
                     val podcastUuid = if (episode is Episode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
+                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)
                     val description = MediaDescriptionCompat.Builder()
                         .setDescription(episode.episodeDescription)
                         .setTitle(episode.title)
                         .setSubtitle(podcastTitle)
                         .setMediaId(episode.uuid)
+                        .setIconUri(localUri)
                         .build()
 
                     return@map MediaSessionCompat.QueueItem(description, episode.adapterId)
