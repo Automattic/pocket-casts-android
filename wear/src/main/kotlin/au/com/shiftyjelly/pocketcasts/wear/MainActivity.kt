@@ -6,9 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -20,11 +17,11 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationGraph
-import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
+import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeFlowGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
-import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
 import com.google.android.horologist.compose.navscaffold.composable
@@ -72,7 +69,7 @@ fun WearApp(themeType: Theme.ThemeType) {
             ) {
                 UpNextScreen(
                     navigateToEpisode = { episodeUuid ->
-                        navController.navigate(EpisodeScreen.navigateRoute(episodeUuid))
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
                     },
                     listState = it.scrollableState,
                 )
@@ -99,29 +96,17 @@ fun WearApp(themeType: Theme.ThemeType) {
             ) {
                 PodcastScreen(
                     onEpisodeTap = { episode ->
-                        navController.navigate(EpisodeScreen.navigateRoute(episodeUuid = episode.uuid))
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
                     },
                 )
             }
 
-            scrollable(
-                route = EpisodeScreen.route,
-                arguments = listOf(
-                    navArgument(EpisodeScreen.episodeUuidArgument) {
-                        type = NavType.StringType
-                    }
-                ),
-                columnStateFactory = ScalingLazyColumnDefaults.belowTimeText(
-                    verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top)
-                ),
-            ) {
-                EpisodeScreen(
-                    columnState = it.columnState,
-                    navigateToPodcast = { podcastUuid ->
-                        navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                    },
-                )
-            }
+            episodeFlowGraph(
+                navigateToPodcast = { podcastUuid ->
+                    navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+                },
+                navController = navController,
+            )
 
             composable(FiltersScreen.route) { FiltersScreen() }
             composable(DownloadsScreen.route) { DownloadsScreen() }

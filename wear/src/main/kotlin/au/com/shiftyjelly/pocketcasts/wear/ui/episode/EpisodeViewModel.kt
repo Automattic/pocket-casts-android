@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
@@ -56,9 +55,7 @@ class EpisodeViewModel @Inject constructor(
             val isPlayingEpisode: Boolean,
             val inUpNext: Boolean,
             val tintColor: Color,
-            val upNextOptions: List<UpNextOption>,
             val downloadProgress: Float? = null,
-            val showUpNextOptions: Boolean = false,
         ) : State()
 
         object Empty : State()
@@ -70,7 +67,7 @@ class EpisodeViewModel @Inject constructor(
         val onClick: () -> Unit,
     )
 
-    private val upNextOptions = listOf(
+    val upNextOptions = listOf(
         UpNextOption(
             iconRes = IR.drawable.ic_upnext_playnext,
             titleRes = LR.string.play_next,
@@ -87,7 +84,7 @@ class EpisodeViewModel @Inject constructor(
     val stateFlow = _stateFlow.asStateFlow()
 
     init {
-        val episodeUuid = savedStateHandle.get<String>(EpisodeScreen.episodeUuidArgument)
+        val episodeUuid = savedStateHandle.get<String>(EpisodeScreenFlow.episodeUuidArgument)
             ?: throw IllegalStateException("EpisodeViewModel must have an episode uuid in the SavedStateHandle")
 
         val episodeFlow = episodeManager
@@ -144,7 +141,6 @@ class EpisodeViewModel @Inject constructor(
                         downloadProgress = downloadProgress,
                         inUpNext = inUpNext,
                         tintColor = tintColor,
-                        upNextOptions = upNextOptions,
                     )
                 } else {
                     State.Empty
@@ -218,7 +214,7 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    private fun addToUpNext(upNextPosition: UpNextPosition) {
+    fun addToUpNext(upNextPosition: UpNextPosition) {
         val state = stateFlow.value as? State.Loaded ?: return
         viewModelScope.launch {
             playbackManager.play(
@@ -234,7 +230,10 @@ class EpisodeViewModel @Inject constructor(
         playbackManager.removeEpisode(episodeToRemove = state.episode, source = AnalyticsSource.WATCH_EPISODE_DETAILS)
     }
 
-    fun onAddToUpNextClicked(showToast: (Int) -> Unit) {
+    fun onAddToUpNextClicked(
+        showToast: (Int) -> Unit,
+        navigateToUpNextOptions: () -> Unit
+    ) {
         val state = stateFlow.value as? State.Loaded ?: return
 
         val wasInUpNext = state.inUpNext
@@ -243,20 +242,10 @@ class EpisodeViewModel @Inject constructor(
             removeFromUpNext()
             showToast(LR.string.episode_removed_from_up_next)
         } else if (playbackManager.upNextQueue.queueEpisodes.isNotEmpty()) {
-            askUserWhereToAddToUpNext()
+            navigateToUpNextOptions()
         } else {
             // If the Up Next queue is empty, it doesn't matter where we add the episode
             addToUpNext(UpNextPosition.NEXT)
-        }
-    }
-
-    private fun askUserWhereToAddToUpNext() {
-        _stateFlow.update {
-            if (it is State.Loaded) {
-                it.copy(showUpNextOptions = true)
-            } else {
-                it
-            }
         }
     }
 
