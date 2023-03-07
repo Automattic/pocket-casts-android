@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Icon
@@ -31,7 +32,7 @@ fun NotificationScreen(
 
     LaunchedEffect(Unit) {
         // Close the screen after a short delay
-        delay(3000)
+        delay(2000)
         onClick()
     }
 
@@ -39,8 +40,8 @@ fun NotificationScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .semantics(mergeDescendants = true) { }
             .clickable { onClick() }
+            .padding(16.dp)
             .fillMaxSize()
     ) {
         Icon(
@@ -50,7 +51,10 @@ fun NotificationScreen(
             modifier = Modifier.size(52.dp)
         )
         Spacer(modifier = Modifier.height(4.dp))
-        TextH30(text)
+        TextH30(
+            text = text,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 

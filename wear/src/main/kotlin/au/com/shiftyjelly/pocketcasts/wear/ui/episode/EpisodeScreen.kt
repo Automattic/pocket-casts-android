@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -37,6 +36,7 @@ fun EpisodeScreen(
     navigateToPodcast: (podcastUuid: String) -> Unit,
     navigateToUpNextOptions: () -> Unit,
     navigateToConfirmDeleteDownload: () -> Unit,
+    navigateToRemoveFromUpNextNotification: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<EpisodeViewModel>()
@@ -130,11 +130,8 @@ fun EpisodeScreen(
                     inUpNext = state.inUpNext,
                     tint = state.tintColor,
                     onClick = {
-                        viewModel.onAddToUpNextClicked(
-                            showToast = {
-                                Toast.makeText(context, context.getString(it), Toast.LENGTH_SHORT)
-                                    .show()
-                            },
+                        viewModel.onUpNextClicked(
+                            onRemoveFromUpNext = navigateToRemoveFromUpNextNotification,
                             navigateToUpNextOptions = navigateToUpNextOptions
                         )
                     }

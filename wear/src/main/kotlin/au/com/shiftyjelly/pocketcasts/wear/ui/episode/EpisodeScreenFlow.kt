@@ -26,6 +26,7 @@ object EpisodeScreenFlow {
     private const val upNextOptionsScreen = "upNextOptionsScreen"
     private const val deleteDownloadConfirmationScreen = "deleteDownloadConfirmationScreen"
     private const val deleteDownloadNotificationScreen = "deleteDownloadNotificationScreen"
+    private const val removeFromUpNextNotificationScreen = "removeFromUpNextNotificationScreen"
 
     fun NavGraphBuilder.episodeGraph(
         navigateToPodcast: (podcastUuid: String) -> Unit,
@@ -51,6 +52,7 @@ object EpisodeScreenFlow {
                     navigateToPodcast = navigateToPodcast,
                     navigateToUpNextOptions = { navController.navigate(upNextOptionsScreen) },
                     navigateToConfirmDeleteDownload = { navController.navigate(deleteDownloadConfirmationScreen) },
+                    navigateToRemoveFromUpNextNotification = { navController.navigate(removeFromUpNextNotificationScreen) },
                 )
             }
 
@@ -87,6 +89,14 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
                     text = stringResource(LR.string.removed),
+                    onClick = { navController.popBackStack() },
+                )
+            }
+
+            composable(removeFromUpNextNotificationScreen) {
+                it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+                NotificationScreen(
+                    text = stringResource(LR.string.episode_removed_from_up_next),
                     onClick = { navController.popBackStack() },
                 )
             }

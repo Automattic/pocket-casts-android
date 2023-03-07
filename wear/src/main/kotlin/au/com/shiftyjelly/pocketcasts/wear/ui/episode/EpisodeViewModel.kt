@@ -227,8 +227,8 @@ class EpisodeViewModel @Inject constructor(
         playbackManager.removeEpisode(episodeToRemove = state.episode, source = AnalyticsSource.WATCH_EPISODE_DETAILS)
     }
 
-    fun onAddToUpNextClicked(
-        showToast: (Int) -> Unit,
+    fun onUpNextClicked(
+        onRemoveFromUpNext: () -> Unit,
         navigateToUpNextOptions: () -> Unit
     ) {
         val state = stateFlow.value as? State.Loaded ?: return
@@ -237,7 +237,7 @@ class EpisodeViewModel @Inject constructor(
 
         if (wasInUpNext) {
             removeFromUpNext()
-            showToast(LR.string.episode_removed_from_up_next)
+            onRemoveFromUpNext()
         } else if (playbackManager.upNextQueue.queueEpisodes.isNotEmpty()) {
             navigateToUpNextOptions()
         } else {
