@@ -30,7 +30,7 @@ object PodcastScreen {
 
 @Composable
 fun PodcastScreen(
-    navigateToNowPlaying: () -> Unit,
+    onEpisodeTap: (Episode) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PodcastViewModel = hiltViewModel(),
 ) {
@@ -64,12 +64,11 @@ fun PodcastScreen(
                 text = podcast.author
             )
         }
-        items(viewModel.uiState.episodes) { item ->
+        items(viewModel.uiState.episodes) { episode ->
             EpisodeChip(
-                episode = item,
+                episode = episode,
                 onClick = {
-                    viewModel.play(item)
-                    navigateToNowPlaying()
+                    onEpisodeTap(episode)
                 }
             )
         }
@@ -79,11 +78,11 @@ fun PodcastScreen(
 @Composable
 private fun EpisodeChip(
     episode: Episode,
-    onClick: (String) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Chip(
-        onClick = { onClick(episode.uuid) },
+        onClick = { onClick() },
         colors = ChipDefaults.secondaryChipColors(),
         label = {
             Text(episode.title, maxLines = 1, overflow = TextOverflow.Ellipsis)

@@ -49,8 +49,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -93,13 +95,13 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.findByUuidRx(uuid)
     }
 
-    override fun observeByUuid(uuid: String): Flowable<Episode> {
+    override fun observeByUuid(uuid: String): Flow<Episode> {
         return episodeDao.observeByUuid(uuid)
     }
 
     override fun observePlayableByUuid(uuid: String): Flowable<Playable> {
         return findByUuidRx(uuid)
-            .flatMapPublisher<Playable> { episodeDao.observeByUuid(uuid) }
+            .flatMapPublisher<Playable> { episodeDao.observeByUuid(uuid).asFlowable() }
             .switchIfEmpty(userEpisodeManager.observeEpisode(uuid))
     }
 

@@ -20,14 +20,20 @@ object Util {
         return uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_CAR
     }
 
-    fun isAutomotive(context: Context): Boolean {
+    fun isAutomotive(context: Context): Boolean =
+        appInfoHasBoolean("pocketcasts_automotive", context)
+
+    fun isWearOs(context: Context): Boolean =
+        appInfoHasBoolean("pocketcasts_wear_os", context)
+
+    private fun appInfoHasBoolean(key: String, context: Context, default: Boolean = false): Boolean {
         val appInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.packageManager.getApplicationInfo(context.packageName, ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()))
         } else {
             @Suppress("DEPRECATION")
             context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
         }.metaData
-        return appInfo?.getBoolean("pocketcasts_automotive", false) == true
+        return appInfo?.getBoolean(key, default) ?: default
     }
 
     fun isTablet(context: Context) =

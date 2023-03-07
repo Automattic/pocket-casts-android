@@ -24,7 +24,7 @@ object UpNextScreen {
 
 @Composable
 fun UpNextScreen(
-    navigateToNowPlaying: () -> Unit,
+    navigateToEpisode: (episodeUuid: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: UpNextViewModel = hiltViewModel(),
     listState: ScalingLazyListState,
@@ -46,8 +46,7 @@ fun UpNextScreen(
                 items(list) { playable ->
                     Chip(
                         onClick = {
-                            viewModel.play(playable)
-                            navigateToNowPlaying()
+                            navigateToEpisode(playable.uuid)
                         },
                         colors = ChipDefaults.secondaryChipColors(),
                         label = {

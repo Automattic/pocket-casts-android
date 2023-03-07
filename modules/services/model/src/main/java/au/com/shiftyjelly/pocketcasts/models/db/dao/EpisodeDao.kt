@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 @Dao
@@ -44,7 +45,7 @@ abstract class EpisodeDao {
     abstract fun findByUuidRx(uuid: String): Maybe<Episode>
 
     @Query("SELECT * FROM episodes WHERE uuid = :uuid")
-    abstract fun observeByUuid(uuid: String): Flowable<Episode>
+    abstract fun observeByUuid(uuid: String): Flow<Episode>
 
     @Query("SELECT * FROM episodes WHERE download_task_id IS NOT NULL")
     abstract fun observeDownloadingEpisodes(): LiveData<List<Episode>>

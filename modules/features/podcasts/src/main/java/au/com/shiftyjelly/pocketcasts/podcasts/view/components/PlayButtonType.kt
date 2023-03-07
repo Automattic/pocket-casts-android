@@ -5,7 +5,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 enum class PlayButtonType(val drawableId: Int, val label: String) {
     DOWNLOAD(IR.drawable.button_download, "Download"),
-    PLAY(R.drawable.button_play, "Play"),
+    PLAY(IR.drawable.button_play, "Play"),
     PAUSE(R.drawable.button_pause, "Pause"),
     PLAYED(R.drawable.button_played, "Mark unplayed"),
     PLAYBACK_FAILED(R.drawable.button_retry, "Playback failed"),

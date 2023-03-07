@@ -24,6 +24,10 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
+        <meta-data
+            android:name="pocketcasts_wear_os"
+            android:value="true" />
+
         <activity
             android:name=".wear.MainActivity"
             android:exported="true"

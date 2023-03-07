@@ -103,18 +103,18 @@ fun WatchListScreen(
         }
 
         item {
-            val num = (upNextState as? UpNextQueue.State.Loaded)?.queue?.size ?: 0
-            UpNextChip(
-                navigateToRoute = navigateToRoute,
-                numInUpNext = num
-            )
-        }
-
-        item {
             WatchListChip(
                 titleRes = LR.string.podcasts,
                 iconRes = IR.drawable.ic_podcasts,
                 onClick = { navigateToRoute(PodcastsScreen.route) }
+            )
+        }
+
+        item {
+            val num = (upNextState as? UpNextQueue.State.Loaded)?.queue?.size ?: 0
+            UpNextChip(
+                navigateToRoute = navigateToRoute,
+                numInUpNext = num
             )
         }
 
