@@ -104,8 +104,7 @@ fun EpisodeScreen(
                         EpisodeStatusEnum.WAITING_FOR_POWER -> DownloadButtonState.Queued
 
                         EpisodeStatusEnum.DOWNLOADING -> DownloadButtonState.Downloading(
-                            state.downloadProgress
-                                ?: 0f
+                            state.downloadProgress ?: 0f
                         )
 
                         EpisodeStatusEnum.DOWNLOADED -> DownloadButtonState.Downloaded(downloadSize)
