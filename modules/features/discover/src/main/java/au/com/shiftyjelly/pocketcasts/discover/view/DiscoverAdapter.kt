@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -27,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBi
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
+import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -163,6 +165,28 @@ internal class DiscoverAdapter(
     }
 
     inner class CarouselListViewHolder(var binding: RowCarouselListBinding) : NetworkLoadableViewHolder(binding.root) {
+        private var autoScrollHelper: AutoScrollHelper? = null
+        private val scrollListener = object : OnScrollListener() {
+            private var draggingStarted: Boolean = false
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_SETTLING -> Unit // Do nothing
+                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        draggingStarted = true
+                        autoScrollHelper?.stopAutoScrollTimer()
+                    }
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        if (draggingStarted) {
+                            autoScrollHelper?.startAutoScrollTimer()
+                            draggingStarted = false
+                        }
+                    }
+                }
+            }
+        }
+
         val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
         private val linearLayoutManager =
@@ -173,22 +197,58 @@ internal class DiscoverAdapter(
         init {
             recyclerView?.layoutManager = linearLayoutManager
             recyclerView?.itemAnimator = null
+            recyclerView?.addOnScrollListener(scrollListener)
+
+            autoScrollHelper = AutoScrollHelper {
+                if (adapter.itemCount == 0) return@AutoScrollHelper
+                val nextPosition = (binding.pageIndicatorView.position + 1)
+                    .takeIf { it < adapter.itemCount } ?: 0
+                recyclerView?.smoothScrollToPosition(nextPosition)
+                binding.pageIndicatorView.position = nextPosition
+                trackPageChanged(nextPosition)
+            }
+
             val snapHelper = HorizontalPeekSnapHelper(0)
             snapHelper.attachToRecyclerView(recyclerView)
             snapHelper.onSnapPositionChanged = { position ->
+                /* Page just snapped, skip auto scroll */
+                autoScrollHelper?.skipAutoScroll()
                 binding.pageIndicatorView.position = position
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED, mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount))
+                trackPageChanged(position)
             }
 
             recyclerView?.adapter = adapter
             adapter.submitList(listOf(LoadingItem()))
+
+            itemView.viewTreeObserver?.apply {
+                /* Stop auto scroll when app is backgrounded */
+                addOnWindowFocusChangeListener { hasFocus ->
+                    if (!hasFocus) autoScrollHelper?.stopAutoScrollTimer()
+                }
+                /* Manage auto scroll when itemView's visibility changes on going to next screen */
+                addOnGlobalLayoutListener {
+                    if (itemView.isShown) {
+                        autoScrollHelper?.startAutoScrollTimer()
+                    } else {
+                        autoScrollHelper?.stopAutoScrollTimer()
+                    }
+                }
+            }
         }
 
         override fun onRestoreInstanceState(state: Parcelable?) {
             super.onRestoreInstanceState(state)
             recyclerView?.post {
                 binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
+                recyclerView.scrollToPosition(binding.pageIndicatorView.position)
             }
+        }
+
+        private fun trackPageChanged(position: Int) {
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED,
+                mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount)
+            )
         }
     }
 
