@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButtonState
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -155,16 +154,6 @@ fun EpisodeScreen(
         val episodeIsMarkedPlayed = episode.playingStatus == EpisodePlayingStatus.COMPLETED
         items(
             listOf(
-                EpisodeScreenItem(
-                    title = LR.string.play_next,
-                    iconRes = IR.drawable.ic_upnext_movetotop,
-                    onClick = { viewModel.addToUpNext(UpNextPosition.NEXT) },
-                ),
-                EpisodeScreenItem(
-                    title = LR.string.play_last,
-                    iconRes = IR.drawable.ic_upnext_movetobottom,
-                    onClick = { viewModel.addToUpNext(UpNextPosition.LAST) }
-                ),
                 EpisodeScreenItem(
                     title = if (episode.isArchived) {
                         LR.string.podcasts_unarchive
