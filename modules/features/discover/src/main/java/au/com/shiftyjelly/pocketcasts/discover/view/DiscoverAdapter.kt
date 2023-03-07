@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
@@ -199,13 +200,15 @@ internal class DiscoverAdapter(
             recyclerView?.itemAnimator = null
             recyclerView?.addOnScrollListener(scrollListener)
 
-            autoScrollHelper = AutoScrollHelper {
-                if (adapter.itemCount == 0) return@AutoScrollHelper
-                val nextPosition = (binding.pageIndicatorView.position + 1)
-                    .takeIf { it < adapter.itemCount } ?: 0
-                recyclerView?.smoothScrollToPosition(nextPosition)
-                binding.pageIndicatorView.position = nextPosition
-                trackPageChanged(nextPosition)
+            if (BuildConfig.DISCOVER_FEATURED_AUTO_SCROLL) {
+                autoScrollHelper = AutoScrollHelper {
+                    if (adapter.itemCount == 0) return@AutoScrollHelper
+                    val nextPosition = (binding.pageIndicatorView.position + 1)
+                        .takeIf { it < adapter.itemCount } ?: 0
+                    recyclerView?.smoothScrollToPosition(nextPosition)
+                    binding.pageIndicatorView.position = nextPosition
+                    trackPageChanged(nextPosition)
+                }
             }
 
             val snapHelper = HorizontalPeekSnapHelper(0)
