@@ -69,6 +69,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -210,11 +212,19 @@ internal class DiscoverAdapter(
             if (BuildConfig.DISCOVER_FEATURED_AUTO_SCROLL) {
                 autoScrollHelper = AutoScrollHelper {
                     if (adapter.itemCount == 0) return@AutoScrollHelper
-                    val nextPosition = (binding.pageIndicatorView.position + 1)
+                    val currentPosition = binding.pageIndicatorView.position
+                    val nextPosition = (currentPosition + 1)
                         .takeIf { it < adapter.itemCount } ?: 0
-                    recyclerView?.smoothScrollToPosition(nextPosition)
-                    binding.pageIndicatorView.position = nextPosition
-                    trackPageChanged(nextPosition)
+                    MainScope().launch {
+                        if (nextPosition > currentPosition) {
+                            recyclerView?.smoothScrollToPosition(nextPosition)
+                        } else {
+                            /* Jump to the beginning to avoid a backward scroll animation */
+                            recyclerView?.scrollToPosition(nextPosition)
+                        }
+                        binding.pageIndicatorView.position = nextPosition
+                        trackPageChanged(nextPosition)
+                    }
                 }
             }
 
