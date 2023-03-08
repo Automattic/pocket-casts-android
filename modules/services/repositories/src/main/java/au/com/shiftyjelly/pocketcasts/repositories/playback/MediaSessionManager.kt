@@ -109,7 +109,13 @@ class MediaSessionManager(
         observePlaybackState()
         observeCustomMediaActionsVisibility()
         observeMediaNotificationControls()
-        playbackManager.upNextQueue.changesObservable
+        playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
+            // ignore the playing episode progress updates, but update when the media player read the duration from the file.
+            .distinctUntilChanged { stateOne, stateTwo ->
+                UpNextQueue.State.isEqualWithEpisodeCompare(stateOne, stateTwo) { episodeOne, episodeTwo ->
+                    episodeOne.uuid == episodeTwo.uuid && episodeOne.duration == episodeTwo.duration
+                }
+            }
             .observeOn(Schedulers.io())
             .doOnNext { updateUpNext(it) }
             .subscribeBy(onError = { Timber.e(it) })
