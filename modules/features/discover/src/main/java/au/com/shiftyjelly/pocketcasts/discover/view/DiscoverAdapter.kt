@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBindi
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
+import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -191,13 +192,17 @@ internal class DiscoverAdapter(
 
         val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
-        private val linearLayoutManager =
-            LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
+        private val scrollingLayoutManager =
+            ScrollingLinearLayoutManager(
+                itemView.context,
+                RecyclerView.HORIZONTAL,
+                false
+            ).apply {
                 initialPrefetchItemCount = INITIAL_PREFETCH_COUNT
             }
 
         init {
-            recyclerView?.layoutManager = linearLayoutManager
+            recyclerView?.layoutManager = scrollingLayoutManager
             recyclerView?.itemAnimator = null
             recyclerView?.addOnScrollListener(scrollListener)
 
@@ -243,7 +248,7 @@ internal class DiscoverAdapter(
         override fun onRestoreInstanceState(state: Parcelable?) {
             super.onRestoreInstanceState(state)
             recyclerView?.post {
-                binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
+                binding.pageIndicatorView.position = scrollingLayoutManager.findFirstVisibleItemPosition()
                 recyclerView.scrollToPosition(binding.pageIndicatorView.position)
             }
         }
