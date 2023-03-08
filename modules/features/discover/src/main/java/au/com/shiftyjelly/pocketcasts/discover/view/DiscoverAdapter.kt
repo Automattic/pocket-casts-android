@@ -182,7 +182,8 @@ internal class DiscoverAdapter(
                     }
                     RecyclerView.SCROLL_STATE_IDLE -> {
                         if (draggingStarted) {
-                            autoScrollHelper?.startAutoScrollTimer()
+                            /* Start auto scroll with a delay after a manual swipe */
+                            autoScrollHelper?.startAutoScrollTimer(delay = AutoScrollHelper.AUTO_SCROLL_DELAY)
                             draggingStarted = false
                         }
                     }

@@ -10,7 +10,7 @@ class AutoScrollHelper(private val onAutoScrollCompleted: () -> Unit) {
     private var autoScrollTimerTask: TimerTask? = null
     private var skipAutoScroll = false
 
-    fun startAutoScrollTimer() {
+    fun startAutoScrollTimer(delay: Long = 0L) {
         if (autoScrollTimerTask != null) return
         autoScrollTimerTask = object : TimerTask() {
             override fun run() {
@@ -19,7 +19,7 @@ class AutoScrollHelper(private val onAutoScrollCompleted: () -> Unit) {
             }
         }
         autoScrollTimer = Timer().apply {
-            schedule(autoScrollTimerTask, 0, AUTO_SCROLL_INTERVAL)
+            schedule(autoScrollTimerTask, delay, AUTO_SCROLL_INTERVAL)
         }
     }
 
@@ -32,5 +32,9 @@ class AutoScrollHelper(private val onAutoScrollCompleted: () -> Unit) {
 
     fun skipAutoScroll() {
         skipAutoScroll = true
+    }
+
+    companion object {
+        const val AUTO_SCROLL_DELAY = 1000L
     }
 }
