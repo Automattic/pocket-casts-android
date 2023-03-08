@@ -5,6 +5,8 @@
         ([#817](https://github.com/Automattic/pocket-casts-android/pull/817)).
     *   Fixed Automotive Up Next podcast images not loading.
         ([#819](https://github.com/Automattic/pocket-casts-android/pull/819)).
+    *   Fixed missing seek bar in the notification drawer and Android Automotive.
+        ([#822](https://github.com/Automattic/pocket-casts-android/pull/822)).
 
 7.34
 -----
