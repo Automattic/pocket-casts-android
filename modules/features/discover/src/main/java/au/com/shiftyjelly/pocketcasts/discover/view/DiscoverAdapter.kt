@@ -76,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 private const val MAX_ROWS_SMALL_LIST = 20
 private const val CURRENT_PAGE = "current_page"
 private const val TOTAL_PAGES = "total_pages"
+private const val INITIAL_PREFETCH_COUNT = 3
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
@@ -192,7 +193,7 @@ internal class DiscoverAdapter(
 
         private val linearLayoutManager =
             LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
-                initialPrefetchItemCount = 1
+                initialPrefetchItemCount = INITIAL_PREFETCH_COUNT
             }
 
         init {
