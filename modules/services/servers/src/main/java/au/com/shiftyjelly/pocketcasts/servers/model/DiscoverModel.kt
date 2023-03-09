@@ -62,7 +62,8 @@ data class DiscoverRow(
     @field:Json(name = "uuid") override val listUuid: String?,
     @field:Json(name = "regions") val regions: List<String>,
     @field:Json(name = "sponsored") val sponsored: Boolean = false,
-    @field:Json(name = "curated") override val curated: Boolean = false
+    @field:Json(name = "curated") override val curated: Boolean = false,
+    @field:Json(name = "sponsored_podcasts") val sponsoredPodcasts: List<SponsoredPodcast> = emptyList(),
 ) : NetworkLoadableList {
 
     override fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): DiscoverRow {
@@ -83,9 +84,29 @@ data class DiscoverRow(
 
         newExpandedTopItemLabel = newExpandedTopItemLabel?.tryToLocalise(resources)
 
-        return DiscoverRow(id, type, displayStyle, expandedStyle, newExpandedTopItemLabel, newTitle, newSource, listUuid, regions, sponsored, curated)
+        return DiscoverRow(
+            id = id,
+            type = type,
+            displayStyle = displayStyle,
+            expandedStyle = expandedStyle,
+            expandedTopItemLabel = newExpandedTopItemLabel,
+            title = newTitle,
+            source = newSource,
+            listUuid = listUuid,
+            regions = regions,
+            sponsored = sponsored,
+            curated = curated,
+            sponsoredPodcasts = sponsoredPodcasts
+        )
     }
 }
+
+@Parcelize
+@JsonClass(generateAdapter = true)
+data class SponsoredPodcast(
+    @field:Json(name = "position") val position: Int?,
+    @field:Json(name = "source") val source: String?,
+) : Parcelable
 
 @JsonClass(generateAdapter = true)
 data class ListFeed(
