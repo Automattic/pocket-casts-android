@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPassword
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
@@ -70,7 +71,7 @@ open class SyncServerManager @Inject constructor(
     }
 
     suspend fun loginGoogle(idToken: String): LoginTokenResponse {
-        val request = LoginGoogleRequest(idToken)
+        val request = LoginGoogleRequest(idToken = idToken, scope = SCOPE_MOBILE)
         return server.loginGoogle(request)
     }
 
@@ -82,6 +83,10 @@ open class SyncServerManager @Inject constructor(
     suspend fun forgotPassword(email: String): ForgotPasswordResponse {
         val request = ForgotPasswordRequest(email = email)
         return server.forgotPassword(request)
+    }
+
+    suspend fun exchangeSonos(): ExchangeSonosResponse {
+        return server.exchangeSonos()
     }
 
     fun emailChange(newEmail: String, password: String): Single<UserChangeResponse> {
