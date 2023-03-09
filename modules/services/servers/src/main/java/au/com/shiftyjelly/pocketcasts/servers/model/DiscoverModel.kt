@@ -189,6 +189,7 @@ data class DiscoverPodcast(
     @field:Json(name = "language") val language: String?,
     @field:Json(name = "media_type") val mediaType: String?,
     val isSubscribed: Boolean = false,
+    val isSponsored: Boolean = false,
     @ColorInt var color: Int = 0
 ) : Parcelable {
     fun updateIsSubscribed(value: Boolean): DiscoverPodcast {

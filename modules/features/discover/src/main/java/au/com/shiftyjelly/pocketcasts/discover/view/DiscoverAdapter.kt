@@ -432,7 +432,7 @@ internal class DiscoverAdapter(
                                 .take(featuredLimit)
                                 .toMutableList()
                             sponsoredPodcastList.forEach { sponsoredPodcast ->
-                                mutableList.addSafely(sponsoredPodcast.podcast, sponsoredPodcast.position)
+                                mutableList.addSafely(sponsoredPodcast.podcast.copy(isSponsored = true), sponsoredPodcast.position)
                             }
                             Flowable.fromIterable(mutableList.toList())
                                 .concatMap { discoverPodcast ->

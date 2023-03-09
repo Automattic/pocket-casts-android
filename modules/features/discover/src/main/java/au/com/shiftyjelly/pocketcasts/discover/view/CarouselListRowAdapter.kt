@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
@@ -42,8 +43,15 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
     override fun onBindViewHolder(holder: CarouselItemViewHolder, position: Int) {
         val podcast = getItem(position)
         if (podcast is DiscoverPodcast) {
+            val context = holder.itemView.context
+            val tagLineText = if (podcast.isSponsored) {
+                context.getString(LR.string.discover_sponsored)
+            } else {
+                pillText
+            }
             holder.podcast = podcast
-            holder.setTaglineText(pillText)
+
+            holder.setTaglineText(tagLineText)
             holder.itemView.setOnClickListener {
                 onPodcastClicked(podcast, null) // no analytics for carousel
 
