@@ -174,7 +174,8 @@ project.ext {
             composeUiUtil: "androidx.compose.ui:ui-util:$versionCompose",
             guava: 'com.google.guava:guava:27.1-android', // Required to fix conflict between versions in exoplayer and workmanager
             // Fixes instrumentation tests, see: https://github.com/android/android-test/issues/861#issuecomment-1180219978
-            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework"
+            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework",
+            zxingCore: "com.google.zxing:core:3.5.1"
     ]
 
     libs = [

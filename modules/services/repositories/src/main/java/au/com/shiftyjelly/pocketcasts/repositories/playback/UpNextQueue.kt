@@ -44,6 +44,19 @@ interface UpNextQueue {
         fun queueSize(): Int {
             return if (this is Loaded) queue.size else 0
         }
+
+        companion object {
+            fun isEqualWithEpisodeCompare(stateOne: State, stateTwo: State, isPlayingEpisodeEqual: (Playable, Playable) -> Boolean): Boolean {
+                return when {
+                    stateOne is Empty && stateTwo is Empty -> true
+                    stateOne is Loaded && stateTwo is Loaded -> {
+                        stateOne.queue.map { it.uuid } == stateTwo.queue.map { it.uuid } &&
+                            isPlayingEpisodeEqual(stateOne.episode, stateTwo.episode)
+                    }
+                    else -> false
+                }
+            }
+        }
     }
 
     fun setup()

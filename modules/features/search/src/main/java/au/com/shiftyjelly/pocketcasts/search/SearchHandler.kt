@@ -27,7 +27,6 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-private const val MAX_ITEM_COUNT = 20
 class SearchHandler @Inject constructor(
     val serverManager: ServerManager,
     val podcastManager: PodcastManager,
@@ -121,28 +120,37 @@ class SearchHandler @Inject constructor(
             } else {
                 analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
                 loadingObservable.accept(true)
+
+                var globalSearch = GlobalServerSearch(searchTerm = it)
                 val podcastServerSearch = serverManager
                     .searchForPodcastsRx(it)
-                    .subscribeOn(Schedulers.io())
+                    .map { podcastSearch ->
+                        globalSearch = globalSearch.copy(podcastSearch = podcastSearch)
+                        globalSearch
+                    }
                     .toObservable()
 
-                val episodesServerSearch = cacheServerManager
-                    .searchEpisodes(it)
-                    .subscribeOn(Schedulers.io())
-                    .toObservable()
+                if (settings.isFeatureFlagSearchImprovementsEnabled()) {
+                    val episodesServerSearch = cacheServerManager
+                        .searchEpisodes(it)
+                        .map { episodeSearch ->
+                            globalSearch = globalSearch.copy(episodeSearch = episodeSearch)
+                            globalSearch
+                        }
 
-                podcastServerSearch
-                    .zipWith(episodesServerSearch) { podcastsSearch, episodesSearch ->
-                        GlobalServerSearch(
-                            searchTerm = it,
-                            error = podcastsSearch.error,
-                            podcastSearch = podcastsSearch,
-                            episodeSearch = episodesSearch
-                        )
+                    podcastServerSearch.mergeWith(episodesServerSearch)
+                } else {
+                    podcastServerSearch
+                }
+                    .subscribeOn(Schedulers.io())
+                    .onErrorReturn { exception ->
+                        GlobalServerSearch(error = exception)
+                    }
+                    .doFinally {
+                        loadingObservable.accept(false)
                     }
             }
         }
-        .doOnNext { loadingObservable.accept(false) }
 
     private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
         if (searchTerm.string.isBlank()) {
@@ -158,26 +166,18 @@ class SearchHandler @Inject constructor(
             val searchPodcastsResult = (localPodcastsResult + serverPodcastsResult).distinctBy { it.uuid }
             val searchEpisodesResult = serverSearchResults.episodeSearch.episodes
 
-            if (serverSearchResults.searchTerm.isEmpty() || searchPodcastsResult.isNotEmpty() || serverSearchResults.error != null) {
+            val hasResults =
+                serverSearchResults.searchTerm.isEmpty() || // if the search term is empty, we don't have "no results"
+                    (searchPodcastsResult.isNotEmpty() || searchEpisodesResult.isNotEmpty()) || // check if there are any results
+                    serverSearchResults.error != null // an error is a result
+            if (hasResults) {
                 serverSearchResults.error?.let {
                     analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
                 }
                 SearchState.Results(
                     searchTerm = searchTerm.string,
-                    podcasts = searchPodcastsResult.take(
-                        if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
-                            minOf(MAX_ITEM_COUNT, searchPodcastsResult.size)
-                        } else {
-                            searchPodcastsResult.size
-                        }
-                    ),
-                    episodes = searchEpisodesResult.take(
-                        if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
-                            minOf(MAX_ITEM_COUNT, searchEpisodesResult.size)
-                        } else {
-                            searchEpisodesResult.size
-                        }
-                    ),
+                    podcasts = searchPodcastsResult,
+                    episodes = searchEpisodesResult,
                     loading = loading,
                     error = serverSearchResults.error
                 )

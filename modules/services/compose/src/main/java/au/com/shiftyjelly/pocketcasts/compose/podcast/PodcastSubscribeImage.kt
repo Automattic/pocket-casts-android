@@ -35,7 +35,7 @@ fun PodcastSubscribeImage(
     podcastUuid: String,
     podcastTitle: String,
     podcastSubscribed: Boolean,
-    onSubscribeClick: () -> Unit,
+    onSubscribeClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     subscribeButtonSize: Dp = 20.dp,
     shadowSize: Dp = 1.dp,
@@ -50,11 +50,15 @@ fun PodcastSubscribeImage(
         .aspectRatio(1f)
         .semantics(mergeDescendants = true) {}
     if (subscribeOnPodcastTap) {
-        rootModifier = rootModifier
-            .clickable(
-                onClickLabel = onClickLabel,
-                onClick = onSubscribeClick
-            )
+        rootModifier = if (onSubscribeClick != null) {
+            rootModifier
+                .clickable(
+                    onClickLabel = onClickLabel,
+                    onClick = onSubscribeClick
+                )
+        } else {
+            rootModifier
+        }
     }
     BoxWithConstraints(
         modifier = rootModifier,
@@ -72,10 +76,14 @@ fun PodcastSubscribeImage(
         val iconSize = subscribeButtonSize / 1.25f
         var iconModifier = Modifier.size(iconSize)
         if (!subscribeOnPodcastTap) {
-            iconModifier = iconModifier.clickable(
-                onClickLabel = onClickLabel,
-                onClick = onSubscribeClick
-            )
+            iconModifier = if (onSubscribeClick != null) {
+                iconModifier.clickable(
+                    onClickLabel = onClickLabel,
+                    onClick = onSubscribeClick
+                )
+            } else {
+                iconModifier
+            }
         }
         Box(
             contentAlignment = Alignment.BottomEnd,

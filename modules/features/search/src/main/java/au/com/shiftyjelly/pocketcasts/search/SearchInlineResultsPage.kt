@@ -47,6 +47,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import au.com.shiftyjelly.pocketcasts.search.component.SearchEpisodeItem
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderItem
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderRow
@@ -58,14 +60,17 @@ import java.util.UUID
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+private const val MAX_ITEM_COUNT = 20
 @Composable
-fun SearchResultsPage(
+fun SearchInlineResultsPage(
     viewModel: SearchViewModel,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
+    onShowAllCLick: (ResultsType) -> Unit,
     onScroll: () -> Unit,
     onlySearchRemote: Boolean,
+    settings: Settings,
     modifier: Modifier = Modifier,
 ) {
     val state by viewModel.state.collectAsState()
@@ -76,12 +81,13 @@ fun SearchResultsPage(
             is SearchState.Results -> {
                 val result = state as SearchState.Results
                 if (result.error == null || !onlySearchRemote || result.loading) {
-                    if (BuildConfig.SEARCH_IMPROVEMENTS_ENABLED) {
+                    if (settings.isFeatureFlagSearchImprovementsEnabled()) {
                         SearchResultsView(
                             state = state as SearchState.Results,
                             onEpisodeClick = onEpisodeClick,
                             onPodcastClick = onPodcastClick,
                             onFolderClick = onFolderClick,
+                            onShowAllCLick = onShowAllCLick,
                             onSubscribeToPodcast = { viewModel.onSubscribeToPodcast(it) },
                             onScroll = onScroll,
                         )
@@ -120,6 +126,7 @@ private fun SearchResultsView(
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
+    onShowAllCLick: (ResultsType) -> Unit,
     onSubscribeToPodcast: (Podcast) -> Unit,
     onScroll: () -> Unit,
     modifier: Modifier = Modifier,
@@ -137,12 +144,17 @@ private fun SearchResultsView(
             .nestedScroll(nestedScrollConnection)
     ) {
         if (state.podcasts.isNotEmpty()) {
-            item { SearchResultsHeaderView(title = stringResource(LR.string.podcasts)) }
+            item {
+                SearchResultsHeaderView(
+                    title = stringResource(LR.string.podcasts),
+                    onShowAllCLick = { onShowAllCLick(ResultsType.PODCASTS) },
+                )
+            }
         }
         item {
             LazyRow(contentPadding = PaddingValues(horizontal = 8.dp)) {
                 items(
-                    items = state.podcasts,
+                    items = state.podcasts.take(minOf(MAX_ITEM_COUNT, state.podcasts.size)),
                     key = { it.adapterId }
                 ) { folderItem ->
                     when (folderItem) {
@@ -158,24 +170,35 @@ private fun SearchResultsView(
                             SearchPodcastItem(
                                 podcast = folderItem.podcast,
                                 onClick = { onPodcastClick(folderItem.podcast) },
-                                onSubscribeClick = onSubscribeToPodcast
+                                onSubscribeClick = if (!folderItem.podcast.isSubscribed) {
+                                    { onSubscribeToPodcast(folderItem.podcast) }
+                                } else {
+                                    null
+                                }
                             )
                         }
                     }
                 }
             }
         }
-        if (state.episodes.isNotEmpty()) {
+        if (state.podcasts.isNotEmpty() && state.episodes.isNotEmpty()) {
             item {
                 HorizontalDivider(
                     startIndent = 16.dp,
                     modifier = modifier.padding(top = 20.dp, bottom = 4.dp)
                 )
-                SearchResultsHeaderView(title = stringResource(LR.string.episodes))
+            }
+        }
+        if (state.episodes.isNotEmpty()) {
+            item {
+                SearchResultsHeaderView(
+                    title = stringResource(LR.string.episodes),
+                    onShowAllCLick = { onShowAllCLick(ResultsType.EPISODES) },
+                )
             }
         }
         items(
-            items = state.episodes,
+            items = state.episodes.take(minOf(MAX_ITEM_COUNT, state.episodes.size)),
             key = { it.uuid }
         ) {
             SearchEpisodeItem(
@@ -189,6 +212,7 @@ private fun SearchResultsView(
 @Composable
 private fun SearchResultsHeaderView(
     title: String,
+    onShowAllCLick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -207,7 +231,7 @@ private fun SearchResultsHeaderView(
             color = MaterialTheme.theme.colors.support03,
             fontWeight = FontWeight.W700,
             modifier = modifier
-                .clickable { /* TODO */ }
+                .clickable { onShowAllCLick() }
                 .padding(12.dp)
         )
     }
@@ -360,6 +384,7 @@ fun SearchResultsViewPreview(
             onEpisodeClick = {},
             onPodcastClick = {},
             onFolderClick = { _, _ -> },
+            onShowAllCLick = {},
             onSubscribeToPodcast = {},
             onScroll = {},
         )

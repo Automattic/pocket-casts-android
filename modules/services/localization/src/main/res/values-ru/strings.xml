@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-09 12:54:04+0000
+Translation-Revision-Date: 2023-02-28 13:54:19+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="search_history_row_type_episode_subtitle">Выпуск \u2022 %s \u2022 %s</string>
+    <string name="search_show_all">Показать всё</string>
+    <string name="podcast">Подкаст</string>
+    <string name="search_history_row_type_podcast_subtitle">Подкаст \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">Папка \u2022 %s</string>
+    <string name="search_history_recent_searches">Последний поиск</string>
+    <string name="search_history_clear_all_confirmation_message">Действительно очистить всю историю поиска?</string>
+    <string name="search_history_clear_all_confirm_button_title">Очистить историю поиска</string>
+    <string name="search_podcasts_or_add_url">Ищите подкасты или добавляйте URL-адрес RSS</string>
+    <string name="error_opening_links_activity_not_found">Похоже, у вас нет приложения для просмотра этого контента.</string>
+    <string name="notifications_blocked_warning">Уведомления заблокированы. Вы можете изменить разрешение в настройках.</string>
     <string name="settings_media_actions_show_subtitle">Отображение пользовательских действий с медиафайлами в соответствующих уведомлениях в Android 13 и Android Auto.</string>
     <string name="settings_media_actions_show_title">Показывать пользовательские действия с медиафайлами</string>
     <string name="settings_media_actions_customise">Настроить действия с медиафайлами</string>
@@ -1278,7 +1289,6 @@ Language: ru
     <string name="time_short_hours_minutes">%1$d ч %2$d мин</string>
     <string name="time_short_hours">%d ч</string>
     <string name="search_hint">Поиск по названию подкаста</string>
-    <string name="search_podcasts">Поиск подкастов</string>
     <string name="stream_warning_button">Транслировать в любом случае</string>
     <string name="profile_cloud_upload_warning_button">Загрузить сейчас</string>
     <string name="profile_cloud_upload_warning_summary">При загрузке этого выпуска будет расходоваться трафик.</string>
