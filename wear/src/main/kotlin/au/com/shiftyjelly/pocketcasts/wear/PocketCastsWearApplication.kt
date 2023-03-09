@@ -7,7 +7,12 @@ import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import com.google.firebase.FirebaseApp
@@ -23,9 +28,13 @@ import javax.inject.Inject
 @HiltAndroidApp
 class PocketCastsWearApplication : Application(), Configuration.Provider {
 
+    @Inject lateinit var downloadManager: DownloadManager
+    @Inject lateinit var episodeManager: EpisodeManager
     @Inject lateinit var playbackManager: PlaybackManager
-    @Inject lateinit var userManager: UserManager
+    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var settings: Settings
+    @Inject lateinit var userManager: UserManager
     @Inject lateinit var workerFactory: HiltWorkerFactory
 
     override fun onCreate() {
@@ -50,9 +59,24 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
             )
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
+                downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
+
+                val storageChoice = settings.getStorageChoice()
+                if (storageChoice == null) {
+                    val folder = StorageOptions()
+                        .getFolderLocations(this@PocketCastsWearApplication)
+                        .firstOrNull()
+                    if (folder != null) {
+                        settings.setStorageChoice(folder.filePath, folder.label)
+                    } else {
+                        settings.setStorageCustomFolder(this@PocketCastsWearApplication.filesDir.absolutePath)
+                    }
+                }
             }
         }
+
         userManager.beginMonitoringAccountManager(playbackManager)
+        downloadManager.beginMonitoringWorkManager(applicationContext)
     }
 
     private fun setupAnalytics() {

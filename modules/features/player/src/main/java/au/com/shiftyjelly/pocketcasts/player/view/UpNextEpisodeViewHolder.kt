@@ -36,6 +36,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -84,7 +85,9 @@ class UpNextEpisodeViewHolder(
     fun bind(episode: Playable, isMultiSelecting: Boolean, isSelected: Boolean) {
         val tintColor = ContextThemeWrapper(itemView.context, UR.style.ThemeDark).getAttrTextStyleColor(UR.attr.textSubtitle1)
 
-        disposable = episodeManager.observeByUuid(episode.uuid)
+        disposable = episodeManager
+            .observeByUuid(episode.uuid)
+            .asFlowable()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext {

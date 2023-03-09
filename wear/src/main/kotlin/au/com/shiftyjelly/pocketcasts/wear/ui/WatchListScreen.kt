@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -20,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -38,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -103,18 +101,18 @@ fun WatchListScreen(
         }
 
         item {
-            val num = (upNextState as? UpNextQueue.State.Loaded)?.queue?.size ?: 0
-            UpNextChip(
-                navigateToRoute = navigateToRoute,
-                numInUpNext = num
-            )
-        }
-
-        item {
             WatchListChip(
                 titleRes = LR.string.podcasts,
                 iconRes = IR.drawable.ic_podcasts,
                 onClick = { navigateToRoute(PodcastsScreen.route) }
+            )
+        }
+
+        item {
+            val num = (upNextState as? UpNextQueue.State.Loaded)?.queue?.size ?: 0
+            UpNextChip(
+                navigateToRoute = navigateToRoute,
+                numInUpNext = num
             )
         }
 
@@ -142,40 +140,6 @@ fun WatchListScreen(
             )
         }
     }
-}
-
-@Composable
-private fun WatchListChip(
-    @StringRes titleRes: Int,
-    @DrawableRes iconRes: Int,
-    secondaryLabel: String? = null,
-    onClick: () -> Unit
-) {
-    val title = stringResource(titleRes)
-    Chip(
-        onClick = onClick,
-        colors = ChipDefaults.secondaryChipColors(
-            secondaryContentColor = MaterialTheme.theme.colors.primaryText02
-        ),
-        label = {
-            Text(title)
-        },
-        secondaryLabel = {
-            if (secondaryLabel != null) {
-                Text(
-                    text = secondaryLabel,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        },
-        icon = {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = title
-            )
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
 }
 
 @Composable

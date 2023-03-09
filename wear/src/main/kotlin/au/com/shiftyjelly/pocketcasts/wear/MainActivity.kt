@@ -17,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
+import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
@@ -59,14 +61,20 @@ fun WearApp(themeType: Theme.ThemeType) {
 
             composable(NowPlayingScreen.route) { viewModel ->
                 viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
-                NowPlayingScreen()
+                NowPlayingScreen(
+                    navigateToEpisode = { episodeUuid ->
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
+                    },
+                )
             }
 
             scrollable(
                 route = UpNextScreen.route,
             ) {
                 UpNextScreen(
-                    navigateToNowPlaying = { navController.navigate(NowPlayingScreen.route) },
+                    navigateToEpisode = { episodeUuid ->
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
+                    },
                     listState = it.scrollableState,
                 )
             }
@@ -91,9 +99,18 @@ fun WearApp(themeType: Theme.ThemeType) {
                 ),
             ) {
                 PodcastScreen(
-                    navigateToNowPlaying = { navController.navigate(NowPlayingScreen.route) }
+                    onEpisodeTap = { episode ->
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
+                    },
                 )
             }
+
+            episodeGraph(
+                navigateToPodcast = { podcastUuid ->
+                    navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+                },
+                navController = navController,
+            )
 
             composable(FiltersScreen.route) { FiltersScreen() }
             composable(DownloadsScreen.route) { DownloadsScreen() }

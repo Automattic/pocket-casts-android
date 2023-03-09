@@ -28,6 +28,7 @@
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
+    <string name="mark_unplayed">Mark unplayed</string>
     <string name="more">More</string>
     <string name="more_options">More options</string>
     <string name="next_episode">Next episode</string>
@@ -48,6 +49,7 @@
     <string name="play_on">Play on&#8230;</string>
     <string name="played">Played</string>
     <string name="remove_from_up_next">Remove from Up Next</string>
+    <string name="removed">Removed</string>
     <string name="search">Search</string>
     <string name="selected">Selected</string>
     <string name="not_selected">Not selected</string>
