@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManagerImpl
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -32,7 +32,7 @@ class UpNextQueueTest {
         downloadManager = mock<DownloadManager> {}
         val episodeManager = mock<EpisodeManager> {}
         val settings = mock<Settings> {}
-        val syncAccountManager = mock<SyncAccountManager> {}
+        val syncAccountManager = SyncAccountManagerImpl(mock(), mock(), context)
 
         upNextQueue = UpNextQueueImpl(appDatabase, settings, episodeManager, syncAccountManager, context)
         upNextQueue.setup()

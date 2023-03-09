@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SignInResult
 import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,13 +75,13 @@ class OnboardingCreateAccountViewModel @Inject constructor(
                 syncServerManager = syncServerManager
             )
             when (result) {
-                is SyncAccountManager.SignInResult.Success -> {
+                is SignInResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
                     analyticsTracker.refreshMetadata()
                     onAccountCreated()
                 }
 
-                is SyncAccountManager.SignInResult.Failed -> {
+                is SignInResult.Failed -> {
                     _stateFlow.update {
                         it.copy(
                             isCallInProgress = false,

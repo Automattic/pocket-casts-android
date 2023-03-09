@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SignInResult
 import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -227,12 +228,12 @@ class CreateAccountViewModel
 
         viewModelScope.launch {
             when (val result = syncAccountManager.createUserWithEmailAndPassword(emailString, passwordString, syncServerManager)) {
-                is SyncAccountManager.SignInResult.Success -> {
+                is SignInResult.Success -> {
                     analyticsTracker.refreshMetadata()
                     podcastManager.refreshPodcastsAfterSignIn()
                     createAccountState.postValue(CreateAccountState.AccountCreated)
                 }
-                is SyncAccountManager.SignInResult.Failed -> {
+                is SignInResult.Failed -> {
                     val message = result.message
                     val errors = mutableSetOf(CreateAccountError.CANNOT_CREATE_ACCOUNT)
                     createAccountState.postValue(CreateAccountState.Failure(errors, message))

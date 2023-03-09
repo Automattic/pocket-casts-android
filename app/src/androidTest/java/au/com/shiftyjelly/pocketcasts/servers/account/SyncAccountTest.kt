@@ -49,14 +49,14 @@ internal class SyncAccountTest {
 
         okhttpCache = Cache(File(context.cacheDir.absolutePath, "HttpCache"), (10 * 1024 * 1024).toLong())
 
-        SyncAccountManager(mock(), mock(), context).signOut()
+        SyncAccountManagerImpl(mock(), mock(), context).signOut()
     }
 
     @After
     fun tearDown() {
         mockWebServer.shutdown()
 
-        SyncAccountManager(mock(), mock(), context).signOut()
+        SyncAccountManagerImpl(mock(), mock(), context).signOut()
     }
 
     @Test
@@ -77,7 +77,7 @@ internal class SyncAccountTest {
             .setBody(responseBody)
         mockWebServer.enqueue(response)
 
-        val accountAuth = SyncAccountManager(mock(), mock(), context)
+        val accountAuth = SyncAccountManagerImpl(mock(), mock(), context)
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache, mock(), {}, accountAuth)
         val result = runBlocking {
             accountAuth.signInWithEmailAndPassword(
@@ -87,8 +87,8 @@ internal class SyncAccountTest {
                 signInSource = SignInSource.Onboarding
             )
         }
-        assert(result is SyncAccountManager.SignInResult.Success)
-        val successResult = result as SyncAccountManager.SignInResult.Success
+        assert(result is SignInResult.Success)
+        val successResult = result as SignInResult.Success
         assertEquals(AccessToken("secret_access_token_signin"), successResult.result.token)
         assertEquals("610c8140-9a2e-013b-4f44-566ad7a4dc9c", successResult.result.uuid)
         assertEquals(true, successResult.result.isNewAccount)
@@ -110,7 +110,7 @@ internal class SyncAccountTest {
         assertEquals("secret_refresh_token_signin", accountManager.getPassword(account))
         // verify user data
         assertEquals("610c8140-9a2e-013b-4f44-566ad7a4dc9c", accountManager.getUserData(account, AccountConstants.UUID))
-        assertEquals("RefreshToken", accountManager.getUserData(account, AccountConstants.SIGN_IN_TYPE_KEY))
+        assertEquals("Tokens", accountManager.getUserData(account, AccountConstants.SIGN_IN_TYPE_KEY))
     }
 
     @Test
@@ -131,7 +131,7 @@ internal class SyncAccountTest {
             .setBody(responseBody)
         mockWebServer.enqueue(response)
 
-        val accountAuth = SyncAccountManager(mock(), mock(), context)
+        val accountAuth = SyncAccountManagerImpl(mock(), mock(), context)
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache, mock(), {}, accountAuth)
         val result = runBlocking {
             accountAuth.createUserWithEmailAndPassword(
@@ -140,8 +140,8 @@ internal class SyncAccountTest {
                 syncServerManager = syncServerManager
             )
         }
-        assert(result is SyncAccountManager.SignInResult.Success)
-        val successResult = result as SyncAccountManager.SignInResult.Success
+        assert(result is SignInResult.Success)
+        val successResult = result as SignInResult.Success
         assertEquals(AccessToken("secret_access_token_register"), successResult.result.token)
         assertEquals("e0730740-9a55-013b-4f44-566ad7a4dc9c", successResult.result.uuid)
         assertEquals(true, successResult.result.isNewAccount)
@@ -163,7 +163,7 @@ internal class SyncAccountTest {
         assertEquals("secret_refresh_token_register", accountManager.getPassword(account))
         // verify user data
         assertEquals("e0730740-9a55-013b-4f44-566ad7a4dc9c", accountManager.getUserData(account, AccountConstants.UUID))
-        assertEquals("RefreshToken", accountManager.getUserData(account, AccountConstants.SIGN_IN_TYPE_KEY))
+        assertEquals("Tokens", accountManager.getUserData(account, AccountConstants.SIGN_IN_TYPE_KEY))
     }
 
     @Test
@@ -179,7 +179,7 @@ internal class SyncAccountTest {
             .setBody(responseBody)
         mockWebServer.enqueue(response)
 
-        val accountAuth = SyncAccountManager(mock(), mock(), context)
+        val accountAuth = SyncAccountManagerImpl(mock(), mock(), context)
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache, mock(), {}, accountAuth)
         val result = runBlocking {
             accountAuth.createUserWithEmailAndPassword(
@@ -188,8 +188,8 @@ internal class SyncAccountTest {
                 syncServerManager = syncServerManager
             )
         }
-        assert(result is SyncAccountManager.SignInResult.Failed)
-        val failedResult = result as SyncAccountManager.SignInResult.Failed
+        assert(result is SignInResult.Failed)
+        val failedResult = result as SignInResult.Failed
         assertEquals("login_email_taken", failedResult.messageId)
         assertEquals("Email taken", failedResult.message)
     }

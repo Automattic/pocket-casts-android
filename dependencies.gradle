@@ -94,7 +94,7 @@ project.ext {
     versionPaging = '3.1.1'
     versionRetrofit = '2.9.0'
     versionRoom = '2.4.3'
-    versionTest = '1.4.0'
+    versionTest = '1.5.0'
     versionWork = '2.7.1'
     versionAccessibilityTestFramework = '4.0.0'
 

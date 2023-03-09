@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SubscribeManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
@@ -23,6 +24,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.util.UUID
@@ -40,12 +42,13 @@ class PodcastManagerTest {
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        val episodeManager = mock<EpisodeManager> {}
-        val playlistManager = mock<PlaylistManager> {}
-        val settingsSignedOut = mock<Settings> {
+        val episodeManager = mock<EpisodeManager>()
+        val playlistManager = mock<PlaylistManager>()
+        val settings = mock<Settings>()
+        val syncAccountManagerSignedOut = mock<SyncAccountManager> {
             on { isLoggedIn() } doReturn false
         }
-        val settingsSignedIn = mock<Settings> {
+        val syncAccountManagerSignedIn = mock<SyncAccountManager> {
             on { isLoggedIn() } doReturn true
         }
 
@@ -61,10 +64,17 @@ class PodcastManagerTest {
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
         val refreshServerManager = mock<RefreshServerManager> {}
-        val subscribeManager = SubscribeManager(appDatabase, podcastCacheServer, syncServerManager, staticServerManager, application, settingsSignedOut)
+        val subscribeManager = SubscribeManager(appDatabase, podcastCacheServer, syncServerManager, staticServerManager, syncAccountManagerSignedOut, application, settings)
         podcastDao = appDatabase.podcastDao()
-        podcastManagerSignedOut = PodcastManagerImpl(episodeManager, playlistManager, settingsSignedOut, application, subscribeManager, podcastCacheServer, refreshServerManager, appDatabase)
-        podcastManagerSignedIn = PodcastManagerImpl(episodeManager, playlistManager, settingsSignedIn, application, subscribeManager, podcastCacheServer, refreshServerManager, appDatabase)
+        podcastManagerSignedOut = PodcastManagerImpl(episodeManager, playlistManager, settings, application, subscribeManager, podcastCacheServer, refreshServerManager, syncAccountManagerSignedOut, appDatabase)
+        podcastManagerSignedIn = PodcastManagerImpl(episodeManager, playlistManager, settings, application, subscribeManager, podcastCacheServer, refreshServerManager, syncAccountManagerSignedIn, appDatabase)
+    }
+
+    // Write a method to mock the SyncAccountManager to return true for isLoggedIn()
+    fun mockSyncAccountManagerSignedIn(): SyncAccountManager {
+        val syncAccountManagerSignedIn = mock<SyncAccountManager>()
+        Mockito.`when`(syncAccountManagerSignedIn.isLoggedIn()).thenReturn(true)
+        return syncAccountManagerSignedIn
     }
 
     @After

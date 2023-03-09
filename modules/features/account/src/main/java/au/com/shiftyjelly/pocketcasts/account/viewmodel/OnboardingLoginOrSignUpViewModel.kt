@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SignInResult
 import au.com.shiftyjelly.pocketcasts.servers.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
@@ -205,11 +206,11 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
 
     private suspend fun signInWithGoogleToken(idToken: String, onSuccess: (GoogleSignInState) -> Unit, onError: suspend () -> Unit) =
         when (val authResult = syncAccountManager.signInWithGoogle(idToken = idToken, syncServerManager = syncServerManager, signInSource = SignInSource.Onboarding)) {
-            is SyncAccountManager.SignInResult.Success -> {
+            is SignInResult.Success -> {
                 podcastManager.refreshPodcastsAfterSignIn()
                 onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))
             }
-            is SyncAccountManager.SignInResult.Failed -> {
+            is SignInResult.Failed -> {
                 onError()
             }
         }

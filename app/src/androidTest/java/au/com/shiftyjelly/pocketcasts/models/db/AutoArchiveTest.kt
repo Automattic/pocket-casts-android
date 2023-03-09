@@ -74,8 +74,8 @@ class AutoArchiveTest {
     }
 
     private fun upNextQueueFor(db: AppDatabase, episodeManager: EpisodeManager): UpNextQueue {
-        val settings = mock<Settings> {}
-        val context = mock<Context> {}
+        val settings = mock<Settings>()
+        val context = mock<Context>()
         val syncAccountManager = mock<SyncAccountManager>()
         return UpNextQueueImpl(db, settings, episodeManager, syncAccountManager, context)
     }

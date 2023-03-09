@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SignInResult
 import au.com.shiftyjelly.pocketcasts.servers.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
@@ -67,12 +68,12 @@ class OnboardingLogInViewModel @Inject constructor(
                 signInSource = SignInSource.Onboarding
             )
             when (result) {
-                is SyncAccountManager.SignInResult.Success -> {
+                is SignInResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
                     onSuccessfulLogin()
                 }
 
-                is SyncAccountManager.SignInResult.Failed -> {
+                is SignInResult.Failed -> {
                     _state.update {
                         it.copy(
                             isCallInProgress = false,
