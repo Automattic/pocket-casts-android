@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
+import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -109,6 +110,31 @@ class DiscoverViewModel @Inject constructor(
             .flatMap {
                 addPlaybackStateToList(it)
             }
+    }
+
+    fun loadCarouselSponsoredPodcasts(
+        sponsoredPodcastList: List<SponsoredPodcast>
+    ): Flowable<List<CarouselSponsoredPodcast>> {
+        val sponsoredPodcastsSources = sponsoredPodcastList
+            .filter { it.source != null && it.position != null }
+            .map { sponsoredPodcast ->
+                loadPodcastList(sponsoredPodcast.source as String)
+                    .filter { it.podcasts.isNotEmpty() }
+                    .map {
+                        CarouselSponsoredPodcast(
+                            podcast = it.podcasts.first(),
+                            position = sponsoredPodcast.position as Int
+                        )
+                    }
+            }
+
+        return if (sponsoredPodcastsSources.isNotEmpty()) {
+            Flowable.zip(sponsoredPodcastsSources) {
+                it.toList().filterIsInstance<CarouselSponsoredPodcast>()
+            }
+        } else {
+            Flowable.just(emptyList())
+        }
     }
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
@@ -202,4 +228,9 @@ data class PodcastList(
     val collectionImageUrl: String?,
     val tintColors: DiscoverFeedTintColors?,
     val images: List<DiscoverFeedImage>?
+)
+
+data class CarouselSponsoredPodcast(
+    val podcast: DiscoverPodcast,
+    val position: Int
 )

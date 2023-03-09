@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.viewmodel.CarouselSponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -48,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
+import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
@@ -91,6 +93,7 @@ internal class DiscoverAdapter(
     val listener: Listener,
     val theme: Theme,
     val loadPodcastList: (String) -> Flowable<PodcastList>,
+    val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -403,29 +406,8 @@ internal class DiscoverAdapter(
                 is CarouselListViewHolder -> {
                     val featuredLimit = 5
 
-                    val sponsoredPodcastsSources = row.sponsoredPodcasts
-                        .filter { it.source != null && it.position != null }
-                        .map { sponsoredPodcast ->
-                            loadPodcastList(sponsoredPodcast.source as String)
-                                .filter { it.podcasts.isNotEmpty() }
-                                .map {
-                                    CarouselSponsoredPodcast(
-                                        podcast = it.podcasts.first(),
-                                        position = sponsoredPodcast.position as Int
-                                    )
-                                }
-                        }
-
-                    val sponsoredPodcastsFlowable = if (sponsoredPodcastsSources.isNotEmpty()) {
-                        Flowable.zip(sponsoredPodcastsSources) {
-                            it.toList().filterIsInstance<CarouselSponsoredPodcast>()
-                        }
-                    } else {
-                        Flowable.just(emptyList())
-                    }
-
                     val loadingFlowable: Flowable<List<Any>> = loadPodcastList(row.source)
-                        .zipWith(sponsoredPodcastsFlowable)
+                        .zipWith(loadCarouselSponsoredPodcastList(row.sponsoredPodcasts))
                         .flatMap {
                             val (featuredPodcastList, sponsoredPodcastList) = it
                             val mutableList = featuredPodcastList.podcasts
@@ -689,11 +671,6 @@ internal class DiscoverAdapter(
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
     }
 }
-
-data class CarouselSponsoredPodcast(
-    val podcast: DiscoverPodcast,
-    val position: Int
-)
 
 private fun MutableList<DiscoverPodcast>.addSafely(item: DiscoverPodcast, position: Int) =
     add(min(position, count()), item)
