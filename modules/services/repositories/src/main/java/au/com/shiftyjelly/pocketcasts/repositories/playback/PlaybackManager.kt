@@ -369,12 +369,14 @@ open class PlaybackManager @Inject constructor(
     suspend fun playNowSync(episode: Playable, forceStream: Boolean = false, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play now: ${episode.uuid} ${episode.title}")
 
-        if (episode.isArchived) {
-            episodeManager.unarchive(episode)
-        }
+        withContext(Dispatchers.IO) {
+            if (episode.isArchived) {
+                episodeManager.unarchive(episode)
+            }
 
-        if (episode.playingStatus == EpisodePlayingStatus.COMPLETED) {
-            episodeManager.markAsNotPlayed(episode)
+            if (episode.playingStatus == EpisodePlayingStatus.COMPLETED) {
+                episodeManager.markAsNotPlayed(episode)
+            }
         }
 
         val switchEpisode: Boolean = !upNextQueue.isCurrentEpisode(episode)
