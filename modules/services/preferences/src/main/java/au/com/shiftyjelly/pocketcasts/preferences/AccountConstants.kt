@@ -9,6 +9,7 @@ object AccountConstants {
     const val TOKEN_TYPE = "sync"
     const val UUID = "uuid"
     const val SIGN_IN_TYPE_KEY = "sign_in"
+    const val LOGIN_IDENTITY = "login_identity"
 
     sealed class SignInType(val value: String) {
         object Password : SignInType("Password")

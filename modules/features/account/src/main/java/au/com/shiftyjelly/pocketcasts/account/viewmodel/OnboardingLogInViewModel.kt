@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SignInResult
+import au.com.shiftyjelly.pocketcasts.servers.account.LoginResult
 import au.com.shiftyjelly.pocketcasts.servers.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
@@ -61,19 +61,19 @@ class OnboardingLogInViewModel @Inject constructor(
         subscriptionManager.clearCachedStatus()
 
         viewModelScope.launch {
-            val result = syncAccountManager.signInWithEmailAndPassword(
+            val result = syncAccountManager.loginWithEmailAndPassword(
                 email = state.email,
                 password = state.password,
                 syncServerManager = syncServerManager,
                 signInSource = SignInSource.Onboarding
             )
             when (result) {
-                is SignInResult.Success -> {
+                is LoginResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
                     onSuccessfulLogin()
                 }
 
-                is SignInResult.Failed -> {
+                is LoginResult.Failed -> {
                     _state.update {
                         it.copy(
                             isCallInProgress = false,

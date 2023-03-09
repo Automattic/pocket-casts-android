@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetails
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -59,6 +60,7 @@ class AccountDetailsFragment : BaseFragment() {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var syncAccountManager: SyncAccountManager
 
     private val viewModel: AccountDetailsViewModel by viewModels()
     private var binding: FragmentAccountDetailsBinding? = null
@@ -136,6 +138,9 @@ class AccountDetailsFragment : BaseFragment() {
             val fragment = ChangeEmailFragment.newInstance()
             (activity as FragmentHostListener).addFragment(fragment)
         }
+
+        val showChangeButtons = !syncAccountManager.isGoogleLogin()
+        binding.changeEmailPasswordGroup?.isVisible = showChangeButtons
 
         binding.btnChangePwd?.setOnClickListener {
             val fragment = ChangePwdFragment.newInstance()

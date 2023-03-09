@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.servers.R
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
@@ -65,6 +66,16 @@ class SyncAccountManagerImpl @Inject constructor(
         return getAccount()?.let { account ->
             accountManager.getUserData(account, AccountConstants.UUID)
         }
+    }
+
+    override fun isGoogleLogin(): Boolean {
+        return getLoginIdentity() == LoginIdentity.Google
+    }
+
+    private fun getLoginIdentity(): LoginIdentity? {
+        val account = getAccount() ?: return null
+        val loginIdentity = accountManager.getUserData(account, AccountConstants.LOGIN_IDENTITY)
+        return LoginIdentity.valueOf(loginIdentity)
     }
 
     override fun peekAccessToken(account: Account?): AccessToken? {
@@ -131,11 +142,12 @@ class SyncAccountManagerImpl @Inject constructor(
         return AccountConstants.SignInType.fromString(accountManager.getUserData(account, AccountConstants.SIGN_IN_TYPE_KEY))
     }
 
-    private fun addAccount(email: String, uuid: String, refreshToken: RefreshToken, accessToken: AccessToken) {
+    private fun addAccount(email: String, uuid: String, refreshToken: RefreshToken, accessToken: AccessToken, loginIdentity: LoginIdentity) {
         val account = Account(email, AccountConstants.ACCOUNT_TYPE)
         val userData = bundleOf(
             AccountConstants.UUID to uuid,
-            AccountConstants.SIGN_IN_TYPE_KEY to AccountConstants.SignInType.Tokens.value
+            AccountConstants.SIGN_IN_TYPE_KEY to AccountConstants.SignInType.Tokens.value,
+            AccountConstants.LOGIN_IDENTITY to loginIdentity.value
         )
         accountManager.addAccountExplicitly(account, refreshToken.value, userData)
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)
@@ -174,66 +186,66 @@ class SyncAccountManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun signInWithGoogle(idToken: String, syncServerManager: SyncServerManager, signInSource: SignInSource): SignInResult {
-        val signInResult = try {
+    override suspend fun loginWithGoogle(idToken: String, syncServerManager: SyncServerManager, signInSource: SignInSource): LoginResult {
+        val loginResult = try {
             val response = syncServerManager.loginGoogle(idToken)
-            val result = handleTokenResponse(response)
-            SignInResult.Success(result)
+            val result = handleTokenResponse(loginIdentity = LoginIdentity.Google, response = response)
+            LoginResult.Success(result)
         } catch (ex: Exception) {
             Timber.e(ex, "Failed to sign in with Google")
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
         }
-        trackSignIn(signInResult, signInSource)
-        return signInResult
+        trackSignIn(loginResult, signInSource)
+        return loginResult
     }
 
-    override suspend fun signInWithEmailAndPassword(email: String, password: String, syncServerManager: SyncServerManager, signInSource: SignInSource): SignInResult {
-        val signInResult = try {
+    override suspend fun loginWithEmailAndPassword(email: String, password: String, syncServerManager: SyncServerManager, signInSource: SignInSource): LoginResult {
+        val loginResult = try {
             val response = syncServerManager.login(email = email, password = password)
-            val result = handleTokenResponse(response)
-            SignInResult.Success(result)
+            val result = handleTokenResponse(loginIdentity = LoginIdentity.PocketCasts, response = response)
+            LoginResult.Success(result)
         } catch (ex: Exception) {
             Timber.e(ex, "Failed to sign in with Pocket Casts")
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
         }
-        trackSignIn(signInResult, signInSource)
-        return signInResult
+        trackSignIn(loginResult, signInSource)
+        return loginResult
     }
 
-    private fun trackSignIn(signInResult: SignInResult, signInSource: SignInSource) {
+    private fun trackSignIn(loginResult: LoginResult, signInSource: SignInSource) {
         val properties = mapOf(TRACKS_KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
-        when (signInResult) {
-            is SignInResult.Success -> {
+        when (loginResult) {
+            is LoginResult.Success -> {
                 analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
             }
-            is SignInResult.Failed -> {
-                val errorCodeValue = signInResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+            is LoginResult.Failed -> {
+                val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
                 val errorProperties = properties.plus(TRACKS_KEY_ERROR_CODE to errorCodeValue)
                 analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, errorProperties)
             }
         }
     }
 
-    override suspend fun createUserWithEmailAndPassword(email: String, password: String, syncServerManager: SyncServerManager): SignInResult {
-        val signInResult = try {
+    override suspend fun createUserWithEmailAndPassword(email: String, password: String, syncServerManager: SyncServerManager): LoginResult {
+        val loginResult = try {
             val response = syncServerManager.register(email = email, password = password)
-            val result = handleTokenResponse(response)
-            SignInResult.Success(result)
+            val result = handleTokenResponse(loginIdentity = LoginIdentity.PocketCasts, response = response)
+            LoginResult.Success(result)
         } catch (ex: Exception) {
             Timber.e(ex, "Failed to create a Pocket Casts account")
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.server_login_unable_to_create_account)
         }
-        trackRegister(signInResult)
-        return signInResult
+        trackRegister(loginResult)
+        return loginResult
     }
 
-    private fun trackRegister(signInResult: SignInResult) {
-        when (signInResult) {
-            is SignInResult.Success -> {
+    private fun trackRegister(loginResult: LoginResult) {
+        when (loginResult) {
+            is LoginResult.Success -> {
                 analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
             }
-            is SignInResult.Failed -> {
-                val errorCodeValue = signInResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+            is LoginResult.Failed -> {
+                val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
                 analyticsTracker.track(
                     AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED,
                     mapOf(
@@ -244,7 +256,7 @@ class SyncAccountManagerImpl @Inject constructor(
         }
     }
 
-    private fun exceptionToAuthResult(exception: Exception, fallbackMessage: Int): SignInResult.Failed {
+    private fun exceptionToAuthResult(exception: Exception, fallbackMessage: Int): LoginResult.Failed {
         val resources = context.resources
         var message: String? = null
         var messageId: String? = null
@@ -254,7 +266,7 @@ class SyncAccountManagerImpl @Inject constructor(
             messageId = errorResponse?.messageId
         }
         message = message ?: resources.getString(fallbackMessage)
-        return SignInResult.Failed(message = message, messageId = messageId)
+        return LoginResult.Failed(message = message, messageId = messageId)
     }
 
     override suspend fun forgotPassword(email: String, syncServerManager: SyncServerManager, onSuccess: () -> Unit, onError: (String) -> Unit) {
@@ -272,7 +284,7 @@ class SyncAccountManagerImpl @Inject constructor(
         }
     }
 
-    private fun handleTokenResponse(response: LoginTokenResponse): AuthResultModel {
+    private fun handleTokenResponse(loginIdentity: LoginIdentity, response: LoginTokenResponse): AuthResultModel {
         val email = response.email
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signed in successfully to $email")
         // Store details in android account manager
@@ -280,7 +292,8 @@ class SyncAccountManagerImpl @Inject constructor(
             email = email,
             uuid = response.uuid,
             refreshToken = response.refreshToken,
-            accessToken = response.accessToken
+            accessToken = response.accessToken,
+            loginIdentity = loginIdentity
         )
 
         settings.setLastModified(null)
@@ -343,8 +356,7 @@ class SyncAccountManagerImpl @Inject constructor(
             .setContentTitle(context.getString(LR.string.token_refresh_sign_in_error_title))
             .setContentText(context.getString(LR.string.token_refresh_sign_in_error_description))
             .setAutoCancel(true)
-            // TODO fix this!!!!!!
-            // .setSmallIcon(IR.drawable.ic_failedwarning)
+            .setSmallIcon(R.drawable.ic_failedwarning)
             .setOnlyAlertOnce(true)
             .setContentIntent(pendingIntent)
             .build()

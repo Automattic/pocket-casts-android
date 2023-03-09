@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SignInResult
+import au.com.shiftyjelly.pocketcasts.servers.account.LoginResult
 import au.com.shiftyjelly.pocketcasts.servers.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
@@ -71,18 +71,18 @@ class SignInViewModel
 
         subscriptionManager.clearCachedStatus()
         viewModelScope.launch {
-            val result = syncAccountManager.signInWithEmailAndPassword(
+            val result = syncAccountManager.loginWithEmailAndPassword(
                 email = emailString,
                 password = pwdString,
                 syncServerManager = syncServerManager,
                 signInSource = SignInSource.SignInViewModel
             )
             when (result) {
-                is SignInResult.Success -> {
+                is LoginResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
                     signInState.postValue(SignInState.Success)
                 }
-                is SignInResult.Failed -> {
+                is LoginResult.Failed -> {
                     val message = result.message
                     val errors = mutableSetOf(SignInError.SERVER)
                     signInState.postValue(SignInState.Failure(errors, message))

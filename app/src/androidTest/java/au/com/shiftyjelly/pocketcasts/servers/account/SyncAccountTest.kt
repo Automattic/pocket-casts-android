@@ -80,15 +80,15 @@ internal class SyncAccountTest {
         val accountAuth = SyncAccountManagerImpl(mock(), mock(), context)
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache, mock(), {}, accountAuth)
         val result = runBlocking {
-            accountAuth.signInWithEmailAndPassword(
+            accountAuth.loginWithEmailAndPassword(
                 email = "support+signin@pocketcasts.com",
                 password = "password_signin",
                 syncServerManager = syncServerManager,
                 signInSource = SignInSource.Onboarding
             )
         }
-        assert(result is SignInResult.Success)
-        val successResult = result as SignInResult.Success
+        assert(result is LoginResult.Success)
+        val successResult = result as LoginResult.Success
         assertEquals(AccessToken("secret_access_token_signin"), successResult.result.token)
         assertEquals("610c8140-9a2e-013b-4f44-566ad7a4dc9c", successResult.result.uuid)
         assertEquals(true, successResult.result.isNewAccount)
@@ -140,8 +140,8 @@ internal class SyncAccountTest {
                 syncServerManager = syncServerManager
             )
         }
-        assert(result is SignInResult.Success)
-        val successResult = result as SignInResult.Success
+        assert(result is LoginResult.Success)
+        val successResult = result as LoginResult.Success
         assertEquals(AccessToken("secret_access_token_register"), successResult.result.token)
         assertEquals("e0730740-9a55-013b-4f44-566ad7a4dc9c", successResult.result.uuid)
         assertEquals(true, successResult.result.isNewAccount)
@@ -188,8 +188,8 @@ internal class SyncAccountTest {
                 syncServerManager = syncServerManager
             )
         }
-        assert(result is SignInResult.Failed)
-        val failedResult = result as SignInResult.Failed
+        assert(result is LoginResult.Failed)
+        val failedResult = result as LoginResult.Failed
         assertEquals("login_email_taken", failedResult.messageId)
         assertEquals("Email taken", failedResult.message)
     }
