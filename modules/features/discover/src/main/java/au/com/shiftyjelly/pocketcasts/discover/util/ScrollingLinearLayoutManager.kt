@@ -6,7 +6,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 
-/* Increases scrolling speed of recyclerView.smoothScrollToPosition(position) */
+/*
+1. Increases scrolling speed of recyclerView.smoothScrollToPosition(position)
+2. Sets custom extra layout space for pre caching an extra page
+*/
 class ScrollingLinearLayoutManager(
     context: Context?,
     orientation: Int,
@@ -25,6 +28,13 @@ class ScrollingLinearLayoutManager(
             }
         linearSmoothScroller.targetPosition = position
         startSmoothScroll(linearSmoothScroller)
+    }
+
+    /* By default, LinearLayoutManager lays out 1 extra page of items while smooth scrolling, in the direction of the scroll.
+       This behavior is overridden to lay out an extra page even on a manual swipe. */
+    override fun calculateExtraLayoutSpace(state: RecyclerView.State, extraLayoutSpace: IntArray) {
+        extraLayoutSpace[0] = 0
+        extraLayoutSpace[1] = this.width
     }
 
     companion object {
