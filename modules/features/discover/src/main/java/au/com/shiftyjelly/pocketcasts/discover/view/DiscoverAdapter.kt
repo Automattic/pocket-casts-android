@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -27,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBi
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
+import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
+import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
@@ -34,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
@@ -65,6 +69,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -73,6 +79,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 private const val MAX_ROWS_SMALL_LIST = 20
 private const val CURRENT_PAGE = "current_page"
 private const val TOTAL_PAGES = "total_pages"
+private const val INITIAL_PREFETCH_COUNT = 1
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
@@ -163,32 +170,105 @@ internal class DiscoverAdapter(
     }
 
     inner class CarouselListViewHolder(var binding: RowCarouselListBinding) : NetworkLoadableViewHolder(binding.root) {
+        private var autoScrollHelper: AutoScrollHelper? = null
+        private val scrollListener = object : OnScrollListener() {
+            private var draggingStarted: Boolean = false
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_SETTLING -> Unit // Do nothing
+                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        draggingStarted = true
+                        autoScrollHelper?.stopAutoScrollTimer()
+                    }
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        if (draggingStarted) {
+                            /* Start auto scroll with a delay after a manual swipe */
+                            autoScrollHelper?.startAutoScrollTimer(delay = AutoScrollHelper.AUTO_SCROLL_DELAY)
+                            draggingStarted = false
+                        }
+                    }
+                }
+            }
+        }
+
         val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
-        private val linearLayoutManager =
-            LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
-                initialPrefetchItemCount = 1
+        private val scrollingLayoutManager =
+            ScrollingLinearLayoutManager(
+                itemView.context,
+                RecyclerView.HORIZONTAL,
+                false
+            ).apply {
+                initialPrefetchItemCount = INITIAL_PREFETCH_COUNT
             }
 
         init {
-            recyclerView?.layoutManager = linearLayoutManager
+            recyclerView?.layoutManager = scrollingLayoutManager
             recyclerView?.itemAnimator = null
+            recyclerView?.addOnScrollListener(scrollListener)
+
+            if (BuildConfig.DISCOVER_FEATURED_AUTO_SCROLL) {
+                autoScrollHelper = AutoScrollHelper {
+                    if (adapter.itemCount == 0) return@AutoScrollHelper
+                    val currentPosition = binding.pageIndicatorView.position
+                    val nextPosition = (currentPosition + 1)
+                        .takeIf { it < adapter.itemCount } ?: 0
+                    MainScope().launch {
+                        if (nextPosition > currentPosition) {
+                            recyclerView?.smoothScrollToPosition(nextPosition)
+                        } else {
+                            /* Jump to the beginning to avoid a backward scroll animation */
+                            recyclerView?.scrollToPosition(nextPosition)
+                        }
+                        binding.pageIndicatorView.position = nextPosition
+                        trackPageChanged(nextPosition)
+                    }
+                }
+            }
+
             val snapHelper = HorizontalPeekSnapHelper(0)
             snapHelper.attachToRecyclerView(recyclerView)
             snapHelper.onSnapPositionChanged = { position ->
+                /* Page just snapped, skip auto scroll */
+                autoScrollHelper?.skipAutoScroll()
                 binding.pageIndicatorView.position = position
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED, mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount))
+                trackPageChanged(position)
             }
 
             recyclerView?.adapter = adapter
             adapter.submitList(listOf(LoadingItem()))
+
+            itemView.viewTreeObserver?.apply {
+                /* Stop auto scroll when app is backgrounded */
+                addOnWindowFocusChangeListener { hasFocus ->
+                    if (!hasFocus) autoScrollHelper?.stopAutoScrollTimer()
+                }
+                /* Manage auto scroll when itemView's visibility changes on going to next screen */
+                addOnGlobalLayoutListener {
+                    if (itemView.isShown) {
+                        autoScrollHelper?.startAutoScrollTimer()
+                    } else {
+                        autoScrollHelper?.stopAutoScrollTimer()
+                    }
+                }
+            }
         }
 
         override fun onRestoreInstanceState(state: Parcelable?) {
             super.onRestoreInstanceState(state)
             recyclerView?.post {
-                binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
+                binding.pageIndicatorView.position = scrollingLayoutManager.findFirstVisibleItemPosition()
+                recyclerView.scrollToPosition(binding.pageIndicatorView.position)
             }
+        }
+
+        private fun trackPageChanged(position: Int) {
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED,
+                mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount)
+            )
         }
     }
 
