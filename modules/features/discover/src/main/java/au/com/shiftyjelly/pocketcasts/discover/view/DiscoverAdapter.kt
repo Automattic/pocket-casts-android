@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.viewmodel.CarouselSponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -48,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
+import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
@@ -68,11 +70,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
+import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -89,6 +93,7 @@ internal class DiscoverAdapter(
     val listener: Listener,
     val theme: Theme,
     val loadPodcastList: (String) -> Flowable<PodcastList>,
+    val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -400,18 +405,26 @@ internal class DiscoverAdapter(
                 }
                 is CarouselListViewHolder -> {
                     val featuredLimit = 5
+
                     val loadingFlowable: Flowable<List<Any>> = loadPodcastList(row.source)
-                        .flatMap<List<Any>> { podcastList ->
-                            Flowable.fromIterable(podcastList.podcasts)
-                                .take(featuredLimit.toLong())
-                                .concatMap {
+                        .zipWith(loadCarouselSponsoredPodcastList(row.sponsoredPodcasts))
+                        .flatMap {
+                            val (featuredPodcastList, sponsoredPodcastList) = it
+                            val mutableList = featuredPodcastList.podcasts
+                                .take(featuredLimit)
+                                .toMutableList()
+                            sponsoredPodcastList.forEach { sponsoredPodcast ->
+                                mutableList.addSafely(sponsoredPodcast.podcast.copy(isSponsored = true), sponsoredPodcast.position)
+                            }
+                            Flowable.fromIterable(mutableList.toList())
+                                .concatMap { discoverPodcast ->
                                     // For each podcast, we need to load its background color.
                                     val zipper: BiFunction<DiscoverPodcast, Optional<ArtworkColors>, DiscoverPodcast> = BiFunction { podcast: DiscoverPodcast, colors: Optional<ArtworkColors> ->
                                         val backgroundColor = colors.get()?.tintForDarkBg ?: 0
                                         podcast.color = backgroundColor
                                         podcast
                                     }
-                                    Single.zip(Single.just(it), staticServerManager.getColorsSingle(it.uuid).subscribeOn(Schedulers.io()), zipper).toFlowable()
+                                    Single.zip(Single.just(discoverPodcast), staticServerManager.getColorsSingle(discoverPodcast.uuid).subscribeOn(Schedulers.io()), zipper).toFlowable()
                                 }
                                 .toList().toFlowable()
                         }
@@ -658,6 +671,9 @@ internal class DiscoverAdapter(
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
     }
 }
+
+private fun MutableList<DiscoverPodcast>.addSafely(item: DiscoverPodcast, position: Int) =
+    add(min(position, count()), item)
 
 private class DiscoverRowDiffCallback : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(old: Any, new: Any): Boolean {

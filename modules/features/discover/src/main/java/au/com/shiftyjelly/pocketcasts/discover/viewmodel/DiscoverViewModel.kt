@@ -19,8 +19,10 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
+import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -31,6 +33,7 @@ import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.io.InvalidObjectException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -109,6 +112,39 @@ class DiscoverViewModel @Inject constructor(
             .flatMap {
                 addPlaybackStateToList(it)
             }
+    }
+
+    fun loadCarouselSponsoredPodcasts(
+        sponsoredPodcastList: List<SponsoredPodcast>
+    ): Flowable<List<CarouselSponsoredPodcast>> {
+        val sponsoredPodcastsSources = sponsoredPodcastList
+            .filter {
+                val isInvalidSponsoredPodcast = it.source == null || it.position == null
+                if (isInvalidSponsoredPodcast) {
+                    val message = "Invalid sponsored podcast found."
+                    Timber.e(message)
+                    SentryHelper.recordException(InvalidObjectException(message))
+                }
+                !isInvalidSponsoredPodcast
+            }
+            .map { sponsoredPodcast ->
+                loadPodcastList(sponsoredPodcast.source as String)
+                    .filter { it.podcasts.isNotEmpty() }
+                    .map {
+                        CarouselSponsoredPodcast(
+                            podcast = it.podcasts.first(),
+                            position = sponsoredPodcast.position as Int
+                        )
+                    }
+            }
+
+        return if (sponsoredPodcastsSources.isNotEmpty()) {
+            Flowable.zip(sponsoredPodcastsSources) {
+                it.toList().filterIsInstance<CarouselSponsoredPodcast>()
+            }
+        } else {
+            Flowable.just(emptyList())
+        }
     }
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
@@ -202,4 +238,9 @@ data class PodcastList(
     val collectionImageUrl: String?,
     val tintColors: DiscoverFeedTintColors?,
     val images: List<DiscoverFeedImage>?
+)
+
+data class CarouselSponsoredPodcast(
+    val podcast: DiscoverPodcast,
+    val position: Int
 )
