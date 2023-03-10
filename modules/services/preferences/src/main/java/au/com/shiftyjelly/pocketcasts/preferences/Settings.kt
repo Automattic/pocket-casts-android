@@ -389,7 +389,6 @@ interface Settings {
     fun setRestoreFromBackupEnded()
 
     fun clearPlusPreferences()
-    fun getOldSyncDetails(): Pair<String?, String?>
 
     fun getLanguageCode(): String
 

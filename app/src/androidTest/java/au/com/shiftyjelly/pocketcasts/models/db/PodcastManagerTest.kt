@@ -24,7 +24,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.util.UUID
@@ -68,13 +67,6 @@ class PodcastManagerTest {
         podcastDao = appDatabase.podcastDao()
         podcastManagerSignedOut = PodcastManagerImpl(episodeManager, playlistManager, settings, application, subscribeManager, podcastCacheServer, refreshServerManager, syncAccountManagerSignedOut, appDatabase)
         podcastManagerSignedIn = PodcastManagerImpl(episodeManager, playlistManager, settings, application, subscribeManager, podcastCacheServer, refreshServerManager, syncAccountManagerSignedIn, appDatabase)
-    }
-
-    // Write a method to mock the SyncAccountManager to return true for isLoggedIn()
-    fun mockSyncAccountManagerSignedIn(): SyncAccountManager {
-        val syncAccountManagerSignedIn = mock<SyncAccountManager>()
-        Mockito.`when`(syncAccountManagerSignedIn.isLoggedIn()).thenReturn(true)
-        return syncAccountManagerSignedIn
     }
 
     @After

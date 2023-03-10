@@ -541,13 +541,6 @@ class SettingsImpl @Inject constructor(
         setString("deviceUuid", getUniqueDeviceId())
     }
 
-    override fun getOldSyncDetails(): Pair<String?, String?> {
-        val email = privatePreferences.getString("syncEmail", null)
-        val password = decrypt(privatePreferences.getString("syncPassword", null))
-
-        return Pair(email, password)
-    }
-
     @SuppressLint("HardwareIds")
     @Suppress("DEPRECATION")
     private fun encrypt(value: String?): String {
