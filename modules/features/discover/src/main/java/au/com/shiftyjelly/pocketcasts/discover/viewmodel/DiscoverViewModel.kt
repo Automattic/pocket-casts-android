@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -32,6 +33,7 @@ import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.io.InvalidObjectException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -116,7 +118,15 @@ class DiscoverViewModel @Inject constructor(
         sponsoredPodcastList: List<SponsoredPodcast>
     ): Flowable<List<CarouselSponsoredPodcast>> {
         val sponsoredPodcastsSources = sponsoredPodcastList
-            .filter { it.source != null && it.position != null }
+            .filter {
+                val isInvalidSponsoredPodcast = it.source == null || it.position == null
+                if (isInvalidSponsoredPodcast) {
+                    val message = "Invalid sponsored podcast found."
+                    Timber.e(message)
+                    SentryHelper.recordException(InvalidObjectException(message))
+                }
+                !isInvalidSponsoredPodcast
+            }
             .map { sponsoredPodcast ->
                 loadPodcastList(sponsoredPodcast.source as String)
                     .filter { it.podcasts.isNotEmpty() }
