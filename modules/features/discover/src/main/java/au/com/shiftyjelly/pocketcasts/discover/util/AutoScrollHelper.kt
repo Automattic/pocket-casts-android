@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.discover.util
 import java.util.Timer
 import java.util.TimerTask
 
-private const val AUTO_SCROLL_INTERVAL = 3000L
+private const val AUTO_SCROLL_INTERVAL = 5000L
 
 class AutoScrollHelper(private val onAutoScrollCompleted: () -> Unit) {
     private var autoScrollTimer: Timer? = null
@@ -35,6 +35,6 @@ class AutoScrollHelper(private val onAutoScrollCompleted: () -> Unit) {
     }
 
     companion object {
-        const val AUTO_SCROLL_DELAY = 1000L
+        const val AUTO_SCROLL_DELAY = 5000L
     }
 }
