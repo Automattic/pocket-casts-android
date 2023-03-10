@@ -22,12 +22,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UploadEpisodeTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -120,7 +120,7 @@ private const val WORK_MANAGER_UPLOAD_TASK = "uploadTask"
 
 class UserEpisodeManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
-    val syncServerManager: SyncServerManager,
+    val syncManager: SyncManager,
     val settings: Settings,
     val subscriptionManager: SubscriptionManager,
     val downloadManager: DownloadManager,
@@ -245,7 +245,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         val missingEpisode = UserEpisode(uuid = uuid, title = placeholderTitle ?: "Unable to find episode", publishedDate = placeholderPublished ?: Date(), serverStatus = UserEpisodeServerStatus.MISSING)
         val replaceEpisodeWithSubstitute = userEpisodeDao.insertRx(missingEpisode).andThen(userEpisodeDao.findEpisodeByUuidRx(uuid))
 
-        val downloadMissingEpisode = syncServerManager.getUserEpisode(uuid)
+        val downloadMissingEpisode = syncManager.getUserEpisode(uuid)
             .flatMap {
                 userEpisodeDao.insertRx(it.toUserEpisode()).andThen(userEpisodeDao.findEpisodeByUuidRx(uuid))
             }.switchIfEmpty(replaceEpisodeWithSubstitute)
@@ -272,7 +272,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun updateFiles(files: List<UserEpisode>) = withContext(Dispatchers.IO) {
-        val response = syncServerManager.postFiles(files.toServerPost()).blockingGet()
+        val response = syncManager.postFiles(files.toServerPost()).blockingGet()
         if (!response.isSuccessful) {
             throw HttpException(response)
         }
@@ -282,7 +282,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         val episodesToSync = userEpisodeDao.findUserEpisodesToSync()
         if (episodesToSync.isNotEmpty()) {
             val response = withContext(Dispatchers.IO) {
-                syncServerManager.postFiles(episodesToSync.toServerPost()).blockingGet()
+                syncManager.postFiles(episodesToSync.toServerPost()).blockingGet()
             }
             if (response.isSuccessful) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Synced cloud files successfully")
@@ -294,7 +294,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         }
 
         val response = withContext(Dispatchers.IO) {
-            syncServerManager.getFiles().blockingGet()
+            syncManager.getFiles().blockingGet()
         }
         if (!response.isSuccessful) {
             throw HttpException(response)
@@ -445,10 +445,10 @@ class UserEpisodeManagerImpl @Inject constructor(
 
         return userEpisodeDao.updateServerStatusRx(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
             .andThen(userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, null))
-            .andThen(syncServerManager.getUploadUrl(userEpisode.toUploadData()))
+            .andThen(syncManager.getUploadUrl(userEpisode.toUploadData()))
             .flatMapCompletable {
                 Timber.d("Upload url $it")
-                syncServerManager.uploadToServer(userEpisode, it)
+                syncManager.uploadToServer(userEpisode, it)
                     .doOnNext {
                         Timber.d("Progress $it")
                         UploadProgressManager.uploadObservers[userEpisode.uuid]?.forEach { consumer -> consumer.accept(it) }
@@ -463,7 +463,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             .delay(1, TimeUnit.SECONDS)
             // the api server will call S3 to check the file exists if it doesn't know
             .andThen(
-                syncServerManager.getFileUploadStatus(userEpisode.uuid)
+                syncManager.getFileUploadStatus(userEpisode.uuid)
                     .onErrorReturn {
                         Timber.e(it)
                         false
@@ -486,8 +486,8 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun uploadImageToServer(userEpisode: UserEpisode, imageFile: File): Completable {
-        return syncServerManager.getImageUploadUrl(FileImageUploadData(userEpisode.uuid, imageFile.length(), "image/png"))
-            .flatMapCompletable { uploadUrl -> syncServerManager.uploadImageToServer(imageFile, uploadUrl).ignoreElement() }
+        return syncManager.getImageUploadUrl(FileImageUploadData(userEpisode.uuid, imageFile.length(), "image/png"))
+            .flatMapCompletable { uploadUrl -> syncManager.uploadImageToServer(imageFile, uploadUrl).ignoreElement() }
     }
 
     override fun cancelUpload(userEpisode: UserEpisode) {
@@ -497,9 +497,9 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun removeFromCloud(userEpisode: UserEpisode) {
-        syncServerManager.deleteFromServer(userEpisode)
+        syncManager.deleteFromServer(userEpisode)
             .flatMapCompletable { userEpisodeDao.updateServerStatusRx(userEpisode.uuid, UserEpisodeServerStatus.LOCAL) }
-            .andThen(syncServerManager.getFileUsage().doOnSuccess { usageRelay.accept(Optional.of(it)) }.ignoreElement())
+            .andThen(syncManager.getFileUsage().doOnSuccess { usageRelay.accept(Optional.of(it)) }.ignoreElement())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -510,14 +510,14 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun deleteImageFromServer(userEpisode: UserEpisode) = withContext(Dispatchers.IO) {
-        syncServerManager.deleteImageFromServer(userEpisode).await()
+        syncManager.deleteImageFromServer(userEpisode).await()
         userEpisode.hasCustomImage = false
         userEpisode.artworkUrl = null
         update(userEpisode)
     }
 
     override fun getPlaybackUrl(userEpisode: UserEpisode): Single<String> {
-        return syncServerManager.getPlaybackUrl(userEpisode)
+        return syncManager.getPlaybackUrl(userEpisode)
     }
 
     override suspend fun updateEpisodeStatus(episode: UserEpisode, status: EpisodeStatusEnum) {

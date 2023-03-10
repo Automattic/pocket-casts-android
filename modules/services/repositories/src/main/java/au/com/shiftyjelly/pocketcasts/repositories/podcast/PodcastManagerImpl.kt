@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.wasCached
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
@@ -56,7 +56,7 @@ class PodcastManagerImpl @Inject constructor(
     private val subscribeManager: SubscribeManager,
     private val cacheServerManager: PodcastCacheServerManager,
     private val refreshServerManager: RefreshServerManager,
-    private val syncAccountManager: SyncAccountManager,
+    private val syncManager: SyncManager,
     appDatabase: AppDatabase
 ) : PodcastManager, CoroutineScope {
 
@@ -76,7 +76,7 @@ class PodcastManagerImpl @Inject constructor(
                 val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast)
                 episodeManager.deleteEpisodes(episodes, playbackManager)
 
-                if (syncAccountManager.isLoggedIn()) {
+                if (syncManager.isLoggedIn()) {
                     podcast.isSubscribed = false
                     podcast.syncStatus = Podcast.SYNC_STATUS_NOT_SYNCED
                     podcast.isShowNotifications = false
@@ -308,7 +308,7 @@ class PodcastManagerImpl @Inject constructor(
 
     override fun deletePodcastIfUnused(podcast: Podcast, playbackManager: PlaybackManager): Boolean {
         // we don't delete podcasts that haven't been synced or you're still subscribed to
-        if ((syncAccountManager.isLoggedIn() && podcast.isNotSynced) || podcast.isSubscribed) {
+        if ((syncManager.isLoggedIn() && podcast.isNotSynced) || podcast.isSubscribed) {
             return false
         }
 

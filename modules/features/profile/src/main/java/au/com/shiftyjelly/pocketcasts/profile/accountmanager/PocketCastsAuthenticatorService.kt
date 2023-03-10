@@ -3,21 +3,18 @@ package au.com.shiftyjelly.pocketcasts.profile.accountmanager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class PocketCastsAuthenticatorService : Service() {
-    @Inject lateinit var syncAccountManager: SyncAccountManager
-    @Inject lateinit var syncServerManager: SyncServerManager
+    @Inject lateinit var syncManager: SyncManager
     lateinit var authenticator: PocketCastsAccountAuthenticator
 
     override fun onCreate() {
         super.onCreate()
-
-        authenticator = PocketCastsAccountAuthenticator(this, syncAccountManager, syncServerManager)
+        authenticator = PocketCastsAccountAuthenticator(this, syncManager)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

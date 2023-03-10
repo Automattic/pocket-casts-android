@@ -2,8 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -12,8 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChangePwdViewModel
 @Inject constructor(
-    private val syncServerManager: SyncServerManager,
-    private val syncAccountManager: SyncAccountManager
+    private val syncManager: SyncManager
 ) : AccountViewModel() {
 
     val pwdCurrent = MutableLiveData<String>().apply { postValue("") }
@@ -96,9 +94,9 @@ class ChangePwdViewModel
 
         viewModelScope.launch {
             try {
-                val response = syncServerManager.updatePassword(pwdNewString, pwdCurrentString)
-                syncAccountManager.setRefreshToken(response.refreshToken)
-                syncAccountManager.setAccessToken(response.accessToken)
+                val response = syncManager.updatePassword(pwdNewString, pwdCurrentString)
+                syncManager.setRefreshToken(response.refreshToken)
+                syncManager.setAccessToken(response.accessToken)
                 changePasswordState.postValue(ChangePasswordState.Success("OK"))
             } catch (ex: Exception) {
                 Timber.e(ex, "Failed update password")

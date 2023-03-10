@@ -91,10 +91,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcut
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts.INTENT_EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts.INTENT_EXTRA_PLAYLIST_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -179,7 +179,7 @@ class MainActivity :
     @Inject lateinit var warningsHelper: WarningsHelper
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
-    @Inject lateinit var syncAccountManager: SyncAccountManager
+    @Inject lateinit var syncManager: SyncManager
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -269,7 +269,7 @@ class MainActivity :
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
 
-        val showOnboarding = !settings.hasCompletedOnboarding() && !syncAccountManager.isLoggedIn()
+        val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding && savedInstanceState == null) {
             openOnboardingFlow(OnboardingFlow.InitialOnboarding)

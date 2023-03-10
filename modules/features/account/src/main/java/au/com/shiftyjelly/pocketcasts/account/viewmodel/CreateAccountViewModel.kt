@@ -11,9 +11,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.account.LoginResult
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -25,8 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateAccountViewModel
 @Inject constructor(
-    private val syncAccountManager: SyncAccountManager,
-    private val syncServerManager: SyncServerManager,
+    private val syncManager: SyncManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val podcastManager: PodcastManager
@@ -227,7 +225,7 @@ class CreateAccountViewModel
         createAccountState.postValue(CreateAccountState.AccountCreating)
 
         viewModelScope.launch {
-            when (val result = syncAccountManager.createUserWithEmailAndPassword(emailString, passwordString, syncServerManager)) {
+            when (val result = syncManager.createUserWithEmailAndPassword(emailString, passwordString)) {
                 is LoginResult.Success -> {
                     analyticsTracker.refreshMetadata()
                     podcastManager.refreshPodcastsAfterSignIn()

@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServerManager
@@ -35,8 +33,4 @@ abstract class ServersModuleBinds {
     @Binds
     @Singleton
     abstract fun providePodcastCacheServerManager(podcastCacheServerManagerImpl: PodcastCacheServerManagerImpl): PodcastCacheServerManager
-
-    @Binds
-    @Singleton
-    abstract fun provideSyncAccountManager(syncAccountManagerImpl: SyncAccountManagerImpl): SyncAccountManager
 }

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.servers.account
+package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 sealed class LoginIdentity(val value: String) {
     object PocketCasts : LoginIdentity("PocketCasts")

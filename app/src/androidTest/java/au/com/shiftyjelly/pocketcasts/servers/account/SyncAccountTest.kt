@@ -6,6 +6,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
@@ -29,6 +34,7 @@ internal class SyncAccountTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var retrofit: Retrofit
     private lateinit var okhttpCache: Cache
+    private lateinit var syncManager: SyncManager
 
     @Before
     fun setUp() {
@@ -49,14 +55,24 @@ internal class SyncAccountTest {
 
         okhttpCache = Cache(File(context.cacheDir.absolutePath, "HttpCache"), (10 * 1024 * 1024).toLong())
 
-        SyncAccountManagerImpl(mock(), mock(), context).signOut()
+        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
+        val syncAccountManager = SyncAccountManager(context)
+
+        syncManager = SyncManagerImpl(
+            analyticsTracker = mock(),
+            context = context,
+            settings = mock(),
+            syncAccountManager = syncAccountManager,
+            syncServerManager = syncServerManager,
+            tokenErrorNotification = mock()
+        )
+        syncManager.signOut()
     }
 
     @After
     fun tearDown() {
         mockWebServer.shutdown()
-
-        SyncAccountManagerImpl(mock(), mock(), context).signOut()
+        syncManager.signOut()
     }
 
     @Test
@@ -77,13 +93,10 @@ internal class SyncAccountTest {
             .setBody(responseBody)
         mockWebServer.enqueue(response)
 
-        val accountAuth = SyncAccountManagerImpl(mock(), mock(), context)
-        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache, mock(), {}, accountAuth)
         val result = runBlocking {
-            accountAuth.loginWithEmailAndPassword(
+            syncManager.loginWithEmailAndPassword(
                 email = "support+signin@pocketcasts.com",
                 password = "password_signin",
-                syncServerManager = syncServerManager,
                 signInSource = SignInSource.Onboarding
             )
         }
@@ -131,13 +144,10 @@ internal class SyncAccountTest {
             .setBody(responseBody)
         mockWebServer.enqueue(response)
 
-        val accountAuth = SyncAccountManagerImpl(mock(), mock(), context)
-        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache, mock(), {}, accountAuth)
         val result = runBlocking {
-            accountAuth.createUserWithEmailAndPassword(
+            syncManager.createUserWithEmailAndPassword(
                 email = "support+register@pocketcasts.com",
                 password = "password_register",
-                syncServerManager = syncServerManager
             )
         }
         assert(result is LoginResult.Success)
@@ -179,13 +189,10 @@ internal class SyncAccountTest {
             .setBody(responseBody)
         mockWebServer.enqueue(response)
 
-        val accountAuth = SyncAccountManagerImpl(mock(), mock(), context)
-        val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache, mock(), {}, accountAuth)
         val result = runBlocking {
-            accountAuth.createUserWithEmailAndPassword(
+            syncManager.createUserWithEmailAndPassword(
                 email = "support@pocketcasts.com",
                 password = "password",
-                syncServerManager = syncServerManager
             )
         }
         assert(result is LoginResult.Failed)

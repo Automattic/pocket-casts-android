@@ -16,15 +16,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncHistoryTask
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import javax.inject.Inject
 
 class CastsWorkerFactory @Inject constructor(
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
-    val syncServerManager: SyncServerManager,
+    val syncManager: SyncManager,
     val downloadManager: DownloadManager,
     val playbackManager: PlaybackManager,
     val refreshServerManager: RefreshServerManager,
@@ -41,7 +41,7 @@ class CastsWorkerFactory @Inject constructor(
         when (instance) {
             is SyncHistoryTask -> {
                 instance.episodeManager = episodeManager
-                instance.serverManager = syncServerManager
+                instance.syncManager = syncManager
                 instance.podcastManager = podcastManager
                 instance.settings = settings
             }
@@ -51,7 +51,7 @@ class CastsWorkerFactory @Inject constructor(
                 instance.userEpisodeManager = userEpisodeManager
             }
             is SyncSettingsTask -> {
-                instance.syncServerManager = syncServerManager
+                instance.namedSettingsCaller = syncManager
                 instance.settings = settings
             }
             is UploadEpisodeTask -> {

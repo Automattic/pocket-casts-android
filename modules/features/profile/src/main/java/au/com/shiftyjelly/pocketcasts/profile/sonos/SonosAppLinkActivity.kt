@@ -7,8 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.databinding.ActivitySonosAppLinkBinding
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
@@ -40,8 +39,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
 
     @Inject lateinit var settings: Settings
     @Inject lateinit var theme: Theme
-    @Inject lateinit var syncServerManager: SyncServerManager
-    @Inject lateinit var syncAccountManager: SyncAccountManager
+    @Inject lateinit var syncManager: SyncManager
 
     private lateinit var sonosState: String
     private lateinit var binding: ActivitySonosAppLinkBinding
@@ -71,7 +69,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
         } ?: run { finish() }
 
         binding.connectBtn.setOnClickListener {
-            if (syncAccountManager.isLoggedIn()) {
+            if (syncManager.isLoggedIn()) {
                 launch {
                     connectWithSonos()
                 }
@@ -86,7 +84,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
 
         binding.sonosImage.setImageResource(if (theme.isDarkTheme) IR.drawable.sonos_dark else IR.drawable.sonos_light)
 
-        if (syncAccountManager.isLoggedIn()) {
+        if (syncManager.isLoggedIn()) {
             binding.explanationText.setText(LR.string.profile_sonos_connect_account)
             binding.connectBtn.setText(LR.string.profile_sonos_connect)
         } else {
@@ -103,7 +101,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
         try {
             binding.connectBtn.setText(LR.string.profile_sonos_connecting)
 
-            val response = syncServerManager.exchangeSonos()
+            val response = syncManager.exchangeSonos()
             val sonosToken = response.accessToken
 
             val code = URLEncoder.encode(sonosToken.value, "UTF-8")

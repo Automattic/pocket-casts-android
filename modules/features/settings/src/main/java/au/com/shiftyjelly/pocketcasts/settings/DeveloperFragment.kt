@@ -13,8 +13,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncJob
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.findToolbar
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -39,7 +39,7 @@ class DeveloperFragment : PreferenceFragmentCompat(), CoroutineScope {
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var subscriptionManager: SubscriptionManager
-    @Inject lateinit var syncAccountManager: SyncAccountManager
+    @Inject lateinit var syncManager: SyncManager
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -96,7 +96,7 @@ class DeveloperFragment : PreferenceFragmentCompat(), CoroutineScope {
     }
 
     private fun syncUpNext() {
-        UpNextSyncJob.run(syncAccountManager, requireActivity())
+        UpNextSyncJob.run(syncManager, requireActivity())
     }
 
     private fun deleteOldEpisodes() {

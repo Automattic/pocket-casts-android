@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.settings.util.FunnyTimeConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class StatsViewModel @Inject constructor(
     val statsManager: StatsManager,
     val settings: Settings,
-    val syncAccountManager: SyncAccountManager,
+    val syncManager: SyncManager,
     val application: Application
 ) : ViewModel() {
 
@@ -46,7 +46,7 @@ class StatsViewModel @Inject constructor(
     fun loadStats() {
         viewModelScope.launch {
             try {
-                val serverStats: StatsBundle? = if (syncAccountManager.isLoggedIn()) {
+                val serverStats: StatsBundle? = if (syncManager.isLoggedIn()) {
                     if (mutableState.value is State.Error) {
                         mutableState.value = State.Loading
                     }

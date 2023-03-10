@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
@@ -27,8 +26,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -60,7 +59,7 @@ class AccountDetailsFragment : BaseFragment() {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-    @Inject lateinit var syncAccountManager: SyncAccountManager
+    @Inject lateinit var syncManager: SyncManager
 
     private val viewModel: AccountDetailsViewModel by viewModels()
     private var binding: FragmentAccountDetailsBinding? = null
@@ -139,7 +138,7 @@ class AccountDetailsFragment : BaseFragment() {
             (activity as FragmentHostListener).addFragment(fragment)
         }
 
-        val showChangeButtons = !syncAccountManager.isGoogleLogin()
+        val showChangeButtons = !syncManager.isGoogleLogin()
         binding.changeEmailPasswordGroup?.isVisible = showChangeButtons
 
         binding.btnChangePwd?.setOnClickListener {

@@ -10,14 +10,12 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import kotlinx.coroutines.runBlocking
 
 class PocketCastsAccountAuthenticator(
     val context: Context,
-    private val syncAccountManager: SyncAccountManager,
-    private val syncServerManager: SyncServerManager,
+    private val syncManager: SyncManager,
 ) : AbstractAccountAuthenticator(context) {
     override fun getAuthTokenLabel(authTokenType: String?): String {
         return AccountConstants.TOKEN_TYPE
@@ -36,8 +34,8 @@ class PocketCastsAccountAuthenticator(
             return buildSignInIntent(response)
         }
 
-        val accessToken = syncAccountManager.peekAccessToken(account)
-            ?: runBlocking { syncAccountManager.refreshAccessToken(account, syncServerManager) }
+        val accessToken = syncManager.peekAccessToken(account)
+            ?: runBlocking { syncManager.refreshAccessToken(account) }
 
         return if (accessToken == null) {
             buildSignInIntent(response)
