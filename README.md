@@ -43,14 +43,17 @@ To build, install, and test the project from the command line:
     │   │   ├── account        # Create account and sign in pages.
     │   │   ├── cartheme       # Automotive resources needed for the account pages.
     │   │   ├── discover       # Discover section.
+    │   │   ├── endofyear      # End of year stats.
     │   │   ├── filters        # Filters section.
     │   │   ├── navigation     # Navigation utilities.
     │   │   ├── player         # Full screen player
     │   │   ├── podcasts       # Podcasts section.
     │   │   ├── profile        # Profile section.
     │   │   ├── search         # Search pages.
-    │   │   └── settings       # Settings pages.
+    │   │   ├── settings       # Settings pages.
+    │   │   └── taskerplugin   # Plugin for integration with Tasker app.
     │   └── services
+    │       ├── analytics      # Analytics code.
     │       ├── compose        # Shared Compose code.
     │       ├── images         # Image resources.
     │       ├── localization   # Contains the strings in English and localized strings from GlotPress. 
