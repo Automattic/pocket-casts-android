@@ -25,6 +25,9 @@ abstract class FolderDao {
     @Delete
     abstract suspend fun delete(folder: Folder)
 
+    @Query("DELETE FROM folders")
+    abstract suspend fun deleteAll()
+
     @Query("DELETE FROM folders WHERE uuid = :uuid")
     abstract suspend fun deleteByUuid(uuid: String)
 

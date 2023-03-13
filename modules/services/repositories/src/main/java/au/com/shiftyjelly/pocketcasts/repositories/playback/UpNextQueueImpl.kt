@@ -245,15 +245,6 @@ class UpNextQueueImpl @Inject constructor(
         saveChanges(UpNextAction.ClearAll)
     }
 
-    /**
-     * Removes all episodes in the list
-     */
-    override suspend fun removeAllEpisodes(episodes: List<Playable>) = withContext(coroutineContext) {
-        episodes.forEach { episode ->
-            removeEpisode(episode)
-        }
-    }
-
     override fun importServerChanges(episodes: List<Playable>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable {
         return Completable.fromAction {
             // don't write over the local Up Next with the server version if we are playing an episode

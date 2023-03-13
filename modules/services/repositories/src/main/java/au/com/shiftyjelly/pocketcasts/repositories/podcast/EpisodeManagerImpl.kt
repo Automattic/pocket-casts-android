@@ -797,6 +797,10 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAll() {
+        episodeDao.deleteAll()
+    }
+
     override fun deleteDownloadedEpisodeFiles() {
         // remove all the files off the disk, ignore any errors and continue
         try {

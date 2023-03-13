@@ -648,6 +648,8 @@
     <string name="profile_change_password_title">Change Password</string>
     <string name="profile_clean_up">Clean up</string>
     <string name="profile_clear_all">Clear all</string>
+    <string name="profile_clear_data">Clear data</string>
+    <string name="profile_clear_data_question">Clear data?</string>
     <string name="profile_clear_cannot_be_undone">This action cannot be undone.</string>
     <string name="profile_clear_listening_history">Clear listening history</string>
     <string name="profile_clear_listening_history_title">Clear Listening History</string>
