@@ -107,7 +107,19 @@ class DiscoverViewModel @Inject constructor(
 
     fun loadPodcastList(source: String): Flowable<PodcastList> {
         return repository.getListFeed(source)
-            .map { PodcastList(it.podcasts ?: emptyList(), it.episodes ?: emptyList(), it.title, it.subtitle, it.description, it.collectionImageUrl, it.tintColors, it.collageImages) }
+            .map {
+                PodcastList(
+                    podcasts = it.podcasts ?: emptyList(),
+                    episodes = it.episodes ?: emptyList(),
+                    title = it.title,
+                    subtitle = it.subtitle,
+                    description = it.description,
+                    collectionImageUrl = it.collectionImageUrl,
+                    tintColors = it.tintColors,
+                    images = it.collageImages,
+                    listId = it.listId
+                )
+            }
             .flatMapPublisher { addSubscriptionStateToPodcasts(it) }
             .flatMap {
                 addPlaybackStateToList(it)
@@ -119,21 +131,25 @@ class DiscoverViewModel @Inject constructor(
     ): Flowable<List<CarouselSponsoredPodcast>> {
         val sponsoredPodcastsSources = sponsoredPodcastList
             .filter {
-                val isInvalidSponsoredPodcast = it.source == null || it.position == null
-                if (isInvalidSponsoredPodcast) {
-                    val message = "Invalid sponsored podcast found."
+                val isInvalidSponsoredSource = it.source == null || it.position == null
+                if (isInvalidSponsoredSource) {
+                    val message = "Invalid sponsored source found."
                     Timber.e(message)
                     SentryHelper.recordException(InvalidObjectException(message))
                 }
-                !isInvalidSponsoredPodcast
+                !isInvalidSponsoredSource
             }
             .map { sponsoredPodcast ->
                 loadPodcastList(sponsoredPodcast.source as String)
-                    .filter { it.podcasts.isNotEmpty() }
+                    .filter {
+                        Timber.e("Invalid sponsored podcast list found.")
+                        it.podcasts.isNotEmpty() && it.listId != null
+                    }
                     .map {
                         CarouselSponsoredPodcast(
                             podcast = it.podcasts.first(),
-                            position = sponsoredPodcast.position as Int
+                            position = sponsoredPodcast.position as Int,
+                            listId = it.listId as String
                         )
                     }
             }
@@ -237,10 +253,12 @@ data class PodcastList(
     val description: String?,
     val collectionImageUrl: String?,
     val tintColors: DiscoverFeedTintColors?,
-    val images: List<DiscoverFeedImage>?
+    val images: List<DiscoverFeedImage>?,
+    val listId: String? = null
 )
 
 data class CarouselSponsoredPodcast(
     val podcast: DiscoverPodcast,
-    val position: Int
+    val position: Int,
+    val listId: String
 )

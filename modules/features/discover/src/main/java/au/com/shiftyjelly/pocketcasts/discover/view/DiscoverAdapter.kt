@@ -84,6 +84,7 @@ private const val MAX_ROWS_SMALL_LIST = 20
 private const val CURRENT_PAGE = "current_page"
 private const val TOTAL_PAGES = "total_pages"
 private const val INITIAL_PREFETCH_COUNT = 1
+private const val LIST_ID = "list_id"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
@@ -175,6 +176,7 @@ internal class DiscoverAdapter(
     }
 
     inner class CarouselListViewHolder(var binding: RowCarouselListBinding) : NetworkLoadableViewHolder(binding.root) {
+        private var listIdImpressionTracked = mutableListOf<String>()
         private var autoScrollHelper: AutoScrollHelper? = null
         private val scrollListener = object : OnScrollListener() {
             private var draggingStarted: Boolean = false
@@ -228,6 +230,7 @@ internal class DiscoverAdapter(
                             recyclerView?.scrollToPosition(nextPosition)
                         }
                         binding.pageIndicatorView.position = nextPosition
+                        trackSponsoredListImpression(nextPosition)
                         trackPageChanged(nextPosition)
                     }
                 }
@@ -239,6 +242,7 @@ internal class DiscoverAdapter(
                 /* Page just snapped, skip auto scroll */
                 autoScrollHelper?.skipAutoScroll()
                 binding.pageIndicatorView.position = position
+                trackSponsoredListImpression(position)
                 trackPageChanged(position)
             }
 
@@ -264,8 +268,10 @@ internal class DiscoverAdapter(
         override fun onRestoreInstanceState(state: Parcelable?) {
             super.onRestoreInstanceState(state)
             recyclerView?.post {
-                binding.pageIndicatorView.position = scrollingLayoutManager.findFirstVisibleItemPosition()
-                recyclerView.scrollToPosition(binding.pageIndicatorView.position)
+                val position = scrollingLayoutManager.findFirstVisibleItemPosition()
+                binding.pageIndicatorView.position = position
+                recyclerView.scrollToPosition(position)
+                trackSponsoredListImpression(position)
             }
         }
 
@@ -274,6 +280,19 @@ internal class DiscoverAdapter(
                 AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED,
                 mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount)
             )
+        }
+
+        private fun trackSponsoredListImpression(position: Int) {
+            val discoverPodcast = adapter.currentList[position] as? DiscoverPodcast
+            discoverPodcast?.listId?.let {
+                if (listIdImpressionTracked.contains(it)) return
+                FirebaseAnalyticsTracker.listImpression(it)
+                analyticsTracker.track(
+                    AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
+                    mapOf(LIST_ID to it)
+                )
+                listIdImpressionTracked.add(it)
+            }
         }
     }
 
@@ -414,7 +433,7 @@ internal class DiscoverAdapter(
                                 .take(featuredLimit)
                                 .toMutableList()
                             sponsoredPodcastList.forEach { sponsoredPodcast ->
-                                mutableList.addSafely(sponsoredPodcast.podcast.copy(isSponsored = true), sponsoredPodcast.position)
+                                mutableList.addSafely(sponsoredPodcast.podcast.copy(isSponsored = true, listId = sponsoredPodcast.listId), sponsoredPodcast.position)
                             }
                             Flowable.fromIterable(mutableList.toList())
                                 .concatMap { discoverPodcast ->

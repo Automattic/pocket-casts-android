@@ -125,7 +125,8 @@ data class ListFeed(
     @field:Json(name = "promotion") var promotion: DiscoverPromotion?,
     @field:Json(name = "payment") val payment: ListPayment? = null,
     @field:Json(name = "paid") val paid: Boolean? = false,
-    @field:Json(name = "author") val author: String? = null
+    @field:Json(name = "author") val author: String? = null,
+    @field:Json(name = "list_id") val listId: String? = null
 ) {
     val displayList: List<Any>
         get() {
@@ -190,6 +191,7 @@ data class DiscoverPodcast(
     @field:Json(name = "media_type") val mediaType: String?,
     val isSubscribed: Boolean = false,
     val isSponsored: Boolean = false,
+    val listId: String? = null, // for carousel sponsored podcast
     @ColorInt var color: Int = 0
 ) : Parcelable {
     fun updateIsSubscribed(value: Boolean): DiscoverPodcast {
