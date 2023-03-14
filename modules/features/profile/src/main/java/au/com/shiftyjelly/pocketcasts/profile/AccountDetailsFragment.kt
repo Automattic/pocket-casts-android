@@ -265,8 +265,8 @@ class AccountDetailsFragment : BaseFragment() {
         val themedContext = if (Util.isAutomotive(context)) ContextThemeWrapper(context, CR.style.Theme_Car_NoActionBar) else context
         val builder = AlertDialog.Builder(themedContext)
         builder.setTitle(getString(LR.string.profile_clear_data_question))
-            .setMessage("Would you also like to clear all data from the app?")
-            .setPositiveButton("Just sign out") { _, _ -> performSignOut() }
+            .setMessage(getString(LR.string.profile_clear_data_would_you_also_like_question))
+            .setPositiveButton(getString(LR.string.profile_just_sign_out)) { _, _ -> performSignOut() }
             .setNegativeButton(getString(LR.string.profile_clear_data)) { _, _ ->
                 signOutAndClearData()
             }

@@ -650,6 +650,7 @@
     <string name="profile_clear_all">Clear all</string>
     <string name="profile_clear_data">Clear data</string>
     <string name="profile_clear_data_question">Clear data?</string>
+    <string name="profile_clear_data_would_you_also_like_question">Would you also like to clear all data from the app?</string>
     <string name="profile_clear_cannot_be_undone">This action cannot be undone.</string>
     <string name="profile_clear_listening_history">Clear listening history</string>
     <string name="profile_clear_listening_history_title">Clear Listening History</string>
@@ -757,6 +758,7 @@
     <string name="profile_get_plus">Get Pocket Casts Plus to unlock this feature, plus lots more!</string>
     <string name="profile_help_support">Help support Pocket Casts by upgrading your account</string>
     <string name="profile_joined">Joined:</string>
+    <string name="profile_just_sign_out">Just sign out</string>
     <string name="profile_last_refresh">Last refresh: %s ago</string>
     <string name="profile_license_agreement">Pocket Casts values your privacy. This Privacy Policy explains what information we collect about you and why, what we may do with that information and how we handle it. It applies to the iOS and Android Pocket Casts apps, and the Pocket Casts web service with associated macOS and Windows apps (jointly and severally, the Service). By using the Service, you agree to this Privacy Policy. If you turn on push notifications in the app, we store the push token Apple provides us in order to deliver those push notifications to your device. If you buy the web app we store a transaction id for your purchase. If you choose not to create an account, and don&#x2019;t use push notifications, no data is stored about you on our servers. Pocket Casts web service also uses cookies and like technologies to keep you logged in. Should you choose to generate a support request from within the Service, we may generate an attachment containing additional data to assist in addressing your support request which you&#x2019;re welcome to view prior to submission.</string>
     <string name="profile_monthly">Monthly</string>
