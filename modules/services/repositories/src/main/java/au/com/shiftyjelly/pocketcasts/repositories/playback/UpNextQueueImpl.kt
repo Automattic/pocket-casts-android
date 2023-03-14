@@ -69,6 +69,7 @@ class UpNextQueueImpl @Inject constructor(
         data class Remove(val episode: Playable, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         data class Import(val episodes: List<Playable>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         object ClearAll : UpNextAction(null)
+        object ClearAllIncludingChanges : UpNextAction(null)
         object ClearUpNext : UpNextAction(null)
     }
 
@@ -117,6 +118,10 @@ class UpNextQueueImpl @Inject constructor(
             is UpNextAction.Import -> upNextDao.saveAll(episodes = action.episodes)
             is UpNextAction.ClearUpNext -> upNextDao.deleteAllNotCurrent()
             is UpNextAction.ClearAll -> upNextDao.deleteAll()
+            is UpNextAction.ClearAllIncludingChanges -> {
+                upNextDao.deleteAll()
+                upNextChangeDao.deleteAll()
+            }
         }
 
         // save changes to sync to the server
@@ -243,6 +248,15 @@ class UpNextQueueImpl @Inject constructor(
      */
     override fun removeAll() {
         saveChanges(UpNextAction.ClearAll)
+    }
+
+    /**
+     * Removes all episodes including the playing episode and any pending changes
+     */
+    override suspend fun removeAllIncludingChanges() {
+        withContext(Dispatchers.IO) {
+            saveChanges(UpNextAction.ClearAllIncludingChanges)
+        }
     }
 
     override fun importServerChanges(episodes: List<Playable>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable {

@@ -279,7 +279,7 @@ class AccountDetailsFragment : BaseFragment() {
 
         // Block while clearing data so that we don't return to the app until the users data has been cleared
         runBlocking(Dispatchers.IO) {
-            upNextQueue.removeAll()
+            upNextQueue.removeAllIncludingChanges()
 
             playlistManager.resetDb()
             folderManager.deleteAll()

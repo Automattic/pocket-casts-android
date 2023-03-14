@@ -31,6 +31,7 @@ interface UpNextQueue {
     fun changeList(episodes: List<Playable>)
     fun clearUpNext()
     fun removeAll()
+    suspend fun removeAllIncludingChanges()
     fun importServerChanges(episodes: List<Playable>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable
     fun contains(uuid: String): Boolean
 
