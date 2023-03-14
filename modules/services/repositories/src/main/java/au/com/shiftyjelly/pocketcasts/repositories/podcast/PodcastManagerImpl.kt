@@ -338,6 +338,10 @@ class PodcastManagerImpl @Inject constructor(
         return false
     }
 
+    override suspend fun deleteAllPodcasts() {
+        podcastDao.deleteAll()
+    }
+
     override suspend fun findSubscribedUuids(): List<String> {
         return podcastDao.findSubscribedUuids()
     }

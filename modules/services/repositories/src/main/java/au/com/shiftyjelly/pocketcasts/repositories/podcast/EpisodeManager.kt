@@ -108,6 +108,7 @@ interface EpisodeManager {
     fun stopDownloadAndCleanUp(episode: Episode, from: String)
 
     /** Remove methods  */
+    suspend fun deleteAll()
     fun deleteEpisodesWithoutSync(episodes: List<Episode>, playbackManager: PlaybackManager)
 
     fun deleteEpisodeWithoutSync(episode: Episode?, playbackManager: PlaybackManager)
