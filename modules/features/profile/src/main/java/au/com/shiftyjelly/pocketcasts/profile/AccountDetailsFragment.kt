@@ -290,7 +290,6 @@ class AccountDetailsFragment : BaseFragment() {
             userEpisodeManager.findUserEpisodes().forEach {
                 userEpisodeManager.delete(it, playbackManager)
             }
-            episodeManager.deleteDownloadedEpisodeFiles()
             episodeManager.deleteAll()
         }
 
