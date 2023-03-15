@@ -14,12 +14,13 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UploadProgressManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.toUploadData
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
-import au.com.shiftyjelly.pocketcasts.servers.sync.FileUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsRequest
@@ -43,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
@@ -230,26 +230,37 @@ class SyncManagerImpl @Inject constructor(
             syncServerManager.postFiles(files, token)
         }
 
-    override fun getFileUploadUrl(file: FileUploadData): Single<String> =
-        getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getFileUploadUrl(file, token)
-        }
-
     override fun getFileUploadStatus(episodeUuid: String): Single<Boolean> =
         getCacheTokenOrLoginRxSingle { token ->
             syncServerManager.getFileUploadStatus(episodeUuid, token)
         }
 
-    override fun getFileImageUploadUrl(imageData: FileImageUploadData): Single<String> =
+    override fun uploadFileToServer(episode: UserEpisode): Completable =
         getCacheTokenOrLoginRxSingle { token ->
-            syncServerManager.getFileImageUploadUrl(imageData, token)
+            syncServerManager.getFileUploadUrl(episode.toUploadData(), token)
+        }.flatMapCompletable { url ->
+            Timber.d("Upload url $url")
+            syncServerManager.uploadToServer(episode, url)
+                .doOnNext { progress ->
+                    Timber.d("Progress $progress")
+                    UploadProgressManager.uploadObservers[episode.uuid]?.forEach { consumer ->
+                        consumer.accept(progress)
+                    }
+                }
+                .ignoreElements()
         }
 
-    override fun uploadToServer(episode: UserEpisode, url: String): Flowable<Float> =
-        syncServerManager.uploadToServer(episode, url)
-
-    override fun uploadImageToServer(imageFile: File, url: String): Single<Response<Void>> =
-        syncServerManager.uploadImageToServer(imageFile, url)
+    override fun uploadImageToServer(
+        episode: UserEpisode,
+        imageFile: File
+    ): Completable =
+        getCacheTokenOrLoginRxSingle { token ->
+            val imageData = FileImageUploadData(episode.uuid, imageFile.length(), "image/png")
+            syncServerManager.getFileImageUploadUrl(imageData, token)
+        }.flatMapCompletable { uploadUrl ->
+            syncServerManager.uploadImageToServer(imageFile, uploadUrl)
+                .ignoreElement()
+        }
 
     override fun deleteImageFromServer(episode: UserEpisode): Single<Response<Void>> =
         getCacheTokenOrLoginRxSingle { token ->

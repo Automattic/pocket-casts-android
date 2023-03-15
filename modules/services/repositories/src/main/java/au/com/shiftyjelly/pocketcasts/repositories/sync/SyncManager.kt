@@ -10,9 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
-import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
-import au.com.shiftyjelly.pocketcasts.servers.sync.FileUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilesResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.NamedSettingsCaller
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
@@ -30,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import retrofit2.Response
@@ -62,16 +59,14 @@ interface SyncManager : NamedSettingsCaller {
     // User Episodes / Files
     fun getFiles(): Single<Response<FilesResponse>>
     fun getFileUploadStatus(episodeUuid: String): Single<Boolean>
-    fun getFileUploadUrl(file: FileUploadData): Single<String>
-    fun getFileImageUploadUrl(imageData: FileImageUploadData): Single<String>
+    fun uploadFileToServer(episode: UserEpisode): Completable
+    fun uploadImageToServer(episode: UserEpisode, imageFile: File): Completable
     fun postFiles(files: List<FilePost>): Single<Response<Void>>
-    fun uploadImageToServer(imageFile: File, url: String): Single<Response<Void>>
     fun getUserEpisode(uuid: String): Maybe<ServerFile>
     fun getFileUsage(): Single<FileAccount>
     fun deleteImageFromServer(episode: UserEpisode): Single<Response<Void>>
     fun deleteFromServer(episode: UserEpisode): Single<Response<Void>>
     fun getPlaybackUrl(episode: UserEpisode): Single<String>
-    fun uploadToServer(episode: UserEpisode, url: String): Flowable<Float>
 
     // History
     fun historySync(request: HistorySyncRequest): Single<HistorySyncResponse>

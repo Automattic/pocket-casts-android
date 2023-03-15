@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
-import au.com.shiftyjelly.pocketcasts.servers.sync.FileImageUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileUploadData
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
@@ -445,16 +444,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
         return userEpisodeDao.updateServerStatusRx(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
             .andThen(userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, null))
-            .andThen(syncManager.getFileUploadUrl(userEpisode.toUploadData()))
-            .flatMapCompletable {
-                Timber.d("Upload url $it")
-                syncManager.uploadToServer(userEpisode, it)
-                    .doOnNext {
-                        Timber.d("Progress $it")
-                        UploadProgressManager.uploadObservers[userEpisode.uuid]?.forEach { consumer -> consumer.accept(it) }
-                    }
-                    .ignoreElements()
-            }
+            .andThen(syncManager.uploadFileToServer(userEpisode))
             .andThen(
                 userEpisodeDao.updateServerStatusRx(userEpisode.uuid, serverStatus = UserEpisodeServerStatus.UPLOADED)
             )
@@ -485,10 +475,8 @@ class UserEpisodeManagerImpl @Inject constructor(
             )
     }
 
-    override fun uploadImageToServer(userEpisode: UserEpisode, imageFile: File): Completable {
-        return syncManager.getFileImageUploadUrl(FileImageUploadData(userEpisode.uuid, imageFile.length(), "image/png"))
-            .flatMapCompletable { uploadUrl -> syncManager.uploadImageToServer(imageFile, uploadUrl).ignoreElement() }
-    }
+    override fun uploadImageToServer(userEpisode: UserEpisode, imageFile: File): Completable =
+        syncManager.uploadImageToServer(userEpisode, imageFile)
 
     override fun cancelUpload(userEpisode: UserEpisode) {
         if (userEpisode.uploadTaskId == null) return
