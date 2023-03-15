@@ -132,8 +132,11 @@ class SyncManagerImpl @Inject constructor(
                 signInType = syncAccountManager.getSignInType(account),
                 signInSource = SignInSource.AccountAuthenticator
             )
+
             // update the refresh token as the expiry may have been increased
             syncAccountManager.setRefreshToken(tokenResponse.refreshToken)
+
+            syncAccountManager.setAccessToken(tokenResponse.accessToken)
             tokenResponse.accessToken
         } catch (ex: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to fetch access token.")
