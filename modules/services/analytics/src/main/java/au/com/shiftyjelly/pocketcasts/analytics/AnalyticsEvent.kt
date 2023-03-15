@@ -522,6 +522,9 @@ enum class AnalyticsEvent(val key: String) {
     SEARCH_FAILED("search_failed"),
     SEARCH_RESULT_TAPPED("search_result_tapped"),
 
+    /* Search - Full List */
+    SEARCH_LIST_SHOWN("search_list_shown"),
+
     /* Search History */
     SEARCH_HISTORY_CLEARED("search_history_cleared"),
     SEARCH_HISTORY_ITEM_TAPPED("search_history_item_tapped"),
