@@ -305,33 +305,6 @@ class SyncManagerImpl @Inject constructor(
         return loginResult
     }
 
-    private fun exceptionToAuthResult(exception: Exception, fallbackMessage: Int): LoginResult.Failed {
-        val resources = context.resources
-        var message: String? = null
-        var messageId: String? = null
-        if (exception is HttpException) {
-            val errorResponse = exception.parseErrorResponse()
-            message = errorResponse?.messageLocalized(resources)
-            messageId = errorResponse?.messageId
-        }
-        message = message ?: resources.getString(fallbackMessage)
-        return LoginResult.Failed(message = message, messageId = messageId)
-    }
-
-    private fun trackSignIn(loginResult: LoginResult, signInSource: SignInSource) {
-        val properties = mapOf(TRACKS_KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
-        when (loginResult) {
-            is LoginResult.Success -> {
-                analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
-            }
-            is LoginResult.Failed -> {
-                val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-                val errorProperties = properties.plus(TRACKS_KEY_ERROR_CODE to errorCodeValue)
-                analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, errorProperties)
-            }
-        }
-    }
-
     override suspend fun createUserWithEmailAndPassword(email: String, password: String): LoginResult {
         val loginResult = try {
             val response = syncServerManager.register(email = email, password = password)
@@ -343,23 +316,6 @@ class SyncManagerImpl @Inject constructor(
         }
         trackRegister(loginResult)
         return loginResult
-    }
-
-    private fun trackRegister(loginResult: LoginResult) {
-        when (loginResult) {
-            is LoginResult.Success -> {
-                analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
-            }
-            is LoginResult.Failed -> {
-                val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-                analyticsTracker.track(
-                    AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED,
-                    mapOf(
-                        TRACKS_KEY_ERROR_CODE to errorCodeValue
-                    )
-                )
-            }
-        }
     }
 
     override suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
@@ -394,6 +350,50 @@ class SyncManagerImpl @Inject constructor(
         } catch (ex: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to refresh token.")
             null
+        }
+    }
+
+    private fun exceptionToAuthResult(exception: Exception, fallbackMessage: Int): LoginResult.Failed {
+        val resources = context.resources
+        var message: String? = null
+        var messageId: String? = null
+        if (exception is HttpException) {
+            val errorResponse = exception.parseErrorResponse()
+            message = errorResponse?.messageLocalized(resources)
+            messageId = errorResponse?.messageId
+        }
+        message = message ?: resources.getString(fallbackMessage)
+        return LoginResult.Failed(message = message, messageId = messageId)
+    }
+
+    private fun trackSignIn(loginResult: LoginResult, signInSource: SignInSource) {
+        val properties = mapOf(TRACKS_KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
+        when (loginResult) {
+            is LoginResult.Success -> {
+                analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
+            }
+            is LoginResult.Failed -> {
+                val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+                val errorProperties = properties.plus(TRACKS_KEY_ERROR_CODE to errorCodeValue)
+                analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, errorProperties)
+            }
+        }
+    }
+
+    private fun trackRegister(loginResult: LoginResult) {
+        when (loginResult) {
+            is LoginResult.Success -> {
+                analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
+            }
+            is LoginResult.Failed -> {
+                val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
+                analyticsTracker.track(
+                    AnalyticsEvent.USER_ACCOUNT_CREATION_FAILED,
+                    mapOf(
+                        TRACKS_KEY_ERROR_CODE to errorCodeValue
+                    )
+                )
+            }
         }
     }
 
