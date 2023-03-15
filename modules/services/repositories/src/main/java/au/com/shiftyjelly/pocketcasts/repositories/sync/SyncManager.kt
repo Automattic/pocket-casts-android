@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.PromoCodeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
@@ -37,7 +36,7 @@ import io.reactivex.Single
 import retrofit2.Response
 import java.io.File
 
-interface SyncManager : NamedSettingsCaller, TokenHandler {
+interface SyncManager : NamedSettingsCaller {
     val isLoggedInObservable: BehaviorRelay<Boolean>
     suspend fun exchangeSonos(): ExchangeSonosResponse
     fun emailChange(newEmail: String, password: String): Single<UserChangeResponse>

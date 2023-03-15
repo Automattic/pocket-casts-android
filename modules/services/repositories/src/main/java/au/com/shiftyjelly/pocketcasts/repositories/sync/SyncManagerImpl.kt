@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.accounts.Account
 import android.content.Context
-import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
@@ -32,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.ServerFile
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
@@ -65,8 +63,7 @@ class SyncManagerImpl @Inject constructor(
     private val settings: Settings,
     private val syncAccountManager: SyncAccountManager,
     private val syncServerManager: SyncServerManager,
-    private val tokenErrorNotification: TokenErrorNotification,
-) : NamedSettingsCaller, TokenHandler, SyncManager {
+) : NamedSettingsCaller, SyncManager {
 
     override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply {
         accept(isLoggedIn())
@@ -424,7 +421,7 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun <T : Any> getCacheTokenOrLoginSuspend(serverCall: suspend (token: AccessToken) -> T): T {
         if (isLoggedIn()) {
             return try {
-                val token = getAccessToken() ?: refreshTokenSuspend()
+                val token = syncAccountManager.getAccessToken() ?: refreshTokenSuspend()
                 serverCall(token)
             } catch (ex: Exception) {
                 // refresh invalid
@@ -444,9 +441,8 @@ class SyncManagerImpl @Inject constructor(
     private fun <T : Any> getCacheTokenOrLogin(serverCall: (token: AccessToken) -> Single<T>): Single<T> {
         if (isLoggedIn()) {
             return Single.fromCallable {
-                runBlocking {
-                    getAccessToken()
-                } ?: throw RuntimeException("Failed to get token")
+                runBlocking { syncAccountManager.getAccessToken() }
+                    ?: throw RuntimeException("Failed to get token")
             }
                 .flatMap { token -> serverCall(token) }
                 // refresh invalid
@@ -471,10 +467,10 @@ class SyncManagerImpl @Inject constructor(
     }
 
     private fun refreshToken(): Single<AccessToken> {
-        invalidateAccessToken()
+        syncAccountManager.invalidateAccessToken()
         return Single.fromCallable {
             runBlocking {
-                getAccessToken()
+                syncAccountManager.getAccessToken()
             } ?: throw RuntimeException("Failed to get token")
         }.doOnError {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Refresh token threw an error.")
@@ -482,8 +478,8 @@ class SyncManagerImpl @Inject constructor(
     }
 
     private suspend fun refreshTokenSuspend(): AccessToken {
-        invalidateAccessToken()
-        return getAccessToken() ?: throw Exception("Failed to get refresh token")
+        syncAccountManager.invalidateAccessToken()
+        return syncAccountManager.getAccessToken() ?: throw Exception("Failed to get refresh token")
     }
 
     private fun isHttpUnauthorized(throwable: Throwable?): Boolean {
@@ -510,16 +506,5 @@ class SyncManagerImpl @Inject constructor(
             uuid = response.uuid,
             isNewAccount = response.isNew
         )
-    }
-
-    override suspend fun getAccessToken(): AccessToken? =
-        syncAccountManager.getAccessToken(::onTokenError)
-
-    override fun invalidateAccessToken() {
-        syncAccountManager.invalidateAccessToken()
-    }
-
-    private fun onTokenError(intent: Intent) {
-        tokenErrorNotification.show(intent)
     }
 }

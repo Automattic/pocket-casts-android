@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.di
 
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import dagger.Module
 import dagger.Provides
@@ -14,5 +14,5 @@ class RepositoryProviderModule {
 
     @Provides
     @Singleton
-    fun provideTokenHandler(syncManager: SyncManager): TokenHandler = syncManager
+    fun provideTokenHandler(syncAccountManager: SyncAccountManager): TokenHandler = syncAccountManager
 }

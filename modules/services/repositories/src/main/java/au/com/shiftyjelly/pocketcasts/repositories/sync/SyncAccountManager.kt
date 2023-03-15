@@ -11,6 +11,7 @@ import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
+import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -21,9 +22,10 @@ import javax.inject.Inject
  * The only class that should use this class is the
  * [SyncManager] class. Consider using that instead of this class.
  */
-open class SyncAccountManager @Inject constructor(
-    @ApplicationContext private val context: Context
-) {
+class SyncAccountManager @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val tokenErrorNotification: TokenErrorNotification,
+) : TokenHandler {
 
     private val accountManager = AccountManager.get(context)
 
@@ -62,7 +64,7 @@ open class SyncAccountManager @Inject constructor(
             }
         }
 
-    suspend fun getAccessToken(onTokenError: (Intent) -> Unit): AccessToken? {
+    override suspend fun getAccessToken(): AccessToken? {
         val account = getAccount() ?: return null
         return withContext(Dispatchers.IO) {
             try {
@@ -84,7 +86,7 @@ open class SyncAccountManager @Inject constructor(
                         @Suppress("DEPRECATION")
                         bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
                     }
-                    intent?.let { onTokenError(it) }
+                    intent?.let { tokenErrorNotification.show(it) }
                     throw SecurityException("Token could not be refreshed")
                 } else {
                     AccessToken(token)
@@ -96,7 +98,7 @@ open class SyncAccountManager @Inject constructor(
         }
     }
 
-    fun invalidateAccessToken() {
+    override fun invalidateAccessToken() {
         val account = getAccount() ?: return
         val accessToken = peekAccessToken(account) ?: return
         accountManager.invalidateAuthToken(AccountConstants.ACCOUNT_TYPE, accessToken.value)

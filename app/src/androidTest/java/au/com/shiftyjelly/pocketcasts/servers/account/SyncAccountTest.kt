@@ -56,7 +56,7 @@ internal class SyncAccountTest {
         okhttpCache = Cache(File(context.cacheDir.absolutePath, "HttpCache"), (10 * 1024 * 1024).toLong())
 
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
-        val syncAccountManager = SyncAccountManager(context)
+        val syncAccountManager = SyncAccountManager(context, mock())
 
         syncManager = SyncManagerImpl(
             analyticsTracker = mock(),
@@ -64,7 +64,6 @@ internal class SyncAccountTest {
             settings = mock(),
             syncAccountManager = syncAccountManager,
             syncServerManager = syncServerManager,
-            tokenErrorNotification = mock()
         )
         syncManager.signOut()
     }
