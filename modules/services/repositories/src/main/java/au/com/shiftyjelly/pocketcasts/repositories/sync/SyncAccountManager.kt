@@ -125,11 +125,6 @@ class SyncAccountManager @Inject constructor(
         }
     }
 
-    fun updateEmail(email: String) {
-        val account = getAccount() ?: return
-        accountManager.renameAccount(account, email, null, null)
-    }
-
     fun setRefreshToken(refreshToken: RefreshToken) {
         val account = getAccount() ?: return
         accountManager.setPassword(account, refreshToken.value)

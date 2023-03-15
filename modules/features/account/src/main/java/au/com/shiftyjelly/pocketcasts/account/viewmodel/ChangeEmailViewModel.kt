@@ -73,7 +73,6 @@ class ChangeEmailViewModel
             .doOnSuccess { response ->
                 val success = response.success ?: false
                 if (success) {
-                    syncManager.setEmail(emailString)
                     existingEmail = emailString
                     changeEmailState.postValue(ChangeEmailState.Success("OK"))
                 } else {

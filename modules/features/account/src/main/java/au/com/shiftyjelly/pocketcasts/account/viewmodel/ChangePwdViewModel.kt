@@ -94,9 +94,10 @@ class ChangePwdViewModel
 
         viewModelScope.launch {
             try {
-                val response = syncManager.updatePassword(pwdNewString, pwdCurrentString)
-                syncManager.setRefreshToken(response.refreshToken)
-                syncManager.setAccessToken(response.accessToken)
+                syncManager.updatePassword(
+                    newPassword = pwdNewString,
+                    oldPassword = pwdCurrentString
+                )
                 changePasswordState.postValue(ChangePasswordState.Success("OK"))
             } catch (ex: Exception) {
                 Timber.e(ex, "Failed update password")

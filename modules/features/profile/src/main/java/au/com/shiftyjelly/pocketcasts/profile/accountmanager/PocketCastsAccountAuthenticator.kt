@@ -34,8 +34,7 @@ class PocketCastsAccountAuthenticator(
             return buildSignInIntent(response)
         }
 
-        val accessToken = syncManager.peekAccessToken(account)
-            ?: runBlocking { syncManager.refreshAccessToken(account) }
+        val accessToken = runBlocking { syncManager.getAccessToken(account) }
 
         return if (accessToken == null) {
             buildSignInIntent(response)

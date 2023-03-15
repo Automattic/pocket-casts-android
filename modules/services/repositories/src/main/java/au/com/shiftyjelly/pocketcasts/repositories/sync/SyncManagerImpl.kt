@@ -81,6 +81,7 @@ class SyncManagerImpl @Inject constructor(
             syncServerManager.emailChange(newEmail, password, token)
         }.doOnSuccess {
             if (it.success == true) {
+                syncAccountManager.setEmail(newEmail)
                 analyticsTracker.track(AnalyticsEvent.USER_EMAIL_UPDATED)
             }
         }
@@ -94,12 +95,15 @@ class SyncManagerImpl @Inject constructor(
             }
         }
 
-    override suspend fun updatePassword(newPassword: String, oldPassword: String): LoginTokenResponse =
-        getCacheTokenOrLogin { token ->
+    override suspend fun updatePassword(newPassword: String, oldPassword: String) {
+        val response = getCacheTokenOrLogin { token ->
             val response = syncServerManager.updatePassword(newPassword, oldPassword, token)
             analyticsTracker.track(AnalyticsEvent.USER_PASSWORD_UPDATED)
             response
         }
+        syncAccountManager.setRefreshToken(response.refreshToken)
+        syncAccountManager.setAccessToken(response.accessToken)
+    }
 
     override fun getUuid(): String? =
         syncAccountManager.getUuid()
@@ -113,30 +117,35 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? =
         syncAccountManager.getEmail()
 
-    override fun setEmail(email: String) {
-        syncAccountManager.setEmail(email)
-    }
-
-    override fun peekAccessToken(account: Account): AccessToken? =
+    override suspend fun getAccessToken(account: Account): AccessToken? =
         syncAccountManager.peekAccessToken(account)
+            ?: fetchAccessToken(account)
+
+    private suspend fun fetchAccessToken(account: Account): AccessToken? {
+        val refreshToken = syncAccountManager.getRefreshToken(account) ?: return null
+        return try {
+            Timber.d("Refreshing the access token")
+            val tokenResponse = downloadTokens(
+                email = account.name,
+                refreshToken = refreshToken,
+                syncServerManager = syncServerManager,
+                signInType = syncAccountManager.getSignInType(account),
+                signInSource = SignInSource.AccountAuthenticator
+            )
+            // update the refresh token as the expiry may have been increased
+            syncAccountManager.setRefreshToken(tokenResponse.refreshToken)
+            tokenResponse.accessToken
+        } catch (ex: Exception) {
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to fetch access token.")
+            null
+        }
+    }
 
     override fun signOut(action: () -> Unit) {
         syncServerManager.signOut()
         action()
         syncAccountManager.signOut()
         isLoggedInObservable.accept(false)
-    }
-
-    override fun updateEmail(email: String) {
-        syncAccountManager.updateEmail(email)
-    }
-
-    override fun setRefreshToken(refreshToken: RefreshToken) {
-        syncAccountManager.setRefreshToken(refreshToken)
-    }
-
-    override fun setAccessToken(accessToken: AccessToken) {
-        syncAccountManager.setAccessToken(accessToken)
     }
 
     override suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult {
@@ -190,26 +199,6 @@ class SyncManagerImpl @Inject constructor(
         } catch (ex: Exception) {
             Timber.e(ex, "Failed to reset password.")
             onError(context.resources.getString(LR.string.profile_reset_password_failed))
-        }
-    }
-
-    override suspend fun refreshAccessToken(account: Account): AccessToken? {
-        val refreshToken = syncAccountManager.getRefreshToken(account) ?: return null
-        return try {
-            Timber.d("Refreshing the access token")
-            val tokenResponse = downloadTokens(
-                email = account.name,
-                refreshToken = refreshToken,
-                syncServerManager = syncServerManager,
-                signInType = syncAccountManager.getSignInType(account),
-                signInSource = SignInSource.AccountAuthenticator
-            )
-            // update the refresh token as the expiry may have been increased
-            setRefreshToken(tokenResponse.refreshToken)
-            tokenResponse.accessToken
-        } catch (ex: Exception) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to refresh token.")
-            null
         }
     }
 
