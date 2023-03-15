@@ -184,14 +184,14 @@ open class SyncServerManager @Inject constructor(
         return server.postFiles(addBearer(token), body)
     }
 
-    fun getUploadUrl(file: FileUploadData, token: AccessToken): Single<String> =
-        server.getUploadUrl(addBearer(token), file).map { it.url }
+    fun getFileUploadUrl(file: FileUploadData, token: AccessToken): Single<String> =
+        server.getFileUploadUrl(addBearer(token), file).map { it.url }
 
     fun getFileUploadStatus(episodeUuid: String, token: AccessToken): Single<Boolean> =
         server.getFileUploadStatus(addBearer(token), episodeUuid).map { it.success }
 
-    fun getImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): Single<String> =
-        server.getImageUploadUrl(addBearer(token), imageData).map { it.url }
+    fun getFileImageUploadUrl(imageData: FileImageUploadData, token: AccessToken): Single<String> =
+        server.getFileImageUploadUrl(addBearer(token), imageData).map { it.url }
 
     fun uploadToServer(episode: UserEpisode, url: String): Flowable<Float> {
         val path = episode.downloadedFilePath ?: throw IllegalStateException("File is not downloaded")

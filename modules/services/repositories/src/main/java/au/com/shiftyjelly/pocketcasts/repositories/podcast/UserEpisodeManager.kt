@@ -445,7 +445,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
         return userEpisodeDao.updateServerStatusRx(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
             .andThen(userEpisodeDao.updateUploadErrorRx(userEpisode.uuid, null))
-            .andThen(syncManager.getUploadUrl(userEpisode.toUploadData()))
+            .andThen(syncManager.getFileUploadUrl(userEpisode.toUploadData()))
             .flatMapCompletable {
                 Timber.d("Upload url $it")
                 syncManager.uploadToServer(userEpisode, it)
@@ -486,7 +486,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun uploadImageToServer(userEpisode: UserEpisode, imageFile: File): Completable {
-        return syncManager.getImageUploadUrl(FileImageUploadData(userEpisode.uuid, imageFile.length(), "image/png"))
+        return syncManager.getFileImageUploadUrl(FileImageUploadData(userEpisode.uuid, imageFile.length(), "image/png"))
             .flatMapCompletable { uploadUrl -> syncManager.uploadImageToServer(imageFile, uploadUrl).ignoreElement() }
     }
 

@@ -37,50 +37,62 @@ import retrofit2.Response
 import java.io.File
 
 interface SyncManager : NamedSettingsCaller {
+
+    // Account
     val isLoggedInObservable: BehaviorRelay<Boolean>
-    suspend fun exchangeSonos(): ExchangeSonosResponse
-    fun emailChange(newEmail: String, password: String): Single<UserChangeResponse>
-    fun deleteAccount(): Single<UserChangeResponse>
-    suspend fun updatePassword(newPassword: String, oldPassword: String): LoginTokenResponse
-    fun redeemPromoCode(code: String): Single<PromoCodeResponse>
-    fun validatePromoCode(code: String): Single<PromoCodeResponse>
-    fun syncUpdate(data: String, lastModified: String): Single<SyncUpdateResponse>
-    fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse>
-    fun getLastSyncAt(): Single<String>
-    fun getHomeFolder(): Single<PodcastListResponse>
-    fun getPodcastEpisodes(podcastUuid: String): Single<PodcastEpisodesResponse>
-    fun getFilters(): Single<List<Playlist>>
-    fun historySync(request: HistorySyncRequest): Single<HistorySyncResponse>
-    suspend fun historyYear(year: Int, count: Boolean): HistoryYearResponse
-    fun episodeSync(request: EpisodeSyncRequest): Completable
-    fun subscriptionStatus(): Single<SubscriptionStatusResponse>
-    fun subscriptionPurchase(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse>
-    fun getFiles(): Single<Response<FilesResponse>>
-    fun postFiles(files: List<FilePost>): Single<Response<Void>>
-    fun getUploadUrl(file: FileUploadData): Single<String>
-    fun getFileUploadStatus(episodeUuid: String): Single<Boolean>
-    fun getImageUploadUrl(imageData: FileImageUploadData): Single<String>
-    fun uploadToServer(episode: UserEpisode, url: String): Flowable<Float>
-    fun uploadImageToServer(imageFile: File, url: String): Single<Response<Void>>
-    fun deleteImageFromServer(episode: UserEpisode): Single<Response<Void>>
-    fun deleteFromServer(episode: UserEpisode): Single<Response<Void>>
-    fun getPlaybackUrl(episode: UserEpisode): Single<String>
-    fun getUserEpisode(uuid: String): Maybe<ServerFile>
-    suspend fun loadStats(): StatsBundle
-    fun getFileUsage(): Single<FileAccount>
     fun getUuid(): String?
     fun isLoggedIn(): Boolean
     fun isGoogleLogin(): Boolean
     fun getEmail(): String?
     fun setEmail(email: String)
-    fun peekAccessToken(account: Account): AccessToken?
     fun signOut(action: () -> Unit = {})
     fun updateEmail(email: String)
-    fun setRefreshToken(refreshToken: RefreshToken)
-    fun setAccessToken(accessToken: AccessToken)
     suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
     suspend fun createUserWithEmailAndPassword(email: String, password: String): LoginResult
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
+    fun setRefreshToken(refreshToken: RefreshToken)
+    fun setAccessToken(accessToken: AccessToken)
+    fun peekAccessToken(account: Account): AccessToken?
     suspend fun refreshAccessToken(account: Account): AccessToken?
+    fun emailChange(newEmail: String, password: String): Single<UserChangeResponse>
+    fun deleteAccount(): Single<UserChangeResponse>
+    suspend fun updatePassword(newPassword: String, oldPassword: String): LoginTokenResponse
+
+    // User Episodes / Files
+    fun getFiles(): Single<Response<FilesResponse>>
+    fun getFileUploadStatus(episodeUuid: String): Single<Boolean>
+    fun getFileUploadUrl(file: FileUploadData): Single<String>
+    fun getFileImageUploadUrl(imageData: FileImageUploadData): Single<String>
+    fun postFiles(files: List<FilePost>): Single<Response<Void>>
+    fun uploadImageToServer(imageFile: File, url: String): Single<Response<Void>>
+    fun getUserEpisode(uuid: String): Maybe<ServerFile>
+    fun getFileUsage(): Single<FileAccount>
+    fun deleteImageFromServer(episode: UserEpisode): Single<Response<Void>>
+    fun deleteFromServer(episode: UserEpisode): Single<Response<Void>>
+    fun getPlaybackUrl(episode: UserEpisode): Single<String>
+    fun uploadToServer(episode: UserEpisode, url: String): Flowable<Float>
+
+    // History
+    fun historySync(request: HistorySyncRequest): Single<HistorySyncResponse>
+    suspend fun historyYear(year: Int, count: Boolean): HistoryYearResponse
+
+    // Subscription
+    fun subscriptionStatus(): Single<SubscriptionStatusResponse>
+    fun subscriptionPurchase(request: SubscriptionPurchaseRequest): Single<SubscriptionStatusResponse>
+    fun redeemPromoCode(code: String): Single<PromoCodeResponse>
+    fun validatePromoCode(code: String): Single<PromoCodeResponse>
+
+    // Sync
+    fun getLastSyncAt(): Single<String>
+    fun getHomeFolder(): Single<PodcastListResponse>
+    fun getPodcastEpisodes(podcastUuid: String): Single<PodcastEpisodesResponse>
+    fun syncUpdate(data: String, lastModified: String): Single<SyncUpdateResponse>
+    fun episodeSync(request: EpisodeSyncRequest): Completable
+
+    // Other
+    suspend fun exchangeSonos(): ExchangeSonosResponse
+    fun getFilters(): Single<List<Playlist>>
+    suspend fun loadStats(): StatsBundle
+    fun upNextSync(request: UpNextSyncRequest): Single<UpNextSyncResponse>
 }
