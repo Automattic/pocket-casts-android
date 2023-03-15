@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-private const val MAX_HISTORY_COUNT = 250
+private const val MAX_HISTORY_COUNT = 20
 
 class SearchHistoryManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
