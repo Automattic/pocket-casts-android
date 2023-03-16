@@ -19,8 +19,10 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
+import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -31,6 +33,7 @@ import io.reactivex.rxkotlin.combineLatest
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.io.InvalidObjectException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -104,11 +107,60 @@ class DiscoverViewModel @Inject constructor(
 
     fun loadPodcastList(source: String): Flowable<PodcastList> {
         return repository.getListFeed(source)
-            .map { PodcastList(it.podcasts ?: emptyList(), it.episodes ?: emptyList(), it.title, it.subtitle, it.description, it.collectionImageUrl, it.tintColors, it.collageImages) }
+            .map {
+                PodcastList(
+                    podcasts = it.podcasts ?: emptyList(),
+                    episodes = it.episodes ?: emptyList(),
+                    title = it.title,
+                    subtitle = it.subtitle,
+                    description = it.description,
+                    collectionImageUrl = it.collectionImageUrl,
+                    tintColors = it.tintColors,
+                    images = it.collageImages,
+                    listId = it.listId
+                )
+            }
             .flatMapPublisher { addSubscriptionStateToPodcasts(it) }
             .flatMap {
                 addPlaybackStateToList(it)
             }
+    }
+
+    fun loadCarouselSponsoredPodcasts(
+        sponsoredPodcastList: List<SponsoredPodcast>
+    ): Flowable<List<CarouselSponsoredPodcast>> {
+        val sponsoredPodcastsSources = sponsoredPodcastList
+            .filter {
+                val isInvalidSponsoredSource = it.source == null || it.position == null
+                if (isInvalidSponsoredSource) {
+                    val message = "Invalid sponsored source found."
+                    Timber.e(message)
+                    SentryHelper.recordException(InvalidObjectException(message))
+                }
+                !isInvalidSponsoredSource
+            }
+            .map { sponsoredPodcast ->
+                loadPodcastList(sponsoredPodcast.source as String)
+                    .filter {
+                        Timber.e("Invalid sponsored podcast list found.")
+                        it.podcasts.isNotEmpty() && it.listId != null
+                    }
+                    .map {
+                        CarouselSponsoredPodcast(
+                            podcast = it.podcasts.first(),
+                            position = sponsoredPodcast.position as Int,
+                            listId = it.listId as String
+                        )
+                    }
+            }
+
+        return if (sponsoredPodcastsSources.isNotEmpty()) {
+            Flowable.zip(sponsoredPodcastsSources) {
+                it.toList().filterIsInstance<CarouselSponsoredPodcast>()
+            }
+        } else {
+            Flowable.just(emptyList())
+        }
     }
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
@@ -201,5 +253,12 @@ data class PodcastList(
     val description: String?,
     val collectionImageUrl: String?,
     val tintColors: DiscoverFeedTintColors?,
-    val images: List<DiscoverFeedImage>?
+    val images: List<DiscoverFeedImage>?,
+    val listId: String? = null
+)
+
+data class CarouselSponsoredPodcast(
+    val podcast: DiscoverPodcast,
+    val position: Int,
+    val listId: String
 )

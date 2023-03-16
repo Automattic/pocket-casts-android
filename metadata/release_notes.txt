@@ -1,9 +1,6 @@
-*   New Features:
-    *    Added search history 
-         ([#784](https://github.com/Automattic/pocket-casts-android/pull/784)).
-*   Bug Fixes:
-    *    App no longer crashes when the device browser has been disabled
-         ([#762](https://github.com/Automattic/pocket-casts-android/issues/762)).    
-    *    Improve discovery of chromecast devices
-         ([#780](https://github.com/Automattic/pocket-casts-android/issues/780)).
+*   Updates
+    *   Improved the Automotive account page styles
+        ([#798](https://github.com/Automattic/pocket-casts-android/pull/798)).
+    *   When Automotive doesn't have a browser, the URL and a QR code are shown instead.
+        ([#800](https://github.com/Automattic/pocket-casts-android/pull/800)).
 

@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-06 16:54:03+0000
+Translation-Revision-Date: 2023-03-01 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="search_history_row_type_episode_subtitle">Episodio \u2022 %s \u2022 %s</string>
+    <string name="search_show_all">Mostra tutti</string>
+    <string name="podcast">Podcast</string>
+    <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">Cartella \u2022 %s</string>
+    <string name="search_history_recent_searches">Ricerche recenti</string>
+    <string name="search_history_clear_all_confirmation_message">Confermi di voler cancellare tutta la cronologia di ricerca?</string>
+    <string name="search_history_clear_all_confirm_button_title">Cancella la cronologia delle ricerche</string>
+    <string name="search_podcasts_or_add_url">Cerca podcast o aggiungi URL RSS</string>
+    <string name="error_opening_links_activity_not_found">Sembra che tu non disponga di un\'app in grado di visualizzare questi contenuti.</string>
+    <string name="notifications_blocked_warning">Le notifiche sono bloccate. Puoi aggiornare l\'autorizzazione in Impostazioni.</string>
     <string name="settings_media_actions_show_subtitle">Mostra azioni multimediali personalizzate nelle notifiche multimediali di Android 13 e Android Auto.</string>
     <string name="settings_media_actions_show_title">Mostra azioni multimediali personalizzate</string>
     <string name="settings_media_actions_customise">Personalizza le azioni multimediali</string>
@@ -1278,7 +1289,6 @@ Language: it
     <string name="time_short_hours_minutes">%1$d h %2$d m</string>
     <string name="time_short_hours">%d h</string>
     <string name="search_hint">Cerca per nome del podcast</string>
-    <string name="search_podcasts">Cerca podcast</string>
     <string name="stream_warning_button">Trasmetti comunque</string>
     <string name="profile_cloud_upload_warning_button">Carica ora</string>
     <string name="profile_cloud_upload_warning_summary">Il caricamento di questo episodio utilizzerà i dati.</string>

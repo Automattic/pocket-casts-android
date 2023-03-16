@@ -265,6 +265,11 @@ class PlaylistManagerImpl @Inject constructor(
         playlistDao.deleteDeleted()
     }
 
+    override suspend fun resetDb() {
+        playlistDao.deleteAll()
+        setupDefaultPlaylists()
+    }
+
     override fun deleteSynced(playlist: Playlist) {
         playlistDao.delete(playlist)
     }

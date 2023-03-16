@@ -53,6 +53,7 @@ dependencies {
     implementation androidLibs.ktx
     implementation androidLibs.design
     implementation androidLibs.constraintLayout
+    implementation androidLibs.zxingCore
     implementation libs.aboutLibrariesCore
     implementation libs.aboutLibrariesCompose
     testImplementation libs.junit

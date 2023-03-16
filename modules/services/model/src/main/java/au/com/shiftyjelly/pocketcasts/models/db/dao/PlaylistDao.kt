@@ -57,6 +57,9 @@ abstract class PlaylistDao {
     @Delete
     abstract fun delete(playlist: Playlist)
 
+    @Query("DELETE FROM filters")
+    abstract suspend fun deleteAll()
+
     @Query("DELETE FROM filters WHERE deleted = 1")
     abstract fun deleteDeleted()
 

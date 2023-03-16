@@ -110,6 +110,7 @@ interface PodcastManager {
     /** Remove methods  */
     fun checkForUnusedPodcasts(playbackManager: PlaybackManager)
     fun deletePodcastIfUnused(podcast: Podcast, playbackManager: PlaybackManager): Boolean
+    suspend fun deleteAllPodcasts()
     fun unsubscribe(podcastUuid: String, playbackManager: PlaybackManager)
     fun unsubscribeAsync(podcastUuid: String, playbackManager: PlaybackManager)
 

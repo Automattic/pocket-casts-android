@@ -33,11 +33,11 @@ import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.extensions.openUrl
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
-import au.com.shiftyjelly.pocketcasts.ui.extensions.startActivityViewUrl
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -49,7 +49,10 @@ class AutomotiveAboutFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 AutomotiveTheme {
-                    AboutPage(onOpenLicenses = { openLicenses() })
+                    AboutPage(
+                        onOpenLicenses = { openLicenses() },
+                        onOpenUrl = { openUrl(it) }
+                    )
                 }
             }
         }
@@ -61,7 +64,7 @@ class AutomotiveAboutFragment : Fragment() {
 }
 
 @Composable
-private fun AboutPage(onOpenLicenses: () -> Unit) {
+private fun AboutPage(onOpenLicenses: () -> Unit, onOpenUrl: (String) -> Unit) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     Column(
@@ -94,11 +97,11 @@ private fun AboutPage(onOpenLicenses: () -> Unit) {
         )
         TextLinkButton(
             text = stringResource(R.string.settings_about_terms_of_serivce),
-            onClick = { context.startActivityViewUrl(Settings.INFO_TOS_URL) }
+            onClick = { onOpenUrl(Settings.INFO_TOS_URL) }
         )
         TextLinkButton(
             text = stringResource(R.string.settings_about_privacy_policy),
-            onClick = { context.startActivityViewUrl(Settings.INFO_PRIVACY_URL) }
+            onClick = { onOpenUrl(Settings.INFO_PRIVACY_URL) }
         )
         TextLinkButton(
             text = stringResource(R.string.settings_about_acknowledgements),
@@ -128,5 +131,5 @@ private fun TextLinkButton(text: String, onClick: () -> Unit, modifier: Modifier
 @Composable
 @Preview
 private fun AboutPageRow() {
-    AboutPage(onOpenLicenses = {})
+    AboutPage(onOpenLicenses = {}, onOpenUrl = {})
 }
