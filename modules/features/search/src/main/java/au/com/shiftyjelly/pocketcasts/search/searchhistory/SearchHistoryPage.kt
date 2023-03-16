@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImageSmall
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.UUID
@@ -124,7 +126,11 @@ fun SearchHistoryView(
             key = { requireNotNull(it.id) },
         ) { entry ->
             when (entry) {
-                is SearchHistoryEntry.Episode -> Unit // TODO
+                is SearchHistoryEntry.Episode -> SearchHistoryRow(
+                    content = { SearchHistoryEpisodeView(entry) },
+                    onCloseClick = { onCloseClick(entry) },
+                    onRowClick = { onRowClick(entry) },
+                )
 
                 is SearchHistoryEntry.Folder -> SearchHistoryRow(
                     content = { SearchHistoryFolderView(entry) },
@@ -181,6 +187,51 @@ private fun CloseButton(
             contentDescription = stringResource(NavigationButton.Close.contentDescription),
             tint = MaterialTheme.theme.colors.primaryIcon02
         )
+    }
+}
+
+@Composable
+fun SearchHistoryEpisodeView(
+    entry: SearchHistoryEntry.Episode,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val durationMs = entry.duration * 1000
+    Column {
+        Row(
+            verticalAlignment = Alignment.Top,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
+        ) {
+            PodcastImage(
+                uuid = entry.podcastUuid,
+                modifier = modifier.size(IconSize)
+            )
+            val formattedDuration = TimeHelper.getTimeDurationMediumString(durationMs.toInt(), context)
+            val subTitle = stringResource(
+                LR.string.search_history_row_type_episode_subtitle,
+                formattedDuration,
+                entry.podcastTitle
+            )
+            Column(
+                modifier = modifier
+                    .padding(start = 8.dp)
+                    .weight(1f)
+            ) {
+                TextH40(
+                    text = entry.title,
+                    maxLines = 2,
+                    color = MaterialTheme.theme.colors.primaryText01
+                )
+                TextH50(
+                    text = subTitle,
+                    maxLines = 1,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = modifier.padding(top = 2.dp)
+                )
+            }
+        }
     }
 }
 

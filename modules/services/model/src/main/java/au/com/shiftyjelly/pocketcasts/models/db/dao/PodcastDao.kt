@@ -196,6 +196,9 @@ abstract class PodcastDao {
     @Delete
     abstract fun delete(podcast: Podcast)
 
+    @Query("DELETE FROM podcasts")
+    abstract suspend fun deleteAll()
+
     @Insert(onConflict = REPLACE)
     abstract fun insert(podcast: Podcast): Long
 

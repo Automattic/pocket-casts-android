@@ -164,6 +164,9 @@ abstract class EpisodeDao {
     @Delete
     abstract fun deleteAll(episode: List<Episode>)
 
+    @Query("DELETE FROM episodes")
+    abstract suspend fun deleteAll()
+
     @Query("DELETE FROM episodes WHERE uuid = :uuid")
     abstract fun deleteByUuid(uuid: String)
 

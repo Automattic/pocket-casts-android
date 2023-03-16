@@ -79,7 +79,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                         // TODO handle loading
                         // TODO handle error
 
-                        searchState.list
+                        searchState.podcasts
                             .filterIsInstance<FolderItem.Podcast>()
                             .map {
                                 PodcastResult(

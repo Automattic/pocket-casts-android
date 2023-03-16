@@ -74,6 +74,10 @@ class FolderManagerImpl @Inject constructor(
         folderDao.updateDeleted(uuid = folder.uuid, deleted = true, syncModified = System.currentTimeMillis())
     }
 
+    override suspend fun deleteAll() {
+        folderDao.deleteAll()
+    }
+
     override suspend fun deleteSynced(folderUuid: String) {
         folderDao.deleteByUuid(folderUuid)
     }
