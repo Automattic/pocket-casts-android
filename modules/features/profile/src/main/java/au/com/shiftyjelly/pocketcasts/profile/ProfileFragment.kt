@@ -155,6 +155,7 @@ class ProfileFragment : BaseFragment() {
             true
         }
 
+        @Suppress("DEPRECATION")
         lifecycleScope.launchWhenStarted {
             val isEligible = viewModel.isEndOfYearStoriesEligible()
             binding.setupEndOfYearPromptCard(isEligible)

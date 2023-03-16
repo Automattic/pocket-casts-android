@@ -60,7 +60,7 @@ android {
         freeCompilerArgs += [
             "-opt-in=kotlin.RequiresOptIn"
         ]
-        kotlinOptions.allWarningsAsErrors = false
+        kotlinOptions.allWarningsAsErrors = true
     }
 
     composeOptions {

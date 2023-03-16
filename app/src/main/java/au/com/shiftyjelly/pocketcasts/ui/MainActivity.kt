@@ -280,6 +280,7 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
+        @Suppress("DEPRECATION")
         lifecycleScope.launchWhenCreated {
             val isEligible = viewModel.isEndOfYearStoriesEligible()
             if (isEligible) {
@@ -987,18 +988,14 @@ class MainActivity :
 
     private fun showAccountUpgradeNowDialog(shouldClose: Boolean, autoSelectPlus: Boolean = false) {
         val observer: Observer<SignInState> = Observer { value ->
-            val intent: Intent
-            if (value != null && value.isSignedInAsFree) {
-                intent =
-                    AccountActivity.newUpgradeInstance(this)
+            val intent = if (value.isSignedInAsFree) {
+                AccountActivity.newUpgradeInstance(this)
             } else if (autoSelectPlus) {
-                intent =
-                    AccountActivity.newAutoSelectPlusInstance(
-                        this
-                    )
+                AccountActivity.newAutoSelectPlusInstance(
+                    this
+                )
             } else {
-                intent =
-                    Intent(this, AccountActivity::class.java)
+                Intent(this, AccountActivity::class.java)
             }
             startActivity(intent)
 
