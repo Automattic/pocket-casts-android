@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.WatchSync
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class WearMainActivityViewModel @Inject constructor(

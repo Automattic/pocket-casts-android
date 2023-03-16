@@ -3,13 +3,13 @@ package au.com.shiftyjelly.pocketcasts.account
 import android.annotation.SuppressLint
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 @SuppressLint("VisibleForTests") // https://issuetracker.google.com/issues/239451111
@@ -39,7 +39,6 @@ class WatchSync @Inject constructor(
                 authData?.refreshToken.let { refreshToken ->
                     tokenBundleRepository.update(refreshToken)
                 }
-
             } catch (cancellationException: CancellationException) {
                 // Don't catch CancellationException since this represents the normal cancellation of a coroutine
                 throw cancellationException

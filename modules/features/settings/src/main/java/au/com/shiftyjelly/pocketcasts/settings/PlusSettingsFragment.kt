@@ -128,7 +128,7 @@ class PlusSettingsFragment : BaseFragment() {
 
         binding?.toolbar?.setup(title = getString(LR.string.pocket_casts_plus), navigationIcon = BackArrow, activity = activity, theme = theme)
 
-            userManager.getSignInState().toLiveData()
+        userManager.getSignInState().toLiveData()
             .observe(viewLifecycleOwner) { signInState ->
                 // If the user has gone through the upgraded to Plus, we no longer want
                 // to present this screen since it is asking them to sign up for Plus

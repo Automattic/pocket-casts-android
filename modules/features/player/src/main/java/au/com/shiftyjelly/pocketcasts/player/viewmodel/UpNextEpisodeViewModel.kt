@@ -61,7 +61,6 @@ class UpNextEpisodeViewModel
         }.toFlowable(BackpressureStrategy.LATEST)
             .toLiveData()
 
-
     fun loadEpisode(episodeUuid: String) {
         this.episodeUuid = episodeUuid
         episodeManager.observePlayableByUuid(episodeUuid)

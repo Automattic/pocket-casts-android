@@ -167,16 +167,16 @@ class PodcastsViewModel
     }
 
     val podcastUuidToBadge: LiveData<Map<String, Int>> =
-            settings.podcastBadgeTypeObservable
-                .toFlowable(BackpressureStrategy.LATEST)
-                .switchMap { badgeType ->
-                    return@switchMap when (badgeType) {
-                        Settings.BadgeType.ALL_UNFINISHED -> episodeManager.getPodcastUuidToBadgeUnfinished()
-                        Settings.BadgeType.LATEST_EPISODE -> episodeManager.getPodcastUuidToBadgeLatest()
-                        else -> Flowable.just(emptyMap())
-                    }
+        settings.podcastBadgeTypeObservable
+            .toFlowable(BackpressureStrategy.LATEST)
+            .switchMap { badgeType ->
+                return@switchMap when (badgeType) {
+                    Settings.BadgeType.ALL_UNFINISHED -> episodeManager.getPodcastUuidToBadgeUnfinished()
+                    Settings.BadgeType.LATEST_EPISODE -> episodeManager.getPodcastUuidToBadgeLatest()
+                    else -> Flowable.just(emptyMap())
                 }
-                .toLiveData()
+            }
+            .toLiveData()
 
     // We only want the current badge type when loading for this observable or else it will rebind the adapter every time the badge changes. We use take(1) for this.
     val layoutChangedLiveData = Observables.combineLatest(settings.podcastLayoutObservable, settings.podcastBadgeTypeObservable.take(1)).toFlowable(BackpressureStrategy.LATEST).toLiveData()

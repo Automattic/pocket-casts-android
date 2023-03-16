@@ -8,11 +8,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class PodcastAutoArchiveViewModel @Inject constructor(

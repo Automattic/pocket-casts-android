@@ -9,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Qualifier
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -26,3 +27,7 @@ object AuthPhoneModule {
         )
     }
 }
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ForApplicationScope
