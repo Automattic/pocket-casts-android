@@ -56,71 +56,70 @@ class PodcastsViewModel
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
-    val folderState: LiveData<FolderState> =
-        combineLatest(
-            // monitor all subscribed podcasts, get the podcast in 'Episode release date' as the rest can be done in memory
-            podcastManager.observePodcastsOrderByLatestEpisode(),
-            // monitor all the folders
-            folderManager.observeFolders()
-                .switchMap { folders ->
-                    if (folders.isEmpty()) {
-                        Flowable.just(emptyList())
-                    } else {
-                        // monitor the folder podcasts
-                        val observeFolderPodcasts = folders.map { folder ->
-                            podcastManager
-                                .observePodcastsInFolderOrderByUserChoice(folder)
-                                .map { podcasts ->
-                                    FolderItem.Folder(
-                                        folder = folder,
-                                        podcasts = podcasts
-                                    )
-                                }
-                        }
-                        Flowable.zip(observeFolderPodcasts) { results ->
-                            results.toList().filterIsInstance<FolderItem.Folder>()
-                        }
+    val folderState: LiveData<FolderState> = combineLatest(
+        // monitor all subscribed podcasts, get the podcast in 'Episode release date' as the rest can be done in memory
+        podcastManager.observePodcastsOrderByLatestEpisode(),
+        // monitor all the folders
+        folderManager.observeFolders()
+            .switchMap { folders ->
+                if (folders.isEmpty()) {
+                    Flowable.just(emptyList())
+                } else {
+                    // monitor the folder podcasts
+                    val observeFolderPodcasts = folders.map { folder ->
+                        podcastManager
+                            .observePodcastsInFolderOrderByUserChoice(folder)
+                            .map { podcasts ->
+                                FolderItem.Folder(
+                                    folder = folder,
+                                    podcasts = podcasts
+                                )
+                            }
                     }
-                },
-            // monitor the folder uuid
-            folderUuidObservable.toFlowable(BackpressureStrategy.LATEST),
-            // monitor the home folder sort order
-            settings.podcastSortTypeObservable.toFlowable(BackpressureStrategy.LATEST),
-            // show folders for Plus users
-            userManager.getSignInState()
-        ) { podcasts, folders, folderUuidOptional, podcastSortOrder, signInState ->
-            val folderUuid = folderUuidOptional.orElse(null)
-            if (!signInState.isSignedInAsPlus) {
+                    Flowable.zip(observeFolderPodcasts) { results ->
+                        results.toList().filterIsInstance<FolderItem.Folder>()
+                    }
+                }
+            },
+        // monitor the folder uuid
+        folderUuidObservable.toFlowable(BackpressureStrategy.LATEST),
+        // monitor the home folder sort order
+        settings.podcastSortTypeObservable.toFlowable(BackpressureStrategy.LATEST),
+        // show folders for Plus users
+        userManager.getSignInState()
+    ) { podcasts, folders, folderUuidOptional, podcastSortOrder, signInState ->
+        val folderUuid = folderUuidOptional.orElse(null)
+        if (!signInState.isSignedInAsPlus) {
+            FolderState(
+                items = buildPodcastItems(podcasts, podcastSortOrder),
+                folder = null,
+                isSignedInAsPlus = false
+            )
+        } else if (folderUuid == null) {
+            FolderState(
+                items = buildHomeFolderItems(podcasts, folders, podcastSortOrder),
+                folder = null,
+                isSignedInAsPlus = true
+            )
+        } else {
+            val openFolder = folders.firstOrNull { it.uuid == folderUuid }
+            if (openFolder == null) {
                 FolderState(
-                    items = buildPodcastItems(podcasts, podcastSortOrder),
-                    folder = null,
-                    isSignedInAsPlus = false
-                )
-            } else if (folderUuid == null) {
-                FolderState(
-                    items = buildHomeFolderItems(podcasts, folders, podcastSortOrder),
+                    items = emptyList(),
                     folder = null,
                     isSignedInAsPlus = true
                 )
             } else {
-                val openFolder = folders.firstOrNull { it.uuid == folderUuid }
-                if (openFolder == null) {
-                    FolderState(
-                        items = emptyList(),
-                        folder = null,
-                        isSignedInAsPlus = true
-                    )
-                } else {
-                    FolderState(
-                        items = openFolder.podcasts.map { FolderItem.Podcast(it) },
-                        folder = openFolder.folder,
-                        isSignedInAsPlus = true
-                    )
-                }
+                FolderState(
+                    items = openFolder.podcasts.map { FolderItem.Podcast(it) },
+                    folder = openFolder.folder,
+                    isSignedInAsPlus = true
+                )
             }
         }
-            .doOnNext { adapterState = it.items.toMutableList() }
-            .toLiveData()
+    }
+        .doOnNext { adapterState = it.items.toMutableList() }
+        .toLiveData()
 
     val folder: Folder?
         get() = folderState.value?.folder
@@ -175,13 +174,16 @@ class PodcastsViewModel
                     Settings.BadgeType.LATEST_EPISODE -> episodeManager.getPodcastUuidToBadgeLatest()
                     else -> Flowable.just(emptyMap())
                 }
-            }
-            .toLiveData()
+            }.toLiveData()
 
     // We only want the current badge type when loading for this observable or else it will rebind the adapter every time the badge changes. We use take(1) for this.
-    val layoutChangedLiveData = Observables.combineLatest(settings.podcastLayoutObservable, settings.podcastBadgeTypeObservable.take(1)).toFlowable(BackpressureStrategy.LATEST).toLiveData()
+    val layoutChangedLiveData = Observables.combineLatest(settings.podcastLayoutObservable, settings.podcastBadgeTypeObservable.take(1))
+        .toFlowable(BackpressureStrategy.LATEST)
+        .toLiveData()
 
-    val refreshObservable: LiveData<RefreshState> = settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
+    val refreshObservable: LiveData<RefreshState> = settings.refreshStateObservable
+        .toFlowable(BackpressureStrategy.LATEST)
+        .toLiveData()
 
     private var adapterState: MutableList<FolderItem> = mutableListOf()
 

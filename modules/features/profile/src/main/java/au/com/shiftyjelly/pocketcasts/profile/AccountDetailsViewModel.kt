@@ -59,9 +59,12 @@ class AccountDetailsViewModel
         }
     }
     val signInState = userManager.getSignInState().toLiveData()
-    val viewState: LiveData<Triple<SignInState, Subscription?, DeleteAccountState>> = userManager.getSignInState().combineLatest(subscription).toLiveData()
-        .combineLatest(deleteAccountState)
-        .map { Triple(it.first.first, it.first.second.get(), it.second) }
+    val viewState: LiveData<Triple<SignInState, Subscription?, DeleteAccountState>> =
+        userManager.getSignInState()
+            .combineLatest(subscription)
+            .toLiveData()
+            .combineLatest(deleteAccountState)
+            .map { Triple(it.first.first, it.first.second.get(), it.second) }
 
     val accountStartDate: LiveData<Date> = MutableLiveData<Date>().apply { value = Date(statsManager.statsStartTime) }
 

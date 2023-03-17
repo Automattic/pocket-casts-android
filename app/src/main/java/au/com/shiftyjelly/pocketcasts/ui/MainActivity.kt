@@ -26,9 +26,11 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.toLiveData
 import androidx.mediarouter.media.MediaControlIntent
 import androidx.mediarouter.media.MediaRouteSelector
@@ -280,15 +282,16 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
-        @Suppress("DEPRECATION")
-        lifecycleScope.launchWhenCreated {
-            val isEligible = viewModel.isEndOfYearStoriesEligible()
-            if (isEligible) {
-                if (!settings.getEndOfYearModalHasBeenShown()) {
-                    setupEndOfYearLaunchBottomSheet()
-                }
-                if (settings.getEndOfYearShowBadge2022()) {
-                    binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                val isEligible = viewModel.isEndOfYearStoriesEligible()
+                if (isEligible) {
+                    if (!settings.getEndOfYearModalHasBeenShown()) {
+                        setupEndOfYearLaunchBottomSheet()
+                    }
+                    if (settings.getEndOfYearShowBadge2022()) {
+                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                    }
                 }
             }
         }

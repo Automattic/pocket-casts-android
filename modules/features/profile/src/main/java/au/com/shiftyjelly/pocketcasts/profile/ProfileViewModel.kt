@@ -34,7 +34,9 @@ class ProfileViewModel @Inject constructor(
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
     val refreshObservable: LiveData<RefreshState> =
-        settings.refreshStateObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
+        settings.refreshStateObservable
+            .toFlowable(BackpressureStrategy.LATEST)
+            .toLiveData()
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForStories()
 

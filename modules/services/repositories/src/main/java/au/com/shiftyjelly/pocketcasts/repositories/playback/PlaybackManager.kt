@@ -135,10 +135,9 @@ open class PlaybackManager @Inject constructor(
         Log.d(Settings.LOG_TAG_AUTO, "Init playback state")
         return@lazy relay
     }
-    val playbackStateLive =
-        playbackStateRelay.toFlowable(
-            BackpressureStrategy.LATEST
-        ).toLiveData()
+    val playbackStateLive = playbackStateRelay
+        .toFlowable(BackpressureStrategy.LATEST)
+        .toLiveData()
 
     private var updateCount = 0
     private var resettingPlayer = false

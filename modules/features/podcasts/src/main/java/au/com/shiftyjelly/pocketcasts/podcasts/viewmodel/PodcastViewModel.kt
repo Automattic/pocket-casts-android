@@ -82,10 +82,9 @@ class PodcastViewModel
     private val searchQueryRelay = BehaviorRelay.create<String>()
         .apply { accept("") }
 
-    val castConnected =
-        castManager.isConnectedObservable.toFlowable(
-            BackpressureStrategy.LATEST
-        ).toLiveData()
+    val castConnected = castManager.isConnectedObservable
+        .toFlowable(BackpressureStrategy.LATEST)
+        .toLiveData()
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

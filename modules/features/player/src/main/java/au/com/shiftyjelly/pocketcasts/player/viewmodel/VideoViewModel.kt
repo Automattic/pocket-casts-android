@@ -21,7 +21,9 @@ class VideoViewModel @Inject constructor(
     private val playbackManager: PlaybackManager
 ) : ViewModel() {
 
-    val playbackState: LiveData<PlaybackState> = playbackManager.playbackStateRelay.toFlowable(BackpressureStrategy.LATEST).toLiveData()
+    val playbackState: LiveData<PlaybackState> = playbackManager.playbackStateRelay
+        .toFlowable(BackpressureStrategy.LATEST)
+        .toLiveData()
 
     private var hideControlsTimer: Disposable? = null
     private var lastTimeHidingControls = 0L

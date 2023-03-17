@@ -42,14 +42,17 @@ class PodcastSettingsViewModel @Inject constructor(
     lateinit var includedFilters: LiveData<List<Playlist>>
     lateinit var availableFilters: LiveData<List<Playlist>>
 
-    val globalSettings =
-        settings.autoAddUpNextLimit.toFlowable(BackpressureStrategy.LATEST)
-            .combineLatest(settings.autoAddUpNextLimitBehaviour.toFlowable(BackpressureStrategy.LATEST))
-            .toLiveData()
+    val globalSettings = settings.autoAddUpNextLimit
+        .toFlowable(BackpressureStrategy.LATEST)
+        .combineLatest(settings.autoAddUpNextLimitBehaviour.toFlowable(BackpressureStrategy.LATEST))
+        .toLiveData()
 
     fun loadPodcast(uuid: String) {
         this.podcastUuid = uuid
-        podcast = podcastManager.observePodcastByUuid(uuid).subscribeOn(Schedulers.io()).toLiveData()
+        podcast = podcastManager
+            .observePodcastByUuid(uuid)
+            .subscribeOn(Schedulers.io())
+            .toLiveData()
 
         val filters = playlistManager.observeAll().map {
             it.filter { filter -> filter.podcastUuidList.contains(uuid) }

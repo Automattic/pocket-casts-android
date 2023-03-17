@@ -29,7 +29,10 @@ class PodcastAutoArchiveViewModel @Inject constructor(
     }
 
     fun setup(podcastUUID: String) {
-        podcast = podcastManager.observePodcastByUuid(podcastUUID).subscribeOn(Schedulers.io()).toLiveData()
+        podcast = podcastManager
+            .observePodcastByUuid(podcastUUID)
+            .subscribeOn(Schedulers.io())
+            .toLiveData()
     }
 
     fun updateGlobalOverride(checked: Boolean) {

@@ -35,8 +35,7 @@ class FiltersFragmentViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    val filters: LiveData<List<Playlist>> =
-        playlistManager.observeAll().toLiveData()
+    val filters: LiveData<List<Playlist>> = playlistManager.observeAll().toLiveData()
 
     val countGenerator = { playlist: Playlist ->
         playlistManager.countEpisodesRx(playlist, episodeManager, playbackManager).onErrorReturn { 0 }

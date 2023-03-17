@@ -9,7 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -19,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -54,8 +57,11 @@ class ChaptersFragment : BaseFragment(), ChapterListener {
             adapter.submitList(it.chapters)
             view.setBackgroundColor(it.podcastHeader.backgroundColor)
         }
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            playerViewModel.showPlayerFlow.collect { showPlayer() }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                playerViewModel.showPlayerFlow.collect { showPlayer() }
+            }
         }
     }
 

@@ -133,18 +133,22 @@ class CreateFilterViewModel @Inject constructor(
         }
 
         playlist = if (playlistUUID != null) {
-            playlistManager.findByUuidRx(playlistUUID).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).toFlowable().toLiveData()
+            playlistManager.findByUuidRx(playlistUUID)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .toFlowable()
         } else {
             val newFilter = createFilter("", 0, 0)
-            playlistManager.observeByUuid(newFilter.uuid).toLiveData()
-        }
+            playlistManager.observeByUuid(newFilter.uuid)
+        }.toLiveData()
 
         hasBeenInitialised = true
     }
 
-    fun observeFilter(filter: Playlist): LiveData<List<Episode>> {
-        return playlistManager.observeEpisodesPreview(filter, episodeManager, playbackManager).toLiveData()
-    }
+    fun observeFilter(filter: Playlist): LiveData<List<Episode>> =
+        playlistManager
+            .observeEpisodesPreview(filter, episodeManager, playbackManager)
+            .toLiveData()
 
     fun updateDownloadLimit(limit: Int) {
         userChangedAutoDownloadEpisodeCount.recordUserChange()

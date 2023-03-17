@@ -36,7 +36,10 @@ class PodcastEffectsViewModel
     lateinit var podcast: LiveData<Podcast>
 
     fun loadPodcast(uuid: String) {
-        podcast = podcastManager.observePodcastByUuid(uuid).subscribeOn(Schedulers.io()).toLiveData()
+        podcast = podcastManager
+            .observePodcastByUuid(uuid)
+            .subscribeOn(Schedulers.io())
+            .toLiveData()
     }
 
     fun updateOverrideGlobalEffects(override: Boolean) {

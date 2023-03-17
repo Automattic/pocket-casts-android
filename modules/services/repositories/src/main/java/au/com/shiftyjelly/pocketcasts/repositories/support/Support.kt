@@ -233,7 +233,10 @@ class Support @Inject constructor(
             output.append(eol)
 
             output.append("Work Manager Tasks").append(eol)
-            val workInfos = WorkManager.getInstance(context).getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG).toPublisher(ProcessLifecycleOwner.get()).awaitFirst()
+            val workInfos = WorkManager.getInstance(context)
+                .getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)
+                .toPublisher(ProcessLifecycleOwner.get())
+                .awaitFirst()
             workInfos.forEach { workInfo ->
                 output.append(workInfo.toString()).append(" Attempt=").append(workInfo.runAttemptCount).append(eol)
             }

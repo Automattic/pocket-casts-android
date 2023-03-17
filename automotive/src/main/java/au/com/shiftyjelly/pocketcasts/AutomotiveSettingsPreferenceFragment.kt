@@ -68,8 +68,8 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedP
                 .toFlowable(BackpressureStrategy.LATEST)
                 .switchMap { state ->
                     Flowable.interval(500, TimeUnit.MILLISECONDS).switchMap { Flowable.just(state) }
-                }.toLiveData()
-
+                }
+                .toLiveData()
         refreshObservable?.observe(viewLifecycleOwner, this)
     }
 
@@ -79,8 +79,8 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedP
         refreshObservable?.removeObserver(this)
     }
 
-    override fun onChanged(state: RefreshState) {
-        updateRefreshSummary(state)
+    override fun onChanged(value: RefreshState) {
+        updateRefreshSummary(value)
     }
 
     private fun updateRefreshSummary(state: RefreshState) {
