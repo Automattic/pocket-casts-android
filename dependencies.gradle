@@ -207,6 +207,7 @@ project.ext {
 
     libs = [
             kotlin: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
+            kotlinJdk8: "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.10",
             kotlinCoroutines: "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versionKotlinCoroutines",
             kotlinCoroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versionKotlinCoroutines",
             kotlinCoroutinesPlayServices: "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$versionKotlinCoroutines",
