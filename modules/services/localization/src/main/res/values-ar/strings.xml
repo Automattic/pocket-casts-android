@@ -1046,6 +1046,7 @@ Language: ar
     <string name="time_short_hours_minutes">⁦%1$d⁩من الساعات ⁦%2$d⁩ من الدقائق</string>
     <string name="time_short_hours">%dس</string>
     <string name="search_hint">البحث حسب اسم البث الصوتي</string>
+    <string name="search_podcasts">البحث في حلقات البث الصوتي</string>
     <string name="stream_warning_button">البث على أي حال</string>
     <string name="profile_cloud_upload_warning_button">الرفع الآن</string>
     <string name="profile_cloud_upload_warning_summary">سوف يستهلك رفع هذه الحلقة البيانات.</string>

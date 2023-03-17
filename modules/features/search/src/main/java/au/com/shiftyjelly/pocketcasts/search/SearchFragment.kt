@@ -288,6 +288,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun onShowAllClick(resultsType: ResultsType) {
+        viewModel.trackSearchListShown(source, resultsType)
         val fragment = SearchResultsFragment.newInstance(resultsType, onlySearchRemote, source)
         childFragmentManager.beginTransaction()
             .replace(R.id.searchResults, fragment)
