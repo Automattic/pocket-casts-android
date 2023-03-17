@@ -103,7 +103,7 @@ class SearchFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
-        binding.setLifecycleOwner { viewLifecycleOwner.lifecycle }
+        binding.lifecycleOwner = viewLifecycleOwner
         viewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setSource(source)

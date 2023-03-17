@@ -5,9 +5,10 @@ import android.content.res.Resources
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -66,7 +67,7 @@ class MultiSelectHelper @Inject constructor(
         get() = Dispatchers.Default
 
     private val _isMultiSelectingLive = MutableLiveData<Boolean>().apply { value = false }
-    val isMultiSelectingLive = Transformations.map(_isMultiSelectingLive) { it }
+    val isMultiSelectingLive: LiveData<Boolean> = _isMultiSelectingLive
 
     var isMultiSelecting: Boolean = false
         set(value) {
@@ -76,16 +77,19 @@ class MultiSelectHelper @Inject constructor(
         }
 
     private val selectedList: MutableList<Playable> = mutableListOf()
-    private val _selectedListLive = MutableLiveData<List<Playable>>().apply { value = listOf() }
-    val selectedListLive = Transformations.map(_selectedListLive) { it }
-    val selectedCount = Transformations.map(_selectedListLive) { it.size }
+    private val selectedListLive = MutableLiveData<List<Playable>>().apply { value = listOf() }
+    val selectedCount: LiveData<Int> = selectedListLive.map { it.size }
 
-    private val settingsToolbarActions = LiveDataReactiveStreams.fromPublisher(settings.multiSelectItemsObservable.toFlowable(BackpressureStrategy.LATEST).map { MultiSelectAction.listFromIds(it) })
-    val toolbarActions = Transformations.map(settingsToolbarActions.combineLatest(selectedListLive)) { (actions, selectedEpisodes) ->
-        actions.mapNotNull {
-            MultiSelectAction.actionForGroup(it.groupId, selectedEpisodes)
+    val toolbarActions = settings.multiSelectItemsObservable
+        .toFlowable(BackpressureStrategy.LATEST)
+        .map { MultiSelectAction.listFromIds(it) }
+        .toLiveData()
+        .combineLatest(selectedListLive)
+        .map { (actions, selectedEpisodes) ->
+            actions.mapNotNull {
+                MultiSelectAction.actionForGroup(it.groupId, selectedEpisodes)
+            }
         }
-    }
 
     var coordinatorLayout: View? = null
     var context: Context? = null
@@ -201,13 +205,13 @@ class MultiSelectHelper @Inject constructor(
         if (!isSelected(episode)) {
             selectedList.add(episode)
         }
-        _selectedListLive.value = selectedList
+        selectedListLive.value = selectedList
     }
 
     fun selectAllInList(episodes: List<Playable>) {
         val trimmed = episodes.filter { !selectedList.contains(it) }
         selectedList.addAll(trimmed)
-        _selectedListLive.value = selectedList
+        selectedListLive.value = selectedList
     }
 
     fun deselect(episode: Playable) {
@@ -216,7 +220,7 @@ class MultiSelectHelper @Inject constructor(
             selectedList.remove(it)
         }
 
-        _selectedListLive.value = selectedList
+        selectedListLive.value = selectedList
 
         if (selectedList.isEmpty()) {
             closeMultiSelect()
@@ -522,7 +526,7 @@ class MultiSelectHelper @Inject constructor(
 
     fun closeMultiSelect() {
         selectedList.clear()
-        _selectedListLive.value = selectedList
+        selectedListLive.value = selectedList
         isMultiSelecting = false
     }
 }

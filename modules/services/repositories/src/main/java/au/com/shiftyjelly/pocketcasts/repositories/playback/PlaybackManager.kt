@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -135,11 +135,7 @@ open class PlaybackManager @Inject constructor(
         Log.d(Settings.LOG_TAG_AUTO, "Init playback state")
         return@lazy relay
     }
-    val playbackStateLive = LiveDataReactiveStreams.fromPublisher(
-        playbackStateRelay.toFlowable(
-            BackpressureStrategy.LATEST
-        )
-    )
+    val playbackStateLive = playbackStateRelay.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
     private var updateCount = 0
     private var resettingPlayer = false

@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.filters
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -90,7 +90,7 @@ class FilterEpisodeListViewModel @Inject constructor(
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-        episodesList = LiveDataReactiveStreams.fromPublisher(episodes)
+        episodesList = episodes.toLiveData()
     }
 
     fun deletePlaylist() {

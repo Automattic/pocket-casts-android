@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.toLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -75,7 +75,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
         itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        LiveDataReactiveStreams.fromPublisher(settings.multiSelectItemsObservable.toFlowable(BackpressureStrategy.LATEST))
+        settings.multiSelectItemsObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
             .observe(viewLifecycleOwner) {
                 val multiSelectActions: MutableList<Any> = MultiSelectAction.listFromIds(it).toMutableList()
 

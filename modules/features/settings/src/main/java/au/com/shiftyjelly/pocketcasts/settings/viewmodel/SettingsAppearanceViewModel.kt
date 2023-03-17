@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -26,10 +26,10 @@ class SettingsAppearanceViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
-    val signInState: LiveData<SignInState> = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val createAccountState = MutableLiveData<SettingsAppearanceState>().apply { value = SettingsAppearanceState.Empty }
-    val showArtworkOnLockScreen = MutableLiveData<Boolean>(settings.showArtworkOnLockScreen())
-    val useEmbeddedArtwork = MutableLiveData<Boolean>(settings.getUseEmbeddedArtwork())
+    val showArtworkOnLockScreen = MutableLiveData(settings.showArtworkOnLockScreen())
+    val useEmbeddedArtwork = MutableLiveData(settings.getUseEmbeddedArtwork())
 
     var changeThemeType: Pair<Theme.ThemeType?, Theme.ThemeType?> = Pair(null, null)
     var changeAppIconType: Pair<AppIcon.AppIconType?, AppIcon.AppIconType?> = Pair(null, null)

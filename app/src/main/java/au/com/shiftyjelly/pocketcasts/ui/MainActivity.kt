@@ -26,10 +26,12 @@ import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.toLiveData
 import androidx.mediarouter.media.MediaControlIntent
 import androidx.mediarouter.media.MediaRouteSelector
 import androidx.mediarouter.media.MediaRouter
@@ -278,14 +280,16 @@ class MainActivity :
         setContentView(view)
         checkForNotificationPermission()
 
-        lifecycleScope.launchWhenCreated {
-            val isEligible = viewModel.isEndOfYearStoriesEligible()
-            if (isEligible) {
-                if (!settings.getEndOfYearModalHasBeenShown()) {
-                    setupEndOfYearLaunchBottomSheet()
-                }
-                if (settings.getEndOfYearShowBadge2022()) {
-                    binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                val isEligible = viewModel.isEndOfYearStoriesEligible()
+                if (isEligible) {
+                    if (!settings.getEndOfYearModalHasBeenShown()) {
+                        setupEndOfYearLaunchBottomSheet()
+                    }
+                    if (settings.getEndOfYearShowBadge2022()) {
+                        binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
+                    }
                 }
             }
         }
@@ -671,7 +675,7 @@ class MainActivity :
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .toFlowable(BackpressureStrategy.LATEST)
-        observeUpNext = LiveDataReactiveStreams.fromPublisher(upNextQueueObservable)
+        observeUpNext = upNextQueueObservable.toLiveData()
         observeUpNext.observe(this) { upNext ->
             binding.playerBottomSheet.setUpNext(
                 upNext = upNext,
@@ -992,18 +996,14 @@ class MainActivity :
 
     private fun showAccountUpgradeNowDialog(shouldClose: Boolean, autoSelectPlus: Boolean = false) {
         val observer: Observer<SignInState> = Observer { value ->
-            val intent: Intent
-            if (value != null && value.isSignedInAsFree) {
-                intent =
-                    AccountActivity.newUpgradeInstance(this)
+            val intent = if (value.isSignedInAsFree) {
+                AccountActivity.newUpgradeInstance(this)
             } else if (autoSelectPlus) {
-                intent =
-                    AccountActivity.newAutoSelectPlusInstance(
-                        this
-                    )
+                AccountActivity.newAutoSelectPlusInstance(
+                    this
+                )
             } else {
-                intent =
-                    Intent(this, AccountActivity::class.java)
+                Intent(this, AccountActivity::class.java)
             }
             startActivity(intent)
 
