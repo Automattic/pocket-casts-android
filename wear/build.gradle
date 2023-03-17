@@ -8,7 +8,6 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "../base.gradle"
 
 android {
-    compileSdkPreview = "UpsideDownCake"
 
     defaultConfig {
         minSdk project.minSdkVersionWear
