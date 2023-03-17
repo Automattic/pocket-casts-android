@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-01 11:54:04+0000
+Translation-Revision-Date: 2023-03-15 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="discover_sponsored">Sponsrad</string>
+    <string name="podcasts_all">Alla podcasts</string>
+    <string name="search_results_all_podcasts">Alla podcasts</string>
+    <string name="search_results_all_episodes">Alla avsnitt</string>
     <string name="search_history_row_type_episode_subtitle">Avsnitt \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Visa alla</string>
     <string name="podcast">Podcast</string>
@@ -1289,6 +1293,7 @@ Language: sv_SE
     <string name="time_short_hours_minutes">%1$dt %2$dm</string>
     <string name="time_short_hours">%dt</string>
     <string name="search_hint">Sök efter podcastnamn</string>
+    <string name="search_podcasts">Sök podcasts</string>
     <string name="stream_warning_button">Streama ändå</string>
     <string name="profile_cloud_upload_warning_button">Ladda upp nu</string>
     <string name="profile_cloud_upload_warning_summary">Att ladda upp det här avsnittet använder data.</string>

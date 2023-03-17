@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-01 18:54:04+0000
+Translation-Revision-Date: 2023-03-15 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="discover_sponsored">Sponsorisé</string>
+    <string name="podcasts_all">Tous les podcasts</string>
+    <string name="search_results_all_podcasts">Tous les podcasts</string>
+    <string name="search_results_all_episodes">Tous les épisodes</string>
     <string name="search_history_row_type_episode_subtitle">Épisode \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Montrer tous</string>
     <string name="podcast">Podcast</string>
@@ -1289,6 +1293,7 @@ Language: fr
     <string name="time_short_hours_minutes">%1$dh %2$dm</string>
     <string name="time_short_hours">%dh</string>
     <string name="search_hint">Rechercher par nom de podcast</string>
+    <string name="search_podcasts">Rechercher des podcasts</string>
     <string name="stream_warning_button">Diffuser quand même en streaming</string>
     <string name="profile_cloud_upload_warning_button">Charger maintenant</string>
     <string name="profile_cloud_upload_warning_summary">Le chargement de cet épisode va consommer des données.</string>
