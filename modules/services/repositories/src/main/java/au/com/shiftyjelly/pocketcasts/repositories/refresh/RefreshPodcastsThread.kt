@@ -112,6 +112,10 @@ class RefreshPodcastsThread(
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as internet not connected")
                 refreshFailedOrCancelled("Not refreshing as internet not connected")
                 return ListenableWorker.Result.retry()
+            } else if (settings.isPodcastAutoDownloadUnmeteredOnly() && !Network.isUnmeteredConnection(context)) {
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not refreshing as we're not on an unmetered connection")
+                refreshFailedOrCancelled("Not refreshing as user prefers unmetered connection")
+                return ListenableWorker.Result.success()
             }
 
             if (!isAllowedToRun(runNow)) {
