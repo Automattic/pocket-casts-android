@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
+import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
@@ -361,5 +362,14 @@ class AutoDownloadSettingsFragment :
     override fun onPause() {
         super.onPause()
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
+
+        context?.let { ctx ->
+            // so we can update the scheduler to take user preference into account
+            // for more efficient updating. We can't use setOnPreferenceClickListener
+            // because the preference isn't persisted until we return true, so
+            // the next best thing is to update the task when we leave this preference
+            // screen.
+            RefreshPodcastsTask.scheduleOrCancel(ctx, settings)
+        }
     }
 }

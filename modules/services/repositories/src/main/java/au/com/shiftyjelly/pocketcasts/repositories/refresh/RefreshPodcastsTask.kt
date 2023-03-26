@@ -60,8 +60,16 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 return
             }
 
+            // Look at user settings and set the constraints so that workmanager
+            // schedules the tasks in a more efficient manner
+            var requiredNetworkType = NetworkType.CONNECTED
+            if(settings.isPodcastAutoDownloadUnmeteredOnly()) {
+                requiredNetworkType = NetworkType.UNMETERED
+            }
+
+            // TODO: get setting and add constraint for setRequiresCharging() based on user's download preferences
             val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiredNetworkType(requiredNetworkType)
                 .setRequiresBatteryNotLow(true)
                 .build()
 
