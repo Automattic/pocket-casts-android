@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2022-08-09 21:08:40+0000
+Translation-Revision-Date: 2023-02-18 02:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nb_NO
 -->
 <resources>
+    <string name="podcast">Podcast</string>
     <string name="next">Neste</string>
     <string name="profile_create_failed_title">Kunne ikke opprette konto</string>
     <string name="please_try_again">Prøv på nytt</string>

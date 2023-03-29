@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-07 08:54:03+0000
+Translation-Revision-Date: 2023-03-14 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="discover_sponsored">贊助內容</string>
+    <string name="podcasts_all">所有 Podcast</string>
+    <string name="search_results_all_podcasts">所有 Podcast</string>
+    <string name="search_results_all_episodes">所有單集</string>
+    <string name="search_history_row_type_episode_subtitle">單集 \u2022 %s \u2022 %s</string>
+    <string name="search_show_all">顯示全部</string>
+    <string name="podcast">Podcast</string>
+    <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">資料夾 \u2022 %s</string>
+    <string name="search_history_recent_searches">最近搜尋的內容</string>
+    <string name="search_history_clear_all_confirmation_message">確定要清除所有搜尋記錄嗎？</string>
+    <string name="search_history_clear_all_confirm_button_title">清除搜尋記錄</string>
+    <string name="search_podcasts_or_add_url">搜尋 Podcast 或新增 RSS URL</string>
+    <string name="error_opening_links_activity_not_found">你似乎沒有可觀看此內容的應用程式。</string>
+    <string name="notifications_blocked_warning">通知已遭封鎖。 你可以透過「設定」更新權限。</string>
     <string name="settings_media_actions_show_subtitle">在 Android 13 媒體通知和 Android Auto 中顯示自訂媒體動作。</string>
     <string name="settings_media_actions_show_title">顯示自訂媒體動作</string>
     <string name="settings_media_actions_customise">自訂媒體動作</string>

@@ -28,6 +28,7 @@
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
+    <string name="mark_unplayed">Mark unplayed</string>
     <string name="more">More</string>
     <string name="more_options">More options</string>
     <string name="next_episode">Next episode</string>
@@ -48,6 +49,7 @@
     <string name="play_on">Play on&#8230;</string>
     <string name="played">Played</string>
     <string name="remove_from_up_next">Remove from Up Next</string>
+    <string name="removed">Removed</string>
     <string name="search">Search</string>
     <string name="selected">Selected</string>
     <string name="not_selected">Not selected</string>
@@ -195,12 +197,16 @@
     <string name="search_no_podcasts_found">No podcasts found</string>
     <string name="search_no_podcasts_found_summary">Try more general or different keywords.</string>
     <string name="search_podcasts_or_add_url">Search podcasts or add RSS URL</string>
+    <string name="search_podcasts">Search podcasts </string>
     <string name="search_hint">Search by podcast name</string>
     <string name="search_history_clear_all_confirm_button_title">Clear Search History</string>
     <string name="search_history_clear_all_confirmation_message">Are you sure you want to clear all your search history?</string>
     <string name="search_history_recent_searches">Recent searches</string>
+    <string name="search_history_row_type_episode_subtitle">Episode \u2022 %s \u2022 %s</string>
     <string name="search_history_row_type_folder_subtitle">Folder \u2022 %s</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
+    <string name="search_results_all_episodes">All episodes</string>
+    <string name="search_results_all_podcasts">All podcasts</string>
     <string name="search_show_all">Show all</string>
 
     <string name="time_short_hours">%dh</string>
@@ -289,6 +295,7 @@
     <!-- Podcasts -->
 
     <string name="podcasts">Podcasts</string>
+    <string name="podcasts_all">All podcasts</string>
     <string name="podcasts_archive" translatable="false">@string/archive</string>
     <string name="podcasts_badges_all_unfinished">All unfinished</string>
     <string name="podcasts_badges_off">Off</string>
@@ -643,6 +650,9 @@
     <string name="profile_change_password_title">Change Password</string>
     <string name="profile_clean_up">Clean up</string>
     <string name="profile_clear_all">Clear all</string>
+    <string name="profile_clear_data">Clear data</string>
+    <string name="profile_clear_data_question">Clear data?</string>
+    <string name="profile_clear_data_would_you_also_like_question">Would you also like to clear all data from the app?</string>
     <string name="profile_clear_cannot_be_undone">This action cannot be undone.</string>
     <string name="profile_clear_listening_history">Clear listening history</string>
     <string name="profile_clear_listening_history_title">Clear Listening History</string>
@@ -750,6 +760,7 @@
     <string name="profile_get_plus">Get Pocket Casts Plus to unlock this feature, plus lots more!</string>
     <string name="profile_help_support">Help support Pocket Casts by upgrading your account</string>
     <string name="profile_joined">Joined:</string>
+    <string name="profile_just_sign_out">Just sign out</string>
     <string name="profile_last_refresh">Last refresh: %s ago</string>
     <string name="profile_license_agreement">Pocket Casts values your privacy. This Privacy Policy explains what information we collect about you and why, what we may do with that information and how we handle it. It applies to the iOS and Android Pocket Casts apps, and the Pocket Casts web service with associated macOS and Windows apps (jointly and severally, the Service). By using the Service, you agree to this Privacy Policy. If you turn on push notifications in the app, we store the push token Apple provides us in order to deliver those push notifications to your device. If you buy the web app we store a transaction id for your purchase. If you choose not to create an account, and don&#x2019;t use push notifications, no data is stored about you on our servers. Pocket Casts web service also uses cookies and like technologies to keep you logged in. Should you choose to generate a support request from within the Service, we may generate an attachment containing additional data to assist in addressing your support request which you&#x2019;re welcome to view prior to submission.</string>
     <string name="profile_monthly">Monthly</string>
@@ -1392,6 +1403,7 @@
     <string name="discover_popular_in">Popular in %s</string>
     <string name="discover_button_play_episode">Play Episode</string>
     <string name="discover_button_play_trailer">Play Trailer</string>
+    <string name="discover_sponsored">Sponsored</string>
 
     <!-- Server errors -->
 

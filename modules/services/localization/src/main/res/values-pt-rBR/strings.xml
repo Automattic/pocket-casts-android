@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-06 20:54:03+0000
+Translation-Revision-Date: 2023-03-14 19:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="discover_sponsored">Patrocinado</string>
+    <string name="podcasts_all">Todos os podcasts</string>
+    <string name="search_results_all_podcasts">Todos os podcasts</string>
+    <string name="search_results_all_episodes">Todos os episódios</string>
+    <string name="search_history_row_type_episode_subtitle">Episódio \u2022 %s \u2022 %s</string>
+    <string name="search_show_all">Mostrar tudo</string>
+    <string name="podcast">Podcast</string>
+    <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">Pasta \u2022 %s</string>
+    <string name="search_history_recent_searches">Pesquisas recentes</string>
+    <string name="search_history_clear_all_confirmation_message">Tem certeza de que deseja limpar todo o seu histórico de pesquisas?</string>
+    <string name="search_history_clear_all_confirm_button_title">Limpar histórico de pesquisas</string>
+    <string name="search_podcasts_or_add_url">Pesquise podcasts ou adicione URL de RSS</string>
+    <string name="error_opening_links_activity_not_found">Parece que você não tem um aplicativo capaz de visualizar este conteúdo.</string>
+    <string name="notifications_blocked_warning">As notificações estão bloqueadas. Você pode atualizar a permissão em Configurações.</string>
     <string name="settings_media_actions_show_subtitle">Mostre ações de mídia personalizadas nas notificações de mídia do Android 13 e no Android Auto.</string>
     <string name="settings_media_actions_show_title">Mostrar ações de mídia personalizadas</string>
     <string name="settings_media_actions_customise">Personalizar ações de mídia</string>

@@ -109,7 +109,13 @@ class MediaSessionManager(
         observePlaybackState()
         observeCustomMediaActionsVisibility()
         observeMediaNotificationControls()
-        playbackManager.upNextQueue.changesObservable
+        playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
+            // ignore the playing episode progress updates, but update when the media player read the duration from the file.
+            .distinctUntilChanged { stateOne, stateTwo ->
+                UpNextQueue.State.isEqualWithEpisodeCompare(stateOne, stateTwo) { episodeOne, episodeTwo ->
+                    episodeOne.uuid == episodeTwo.uuid && episodeOne.duration == episodeTwo.duration
+                }
+            }
             .observeOn(Schedulers.io())
             .doOnNext { updateUpNext(it) }
             .subscribeBy(onError = { Timber.e(it) })
@@ -226,7 +232,7 @@ class MediaSessionManager(
         }
     }
 
-    fun updateUpNext(upNext: UpNextQueue.State) {
+    private fun updateUpNext(upNext: UpNextQueue.State) {
         try {
             mediaSession.setQueueTitle("Up Next")
             if (upNext is UpNextQueue.State.Loaded) {
@@ -236,11 +242,13 @@ class MediaSessionManager(
                     val podcastUuid = if (episode is Episode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
+                    val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)
                     val description = MediaDescriptionCompat.Builder()
                         .setDescription(episode.episodeDescription)
                         .setTitle(episode.title)
                         .setSubtitle(podcastTitle)
                         .setMediaId(episode.uuid)
+                        .setIconUri(localUri)
                         .build()
 
                     return@map MediaSessionCompat.QueueItem(description, episode.adapterId)

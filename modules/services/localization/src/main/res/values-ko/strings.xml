@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-07 16:54:22+0000
+Translation-Revision-Date: 2023-03-15 23:45:34+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="discover_sponsored">후원</string>
+    <string name="podcasts_all">모든 팟캐스트</string>
+    <string name="search_results_all_podcasts">모든 팟캐스트</string>
+    <string name="search_results_all_episodes">모든 에피소드</string>
+    <string name="search_history_row_type_episode_subtitle">에피소드 \u2022 %s \u2022 %s</string>
+    <string name="search_show_all">모두 보기</string>
+    <string name="podcast">팟캐스트</string>
+    <string name="search_history_row_type_podcast_subtitle">팟캐스트 \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">폴더 \u2022 %s</string>
+    <string name="search_history_recent_searches">최근 검색 항목</string>
+    <string name="search_history_clear_all_confirmation_message">검색 기록을 모두 지우시겠나요?</string>
+    <string name="search_history_clear_all_confirm_button_title">검색 기록 지우기</string>
+    <string name="search_podcasts_or_add_url">팟캐스트 검색 또는 RSS URL 추가</string>
+    <string name="error_opening_links_activity_not_found">이 콘텐츠를 볼 수 있는 앱이 없는 것 같습니다.</string>
+    <string name="notifications_blocked_warning">알림이 차단되었습니다. 설정을 통해 권한을 업데이트할 수 있습니다.</string>
     <string name="settings_media_actions_show_subtitle">Android 13 미디어 알림과 Android Auto에 사용자 정의 미디어 작업을 표시합니다.</string>
     <string name="settings_media_actions_show_title">사용자 정의 미디어 작업 표시</string>
     <string name="settings_media_actions_customise">미디어 작업 사용자 정의</string>
@@ -757,7 +772,6 @@ Language: ko_KR
     <string name="profile_yearly">매년</string>
     <string name="profile_whats_included">무엇이 포함되나요?</string>
     <string name="profile_welcome_to_plus">Pocket Casts Plus에 오신 것을 환영합니다!</string>
-    <string name="profile_welcome_to_free">Pocket Casts Plus에 오신 것을 환영합니다!</string>
     <string name="profile_web_player">웹 플레이어</string>
     <string name="profile_upgrade_to_plus">Plus로 업그레이드</string>
     <string name="profile_updates_ends">업데이트 종료: %s</string>
@@ -1026,6 +1040,7 @@ Language: ko_KR
     <string name="filters_choose_podcasts">팟캐스트 선택</string>
     <string name="filters_chip_media_type">미디어 유형</string>
     <string name="filters_chip_download_status">다운로드 상태</string>
+    <string name="profile_welcome_to_free">Pocket Casts에 오신 것을 환영합니다!</string>
     <string name="filters_chip_all_your_podcasts">모든 내 팟캐스트</string>
     <string name="filters_all_your_podcasts">모든 내 팟캐스트</string>
     <string name="episode_filters">에피소드 필터</string>

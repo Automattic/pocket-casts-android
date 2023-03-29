@@ -28,8 +28,8 @@ private val gradientBottom = Color(0xFF000000)
 private val topPodcastImageGradient = listOf(Color(0x00000000), Color(0x16000000))
 private val bottomPodcastImageGradient = listOf(Color(0x16000000), Color(0x33000000))
 
-private val FolderImageSize = 64.dp
-private val PodcastImageSize = 26.dp
+private val FolderImageSize = 56.dp
+private val PodcastImageSize = 23.dp
 @Composable
 fun FolderImageSmall(
     color: Color,

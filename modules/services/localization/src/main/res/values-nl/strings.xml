@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-08 10:54:03+0000
+Translation-Revision-Date: 2023-03-15 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="discover_sponsored">Gesponsord</string>
+    <string name="podcasts_all">Alle podcasts</string>
+    <string name="search_results_all_podcasts">Alle podcasts</string>
+    <string name="search_results_all_episodes">Alle afleveringen</string>
+    <string name="search_history_row_type_episode_subtitle">Aflevering \u2022 %s \u2022 %s</string>
+    <string name="search_show_all">Alles tonen</string>
+    <string name="podcast">Podcast</string>
+    <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">Folder \u2022 %s</string>
+    <string name="search_history_recent_searches">Recente zoekopdrachten</string>
+    <string name="search_history_clear_all_confirmation_message">Weet je zeker dat je je hele zoekgeschiedenis wilt wissen?</string>
+    <string name="search_history_clear_all_confirm_button_title">Zoekgeschiedenis wissen</string>
+    <string name="search_podcasts_or_add_url">Zoek podcasts of voeg de RSS-URL toe</string>
+    <string name="error_opening_links_activity_not_found">Zo te zien heb je geen app waarmee je deze content kunt bekijken.</string>
+    <string name="notifications_blocked_warning">Meldingen worden geblokkeerd. Je kunt de toestemming bijwerken bij de instellen.</string>
     <string name="settings_media_actions_show_subtitle">Aangepaste media-actes weergeven in Android 13-mediameldingen en Android Auto.</string>
     <string name="settings_media_actions_show_title">Aangepaste media-acties weergeven</string>
     <string name="settings_media_actions_customise">Media-acties aanpassen</string>

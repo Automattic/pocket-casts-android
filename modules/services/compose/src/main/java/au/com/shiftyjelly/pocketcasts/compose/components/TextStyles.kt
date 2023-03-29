@@ -200,6 +200,7 @@ fun TextP50(
     style: TextStyle? = null,
     textAlign: TextAlign? = null,
     fontWeight: FontWeight? = null,
+    lineHeight: TextUnit? = null,
 ) {
     TextP50(
         text = AnnotatedString(text),
@@ -209,6 +210,7 @@ fun TextP50(
         style = style,
         textAlign = textAlign,
         fontWeight = fontWeight,
+        lineHeight = lineHeight,
     )
 }
 
@@ -221,12 +223,13 @@ fun TextP50(
     style: TextStyle? = null,
     textAlign: TextAlign? = null,
     fontWeight: FontWeight? = null,
+    lineHeight: TextUnit? = null,
 ) {
     Text(
         text = text,
         color = color ?: MaterialTheme.theme.colors.primaryText01,
         fontSize = 14.sp,
-        lineHeight = 20.sp,
+        lineHeight = lineHeight ?: 20.sp,
         maxLines = maxLines ?: Int.MAX_VALUE,
         overflow = TextOverflow.Ellipsis,
         style = style ?: LocalTextStyle.current,
@@ -306,6 +309,26 @@ fun TextH70(
 }
 
 @Composable
+fun TextC50(
+    text: String,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE
+) {
+    Text(
+        text = text.uppercase(Locale.getDefault()),
+        color = MaterialTheme.theme.colors.primaryText02,
+        fontFamily = FontFamily.SansSerif,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.W700,
+        lineHeight = 19.sp,
+        letterSpacing = 0.6.sp,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+    )
+}
+
+@Composable
 fun TextC70(
     text: String,
     modifier: Modifier = Modifier,
@@ -353,6 +376,7 @@ private fun TextStylesPreview() {
         TextP50("P50")
         TextP60("P60")
         TextH70("H70")
+        TextC50("C50")
         TextC70("C70")
     }
 }

@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Power
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -134,7 +135,15 @@ class DownloadManagerImpl @Inject constructor(
                             launch(downloadsCoroutineContext) {
                                 pendingQueue[episodeUUID] = DownloadingInfo(episodeUUID, workInfo.id)
                                 episodeManager.findPlayableByUuid(episodeUUID)?.let { episode ->
-                                    getRequirementsAndSetStatusAsync(episode)
+
+                                    // FIXME this is a hack to avoid an issue where this listener says downloads
+                                    //  on the watch app are enqueued when they are actually still running.
+                                    val queriedState = workManager.getWorkInfoById(workInfo.id).get().state
+                                    if (Util.isWearOs(context) && queriedState == WorkInfo.State.RUNNING) {
+                                        getRequirementsAsync(episode)
+                                    } else {
+                                        getRequirementsAndSetStatusAsync(episode)
+                                    }
                                 }
                                 synchronized(downloadingQueue) {
                                     if (downloadingQueue.contains(info)) {
@@ -287,6 +296,11 @@ class DownloadManagerImpl @Inject constructor(
             }
         }
     }
+
+    private suspend fun getRequirementsAsync(episode: Playable): NetworkRequirements =
+        withContext(downloadsCoroutineContext) {
+            networkRequiredForEpisode(episode)
+        }
 
     override suspend fun getRequirementsAndSetStatusAsync(episode: Playable): NetworkRequirements {
         return withContext(downloadsCoroutineContext) {
@@ -470,6 +484,10 @@ class DownloadManagerImpl @Inject constructor(
     }
 
     private fun updateNotification() {
+
+        // Don't show these notifications on wear os
+        if (Util.isWearOs(context)) return
+
         launch(downloadsCoroutineContext) {
             var progress = 0.0
             var max = 0.0

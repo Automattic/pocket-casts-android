@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-07 08:54:03+0000
+Translation-Revision-Date: 2023-03-15 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="discover_sponsored">スポンサー</string>
+    <string name="podcasts_all">すべてのポッドキャスト</string>
+    <string name="search_results_all_podcasts">すべてのポッドキャスト</string>
+    <string name="search_results_all_episodes">すべてのエピソード</string>
+    <string name="search_history_row_type_episode_subtitle">エピソード \u2022%s \u2022%s</string>
+    <string name="search_show_all">すべて表示</string>
+    <string name="podcast">ポッドキャスト</string>
+    <string name="search_history_row_type_podcast_subtitle">ポッドキャスト \u2022 %s</string>
+    <string name="search_history_row_type_folder_subtitle">フォルダー \u2022 %s</string>
+    <string name="search_history_recent_searches">最近の検索</string>
+    <string name="search_history_clear_all_confirmation_message">検索履歴をすべて削除してもよろしいですか ?</string>
+    <string name="search_history_clear_all_confirm_button_title">検索履歴を削除</string>
+    <string name="search_podcasts_or_add_url">ポッドキャストを検索または RSS の URL を追加</string>
+    <string name="error_opening_links_activity_not_found">このコンテンツを表示できるアプリがないようです。</string>
+    <string name="notifications_blocked_warning">通知がブロックされました。 「設定」で権限を更新できます。</string>
     <string name="settings_media_actions_show_subtitle">Android 13のメディア通知と Android Auto でカスタムメディアアクションを表示します。</string>
     <string name="settings_media_actions_show_title">カスタムメディアアクションを表示</string>
     <string name="settings_media_actions_customise">メディアアクションをカスタマイズ</string>

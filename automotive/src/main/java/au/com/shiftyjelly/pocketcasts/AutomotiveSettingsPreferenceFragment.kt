@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -31,10 +32,19 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedP
     @Inject lateinit var podcastManager: PodcastManager
 
     private var preferenceRefreshNow: Preference? = null
+    private var preferenceSkipForward: EditTextPreference? = null
+    private var preferenceSkipBackward: EditTextPreference? = null
     private var refreshObservable: LiveData<RefreshState>? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_auto)
+
+        preferenceSkipForward = preferenceManager.findPreference<EditTextPreference>(Settings.PREFERENCE_SKIP_FORWARD)?.apply {
+            setInputAsSeconds()
+        }
+        preferenceSkipBackward = preferenceManager.findPreference<EditTextPreference>(Settings.PREFERENCE_SKIP_BACKWARD)?.apply {
+            setInputAsSeconds()
+        }
 
         changeSkipTitles()
         setupRefreshNow()
@@ -110,9 +120,9 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedP
 
     private fun changeSkipTitles() {
         val skipForwardSummary = resources.getStringPluralSeconds(settings.getSkipForwardInSecs())
-        preferenceManager.findPreference<EditTextPreference>(Settings.PREFERENCE_SKIP_FORWARD)?.summary = skipForwardSummary
+        preferenceSkipForward?.summary = skipForwardSummary
         val skipBackwardSummary = resources.getStringPluralSeconds(settings.getSkipBackwardInSecs())
-        preferenceManager.findPreference<EditTextPreference>(Settings.PREFERENCE_SKIP_BACKWARD)?.summary = skipBackwardSummary
+        preferenceSkipBackward?.summary = skipBackwardSummary
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {

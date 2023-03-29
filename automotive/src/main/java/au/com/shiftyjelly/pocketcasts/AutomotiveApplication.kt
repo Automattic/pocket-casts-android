@@ -2,7 +2,9 @@ package au.com.shiftyjelly.pocketcasts
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.app.UiModeManager
 import android.util.Log
+import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.account.AccountAuth
@@ -82,6 +84,9 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         userEpisodeManager.monitorUploads(applicationContext)
         downloadManager.beginMonitoringWorkManager(applicationContext)
         userManager.beginMonitoringAccountManager(playbackManager)
+
+        // force the Automotive app into car mode as some car companies send the UI mode as normal, this makes sure the car resources such as layout-car are used.
+        this.getSystemService<UiModeManager>()?.enableCarMode(0)
     }
 
     override fun onTerminate() {

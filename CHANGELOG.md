@@ -1,6 +1,22 @@
+7.35
+-----
+*   Updates
+    *   The Automotive skip forward and backward time settings were improved.
+        ([#817](https://github.com/Automattic/pocket-casts-android/pull/817)).
+    *   Fixed Automotive Up Next podcast images not loading.
+        ([#819](https://github.com/Automattic/pocket-casts-android/pull/819)).
+    *   Fixed missing seek bar in the notification drawer and Android Automotive.
+        ([#822](https://github.com/Automattic/pocket-casts-android/pull/822)).
+    *   Added option to clear data when signing out of Android Automotive.
+        ([828](https://github.com/Automattic/pocket-casts-android/pull/828))
+
 7.34
 -----
-
+*   Updates
+    *   Improved the Automotive account page styles
+        ([#798](https://github.com/Automattic/pocket-casts-android/pull/798)).
+    *   When Automotive doesn't have a browser, the URL and a QR code are shown instead.
+        ([#800](https://github.com/Automattic/pocket-casts-android/pull/800)).
 
 7.33
 -----

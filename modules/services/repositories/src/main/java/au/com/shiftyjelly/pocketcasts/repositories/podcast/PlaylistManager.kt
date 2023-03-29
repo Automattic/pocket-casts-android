@@ -39,6 +39,7 @@ interface PlaylistManager {
     fun rxUpdateAutoDownloadStatus(playlist: Playlist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean): Completable
 
     fun delete(playlist: Playlist)
+    suspend fun resetDb()
     fun deleteSynced()
     fun deleteSynced(playlist: Playlist)
 

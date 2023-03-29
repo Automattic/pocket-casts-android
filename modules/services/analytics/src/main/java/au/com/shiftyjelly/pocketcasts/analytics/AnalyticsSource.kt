@@ -14,6 +14,7 @@ enum class AnalyticsSource(val analyticsValue: String) {
     STARRED("starred"),
     LISTENING_HISTORY("listening_history"),
     EPISODE_DETAILS("episode_details"),
+    WATCH_EPISODE_DETAILS("watch_episode_details"),
     MINIPLAYER("miniplayer"),
     PLAYER("player"),
     WATCH_PLAYER("watch_player"),
