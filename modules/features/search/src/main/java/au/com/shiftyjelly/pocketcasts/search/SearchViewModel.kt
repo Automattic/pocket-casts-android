@@ -91,6 +91,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
+        if (_state.value.searchTerm == query) return
         searchHandler.updateSearchQuery(query, immediate)
     }
 

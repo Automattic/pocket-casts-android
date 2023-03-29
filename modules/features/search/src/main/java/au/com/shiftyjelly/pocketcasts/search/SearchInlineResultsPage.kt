@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -141,10 +142,11 @@ private fun SearchResultsView(
             }
         }
     }
+    val podcasts by remember { mutableStateOf(state.podcasts) }
     val podcastsRowState = rememberLazyListState()
     val episodesRowState = rememberLazyListState()
     LaunchedEffect(key1 = state.podcasts) {
-        if (state.podcasts.isNotEmpty()) {
+        if (state.podcasts.isNotEmpty() && state.podcasts != podcasts) {
             podcastsRowState.scrollToItem(0)
         }
     }
