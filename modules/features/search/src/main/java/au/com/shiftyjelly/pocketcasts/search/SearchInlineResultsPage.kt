@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -139,7 +141,20 @@ private fun SearchResultsView(
             }
         }
     }
+    val podcastsRowState = rememberLazyListState()
+    val episodesRowState = rememberLazyListState()
+    LaunchedEffect(key1 = state.podcasts) {
+        if (state.podcasts.isNotEmpty()) {
+            podcastsRowState.scrollToItem(0)
+        }
+    }
+    LaunchedEffect(key1 = state.episodes) {
+        if (state.episodes.isNotEmpty()) {
+            episodesRowState.scrollToItem(0)
+        }
+    }
     LazyColumn(
+        state = episodesRowState,
         modifier = modifier
             .nestedScroll(nestedScrollConnection)
     ) {
@@ -152,10 +167,13 @@ private fun SearchResultsView(
             }
         }
         item {
-            LazyRow(contentPadding = PaddingValues(horizontal = 8.dp)) {
+            LazyRow(
+                state = podcastsRowState,
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
                 items(
                     items = state.podcasts.take(minOf(MAX_ITEM_COUNT, state.podcasts.size)),
-                    key = { it.adapterId }
+                    key = { it.uuid }
                 ) { folderItem ->
                     when (folderItem) {
                         is FolderItem.Folder -> {
