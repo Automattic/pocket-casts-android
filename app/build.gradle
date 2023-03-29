@@ -11,7 +11,6 @@ apply from: "../base.gradle"
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
-
     namespace 'au.com.shiftyjelly.pocketcasts'
 
     defaultConfig {

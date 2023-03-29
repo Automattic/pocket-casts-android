@@ -719,11 +719,7 @@ class MainActivity :
                 settings.setTrialFinishedSeen(true)
             }
 
-            lifecycleScope.launch {
-                // FIXME This gets called every time MainActivity resumes. Can we reduce how often this is called?
-                //   But if that gets fixed we may want to also start calling this explicitly in onCreate
-                watchSync.sendAuthToDataLayer()
-            }
+            lifecycleScope.launch { watchSync.sendAuthToDataLayer() }
         }
 
         val lastSeenVersionCode = settings.getWhatsNewVersionCode()
