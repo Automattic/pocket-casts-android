@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import android.content.Context
 import android.content.res.Resources
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -181,12 +181,12 @@ class PlayerViewModel @Inject constructor(
     )
         .distinctUntilChanged()
         .toFlowable(BackpressureStrategy.LATEST)
-    val listDataLive: LiveData<ListData> = LiveDataReactiveStreams.fromPublisher(listDataRx)
-    val playingEpisodeLive: LiveData<Pair<Playable, Int>> = LiveDataReactiveStreams.fromPublisher(
+    val listDataLive: LiveData<ListData> = listDataRx.toLiveData()
+    val playingEpisodeLive: LiveData<Pair<Playable, Int>> =
         listDataRx.map { Pair(it.podcastHeader.episodeUuid, it.podcastHeader.backgroundColor) }
             .distinctUntilChanged()
             .switchMap { pair -> episodeManager.observePlayableByUuid(pair.first).map { Pair(it, pair.second) } }
-    )
+            .toLiveData()
 
     private val shelfObservable = settings.shelfItemsObservable.map { list ->
         if (list.isEmpty()) {
@@ -212,8 +212,8 @@ class PlayerViewModel @Inject constructor(
         return@map Pair(trimmedShelf, episode)
     }
 
-    val shelfLive: LiveData<List<ShelfItem>> = LiveDataReactiveStreams.fromPublisher(shelfObservable)
-    val trimmedShelfLive: LiveData<Pair<List<ShelfItem>, Playable?>> = LiveDataReactiveStreams.fromPublisher(trimmedShelfObservable)
+    val shelfLive: LiveData<List<ShelfItem>> = shelfObservable.toLiveData()
+    val trimmedShelfLive: LiveData<Pair<List<ShelfItem>, Playable?>> = trimmedShelfObservable.toLiveData()
 
     val upNextPlusData = upNextStateObservable.map { upNextState ->
         var episodeCount = 0
@@ -245,7 +245,7 @@ class PlayerViewModel @Inject constructor(
         return@map listOfNotNull(nowPlayingInfo, upNextSummary) + upNextEpisodes
     }
 
-    val upNextLive: LiveData<List<Any>> = LiveDataReactiveStreams.fromPublisher(upNextPlusData.toFlowable(BackpressureStrategy.LATEST))
+    val upNextLive: LiveData<List<Any>> = upNextPlusData.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
     val effectsObservable: Flowable<PodcastEffectsPair> = playbackStateObservable
         .toFlowable(BackpressureStrategy.LATEST)
@@ -261,7 +261,7 @@ class PlayerViewModel @Inject constructor(
         .map { PodcastEffectsPair(it, if (it.overrideGlobalEffects) it.playbackEffects else settings.getGlobalPlaybackEffects()) }
         .doOnNext { Timber.i("Effects: Podcast: ${it.podcast.overrideGlobalEffects} ${it.effects}") }
         .observeOn(AndroidSchedulers.mainThread())
-    val effectsLive = LiveDataReactiveStreams.fromPublisher(effectsObservable)
+    val effectsLive = effectsObservable.toLiveData()
 
     var episode: Playable? = null
     var podcast: Podcast? = null

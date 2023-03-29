@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.filters
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
@@ -35,9 +35,7 @@ class FiltersFragmentViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    val filters: LiveData<List<Playlist>> = LiveDataReactiveStreams.fromPublisher(
-        playlistManager.observeAll()
-    )
+    val filters: LiveData<List<Playlist>> = playlistManager.observeAll().toLiveData()
 
     val countGenerator = { playlist: Playlist ->
         playlistManager.countEpisodesRx(playlist, episodeManager, playbackManager).onErrorReturn { 0 }

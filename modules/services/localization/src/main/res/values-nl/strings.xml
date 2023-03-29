@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-28 17:54:03+0000
+Translation-Revision-Date: 2023-03-15 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="discover_sponsored">Gesponsord</string>
+    <string name="podcasts_all">Alle podcasts</string>
+    <string name="search_results_all_podcasts">Alle podcasts</string>
+    <string name="search_results_all_episodes">Alle afleveringen</string>
     <string name="search_history_row_type_episode_subtitle">Aflevering \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Alles tonen</string>
     <string name="podcast">Podcast</string>
@@ -1289,6 +1293,7 @@ Language: nl
     <string name="time_short_hours_minutes">%1$du %2$d m</string>
     <string name="time_short_hours">%d u</string>
     <string name="search_hint">Zoeken op podcastnaam</string>
+    <string name="search_podcasts">Podcasts zoeken</string>
     <string name="stream_warning_button">Toch streamen</string>
     <string name="profile_cloud_upload_warning_button">Nu uploaden</string>
     <string name="profile_cloud_upload_warning_summary">Voor het uploaden van deze aflevering wordt data gebruikt.</string>

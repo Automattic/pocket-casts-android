@@ -1046,6 +1046,7 @@ Language: nb_NO
     <string name="time_short_hours_minutes">%1$d t %2$d m</string>
     <string name="time_short_hours">%d t</string>
     <string name="search_hint">Søk etter navn på podcast</string>
+    <string name="search_podcasts">Søk etter podcaster</string>
     <string name="stream_warning_button">Strøm likevel</string>
     <string name="profile_cloud_upload_warning_button">Last opp nå</string>
     <string name="profile_cloud_upload_warning_summary">Opplasting av denne episoden vil forbruke data.</string>

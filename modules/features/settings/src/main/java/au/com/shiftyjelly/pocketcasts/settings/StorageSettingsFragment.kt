@@ -11,13 +11,16 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.StorageSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class StorageSettingsFragment : BaseFragment() {
@@ -53,10 +56,12 @@ class StorageSettingsFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.permissionRequest.collect { permissionRequest ->
-                if (permissionRequest == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                    requestPermissionLauncher.launch(permissionRequest)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.permissionRequest.collect { permissionRequest ->
+                    if (permissionRequest == Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                        requestPermissionLauncher.launch(permissionRequest)
+                    }
                 }
             }
         }

@@ -22,7 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
@@ -46,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Collections
 import javax.inject.Inject
@@ -115,14 +118,16 @@ class MediaNotificationControlsFragment : BaseFragment(), MediaActionTouchCallba
         itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            settings.defaultMediaNotificationControlsFlow.collect {
-                val itemsPlusTitles = mutableListOf<Any>()
-                itemsPlusTitles.addAll(it)
-                itemsPlusTitles.add(3, otherActionsTitle)
-                itemsPlusTitles.add(0, mediaTitle)
-                items = itemsPlusTitles
-                adapter.submitList(items)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settings.defaultMediaNotificationControlsFlow.collect {
+                    val itemsPlusTitles = mutableListOf<Any>()
+                    itemsPlusTitles.addAll(it)
+                    itemsPlusTitles.add(3, otherActionsTitle)
+                    itemsPlusTitles.add(0, mediaTitle)
+                    items = itemsPlusTitles
+                    adapter.submitList(items)
+                }
             }
         }
 
