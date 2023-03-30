@@ -63,7 +63,7 @@ class RefreshPodcastsTask @AssistedInject constructor(
             // Look at user settings and set the constraints so that workmanager
             // schedules the tasks in a more efficient manner
             var requiredNetworkType = NetworkType.CONNECTED
-            if (settings.isPodcastAutoDownloadUnmeteredOnly()) {
+            if (settings.warnOnMeteredNetwork()) {
                 requiredNetworkType = NetworkType.UNMETERED
             }
 

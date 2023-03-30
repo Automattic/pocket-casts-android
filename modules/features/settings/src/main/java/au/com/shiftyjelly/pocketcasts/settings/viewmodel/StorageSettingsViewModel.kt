@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -163,6 +164,10 @@ class StorageSettingsViewModel
     private fun onStorageDataWarningCheckedChange(isChecked: Boolean) {
         settings.setWarnOnMeteredNetwork(isChecked)
         updateMobileDataWarningState()
+
+        // Update work manager to take the warning into account for scheduling
+        // for more efficient updating.
+        RefreshPodcastsTask.scheduleOrCancel(context, settings)
     }
 
     private fun updateMobileDataWarningState() {
