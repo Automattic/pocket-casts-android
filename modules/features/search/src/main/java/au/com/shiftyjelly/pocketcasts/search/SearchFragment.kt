@@ -194,6 +194,9 @@ class SearchFragment : BaseFragment() {
                 val characterCount = query.length
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
+                    if ((viewModel.state.value as? SearchState.Results)?.podcasts?.isNotEmpty() == true) {
+                        binding.searchHistoryPanel.hide()
+                    }
                     return true
                 }
                 viewModel.updateSearchQuery(query)
