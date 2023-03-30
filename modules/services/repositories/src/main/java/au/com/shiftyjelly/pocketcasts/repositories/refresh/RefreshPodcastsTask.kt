@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
@@ -59,7 +60,24 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 workManager.cancelAllWorkByTag(TAG_REFRESH_TASK)
                 return
             }
+            val request = buildPeriodicWorkRequest(settings)
 
+            workManager.enqueueUniquePeriodicWork(TAG_REFRESH_TASK, ExistingPeriodicWorkPolicy.REPLACE, request)
+
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Set up periodic refresh")
+        }
+
+        private fun buildPeriodicWorkRequest(settings: Settings): PeriodicWorkRequest {
+            val constraints = buildPeriodicWorkRequestConstraints(settings)
+
+            return PeriodicWorkRequestBuilder<RefreshPodcastsTask>(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
+                .addTag(TAG_REFRESH_TASK)
+                .setConstraints(constraints)
+                .setInitialDelay(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
+                .build()
+        }
+
+        private fun buildPeriodicWorkRequestConstraints(settings: Settings): Constraints {
             // Look at user settings and set the constraints so that workmanager
             // schedules the tasks in a more efficient manner
             var requiredNetworkType = NetworkType.CONNECTED
@@ -68,20 +86,10 @@ class RefreshPodcastsTask @AssistedInject constructor(
             }
 
             // TODO: get setting and add constraint for setRequiresCharging() based on user's download preferences
-            val constraints = Constraints.Builder()
+            return Constraints.Builder()
                 .setRequiredNetworkType(requiredNetworkType)
                 .setRequiresBatteryNotLow(true)
                 .build()
-
-            val request = PeriodicWorkRequestBuilder<RefreshPodcastsTask>(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
-                .addTag(TAG_REFRESH_TASK)
-                .setConstraints(constraints)
-                .setInitialDelay(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
-                .build()
-
-            workManager.enqueueUniquePeriodicWork(TAG_REFRESH_TASK, ExistingPeriodicWorkPolicy.REPLACE, request)
-
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Set up periodic refresh")
         }
 
         @OptIn(DelicateCoroutinesApi::class)
