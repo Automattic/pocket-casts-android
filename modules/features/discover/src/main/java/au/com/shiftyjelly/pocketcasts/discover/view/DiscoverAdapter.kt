@@ -254,7 +254,8 @@ internal class DiscoverAdapter(
                 /* Manage auto scroll when itemView's visibility changes on going to next screen */
                 addOnGlobalLayoutListener {
                     if (itemView.isShown) {
-                        autoScrollHelper?.startAutoScrollTimer()
+                        /* Start auto scroll with a delay after coming from another screen */
+                        autoScrollHelper?.startAutoScrollTimer(delay = AutoScrollHelper.AUTO_SCROLL_DELAY)
                     } else {
                         autoScrollHelper?.stopAutoScrollTimer()
                     }
