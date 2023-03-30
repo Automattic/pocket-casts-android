@@ -11,12 +11,12 @@ import androidx.navigation.navArgument
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
-import au.com.shiftyjelly.pocketcasts.wear.ui.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
@@ -113,7 +113,17 @@ fun WearApp(themeType: Theme.ThemeType) {
             )
 
             composable(FiltersScreen.route) { FiltersScreen() }
-            composable(DownloadsScreen.route) { DownloadsScreen() }
+
+            scrollable(DownloadsScreen.route) {
+                DownloadsScreen(
+                    columnState = it.columnState,
+                    onItemClick = { episode ->
+                        val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
+                        navController.navigate(route)
+                    }
+                )
+            }
+
             composable(FilesScreen.route) { FilesScreen() }
 
             authenticationGraph(navController)
