@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -58,8 +59,11 @@ object EpisodeScreenFlow {
 
             composable(upNextOptionsScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+                val episodeScreenBackStackEntry = remember(it.backStackEntry) {
+                    navController.getBackStackEntry(episodeScreen)
+                }
                 UpNextOptionsScreen(
-                    episodeScreenViewModelStoreOwner = navController.getBackStackEntry(episodeScreen), // Reuse view model from EpisodeScreen
+                    episodeScreenViewModelStoreOwner = episodeScreenBackStackEntry, // Reuse view model from EpisodeScreen
                     onComplete = { navController.popBackStack() },
                 )
             }
@@ -68,7 +72,9 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
 
                 // Reuse view model from EpisodeScreen
-                val episodeScreenViewModelStoreOwner = navController.getBackStackEntry(episodeScreen)
+                val episodeScreenViewModelStoreOwner = remember(it.backStackEntry) {
+                    navController.getBackStackEntry(episodeScreen)
+                }
                 val viewModel = hiltViewModel<EpisodeViewModel>(episodeScreenViewModelStoreOwner)
 
                 ObtainConfirmationScreen(
