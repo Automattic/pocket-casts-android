@@ -8,8 +8,8 @@ import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.toPublisher
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -233,7 +233,10 @@ class Support @Inject constructor(
             output.append(eol)
 
             output.append("Work Manager Tasks").append(eol)
-            val workInfos = LiveDataReactiveStreams.toPublisher(ProcessLifecycleOwner.get(), WorkManager.getInstance(context).getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)).awaitFirst()
+            val workInfos = WorkManager.getInstance(context)
+                .getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG)
+                .toPublisher(ProcessLifecycleOwner.get())
+                .awaitFirst()
             workInfos.forEach { workInfo ->
                 output.append(workInfo.toString()).append(" Attempt=").append(workInfo.runAttemptCount).append(eol)
             }

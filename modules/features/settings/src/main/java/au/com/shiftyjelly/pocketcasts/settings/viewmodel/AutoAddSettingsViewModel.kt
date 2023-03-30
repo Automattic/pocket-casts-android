@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -36,11 +36,11 @@ class AutoAddSettingsViewModel @Inject constructor(
         isFragmentChangingConfigurations = isChangingConfigurations ?: false
     }
 
-    val autoAddPodcasts = LiveDataReactiveStreams.fromPublisher(
+    val autoAddPodcasts =
         podcastManager.observeAutoAddToUpNextPodcasts()
             .combineLatest(settings.autoAddUpNextLimit.toFlowable(BackpressureStrategy.LATEST), settings.autoAddUpNextLimitBehaviour.toFlowable(BackpressureStrategy.LATEST))
             .map { AutoAddSettingsState(it.first, it.second, it.third) }
-    )
+            .toLiveData()
 
     fun updatePodcast(podcast: Podcast, autoAddOption: Podcast.AutoAddUpNext) {
         viewModelScope.launch {

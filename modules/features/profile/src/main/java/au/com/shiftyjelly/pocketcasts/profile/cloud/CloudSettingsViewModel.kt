@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.profile.cloud
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -18,7 +18,7 @@ class CloudSettingsViewModel @Inject constructor(
     userManager: UserManager,
 ) : ViewModel() {
 
-    val signInState: LiveData<SignInState> = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
 
     private var isFragmentChangingConfigurations: Boolean = false
 

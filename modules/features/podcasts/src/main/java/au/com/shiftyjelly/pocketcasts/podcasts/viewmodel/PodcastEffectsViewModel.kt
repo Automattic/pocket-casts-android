@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
@@ -36,7 +36,10 @@ class PodcastEffectsViewModel
     lateinit var podcast: LiveData<Podcast>
 
     fun loadPodcast(uuid: String) {
-        podcast = LiveDataReactiveStreams.fromPublisher(podcastManager.observePodcastByUuid(uuid).subscribeOn(Schedulers.io()))
+        podcast = podcastManager
+            .observePodcastByUuid(uuid)
+            .subscribeOn(Schedulers.io())
+            .toLiveData()
     }
 
     fun updateOverrideGlobalEffects(override: Boolean) {
