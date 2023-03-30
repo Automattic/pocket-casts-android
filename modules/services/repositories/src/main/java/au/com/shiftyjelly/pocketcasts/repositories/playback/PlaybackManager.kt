@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -878,6 +879,11 @@ open class PlaybackManager @Inject constructor(
                 } else {
                     event.message
                 }
+                val isAutomotive = Util.isAutomotive(application)
+                SentryHelper.recordException(
+                    message = "Illegal playback state encountered for episode uuid ${episode?.uuid}, isAutomotive $isAutomotive}: ",
+                    throwable = event.error ?: IllegalStateException(event.message)
+                )
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = "onPlayerError"))
             }
         }
