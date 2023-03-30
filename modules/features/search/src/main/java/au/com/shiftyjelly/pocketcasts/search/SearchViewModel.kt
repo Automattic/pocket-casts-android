@@ -91,6 +91,8 @@ class SearchViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
+        // Prevent updating the search query when navigating back to the search results after tapping on a result.
+        if (_state.value.searchTerm == query) return
         searchHandler.updateSearchQuery(query, immediate)
     }
 
