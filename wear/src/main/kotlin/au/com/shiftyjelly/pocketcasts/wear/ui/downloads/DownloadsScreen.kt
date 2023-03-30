@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.downloads
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -42,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -58,13 +60,22 @@ fun DownloadsScreen(
     val viewModel = hiltViewModel<DownloadsScreenViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
+    Content(columnState, state, onItemClick)
+}
+
+@Composable
+private fun Content(
+    columnState: ScalingLazyColumnState,
+    episodes: List<Episode>,
+    onItemClick: (Episode) -> Unit,
+) {
     ScalingLazyColumn(
         columnState = columnState,
     ) {
         item {
             Text(
                 text = stringResource(
-                    if (state.isEmpty()) {
+                    if (episodes.isEmpty()) {
                         LR.string.profile_empty_downloaded
                     } else {
                         LR.string.downloads
@@ -74,11 +85,12 @@ fun DownloadsScreen(
                 style = MaterialTheme.typography.button,
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
+                    .padding(bottom = 12.dp)
                     .fillMaxWidth(),
             )
         }
 
-        items(state) { episode ->
+        items(episodes) { episode ->
             Download(
                 episode = episode,
                 onClick = { onItemClick(episode) }
@@ -154,13 +166,35 @@ private fun Download(episode: Episode, onClick: () -> Unit) {
     }
 }
 
-@Preview
+@Preview(
+    widthDp = 200,
+    heightDp = 200,
+    uiMode = Configuration.UI_MODE_TYPE_WATCH,
+)
 @Composable
 private fun DownloadsScreenPreview() {
     WearAppTheme(Theme.ThemeType.DARK) {
-        DownloadsScreen(
+        Content(
             columnState = ScalingLazyColumnState(),
             onItemClick = {},
+            episodes = listOf(
+                Episode(
+                    uuid = "57853d71-30ac-4477-af73-e8fe2b1d4dda",
+                    podcastUuid = "b643cb50-2c52-013b-ef7a-0acc26574db2",
+                    title = "Such a great episode title, but it's so long that it is definitely going to be more than two lines",
+                    publishedDate = Date(),
+                    playedUpTo = 0.0,
+                    duration = 20.0,
+                ),
+                Episode(
+                    uuid = "c146e703-e408-4979-852c-f9927ce19ef7",
+                    podcastUuid = "3df2e780-0063-0135-ec79-4114446340cb",
+                    title = "1 line title",
+                    publishedDate = Date(),
+                    playedUpTo = 0.0,
+                    duration = 20.0,
+                ),
+            )
         )
     }
 }
