@@ -251,10 +251,10 @@ internal class DiscoverAdapter(
                 addOnWindowFocusChangeListener { hasFocus ->
                     if (!hasFocus) autoScrollHelper?.stopAutoScrollTimer()
                 }
-                /* Manage auto scroll when itemView's visibility changes on going to next screen */
+                /* Manage auto scroll when itemView's visibility changes */
                 addOnGlobalLayoutListener {
                     if (itemView.isShown) {
-                        /* Start auto scroll with a delay after coming from another screen */
+                        /* Start auto scroll with a delay when carousel item view is re-shown */
                         autoScrollHelper?.startAutoScrollTimer(delay = AutoScrollHelper.AUTO_SCROLL_DELAY)
                     } else {
                         autoScrollHelper?.stopAutoScrollTimer()
