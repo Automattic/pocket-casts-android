@@ -77,7 +77,7 @@ object EpisodeScreenFlow {
                         viewModel.deleteDownloadedEpisode()
                         navController.navigate(deleteDownloadNotificationScreen) {
                             popUpTo(episodeScreen) {
-                                inclusive = true
+                                inclusive = false
                             }
                         }
                     },
