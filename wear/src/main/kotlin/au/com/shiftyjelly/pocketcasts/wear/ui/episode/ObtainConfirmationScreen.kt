@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Icon
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -56,7 +57,7 @@ fun ObtainConfirmationScreen(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .background(color = Color(0xFF202124)) // FIXME
+                        .background(color = WearColors.FF202124)
                         .clip(CircleShape)
                         .fillMaxSize()
                 ) {

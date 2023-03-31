@@ -41,7 +41,7 @@ private fun buildWearMaterialColors(colors: ThemeColors): Colors {
         error = colors.support05,
         onPrimary = colors.primaryInteractive02,
         onSecondary = colors.primaryInteractive02,
-        onBackground = colors.secondaryIcon01,
+        onBackground = colors.secondaryIcon02,
         onSurface = colors.primaryText01,
         onError = colors.secondaryIcon01,
     )

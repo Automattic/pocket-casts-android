@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +20,7 @@ import androidx.wear.compose.material.Icon
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
+import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
@@ -46,7 +46,7 @@ fun NotificationScreen(
     ) {
         Icon(
             painter = painterResource(IR.drawable.ic_check_black_24dp),
-            tint = Color(0xFFA1E7B0),
+            tint = WearColors.FFA1E7B0,
             contentDescription = null,
             modifier = Modifier.size(52.dp)
         )
