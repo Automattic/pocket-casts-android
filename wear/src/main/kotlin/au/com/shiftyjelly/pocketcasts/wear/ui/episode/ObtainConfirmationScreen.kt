@@ -57,7 +57,7 @@ fun ObtainConfirmationScreen(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .background(color = WearColors.FF202124) // FIXME
+                        .background(color = WearColors.FF202124)
                         .clip(CircleShape)
                         .fillMaxSize()
                 ) {
