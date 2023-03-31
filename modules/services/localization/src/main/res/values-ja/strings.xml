@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-15 09:54:03+0000
+Translation-Revision-Date: 2023-03-23 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="profile_just_sign_out">ログアウトしました</string>
+    <string name="profile_clear_data_would_you_also_like_question">アプリからすべてのデータも消去しますか ?</string>
+    <string name="profile_clear_data_question">データを消去しますか ?</string>
+    <string name="profile_clear_data">データを消去</string>
     <string name="discover_sponsored">スポンサー</string>
     <string name="podcasts_all">すべてのポッドキャスト</string>
     <string name="search_results_all_podcasts">すべてのポッドキャスト</string>
