@@ -65,6 +65,8 @@ To build, install, and test the project from the command line:
     │       ├── utils          # Utility classes.
     │       └── views          # Shred Only the old views code.
 
+The hierarchy of the modules in the project are reflected in [this diagram](docs/module-diagram.png).
+
 ## Contributing
 
 Read our [Contributing Guide](CONTRIBUTING.md) to learn about reporting issues, contributing code, and more ways to contribute.
