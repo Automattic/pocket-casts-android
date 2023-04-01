@@ -21,10 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ChipScreenHeader
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import java.util.Date
@@ -66,35 +65,29 @@ fun DownloadsScreen(
 @Composable
 private fun Content(
     columnState: ScalingLazyColumnState,
-    episodes: List<Episode>,
+    episodes: List<Episode>?,
     onItemClick: (Episode) -> Unit,
 ) {
     ScalingLazyColumn(
         columnState = columnState,
     ) {
-        item {
-            Text(
-                text = stringResource(
-                    if (episodes.isEmpty()) {
+        if (episodes != null) {
+            item {
+                ChipScreenHeader(
+                    text = if (episodes.isEmpty()) {
                         LR.string.profile_empty_downloaded
                     } else {
                         LR.string.downloads
-                    }
-                ),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.button,
-                modifier = Modifier
-                    .padding(horizontal = 10.dp)
-                    .padding(bottom = 12.dp)
-                    .fillMaxWidth(),
-            )
-        }
+                    },
+                )
+            }
 
-        items(episodes) { episode ->
-            Download(
-                episode = episode,
-                onClick = { onItemClick(episode) }
-            )
+            items(episodes) { episode ->
+                Download(
+                    episode = episode,
+                    onClick = { onItemClick(episode) }
+                )
+            }
         }
     }
 }
