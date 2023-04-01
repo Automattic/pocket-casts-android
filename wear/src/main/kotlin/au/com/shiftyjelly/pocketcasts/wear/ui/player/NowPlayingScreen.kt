@@ -34,6 +34,7 @@ fun NowPlayingScreen(
     playerViewModel: NowPlayingViewModel = hiltViewModel(),
     volumeViewModel: PCVolumeViewModel = hiltViewModel(),
     navigateToEpisode: (episodeUuid: String) -> Unit,
+    showStreamingConfirmation: () -> Unit,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -64,7 +65,7 @@ fun NowPlayingScreen(
             controlButtons = {
                 if (state is NowPlayingViewModel.State.Loaded) {
                     PodcastControlButtons(
-                        onPlayButtonClick = playerViewModel::onPlayButtonClick,
+                        onPlayButtonClick = { playerViewModel.onPlayButtonClick(showStreamingConfirmation) },
                         onPauseButtonClick = playerViewModel::onPauseButtonClick,
                         playPauseButtonEnabled = true,
                         playing = state.playing,

@@ -51,11 +51,9 @@ object WatchListScreen {
 fun WatchListScreen(
     navigateToRoute: (String) -> Unit,
     scrollState: ScalingLazyListState,
-    viewModel: WatchListViewModel = hiltViewModel(),
     upNextViewModel: UpNextViewModel = hiltViewModel(),
 ) {
 
-    val signInState by viewModel.signInState.subscribeAsState(null)
     val upNextState by upNextViewModel.upNextQueue.subscribeAsState(null)
 
     ScalingLazyColumn(
@@ -70,26 +68,6 @@ fun WatchListScreen(
                 color = MaterialTheme.colors.primary,
                 text = stringResource(LR.string.app_name)
             )
-        }
-
-        item {
-            when (signInState?.isSignedIn) {
-                true -> {
-                    WatchListChip(
-                        titleRes = LR.string.sign_out,
-                        iconRes = IR.drawable.ic_signout,
-                        onClick = viewModel::signOut,
-                    )
-                }
-                false -> {
-                    WatchListChip(
-                        titleRes = LR.string.sign_in,
-                        iconRes = IR.drawable.ic_profile,
-                        onClick = { navigateToRoute(authenticationSubGraph) },
-                    )
-                }
-                null -> { /* Do nothing */ }
-            }
         }
 
         item {
@@ -138,6 +116,14 @@ fun WatchListScreen(
                 titleRes = LR.string.profile_navigation_files,
                 iconRes = PR.drawable.ic_file,
                 onClick = { navigateToRoute(FilesScreen.route) }
+            )
+        }
+
+        item {
+            WatchListChip(
+                titleRes = LR.string.settings,
+                iconRes = IR.drawable.ic_profile_settings,
+                onClick = { navigateToRoute(SettingsScreen.route) }
             )
         }
     }
