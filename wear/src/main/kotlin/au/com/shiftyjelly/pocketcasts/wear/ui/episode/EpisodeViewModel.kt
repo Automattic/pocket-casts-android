@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -190,7 +191,22 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    fun play() {
+    fun onPlayClicked(showStreamingConfirmation: () -> Unit) {
+        if (playbackManager.shouldWarnAboutPlayback()) {
+            showStreamingConfirmation()
+        } else {
+            play()
+        }
+    }
+
+    fun onStreamingConfirmationResult(result: StreamingConfirmationScreen.Result) {
+        val confirmedStreaming = result == StreamingConfirmationScreen.Result.CONFIRMED
+        if (confirmedStreaming && !playbackManager.isPlaying()) {
+            play()
+        }
+    }
+
+    private fun play() {
         val episode = (stateFlow.value as? State.Loaded)?.episode
             ?: return
         viewModelScope.launch {
@@ -201,7 +217,7 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    fun pause() {
+    fun onPauseClicked() {
         if ((stateFlow.value as? State.Loaded)?.isPlayingEpisode != true) {
             Timber.e("Attempted to pause when not playing")
             return

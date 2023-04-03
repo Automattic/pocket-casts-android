@@ -6,6 +6,7 @@
 
     <string name="empty" translatable="false" />
 
+    <string name="account">Account</string>
     <string name="add_to_up_next">Add to Up Next</string>
     <string name="archive">Archive</string>
     <string name="unarchive">Unarchive</string>
@@ -25,6 +26,8 @@
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
+    <string name="log_in">Log in</string>
+    <string name="log_out">Log out</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
@@ -192,6 +195,7 @@
     <string name="stream_warning_title_not_wifi" translatable="false">@string/youre_not_on_wifi</string>
     <string name="stream_warning_title_metered_wifi" translatable="false">@string/youre_on_metered_wifi</string>
     <string name="stream_warning_summary">Streaming this episode will use data.</string>
+    <string name="stream_warning_summary_short">Streaming will use data. Proceed?</string>
     <string name="stream_warning_button">Stream Anyway</string>
 
     <string name="search_no_podcasts_found">No podcasts found</string>
@@ -1054,6 +1058,7 @@
     <string name="settings_media_notification_controls_title_play_next" translatable="false">@string/play_next</string>
     <string name="settings_media_notification_controls_title_playback_speed" translatable="false">@string/playback_speed</string>
     <string name="settings_media_notification_controls_title_star" translatable="false">@string/star</string>
+    <string name="settings_metered_data_warning">Metered data warning</string>
     <string name="settings_no_thanks">No thanks</string>
     <string name="settings_notifications_new_episodes">New Episodes</string>
     <string name="settings_notification_actions">Actions</string>

@@ -38,6 +38,7 @@ fun EpisodeScreen(
     navigateToUpNextOptions: () -> Unit,
     navigateToConfirmDeleteDownload: () -> Unit,
     navigateToRemoveFromUpNextNotification: () -> Unit,
+    navigateToStreamingConfirmation: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<EpisodeViewModel>()
@@ -119,9 +120,9 @@ fun EpisodeScreen(
                     backgroundColor = state.tintColor,
                     onClick = {
                         if (state.isPlayingEpisode) {
-                            viewModel.pause()
+                            viewModel.onPauseClicked()
                         } else {
-                            viewModel.play()
+                            viewModel.onPlayClicked(navigateToStreamingConfirmation)
                         }
                     },
                     isPlaying = state.isPlayingEpisode,

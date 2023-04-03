@@ -1366,7 +1366,13 @@ open class PlaybackManager @Inject constructor(
 
         episodeSubscription?.dispose()
         if (!episode.isDownloaded) {
-            if (!Util.isCarUiMode(application) && settings.warnOnMeteredNetwork() && !Network.isUnmeteredConnection(application) && !forceStream && play) {
+            if (!Util.isCarUiMode(application) &&
+                !Util.isWearOs(application) && // The watch handles these warnings before this is called
+                settings.warnOnMeteredNetwork() &&
+                !Network.isUnmeteredConnection(application) &&
+                !forceStream &&
+                play
+            ) {
                 sendDataWarningNotification(episode)
                 val previousPlaybackState = playbackStateRelay.blockingFirst()
                 val playbackState = PlaybackState(

@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import com.google.android.horologist.media.ui.components.controls.SeekButtonIncrement
 import com.google.android.horologist.media.ui.state.model.TrackPositionUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,9 +19,7 @@ import kotlin.time.toDuration
 
 @HiltViewModel
 class NowPlayingViewModel @Inject constructor(
-    private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
-    private val podcastManager: PodcastManager,
     settings: Settings,
 ) : ViewModel() {
 
@@ -72,8 +68,12 @@ class NowPlayingViewModel @Inject constructor(
             initialValue = State.Loading
         )
 
-    fun onPlayButtonClick() {
-        playbackManager.playQueue(AnalyticsSource.WATCH_PLAYER)
+    fun onPlayButtonClick(showStreamingConfirmation: () -> Unit) {
+        if (playbackManager.shouldWarnAboutPlayback()) {
+            showStreamingConfirmation()
+        } else {
+            play()
+        }
     }
 
     fun onPauseButtonClick() {
@@ -86,5 +86,16 @@ class NowPlayingViewModel @Inject constructor(
 
     fun onSeekForwardButtonClick() {
         playbackManager.skipForward(AnalyticsSource.WATCH_PLAYER)
+    }
+
+    fun onStreamingConfirmationResult(result: StreamingConfirmationScreen.Result) {
+        val confirmedStreaming = result == StreamingConfirmationScreen.Result.CONFIRMED
+        if (confirmedStreaming && !playbackManager.isPlaying()) {
+            play()
+        }
+    }
+
+    private fun play() {
+        playbackManager.playQueue(AnalyticsSource.WATCH_PLAYER)
     }
 }
