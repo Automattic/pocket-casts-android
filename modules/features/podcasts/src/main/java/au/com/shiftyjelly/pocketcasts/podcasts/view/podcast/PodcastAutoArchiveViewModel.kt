@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -29,7 +29,10 @@ class PodcastAutoArchiveViewModel @Inject constructor(
     }
 
     fun setup(podcastUUID: String) {
-        podcast = LiveDataReactiveStreams.fromPublisher(podcastManager.observePodcastByUuid(podcastUUID).subscribeOn(Schedulers.io()))
+        podcast = podcastManager
+            .observePodcastByUuid(podcastUUID)
+            .subscribeOn(Schedulers.io())
+            .toLiveData()
     }
 
     fun updateGlobalOverride(checked: Boolean) {

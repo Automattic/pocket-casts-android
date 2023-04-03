@@ -6,7 +6,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.toLiveData
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
@@ -120,7 +120,7 @@ class DownloadManagerImpl @Inject constructor(
             cleanUpStaleDownloads(workManager)
         }
 
-        val episodeLiveData = LiveDataReactiveStreams.fromPublisher(episodeFlowable)
+        val episodeLiveData = episodeFlowable.toLiveData()
         workManagerListener = workManager.getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG).combineLatest(episodeLiveData)
 
         workManagerListener?.observeForever { (tasks, episodeUuids) ->

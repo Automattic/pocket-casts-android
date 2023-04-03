@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.profile.cloud
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
@@ -40,7 +40,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     userManager: UserManager
 ) : ViewModel() {
     lateinit var state: LiveData<BottomSheetState>
-    var signInState = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    var signInState = userManager.getSignInState().toLiveData()
     private val source = AnalyticsSource.FILES
 
     fun setup(uuid: String) {
@@ -50,7 +50,7 @@ class CloudBottomSheetViewModel @Inject constructor(
         val combined = Flowables.combineLatest(episodeFlowable, inUpNextFlowable, isPlayingFlowable) { episode, inUpNext, isPlaying ->
             BottomSheetState(episode, inUpNext, isPlaying)
         }
-        state = LiveDataReactiveStreams.fromPublisher(combined)
+        state = combined.toLiveData()
     }
 
     fun getDeleteStateOnDeleteClick(episode: UserEpisode): DeleteState {

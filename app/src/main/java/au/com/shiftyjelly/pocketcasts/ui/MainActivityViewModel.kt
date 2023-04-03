@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.ui
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -42,9 +42,9 @@ class MainActivityViewModel
             Timber.d("Updated playback state from ${it.lastChangeFrom} is playing ${it.isPlaying}")
         }
         .toFlowable(BackpressureStrategy.LATEST)
-    val playbackState = LiveDataReactiveStreams.fromPublisher(playbackStateRx)
+    val playbackState = playbackStateRx.toLiveData()
 
-    val signInState: LiveData<SignInState> = LiveDataReactiveStreams.fromPublisher(userManager.getSignInState())
+    val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
     val isSignedIn: Boolean
         get() = signInState.value?.isSignedIn ?: false
 
