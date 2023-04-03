@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-15 11:54:04+0000
+Translation-Revision-Date: 2023-03-22 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="profile_just_sign_out">Je kunt je gewoon afmelden</string>
+    <string name="profile_clear_data_would_you_also_like_question">Wil je ook alle gegevens uit de app wissen?</string>
+    <string name="profile_clear_data_question">Gegevens wissen?</string>
+    <string name="profile_clear_data">Gegevens wissen</string>
     <string name="discover_sponsored">Gesponsord</string>
     <string name="podcasts_all">Alle podcasts</string>
     <string name="search_results_all_podcasts">Alle podcasts</string>

@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-14 19:54:03+0000
+Translation-Revision-Date: 2023-03-22 17:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="profile_just_sign_out">Só fazer logout</string>
+    <string name="profile_clear_data_would_you_also_like_question">Você gostaria de limpar todos os dados do aplicativo?</string>
+    <string name="profile_clear_data_question">Limpar dados?</string>
+    <string name="profile_clear_data">Limpar dados</string>
     <string name="discover_sponsored">Patrocinado</string>
     <string name="podcasts_all">Todos os podcasts</string>
     <string name="search_results_all_podcasts">Todos os podcasts</string>
