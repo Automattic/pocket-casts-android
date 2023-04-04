@@ -67,6 +67,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import kotlinx.coroutines.rx2.rxCompletable
@@ -362,15 +363,17 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    private suspend fun playNowSync(episode: Playable, forceStream: Boolean = false, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
+    suspend fun playNowSync(episode: Playable, forceStream: Boolean = false, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play now: ${episode.uuid} ${episode.title}")
 
-        if (episode.isArchived) {
-            episodeManager.unarchive(episode)
-        }
+        withContext(Dispatchers.IO) {
+            if (episode.isArchived) {
+                episodeManager.unarchive(episode)
+            }
 
-        if (episode.playingStatus == EpisodePlayingStatus.COMPLETED) {
-            episodeManager.markAsNotPlayed(episode)
+            if (episode.playingStatus == EpisodePlayingStatus.COMPLETED) {
+                episodeManager.markAsNotPlayed(episode)
+            }
         }
 
         val switchEpisode: Boolean = !upNextQueue.isCurrentEpisode(episode)
@@ -390,6 +393,18 @@ open class PlaybackManager @Inject constructor(
         } else if (!switchEpisode && playbackStateRelay.blockingFirst().isPaused) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No player switch required. Playing queue.")
             playQueue(playbackSource)
+        }
+    }
+
+    suspend fun play(
+        upNextPosition: UpNextPosition,
+        episode: Playable,
+        source: AnalyticsSource,
+        userInitiated: Boolean = true
+    ) {
+        when (upNextPosition) {
+            UpNextPosition.NEXT -> playNext(episode, source, userInitiated)
+            UpNextPosition.LAST -> playLast(episode, source, userInitiated)
         }
     }
 
@@ -1357,7 +1372,13 @@ open class PlaybackManager @Inject constructor(
 
         episodeSubscription?.dispose()
         if (!episode.isDownloaded) {
-            if (!Util.isCarUiMode(application) && settings.warnOnMeteredNetwork() && !Network.isUnmeteredConnection(application) && !forceStream && play) {
+            if (!Util.isCarUiMode(application) &&
+                !Util.isWearOs(application) && // The watch handles these warnings before this is called
+                settings.warnOnMeteredNetwork() &&
+                !Network.isUnmeteredConnection(application) &&
+                !forceStream &&
+                play
+            ) {
                 sendDataWarningNotification(episode)
                 val previousPlaybackState = playbackStateRelay.blockingFirst()
                 val playbackState = PlaybackState(
@@ -1380,7 +1401,9 @@ open class PlaybackManager @Inject constructor(
                 return
             } else {
                 val episodeObservable: Flowable<Playable>? = if (episode is Episode) {
-                    episodeManager.observeByUuid(episode.uuid).cast(Playable::class.java)
+                    episodeManager.observeByUuid(episode.uuid)
+                        .asFlowable()
+                        .cast(Playable::class.java)
                 } else if (episode is UserEpisode) {
                     userEpisodeManager.observeEpisode(episode.uuid).cast(Playable::class.java)
                 } else {

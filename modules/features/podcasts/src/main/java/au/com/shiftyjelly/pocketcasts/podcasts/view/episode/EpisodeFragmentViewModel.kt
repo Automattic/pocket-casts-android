@@ -37,6 +37,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -109,7 +110,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 }
                 loadShowNotes(episode)
                 return@flatMapPublisher Flowable.combineLatest(
-                    episodeManager.observeByUuid(episodeUUID),
+                    episodeManager.observeByUuid(episodeUUID).asFlowable(),
                     podcastManager.findPodcastByUuidRx(episode.podcastUuid).toFlowable(),
                     progressUpdatesObservable,
                     zipper

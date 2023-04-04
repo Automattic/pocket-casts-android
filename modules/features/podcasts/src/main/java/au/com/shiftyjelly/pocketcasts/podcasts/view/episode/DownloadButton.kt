@@ -38,37 +38,37 @@ class DownloadButton @JvmOverloads constructor(
         setRippleBackground(borderless = true)
     }
 
-    var state: DownloadButton.State = State.NotDownloaded(context.getString(LR.string.podcasts_download_download))
+    var state: DownloadButtonState = DownloadButtonState.NotDownloaded(context.getString(LR.string.podcasts_download_download))
         set(value) {
             when (value) {
-                is State.NotDownloaded -> {
+                is DownloadButtonState.NotDownloaded -> {
                     imgIcon.setImageResource(IR.drawable.ic_download)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(tintColor))
                     lblStatus.text = value.downloadSize
                     progressCircle.isVisible = false
                 }
-                is State.Queued -> {
+                is DownloadButtonState.Queued -> {
                     imgIcon.setImageResource(IR.drawable.ic_stop)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(tintColor))
                     lblStatus.text = context.getString(LR.string.podcasts_download_queued)
                     progressCircle.isVisible = false
                 }
-                is State.Downloading -> {
+                is DownloadButtonState.Downloading -> {
                     lblStatus.text = "${round(value.progressPercent * 100f)}%"
                     imgIcon.setImageResource(IR.drawable.ic_downloading)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(tintColor))
                     progressCircle.setPercent(value.progressPercent)
                     progressCircle.isVisible = true
                 }
-                is State.Downloaded -> {
+                is DownloadButtonState.Downloaded -> {
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(context.getThemeColor(UR.attr.support_02)))
                     lblStatus.text = value.downloadSize
                     imgIcon.setImageResource(IR.drawable.ic_downloaded)
                     progressCircle.isVisible = false
                 }
-                is State.Errored -> {
+                is DownloadButtonState.Errored -> {
                     lblStatus.text = context.getString(LR.string.podcasts_download_retry)
-                    imgIcon.setImageResource(R.drawable.ic_retry)
+                    imgIcon.setImageResource(IR.drawable.ic_retry)
                     ImageViewCompat.setImageTintList(imgIcon, ColorStateList.valueOf(tintColor))
                     progressCircle.isVisible = false
                 }
@@ -80,12 +80,4 @@ class DownloadButton @JvmOverloads constructor(
             progressCircle.setColor(value)
             field = value
         }
-
-    sealed class State {
-        data class NotDownloaded(val downloadSize: String) : State()
-        object Queued : State()
-        data class Downloading(val progressPercent: Float) : State()
-        data class Downloaded(val downloadSize: String) : State()
-        object Errored : State()
-    }
 }

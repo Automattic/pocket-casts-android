@@ -6,6 +6,7 @@
 
     <string name="empty" translatable="false" />
 
+    <string name="account">Account</string>
     <string name="add_to_up_next">Add to Up Next</string>
     <string name="archive">Archive</string>
     <string name="unarchive">Unarchive</string>
@@ -25,9 +26,12 @@
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
+    <string name="log_in">Log in</string>
+    <string name="log_out">Log out</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
+    <string name="mark_unplayed">Mark unplayed</string>
     <string name="more">More</string>
     <string name="more_options">More options</string>
     <string name="next_episode">Next episode</string>
@@ -48,6 +52,7 @@
     <string name="play_on">Play on&#8230;</string>
     <string name="played">Played</string>
     <string name="remove_from_up_next">Remove from Up Next</string>
+    <string name="removed">Removed</string>
     <string name="search">Search</string>
     <string name="selected">Selected</string>
     <string name="not_selected">Not selected</string>
@@ -190,6 +195,7 @@
     <string name="stream_warning_title_not_wifi" translatable="false">@string/youre_not_on_wifi</string>
     <string name="stream_warning_title_metered_wifi" translatable="false">@string/youre_on_metered_wifi</string>
     <string name="stream_warning_summary">Streaming this episode will use data.</string>
+    <string name="stream_warning_summary_short">Streaming will use data. Proceed?</string>
     <string name="stream_warning_button">Stream Anyway</string>
 
     <string name="search_no_podcasts_found">No podcasts found</string>
@@ -1052,6 +1058,7 @@
     <string name="settings_media_notification_controls_title_play_next" translatable="false">@string/play_next</string>
     <string name="settings_media_notification_controls_title_playback_speed" translatable="false">@string/playback_speed</string>
     <string name="settings_media_notification_controls_title_star" translatable="false">@string/star</string>
+    <string name="settings_metered_data_warning">Metered data warning</string>
     <string name="settings_no_thanks">No thanks</string>
     <string name="settings_notifications_new_episodes">New Episodes</string>
     <string name="settings_notification_actions">Actions</string>
@@ -1621,4 +1628,9 @@
     <string name="filter_title">Filter Title</string>
     <string name="filter_id_or_title">Filter ID or Title</string>
     <string name="error_opening_links_activity_not_found">Looks like you don\'t have an app capable of viewing this content.</string>
+
+    <!-- Wear -->
+
+    <string name="wear_hide_password">Hide password</string>
+    <string name="wear_show_password">Show password</string>
 </resources>

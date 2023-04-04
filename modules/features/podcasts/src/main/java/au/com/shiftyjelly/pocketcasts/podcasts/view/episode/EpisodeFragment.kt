@@ -287,12 +287,12 @@ class EpisodeFragment : BaseDialogFragment() {
                         )
                         val episodeStatus = state.episode.episodeStatus
                         binding.btnDownload.state = when (episodeStatus) {
-                            EpisodeStatusEnum.NOT_DOWNLOADED -> DownloadButton.State.NotDownloaded(downloadSize)
-                            EpisodeStatusEnum.QUEUED -> DownloadButton.State.Queued
-                            EpisodeStatusEnum.DOWNLOADING -> DownloadButton.State.Downloading(state.downloadProgress)
-                            EpisodeStatusEnum.DOWNLOAD_FAILED -> DownloadButton.State.Errored
-                            EpisodeStatusEnum.DOWNLOADED -> DownloadButton.State.Downloaded(downloadSize)
-                            else -> DownloadButton.State.Queued
+                            EpisodeStatusEnum.NOT_DOWNLOADED -> DownloadButtonState.NotDownloaded(downloadSize)
+                            EpisodeStatusEnum.QUEUED -> DownloadButtonState.Queued
+                            EpisodeStatusEnum.DOWNLOADING -> DownloadButtonState.Downloading(state.downloadProgress)
+                            EpisodeStatusEnum.DOWNLOAD_FAILED -> DownloadButtonState.Errored
+                            EpisodeStatusEnum.DOWNLOADED -> DownloadButtonState.Downloaded(downloadSize)
+                            else -> DownloadButtonState.Queued
                         }
 
                         val playbackError = state.episode.playErrorDetails
