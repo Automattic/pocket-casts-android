@@ -173,8 +173,10 @@ class SearchFragment : BaseFragment() {
         searchView.imeOptions = searchView.imeOptions or EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_FULLSCREEN
         searchView.setIconifiedByDefault(false)
         // seems like a more reliable focus using a post
-        searchView.post {
-            searchView.showKeyboard()
+        if (viewModel.state.value.searchTerm.isEmpty()) {
+            searchView.post {
+                searchView.showKeyboard()
+            }
         }
         searchView.setOnCloseListener {
             UiUtil.hideKeyboard(searchView)
