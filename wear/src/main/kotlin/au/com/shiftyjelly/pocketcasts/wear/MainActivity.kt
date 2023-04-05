@@ -3,15 +3,29 @@ package au.com.shiftyjelly.pocketcasts.wear
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material.SwipeToDismissBoxState
+import androidx.wear.compose.material.edgeSwipeToDismiss
+import androidx.wear.compose.material.rememberSwipeToDismissBoxState
+import androidx.wear.compose.navigation.SwipeDismissableNavHostState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
@@ -34,7 +48,10 @@ import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
 import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
+import com.google.android.horologist.compose.pager.PagerScreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -51,30 +68,60 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WearApp(themeType: Theme.ThemeType) {
     WearAppTheme(themeType) {
+
         val navController = rememberSwipeDismissableNavController()
 
-        WearNavScaffold(
+        val swipeDismissState = rememberSwipeToDismissBoxState()
+        val navState = rememberSwipeDismissableNavHostState(swipeDismissState)
+        val pagerState = rememberPagerState()
+        val coroutineScope = rememberCoroutineScope()
+
+        NowPlayingPager(
             navController = navController,
-            startDestination = WatchListScreen.route
+//            swipeToDismissState = swipeDismissState,
+            pagerState = pagerState,
         ) {
+            ListPage(
+                navController = navController,
+                state = navState,
+                toNowPlaying = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(1)
+                    }
+                },
+            )
+        }
+    }
+}
 
-            scrollable(
-                route = WatchListScreen.route,
-                columnStateFactory = ScalingLazyColumnDefaults.belowTimeText()
-            ) {
-                WatchListScreen(navController::navigate, it.scrollableState)
-            }
-
-            composable(NowPlayingScreen.route) {
-                it.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun NowPlayingPager(
+    navController: NavController,
+//    swipeToDismissState: SwipeToDismissBoxState,
+    pagerState: PagerState,
+    content: @Composable () -> Unit,
+) {
+    PagerScreen(
+        count = 3,
+        state = pagerState,
+//        modifier = Modifier.edgeSwipeToDismiss(swipeToDismissState),
+    ) { page ->
+        when (page) {
+            0 -> content()
+            1 -> Column {
 
                 // Listen for results from streaming confirmation screen
                 navController.currentBackStackEntry?.savedStateHandle
                     ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey, null)
                     ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
+
+                        Timber.i("TEST123, collecting streaming confirmation for Now Playing screen")
+
                         val viewModel = hiltViewModel<NowPlayingViewModel>()
                         LaunchedEffect(streamingConfirmationResult) {
                             viewModel.onStreamingConfirmationResult(streamingConfirmationResult)
@@ -91,88 +138,114 @@ fun WearApp(themeType: Theme.ThemeType) {
                     showStreamingConfirmation = { navController.navigate(StreamingConfirmationScreen.route) },
                 )
             }
-
-            composable(StreamingConfirmationScreen.route) {
-                it.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
-
-                StreamingConfirmationScreen(
-                    onFinished = { result ->
-                        navController.previousBackStackEntry?.savedStateHandle?.set(
-                            StreamingConfirmationScreen.resultKey,
-                            result
-                        )
-                        navController.popBackStack()
-                    },
-                )
-            }
-
-            scrollable(
-                route = UpNextScreen.route,
-            ) {
+            2 -> Column {
+                val scrollableState = rememberScalingLazyListState()
                 UpNextScreen(
                     navigateToEpisode = { episodeUuid ->
                         navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
                     },
-                    listState = it.scrollableState,
+                    listState = scrollableState,
                 )
             }
+        }
+    }
+}
 
-            scrollable(
-                route = PodcastsScreen.route,
-            ) {
-                PodcastsScreen(
-                    listState = it.scrollableState,
-                    navigateToPodcast = { podcastUuid ->
-                        navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                    }
-                )
-            }
+@Composable
+private fun ListPage(
+    navController: NavHostController,
+    state: SwipeDismissableNavHostState,
+    toNowPlaying: () -> Unit,
+) {
+    WearNavScaffold(
+        navController = navController,
+        startDestination = WatchListScreen.route,
+        state = state,
+    ) {
 
-            composable(
-                route = PodcastScreen.route,
-                arguments = listOf(
-                    navArgument(PodcastScreen.argument) {
-                        type = NavType.StringType
-                    }
-                ),
-            ) {
-                PodcastScreen(
-                    onEpisodeTap = { episode ->
-                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
-                    },
-                )
-            }
+        scrollable(
+            route = WatchListScreen.route,
+        ) {
+            WatchListScreen(
+                scrollState = it.scrollableState,
+                navigateToRoute = navController::navigate,
+                toNowPlaying = toNowPlaying,
+            )
+        }
 
-            episodeGraph(
+        composable(StreamingConfirmationScreen.route) {
+            it.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+
+            StreamingConfirmationScreen(
+                onFinished = { result ->
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        StreamingConfirmationScreen.resultKey,
+                        result
+                    )
+                    navController.popBackStack()
+                },
+            )
+        }
+
+        scrollable(
+            route = PodcastsScreen.route,
+        ) {
+
+            it.scrollableState
+            PodcastsScreen(
+                listState = it.scrollableState,
                 navigateToPodcast = { podcastUuid ->
                     navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                },
-                navController = navController,
+                }
             )
-
-            composable(FiltersScreen.route) { FiltersScreen() }
-
-            scrollable(DownloadsScreen.route) {
-                DownloadsScreen(
-                    columnState = it.columnState,
-                    onItemClick = { episode ->
-                        val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
-                        navController.navigate(route)
-                    }
-                )
-            }
-
-            composable(FilesScreen.route) { FilesScreen() }
-
-            scrollable(SettingsScreen.route) {
-                SettingsScreen(
-                    scrollState = it.columnState,
-                    signInClick = { navController.navigate(authenticationSubGraph) },
-                )
-            }
-
-            authenticationGraph(navController)
         }
+
+        composable(
+            route = PodcastScreen.route,
+            arguments = listOf(
+                navArgument(PodcastScreen.argument) {
+                    type = NavType.StringType
+                }
+            ),
+        ) {
+
+            PodcastScreen(
+                onEpisodeTap = { episode ->
+                    navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
+                },
+            )
+        }
+
+        episodeGraph(
+            navigateToPodcast = { podcastUuid ->
+                navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+            },
+            navController = navController,
+        )
+
+        composable(FiltersScreen.route) { FiltersScreen() }
+
+        scrollable(DownloadsScreen.route) {
+
+            DownloadsScreen(
+                columnState = it.columnState,
+                onItemClick = { episode ->
+                    val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
+                    navController.navigate(route)
+                }
+            )
+        }
+
+        composable(FilesScreen.route) { FilesScreen() }
+
+        scrollable(SettingsScreen.route) {
+            SettingsScreen(
+                scrollState = it.columnState,
+                signInClick = { navController.navigate(authenticationSubGraph) },
+            )
+        }
+
+        authenticationGraph(navController)
     }
 }
 
