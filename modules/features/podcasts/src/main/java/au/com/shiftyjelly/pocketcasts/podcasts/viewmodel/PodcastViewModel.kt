@@ -15,8 +15,11 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.RatingState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -24,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -43,7 +47,9 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -65,7 +71,8 @@ class PodcastViewModel
     private val downloadManager: DownloadManager,
     private val userManager: UserManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val episodeAnalytics: EpisodeAnalytics
+    private val episodeAnalytics: EpisodeAnalytics,
+    private val ratingsManager: RatingsManager,
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()
@@ -75,6 +82,7 @@ class PodcastViewModel
     lateinit var podcastUuid: String
     lateinit var episodes: LiveData<EpisodeState>
     val groupedEpisodes: MutableLiveData<List<List<Episode>>> = MutableLiveData()
+    val ratingsState: MutableLiveData<RatingState> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
 
     val tintColor = MutableLiveData<Int>()
@@ -140,8 +148,11 @@ class PodcastViewModel
                 observableHeaderExpanded.value = !newPodcast.isSubscribed
                 podcast.postValue(newPodcast)
             }
-            .switchMap {
-                Observables.combineLatest(Observable.just(it), searchResults) { podcast, searchQuery ->
+            .loadRatings(ratingsManager)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext { (_, ratings) -> ratings?.let { ratingsState.postValue(it) } }
+            .switchMap { (podcastModel, _) ->
+                Observables.combineLatest(Observable.just(podcastModel), searchResults) { podcast, searchQuery ->
                     CombinedEpisodeData(podcast, podcast.showArchived, searchQuery.first, searchQuery.second)
                 }.toFlowable(BackpressureStrategy.LATEST)
             }
@@ -165,6 +176,16 @@ class PodcastViewModel
             .observeOn(AndroidSchedulers.mainThread())
 
         episodes = episodeStateFlowable.toLiveData()
+    }
+
+    fun refreshPodcastRatings(uuid: String) {
+        launch(Dispatchers.IO) {
+            try {
+                ratingsManager.refreshPodcastRatings(uuid)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to refresh podcast ratings")
+            }
+        }
     }
 
     override fun onCleared() {
@@ -440,6 +461,13 @@ class PodcastViewModel
         ) : EpisodeState()
     }
 
+    sealed class RatingState {
+        data class Loaded(
+            val ratings: PodcastRatings,
+        ) : RatingState()
+        object Error : RatingState()
+    }
+
     private fun trackSearchIfNeeded(oldValue: String, newValue: String) {
         if (oldValue.isEmpty() && newValue.isNotEmpty()) {
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SEARCH_PERFORMED)
@@ -536,6 +564,23 @@ private fun Flowable<CombinedEpisodeData>.loadEpisodes(episodeManager: EpisodeMa
             .subscribeOn(Schedulers.io())
     }
 }
+
+private data class PodcastWithRatingData(val podcast: Podcast, val ratingState: RatingState? = null)
+
+private fun Flowable<Podcast>.loadRatings(ratingsManager: RatingsManager) =
+    this.switchMap { podcast ->
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast ${podcast.uuid} ratings changes")
+        if (BuildConfig.SHOW_RATINGS) {
+            ratingsManager.podcastRatings(podcast.uuid)
+                .map { PodcastWithRatingData(podcast, RatingState.Loaded(ratings = it)) }
+                .asFlowable()
+                .doOnError { Timber.e("Error loading ratings: ${it.message}") }
+                .onErrorReturnItem(PodcastWithRatingData(podcast, RatingState.Error))
+                .subscribeOn(Schedulers.io())
+        } else {
+            Flowable.just(PodcastWithRatingData(podcast))
+        }
+    }
 
 private fun Maybe<Podcast>.downloadMissingPodcast(uuid: String, podcastManager: PodcastManager): Single<Podcast> {
     return this.switchIfEmpty(

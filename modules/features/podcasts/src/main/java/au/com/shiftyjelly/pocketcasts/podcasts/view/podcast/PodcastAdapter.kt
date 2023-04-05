@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -26,8 +27,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -35,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -89,7 +93,7 @@ class PodcastAdapter(
     val settings: Settings,
     val theme: Theme,
     var fromListUuid: String?,
-    private val onHeaderSummaryToggled: (Boolean) -> Unit,
+    private val onHeaderSummaryToggled: (String, Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
     private val onEpisodesOptionsClicked: () -> Unit,
@@ -121,6 +125,7 @@ class PodcastAdapter(
 
     private val disposables = CompositeDisposable()
     private var podcast: Podcast = Podcast()
+    private var ratings: PodcastRatings? = null
 
     private var headerExpanded: Boolean = false
     private var tintColor: Int = 0x000000
@@ -169,6 +174,12 @@ class PodcastAdapter(
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
         holder.binding.isPlusUser = signedInAsPlus
+
+        holder.binding.bottom.ratings.setContent {
+            AppTheme(theme.activeTheme) {
+                ratings?.let { StarRatingView(averageRating = it.average, total = it.total) }
+            }
+        }
 
         val context = holder.itemView.context
         val imageLoader = PodcastImageLoaderThemed(context)
@@ -264,9 +275,15 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
+            onHeaderSummaryToggled(podcast.uuid, headerExpanded, false)
         }
         this.podcast = podcast
         notifyDataSetChanged()
+    }
+
+    fun setRatings(ratings: PodcastRatings) {
+        this.ratings = ratings
+        notifyItemChanged(0)
     }
 
     fun setTint(tintColor: Int) {
@@ -374,7 +391,7 @@ class PodcastAdapter(
         val expanded = binding.bottom.root.toggleVisibility()
         binding.top.chevron.isEnabled = expanded
         headerExpanded = expanded
-        onHeaderSummaryToggled(expanded)
+        onHeaderSummaryToggled(podcast.uuid, expanded, true)
     }
 
     private fun onWebsiteLinkClicked(context: Context) {
@@ -451,6 +468,9 @@ class PodcastAdapter(
             binding.bottom.linkText.setOnClickListener {
                 adapter.onWebsiteLinkClicked(it.context)
             }
+            binding.bottom.ratings.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
         }
 
         private fun unsubscribe() {
