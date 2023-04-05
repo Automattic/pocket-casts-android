@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.account
 import android.annotation.SuppressLint
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.android.horologist.auth.data.phone.ExperimentalHorologistAuthDataPhoneApi
 import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +14,7 @@ import javax.inject.Singleton
 
 @Singleton
 @SuppressLint("VisibleForTests") // https://issuetracker.google.com/issues/239451111
+@OptIn(ExperimentalHorologistAuthDataPhoneApi::class)
 class WatchSync @Inject constructor(
     private val settings: Settings,
     private val accountAuth: AccountAuth,

@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.di
 
 import au.com.shiftyjelly.pocketcasts.account.TokenSerializer
+import com.google.android.horologist.auth.data.phone.ExperimentalHorologistAuthDataPhoneApi
 import com.google.android.horologist.auth.data.phone.tokenshare.TokenBundleRepository
 import com.google.android.horologist.auth.data.phone.tokenshare.impl.TokenBundleRepositoryImpl
+import com.google.android.horologist.data.ExperimentalHorologistDataLayerApi
 import com.google.android.horologist.data.WearDataLayerRegistry
 import dagger.Module
 import dagger.Provides
@@ -15,6 +17,7 @@ import javax.inject.Qualifier
 @InstallIn(SingletonComponent::class)
 object AuthPhoneModule {
 
+    @OptIn(ExperimentalHorologistAuthDataPhoneApi::class, ExperimentalHorologistDataLayerApi::class)
     @Provides
     fun providesTokenBundleRepository(
         wearDataLayerRegistry: WearDataLayerRegistry,

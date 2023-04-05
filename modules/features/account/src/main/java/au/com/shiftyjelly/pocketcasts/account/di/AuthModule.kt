@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.di
 
 import android.content.Context
+import com.google.android.horologist.data.ExperimentalHorologistDataLayerApi
 import com.google.android.horologist.data.WearDataLayerRegistry
 import dagger.Module
 import dagger.Provides
@@ -22,6 +23,7 @@ object AuthModule {
     fun coroutineScope(): CoroutineScope =
         CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
+    @OptIn(ExperimentalHorologistDataLayerApi::class)
     @Singleton
     @Provides
     fun providesWearDataLayerRegistry(
