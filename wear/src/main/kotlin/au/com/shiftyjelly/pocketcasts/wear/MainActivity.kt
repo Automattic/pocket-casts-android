@@ -33,8 +33,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var theme: Theme
+    @Inject lateinit var theme: Theme
 
     private val viewModel: WearMainActivityViewModel by viewModels()
 
