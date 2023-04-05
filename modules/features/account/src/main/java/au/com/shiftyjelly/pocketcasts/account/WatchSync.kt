@@ -54,14 +54,13 @@ class WatchSync @Inject constructor(
     }
 
     suspend fun processAuthDataChange(refreshToken: String?) {
-        Timber.i("Received refreshToken change")
         if (refreshToken != null) {
+            Timber.i("Received authData change from phone with refresh token")
             // Don't do anything if the user is already logged in.
             if (!settings.isLoggedIn()) {
                 val result = accountAuth.signInWithToken(refreshToken, SignInSource.WatchPhoneSync)
                 when (result) {
-                    is AccountAuth.AuthResult.Failed -> { /* do nothing */
-                    }
+                    is AccountAuth.AuthResult.Failed -> { /* do nothing */ }
 
                     is AccountAuth.AuthResult.Success -> {
                         Timber.e("TODO: notify the user we have signed them in!")
@@ -73,7 +72,7 @@ class WatchSync @Inject constructor(
         } else {
             // The user either was never logged in on their phone or just logged out.
             // Either way, leave the user's login state on the watch unchanged.
-            Timber.i("Received data from phone without refresh token")
+            Timber.i("Received authData change from phone without refresh token")
         }
     }
 }
