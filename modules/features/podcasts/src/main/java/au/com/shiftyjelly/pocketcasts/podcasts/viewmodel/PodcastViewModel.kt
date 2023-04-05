@@ -47,7 +47,9 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -569,8 +571,9 @@ private fun Flowable<Podcast>.loadRatings(ratingsManager: RatingsManager) =
     this.switchMap { podcast ->
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Observing podcast ${podcast.uuid} ratings changes")
         if (BuildConfig.SHOW_RATINGS) {
-            ratingsManager.observePodcastRatings(podcast.uuid)
+            ratingsManager.podcastRatings(podcast.uuid)
                 .map { PodcastWithRatingData(podcast, RatingState.Loaded(ratings = it)) }
+                .asFlowable()
                 .doOnError { Timber.e("Error loading ratings: ${it.message}") }
                 .onErrorReturnItem(PodcastWithRatingData(podcast, RatingState.Error))
                 .subscribeOn(Schedulers.io())

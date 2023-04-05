@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.ratings
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 
 interface RatingsManager {
-    fun observePodcastRatings(podcastUuid: String): Flowable<PodcastRatings>
+    fun podcastRatings(podcastUuid: String): Flow<PodcastRatings>
     fun findPodcastRatings(podcastUuid: String): PodcastRatings?
     suspend fun refreshPodcastRatings(podcastUuid: String)
 }

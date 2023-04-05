@@ -6,12 +6,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
-import io.reactivex.Flowable
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class PodcastRatingsDao {
     @Query("SELECT * FROM podcast_ratings WHERE podcast_uuid = :podcastUuid")
-    abstract fun observePodcastRatings(podcastUuid: String): Flowable<List<PodcastRatings>>
+    abstract fun podcastRatings(podcastUuid: String): Flow<List<PodcastRatings>>
 
     @Query("SELECT * FROM podcast_ratings WHERE podcast_uuid = :podcastUuid")
     abstract fun findPodcastRatings(podcastUuid: String): PodcastRatings?

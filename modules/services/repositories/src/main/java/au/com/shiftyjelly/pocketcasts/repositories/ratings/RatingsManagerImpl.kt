@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -17,8 +18,8 @@ class RatingsManagerImpl @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    override fun observePodcastRatings(podcastUuid: String) =
-        podcastRatingsDao.observePodcastRatings(podcastUuid)
+    override fun podcastRatings(podcastUuid: String) =
+        podcastRatingsDao.podcastRatings(podcastUuid)
             .map { it.firstOrNull() ?: PodcastRatings(podcastUuid, 0.0) }
 
     override fun findPodcastRatings(podcastUuid: String) =
