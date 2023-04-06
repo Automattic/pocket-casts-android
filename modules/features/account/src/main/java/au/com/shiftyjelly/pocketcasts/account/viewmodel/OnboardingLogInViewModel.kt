@@ -6,10 +6,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.account.LoginResult
-import au.com.shiftyjelly.pocketcasts.servers.account.SignInSource
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,11 +21,10 @@ import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class OnboardingLogInViewModel @Inject constructor(
-    private val syncAccountManager: SyncAccountManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val podcastManager: PodcastManager,
     private val subscriptionManager: SubscriptionManager,
-    private val syncServerManager: SyncServerManager,
-    private val podcastManager: PodcastManager
+    private val syncManager: SyncManager,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -61,10 +59,9 @@ class OnboardingLogInViewModel @Inject constructor(
         subscriptionManager.clearCachedStatus()
 
         viewModelScope.launch {
-            val result = syncAccountManager.loginWithEmailAndPassword(
+            val result = syncManager.loginWithEmailAndPassword(
                 email = state.email,
                 password = state.password,
-                syncServerManager = syncServerManager,
                 signInSource = SignInSource.Onboarding
             )
             when (result) {

@@ -4,10 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.account.LoginResult
-import au.com.shiftyjelly.pocketcasts.servers.account.SignInSource
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,8 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignInViewModel
 @Inject constructor(
-    private val syncAccountManager: SyncAccountManager,
-    private val syncServerManager: SyncServerManager,
+    private val syncManager: SyncManager,
     private val subscriptionManager: SubscriptionManager,
     private val podcastManager: PodcastManager
 ) : AccountViewModel() {
@@ -71,10 +69,9 @@ class SignInViewModel
 
         subscriptionManager.clearCachedStatus()
         viewModelScope.launch {
-            val result = syncAccountManager.loginWithEmailAndPassword(
+            val result = syncManager.loginWithEmailAndPassword(
                 email = emailString,
                 password = pwdString,
-                syncServerManager = syncServerManager,
                 signInSource = SignInSource.SignInViewModel
             )
             when (result) {

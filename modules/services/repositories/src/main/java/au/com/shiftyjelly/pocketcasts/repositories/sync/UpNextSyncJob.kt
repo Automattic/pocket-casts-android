@@ -22,9 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
@@ -49,7 +47,7 @@ import javax.inject.Inject
 class UpNextSyncJob : JobService() {
 
     @Inject lateinit var settings: Settings
-    @Inject lateinit var serverManager: SyncServerManager
+    @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var appDatabase: AppDatabase
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var playbackManager: PlaybackManager
@@ -63,9 +61,9 @@ class UpNextSyncJob : JobService() {
 
     companion object {
         @JvmStatic
-        fun run(syncAccountManager: SyncAccountManager, context: Context) {
+        fun run(syncManager: SyncManager, context: Context) {
             // Don't run the job if Up Next syncing is turned off
-            if (!syncAccountManager.isLoggedIn()) {
+            if (!syncManager.isLoggedIn()) {
                 return
             }
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncJob - scheduled")
@@ -96,7 +94,7 @@ class UpNextSyncJob : JobService() {
             .findAllRx()
             .map { changes -> buildRequest(changes) }
             .flatMapCompletable { request ->
-                serverManager.upNextSync(request)
+                syncManager.upNextSync(request)
                     .flatMapCompletable { response -> readResponse(response) }
                     .andThen(clearSyncedData(request, upNextChangeDao))
                     .onErrorComplete { it is HttpException && it.code() == 304 }

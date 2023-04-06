@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -29,12 +29,12 @@ class UpNextQueueTest {
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-        downloadManager = mock<DownloadManager> {}
+        downloadManager = mock {}
         val episodeManager = mock<EpisodeManager> {}
         val settings = mock<Settings> {}
-        val syncAccountManager = SyncAccountManagerImpl(mock(), mock(), context)
+        val syncManager = mock<SyncManager> {}
 
-        upNextQueue = UpNextQueueImpl(appDatabase, settings, episodeManager, syncAccountManager, context)
+        upNextQueue = UpNextQueueImpl(appDatabase, settings, episodeManager, syncManager, context)
         upNextQueue.setup()
     }
 

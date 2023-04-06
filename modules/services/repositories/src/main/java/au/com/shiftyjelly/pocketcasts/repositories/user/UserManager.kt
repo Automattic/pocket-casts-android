@@ -12,8 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -35,11 +34,10 @@ interface UserManager {
 class UserManagerImpl @Inject constructor(
     @ApplicationContext val application: Context,
     val settings: Settings,
-    val syncServerManager: SyncServerManager,
+    val syncManager: SyncManager,
     val subscriptionManager: SubscriptionManager,
     val podcastManager: PodcastManager,
     val userEpisodeManager: UserEpisodeManager,
-    val syncAccountManager: SyncAccountManager,
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : UserManager {
 
@@ -51,7 +49,7 @@ class UserManagerImpl @Inject constructor(
         val accountListener = OnAccountsUpdateListener {
             try {
                 // Handle sign out from outside of the app
-                if (!syncAccountManager.isLoggedIn()) {
+                if (!syncManager.isLoggedIn()) {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out because no account manager account found")
                     signOut(playbackManager, wasInitiatedByUser = false)
                 }
@@ -65,7 +63,7 @@ class UserManagerImpl @Inject constructor(
     }
 
     override fun getSignInState(): Flowable<SignInState> {
-        return syncAccountManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
+        return syncManager.isLoggedInObservable.toFlowable(BackpressureStrategy.LATEST)
             .switchMap { isLoggedIn ->
                 if (isLoggedIn) {
                     subscriptionManager.observeSubscriptionStatus()
@@ -79,11 +77,11 @@ class UserManagerImpl @Inject constructor(
                         }
                         .map {
                             analyticsTracker.refreshMetadata()
-                            SignInState.SignedIn(email = syncAccountManager.getEmail() ?: "", subscriptionStatus = it)
+                            SignInState.SignedIn(email = syncManager.getEmail() ?: "", subscriptionStatus = it)
                         }
                         .onErrorReturn {
                             Timber.e(it, "Error getting subscription state")
-                            SignInState.SignedIn(syncAccountManager.getEmail() ?: "", SubscriptionStatus.Free())
+                            SignInState.SignedIn(syncManager.getEmail() ?: "", SubscriptionStatus.Free())
                         }
                 } else {
                     Flowable.just(SignInState.SignedOut())
@@ -95,20 +93,22 @@ class UserManagerImpl @Inject constructor(
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
         subscriptionManager.clearCachedStatus()
-        syncServerManager.signOut()
-        settings.clearPlusPreferences()
-        GlobalScope.launch {
-            userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
+        syncManager.signOut {
+            settings.clearPlusPreferences()
+            GlobalScope.launch {
+                userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
+            }
+
+            settings.setMarketingOptIn(false)
+            settings.setMarketingOptInNeedsSync(false)
+            settings.setEndOfYearModalHasBeenShown(false)
+            analyticsTracker.track(
+                AnalyticsEvent.USER_SIGNED_OUT,
+                mapOf(KEY_USER_INITIATED to wasInitiatedByUser)
+            )
+            analyticsTracker.flush()
+            analyticsTracker.clearAllData()
+            analyticsTracker.refreshMetadata()
         }
-
-        settings.setMarketingOptIn(false)
-        settings.setMarketingOptInNeedsSync(false)
-        settings.setEndOfYearModalHasBeenShown(false)
-        analyticsTracker.track(AnalyticsEvent.USER_SIGNED_OUT, mapOf(KEY_USER_INITIATED to wasInitiatedByUser))
-        analyticsTracker.flush()
-        analyticsTracker.clearAllData()
-        analyticsTracker.refreshMetadata()
-
-        syncAccountManager.signOut()
     }
 }

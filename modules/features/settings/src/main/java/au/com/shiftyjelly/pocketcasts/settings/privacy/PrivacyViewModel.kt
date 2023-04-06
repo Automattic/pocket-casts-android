@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PrivacyViewModel @Inject constructor(
     private val settings: Settings,
-    private val syncAccountManager: SyncAccountManager,
+    private val syncManager: SyncManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
@@ -73,5 +73,5 @@ class PrivacyViewModel @Inject constructor(
         mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(linkAccount = on)
     }
 
-    private fun getUserEmail() = syncAccountManager.getEmail()
+    private fun getUserEmail() = syncManager.getEmail()
 }

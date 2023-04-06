@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.servers.account
+package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import au.com.shiftyjelly.pocketcasts.servers.model.AuthResultModel
 

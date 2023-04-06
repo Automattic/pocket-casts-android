@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -12,12 +10,12 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
+import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -28,6 +26,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.Dispatcher
 import okhttp3.Interceptor
@@ -167,22 +166,19 @@ class ServersModule {
     @Provides
     @TokenInterceptor
     @Singleton
-    internal fun provideTokenInterceptor(
-        syncAccountManager: SyncAccountManager,
-        @OnTokenErrorUiShown onTokenErrorUiShown: () -> Unit
-    ): Interceptor {
+    internal fun provideTokenInterceptor(tokenHandler: TokenHandler): Interceptor {
         val unauthenticatedEndpoints = setOf("security") // Don't attach a token to these methods because they get the token
         return Interceptor { chain ->
             val original = chain.request()
             if (unauthenticatedEndpoints.contains(original.url.encodedPathSegments.firstOrNull())) {
                 chain.proceed(original)
             } else {
-                val token = syncAccountManager.getAccessTokenBlocking(onTokenErrorUiShown)
+                val token = runBlocking { tokenHandler.getAccessToken() }
                 return@Interceptor if (token != null) {
                     val response = chain.proceed(buildRequestWithToken(original, token))
                     if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                        syncAccountManager.invalidateAccessToken()
-                        val newToken = syncAccountManager.getAccessTokenBlocking(onTokenErrorUiShown)
+                        tokenHandler.invalidateAccessToken()
+                        val newToken = runBlocking { tokenHandler.getAccessToken() }
                         chain.proceed(buildRequestWithToken(original, newToken))
                     } else {
                         response
@@ -193,11 +189,6 @@ class ServersModule {
             }
         }
     }
-
-    @Provides
-    @OnTokenErrorUiShown
-    internal fun provideTokenErrorUiTracker(analyticsTracker: AnalyticsTrackerWrapper): () -> Unit =
-        { analyticsTracker.track(AnalyticsEvent.SIGNED_OUT_ALERT_SHOWN) }
 
     @Provides
     @CachedTokenedOkHttpClient
@@ -429,7 +420,3 @@ annotation class NoCacheOkHttpClientBuilder
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class TokenInterceptor
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class OnTokenErrorUiShown

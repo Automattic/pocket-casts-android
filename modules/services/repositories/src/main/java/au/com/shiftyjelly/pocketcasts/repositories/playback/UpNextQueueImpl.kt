@@ -11,8 +11,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncJob
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
@@ -36,7 +36,7 @@ class UpNextQueueImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val settings: Settings,
     private val episodeManager: EpisodeManager,
-    private val syncAccountManager: SyncAccountManager,
+    private val syncManager: SyncManager,
     @ApplicationContext private val application: Context
 ) : UpNextQueue, CoroutineScope {
 
@@ -122,7 +122,7 @@ class UpNextQueueImpl @Inject constructor(
         }
 
         // save changes to sync to the server
-        if (syncAccountManager.isLoggedIn()) {
+        if (syncManager.isLoggedIn()) {
             when (action) {
                 is UpNextAction.PlayNow -> upNextChangeDao.savePlayNow(action.episode)
                 is UpNextAction.PlayNext -> upNextChangeDao.savePlayNext(action.episode)
@@ -303,6 +303,6 @@ class UpNextQueueImpl @Inject constructor(
         if (changes.isEmpty()) {
             return
         }
-        UpNextSyncJob.run(syncAccountManager, application)
+        UpNextSyncJob.run(syncManager, application)
     }
 }

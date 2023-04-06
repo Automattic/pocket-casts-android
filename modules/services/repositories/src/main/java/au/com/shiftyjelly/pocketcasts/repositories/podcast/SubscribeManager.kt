@@ -11,12 +11,11 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
@@ -37,9 +36,8 @@ import javax.inject.Singleton
 class SubscribeManager @Inject constructor(
     val appDatabase: AppDatabase,
     val podcastCacheServerManager: PodcastCacheServerManager,
-    val syncServerManager: SyncServerManager,
     private val staticServerManager: StaticServerManager,
-    private val syncAccountManager: SyncAccountManager,
+    private val syncManager: SyncManager,
     @ApplicationContext val context: Context,
     val settings: Settings
 ) {
@@ -176,8 +174,8 @@ class SubscribeManager @Inject constructor(
             }
         )
         // add sync information
-        if (syncAccountManager.isLoggedIn()) {
-            val syncPodcastObservable = syncServerManager.getPodcastEpisodes(podcastUuid).subscribeOn(Schedulers.io())
+        if (syncManager.isLoggedIn()) {
+            val syncPodcastObservable = syncManager.getPodcastEpisodes(podcastUuid).subscribeOn(Schedulers.io())
             return Single.zip(cleanPodcastObservable, syncPodcastObservable, BiFunction<Podcast, PodcastEpisodesResponse, Podcast>(this::mergeSyncPodcast))
                 .onErrorResumeNext(cleanPodcastObservable)
         } else {

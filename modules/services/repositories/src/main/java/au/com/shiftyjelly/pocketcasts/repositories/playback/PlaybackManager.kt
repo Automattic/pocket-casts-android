@@ -40,12 +40,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toServerPostFile
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
@@ -98,12 +97,11 @@ open class PlaybackManager @Inject constructor(
     private val playlistManager: PlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
-    private val syncServerManager: SyncServerManager,
     private val notificationHelper: NotificationHelper,
     private val userEpisodeManager: UserEpisodeManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
-    private val syncAccountManager: SyncAccountManager,
+    private val syncManager: SyncManager,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -256,7 +254,7 @@ open class PlaybackManager @Inject constructor(
         syncTimerDisposable?.dispose()
         syncTimerDisposable = playbackStateRelay.sample(settings.getPeriodicSaveTimeMs(), TimeUnit.MILLISECONDS)
             .concatMap {
-                if (it.isPlaying && syncAccountManager.isLoggedIn()) {
+                if (it.isPlaying && syncManager.isLoggedIn()) {
                     syncEpisodeProgress(it)
                         .toObservable<EpisodeSyncResponse>()
                         .onErrorResumeNext(Observable.empty())
@@ -287,7 +285,7 @@ open class PlaybackManager @Inject constructor(
                 playbackState.durationMs / 1000L,
                 EpisodeSyncRequest.STATUS_IN_PROGRESS
             )
-            return syncServerManager.episodeSync(request)
+            return syncManager.episodeSync(request)
         } else if (episode is UserEpisode && episode.isUploaded) {
             rxCompletable {
                 episode.playedUpToMs = playbackState.positionMs
@@ -1016,7 +1014,7 @@ open class PlaybackManager @Inject constructor(
             }
 
             // Sync played to server straight away
-            if (syncAccountManager.isLoggedIn()) {
+            if (syncManager.isLoggedIn()) {
                 if (episode is Episode) {
                     val syncRequest =
                         EpisodeSyncRequest(
@@ -1026,7 +1024,7 @@ open class PlaybackManager @Inject constructor(
                             episode.durationMs.toLong() / 1000,
                             EpisodeSyncRequest.STATUS_COMPLETE
                         )
-                    syncServerManager.episodeSync(syncRequest)
+                    syncManager.episodeSync(syncRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnComplete { Timber.d("Synced episode completion") }
@@ -1035,7 +1033,7 @@ open class PlaybackManager @Inject constructor(
                         .subscribe()
                 } else if (episode is UserEpisode) {
                     userEpisodeManager.findEpisodeByUuid(episode.uuid)?.let { userEpisode ->
-                        syncServerManager.postFiles(listOf(userEpisode.toServerPostFile()))
+                        syncManager.postFiles(listOf(userEpisode.toServerPostFile()))
                             .ignoreElement()
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())

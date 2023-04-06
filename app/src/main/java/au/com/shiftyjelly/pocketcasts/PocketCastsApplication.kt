@@ -22,9 +22,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -72,7 +72,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
-    @Inject lateinit var syncAccountManager: SyncAccountManager
+    @Inject lateinit var syncManager: SyncManager
 
     private val applicationScope = MainScope()
 
@@ -119,7 +119,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
         // Link email to Sentry crash reports only if the user has opted in
         if (settings.getLinkCrashReportsToUser()) {
-            syncAccountManager.getEmail()?.let { syncEmail ->
+            syncManager.getEmail()?.let { syncEmail ->
                 val user = User().apply { email = syncEmail }
                 Sentry.setUser(user)
             }
@@ -205,7 +205,12 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
-                VersionMigrationsJob.run(podcastManager = podcastManager, settings = settings, syncAccountManager = syncAccountManager, context = this@PocketCastsApplication)
+                VersionMigrationsJob.run(
+                    podcastManager = podcastManager,
+                    settings = settings,
+                    syncManager = syncManager,
+                    context = this@PocketCastsApplication
+                )
 
                 // check that we have .nomedia files in existing folders
                 fileStorage.checkNoMediaDirs()
@@ -227,7 +232,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     }
 
     private fun retrieveUserIdIfNeededAndRefreshMetadata() {
-        val uuid = syncAccountManager.getUuid()
+        val uuid = syncManager.getUuid()
         if (uuid.isNullOrEmpty()) {
             Timber.e("Missing User ID - Retrieving from the server")
             applicationScope.launch(Dispatchers.IO) {

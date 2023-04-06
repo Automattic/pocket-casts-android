@@ -6,9 +6,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.account.LoginResult
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +20,7 @@ import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class OnboardingCreateAccountViewModel @Inject constructor(
-    private val syncAccountManager: SyncAccountManager,
-    private val syncServerManager: SyncServerManager,
+    private val syncManager: SyncManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
     private val podcastManager: PodcastManager
@@ -69,10 +67,9 @@ class OnboardingCreateAccountViewModel @Inject constructor(
         subscriptionManager.clearCachedStatus()
 
         viewModelScope.launch {
-            val result = syncAccountManager.createUserWithEmailAndPassword(
+            val result = syncManager.createUserWithEmailAndPassword(
                 email = state.email,
                 password = state.password,
-                syncServerManager = syncServerManager
             )
             when (result) {
                 is LoginResult.Success -> {

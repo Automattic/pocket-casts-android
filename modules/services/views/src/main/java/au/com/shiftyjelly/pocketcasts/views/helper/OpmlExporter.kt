@@ -13,9 +13,9 @@ import androidx.preference.PreferenceFragmentCompat
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class OpmlExporter(
     private val fragment: PreferenceFragmentCompat,
     private val serverManager: ServerManager,
     private val podcastManager: PodcastManager,
-    private val syncAccountManager: SyncAccountManager,
+    private val syncManager: SyncManager,
     private val context: Context,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) {
@@ -168,7 +168,7 @@ class OpmlExporter(
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = "text/html"
 
-            val email = syncAccountManager.getEmail()
+            val email = syncManager.getEmail()
             if (email != null && email.isNotBlank()) {
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
             }

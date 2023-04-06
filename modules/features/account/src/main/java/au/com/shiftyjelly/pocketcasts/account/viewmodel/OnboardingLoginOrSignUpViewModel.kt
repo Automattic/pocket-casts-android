@@ -12,10 +12,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.account.LoginResult
-import au.com.shiftyjelly.pocketcasts.servers.account.SignInSource
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -41,8 +40,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext context: Context,
     private val podcastManager: PodcastManager,
-    private val syncServerManager: SyncServerManager,
-    private val syncAccountManager: SyncAccountManager,
+    private val syncManager: SyncManager,
 ) : AndroidViewModel(context as Application) {
 
     val showContinueWithGoogleButton =
@@ -205,7 +203,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     }
 
     private suspend fun signInWithGoogleToken(idToken: String, onSuccess: (GoogleSignInState) -> Unit, onError: suspend () -> Unit) =
-        when (val authResult = syncAccountManager.loginWithGoogle(idToken = idToken, syncServerManager = syncServerManager, signInSource = SignInSource.Onboarding)) {
+        when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.Onboarding)) {
             is LoginResult.Success -> {
                 podcastManager.refreshPodcastsAfterSignIn()
                 onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))

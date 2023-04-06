@@ -26,3 +26,7 @@ data class SettingResponse(
     @field:Json(name = "value") val value: Any,
     @field:Json(name = "changed") val changed: Boolean
 )
+
+interface NamedSettingsCaller {
+    suspend fun namedSettings(request: NamedSettingsRequest): NamedSettingsResponse
+}

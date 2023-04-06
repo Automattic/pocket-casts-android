@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.account.SyncAccountManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,18 +29,18 @@ import javax.inject.Inject
 class VersionMigrationsJob : JobService() {
 
     companion object {
-        fun run(podcastManager: PodcastManager, settings: Settings, syncAccountManager: SyncAccountManager, context: Context) {
-            runSync(podcastManager, settings, syncAccountManager)
+        fun run(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager, context: Context) {
+            runSync(podcastManager, settings, syncManager)
             runAsync(settings, context)
         }
 
         /**
          * Run short migrations straight away.
          */
-        private fun runSync(podcastManager: PodcastManager, settings: Settings, syncAccountManager: SyncAccountManager) {
+        private fun runSync(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager) {
             performUpdateIfRequired(updateKey = "run_v7_20", settings = settings) {
                 // Upgrading to version 7.20.0 requires the folders from the servers to be added to the existing podcasts. In case the user doesn't have internet this is done as part of the regular sync process.
-                if (syncAccountManager.isLoggedIn()) {
+                if (syncManager.isLoggedIn()) {
                     podcastManager.reloadFoldersFromServer()
                 }
             }

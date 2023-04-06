@@ -101,10 +101,10 @@ interface SyncServer {
     fun postFiles(@Header("Authorization") authorization: String, @Body body: FilePostBody): Single<Response<Void>>
 
     @POST("/files/upload/request")
-    fun getUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): Single<FileUploadResponse>
+    fun getFileUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): Single<FileUploadResponse>
 
     @POST("/files/upload/image")
-    fun getImageUploadUrl(@Header("Authorization") authorization: String, @Body body: FileImageUploadData): Single<FileUrlResponse>
+    fun getFileImageUploadUrl(@Header("Authorization") authorization: String, @Body body: FileImageUploadData): Single<FileUrlResponse>
 
     @PUT
     fun uploadFile(@Url url: String, @Body requestBody: RequestBody): Call<Void>
