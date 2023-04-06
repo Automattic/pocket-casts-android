@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-28 13:54:19+0000
+Translation-Revision-Date: 2023-03-22 17:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="profile_just_sign_out">Só fazer logout</string>
+    <string name="profile_clear_data_would_you_also_like_question">Você gostaria de limpar todos os dados do aplicativo?</string>
+    <string name="profile_clear_data_question">Limpar dados?</string>
+    <string name="profile_clear_data">Limpar dados</string>
+    <string name="discover_sponsored">Patrocinado</string>
+    <string name="podcasts_all">Todos os podcasts</string>
+    <string name="search_results_all_podcasts">Todos os podcasts</string>
+    <string name="search_results_all_episodes">Todos os episódios</string>
     <string name="search_history_row_type_episode_subtitle">Episódio \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Mostrar tudo</string>
     <string name="podcast">Podcast</string>
@@ -1289,6 +1297,7 @@ Language: pt_BR
     <string name="time_short_hours_minutes">%1$dh %2$dmin</string>
     <string name="time_short_hours">%dh</string>
     <string name="search_hint">Pesquisar pelo nome do podcast</string>
+    <string name="search_podcasts">Pesquisar podcasts</string>
     <string name="stream_warning_button">Reproduzir mesmo assim</string>
     <string name="profile_cloud_upload_warning_button">Fazer upload agora</string>
     <string name="profile_cloud_upload_warning_summary">Fazer upload deste episódio consumirá seus dados.</string>

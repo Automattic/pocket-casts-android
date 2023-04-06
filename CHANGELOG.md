@@ -1,12 +1,24 @@
+7.37
+-----
+
+
+7.36
+-----
+
+
 7.35
 -----
 *   Updates
-    *   The Automotive skip forward and backward time settings were improved.
+    *   The Automotive skip forward and backward time settings were improved
         ([#817](https://github.com/Automattic/pocket-casts-android/pull/817)).
-    *   Fixed Automotive Up Next podcast images not loading.
+    *   Fixed Automotive Up Next podcast images not loading
         ([#819](https://github.com/Automattic/pocket-casts-android/pull/819)).
-    *   Fixed missing seek bar in the notification drawer and Android Automotive.
+    *   Fixed missing seek bar in the notification drawer and Android Automotive
         ([#822](https://github.com/Automattic/pocket-casts-android/pull/822)).
+    *   Added option to clear data when signing out of Android Automotive
+        ([828](https://github.com/Automattic/pocket-casts-android/pull/828)).
+    *   Podcast carousel on Discover screen now scrolls automatically
+        ([818](https://github.com/Automattic/pocket-casts-android/pull/818)).
 
 7.34
 -----

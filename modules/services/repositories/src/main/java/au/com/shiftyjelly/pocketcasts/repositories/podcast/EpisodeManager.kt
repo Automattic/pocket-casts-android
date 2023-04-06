@@ -15,6 +15,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 interface EpisodeManager {
@@ -25,7 +26,7 @@ interface EpisodeManager {
     /** Find methods  */
     fun findByUuid(uuid: String): Episode?
     fun findByUuidRx(uuid: String): Maybe<Episode>
-    fun observeByUuid(uuid: String): Flowable<Episode>
+    fun observeByUuid(uuid: String): Flow<Episode>
     fun observePlayableByUuid(uuid: String): Flowable<Playable>
     fun findFirstBySearchQuery(query: String): Episode?
 
@@ -108,6 +109,7 @@ interface EpisodeManager {
     fun stopDownloadAndCleanUp(episode: Episode, from: String)
 
     /** Remove methods  */
+    suspend fun deleteAll()
     fun deleteEpisodesWithoutSync(episodes: List<Episode>, playbackManager: PlaybackManager)
 
     fun deleteEpisodeWithoutSync(episode: Episode?, playbackManager: PlaybackManager)

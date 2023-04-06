@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -27,9 +28,12 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBi
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSingleEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowSinglePodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
+import au.com.shiftyjelly.pocketcasts.discover.util.AutoScrollHelper
+import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.PODCAST_UUID_KEY
+import au.com.shiftyjelly.pocketcasts.discover.viewmodel.CarouselSponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -44,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
+import au.com.shiftyjelly.pocketcasts.servers.model.SponsoredPodcast
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
@@ -64,15 +69,21 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Locale
+import kotlin.math.min
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MAX_ROWS_SMALL_LIST = 20
 private const val CURRENT_PAGE = "current_page"
 private const val TOTAL_PAGES = "total_pages"
+private const val INITIAL_PREFETCH_COUNT = 1
+private const val LIST_ID = "list_id"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 
@@ -82,6 +93,7 @@ internal class DiscoverAdapter(
     val listener: Listener,
     val theme: Theme,
     val loadPodcastList: (String) -> Flowable<PodcastList>,
+    val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -163,31 +175,121 @@ internal class DiscoverAdapter(
     }
 
     inner class CarouselListViewHolder(var binding: RowCarouselListBinding) : NetworkLoadableViewHolder(binding.root) {
+        private var listIdImpressionTracked = mutableListOf<String>()
+        private var autoScrollHelper: AutoScrollHelper? = null
+        private val scrollListener = object : OnScrollListener() {
+            private var draggingStarted: Boolean = false
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_SETTLING -> Unit // Do nothing
+                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        draggingStarted = true
+                        autoScrollHelper?.stopAutoScrollTimer()
+                    }
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        if (draggingStarted) {
+                            /* Start auto scroll with a delay after a manual swipe */
+                            autoScrollHelper?.startAutoScrollTimer(delay = AutoScrollHelper.AUTO_SCROLL_DELAY)
+                            draggingStarted = false
+                        }
+                    }
+                }
+            }
+        }
+
         val adapter = CarouselListRowAdapter(null, theme, listener::onPodcastClicked, listener::onPodcastSubscribe, analyticsTracker)
 
-        private val linearLayoutManager =
-            LinearLayoutManager(itemView.context, RecyclerView.HORIZONTAL, false).apply {
-                initialPrefetchItemCount = 1
+        private val scrollingLayoutManager =
+            ScrollingLinearLayoutManager(
+                itemView.context,
+                RecyclerView.HORIZONTAL,
+                false
+            ).apply {
+                initialPrefetchItemCount = INITIAL_PREFETCH_COUNT
             }
 
         init {
-            recyclerView?.layoutManager = linearLayoutManager
+            recyclerView?.layoutManager = scrollingLayoutManager
             recyclerView?.itemAnimator = null
+            recyclerView?.addOnScrollListener(scrollListener)
+
+            autoScrollHelper = AutoScrollHelper {
+                if (adapter.itemCount == 0) return@AutoScrollHelper
+                val currentPosition = binding.pageIndicatorView.position
+                val nextPosition = (currentPosition + 1)
+                    .takeIf { it < adapter.itemCount } ?: 0
+                MainScope().launch {
+                    if (nextPosition > currentPosition) {
+                        recyclerView?.smoothScrollToPosition(nextPosition)
+                    } else {
+                        /* Jump to the beginning to avoid a backward scroll animation */
+                        recyclerView?.scrollToPosition(nextPosition)
+                    }
+                    binding.pageIndicatorView.position = nextPosition
+                    trackSponsoredListImpression(nextPosition)
+                    trackPageChanged(nextPosition)
+                }
+            }
+
             val snapHelper = HorizontalPeekSnapHelper(0)
             snapHelper.attachToRecyclerView(recyclerView)
             snapHelper.onSnapPositionChanged = { position ->
+                /* Page just snapped, skip auto scroll */
+                autoScrollHelper?.skipAutoScroll()
                 binding.pageIndicatorView.position = position
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED, mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount))
+                trackSponsoredListImpression(position)
+                trackPageChanged(position)
             }
 
             recyclerView?.adapter = adapter
             adapter.submitList(listOf(LoadingItem()))
+
+            itemView.viewTreeObserver?.apply {
+                /* Stop auto scroll when app is backgrounded */
+                addOnWindowFocusChangeListener { hasFocus ->
+                    if (!hasFocus) autoScrollHelper?.stopAutoScrollTimer()
+                }
+                /* Manage auto scroll when itemView's visibility changes */
+                addOnGlobalLayoutListener {
+                    if (itemView.isShown) {
+                        /* Start auto scroll with a delay when carousel item view is re-shown */
+                        autoScrollHelper?.startAutoScrollTimer(delay = AutoScrollHelper.AUTO_SCROLL_DELAY)
+                    } else {
+                        autoScrollHelper?.stopAutoScrollTimer()
+                    }
+                }
+            }
         }
 
         override fun onRestoreInstanceState(state: Parcelable?) {
             super.onRestoreInstanceState(state)
             recyclerView?.post {
-                binding.pageIndicatorView.position = linearLayoutManager.findFirstVisibleItemPosition()
+                val position = scrollingLayoutManager.findFirstVisibleItemPosition()
+                binding.pageIndicatorView.position = position
+                recyclerView.scrollToPosition(position)
+                trackSponsoredListImpression(position)
+            }
+        }
+
+        private fun trackPageChanged(position: Int) {
+            analyticsTracker.track(
+                AnalyticsEvent.DISCOVER_FEATURED_PAGE_CHANGED,
+                mapOf(CURRENT_PAGE to position, TOTAL_PAGES to adapter.itemCount)
+            )
+        }
+
+        private fun trackSponsoredListImpression(position: Int) {
+            val discoverPodcast = adapter.currentList[position] as? DiscoverPodcast
+            discoverPodcast?.listId?.let {
+                if (listIdImpressionTracked.contains(it)) return
+                FirebaseAnalyticsTracker.listImpression(it)
+                analyticsTracker.track(
+                    AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
+                    mapOf(LIST_ID to it)
+                )
+                listIdImpressionTracked.add(it)
             }
         }
     }
@@ -320,18 +422,26 @@ internal class DiscoverAdapter(
                 }
                 is CarouselListViewHolder -> {
                     val featuredLimit = 5
+
                     val loadingFlowable: Flowable<List<Any>> = loadPodcastList(row.source)
-                        .flatMap<List<Any>> { podcastList ->
-                            Flowable.fromIterable(podcastList.podcasts)
-                                .take(featuredLimit.toLong())
-                                .concatMap {
+                        .zipWith(loadCarouselSponsoredPodcastList(row.sponsoredPodcasts))
+                        .flatMap {
+                            val (featuredPodcastList, sponsoredPodcastList) = it
+                            val mutableList = featuredPodcastList.podcasts
+                                .take(featuredLimit)
+                                .toMutableList()
+                            sponsoredPodcastList.forEach { sponsoredPodcast ->
+                                mutableList.addSafely(sponsoredPodcast.podcast.copy(isSponsored = true, listId = sponsoredPodcast.listId), sponsoredPodcast.position)
+                            }
+                            Flowable.fromIterable(mutableList.toList())
+                                .concatMap { discoverPodcast ->
                                     // For each podcast, we need to load its background color.
                                     val zipper: BiFunction<DiscoverPodcast, Optional<ArtworkColors>, DiscoverPodcast> = BiFunction { podcast: DiscoverPodcast, colors: Optional<ArtworkColors> ->
                                         val backgroundColor = colors.get()?.tintForDarkBg ?: 0
                                         podcast.color = backgroundColor
                                         podcast
                                     }
-                                    Single.zip(Single.just(it), staticServerManager.getColorsSingle(it.uuid).subscribeOn(Schedulers.io()), zipper).toFlowable()
+                                    Single.zip(Single.just(discoverPodcast), staticServerManager.getColorsSingle(discoverPodcast.uuid).subscribeOn(Schedulers.io()), zipper).toFlowable()
                                 }
                                 .toList().toFlowable()
                         }
@@ -578,6 +688,9 @@ internal class DiscoverAdapter(
         analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to listUuid, PODCAST_UUID_KEY to podcastUuid))
     }
 }
+
+private fun MutableList<DiscoverPodcast>.addSafely(item: DiscoverPodcast, position: Int) =
+    add(min(position, count()), item)
 
 private class DiscoverRowDiffCallback : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(old: Any, new: Any): Boolean {

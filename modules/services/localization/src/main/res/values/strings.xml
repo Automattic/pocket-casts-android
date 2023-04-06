@@ -6,6 +6,7 @@
 
     <string name="empty" translatable="false" />
 
+    <string name="account">Account</string>
     <string name="add_to_up_next">Add to Up Next</string>
     <string name="archive">Archive</string>
     <string name="unarchive">Unarchive</string>
@@ -25,9 +26,12 @@
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
+    <string name="log_in">Log in</string>
+    <string name="log_out">Log out</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
+    <string name="mark_unplayed">Mark unplayed</string>
     <string name="more">More</string>
     <string name="more_options">More options</string>
     <string name="next_episode">Next episode</string>
@@ -48,6 +52,7 @@
     <string name="play_on">Play on&#8230;</string>
     <string name="played">Played</string>
     <string name="remove_from_up_next">Remove from Up Next</string>
+    <string name="removed">Removed</string>
     <string name="search">Search</string>
     <string name="selected">Selected</string>
     <string name="not_selected">Not selected</string>
@@ -190,6 +195,7 @@
     <string name="stream_warning_title_not_wifi" translatable="false">@string/youre_not_on_wifi</string>
     <string name="stream_warning_title_metered_wifi" translatable="false">@string/youre_on_metered_wifi</string>
     <string name="stream_warning_summary">Streaming this episode will use data.</string>
+    <string name="stream_warning_summary_short">Streaming will use data. Proceed?</string>
     <string name="stream_warning_button">Stream Anyway</string>
 
     <string name="search_no_podcasts_found">No podcasts found</string>
@@ -648,6 +654,9 @@
     <string name="profile_change_password_title">Change Password</string>
     <string name="profile_clean_up">Clean up</string>
     <string name="profile_clear_all">Clear all</string>
+    <string name="profile_clear_data">Clear data</string>
+    <string name="profile_clear_data_question">Clear data?</string>
+    <string name="profile_clear_data_would_you_also_like_question">Would you also like to clear all data from the app?</string>
     <string name="profile_clear_cannot_be_undone">This action cannot be undone.</string>
     <string name="profile_clear_listening_history">Clear listening history</string>
     <string name="profile_clear_listening_history_title">Clear Listening History</string>
@@ -755,6 +764,7 @@
     <string name="profile_get_plus">Get Pocket Casts Plus to unlock this feature, plus lots more!</string>
     <string name="profile_help_support">Help support Pocket Casts by upgrading your account</string>
     <string name="profile_joined">Joined:</string>
+    <string name="profile_just_sign_out">Just sign out</string>
     <string name="profile_last_refresh">Last refresh: %s ago</string>
     <string name="profile_license_agreement">Pocket Casts values your privacy. This Privacy Policy explains what information we collect about you and why, what we may do with that information and how we handle it. It applies to the iOS and Android Pocket Casts apps, and the Pocket Casts web service with associated macOS and Windows apps (jointly and severally, the Service). By using the Service, you agree to this Privacy Policy. If you turn on push notifications in the app, we store the push token Apple provides us in order to deliver those push notifications to your device. If you buy the web app we store a transaction id for your purchase. If you choose not to create an account, and don&#x2019;t use push notifications, no data is stored about you on our servers. Pocket Casts web service also uses cookies and like technologies to keep you logged in. Should you choose to generate a support request from within the Service, we may generate an attachment containing additional data to assist in addressing your support request which you&#x2019;re welcome to view prior to submission.</string>
     <string name="profile_monthly">Monthly</string>
@@ -1048,6 +1058,7 @@
     <string name="settings_media_notification_controls_title_play_next" translatable="false">@string/play_next</string>
     <string name="settings_media_notification_controls_title_playback_speed" translatable="false">@string/playback_speed</string>
     <string name="settings_media_notification_controls_title_star" translatable="false">@string/star</string>
+    <string name="settings_metered_data_warning">Metered data warning</string>
     <string name="settings_no_thanks">No thanks</string>
     <string name="settings_notifications_new_episodes">New Episodes</string>
     <string name="settings_notification_actions">Actions</string>
@@ -1397,6 +1408,7 @@
     <string name="discover_popular_in">Popular in %s</string>
     <string name="discover_button_play_episode">Play Episode</string>
     <string name="discover_button_play_trailer">Play Trailer</string>
+    <string name="discover_sponsored">Sponsored</string>
 
     <!-- Server errors -->
 
@@ -1624,4 +1636,9 @@
     <string name="filter_title">Filter Title</string>
     <string name="filter_id_or_title">Filter ID or Title</string>
     <string name="error_opening_links_activity_not_found">Looks like you don\'t have an app capable of viewing this content.</string>
+
+    <!-- Wear -->
+
+    <string name="wear_hide_password">Hide password</string>
+    <string name="wear_show_password">Show password</string>
 </resources>

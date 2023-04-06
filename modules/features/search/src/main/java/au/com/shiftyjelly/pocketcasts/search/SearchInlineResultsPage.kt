@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -139,7 +142,23 @@ private fun SearchResultsView(
             }
         }
     }
+    val podcasts by remember { mutableStateOf(state.podcasts) }
+    val podcastsRowState = rememberLazyListState()
+    val episodesRowState = rememberLazyListState()
+    LaunchedEffect(key1 = state.podcasts) {
+        // Only reset the scroll state if we have podcasts and they are different. This prevents resetting the
+        // scroll state when navigating back to the search results after tapping on one of the results.
+        if (state.podcasts.isNotEmpty() && state.podcasts != podcasts) {
+            podcastsRowState.scrollToItem(0)
+        }
+    }
+    LaunchedEffect(key1 = state.episodes) {
+        if (state.episodes.isNotEmpty()) {
+            episodesRowState.scrollToItem(0)
+        }
+    }
     LazyColumn(
+        state = episodesRowState,
         modifier = modifier
             .nestedScroll(nestedScrollConnection)
     ) {
@@ -152,10 +171,13 @@ private fun SearchResultsView(
             }
         }
         item {
-            LazyRow(contentPadding = PaddingValues(horizontal = 8.dp)) {
+            LazyRow(
+                state = podcastsRowState,
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
                 items(
                     items = state.podcasts.take(minOf(MAX_ITEM_COUNT, state.podcasts.size)),
-                    key = { it.adapterId }
+                    key = { it.uuid }
                 ) { folderItem ->
                     when (folderItem) {
                         is FolderItem.Folder -> {

@@ -43,14 +43,17 @@ To build, install, and test the project from the command line:
     │   │   ├── account        # Create account and sign in pages.
     │   │   ├── cartheme       # Automotive resources needed for the account pages.
     │   │   ├── discover       # Discover section.
+    │   │   ├── endofyear      # End of year stats.
     │   │   ├── filters        # Filters section.
     │   │   ├── navigation     # Navigation utilities.
     │   │   ├── player         # Full screen player
     │   │   ├── podcasts       # Podcasts section.
     │   │   ├── profile        # Profile section.
     │   │   ├── search         # Search pages.
-    │   │   └── settings       # Settings pages.
+    │   │   ├── settings       # Settings pages.
+    │   │   └── taskerplugin   # Plugin for integration with Tasker app.
     │   └── services
+    │       ├── analytics      # Analytics code.
     │       ├── compose        # Shared Compose code.
     │       ├── images         # Image resources.
     │       ├── localization   # Contains the strings in English and localized strings from GlotPress. 
@@ -61,6 +64,8 @@ To build, install, and test the project from the command line:
     │       ├── ui             # Shared UI code for the 'compose' and 'views' modules. This includes the themes.
     │       ├── utils          # Utility classes.
     │       └── views          # Shred Only the old views code.
+
+The hierarchy of the modules in the project are reflected in [this diagram](docs/module-diagram.png).
 
 ## Contributing
 

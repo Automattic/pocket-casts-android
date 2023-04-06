@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -41,7 +41,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
             is ProfileEpisodeListFragment.Mode.History -> episodeManager.observePlaybackHistoryEpisodes()
         }
 
-        episodeList = LiveDataReactiveStreams.fromPublisher(episodeListFlowable)
+        episodeList = episodeListFlowable.toLiveData()
     }
 
     @Suppress("UNUSED_PARAMETER")

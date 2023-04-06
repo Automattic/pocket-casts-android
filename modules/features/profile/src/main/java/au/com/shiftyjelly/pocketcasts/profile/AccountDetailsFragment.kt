@@ -25,7 +25,13 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentAccountDetailsBinding
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -38,6 +44,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.util.Date
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
@@ -54,11 +62,17 @@ class AccountDetailsFragment : BaseFragment() {
         }
     }
 
-    @Inject lateinit var settings: Settings
-    @Inject lateinit var userManager: UserManager
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject lateinit var folderManager: FolderManager
+    @Inject lateinit var playlistManager: PlaylistManager
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var podcastManager: PodcastManager
-    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var searchHistoryManager: SearchHistoryManager
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var upNextQueue: UpNextQueue
+    @Inject lateinit var userEpisodeManager: UserEpisodeManager
+    @Inject lateinit var userManager: UserManager
     @Inject lateinit var syncManager: SyncManager
 
     private val viewModel: AccountDetailsViewModel by viewModels()
@@ -246,9 +260,45 @@ class AccountDetailsFragment : BaseFragment() {
         val builder = AlertDialog.Builder(themedContext)
         builder.setTitle(getString(LR.string.profile_sign_out))
             .setMessage(getString(LR.string.profile_sign_out_confirm))
-            .setPositiveButton(getString(LR.string.profile_sign_out)) { _, _ -> performSignOut() }
+            .setPositiveButton(getString(LR.string.profile_sign_out)) { _, _ -> clearDataAlert() }
             .setNegativeButton(getString(LR.string.cancel), null)
             .show()
+    }
+
+    private fun clearDataAlert() {
+        val context = context ?: return
+        val themedContext = if (Util.isAutomotive(context)) ContextThemeWrapper(context, CR.style.Theme_Car_NoActionBar) else context
+        val builder = AlertDialog.Builder(themedContext)
+        builder.setTitle(getString(LR.string.profile_clear_data_question))
+            .setMessage(getString(LR.string.profile_clear_data_would_you_also_like_question))
+            .setPositiveButton(getString(LR.string.profile_just_sign_out)) { _, _ -> performSignOut() }
+            .setNegativeButton(getString(LR.string.profile_clear_data)) { _, _ ->
+                signOutAndClearData()
+            }
+            .show()
+    }
+
+    private fun signOutAndClearData() {
+        // Sign out first to make sure no data changes get synced
+        userManager.signOut(playbackManager, wasInitiatedByUser = true)
+
+        // Block while clearing data so that we don't return to the app until the users data has been cleared
+        runBlocking(Dispatchers.IO) {
+            upNextQueue.removeAllIncludingChanges()
+
+            playlistManager.resetDb()
+            folderManager.deleteAll()
+            searchHistoryManager.clearAll()
+
+            podcastManager.deleteAllPodcasts()
+
+            userEpisodeManager.findUserEpisodes().forEach {
+                userEpisodeManager.delete(it, playbackManager)
+            }
+            episodeManager.deleteAll()
+        }
+
+        activity?.finish()
     }
 
     private fun performSignOut() {

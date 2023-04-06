@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
@@ -42,20 +43,48 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
     override fun onBindViewHolder(holder: CarouselItemViewHolder, position: Int) {
         val podcast = getItem(position)
         if (podcast is DiscoverPodcast) {
+            val context = holder.itemView.context
+            val tagLineText = if (podcast.isSponsored) {
+                context.getString(LR.string.discover_sponsored)
+            } else {
+                pillText
+            }
             holder.podcast = podcast
-            holder.setTaglineText(pillText)
-            holder.itemView.setOnClickListener {
-                onPodcastClicked(podcast, null) // no analytics for carousel
 
-                FirebaseAnalyticsTracker.openedFeaturedPodcast()
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED, AnalyticsProp.featuredPodcastTapped(podcast.uuid))
+            holder.setTaglineText(tagLineText)
+            holder.itemView.setOnClickListener {
+                onPodcastClicked(podcast, podcast.listId) // no analytics for carousel
+
+                if (podcast.listId != null) {
+                    val listId = podcast.listId as String
+                    FirebaseAnalyticsTracker.podcastTappedFromList(listId, podcast.uuid)
+                    analyticsTracker.track(
+                        AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
+                        AnalyticsProp.sponsoredPodcastTapped(listId, podcast.uuid)
+                    )
+                } else {
+                    FirebaseAnalyticsTracker.openedFeaturedPodcast()
+                    analyticsTracker.track(
+                        AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED,
+                        AnalyticsProp.featuredPodcastTapped(podcast.uuid)
+                    )
+                }
             }
             holder.btnSubscribe.setOnClickListener {
                 holder.btnSubscribe.updateSubscribeButtonIcon(subscribed = true)
                 onPodcastSubscribe(podcast, null) // no analytics for carousel
 
-                FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
-                analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, AnalyticsProp.featuredPodcastSubscribed(podcast.uuid))
+                if (podcast.listId != null) {
+                    val listId = podcast.listId as String
+                    FirebaseAnalyticsTracker.podcastSubscribedFromList(listId, podcast.uuid)
+                    analyticsTracker.track(
+                        AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED,
+                        AnalyticsProp.sponsoredPodcastSubscribed(listId, podcast.uuid)
+                    )
+                } else {
+                    FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
+                    analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, AnalyticsProp.featuredPodcastSubscribed(podcast.uuid))
+                }
                 analyticsTracker.track(AnalyticsEvent.PODCAST_SUBSCRIBED, AnalyticsProp.podcastSubscribed(AnalyticsSource.DISCOVER, podcast.uuid))
             }
         } else {
@@ -65,9 +94,13 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
 
     companion object {
         private object AnalyticsProp {
+            const val LIST_ID_KEY = "list_id"
             private const val PODCAST_UUID_KEY = "podcast_uuid"
             private const val SOURCE_KEY = "source"
             private const val UUID_KEY = "uuid"
+
+            fun sponsoredPodcastTapped(listId: String, uuid: String) = mapOf(LIST_ID_KEY to listId, PODCAST_UUID_KEY to uuid)
+            fun sponsoredPodcastSubscribed(listId: String, uuid: String) = mapOf(LIST_ID_KEY to listId, PODCAST_UUID_KEY to uuid)
             fun featuredPodcastTapped(uuid: String) = mapOf(PODCAST_UUID_KEY to uuid)
             fun featuredPodcastSubscribed(uuid: String) = mapOf(PODCAST_UUID_KEY to uuid)
             fun podcastSubscribed(source: AnalyticsSource, uuid: String) =

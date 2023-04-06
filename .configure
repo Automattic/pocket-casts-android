@@ -1,7 +1,7 @@
 {
   "project_name": "pocketcasts-android",
   "branch": "trunk",
-  "pinned_hash": "2b485a2b13db12c7cb2260240392d2575fbec74c",
+  "pinned_hash": "d3e500e4dc78d4097c4fa119565c69333bc1720d",
   "files_to_copy": [
     {
       "file": "android/pocket-casts/secret.properties",
@@ -21,6 +21,11 @@
     {
       "file": "android/pocket-casts/google-services.json",
       "destination": "automotive/google-services.json",
+      "encrypt": true
+    },
+    {
+      "file": "android/pocket-casts/google-services.json",
+      "destination": "wear/google-services.json",
       "encrypt": true
     },
     {

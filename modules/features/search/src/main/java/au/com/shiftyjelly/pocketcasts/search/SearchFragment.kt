@@ -103,7 +103,7 @@ class SearchFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentSearchBinding.inflate(inflater, container, false)
-        binding.setLifecycleOwner { viewLifecycleOwner.lifecycle }
+        binding.lifecycleOwner = viewLifecycleOwner
         viewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setSource(source)
@@ -173,8 +173,10 @@ class SearchFragment : BaseFragment() {
         searchView.imeOptions = searchView.imeOptions or EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_FULLSCREEN
         searchView.setIconifiedByDefault(false)
         // seems like a more reliable focus using a post
-        searchView.post {
-            searchView.showKeyboard()
+        if (viewModel.state.value.searchTerm.isEmpty()) {
+            searchView.post {
+                searchView.showKeyboard()
+            }
         }
         searchView.setOnCloseListener {
             UiUtil.hideKeyboard(searchView)
@@ -194,6 +196,9 @@ class SearchFragment : BaseFragment() {
                 val characterCount = query.length
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
+                    if ((viewModel.state.value as? SearchState.Results)?.podcasts?.isNotEmpty() == true) {
+                        binding.searchHistoryPanel.hide()
+                    }
                     return true
                 }
                 viewModel.updateSearchQuery(query)
@@ -288,6 +293,7 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun onShowAllClick(resultsType: ResultsType) {
+        viewModel.trackSearchListShown(source, resultsType)
         val fragment = SearchResultsFragment.newInstance(resultsType, onlySearchRemote, source)
         childFragmentManager.beginTransaction()
             .replace(R.id.searchResults, fragment)

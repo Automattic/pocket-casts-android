@@ -285,4 +285,11 @@ dependencies {
     androidTestImplementation androidLibs.accessibilityTestFramework
 
     coreLibraryDesugaring androidLibs.desugarJdk
+
+    constraints {
+        // Avoid duplicate class compile failure: https://stackoverflow.com/a/75298544/1910286
+        implementation(libs.kotlinJdk8) {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
 }

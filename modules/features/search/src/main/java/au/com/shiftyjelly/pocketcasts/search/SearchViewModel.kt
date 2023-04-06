@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
+import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -90,6 +91,8 @@ class SearchViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
+        // Prevent updating the search query when navigating back to the search results after tapping on a result.
+        if (_state.value.searchTerm == query) return
         searchHandler.updateSearchQuery(query, immediate)
     }
 
@@ -154,6 +157,13 @@ class SearchViewModel @Inject constructor(
         )
     }
 
+    fun trackSearchListShown(source: AnalyticsSource, type: ResultsType) {
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_LIST_SHOWN,
+            AnalyticsProp.searchListShown(source = source, type = type)
+        )
+    }
+
     enum class SearchResultType(val value: String) {
         PODCAST_LOCAL_RESULT("podcast_local_result"),
         PODCAST_REMOTE_RESULT("podcast_remote_result"),
@@ -165,6 +175,8 @@ class SearchViewModel @Inject constructor(
         private const val SOURCE = "source"
         private const val UUID = "uuid"
         private const val RESULT_TYPE = "result_type"
+        private const val DISPLAYING = "displaying"
+
         fun searchResultTapped(source: AnalyticsSource, uuid: String, type: SearchResultType) =
             mapOf(SOURCE to source.analyticsValue, UUID to uuid, RESULT_TYPE to type.value)
 
@@ -173,6 +185,9 @@ class SearchViewModel @Inject constructor(
 
         fun podcastSubscribed(source: AnalyticsSource, uuid: String) =
             mapOf(SOURCE to "${source.analyticsValue}_search", UUID to uuid)
+
+        fun searchListShown(source: AnalyticsSource, type: ResultsType) =
+            mapOf(SOURCE to source.analyticsValue, DISPLAYING to type.value)
     }
 }
 

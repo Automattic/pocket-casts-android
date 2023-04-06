@@ -12,6 +12,7 @@ interface FolderManager {
 
     suspend fun create(name: String, color: Int, podcastsSortType: PodcastsSortType, podcastUuids: List<String>): Folder
     suspend fun delete(folder: Folder)
+    suspend fun deleteAll()
     suspend fun upsertSynced(folder: Folder): Folder
     suspend fun deleteSynced(folderUuid: String)
     suspend fun findByUuid(uuid: String): Folder?

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-28 09:54:03+0000
+Translation-Revision-Date: 2023-03-22 10:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="profile_just_sign_out">Solo cerrar sesión</string>
+    <string name="profile_clear_data_would_you_also_like_question">¿Quieres borrar también todos los datos de la aplicación?</string>
+    <string name="profile_clear_data_question">¿Quieres borrar los datos?</string>
+    <string name="profile_clear_data">Borrar datos</string>
+    <string name="discover_sponsored">Patrocinado</string>
+    <string name="podcasts_all">Todos los podcasts</string>
+    <string name="search_results_all_podcasts">Todos los podcasts</string>
+    <string name="search_results_all_episodes">Todos los episodios</string>
     <string name="search_history_row_type_episode_subtitle">Episode \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Mostrar todas</string>
     <string name="podcast">Pódcast</string>
@@ -1289,6 +1297,7 @@ Language: es
     <string name="time_short_hours_minutes">%1$d h %2$d min</string>
     <string name="time_short_hours">%dh</string>
     <string name="search_hint">Buscar por nombre del podcast</string>
+    <string name="search_podcasts">Buscar podcasts</string>
     <string name="stream_warning_button">Reproducir de todos modos</string>
     <string name="profile_cloud_upload_warning_button">Subir ahora</string>
     <string name="profile_cloud_upload_warning_summary">Si subes el episodio, se utilizarán los datos móviles.</string>

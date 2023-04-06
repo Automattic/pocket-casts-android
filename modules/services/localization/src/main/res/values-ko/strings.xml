@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-02-27 12:54:03+0000
+Translation-Revision-Date: 2023-03-20 14:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="profile_just_sign_out">방금 로그아웃했습니다.</string>
+    <string name="profile_clear_data_would_you_also_like_question">앱에 저장된 모든 데이터를 지우시겠나요?</string>
+    <string name="profile_clear_data_question">데이터를 지우시겠나요?</string>
+    <string name="profile_clear_data">데이터 지우기</string>
+    <string name="discover_sponsored">후원</string>
+    <string name="podcasts_all">모든 팟캐스트</string>
+    <string name="search_results_all_podcasts">모든 팟캐스트</string>
+    <string name="search_results_all_episodes">모든 에피소드</string>
     <string name="search_history_row_type_episode_subtitle">에피소드 \u2022 %s \u2022 %s</string>
     <string name="search_show_all">모두 보기</string>
     <string name="podcast">팟캐스트</string>
@@ -768,7 +776,7 @@ Language: ko_KR
     <string name="profile_yearly">매년</string>
     <string name="profile_whats_included">무엇이 포함되나요?</string>
     <string name="profile_welcome_to_plus">Pocket Casts Plus에 오신 것을 환영합니다!</string>
-    <string name="profile_welcome_to_free">Pocket Casts Plus에 오신 것을 환영합니다!</string>
+    <string name="profile_welcome_to_free">Pocket Casts에 오신 것을 환영합니다!</string>
     <string name="profile_web_player">웹 플레이어</string>
     <string name="profile_upgrade_to_plus">Plus로 업그레이드</string>
     <string name="profile_updates_ends">업데이트 종료: %s</string>
@@ -1289,6 +1297,7 @@ Language: ko_KR
     <string name="time_short_hours_minutes">%1$d시간 %2$d분</string>
     <string name="time_short_hours">%d시간</string>
     <string name="search_hint">팟캐스트 이름으로 검색</string>
+    <string name="search_podcasts">팟캐스트 검색</string>
     <string name="stream_warning_button">무시하고 스트리밍</string>
     <string name="profile_cloud_upload_warning_button">지금 업로드</string>
     <string name="profile_cloud_upload_warning_summary">이 에피소드를 업로드하면 데이터가 사용됩니다.</string>

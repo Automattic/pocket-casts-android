@@ -14,15 +14,9 @@ object DownloadHelper {
         if (episode.isDownloaded) {
             return
         }
-        manuallyDownloadEpisodeNow(episode, from, true, downloadManager, episodeManager)
-    }
 
-    fun manuallyDownloadEpisodeNow(episode: Playable, from: String, fireEvent: Boolean, downloadManager: DownloadManager, episodeManager: EpisodeManager) {
-        if (episode.isDownloaded) {
-            return
-        }
         episodeManager.updateAutoDownloadStatus(episode, Episode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED)
-        downloadManager.addEpisodeToQueue(episode, from, fireEvent)
+        downloadManager.addEpisodeToQueue(episode, from, true)
     }
 
     fun addAutoDownloadedEpisodeToQueue(episode: Playable, from: String, downloadManager: DownloadManager, episodeManager: EpisodeManager) {

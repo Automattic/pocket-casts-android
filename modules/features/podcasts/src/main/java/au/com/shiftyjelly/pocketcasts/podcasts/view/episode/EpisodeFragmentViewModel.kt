@@ -3,10 +3,10 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 import android.content.Context
 import androidx.annotation.ColorInt
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -37,6 +37,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -61,7 +62,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     lateinit var state: LiveData<EpisodeFragmentState>
     val showNotes: MutableLiveData<String> = MutableLiveData()
     lateinit var inUpNext: LiveData<Boolean>
-    val isPlaying: LiveData<Boolean> = Transformations.map(playbackManager.playbackStateLive) {
+    val isPlaying: LiveData<Boolean> = playbackManager.playbackStateLive.map {
         it.episodeUuid == episode?.uuid && it.isPlaying
     }
 
@@ -109,7 +110,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 }
                 loadShowNotes(episode)
                 return@flatMapPublisher Flowable.combineLatest(
-                    episodeManager.observeByUuid(episodeUUID),
+                    episodeManager.observeByUuid(episodeUUID).asFlowable(),
                     podcastManager.findPodcastByUuidRx(episode.podcastUuid).toFlowable(),
                     progressUpdatesObservable,
                     zipper
@@ -120,11 +121,11 @@ class EpisodeFragmentViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
 
-        state = LiveDataReactiveStreams.fromPublisher(stateObservable)
+        state = stateObservable.toLiveData()
 
         val inUpNextObservable = playbackManager.upNextQueue.changesObservable.toFlowable(BackpressureStrategy.LATEST)
             .map { upNext -> (upNext is UpNextQueue.State.Loaded) && (upNext.episode == episode || upNext.queue.map { it.uuid }.contains(episodeUUID)) }
-        inUpNext = LiveDataReactiveStreams.fromPublisher(inUpNextObservable)
+        inUpNext = inUpNextObservable.toLiveData()
     }
 
     override fun onCleared() {

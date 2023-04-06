@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.LiveDataReactiveStreams
+import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -130,7 +130,7 @@ class SearchHandler @Inject constructor(
                     }
                     .toObservable()
 
-                if (settings.isFeatureFlagSearchImprovementsEnabled()) {
+                if (settings.isFeatureFlagSearchImprovementsEnabled() && !it.startsWith("http")) {
                     val episodesServerSearch = cacheServerManager
                         .searchEpisodes(it)
                         .map { episodeSearch ->
@@ -200,8 +200,8 @@ class SearchHandler @Inject constructor(
         .observeOn(AndroidSchedulers.mainThread())
         .toFlowable(BackpressureStrategy.LATEST)
 
-    val searchResults: LiveData<SearchState> = LiveDataReactiveStreams.fromPublisher(searchFlowable)
-    val loading: LiveData<Boolean> = LiveDataReactiveStreams.fromPublisher(loadingObservable.toFlowable(BackpressureStrategy.LATEST))
+    val searchResults: LiveData<SearchState> = searchFlowable.toLiveData()
+    val loading: LiveData<Boolean> = loadingObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
         searchQuery.accept(Query(query, immediate))
