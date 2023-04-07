@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
@@ -69,7 +67,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import java.lang.Long.max
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -379,33 +376,6 @@ private fun FeatureItem(
             modifier = Modifier.alpha(0.72f),
         )
     }
-}
-
-enum class PlusUpgradeFeatureItem(
-    @DrawableRes val image: Int,
-    @StringRes val title: Int,
-    @StringRes val text: Int,
-) {
-    DesktopApps(
-        image = IR.drawable.desktop_apps,
-        title = LR.string.onboarding_plus_feature_desktop_apps_title,
-        text = LR.string.onboarding_plus_feature_desktop_apps_text,
-    ),
-    Folders(
-        image = IR.drawable.folder,
-        title = LR.string.onboarding_plus_feature_folders_title,
-        text = LR.string.onboarding_plus_feature_folders_text,
-    ),
-    CloudStorage(
-        image = IR.drawable.cloud_storage,
-        title = LR.string.onboarding_plus_feature_cloud_storage_title,
-        text = LR.string.onboarding_plus_feature_cloud_storage_text,
-    ),
-    ThemesIcons(
-        image = IR.drawable.themes_icons,
-        title = LR.string.onboarding_plus_feature_themes_icons_title,
-        text = LR.string.onboarding_plus_feature_themes_icons_text,
-    ),
 }
 
 // Based on https://stackoverflow.com/a/71344813/1910286
