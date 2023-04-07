@@ -8,6 +8,7 @@
 
     <string name="account">Account</string>
     <string name="add_to_up_next">Add to Up Next</string>
+    <string name="add_to_up_next_question">Add to up next?</string>
     <string name="archive">Archive</string>
     <string name="unarchive">Unarchive</string>
     <string name="archive_episode">Archive episode</string>
