@@ -13,7 +13,7 @@ import javax.inject.Inject
 class UpNextViewModel @Inject constructor(
     episodeManager: EpisodeManager,
     podcastManager: PodcastManager,
-    private val playbackManager: PlaybackManager,
+    playbackManager: PlaybackManager,
 ) : ViewModel() {
 
     val upNextQueue: Observable<UpNextQueue.State> = playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)

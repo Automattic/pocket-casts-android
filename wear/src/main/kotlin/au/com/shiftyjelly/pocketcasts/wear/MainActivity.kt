@@ -63,10 +63,7 @@ fun WearApp(themeType: Theme.ThemeType) {
 
             scrollable(
                 route = WatchListScreen.route,
-                columnStateFactory = ScalingLazyColumnDefaults.scalingLazyColumnDefaults(
-                    initialCenterIndex = 1,
-                    initialCenterOffset = 50,
-                ),
+                columnStateFactory = ScalingLazyColumnDefaults.belowTimeText()
             ) {
                 WatchListScreen(navController::navigate, it.scrollableState)
             }
