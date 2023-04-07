@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
@@ -45,6 +46,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -52,13 +54,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -111,69 +116,132 @@ internal fun OnboardingUpgradeFeaturesPage(
             .fillMaxHeight()
             .background(OnboardingUpgradeHelper.backgroundColor)
     ) {
+        if (BuildConfig.ADD_PATRON_ENABLED) {
+            UpgradeLayout(
+                scrollState = scrollState,
+                onBackPressed = onBackPressed,
+            )
+        } else {
+            OldUpgradeLayout(
+                state = state,
+                scrollState = scrollState,
+                onBackPressed = onBackPressed,
+                onUpgradePressed = onUpgradePressed,
+                onNotNowPressed = onNotNowPressed,
+                canUpgrade = canUpgrade,
+            )
+        }
+    }
+}
 
-        OnboardingUpgradeHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
-            Column(
-                Modifier
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .heightIn(min = this@BoxWithConstraints.calculateMinimumHeightWithInsets())
-            ) {
+@Composable
+private fun BoxWithConstraintsScope.UpgradeLayout(
+    scrollState: ScrollState,
+    onBackPressed: () -> Unit,
+) {
+    OnboardingUpgradeHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
+        Column(
+            Modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .heightIn(min = this.calculateMinimumHeightWithInsets()),
+        ) {
 
-                Spacer(Modifier.height(8.dp))
-                NavigationIconButton(
-                    onNavigationClick = onBackPressed,
-                    iconColor = Color.White,
-                    modifier = Modifier
-                        .height(48.dp)
-                        .width(48.dp)
-                )
+            Spacer(Modifier.height(8.dp))
+            NavigationIconButton(
+                onNavigationClick = onBackPressed,
+                iconColor = Color.White,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(48.dp)
+            )
 
-                Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
 
-                IconRow(Modifier.padding(horizontal = 24.dp))
+            TextH20(
+                text = stringResource(LR.string.onboarding_upgrade_everything_you_love_about_pocket_casts_plus),
+                textAlign = TextAlign.Center,
+                color = Color.White,
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth(),
+            )
 
-                Spacer(Modifier.height(36.dp))
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
 
-                TextH10(
-                    text = stringResource(LR.string.onboarding_upgrade_everything_you_love_about_pocket_casts_plus),
-                    color = Color.White,
+@Composable
+private fun BoxWithConstraintsScope.OldUpgradeLayout(
+    state: OnboardingUpgradeFeaturesState,
+    scrollState: ScrollState,
+    onBackPressed: () -> Unit,
+    onUpgradePressed: () -> Unit,
+    onNotNowPressed: () -> Unit,
+    canUpgrade: Boolean,
+) {
+    OnboardingUpgradeHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
+        Column(
+            Modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .heightIn(min = this.calculateMinimumHeightWithInsets())
+        ) {
+
+            Spacer(Modifier.height(8.dp))
+            NavigationIconButton(
+                onNavigationClick = onBackPressed,
+                iconColor = Color.White,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(48.dp)
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            IconRow(Modifier.padding(horizontal = 24.dp))
+
+            Spacer(Modifier.height(36.dp))
+
+            TextH10(
+                text = stringResource(LR.string.onboarding_upgrade_everything_you_love_about_pocket_casts_plus),
+                color = Color.White,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            TextP30(
+                text = stringResource(LR.string.onboarding_upgrade_exclusive_features_and_options),
+                color = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+
+            Spacer(Modifier.height(58.dp))
+
+            FeatureRow(scrollAutomatically = state.scrollAutomatically)
+
+            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(36.dp))
+
+            if (canUpgrade) {
+                PlusRowButton(
+                    text = stringResource(LR.string.onboarding_upgrade_unlock_all_features),
+                    onClick = onUpgradePressed,
                     modifier = Modifier.padding(horizontal = 24.dp),
                 )
-
-                Spacer(Modifier.height(12.dp))
-
-                TextP30(
-                    text = stringResource(LR.string.onboarding_upgrade_exclusive_features_and_options),
-                    color = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
-
-                Spacer(Modifier.height(58.dp))
-
-                FeatureRow(scrollAutomatically = state.scrollAutomatically)
-
-                Spacer(Modifier.weight(1f))
-                Spacer(Modifier.height(36.dp))
-
-                if (canUpgrade) {
-                    PlusRowButton(
-                        text = stringResource(LR.string.onboarding_upgrade_unlock_all_features),
-                        onClick = onUpgradePressed,
-                        modifier = Modifier.padding(horizontal = 24.dp),
-                    )
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                PlusOutlinedRowButton(
-                    text = stringResource(LR.string.not_now),
-                    onClick = onNotNowPressed,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
-
-                Spacer(Modifier.height(16.dp))
             }
+
+            Spacer(Modifier.height(16.dp))
+
+            PlusOutlinedRowButton(
+                text = stringResource(LR.string.not_now),
+                onClick = onNotNowPressed,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
