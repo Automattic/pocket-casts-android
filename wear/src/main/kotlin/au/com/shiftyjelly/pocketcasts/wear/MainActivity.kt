@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingViewModel
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
+import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
 import com.google.android.horologist.compose.navscaffold.composable
@@ -62,6 +63,10 @@ fun WearApp(themeType: Theme.ThemeType) {
 
             scrollable(
                 route = WatchListScreen.route,
+                columnStateFactory = ScalingLazyColumnDefaults.scalingLazyColumnDefaults(
+                    initialCenterIndex = 1,
+                    initialCenterOffset = 50,
+                ),
             ) {
                 WatchListScreen(navController::navigate, it.scrollableState)
             }

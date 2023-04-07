@@ -62,12 +62,8 @@ fun WatchListScreen(
     ) {
 
         item {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.primary,
-                text = stringResource(LR.string.app_name)
-            )
+            // Need this to position the first chip correctly when the screen loads
+            Spacer(Modifier)
         }
 
         item {
