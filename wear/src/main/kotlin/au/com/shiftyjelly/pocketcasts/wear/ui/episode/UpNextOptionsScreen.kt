@@ -1,59 +1,63 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.wear.compose.foundation.lazy.items
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ChipScreenHeader
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
+import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun UpNextOptionsScreen(
+    columnState: ScalingLazyColumnState,
     episodeScreenViewModelStoreOwner: ViewModelStoreOwner,
-    onComplete: () -> Unit
+    onComplete: () -> Unit,
 ) {
     val viewModel = hiltViewModel<EpisodeViewModel>(episodeScreenViewModelStoreOwner)
     Content(
+        columnState = columnState,
         upNextOptions = viewModel.upNextOptions,
         onComplete = onComplete
     )
 }
 
 @Composable
-private fun Content(upNextOptions: List<EpisodeViewModel.UpNextOption>, onComplete: () -> Unit) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()
+private fun Content(
+    columnState: ScalingLazyColumnState,
+    upNextOptions: List<EpisodeViewModel.UpNextOption>,
+    onComplete: () -> Unit,
+) {
+    ScalingLazyColumn(
+        columnState = columnState,
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier
-                .width(IntrinsicSize.Max)
-                .padding(horizontal = 16.dp)
-        ) {
-            upNextOptions.forEach { upNextOption ->
-                WatchListChip(
-                    titleRes = upNextOption.titleRes,
-                    iconRes = upNextOption.iconRes,
-                    onClick = {
-                        upNextOption.onClick()
-                        onComplete()
-                    },
-                )
-            }
+        item {
+            ChipScreenHeader(
+                text = LR.string.add_to_up_next_question,
+                textColor = Color.White,
+            )
+        }
+
+        items(upNextOptions) { upNextOption ->
+            WatchListChip(
+                titleRes = upNextOption.titleRes,
+                iconRes = upNextOption.iconRes,
+                onClick = {
+                    upNextOption.onClick()
+                    onComplete()
+                },
+            )
         }
     }
 }
@@ -63,7 +67,7 @@ private fun Content(upNextOptions: List<EpisodeViewModel.UpNextOption>, onComple
 private fun Preview() {
     WearAppTheme(Theme.ThemeType.DARK) {
         Content(
-            onComplete = {},
+            columnState = ScalingLazyColumnState(),
             upNextOptions = listOf(
                 EpisodeViewModel.UpNextOption(
                     iconRes = IR.drawable.ic_upnext_playnext,
@@ -75,7 +79,8 @@ private fun Preview() {
                     titleRes = LR.string.play_last,
                     onClick = {},
                 ),
-            )
+            ),
+            onComplete = {},
         )
     }
 }
