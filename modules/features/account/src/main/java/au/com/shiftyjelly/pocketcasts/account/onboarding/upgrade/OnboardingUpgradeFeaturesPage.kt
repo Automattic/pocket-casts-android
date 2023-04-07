@@ -48,6 +48,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -135,6 +136,9 @@ internal fun OnboardingUpgradeFeaturesPage(
                 state = state,
                 scrollState = scrollState,
                 onBackPressed = onBackPressed,
+                onFeatureCardChanged = { page ->
+                    viewModel.onFeatureCardChanged(page)
+                }
             )
         } else {
             OldUpgradeLayout(
@@ -154,6 +158,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     state: OnboardingUpgradeFeaturesState,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
+    onFeatureCardChanged: (Int) -> Unit,
 ) {
     OnboardingUpgradeHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
         Column(
@@ -187,6 +192,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 
             FeatureCards(
                 cards = state.featureCards,
+                onFeatureCardChanged = onFeatureCardChanged,
             )
         }
     }
@@ -196,8 +202,15 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 @Composable
 fun FeatureCards(
     cards: List<UpgradeFeatureCard>,
+    onFeatureCardChanged: (Int) -> Unit,
 ) {
     val pagerState = rememberPagerState()
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { index ->
+            onFeatureCardChanged(index)
+        }
+    }
 
     HorizontalPager(
         pageCount = cards.size,

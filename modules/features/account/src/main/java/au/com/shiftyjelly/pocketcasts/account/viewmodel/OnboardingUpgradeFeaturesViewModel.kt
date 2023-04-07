@@ -55,13 +55,20 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
+    fun onFeatureCardChanged(index: Int) {
+        _state.value = _state.value.copy(currentFeatureCard = UpgradeFeatureCard.values()[index])
+    }
+
     companion object {
         private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) =
             mapOf("flow" to flow.analyticsValue, "source" to source.analyticsValue)
     }
 }
 
-data class OnboardingUpgradeFeaturesState(private val isTouchExplorationEnabled: Boolean) {
+data class OnboardingUpgradeFeaturesState(
+    private val isTouchExplorationEnabled: Boolean,
+    val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
+) {
     val scrollAutomatically = !isTouchExplorationEnabled
     val featureCards = UpgradeFeatureCard.values().toList()
 }
