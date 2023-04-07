@@ -17,11 +17,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.UnselectedPlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetViewModel
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedPlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OnboardingPlusUpgradeFlow(
+fun OnboardingUpgradeFlow(
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
     isLoggedIn: Boolean,
@@ -39,10 +39,10 @@ fun OnboardingPlusUpgradeFlow(
     onProceed: () -> Unit,
 ) {
 
-    val bottomSheetViewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
-    val mainSheetViewModel = hiltViewModel<OnboardingPlusFeaturesViewModel>()
+    val bottomSheetViewModel = hiltViewModel<OnboardingUpgradeBottomSheetViewModel>()
+    val mainSheetViewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
     val state = bottomSheetViewModel.state.collectAsState().value
-    val hasSubscriptions = state is OnboardingPlusBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
+    val hasSubscriptions = state is OnboardingUpgradeBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -97,7 +97,7 @@ fun OnboardingPlusUpgradeFlow(
         scrimColor = Color.Black.copy(alpha = 0.5f),
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         content = {
-            OnboardingPlusFeaturesPage(
+            OnboardingUpgradeFeaturesPage(
                 flow = flow,
                 source = source,
                 onUpgradePressed = {
@@ -113,7 +113,7 @@ fun OnboardingPlusUpgradeFlow(
             )
         },
         sheetContent = {
-            OnboardingPlusBottomSheet(
+            OnboardingUpgradeBottomSheet(
                 onClickSubscribe = {
                     if (activity != null) {
                         bottomSheetViewModel.onClickSubscribe(

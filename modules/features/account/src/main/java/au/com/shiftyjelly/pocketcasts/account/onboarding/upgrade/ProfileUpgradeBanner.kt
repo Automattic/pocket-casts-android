@@ -21,20 +21,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.IconRow
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfilePlusUpgradeBannerViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun ProfilePlusUpgradeBanner(
+fun ProfileUpgradeBanner(
     onClick: () -> Unit
 ) {
-    val state by hiltViewModel<ProfilePlusUpgradeBannerViewModel>()
+    val state by hiltViewModel<ProfileUpgradeBannerViewModel>()
         .state
         .collectAsState()
 
-    OnboardingPlusHelper.PlusBackground {
+    OnboardingUpgradeHelper.PlusBackground {
         Column(Modifier.padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(24.dp))
             IconRow()
@@ -47,7 +47,7 @@ fun ProfilePlusUpgradeBanner(
 
             state.numPeriodFree?.let { numPeriodFree ->
                 Spacer(Modifier.height(16.dp))
-                OnboardingPlusHelper.TopText(topText = numPeriodFree)
+                OnboardingUpgradeHelper.TopText(topText = numPeriodFree)
             }
 
             Spacer(Modifier.height(20.dp))
@@ -67,7 +67,7 @@ fun ProfilePlusUpgradeBanner(
             }
 
             Spacer(Modifier.height(30.dp))
-            OnboardingPlusHelper.PlusRowButton(
+            OnboardingUpgradeHelper.PlusRowButton(
                 text = stringResource(LR.string.profile_upgrade_to_plus),
                 onClick = onClick,
             )
@@ -101,8 +101,8 @@ private fun FeatureItemComposable(
 
 @Preview
 @Composable
-private fun ProfilePlusUpgradeBannerPreview() {
-    ProfilePlusUpgradeBanner(
+private fun ProfileUpgradeBannerPreview() {
+    ProfileUpgradeBanner(
         onClick = { }
     )
 }

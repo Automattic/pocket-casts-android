@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.Loaded
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.Loading
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState.NoSubscriptions
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.Loaded
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.Loading
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.NoSubscriptions
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -29,13 +29,13 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class OnboardingPlusBottomSheetViewModel @Inject constructor(
+class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<OnboardingPlusBottomSheetState>(Loading)
-    val state: StateFlow<OnboardingPlusBottomSheetState> = _state
+    private val _state = MutableStateFlow<OnboardingUpgradeBottomSheetState>(Loading)
+    val state: StateFlow<OnboardingUpgradeBottomSheetState> = _state
         .map {
             // If selected subscription has trialPricingPhase, update mostRecentlySelectedTrialPhase
             (it as? Loaded)?.selectedSubscription?.trialPricingPhase?.let { trialPhase ->
@@ -131,7 +131,7 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
         }
     }
 
-    private fun stateFromList(subscriptions: List<Subscription>): OnboardingPlusBottomSheetState {
+    private fun stateFromList(subscriptions: List<Subscription>): OnboardingUpgradeBottomSheetState {
         val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions)
         return if (defaultSelected == null) {
             NoSubscriptions
@@ -164,9 +164,9 @@ class OnboardingPlusBottomSheetViewModel @Inject constructor(
     }
 }
 
-sealed class OnboardingPlusBottomSheetState {
-    object Loading : OnboardingPlusBottomSheetState()
-    object NoSubscriptions : OnboardingPlusBottomSheetState()
+sealed class OnboardingUpgradeBottomSheetState {
+    object Loading : OnboardingUpgradeBottomSheetState()
+    object NoSubscriptions : OnboardingUpgradeBottomSheetState()
     data class Loaded constructor(
         val subscriptions: List<Subscription>, // This list should never be empty
         val selectedSubscription: Subscription,
@@ -174,7 +174,7 @@ sealed class OnboardingPlusBottomSheetState {
         // it animates out of view after a subscription without a trial phase is selected
         val mostRecentlySelectedTrialPhase: TrialSubscriptionPricingPhase? = null,
         val purchaseFailed: Boolean = false
-    ) : OnboardingPlusBottomSheetState() {
+    ) : OnboardingUpgradeBottomSheetState() {
         val showTrialInfo = selectedSubscription.trialPricingPhase != null
 
         init {

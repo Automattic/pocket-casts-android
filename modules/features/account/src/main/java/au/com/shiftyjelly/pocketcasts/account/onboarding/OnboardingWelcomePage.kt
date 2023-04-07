@@ -44,7 +44,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingWelcomeViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -317,7 +317,7 @@ private fun NewsletterSwitch(
 
 @Composable
 private fun PlusPersonCheckmark() {
-    PersonCheckmark(OnboardingPlusHelper.plusGradientBrush)
+    PersonCheckmark(OnboardingUpgradeHelper.plusGradientBrush)
 }
 
 @Composable
