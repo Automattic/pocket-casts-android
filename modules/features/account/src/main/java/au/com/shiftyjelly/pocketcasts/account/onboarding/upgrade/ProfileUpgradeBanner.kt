@@ -34,7 +34,7 @@ fun ProfileUpgradeBanner(
         .state
         .collectAsState()
 
-    OnboardingUpgradeHelper.PlusBackground {
+    OnboardingUpgradeHelper.OldPlusBackground {
         Column(Modifier.padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(24.dp))
             IconRow()

@@ -3,19 +3,21 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import android.app.Application
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
+import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class OnboardingUpgradeFeaturesViewModel @Inject constructor(
@@ -75,16 +77,19 @@ data class OnboardingUpgradeFeaturesState(
 
 enum class UpgradeFeatureCard(
     @StringRes val shortNameRes: Int,
+    @DrawableRes val backgroundGlowsRes: Int,
     val color: Long,
     val featureItems: List<UpgradeFeatureItem>,
 ) {
     PLUS(
-        shortNameRes = R.string.pocket_casts_plus_short,
+        shortNameRes = LR.string.pocket_casts_plus_short,
+        backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         color = 0xFFFFD845,
         featureItems = PlusUpgradeFeatureItem.values().toList(),
     ),
     PATRON(
-        shortNameRes = R.string.pocket_casts_patron_short,
+        shortNameRes = LR.string.pocket_casts_patron_short,
+        backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
         color = 0xFF7A64F6,
         featureItems = emptyList(),
     )

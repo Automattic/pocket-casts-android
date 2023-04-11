@@ -94,7 +94,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     onUpgradePressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
-    canUpgrade: Boolean
+    canUpgrade: Boolean,
 ) {
 
     val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
@@ -160,7 +160,11 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     onBackPressed: () -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
 ) {
-    OnboardingUpgradeHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
+    OnboardingUpgradeHelper.UpgradeBackground(
+        modifier = Modifier.verticalScroll(scrollState),
+        shortNamRes = state.currentFeatureCard.shortNameRes,
+        backgroundGlowsRes = state.currentFeatureCard.backgroundGlowsRes,
+    ) {
         Column(
             Modifier
                 .windowInsetsPadding(WindowInsets.statusBars)
@@ -228,7 +232,8 @@ fun FeatureCards(
         horizontalArrangement = Arrangement.Center,
     ) {
         repeat(cards.size) { iteration ->
-            val color = if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
+            val color =
+                if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
             Box(
                 modifier = Modifier
                     .padding(2.dp)
@@ -349,7 +354,7 @@ private fun BoxWithConstraintsScope.OldUpgradeLayout(
     onNotNowPressed: () -> Unit,
     canUpgrade: Boolean,
 ) {
-    OnboardingUpgradeHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
+    OnboardingUpgradeHelper.OldPlusBackground(Modifier.verticalScroll(scrollState)) {
         Column(
             Modifier
                 .windowInsetsPadding(WindowInsets.statusBars)
