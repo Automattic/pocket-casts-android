@@ -44,7 +44,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -212,45 +211,49 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.weight(1f))
 
-            AnimatedContent(
-                targetState = state.currentFeatureCard.titleRes,
-                label = "titleRes"
-            ) { titleRes ->
-                TextH20(
-                    text = stringResource(titleRes),
-                    textAlign = TextAlign.Center,
-                    color = Color.White,
+            Column {
+                AnimatedContent(
+                    targetState = state.currentFeatureCard.titleRes,
+                    label = "titleRes"
+                ) { titleRes ->
+                    TextH20(
+                        text = stringResource(titleRes),
+                        textAlign = TextAlign.Center,
+                        color = Color.White,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .fillMaxWidth(),
+                    )
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Box(
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    StyledToggle(
+                        state.subscriptionFrequencies
+                            .map { stringResource(id = it.localisedLabelRes) },
+                    ) {
+                        onSubscriptionFrequencyChanged(it)
+                    }
+                }
+
+                FeatureCards(
+                    state = state,
+                    onFeatureCardChanged = onFeatureCardChanged,
+                    onUpgradePressed = onUpgradePressed,
+                    canUpgrade = canUpgrade,
+                    upgradePrice = upgradePrice,
                 )
             }
 
-            Spacer(Modifier.height(24.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                StyledToggle(
-                    state.subscriptionFrequencies
-                        .map { stringResource(id = it.localisedLabelRes) },
-                ) {
-                    onSubscriptionFrequencyChanged(it)
-                }
-            }
-
-            FeatureCards(
-                state = state,
-                onFeatureCardChanged = onFeatureCardChanged,
-                onUpgradePressed = onUpgradePressed,
-                canUpgrade = canUpgrade,
-                upgradePrice = upgradePrice,
-            )
+            Spacer(Modifier.weight(1f))
         }
     }
 }
@@ -333,7 +336,7 @@ fun FeatureCard(
             Box(
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 12.dp),
                 contentAlignment = Alignment.TopStart
             ) {
                 FeaturePill(card.iconRes, card.shortNameRes)
@@ -366,14 +369,17 @@ fun FeatureCard(
                     color = Color.Black,
                     modifier = modifier
                         .alpha(.6f)
+                        .padding(bottom = 6.dp)
                 )
             }
 
             TextH70(
                 text = stringResource(id = card.descriptionRes),
-                color = Color.Gray,
+                color = Color.Black,
                 textAlign = TextAlign.Start,
-                modifier = modifier.padding(bottom = 8.dp)
+                modifier = modifier
+                    .padding(bottom = 8.dp)
+                    .alpha(.6f)
             )
 
             Column(
@@ -405,7 +411,6 @@ fun FeaturePill(
     Card(
         shape = RoundedCornerShape(800.dp),
         backgroundColor = Color.Black,
-        modifier = modifier.padding(4.dp)
     ) {
         Row(
             modifier = modifier
@@ -421,7 +426,7 @@ fun FeaturePill(
                 tint = Color.Unspecified,
             )
             Spacer(Modifier.width(4.dp))
-            Text(
+            TextH50(
                 text = stringResource(shortNameRes),
                 color = Color.White,
             )
