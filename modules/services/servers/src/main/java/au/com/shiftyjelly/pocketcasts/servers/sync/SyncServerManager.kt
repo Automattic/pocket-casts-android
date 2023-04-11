@@ -78,8 +78,8 @@ open class SyncServerManager @Inject constructor(
         return server.forgotPassword(request)
     }
 
-    suspend fun exchangeSonos(): ExchangeSonosResponse {
-        return server.exchangeSonos()
+    suspend fun exchangeSonos(token: AccessToken): ExchangeSonosResponse {
+        return server.exchangeSonos(addBearer(token))
     }
 
     fun emailChange(newEmail: String, password: String, token: AccessToken): Single<UserChangeResponse> {

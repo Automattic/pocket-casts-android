@@ -46,7 +46,7 @@ interface SyncServer {
     suspend fun forgotPassword(@Body request: ForgotPasswordRequest): ForgotPasswordResponse
 
     @POST("/user/exchange_sonos")
-    suspend fun exchangeSonos(): ExchangeSonosResponse
+    suspend fun exchangeSonos(@Header("Authorization") authorization: String): ExchangeSonosResponse
 
     @POST("/user/change_email")
     fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): Single<UserChangeResponse>

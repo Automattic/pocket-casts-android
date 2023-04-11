@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.databinding.ActivitySonosAppLinkBinding
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -115,7 +116,7 @@ class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
             setResult(SONOS_APP_ACTIVITY_RESULT, result)
             finish()
         } catch (e: Exception) {
-            Timber.e(e, "Failed to link Sonos")
+            LogBuffer.e(LogBuffer.TAG_CRASH, e, "Failed to link Sonos")
 
             binding.connectBtn.setText(LR.string.profile_sonos_retry)
             UiUtil.displayAlert(this, getString(LR.string.profile_sonos_linking_failed), getString(LR.string.profile_sonos_linking_failed_summary), null)
