@@ -80,7 +80,7 @@ private fun Content(
             when (signInState) {
                 is SignInState.SignedIn -> {
                     WatchListChip(
-                        titleRes = LR.string.log_out,
+                        title = stringResource(LR.string.log_out),
                         secondaryLabel = signInState.email,
                         iconRes = IR.drawable.ic_signout,
                         onClick = onSignOutClicked,
@@ -88,7 +88,7 @@ private fun Content(
                 }
                 is SignInState.SignedOut -> {
                     WatchListChip(
-                        titleRes = LR.string.log_in,
+                        title = stringResource(LR.string.log_in),
                         iconRes = IR.drawable.signin,
                         onClick = signInClick,
                     )

@@ -251,7 +251,7 @@ fun EpisodeScreen(
 @Composable
 private fun EpisodeListChip(episodeScreenItem: EpisodeScreenItem) {
     WatchListChip(
-        titleRes = episodeScreenItem.title,
+        title = stringResource(episodeScreenItem.title),
         iconRes = episodeScreenItem.iconRes,
         onClick = episodeScreenItem.onClick,
         modifier = Modifier
