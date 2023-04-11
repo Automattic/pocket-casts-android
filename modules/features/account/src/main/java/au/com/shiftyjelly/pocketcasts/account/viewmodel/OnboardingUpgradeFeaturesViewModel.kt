@@ -7,7 +7,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OldPlusUpgradeFeatureItem
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PatronUpgradeFeatureItem
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -77,20 +78,23 @@ data class OnboardingUpgradeFeaturesState(
 
 enum class UpgradeFeatureCard(
     @StringRes val shortNameRes: Int,
+    @StringRes val descriptionRes: Int,
     @DrawableRes val backgroundGlowsRes: Int,
     val color: Long,
     val featureItems: List<UpgradeFeatureItem>,
 ) {
     PLUS(
         shortNameRes = LR.string.pocket_casts_plus_short,
+        descriptionRes = LR.string.onboarding_patron_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         color = 0xFFFFD845,
-        featureItems = OldPlusUpgradeFeatureItem.values().toList(),
+        featureItems = PlusUpgradeFeatureItem.values().toList(),
     ),
     PATRON(
         shortNameRes = LR.string.pocket_casts_patron_short,
+        descriptionRes = LR.string.onboarding_plus_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
         color = 0xFF7A64F6,
-        featureItems = emptyList(),
+        featureItems = PatronUpgradeFeatureItem.values().toList(),
     )
 }

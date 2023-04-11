@@ -76,6 +76,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -173,6 +174,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
         ) {
 
             Spacer(Modifier.height(8.dp))
+
             NavigationIconButton(
                 onNavigationClick = onBackPressed,
                 iconColor = Color.White,
@@ -267,13 +269,15 @@ fun FeatureCard(
             ) {
                 FeaturePill(card.shortNameRes)
             }
+
             TextH10(
                 text = "$39.99 /year",
                 color = Color.Black,
                 modifier = modifier.padding(bottom = 8.dp)
             )
+
             TextH70(
-                text = "Take your podcasting experience to the next level with exclusive access to features and customization options.",
+                text = stringResource(id = card.descriptionRes),
                 color = Color.Gray,
                 textAlign = TextAlign.Start,
                 modifier = modifier.padding(bottom = 8.dp)
@@ -295,7 +299,7 @@ fun FeatureCard(
                     .padding(bottom = 8.dp)
                     .fillMaxWidth()
             ) {
-                TextH30("Subscribe")
+                TextH30(stringResource(id = LR.string.subscribe))
             }
         }
     }
@@ -328,17 +332,19 @@ private fun FeatureItem(
         modifier = modifier
             .semantics(mergeDescendants = true) {}
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.Top,
     ) {
         Icon(
             painter = painterResource(content.image),
             contentDescription = null,
             tint = Color.Black,
-            modifier = modifier.size(32.dp)
+            modifier = modifier
+                .size(20.dp)
+                .padding(2.dp),
         )
-        Spacer(Modifier.width(8.dp))
-        TextH40(
+        Spacer(Modifier.width(16.dp))
+        TextH50(
             text = stringResource(content.title),
             color = Color.Black,
         )
@@ -503,13 +509,13 @@ private fun FeatureItems() {
             .height(IntrinsicSize.Max)
     ) {
         OldPlusUpgradeFeatureItem.values().forEach {
-            FeatureItem(it)
+            OldFeatureItem(it)
         }
     }
 }
 
 @Composable
-private fun FeatureItem(
+private fun OldFeatureItem(
     content: OldPlusUpgradeFeatureItem,
     modifier: Modifier = Modifier,
 ) {
