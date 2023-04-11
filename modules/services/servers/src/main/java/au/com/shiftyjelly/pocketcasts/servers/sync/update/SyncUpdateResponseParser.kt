@@ -16,6 +16,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.HttpException
+import retrofit2.Response
 import java.util.Date
 
 class UserNotLoggedInException : Exception()
@@ -33,7 +38,8 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
             when (reader.nextName()) {
                 "token" -> response.token = reader.nextStringOrNull()
                 "result" -> readResult(reader, response)
-                "error_code" -> if (reader.nextInt() == 2) throw UserNotLoggedInException()
+                // Until we switch to the new user sync API and use HTTP status codes assume the error code of 2 means the token has expired but the user could still be logged in
+                "error_code" -> if (reader.nextInt() == 2) throw HttpException(Response.error<ResponseBody>(401, "".toResponseBody("plain/text".toMediaTypeOrNull())))
                 else -> reader.skipValue()
             }
         }

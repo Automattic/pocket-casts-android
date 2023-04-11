@@ -346,7 +346,9 @@ class SyncManagerImpl @Inject constructor(
 // Other
 
     override suspend fun exchangeSonos(): ExchangeSonosResponse =
-        syncServerManager.exchangeSonos()
+        getCacheTokenOrLogin { token ->
+            syncServerManager.exchangeSonos(token)
+        }
 
     override fun getFilters(): Single<List<Playlist>> =
         getCacheTokenOrLoginRxSingle { token ->
