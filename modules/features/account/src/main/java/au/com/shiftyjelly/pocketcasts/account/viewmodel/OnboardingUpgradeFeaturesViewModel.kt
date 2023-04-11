@@ -7,7 +7,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import au.com.shiftyjelly.pocketcasts.account.R
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeatureItem
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OldPlusUpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -85,7 +85,7 @@ enum class UpgradeFeatureCard(
         shortNameRes = LR.string.pocket_casts_plus_short,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         color = 0xFFFFD845,
-        featureItems = PlusUpgradeFeatureItem.values().toList(),
+        featureItems = OldPlusUpgradeFeatureItem.values().toList(),
     ),
     PATRON(
         shortNameRes = LR.string.pocket_casts_patron_short,

@@ -502,7 +502,7 @@ private fun FeatureItems() {
         modifier = Modifier
             .height(IntrinsicSize.Max)
     ) {
-        PlusUpgradeFeatureItem.values().forEach {
+        OldPlusUpgradeFeatureItem.values().forEach {
             FeatureItem(it)
         }
     }
@@ -510,7 +510,7 @@ private fun FeatureItems() {
 
 @Composable
 private fun FeatureItem(
-    content: PlusUpgradeFeatureItem,
+    content: OldPlusUpgradeFeatureItem,
     modifier: Modifier = Modifier,
 ) {
     val shape = RoundedCornerShape(16.dp)

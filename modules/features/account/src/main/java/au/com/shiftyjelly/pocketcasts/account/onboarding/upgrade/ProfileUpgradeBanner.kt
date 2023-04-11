@@ -54,7 +54,7 @@ fun ProfileUpgradeBanner(
 
             // Not using a lazy grid here because lazy grids cannot be used inside a ScrollView
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                PlusUpgradeFeatureItem.values().toList().chunked(2).forEach { chunk ->
+                OldPlusUpgradeFeatureItem.values().toList().chunked(2).forEach { chunk ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxWidth(),
@@ -78,7 +78,7 @@ fun ProfileUpgradeBanner(
 
 @Composable
 private fun FeatureItemComposable(
-    item: PlusUpgradeFeatureItem,
+    item: OldPlusUpgradeFeatureItem,
     modifier: Modifier = Modifier,
 ) {
     Row(

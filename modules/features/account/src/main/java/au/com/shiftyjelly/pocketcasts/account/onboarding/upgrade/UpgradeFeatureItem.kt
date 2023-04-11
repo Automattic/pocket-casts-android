@@ -10,7 +10,7 @@ interface UpgradeFeatureItem {
     @get:StringRes val text: Int
 }
 
-enum class PlusUpgradeFeatureItem(
+enum class OldPlusUpgradeFeatureItem(
     override val image: Int,
     override val title: Int,
     override val text: Int,
