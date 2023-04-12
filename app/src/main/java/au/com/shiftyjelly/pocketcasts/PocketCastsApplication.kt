@@ -105,7 +105,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     private fun setupAnalytics() {
         AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
-        retrieveUserIdIfNeededAndRefreshMetadata()
+        AnalyticsTracker.refreshMetadata()
     }
 
     private fun setupSentry() {
@@ -229,18 +229,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         userManager.beginMonitoringAccountManager(playbackManager)
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
-    }
-
-    private fun retrieveUserIdIfNeededAndRefreshMetadata() {
-        val uuid = syncManager.getUuid()
-        if (uuid.isNullOrEmpty()) {
-            Timber.e("Missing User ID - Retrieving from the server")
-            applicationScope.launch(Dispatchers.IO) {
-                AnalyticsTracker.refreshMetadata()
-            }
-        } else {
-            AnalyticsTracker.refreshMetadata()
-        }
     }
 
     @Suppress("DEPRECATION")

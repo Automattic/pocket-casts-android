@@ -52,7 +52,7 @@ class SyncAccountManager @Inject constructor(
     private fun getLoginIdentity(): LoginIdentity? {
         val account = getAccount() ?: return null
         val loginIdentity = accountManager.getUserData(account, AccountConstants.LOGIN_IDENTITY)
-        return LoginIdentity.valueOf(loginIdentity)
+        return LoginIdentity.valueOf(loginIdentity) ?: LoginIdentity.PocketCasts
     }
 
     fun peekAccessToken(account: Account): AccessToken? =
