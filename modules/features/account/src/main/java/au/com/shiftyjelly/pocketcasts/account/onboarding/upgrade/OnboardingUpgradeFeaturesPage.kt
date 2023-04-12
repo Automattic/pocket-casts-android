@@ -1,16 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -27,17 +31,27 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -54,11 +68,14 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
@@ -115,6 +132,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     ) {
         if (BuildConfig.ADD_PATRON_ENABLED) {
             UpgradeLayout(
+                state = state,
                 scrollState = scrollState,
                 onBackPressed = onBackPressed,
             )
@@ -133,6 +151,7 @@ internal fun OnboardingUpgradeFeaturesPage(
 
 @Composable
 private fun BoxWithConstraintsScope.UpgradeLayout(
+    state: OnboardingUpgradeFeaturesState,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
 ) {
@@ -165,7 +184,146 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
             )
 
             Spacer(Modifier.height(16.dp))
+
+            FeatureCards(
+                cards = state.featureCards,
+            )
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FeatureCards(
+    cards: List<UpgradeFeatureCard>,
+) {
+    val pagerState = rememberPagerState()
+
+    HorizontalPager(
+        pageCount = cards.size,
+        state = pagerState,
+        pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
+        contentPadding = PaddingValues(horizontal = 32.dp),
+    ) { index -> FeatureCard(cards[index]) }
+
+    // Page indicator
+    Row(
+        Modifier
+            .height(40.dp)
+            .fillMaxWidth()
+            .padding(top = 16.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        repeat(cards.size) { iteration ->
+            val color = if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
+            Box(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clip(CircleShape)
+                    .background(color)
+                    .size(8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun FeatureCard(
+    card: UpgradeFeatureCard,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        elevation = 8.dp,
+        backgroundColor = Color.White,
+        modifier = modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = modifier.padding(24.dp)
+        ) {
+            Box(
+                modifier = modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopStart
+            ) {
+                FeaturePill(card.shortNameRes)
+            }
+            TextH10(
+                text = "$39.99 /year",
+                color = Color.Black,
+                modifier = modifier.padding(bottom = 8.dp)
+            )
+            TextH70(
+                text = "Take your podcasting experience to the next level with exclusive access to features and customization options.",
+                color = Color.Gray,
+                textAlign = TextAlign.Start,
+                modifier = modifier.padding(bottom = 8.dp)
+            )
+
+            Column(
+                modifier = modifier.padding(bottom = 8.dp)
+            ) {
+                card.featureItems.forEach {
+                    FeatureItem(it)
+                }
+            }
+
+            Button(
+                onClick = { /* Do something */ },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(card.color)),
+                shape = RoundedCornerShape(8.dp),
+                modifier = modifier
+                    .padding(bottom = 8.dp)
+                    .fillMaxWidth()
+            ) {
+                TextH30("Subscribe")
+            }
+        }
+    }
+}
+
+@Composable
+fun FeaturePill(
+    @StringRes shortNameRes: Int,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        shape = RoundedCornerShape(50),
+        backgroundColor = Color.Black,
+        modifier = modifier.padding(4.dp)
+    ) {
+        Text(
+            text = stringResource(shortNameRes),
+            color = Color.White,
+            modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+    }
+}
+
+@Composable
+private fun FeatureItem(
+    content: UpgradeFeatureItem,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .semantics(mergeDescendants = true) {}
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(content.image),
+            contentDescription = null,
+            tint = Color.Black,
+            modifier = modifier.size(32.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        TextH40(
+            text = stringResource(content.title),
+            color = Color.Black,
+        )
     }
 }
 

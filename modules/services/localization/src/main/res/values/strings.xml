@@ -3,6 +3,8 @@
     <string name="pocket_casts" translatable="false">@string/app_name</string>
     <string name="pocket_casts_plus" translatable="false">Pocket Casts Plus</string>
     <string name="pocket_casts_plus_short" translatable="false">Plus</string>
+    <string name="pocket_casts_patron" translatable="false">Pocket Casts Patron</string>
+    <string name="pocket_casts_patron_short" translatable="false">Patron</string>
 
     <string name="empty" translatable="false" />
 

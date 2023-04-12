@@ -3,9 +3,13 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 import android.app.Application
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeatureItem
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,4 +63,22 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
 data class OnboardingUpgradeFeaturesState(private val isTouchExplorationEnabled: Boolean) {
     val scrollAutomatically = !isTouchExplorationEnabled
+    val featureCards = UpgradeFeatureCard.values().toList()
+}
+
+enum class UpgradeFeatureCard(
+    @StringRes val shortNameRes: Int,
+    val color: Long,
+    val featureItems: List<UpgradeFeatureItem>,
+) {
+    PLUS(
+        shortNameRes = R.string.pocket_casts_plus_short,
+        color = 0xFFFFD845,
+        featureItems = PlusUpgradeFeatureItem.values().toList(),
+    ),
+    PATRON(
+        shortNameRes = R.string.pocket_casts_patron_short,
+        color = 0xFF7A64F6,
+        featureItems = emptyList(),
+    )
 }
