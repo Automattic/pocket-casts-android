@@ -69,7 +69,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
@@ -82,6 +81,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -205,7 +205,8 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                 contentAlignment = Alignment.Center
             ) {
                 StyledToggle(
-                    state.subscriptionFrequencies.map { stringResource(id = it.labelRes) },
+                    state.subscriptionFrequencies
+                        .map { stringResource(id = it.localisedLabelRes) },
                 ) {
                     onSubscriptionFrequencyChanged(it)
                 }
@@ -299,7 +300,13 @@ fun FeatureCard(
                     modifier = modifier.padding(end = 8.dp)
                 )
                 TextH30(
-                    text = stringResource(id = subscriptionFrequency.slashFrequencyRes),
+                    text = stringResource(
+                        id = when (subscriptionFrequency) {
+                            SubscriptionFrequency.YEARLY -> LR.string.slash_year
+                            SubscriptionFrequency.MONTHLY -> LR.string.slash_month
+                            else -> throw IllegalStateException("Unknown subscription frequency: $subscriptionFrequency")
+                        }
+                    ),
                     color = Color.Black,
                     modifier = modifier
                         .alpha(.6f)

@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeat
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,7 +61,13 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     }
 
     fun onSubscriptionFrequencyChanged(index: Int) {
-        _state.value = _state.value.copy(currentSubscriptionFrequency = SubscriptionFrequency.values()[index])
+        _state.value = _state.value.copy(
+            currentSubscriptionFrequency = when (index) {
+                0 -> SubscriptionFrequency.YEARLY
+                1 -> SubscriptionFrequency.MONTHLY
+                else -> throw IllegalArgumentException("Invalid index: $index")
+            }
+        )
     }
 
     fun onFeatureCardChanged(index: Int) {
@@ -80,7 +87,7 @@ data class OnboardingUpgradeFeaturesState(
 ) {
     val scrollAutomatically = !isTouchExplorationEnabled
     val featureCards = UpgradeFeatureCard.values().toList()
-    val subscriptionFrequencies = SubscriptionFrequency.values().toList()
+    val subscriptionFrequencies = listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
 }
 
 enum class UpgradeFeatureCard(
@@ -110,12 +117,4 @@ enum class UpgradeFeatureCard(
         buttonTextColor = 0xFFFFFFFF,
         featureItems = PatronUpgradeFeatureItem.values().toList(),
     )
-}
-
-enum class SubscriptionFrequency(
-    @StringRes val labelRes: Int,
-    @StringRes val slashFrequencyRes: Int,
-) {
-    YEARLY(LR.string.plus_yearly, LR.string.slash_year),
-    MONTHLY(LR.string.plus_monthly, LR.string.slash_month),
 }
