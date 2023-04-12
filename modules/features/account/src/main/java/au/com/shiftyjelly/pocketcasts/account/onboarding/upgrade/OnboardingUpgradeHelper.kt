@@ -57,6 +57,29 @@ object OnboardingUpgradeHelper {
     private val unselectedColor = Color(0xFF666666)
 
     @Composable
+    fun UpgradeRowButton(
+        text: String,
+        backgroundColor: Long,
+        textColor: Long,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+    ) {
+        Button(
+            onClick = onClick,
+            shape = RoundedCornerShape(12.dp),
+            modifier = modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(backgroundColor),
+            ),
+        ) {
+            TextH30(
+                text = text,
+                color = Color(textColor),
+            )
+        }
+    }
+
+    @Composable
     fun PlusRowButton(
         text: String,
         onClick: () -> Unit,

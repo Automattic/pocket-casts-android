@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -38,8 +39,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -67,6 +66,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
@@ -230,7 +230,7 @@ fun FeatureCards(
         Modifier
             .height(40.dp)
             .fillMaxWidth()
-            .padding(top = 16.dp),
+            .padding(top = 24.dp),
         horizontalArrangement = Arrangement.Center,
     ) {
         repeat(cards.size) { iteration ->
@@ -238,7 +238,7 @@ fun FeatureCards(
                 if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
             Box(
                 modifier = Modifier
-                    .padding(2.dp)
+                    .padding(4.dp)
                     .clip(CircleShape)
                     .background(color)
                     .size(8.dp)
@@ -253,7 +253,7 @@ fun FeatureCard(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(24.dp),
         elevation = 8.dp,
         backgroundColor = Color.White,
         modifier = modifier
@@ -264,17 +264,31 @@ fun FeatureCard(
             modifier = modifier.padding(24.dp)
         ) {
             Box(
-                modifier = modifier.fillMaxWidth(),
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 contentAlignment = Alignment.TopStart
             ) {
-                FeaturePill(card.shortNameRes)
+                FeaturePill(card.iconRes, card.shortNameRes)
             }
 
-            TextH10(
-                text = "$39.99 /year",
-                color = Color.Black,
-                modifier = modifier.padding(bottom = 8.dp)
-            )
+            Row(
+                modifier = modifier
+                    .padding(bottom = 8.dp),
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                TextH10(
+                    text = "XXX",
+                    color = Color.Black,
+                    modifier = modifier.padding(end = 8.dp)
+                )
+                TextH30(
+                    text = stringResource(id = LR.string.slash_year),
+                    color = Color.Black,
+                    modifier = modifier
+                        .alpha(.6f)
+                )
+            }
 
             TextH70(
                 text = stringResource(id = card.descriptionRes),
@@ -284,42 +298,53 @@ fun FeatureCard(
             )
 
             Column(
-                modifier = modifier.padding(bottom = 8.dp)
+                modifier = modifier.padding(bottom = 18.dp)
             ) {
                 card.featureItems.forEach {
                     FeatureItem(it)
                 }
             }
 
-            Button(
-                onClick = { /* Do something */ },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(card.color)),
-                shape = RoundedCornerShape(8.dp),
-                modifier = modifier
-                    .padding(bottom = 8.dp)
-                    .fillMaxWidth()
-            ) {
-                TextH30(stringResource(id = LR.string.subscribe))
-            }
+            UpgradeRowButton(
+                text = stringResource(LR.string.subscribe),
+                backgroundColor = card.buttonBackgroundColor,
+                textColor = card.buttonTextColor,
+                onClick = {},
+            )
         }
     }
 }
 
 @Composable
 fun FeaturePill(
+    @DrawableRes iconRes: Int,
     @StringRes shortNameRes: Int,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(800.dp),
         backgroundColor = Color.Black,
         modifier = modifier.padding(4.dp)
     ) {
-        Text(
-            text = stringResource(shortNameRes),
-            color = Color.White,
-            modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-        )
+        Row(
+            modifier = modifier
+                .semantics(mergeDescendants = true) {}
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                modifier = modifier
+                    .size(16.dp),
+                tint = Color.Unspecified,
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = stringResource(shortNameRes),
+                color = Color.White,
+            )
+        }
     }
 }
 

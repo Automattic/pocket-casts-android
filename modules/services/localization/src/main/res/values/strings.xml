@@ -69,6 +69,8 @@
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
     <string name="skip_forward">Skip forward</string>
+    <string name="slash_year">/year</string>
+    <string name="slash_month">/month</string>
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
     <string name="star_episode">Star episode</string>

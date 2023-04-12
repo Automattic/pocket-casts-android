@@ -18,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -80,21 +81,27 @@ enum class UpgradeFeatureCard(
     @StringRes val shortNameRes: Int,
     @StringRes val descriptionRes: Int,
     @DrawableRes val backgroundGlowsRes: Int,
-    val color: Long,
+    @DrawableRes val iconRes: Int,
+    val buttonBackgroundColor: Long,
+    val buttonTextColor: Long,
     val featureItems: List<UpgradeFeatureItem>,
 ) {
     PLUS(
         shortNameRes = LR.string.pocket_casts_plus_short,
         descriptionRes = LR.string.onboarding_patron_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
-        color = 0xFFFFD845,
+        iconRes = IR.drawable.ic_plus,
+        buttonBackgroundColor = 0xFFFFD845,
+        buttonTextColor = 0xFF000000,
         featureItems = PlusUpgradeFeatureItem.values().toList(),
     ),
     PATRON(
         shortNameRes = LR.string.pocket_casts_patron_short,
         descriptionRes = LR.string.onboarding_plus_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
-        color = 0xFF7A64F6,
+        iconRes = IR.drawable.ic_patron,
+        buttonBackgroundColor = 0xFF7A64F6,
+        buttonTextColor = 0xFFFFFFFF,
         featureItems = PatronUpgradeFeatureItem.values().toList(),
     )
 }
