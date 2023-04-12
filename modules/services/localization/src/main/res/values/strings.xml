@@ -1430,11 +1430,19 @@
     <string name="server_files_uuid_required">File uuid is required.</string>
     <string name="server_login_email_taken">Email taken</string>
     <string name="server_login_user_register_failed">Unable to create account, please try again later</string>
+    <string name="server_login_password_change_success">Successfully changed password</string>
+    <string name="server_login_password_change_failed">Unable to change password</string>
     <string name="server_files_invalid_content_type">Unable to upload, as we\'re unable to determine the content type of this file.</string>
     <string name="server_files_invalid_user">User is not logged in.</string>
     <string name="server_files_file_too_large">This file is too big to upload.</string>
     <string name="server_files_storage_limit_exceeded">You have exceeded the storage limit for your account.</string>
     <string name="server_files_title_required">Title is required.</string>
+    <string name="server_promo_winback_no_plus">Could not redeem this promo, because you are not currently a plus subscriber.</string>
+    <string name="server_user_email_failed">Error sending email.</string>
+    <string name="server_user_email_success">Successfully sent email.</string>
+    <string name="server_user_email_verification_failed">Email verification failed.</string>
+    <string name="server_user_change_email_success">Your email has been successfully changed.</string>
+    <string name="server_user_delete_account_with_sub_failed">Your account has an active Pocket Casts Plus subscription. Please cancel this first before deleting your account.</string>
 
     <!-- End of Year -->
 

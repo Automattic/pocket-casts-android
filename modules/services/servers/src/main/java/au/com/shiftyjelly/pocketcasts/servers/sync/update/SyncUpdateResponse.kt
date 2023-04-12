@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.servers.sync.old
+package au.com.shiftyjelly.pocketcasts.servers.sync.update
 
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist

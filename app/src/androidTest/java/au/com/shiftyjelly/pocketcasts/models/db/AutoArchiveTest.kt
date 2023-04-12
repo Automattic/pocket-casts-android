@@ -15,9 +15,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManagerImpl
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -37,7 +37,6 @@ class AutoArchiveTest {
     lateinit var testDb: AppDatabase
     lateinit var episodeDao: EpisodeDao
     val context = InstrumentationRegistry.getInstrumentation().targetContext
-    val playlistManager = mock<PlaylistManager> {}
     val fileStorage = mock<FileStorage> {}
     val downloadManager = mock<DownloadManager> {}
     val podcastCacheServerManager = mock<PodcastCacheServerManager> {}
@@ -66,16 +65,17 @@ class AutoArchiveTest {
     }
 
     private fun podcastManagerThatReturns(podcast: Podcast): PodcastManager {
-        return mock<PodcastManager> {
+        return mock {
             on { findPodcastByUuid(any()) } doReturn podcast
             on { findSubscribed() } doReturn listOf(podcast)
         }
     }
 
     private fun upNextQueueFor(db: AppDatabase, episodeManager: EpisodeManager): UpNextQueue {
-        val settings = mock<Settings> {}
-        val context = mock<Context> {}
-        return UpNextQueueImpl(db, settings, episodeManager, context)
+        val settings = mock<Settings>()
+        val context = mock<Context>()
+        val syncManager = mock<SyncManager>()
+        return UpNextQueueImpl(db, settings, episodeManager, syncManager, context)
     }
 
     @Test

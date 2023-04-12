@@ -22,8 +22,6 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.io.IOException
 import java.util.Locale
@@ -40,44 +38,6 @@ open class ServerManager @Inject constructor(
     companion object {
         private const val LIST_SEPERATOR = ","
         private const val NO_INTERNET_CONNECTION_MSG = "Check your connection and try again."
-    }
-
-    fun obtainThirdPartyToken(email: String, password: String, scope: String, callback: ServerCallback<String>) {
-        val tokenRequest = ApiTokenRequest(email, password, scope)
-
-        val retrofit = Retrofit.Builder().baseUrl(Settings.SERVER_API_URL).addConverterFactory(MoshiConverterFactory.create()).build()
-        val apiServer = retrofit.create(ApiServer::class.java)
-        val call = apiServer.login(tokenRequest)
-        call.enqueue(object : retrofit2.Callback<ApiTokenResponse> {
-            override fun onResponse(call: retrofit2.Call<ApiTokenResponse>, response: retrofit2.Response<ApiTokenResponse>) {
-                val token = response.body()?.token
-                if (token != null) {
-                    callback.dataReturned(token)
-                } else {
-                    callback.onFailed(
-                        errorCode = -1,
-                        userMessage = "Unable to link Pocket Casts account with Sonos.",
-                        serverMessageId = null,
-                        serverMessage = response.code().toString() + "Unable to link Pocket Casts account with Sonos.",
-                        throwable = null
-                    )
-                }
-            }
-
-            override fun onFailure(call: retrofit2.Call<ApiTokenResponse>, t: Throwable) {
-                callback.onFailed(
-                    errorCode = -1,
-                    userMessage = "Unable to link Pocket Casts account with Sonos.",
-                    serverMessageId = null,
-                    serverMessage = "Unable to link Pocket Casts account with Sonos. " + if (t.message == null) "" else t.message,
-                    throwable = t
-                )
-            }
-        })
-    }
-
-    fun forgottenPasswordToSyncServer(email: String, callback: ServerCallback<String>): Call? {
-        return postToSyncServer("/security/forgot_password", email, null, null, true, PostCallbackDefault(callback))
     }
 
     fun searchForPodcasts(searchTerm: String, callback: ServerCallback<PodcastSearch>): Call? {
