@@ -1,10 +1,8 @@
 7.37
 -----
-
-
-7.36
------
-
+* New Features:
+    *   Added capability to sign into Pocket Casts using Google account
+        ([#878](https://github.com/Automattic/pocket-casts-android/pull/878))
 
 7.35
 -----
