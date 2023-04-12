@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.di
 
 import androidx.work.WorkerFactory
+import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -128,4 +129,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideSyncManager(syncManagerImpl: SyncManagerImpl): SyncManager
+
+    @Binds
+    @Singleton
+    abstract fun provideAccountStatusInfo(syncManager: SyncManager): AccountStatusInfo
 }
