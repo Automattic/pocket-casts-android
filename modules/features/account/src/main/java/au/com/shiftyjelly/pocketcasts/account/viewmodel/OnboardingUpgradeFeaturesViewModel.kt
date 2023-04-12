@@ -59,6 +59,10 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
+    fun onSubscriptionFrequencyChanged(index: Int) {
+        _state.value = _state.value.copy(currentSubscriptionFrequency = SubscriptionFrequency.values()[index])
+    }
+
     fun onFeatureCardChanged(index: Int) {
         _state.value = _state.value.copy(currentFeatureCard = UpgradeFeatureCard.values()[index])
     }
@@ -72,9 +76,11 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 data class OnboardingUpgradeFeaturesState(
     private val isTouchExplorationEnabled: Boolean,
     val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
+    val currentSubscriptionFrequency: SubscriptionFrequency = SubscriptionFrequency.YEARLY,
 ) {
     val scrollAutomatically = !isTouchExplorationEnabled
     val featureCards = UpgradeFeatureCard.values().toList()
+    val subscriptionFrequencies = SubscriptionFrequency.values().toList()
 }
 
 enum class UpgradeFeatureCard(
@@ -104,4 +110,12 @@ enum class UpgradeFeatureCard(
         buttonTextColor = 0xFFFFFFFF,
         featureItems = PatronUpgradeFeatureItem.values().toList(),
     )
+}
+
+enum class SubscriptionFrequency(
+    @StringRes val labelRes: Int,
+    @StringRes val slashFrequencyRes: Int,
+) {
+    YEARLY(LR.string.plus_yearly, LR.string.slash_year),
+    MONTHLY(LR.string.plus_monthly, LR.string.slash_month),
 }

@@ -69,9 +69,11 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
+import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -137,9 +139,8 @@ internal fun OnboardingUpgradeFeaturesPage(
                 state = state,
                 scrollState = scrollState,
                 onBackPressed = onBackPressed,
-                onFeatureCardChanged = { page ->
-                    viewModel.onFeatureCardChanged(page)
-                }
+                onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
+                onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) }
             )
         } else {
             OldUpgradeLayout(
@@ -159,6 +160,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     state: OnboardingUpgradeFeaturesState,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
+    onSubscriptionFrequencyChanged: (Int) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     OnboardingUpgradeHelper.UpgradeBackground(
@@ -194,10 +196,23 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                     .fillMaxWidth(),
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                StyledToggle(
+                    state.subscriptionFrequencies.map { stringResource(id = it.labelRes) },
+                ) {
+                    onSubscriptionFrequencyChanged(it)
+                }
+            }
 
             FeatureCards(
-                cards = state.featureCards,
+                state = state,
                 onFeatureCardChanged = onFeatureCardChanged,
             )
         }
@@ -207,7 +222,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeatureCards(
-    cards: List<UpgradeFeatureCard>,
+    state: OnboardingUpgradeFeaturesState,
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     val pagerState = rememberPagerState()
@@ -219,11 +234,11 @@ fun FeatureCards(
     }
 
     HorizontalPager(
-        pageCount = cards.size,
+        pageCount = state.featureCards.size,
         state = pagerState,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
-    ) { index -> FeatureCard(cards[index]) }
+    ) { index -> FeatureCard(state.currentSubscriptionFrequency, state.featureCards[index]) }
 
     // Page indicator
     Row(
@@ -233,7 +248,7 @@ fun FeatureCards(
             .padding(top = 24.dp),
         horizontalArrangement = Arrangement.Center,
     ) {
-        repeat(cards.size) { iteration ->
+        repeat(state.featureCards.size) { iteration ->
             val color =
                 if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
             Box(
@@ -249,6 +264,7 @@ fun FeatureCards(
 
 @Composable
 fun FeatureCard(
+    subscriptionFrequency: SubscriptionFrequency,
     card: UpgradeFeatureCard,
     modifier: Modifier = Modifier,
 ) {
@@ -283,7 +299,7 @@ fun FeatureCard(
                     modifier = modifier.padding(end = 8.dp)
                 )
                 TextH30(
-                    text = stringResource(id = LR.string.slash_year),
+                    text = stringResource(id = subscriptionFrequency.slashFrequencyRes),
                     color = Color.Black,
                     modifier = modifier
                         .alpha(.6f)
