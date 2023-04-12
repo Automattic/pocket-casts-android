@@ -14,24 +14,24 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class OnboardingPlusFeaturesViewModel @Inject constructor(
+class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     app: Application,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : AndroidViewModel(app) {
 
-    private val _state: MutableStateFlow<OnboardingPlusFeaturesState>
-    val state: StateFlow<OnboardingPlusFeaturesState>
+    private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState>
+    val state: StateFlow<OnboardingUpgradeFeaturesState>
 
     init {
         val accessibiltyManager = getApplication<Application>().getSystemService(Context.ACCESSIBILITY_SERVICE)
             as? AccessibilityManager
 
         val isTouchExplorationEnabled = accessibiltyManager?.isTouchExplorationEnabled ?: false
-        _state = MutableStateFlow(OnboardingPlusFeaturesState(isTouchExplorationEnabled))
+        _state = MutableStateFlow(OnboardingUpgradeFeaturesState(isTouchExplorationEnabled))
         state = _state
 
         accessibiltyManager?.addTouchExplorationStateChangeListener { enabled ->
-            _state.value = OnboardingPlusFeaturesState(enabled)
+            _state.value = OnboardingUpgradeFeaturesState(enabled)
         }
     }
 
@@ -57,6 +57,6 @@ class OnboardingPlusFeaturesViewModel @Inject constructor(
     }
 }
 
-data class OnboardingPlusFeaturesState(private val isTouchExplorationEnabled: Boolean) {
+data class OnboardingUpgradeFeaturesState(private val isTouchExplorationEnabled: Boolean) {
     val scrollAutomatically = !isTouchExplorationEnabled
 }

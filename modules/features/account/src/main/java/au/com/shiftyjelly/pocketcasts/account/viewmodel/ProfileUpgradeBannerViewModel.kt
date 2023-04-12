@@ -15,7 +15,7 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfilePlusUpgradeBannerViewModel @Inject constructor(
+class ProfileUpgradeBannerViewModel @Inject constructor(
     subscriptionManager: SubscriptionManager,
     app: Application,
 ) : AndroidViewModel(app) {

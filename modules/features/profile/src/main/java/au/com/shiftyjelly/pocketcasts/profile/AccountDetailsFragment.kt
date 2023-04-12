@@ -15,7 +15,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfilePlusUpgradeBanner
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -121,7 +121,7 @@ class AccountDetailsFragment : BaseFragment() {
                 setContent {
                     AppTheme(theme.activeTheme) {
                         if (subscription != null && (signInState.isSignedInAsFree || giftExpiring)) {
-                            ProfilePlusUpgradeBanner(
+                            ProfileUpgradeBanner(
                                 onClick = {
                                     val source = OnboardingUpgradeSource.PROFILE
                                     val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
