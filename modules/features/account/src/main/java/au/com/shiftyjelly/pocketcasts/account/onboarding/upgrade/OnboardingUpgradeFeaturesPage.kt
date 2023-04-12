@@ -8,6 +8,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.backgroundColor
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
@@ -139,8 +141,11 @@ internal fun OnboardingUpgradeFeaturesPage(
                 state = state,
                 scrollState = scrollState,
                 onBackPressed = onBackPressed,
+                onNotNowPressed = onNotNowPressed,
                 onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) }
+                onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
+                onUpgradePressed = onUpgradePressed,
+                canUpgrade = canUpgrade,
             )
         } else {
             OldUpgradeLayout(
@@ -160,8 +165,11 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     state: OnboardingUpgradeFeaturesState,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
+    onNotNowPressed: () -> Unit,
     onSubscriptionFrequencyChanged: (Int) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
+    onUpgradePressed: () -> Unit,
+    canUpgrade: Boolean,
 ) {
     OnboardingUpgradeHelper.UpgradeBackground(
         modifier = Modifier.verticalScroll(scrollState),
@@ -177,13 +185,26 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 
             Spacer(Modifier.height(8.dp))
 
-            NavigationIconButton(
-                onNavigationClick = onBackPressed,
-                iconColor = Color.White,
-                modifier = Modifier
-                    .height(48.dp)
-                    .width(48.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                NavigationIconButton(
+                    onNavigationClick = onBackPressed,
+                    iconColor = Color.White,
+                    modifier = Modifier
+                        .height(48.dp)
+                        .width(48.dp)
+                )
+                TextH30(
+                    text = stringResource(LR.string.not_now),
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .clickable { onNotNowPressed() },
+                )
+            }
 
             Spacer(Modifier.height(16.dp))
 
@@ -215,6 +236,8 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
             FeatureCards(
                 state = state,
                 onFeatureCardChanged = onFeatureCardChanged,
+                onUpgradePressed = onUpgradePressed,
+                canUpgrade = canUpgrade,
             )
         }
     }
@@ -225,6 +248,8 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 fun FeatureCards(
     state: OnboardingUpgradeFeaturesState,
     onFeatureCardChanged: (Int) -> Unit,
+    onUpgradePressed: () -> Unit,
+    canUpgrade: Boolean,
 ) {
     val pagerState = rememberPagerState()
 
@@ -239,7 +264,14 @@ fun FeatureCards(
         state = pagerState,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
-    ) { index -> FeatureCard(state.currentSubscriptionFrequency, state.featureCards[index]) }
+    ) { index ->
+        FeatureCard(
+            subscriptionFrequency = state.currentSubscriptionFrequency,
+            card = state.featureCards[index],
+            onUpgradePressed = onUpgradePressed,
+            canUpgrade = canUpgrade,
+        )
+    }
 
     // Page indicator
     Row(
@@ -267,6 +299,8 @@ fun FeatureCards(
 fun FeatureCard(
     subscriptionFrequency: SubscriptionFrequency,
     card: UpgradeFeatureCard,
+    onUpgradePressed: () -> Unit,
+    canUpgrade: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -328,12 +362,14 @@ fun FeatureCard(
                 }
             }
 
-            UpgradeRowButton(
-                text = stringResource(LR.string.subscribe),
-                backgroundColor = card.buttonBackgroundColor,
-                textColor = card.buttonTextColor,
-                onClick = {},
-            )
+            if (canUpgrade) {
+                UpgradeRowButton(
+                    text = stringResource(LR.string.subscribe),
+                    backgroundColor = card.buttonBackgroundColor,
+                    textColor = card.buttonTextColor,
+                    onClick = onUpgradePressed,
+                )
+            }
         }
     }
 }
