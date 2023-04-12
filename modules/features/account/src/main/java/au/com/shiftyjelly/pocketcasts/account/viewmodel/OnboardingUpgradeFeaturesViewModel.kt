@@ -12,7 +12,11 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeat
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PATRON_PRODUCT_BASE
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,6 +78,19 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         _state.value = _state.value.copy(currentFeatureCard = UpgradeFeatureCard.values()[index])
     }
 
+    fun getUpgradePrice(
+        subscriptions: List<Subscription>,
+        productIdPrefix: String,
+    ) = subscriptions
+        .find {
+            if (_state.value.currentSubscriptionFrequency == SubscriptionFrequency.MONTHLY) {
+                it.recurringPricingPhase is SubscriptionPricingPhase.Months
+            } else {
+                it.recurringPricingPhase is SubscriptionPricingPhase.Years
+            } && it.productDetails.productId.startsWith(productIdPrefix)
+        }
+        ?.recurringPricingPhase?.formattedPrice ?: ""
+
     companion object {
         private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) =
             mapOf("flow" to flow.analyticsValue, "source" to source.analyticsValue)
@@ -87,7 +104,8 @@ data class OnboardingUpgradeFeaturesState(
 ) {
     val scrollAutomatically = !isTouchExplorationEnabled
     val featureCards = UpgradeFeatureCard.values().toList()
-    val subscriptionFrequencies = listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
+    val subscriptionFrequencies =
+        listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
 }
 
 enum class UpgradeFeatureCard(
@@ -98,6 +116,7 @@ enum class UpgradeFeatureCard(
     val buttonBackgroundColor: Long,
     val buttonTextColor: Long,
     val featureItems: List<UpgradeFeatureItem>,
+    val productIdPrefix: String,
 ) {
     PLUS(
         shortNameRes = LR.string.pocket_casts_plus_short,
@@ -107,6 +126,7 @@ enum class UpgradeFeatureCard(
         buttonBackgroundColor = 0xFFFFD845,
         buttonTextColor = 0xFF000000,
         featureItems = PlusUpgradeFeatureItem.values().toList(),
+        productIdPrefix = PLUS_PRODUCT_BASE,
     ),
     PATRON(
         shortNameRes = LR.string.pocket_casts_patron_short,
@@ -116,5 +136,6 @@ enum class UpgradeFeatureCard(
         buttonBackgroundColor = 0xFF7A64F6,
         buttonTextColor = 0xFFFFFFFF,
         featureItems = PatronUpgradeFeatureItem.values().toList(),
+        productIdPrefix = PATRON_PRODUCT_BASE,
     )
 }

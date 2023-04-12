@@ -68,7 +68,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.backgroundColor
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
@@ -83,6 +82,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -100,6 +100,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
     canUpgrade: Boolean,
+    subscriptions: List<Subscription>,
 ) {
 
     val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
@@ -146,6 +147,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                 onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
                 onUpgradePressed = onUpgradePressed,
                 canUpgrade = canUpgrade,
+                upgradePrice = { productId: String -> viewModel.getUpgradePrice(subscriptions, productId) },
             )
         } else {
             OldUpgradeLayout(
@@ -170,6 +172,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     onFeatureCardChanged: (Int) -> Unit,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
+    upgradePrice: (String) -> String,
 ) {
     OnboardingUpgradeHelper.UpgradeBackground(
         modifier = Modifier.verticalScroll(scrollState),
@@ -238,6 +241,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                 onFeatureCardChanged = onFeatureCardChanged,
                 onUpgradePressed = onUpgradePressed,
                 canUpgrade = canUpgrade,
+                upgradePrice = upgradePrice,
             )
         }
     }
@@ -250,6 +254,7 @@ fun FeatureCards(
     onFeatureCardChanged: (Int) -> Unit,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
+    upgradePrice: (String) -> String,
 ) {
     val pagerState = rememberPagerState()
 
@@ -270,6 +275,7 @@ fun FeatureCards(
             card = state.featureCards[index],
             onUpgradePressed = onUpgradePressed,
             canUpgrade = canUpgrade,
+            upgradePrice = upgradePrice,
         )
     }
 
@@ -301,6 +307,7 @@ fun FeatureCard(
     card: UpgradeFeatureCard,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
+    upgradePrice: (String) -> String,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -329,7 +336,7 @@ fun FeatureCard(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 TextH10(
-                    text = "XXX",
+                    text = upgradePrice(card.productIdPrefix),
                     color = Color.Black,
                     modifier = modifier.padding(end = 8.dp)
                 )
@@ -670,5 +677,6 @@ private fun OnboardingUpgradeFeaturesPreview() {
         onUpgradePressed = {},
         onNotNowPressed = {},
         canUpgrade = true,
+        subscriptions = emptyList()
     )
 }
