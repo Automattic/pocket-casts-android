@@ -1523,6 +1523,7 @@
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket&#160;Casts, plus more</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customization options</string>
     <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
+    <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
     <string name="onboarding_patron_features_description">Become a Pocket Casts Patron and help us continue to deliver the best podcasting experience available.</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
     <string name="onboarding_patron_feature_early_access_title">Early access to features</string>
@@ -1530,6 +1531,7 @@
     <string name="onboarding_patron_feature_profile_badge_title">Supporters profile badge</string>
     <string name="onboarding_patron_feature_special_icons_title">Special Pocket Casts app icons</string>
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
+    <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
     <string name="onboarding_plus_features_description">Take your podcasting experience to the next level with exclusive access to features and customization options.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>

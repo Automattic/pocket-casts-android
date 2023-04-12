@@ -109,6 +109,7 @@ data class OnboardingUpgradeFeaturesState(
 }
 
 enum class UpgradeFeatureCard(
+    @StringRes val titleRes: Int,
     @StringRes val shortNameRes: Int,
     @StringRes val descriptionRes: Int,
     @DrawableRes val backgroundGlowsRes: Int,
@@ -119,6 +120,7 @@ enum class UpgradeFeatureCard(
     val productIdPrefix: String,
 ) {
     PLUS(
+        titleRes = LR.string.onboarding_plus_features_title,
         shortNameRes = LR.string.pocket_casts_plus_short,
         descriptionRes = LR.string.onboarding_patron_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
@@ -129,6 +131,7 @@ enum class UpgradeFeatureCard(
         productIdPrefix = PLUS_PRODUCT_BASE,
     ),
     PATRON(
+        titleRes = LR.string.onboarding_patron_features_title,
         shortNameRes = LR.string.pocket_casts_patron_short,
         descriptionRes = LR.string.onboarding_plus_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,

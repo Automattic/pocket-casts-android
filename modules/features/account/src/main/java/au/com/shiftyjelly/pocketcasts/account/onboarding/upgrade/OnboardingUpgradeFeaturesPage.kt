@@ -212,7 +212,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
             Spacer(Modifier.height(16.dp))
 
             TextH20(
-                text = stringResource(LR.string.onboarding_upgrade_everything_you_love_about_pocket_casts_plus),
+                text = stringResource(state.currentFeatureCard.titleRes),
                 textAlign = TextAlign.Center,
                 color = Color.White,
                 modifier = Modifier
