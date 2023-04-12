@@ -65,7 +65,6 @@ class SettingsImpl @Inject constructor(
 
     private val firebaseRemoteConfig: FirebaseRemoteConfig by lazy { setupFirebaseConfig() }
 
-    // override val isLoggedInObservable = BehaviorRelay.create<Boolean>().apply { accept(isLoggedIn()) }
     override val podcastLayoutObservable = BehaviorRelay.create<Int>().apply { accept(getPodcastsLayout()) }
     override val skipForwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipForwardInSecs()) }
     override val skipBackwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipBackwardInSecs()) }
