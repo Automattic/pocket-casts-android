@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -162,6 +164,7 @@ internal fun OnboardingUpgradeFeaturesPage(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun BoxWithConstraintsScope.UpgradeLayout(
     state: OnboardingUpgradeFeaturesState,
@@ -211,14 +214,19 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 
             Spacer(Modifier.height(16.dp))
 
-            TextH20(
-                text = stringResource(state.currentFeatureCard.titleRes),
-                textAlign = TextAlign.Center,
-                color = Color.White,
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth(),
-            )
+            AnimatedContent(
+                targetState = state.currentFeatureCard.titleRes,
+                label = "titleRes"
+            ) { titleRes ->
+                TextH20(
+                    text = stringResource(titleRes),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth(),
+                )
+            }
 
             Spacer(Modifier.height(24.dp))
 
@@ -301,6 +309,7 @@ fun FeatureCards(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FeatureCard(
     subscriptionFrequency: SubscriptionFrequency,
@@ -335,11 +344,17 @@ fun FeatureCard(
                     .padding(bottom = 8.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                TextH10(
-                    text = upgradePrice(card.productIdPrefix),
-                    color = Color.Black,
-                    modifier = modifier.padding(end = 8.dp)
-                )
+                AnimatedContent(
+                    targetState = upgradePrice(card.productIdPrefix),
+                    label = "price"
+                ) { price ->
+                    TextH10(
+                        text = price,
+                        color = Color.Black,
+                        modifier = modifier.padding(end = 8.dp)
+                    )
+                }
+
                 TextH30(
                     text = stringResource(
                         id = when (subscriptionFrequency) {
