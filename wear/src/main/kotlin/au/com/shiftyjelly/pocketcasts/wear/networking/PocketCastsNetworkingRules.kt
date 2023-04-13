@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.networking
 
+import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import com.google.android.horologist.networks.ExperimentalHorologistNetworksApi
 import com.google.android.horologist.networks.data.NetworkInfo
@@ -80,15 +81,14 @@ object PocketCastsNetworkingRules : NetworkingRules {
     }
 }
 
-// TODO This function is a good candidate for a test
-
 /**
  * @param types The preferred network types in order of preference.
  * @return The most preferred network type that is available. If none of the preferred types are
- * available, the first available network is returned.
+ * available, the first available network is returned. See test cases for examples.
  */
 @OptIn(ExperimentalHorologistNetworksApi::class)
-private fun List<NetworkStatus>.prefer(vararg types: NetworkType): NetworkStatus? =
+@VisibleForTesting
+internal fun List<NetworkStatus>.prefer(vararg types: NetworkType): NetworkStatus? =
     types.firstNotNullOfOrNull { type ->
         firstOrNull { it.networkInfo.type == type }
     } ?: firstOrNull()
