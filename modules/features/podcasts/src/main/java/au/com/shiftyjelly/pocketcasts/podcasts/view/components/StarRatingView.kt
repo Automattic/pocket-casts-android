@@ -23,13 +23,11 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
-
-private const val MAX_STARS = 5
 
 @Composable
 fun StarRatingView(viewModel: PodcastRatingsViewModel) {
@@ -55,27 +53,22 @@ private fun Content(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Stars(
-            rating = state.ratings.average,
+            stars = state.stars,
             color = MaterialTheme.theme.colors.filter03
         )
-        state.ratings.total?.let { TextP50(text = it.abbreviated) }
+        state.total?.let { TextP50(text = it.abbreviated) }
     }
 }
 
 @Composable
 private fun Stars(
-    rating: Double,
+    stars: List<Star>,
     color: Color,
 ) {
-    // truncate the floating points off without rounding
-    val stars = rating.toInt()
-    // Get the float value
-    val half = rating % 1
-
     Row(horizontalArrangement = Arrangement.Start) {
-        for (index in 0 until MAX_STARS) {
+        stars.forEach { star ->
             Icon(
-                imageVector = iconFor(index, stars, half),
+                imageVector = star.mapToIcon(),
                 contentDescription = null,
                 tint = color
             )
@@ -83,10 +76,10 @@ private fun Stars(
     }
 }
 
-private fun iconFor(index: Int, stars: Int, half: Double) = when {
-    index < stars -> Icons.Filled.Star
-    (index > stars) || (half < 0.5) -> Icons.Default.StarBorder
-    else -> Icons.Filled.StarHalf
+fun Star.mapToIcon() = when (this) {
+    is Star.FilledStar -> Icons.Filled.Star
+    is Star.HalfStar -> Icons.Default.StarHalf
+    is Star.BorderedStar -> Icons.Filled.StarBorder
 }
 
 @Preview
@@ -97,7 +90,14 @@ private fun PodcastRatingsPreview(
     AppThemeWithBackground(themeType) {
         Content(
             RatingState.Loaded(
-                ratings = PodcastRatings("", 4.5, 1000)
+                stars = listOf(
+                    Star.FilledStar,
+                    Star.FilledStar,
+                    Star.FilledStar,
+                    Star.HalfStar,
+                    Star.BorderedStar,
+                ),
+                total = 1200
             )
         )
     }

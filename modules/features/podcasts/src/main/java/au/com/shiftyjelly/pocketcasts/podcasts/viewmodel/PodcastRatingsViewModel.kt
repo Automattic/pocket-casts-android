@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +16,8 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+
+private const val MAX_STARS = 5
 
 @HiltViewModel
 class PodcastRatingsViewModel
@@ -35,7 +36,14 @@ class PodcastRatingsViewModel
                 try {
                     ratingsManager.podcastRatings(podcastUuid)
                         .stateIn(viewModelScope)
-                        .collect { ratings -> _stateFlow.update { RatingState.Loaded(ratings = ratings) } }
+                        .collect { ratings ->
+                            _stateFlow.update {
+                                RatingState.Loaded(
+                                    stars = getStars(ratings.average),
+                                    total = ratings.total
+                                )
+                            }
+                        }
                 } catch (e: IOException) {
                     Timber.e(e, "Failed to load podcast ratings")
                     _stateFlow.update { RatingState.Error }
@@ -55,16 +63,37 @@ class PodcastRatingsViewModel
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
+    private fun getStars(rating: Double): List<Star> {
+        // truncate the floating points off without rounding
+        val ratingInt = rating.toInt()
+        // Get the float value
+        val half = rating % 1
+
+        val stars = (0 until MAX_STARS).map { index ->
+            getStarFor(index, ratingInt, half)
+        }
+        return stars
+    }
+
+    private fun getStarFor(index: Int, rating: Int, half: Double) = when {
+        index < rating -> Star.FilledStar
+        (index == rating) && (half >= 0.5) -> Star.HalfStar
+        else -> Star.BorderedStar
     }
 
     sealed class RatingState {
         object Loading : RatingState()
         data class Loaded(
-            val ratings: PodcastRatings,
+            val stars: List<Star>,
+            val total: Int?,
         ) : RatingState()
 
         object Error : RatingState()
+    }
+
+    sealed class Star {
+        object FilledStar : Star()
+        object HalfStar : Star()
+        object BorderedStar : Star()
     }
 }
