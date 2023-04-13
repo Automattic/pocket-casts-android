@@ -18,13 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-private const val CORNER_RADIUS_IN_DP = 24
+private val CornerRadiusInDp = 24.dp
 @Composable
 fun StyledToggle(
     items: List<String>,
     modifier: Modifier = Modifier,
     defaultSelectedItemIndex: Int = 0,
-    cornerRadius: Dp = CORNER_RADIUS_IN_DP.dp,
+    cornerRadius: Dp = CornerRadiusInDp,
     onItemSelected: (selectedItemIndex: Int) -> Unit,
 ) {
     var selectedIndex by remember { mutableStateOf(defaultSelectedItemIndex) }
