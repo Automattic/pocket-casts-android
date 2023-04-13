@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderChooserFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -115,6 +116,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     private val viewModel: PodcastViewModel by viewModels()
+    private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
     private var adapter: PodcastAdapter? = null
     private var binding: FragmentPodcastBinding? = null
 
@@ -528,7 +530,30 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
 
         playButtonListener.source = AnalyticsSource.PODCAST_SCREEN
         if (adapter == null) {
-            adapter = PodcastAdapter(downloadManager, playbackManager, upNextQueue, settings, theme, fromListUuid, onHeaderSummaryToggled, onSubscribeClicked, onUnsubscribeClicked, onEpisodesOptionsClicked, onRowLongPress, onFoldersClicked, onNotificationsClicked, onSettingsClicked, playButtonListener, onRowClicked, onSearchQueryChanged, onSearchFocus, onShowArchivedClicked, multiSelectHelper, onArtworkLongClicked)
+            adapter = PodcastAdapter(
+                downloadManager = downloadManager,
+                playbackManager = playbackManager,
+                upNextQueue = upNextQueue,
+                settings = settings,
+                theme = theme,
+                fromListUuid = fromListUuid,
+                onHeaderSummaryToggled = onHeaderSummaryToggled,
+                onSubscribeClicked = onSubscribeClicked,
+                onUnsubscribeClicked = onUnsubscribeClicked,
+                onEpisodesOptionsClicked = onEpisodesOptionsClicked,
+                onRowLongPress = onRowLongPress,
+                onFoldersClicked = onFoldersClicked,
+                onNotificationsClicked = onNotificationsClicked,
+                onSettingsClicked = onSettingsClicked,
+                playButtonListener = playButtonListener,
+                onRowClicked = onRowClicked,
+                onSearchQueryChanged = onSearchQueryChanged,
+                onSearchFocus = onSearchFocus,
+                onShowArchivedClicked = onShowArchivedClicked,
+                multiSelectHelper = multiSelectHelper,
+                onArtworkLongClicked = onArtworkLongClicked,
+                ratingsViewModel = ratingsViewModel,
+            )
         }
 
         binding.episodesRecyclerView.let {

@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,12 +23,30 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.RatingState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
 
 private const val MAX_STARS = 5
+
 @Composable
-fun StarRatingView(averageRating: Double, total: Int? = null) {
+fun StarRatingView(viewModel: PodcastRatingsViewModel) {
+    val state by viewModel.stateFlow.collectAsState()
+
+    when (state) {
+        is RatingState.Loaded -> Content(state as RatingState.Loaded)
+        is RatingState.Loading,
+        is RatingState.Error,
+        -> Unit // Do Nothing
+    }
+}
+
+@Composable
+private fun Content(
+    state: RatingState.Loaded,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,9 +54,11 @@ fun StarRatingView(averageRating: Double, total: Int? = null) {
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Stars(rating = averageRating, color = MaterialTheme.theme.colors.filter03)
-
-        total?.let { TextP50(text = it.abbreviated) }
+        Stars(
+            rating = state.ratings.average,
+            color = MaterialTheme.theme.colors.filter03
+        )
+        state.ratings.total?.let { TextP50(text = it.abbreviated) }
     }
 }
 
@@ -73,9 +95,10 @@ private fun PodcastRatingsPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        StarRatingView(
-            averageRating = 3.75,
-            total = 15071,
+        Content(
+            RatingState.Loaded(
+                ratings = PodcastRatings("", 4.5, 1000)
+            )
         )
     }
 }

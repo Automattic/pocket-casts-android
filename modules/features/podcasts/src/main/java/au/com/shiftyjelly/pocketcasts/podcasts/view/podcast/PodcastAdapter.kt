@@ -39,6 +39,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderB
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -107,7 +108,8 @@ class PodcastAdapter(
     private val onSearchFocus: () -> Unit,
     private val onShowArchivedClicked: () -> Unit,
     private val multiSelectHelper: MultiSelectHelper,
-    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit
+    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit,
+    private val ratingsViewModel: PodcastRatingsViewModel,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -177,7 +179,7 @@ class PodcastAdapter(
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
-                ratings?.let { StarRatingView(averageRating = it.average, total = it.total) }
+                StarRatingView(ratingsViewModel)
             }
         }
 
@@ -275,6 +277,8 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
+            ratingsViewModel.loadRatings(podcast.uuid)
+            ratingsViewModel.refreshPodcastRatings(podcast.uuid)
             onHeaderSummaryToggled(podcast.uuid, headerExpanded, false)
         }
         this.podcast = podcast
