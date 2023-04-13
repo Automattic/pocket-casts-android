@@ -116,7 +116,7 @@ enum class UpgradeFeatureCard(
     PLUS(
         titleRes = LR.string.onboarding_plus_features_title,
         shortNameRes = LR.string.pocket_casts_plus_short,
-        descriptionRes = LR.string.onboarding_patron_features_description,
+        descriptionRes = LR.string.onboarding_plus_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         iconRes = IR.drawable.ic_plus,
         buttonBackgroundColor = 0xFFFFD846,
@@ -127,7 +127,7 @@ enum class UpgradeFeatureCard(
     PATRON(
         titleRes = LR.string.onboarding_patron_features_title,
         shortNameRes = LR.string.pocket_casts_patron_short,
-        descriptionRes = LR.string.onboarding_plus_features_description,
+        descriptionRes = LR.string.onboarding_patron_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
         iconRes = IR.drawable.ic_patron,
         buttonBackgroundColor = 0xFF6046F5,
