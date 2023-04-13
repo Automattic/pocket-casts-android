@@ -363,7 +363,7 @@ fun FeatureCard(
                         id = when (subscriptionFrequency) {
                             SubscriptionFrequency.YEARLY -> LR.string.slash_year
                             SubscriptionFrequency.MONTHLY -> LR.string.slash_month
-                            else -> throw IllegalStateException("Unknown subscription frequency: $subscriptionFrequency")
+                            SubscriptionFrequency.NONE -> throw IllegalStateException("Unknown subscription frequency: $subscriptionFrequency")
                         }
                     ),
                     color = Color.Black,
