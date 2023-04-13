@@ -6,14 +6,14 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.BuildConfig
-import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -39,12 +39,11 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext context: Context,
     private val podcastManager: PodcastManager,
-    private val accountAuth: AccountAuth,
+    private val syncManager: SyncManager,
 ) : AndroidViewModel(context as Application) {
 
     val showContinueWithGoogleButton =
-        BuildConfig.SINGLE_SIGN_ON_ENABLED &&
-            Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty() &&
+        Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty() &&
             GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(context)
 
     val randomPodcasts = mutableListOf<Podcast>()
@@ -202,11 +201,12 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     }
 
     private suspend fun signInWithGoogleToken(idToken: String, onSuccess: (GoogleSignInState) -> Unit, onError: suspend () -> Unit) =
-        when (val authResult = accountAuth.signInWithGoogle(idToken = idToken, signInSource = SignInSource.Onboarding)) {
-            is AccountAuth.AuthResult.Success -> {
+        when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.Onboarding)) {
+            is LoginResult.Success -> {
+                podcastManager.refreshPodcastsAfterSignIn()
                 onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))
             }
-            is AccountAuth.AuthResult.Failed -> {
+            is LoginResult.Failed -> {
                 onError()
             }
         }

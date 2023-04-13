@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -42,7 +41,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
-    @Inject lateinit var accountAuth: AccountAuth
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var workerFactory: HiltWorkerFactory

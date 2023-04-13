@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -13,10 +14,15 @@ import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 
 @Composable
-fun ChipScreenHeader(@StringRes text: Int, modifier: Modifier = Modifier) {
+fun ChipScreenHeader(
+    @StringRes text: Int,
+    textColor: Color? = null,
+    modifier: Modifier = Modifier,
+) {
     Header(
-        text,
-        modifier.padding(
+        text = text,
+        textColor = textColor,
+        modifier = modifier.padding(
             start = horizontalPadding,
             end = horizontalPadding,
             bottom = verticalPadding,
@@ -26,14 +32,21 @@ fun ChipScreenHeader(@StringRes text: Int, modifier: Modifier = Modifier) {
 
 @Composable
 fun ChipSectionHeader(@StringRes text: Int, modifier: Modifier = Modifier) {
-    Header(text, modifier.padding(vertical = verticalPadding, horizontal = horizontalPadding))
+    Header(
+        text = text,
+        modifier = modifier.padding(vertical = verticalPadding, horizontal = horizontalPadding)
+    )
 }
 
 @Composable
-private fun Header(@StringRes text: Int, modifier: Modifier = Modifier) {
+private fun Header(
+    @StringRes text: Int,
+    textColor: Color? = null,
+    modifier: Modifier = Modifier,
+) {
     Text(
         text = stringResource(text),
-        color = WearColors.FFBDC1C6,
+        color = textColor ?: WearColors.FFBDC1C6,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.button,
         modifier = modifier.fillMaxWidth()

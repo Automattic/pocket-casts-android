@@ -132,8 +132,7 @@ class ChangePwdFragment : BaseFragment() {
                     updateForm(invalidPwdCurrent, invalidPwdNew, invalidPwdConfirm)
 
                     if (serverFail) {
-                        val error = it.message ?: "Check your password"
-                        txtError.text = error
+                        txtError.text = getString(LR.string.server_login_password_change_failed)
                         viewModel.clearServerError()
                     }
                 }

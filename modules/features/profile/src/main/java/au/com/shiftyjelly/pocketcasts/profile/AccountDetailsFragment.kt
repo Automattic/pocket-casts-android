@@ -15,7 +15,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfilePlusUpgradeBanner
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -72,6 +73,7 @@ class AccountDetailsFragment : BaseFragment() {
     @Inject lateinit var upNextQueue: UpNextQueue
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
     @Inject lateinit var userManager: UserManager
+    @Inject lateinit var syncManager: SyncManager
 
     private val viewModel: AccountDetailsViewModel by viewModels()
     private var binding: FragmentAccountDetailsBinding? = null
@@ -119,7 +121,7 @@ class AccountDetailsFragment : BaseFragment() {
                 setContent {
                     AppTheme(theme.activeTheme) {
                         if (subscription != null && (signInState.isSignedInAsFree || giftExpiring)) {
-                            ProfilePlusUpgradeBanner(
+                            ProfileUpgradeBanner(
                                 onClick = {
                                     val source = OnboardingUpgradeSource.PROFILE
                                     val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
@@ -149,6 +151,9 @@ class AccountDetailsFragment : BaseFragment() {
             val fragment = ChangeEmailFragment.newInstance()
             (activity as FragmentHostListener).addFragment(fragment)
         }
+
+        val showChangeButtons = !syncManager.isGoogleLogin()
+        binding.changeEmailPasswordGroup?.isVisible = showChangeButtons
 
         binding.btnChangePwd?.setOnClickListener {
             val fragment = ChangePwdFragment.newInstance()

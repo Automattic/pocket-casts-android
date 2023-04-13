@@ -2,13 +2,19 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -17,17 +23,21 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.parseAsHtml
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
+import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButtonState
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ExpandableText
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -150,6 +160,40 @@ fun EpisodeScreen(
             )
         }
 
+        item {
+            if (state.showNotes != null) {
+                val coroutineScope = rememberCoroutineScope()
+                Column {
+                    ExpandableText(
+                        text = state.showNotes.parseAsHtml().toString(),
+                        style = MaterialTheme.typography.caption2,
+                        textAlign = TextAlign.Center,
+                        onClick = { isExpanded ->
+                            if (!isExpanded) {
+                                val thisItemIndex = 4
+                                val visibleIndices = columnState.state.layoutInfo.visibleItemsInfo.map { it.index }
+                                val isPreviousItemVisible = visibleIndices.any { it == thisItemIndex - 1 }
+
+                                // If the previous item is not visible, scroll to this item to ensure that the top of
+                                // the show notes is still visible after collapsing is complete. Otherwise, it is
+                                // possible for collapsing the show notes to cause all of the content on the screen
+                                // to change, leaving the user confused about what happened and where they have ended up.
+                                if (!isPreviousItemVisible) {
+                                    coroutineScope.launch {
+                                        columnState.state.animateScrollToItem(thisItemIndex)
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp)
+                            .fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
+        }
+
         val episodeIsMarkedPlayed = episode.playingStatus == EpisodePlayingStatus.COMPLETED
         items(
             listOf(
@@ -207,7 +251,7 @@ fun EpisodeScreen(
 @Composable
 private fun EpisodeListChip(episodeScreenItem: EpisodeScreenItem) {
     WatchListChip(
-        titleRes = episodeScreenItem.title,
+        title = stringResource(episodeScreenItem.title),
         iconRes = episodeScreenItem.iconRes,
         onClick = episodeScreenItem.onClick,
         modifier = Modifier

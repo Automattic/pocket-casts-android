@@ -1,21 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class ChangePwdViewModel
 @Inject constructor(
-    private val syncServerManager: SyncServerManager,
-    private val settings: Settings
+    private val syncManager: SyncManager
 ) : AccountViewModel() {
 
     val pwdCurrent = MutableLiveData<String>().apply { postValue("") }
@@ -23,7 +19,6 @@ class ChangePwdViewModel
     val pwdConfirm = MutableLiveData<String>().apply { postValue("") }
 
     val changePasswordState = MutableLiveData<ChangePasswordState>().apply { value = ChangePasswordState.Empty }
-    private val disposables = CompositeDisposable()
 
     private fun pwdCurrentValid(): Boolean {
         return isPasswordValid(pwdCurrent.value)
@@ -97,25 +92,18 @@ class ChangePwdViewModel
 
         changePasswordState.postValue(ChangePasswordState.Loading)
 
-        syncServerManager.pwdChange(pwdNewString, pwdCurrentString)
-            .subscribeOn(Schedulers.io())
-            .doOnSuccess { response ->
-                val success = response.success ?: false
-                if (success) {
-                    settings.setSyncPassword(pwdNewString)
-                    changePasswordState.postValue(ChangePasswordState.Success("OK"))
-                } else {
-                    val errors = mutableSetOf(ChangePasswordError.SERVER)
-                    changePasswordState.postValue(ChangePasswordState.Failure(errors, response.message))
-                }
+        viewModelScope.launch {
+            try {
+                syncManager.updatePassword(
+                    newPassword = pwdNewString,
+                    oldPassword = pwdCurrentString
+                )
+                changePasswordState.postValue(ChangePasswordState.Success("OK"))
+            } catch (ex: Exception) {
+                Timber.e(ex, "Failed update password")
+                changePasswordState.postValue(ChangePasswordState.Failure(errors = setOf(ChangePasswordError.SERVER), message = null))
             }
-            .subscribeBy(onError = { Timber.e(it) })
-            .addTo(disposables)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
+        }
     }
 }
 
@@ -130,5 +118,5 @@ sealed class ChangePasswordState {
     object Empty : ChangePasswordState()
     object Loading : ChangePasswordState()
     data class Success(val result: String) : ChangePasswordState()
-    data class Failure(val errors: MutableSet<ChangePasswordError>, val message: String?) : ChangePasswordState()
+    data class Failure(val errors: Set<ChangePasswordError>, val message: String?) : ChangePasswordState()
 }

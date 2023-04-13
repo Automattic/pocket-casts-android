@@ -30,7 +30,6 @@ android {
 
         // Feature Flags
         buildConfigField "boolean", "END_OF_YEAR_ENABLED", "false"
-        buildConfigField "boolean", "SINGLE_SIGN_ON_ENABLED", "false"
         buildConfigField "boolean", "SHOW_RATINGS", "false"
 
         testInstrumentationRunner project.testInstrumentationRunner

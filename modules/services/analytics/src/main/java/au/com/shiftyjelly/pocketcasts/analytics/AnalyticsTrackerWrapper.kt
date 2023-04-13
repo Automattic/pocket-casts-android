@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import javax.inject.Inject
 
-class AnalyticsTrackerWrapper @Inject constructor() {
+open class AnalyticsTrackerWrapper @Inject constructor() {
 
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         AnalyticsTracker.track(event, properties)

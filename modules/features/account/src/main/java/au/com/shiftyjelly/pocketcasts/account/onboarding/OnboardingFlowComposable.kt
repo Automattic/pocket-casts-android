@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImport
 import au.com.shiftyjelly.pocketcasts.account.onboarding.import.OnboardingImportFlow.importFlowGraph
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow.onboardingRecommendationsFlowGraph
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusUpgradeFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeFlow
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -173,7 +173,7 @@ fun OnboardingFlowComposable(
                     OnboardingUpgradeSource.RECOMMENDATIONS -> true
                 }
 
-                OnboardingPlusUpgradeFlow(
+                OnboardingUpgradeFlow(
                     flow = flow,
                     source = upgradeSource,
                     isLoggedIn = signInState.isSignedIn,

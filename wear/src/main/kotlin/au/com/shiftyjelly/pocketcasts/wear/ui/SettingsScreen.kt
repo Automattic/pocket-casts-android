@@ -1,11 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -14,6 +22,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.ToggleChipDefaults
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -46,6 +55,7 @@ fun SettingsScreen(
         onWarnOnMeteredChanged = { viewModel.setWarnOnMeteredNetwork(it) },
         signInClick = signInClick,
         onSignOutClicked = viewModel::signOut,
+        onRefreshClicked = viewModel::refresh,
     )
 }
 
@@ -56,6 +66,7 @@ private fun Content(
     onWarnOnMeteredChanged: (Boolean) -> Unit,
     signInClick: () -> Unit,
     onSignOutClicked: () -> Unit,
+    onRefreshClicked: () -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
 
@@ -76,11 +87,32 @@ private fun Content(
         }
 
         item {
+            val title = stringResource(LR.string.profile_refresh_now)
+            val rotation = RotationAnimation(
+                state = state.refreshState,
+                durationMillis = 800,
+            )
+            WatchListChip(
+                title = title,
+                icon = {
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_retry),
+                        contentDescription = null,
+                        modifier = Modifier.graphicsLayer {
+                            rotationZ = rotation.value
+                        }
+                    )
+                },
+                onClick = onRefreshClicked,
+            )
+        }
+
+        item {
             val signInState = state.signInState
             when (signInState) {
                 is SignInState.SignedIn -> {
                     WatchListChip(
-                        titleRes = LR.string.log_out,
+                        title = stringResource(LR.string.log_out),
                         secondaryLabel = signInState.email,
                         iconRes = IR.drawable.ic_signout,
                         onClick = onSignOutClicked,
@@ -88,7 +120,7 @@ private fun Content(
                 }
                 is SignInState.SignedOut -> {
                     WatchListChip(
-                        titleRes = LR.string.log_in,
+                        title = stringResource(LR.string.log_in),
                         iconRes = IR.drawable.signin,
                         onClick = signInClick,
                     )
@@ -96,6 +128,41 @@ private fun Content(
             }
         }
     }
+}
+
+@Composable
+private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animatable<Float, AnimationVector1D> {
+    val anim = remember { Animatable(0f) }
+    LaunchedEffect(state, anim.isRunning) {
+        if (anim.value == 360f) {
+            anim.snapTo(0f)
+        }
+
+        if (anim.value == 0f && state == RefreshState.Refreshing) {
+
+            // We're at 0 and we're refreshing, so start animating
+
+            anim.animateTo(
+                targetValue = 360f,
+                animationSpec = tween(durationMillis, easing = LinearEasing)
+            )
+        } else if (anim.value != 0f && state != RefreshState.Refreshing) {
+
+            // No longer refreshing but we're not at 0 so continue animating until
+            // we're back at 0 to keep things smooth (i.e., if a second refresh is
+            // later initiated, we won't have a "jump" back to 0)
+
+            val degreesLeft = 360 - anim.value
+            val percentLeft = degreesLeft / 360f
+            val timeLeft = (percentLeft * durationMillis).toInt()
+
+            anim.animateTo(
+                targetValue = 360f,
+                animationSpec = tween(timeLeft, easing = LinearEasing)
+            )
+        }
+    }
+    return anim
 }
 
 @Composable
@@ -145,11 +212,12 @@ private fun SettingsScreenPreview_unchecked() {
                     subscriptionStatus = SubscriptionStatus.Free(),
                 ),
                 showDataWarning = false,
+                refreshState = null,
             ),
             signInClick = {},
             onWarnOnMeteredChanged = {},
-            onSignOutClicked = {}
-
+            onSignOutClicked = {},
+            onRefreshClicked = {},
         )
     }
 }
@@ -170,11 +238,12 @@ private fun SettingsScreenPreview_checked() {
                     subscriptionStatus = SubscriptionStatus.Free(),
                 ),
                 showDataWarning = true,
+                refreshState = null,
             ),
             signInClick = {},
             onWarnOnMeteredChanged = {},
-            onSignOutClicked = {}
-
+            onSignOutClicked = {},
+            onRefreshClicked = {},
         )
     }
 }

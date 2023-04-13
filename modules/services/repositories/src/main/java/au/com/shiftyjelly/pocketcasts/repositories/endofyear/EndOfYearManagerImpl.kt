@@ -4,7 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
@@ -19,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryTopPod
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
@@ -32,9 +31,8 @@ import kotlin.coroutines.CoroutineContext
 class EndOfYearManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
-    private val syncServerManager: SyncServerManager,
     private val historyManager: HistoryManager,
-    private val settings: Settings,
+    private val syncManager: SyncManager,
 ) : EndOfYearManager, CoroutineScope {
 
     companion object {
@@ -58,7 +56,7 @@ class EndOfYearManagerImpl @Inject constructor(
      * Download the year's listening history.
      */
     override suspend fun downloadListeningHistory(onProgressChanged: (Float) -> Unit) {
-        if (!settings.isLoggedIn()) {
+        if (!syncManager.isLoggedIn()) {
             return
         }
         // check for an episode interacted with before this year and assume they have the full listening history if they exist
@@ -66,14 +64,14 @@ class EndOfYearManagerImpl @Inject constructor(
             return
         }
         // only download the count to check if we are missing history episodes
-        val countResponse = syncServerManager.historyYear(year = YEAR, count = true)
+        val countResponse = syncManager.historyYear(year = YEAR, count = true)
         onProgressChanged(0.1f)
         val serverCount = countResponse.count ?: 0
         val localCount = countEpisodeInteractionsInYear()
         Timber.i("End of Year: Server listening history. server: ${countResponse.count} local: $localCount")
         if (serverCount > localCount) {
             // sync the year's listening history
-            val response = syncServerManager.historyYear(year = YEAR, count = false)
+            val response = syncManager.historyYear(year = YEAR, count = false)
             onProgressChanged(0.2f)
             val history = response.history ?: return
             historyManager.processServerResponse(

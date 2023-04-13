@@ -10,7 +10,7 @@ import timber.log.Timber
 
 class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
     companion object {
-        suspend fun run(settings: Settings, syncServerManager: SyncServerManager): Result {
+        suspend fun run(settings: Settings, namedSettingsCall: NamedSettingsCaller): Result {
             try {
                 val request = NamedSettingsRequest(
                     settings = NamedSettingsSettings(
@@ -22,7 +22,7 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
                     )
                 )
 
-                val response = syncServerManager.namedSettings(request)
+                val response = namedSettingsCall.namedSettings(request)
                 for ((key, value) in response) {
                     if (value.changed) {
                         Timber.d("$key changed to ${value.value}")
@@ -61,9 +61,9 @@ class SyncSettingsTask(val context: Context, val parameters: WorkerParameters) :
     }
 
     lateinit var settings: Settings
-    lateinit var syncServerManager: SyncServerManager
+    lateinit var namedSettingsCaller: NamedSettingsCaller
 
     override suspend fun doWork(): Result {
-        return run(settings, syncServerManager)
+        return run(settings, namedSettingsCaller)
     }
 }
