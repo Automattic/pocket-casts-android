@@ -278,7 +278,6 @@ interface Settings {
         fun toIndex(): Int = options.indexOf(this)
     }
 
-    val isLoggedInObservable: Observable<Boolean>
     val podcastLayoutObservable: Observable<Int>
     val podcastBadgeTypeObservable: Observable<BadgeType>
     val podcastSortTypeObservable: Observable<PodcastsSortType>
@@ -389,21 +388,7 @@ interface Settings {
     fun isRestoreFromBackup(): Boolean
     fun setRestoreFromBackupEnded()
 
-    fun setSyncEmail(email: String)
-    fun setSyncPassword(password: String)
-    fun clearEmailAndPassword()
-    fun getSyncEmail(): String?
-    fun getSyncPassword(): String?
-    fun getSyncUuid(): String?
-    fun getSyncRefreshToken(): String?
-    fun getSyncToken(onTokenErrorUiShown: () -> Unit): String?
-    suspend fun getSyncTokenSuspend(onTokenErrorUiShown: () -> Unit): String?
-    fun isLoggedIn(): Boolean
     fun clearPlusPreferences()
-    fun getUsedAccountManager(): Boolean
-    fun setUsedAccountManager(value: Boolean)
-    fun invalidateToken()
-    fun getOldSyncDetails(): Pair<String?, String?>
 
     fun getLanguageCode(): String
 

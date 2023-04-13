@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentPlusSettingsBinding
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -44,6 +45,7 @@ class PlusSettingsFragment : BaseFragment() {
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
+    @Inject lateinit var syncManager: SyncManager
 
     private var binding: FragmentPlusSettingsBinding? = null
 
@@ -79,7 +81,7 @@ class PlusSettingsFragment : BaseFragment() {
                     subscriptions = subscriptions,
                     onClick = {
                         analyticsTracker.track(AnalyticsEvent.SETTINGS_PLUS_UPGRADE_BUTTON_TAPPED)
-                        val flow = if (settings.isLoggedIn()) {
+                        val flow = if (syncManager.isLoggedIn()) {
                             OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.PLUS_DETAILS)
                         } else {
                             OnboardingFlow.PlusAccountUpgradeNeedsLogin

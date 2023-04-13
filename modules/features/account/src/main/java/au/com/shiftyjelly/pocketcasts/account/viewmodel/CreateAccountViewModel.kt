@@ -2,15 +2,17 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
@@ -22,9 +24,10 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateAccountViewModel
 @Inject constructor(
-    private val auth: AccountAuth,
+    private val syncManager: SyncManager,
     private val settings: Settings,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val podcastManager: PodcastManager
 ) : AccountViewModel() {
 
     val upgradeMode = MutableLiveData<Boolean>()
@@ -222,12 +225,13 @@ class CreateAccountViewModel
         createAccountState.postValue(CreateAccountState.AccountCreating)
 
         viewModelScope.launch {
-            when (val result = auth.createUserWithEmailAndPassword(emailString, passwordString)) {
-                is AccountAuth.AuthResult.Success -> {
+            when (val result = syncManager.createUserWithEmailAndPassword(emailString, passwordString)) {
+                is LoginResult.Success -> {
                     analyticsTracker.refreshMetadata()
+                    podcastManager.refreshPodcastsAfterSignIn()
                     createAccountState.postValue(CreateAccountState.AccountCreated)
                 }
-                is AccountAuth.AuthResult.Failed -> {
+                is LoginResult.Failed -> {
                     val message = result.message
                     val errors = mutableSetOf(CreateAccountError.CANNOT_CREATE_ACCOUNT)
                     createAccountState.postValue(CreateAccountState.Failure(errors, message))

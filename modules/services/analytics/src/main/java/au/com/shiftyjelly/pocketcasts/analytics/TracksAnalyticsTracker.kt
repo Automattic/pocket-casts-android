@@ -17,6 +17,7 @@ class TracksAnalyticsTracker @Inject constructor(
     @PublicSharedPreferences preferences: SharedPreferences,
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
+    private val accountStatusInfo: AccountStatusInfo,
 ) : IdentifyingTracker(preferences) {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
     override val anonIdPrefKey: String = TRACKS_ANON_ID
@@ -25,7 +26,7 @@ class TracksAnalyticsTracker @Inject constructor(
 
     private val predefinedEventProperties: Map<String, Any>
         get() {
-            val isLoggedIn = settings.isLoggedIn()
+            val isLoggedIn = accountStatusInfo.isLoggedIn()
             val hasSubscription = plusSubscription != null
             val hasLifetime = plusSubscription?.isLifetimePlus
                 ?: false
@@ -77,7 +78,7 @@ class TracksAnalyticsTracker @Inject constructor(
     }
 
     override fun refreshMetadata() {
-        val uuid = settings.getSyncUuid()
+        val uuid = accountStatusInfo.getUuid()
         if (!uuid.isNullOrEmpty()) {
             userId = uuid
             // Re-unify the user

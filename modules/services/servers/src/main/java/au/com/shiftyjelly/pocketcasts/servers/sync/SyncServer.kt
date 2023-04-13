@@ -6,13 +6,13 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPassword
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.RequestBody
@@ -20,6 +20,8 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.FieldMap
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -28,8 +30,8 @@ import retrofit2.http.Path
 import retrofit2.http.Url
 
 interface SyncServer {
-    @POST("/user/login")
-    suspend fun login(@Body request: LoginRequest): LoginResponse
+    @POST("/user/login_pocket_casts")
+    suspend fun login(@Body request: LoginRequest): LoginTokenResponse
 
     @POST("/user/login_google")
     suspend fun loginGoogle(@Body request: LoginGoogleRequest): LoginTokenResponse
@@ -37,11 +39,14 @@ interface SyncServer {
     @POST("/user/token")
     suspend fun loginToken(@Body request: LoginTokenRequest): LoginTokenResponse
 
-    @POST("/user/register")
-    suspend fun register(@Body request: RegisterRequest): RegisterResponse
+    @POST("/user/register_pocket_casts")
+    suspend fun register(@Body request: RegisterRequest): LoginTokenResponse
 
     @POST("/user/forgot_password")
     suspend fun forgotPassword(@Body request: ForgotPasswordRequest): ForgotPasswordResponse
+
+    @POST("/user/exchange_sonos")
+    suspend fun exchangeSonos(@Header("Authorization") authorization: String): ExchangeSonosResponse
 
     @POST("/user/change_email")
     fun emailChange(@Header("Authorization") authorization: String, @Body request: EmailChangeRequest): Single<UserChangeResponse>
@@ -49,11 +54,15 @@ interface SyncServer {
     @POST("/user/delete_account")
     fun deleteAccount(@Header("Authorization") authorization: String): Single<UserChangeResponse>
 
-    @POST("/user/change_password")
-    fun pwdChange(@Header("Authorization") authorization: String, @Body request: PwdChangeRequest): Single<PwdChangeResponse>
+    @POST("/user/update_password")
+    suspend fun updatePassword(@Header("Authorization") authorization: String, @Body request: UpdatePasswordRequest): LoginTokenResponse
 
     @POST("/user/named_settings/update")
     suspend fun namedSettings(@Header("Authorization") authorization: String, @Body request: NamedSettingsRequest): NamedSettingsResponse
+
+    @FormUrlEncoded
+    @POST("/sync/update")
+    fun syncUpdate(@FieldMap fields: Map<String, String>): Single<SyncUpdateResponse>
 
     @POST("/up_next/sync")
     fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): Single<UpNextSyncResponse>
@@ -92,10 +101,10 @@ interface SyncServer {
     fun postFiles(@Header("Authorization") authorization: String, @Body body: FilePostBody): Single<Response<Void>>
 
     @POST("/files/upload/request")
-    fun getUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): Single<FileUploadResponse>
+    fun getFileUploadUrl(@Header("Authorization") authorization: String, @Body body: FileUploadData): Single<FileUploadResponse>
 
     @POST("/files/upload/image")
-    fun getImageUploadUrl(@Header("Authorization") authorization: String, @Body body: FileImageUploadData): Single<FileUrlResponse>
+    fun getFileImageUploadUrl(@Header("Authorization") authorization: String, @Body body: FileImageUploadData): Single<FileUrlResponse>
 
     @PUT
     fun uploadFile(@Url url: String, @Body requestBody: RequestBody): Call<Void>

@@ -35,15 +35,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastSyncProcess
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncOldServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.UserNotLoggedInException
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.UserNotLoggedInException
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.EntryPoint
@@ -69,8 +68,6 @@ class RefreshPodcastsThread(
         fun playlistManager(): PlaylistManager
         fun statsManager(): StatsManager
         fun fileStorage(): FileStorage
-        fun syncOldServerManager(): SyncOldServerManager
-        fun syncServerManager(): SyncServerManager
         fun podcastCacheServerManager(): PodcastCacheServerManagerImpl
         fun userEpisodeManager(): UserEpisodeManager
         fun subscriptionManager(): SubscriptionManager
@@ -81,6 +78,7 @@ class RefreshPodcastsThread(
         fun downloadManager(): DownloadManager
         fun notificationHelper(): NotificationHelper
         fun userManager(): UserManager
+        fun syncManager(): SyncManager
     }
 
     @Volatile
@@ -250,12 +248,11 @@ class RefreshPodcastsThread(
             statsManager = entryPoint.statsManager(),
             fileStorage = entryPoint.fileStorage(),
             playbackManager = playbackManager,
-            syncOldServerManager = entryPoint.syncOldServerManager(),
-            syncServerManager = entryPoint.syncServerManager(),
             podcastCacheServerManager = entryPoint.podcastCacheServerManager(),
             userEpisodeManager = entryPoint.userEpisodeManager(),
             subscriptionManager = entryPoint.subscriptionManager(),
-            folderManager = entryPoint.folderManager()
+            folderManager = entryPoint.folderManager(),
+            syncManager = entryPoint.syncManager(),
         )
         val startTime = SystemClock.elapsedRealtime()
         val syncCompletable = sync.run()

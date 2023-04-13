@@ -13,9 +13,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
@@ -37,7 +37,7 @@ class AccountDetailsViewModel
     userManager: UserManager,
     statsManager: StatsManager,
     private val settings: Settings,
-    private val syncServerManager: SyncServerManager,
+    private val syncManager: SyncManager,
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ViewModel() {
 
@@ -75,7 +75,7 @@ class AccountDetailsViewModel
             .toLiveData()
 
     fun deleteAccount() {
-        syncServerManager.deleteAccount()
+        syncManager.deleteAccount()
             .subscribeOn(Schedulers.io())
             .doOnSuccess { response ->
                 val success = response.success ?: false

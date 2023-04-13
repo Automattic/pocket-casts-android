@@ -22,6 +22,7 @@ import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
@@ -42,6 +43,7 @@ object ViewModelModule {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Provides
     @ActivityRetainedScoped
     fun mediaController(

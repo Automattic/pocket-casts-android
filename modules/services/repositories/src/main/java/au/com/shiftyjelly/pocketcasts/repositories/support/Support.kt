@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
@@ -58,6 +59,7 @@ class Support @Inject constructor(
     private val upNextQueue: UpNextQueue,
     private val subscriptionManager: SubscriptionManager,
     private val systemBatteryRestrictions: SystemBatteryRestrictions,
+    private val syncManager: SyncManager,
     @ApplicationContext private val context: Context
 ) : CoroutineScope {
 
@@ -138,8 +140,8 @@ class Support @Inject constructor(
         try {
             val eol = if (html) "<br/>" else "\n"
             output.append("App version : ").append(settings.getVersion()).append(" (").append(settings.getVersionCode()).append(")").append(eol)
-            output.append("Sync account: ").append(if (settings.isLoggedIn()) settings.getSyncEmail() else "Not logged in").append(eol)
-            if (settings.isLoggedIn()) {
+            output.append("Sync account: ").append(if (syncManager.isLoggedIn()) syncManager.getEmail() else "Not logged in").append(eol)
+            if (syncManager.isLoggedIn()) {
                 output.append("Last Sync: ").append(settings.getLastModified() ?: "Never").append(eol)
             }
             val now = Date()
