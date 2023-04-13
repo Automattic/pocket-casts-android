@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,13 +29,22 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel.Star
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.abbreviated
+import java.util.UUID
 
 @Composable
-fun StarRatingView(viewModel: PodcastRatingsViewModel) {
+fun StarRatingView(
+    viewModel: PodcastRatingsViewModel,
+) {
     val state by viewModel.stateFlow.collectAsState()
 
     when (state) {
-        is RatingState.Loaded -> Content(state as RatingState.Loaded)
+        is RatingState.Loaded -> {
+            val loadedState = state as RatingState.Loaded
+            Content(
+                state = loadedState,
+                onClick = { viewModel.onRatingStarsTapped(loadedState.podcastUuid) },
+            )
+        }
         is RatingState.Loading,
         is RatingState.Error,
         -> Unit // Do Nothing
@@ -44,11 +54,13 @@ fun StarRatingView(viewModel: PodcastRatingsViewModel) {
 @Composable
 private fun Content(
     state: RatingState.Loaded,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 4.dp),
+            .padding(horizontal = 14.dp, vertical = 4.dp)
+            .clickable { onClick() },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -89,7 +101,8 @@ private fun PodcastRatingsPreview(
 ) {
     AppThemeWithBackground(themeType) {
         Content(
-            RatingState.Loaded(
+            state = RatingState.Loaded(
+                podcastUuid = UUID.randomUUID().toString(),
                 stars = listOf(
                     Star.FilledStar,
                     Star.FilledStar,
@@ -98,7 +111,8 @@ private fun PodcastRatingsPreview(
                     Star.BorderedStar,
                 ),
                 total = 1200
-            )
+            ),
+            onClick = {}
         )
     }
 }

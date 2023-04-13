@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +25,7 @@ private const val MAX_STARS = 5
 class PodcastRatingsViewModel
 @Inject constructor(
     private val ratingsManager: RatingsManager,
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -39,6 +42,7 @@ class PodcastRatingsViewModel
                         .collect { ratings ->
                             _stateFlow.update {
                                 RatingState.Loaded(
+                                    podcastUuid = ratings.podcastUuid,
                                     stars = getStars(ratings.average),
                                     total = ratings.total
                                 )
@@ -75,6 +79,13 @@ class PodcastRatingsViewModel
         return stars
     }
 
+    fun onRatingStarsTapped(podcastUuid: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.RATING_STARS_TAPPED,
+            AnalyticsProp.ratingStarsTapped(podcastUuid)
+        )
+    }
+
     private fun getStarFor(index: Int, rating: Int, half: Double) = when {
         index < rating -> Star.FilledStar
         (index == rating) && (half >= 0.5) -> Star.HalfStar
@@ -84,6 +95,7 @@ class PodcastRatingsViewModel
     sealed class RatingState {
         object Loading : RatingState()
         data class Loaded(
+            val podcastUuid: String,
             val stars: List<Star>,
             val total: Int?,
         ) : RatingState()
@@ -95,5 +107,13 @@ class PodcastRatingsViewModel
         object FilledStar : Star()
         object HalfStar : Star()
         object BorderedStar : Star()
+    }
+
+    companion object {
+        private object AnalyticsProp {
+            private const val UUID_KEY = "uuid"
+            fun ratingStarsTapped(podcastUuid: String) =
+                mapOf(UUID_KEY to podcastUuid)
+        }
     }
 }
