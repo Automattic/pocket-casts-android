@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
 import android.net.ConnectivityManager
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadPhoneOkHttpClient
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadWearCallFactory
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadWearRequestBuilder
+import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
+import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadOkHttpClient
+import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
 import au.com.shiftyjelly.pocketcasts.wear.networking.PocketCastsNetworkingRules
 import com.google.android.horologist.networks.data.DataRequestRepository
 import com.google.android.horologist.networks.data.InMemoryDataRequestRepository
@@ -37,7 +37,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Module
 @InstallIn(SingletonComponent::class)
-object NetworkModule {
+object WearNetworkModule {
 
     @Singleton
     @Provides
@@ -80,12 +80,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @DownloadWearCallFactory
+    @DownloadCallFactory
     fun provideDownloadWearCallFactory(
         highBandwidthNetworkMediator: HighBandwidthNetworkMediator,
         networkRepository: NetworkRepository,
         networkingRulesEngine: NetworkingRulesEngine,
-        @DownloadPhoneOkHttpClient phoneCallFactory: OkHttpClient,
+        @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
         @ForApplicationScope coroutineScope: CoroutineScope,
     ): Call.Factory {
 
@@ -101,7 +101,7 @@ object NetworkModule {
     }
 
     @Provides
-    @DownloadWearRequestBuilder
+    @DownloadRequestBuilder
     fun downloadRequestBuilder(): Request.Builder =
         Request.Builder()
             .requestType(RequestType.MediaRequest.DownloadRequest)
