@@ -1,10 +1,23 @@
 package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
+import android.net.ConnectivityManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadPhoneOkHttpClient
+import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadWearCallFactory
+import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadWearRequestBuilder
+import au.com.shiftyjelly.pocketcasts.wear.networking.PocketCastsNetworkingRules
 import com.google.android.horologist.networks.data.DataRequestRepository
 import com.google.android.horologist.networks.data.InMemoryDataRequestRepository
+import com.google.android.horologist.networks.data.RequestType
+import com.google.android.horologist.networks.highbandwidth.HighBandwidthNetworkMediator
+import com.google.android.horologist.networks.highbandwidth.StandardHighBandwidthNetworkMediator
 import com.google.android.horologist.networks.logging.NetworkStatusLogger
+import com.google.android.horologist.networks.okhttp.NetworkSelectingCallFactory
 import com.google.android.horologist.networks.okhttp.impl.NetworkLoggingEventListenerFactory
+import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
+import com.google.android.horologist.networks.request.NetworkRequesterImpl
+import com.google.android.horologist.networks.rules.NetworkingRules
+import com.google.android.horologist.networks.rules.NetworkingRulesEngine
 import com.google.android.horologist.networks.status.NetworkRepository
 import com.google.android.horologist.networks.status.NetworkRepositoryImpl
 import dagger.Module
@@ -17,12 +30,15 @@ import okhttp3.Cache
 import okhttp3.Call
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.LoggingEventListener
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
     @Singleton
     @Provides
     fun networkRepository(
@@ -32,6 +48,65 @@ object NetworkModule {
         application,
         coroutineScope
     )
+
+    @Provides
+    @Singleton
+    fun provideNetworkingRules(): NetworkingRules = PocketCastsNetworkingRules
+
+    @Provides
+    @Singleton
+    fun provideNetworkingRulesEngine(
+        networkRepository: NetworkRepository,
+        networkingRules: NetworkingRules,
+    ): NetworkingRulesEngine =
+        NetworkingRulesEngine(
+            networkRepository = networkRepository,
+            logger = NetworkStatusLogger.Logging,
+            networkingRules = networkingRules,
+        )
+
+    @Provides
+    @Singleton
+    fun provideHighBandwidthNetworkMediator(
+        connectivityManager: ConnectivityManager,
+        @ForApplicationScope coroutineScope: CoroutineScope,
+    ): HighBandwidthNetworkMediator =
+        StandardHighBandwidthNetworkMediator(
+            logger = NetworkStatusLogger.Logging,
+            networkRequester = NetworkRequesterImpl(connectivityManager),
+            coroutineScope = coroutineScope,
+            delayToRelease = 3.seconds,
+        )
+
+    @Provides
+    @Singleton
+    @DownloadWearCallFactory
+    fun provideDownloadWearCallFactory(
+        highBandwidthNetworkMediator: HighBandwidthNetworkMediator,
+        networkRepository: NetworkRepository,
+        networkingRulesEngine: NetworkingRulesEngine,
+        @DownloadPhoneOkHttpClient phoneCallFactory: OkHttpClient,
+        @ForApplicationScope coroutineScope: CoroutineScope,
+    ): Call.Factory {
+
+        return NetworkSelectingCallFactory(
+            networkingRulesEngine = networkingRulesEngine,
+            highBandwidthNetworkMediator = highBandwidthNetworkMediator,
+            networkRepository = networkRepository,
+            dataRequestRepository = null,
+            rootClient = phoneCallFactory,
+            coroutineScope = coroutineScope,
+            timeout = 5.seconds,
+        )
+    }
+
+    @Provides
+    @DownloadWearRequestBuilder
+    fun downloadRequestBuilder(): Request.Builder =
+        Request.Builder()
+            .requestType(RequestType.MediaRequest.DownloadRequest)
+
+    // FIXME update the provide methods below this point
 
     @Singleton
     @Provides
@@ -67,9 +142,6 @@ object NetworkModule {
             .eventListenerFactory(LoggingEventListener.Factory()).cache(cache).build()
     }
 
-    @Provides
-    fun networkLogger(): NetworkStatusLogger = NetworkStatusLogger.Logging
-
     @Singleton
     @Provides
     fun dataRequestRepository(): DataRequestRepository =
@@ -85,7 +157,6 @@ object NetworkModule {
         dataRequestRepository: DataRequestRepository,
         networkRepository: NetworkRepository,
         /*@ForApplicationScope coroutineScope: CoroutineScope,*/
-        logger: NetworkStatusLogger,
     ): Call.Factory =
         /*if (appConfig.strictNetworking != null) {
             NetworkSelectingCallFactory(
@@ -100,7 +171,7 @@ object NetworkModule {
         okhttpClient.newBuilder()
             .eventListenerFactory(
                 NetworkLoggingEventListenerFactory(
-                    logger,
+                    NetworkStatusLogger.Logging,
                     networkRepository,
                     okhttpClient.eventListenerFactory,
                     dataRequestRepository

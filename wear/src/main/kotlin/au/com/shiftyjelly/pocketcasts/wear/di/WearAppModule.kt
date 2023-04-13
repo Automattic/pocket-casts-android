@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
+import android.net.ConnectivityManager
 import au.com.shiftyjelly.pocketcasts.wear.data.service.log.Logging
 import au.com.shiftyjelly.pocketcasts.wear.ui.AppConfig
 import com.google.android.horologist.media3.config.WearMedia3Factory
@@ -20,7 +21,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object ApplicationModule {
+object WearAppModule {
+
     @Singleton
     @Provides
     fun intentBuilder(
@@ -71,4 +73,10 @@ object ApplicationModule {
     fun errorReporter(
         logging: Logging,
     ): ErrorReporter = logging
+
+    @Provides
+    fun connectivityManager(
+        @ApplicationContext application: Context
+    ): ConnectivityManager =
+        application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 }
