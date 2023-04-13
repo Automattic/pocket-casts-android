@@ -13,9 +13,6 @@ abstract class PodcastRatingsDao {
     @Query("SELECT * FROM podcast_ratings WHERE podcast_uuid = :podcastUuid")
     abstract fun podcastRatings(podcastUuid: String): Flow<List<PodcastRatings>>
 
-    @Query("SELECT * FROM podcast_ratings WHERE podcast_uuid = :podcastUuid")
-    abstract fun findPodcastRatings(podcastUuid: String): PodcastRatings?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(ratings: PodcastRatings)
 

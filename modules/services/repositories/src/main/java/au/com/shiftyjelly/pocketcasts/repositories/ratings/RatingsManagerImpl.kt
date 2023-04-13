@@ -22,9 +22,6 @@ class RatingsManagerImpl @Inject constructor(
         podcastRatingsDao.podcastRatings(podcastUuid)
             .map { it.firstOrNull() ?: PodcastRatings(podcastUuid, 0.0) }
 
-    override fun findPodcastRatings(podcastUuid: String) =
-        podcastRatingsDao.findPodcastRatings(podcastUuid)
-
     override suspend fun refreshPodcastRatings(podcastUuid: String) {
         val ratings = cacheServerManager.getPodcastRatings(podcastUuid)
         podcastRatingsDao.insert(

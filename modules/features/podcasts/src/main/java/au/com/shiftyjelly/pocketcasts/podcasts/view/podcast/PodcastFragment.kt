@@ -144,14 +144,13 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         podcastUuid: String,
         expanded: Boolean,
         userInitiated: Boolean,
-    ) -> Unit = { podcastUuid, expanded, userInitiated ->
+    ) -> Unit = { _, expanded, userInitiated ->
         if (userInitiated) {
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SCREEN_TOGGLE_SUMMARY,
                 mapOf(IS_EXPANDED_KEY to expanded)
             )
         }
-        if (BuildConfig.SHOW_RATINGS && expanded) viewModel.refreshPodcastRatings(podcastUuid)
     }
 
     private val onSubscribeClicked: () -> Unit = {
@@ -659,13 +658,6 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 binding.executePendingBindings()
             }
         )
-
-        viewModel.ratingsState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is PodcastViewModel.RatingState.Loaded -> adapter?.setRatings(state.ratings)
-                is PodcastViewModel.RatingState.Error -> Unit // Do Nothing
-            }
-        }
 
         viewModel.tintColor.observe(viewLifecycleOwner) { tintColor ->
             binding?.tintColor = tintColor

@@ -5,6 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface RatingsManager {
     fun podcastRatings(podcastUuid: String): Flow<PodcastRatings>
-    fun findPodcastRatings(podcastUuid: String): PodcastRatings?
     suspend fun refreshPodcastRatings(podcastUuid: String)
 }

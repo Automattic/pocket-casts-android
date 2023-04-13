@@ -30,9 +30,9 @@ import androidx.transition.TransitionManager
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
@@ -127,7 +127,6 @@ class PodcastAdapter(
 
     private val disposables = CompositeDisposable()
     private var podcast: Podcast = Podcast()
-    private var ratings: PodcastRatings? = null
 
     private var headerExpanded: Boolean = false
     private var tintColor: Int = 0x000000
@@ -277,17 +276,14 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
-            ratingsViewModel.loadRatings(podcast.uuid)
-            ratingsViewModel.refreshPodcastRatings(podcast.uuid)
+            if (BuildConfig.SHOW_RATINGS) {
+                ratingsViewModel.loadRatings(podcast.uuid)
+                ratingsViewModel.refreshPodcastRatings(podcast.uuid)
+            }
             onHeaderSummaryToggled(podcast.uuid, headerExpanded, false)
         }
         this.podcast = podcast
         notifyDataSetChanged()
-    }
-
-    fun setRatings(ratings: PodcastRatings) {
-        this.ratings = ratings
-        notifyItemChanged(0)
     }
 
     fun setTint(tintColor: Int) {
