@@ -170,7 +170,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
-    onSubscriptionFrequencyChanged: (Int) -> Unit,
+    onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
@@ -240,7 +240,8 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                         state.subscriptionFrequencies
                             .map { stringResource(id = it.localisedLabelRes) },
                     ) {
-                        onSubscriptionFrequencyChanged(it)
+                        val selectedFrequency = state.subscriptionFrequencies[it]
+                        onSubscriptionFrequencyChanged(selectedFrequency)
                     }
                 }
 

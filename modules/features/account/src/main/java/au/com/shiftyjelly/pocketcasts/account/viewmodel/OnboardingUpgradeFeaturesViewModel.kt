@@ -64,14 +64,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, analyticsProps(flow, source))
     }
 
-    fun onSubscriptionFrequencyChanged(index: Int) {
-        _state.value = _state.value.copy(
-            currentSubscriptionFrequency = when (index) {
-                0 -> SubscriptionFrequency.YEARLY
-                1 -> SubscriptionFrequency.MONTHLY
-                else -> throw IllegalArgumentException("Invalid index: $index")
-            }
-        )
+    fun onSubscriptionFrequencyChanged(frequency: SubscriptionFrequency) {
+        _state.value = _state.value.copy(currentSubscriptionFrequency = frequency)
     }
 
     fun onFeatureCardChanged(index: Int) {
