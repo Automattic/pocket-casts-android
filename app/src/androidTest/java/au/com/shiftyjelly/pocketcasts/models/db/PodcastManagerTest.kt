@@ -12,10 +12,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SubscribeManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServerManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
 import org.junit.After
@@ -40,12 +40,13 @@ class PodcastManagerTest {
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        val episodeManager = mock<EpisodeManager> {}
-        val playlistManager = mock<PlaylistManager> {}
-        val settingsSignedOut = mock<Settings> {
+        val episodeManager = mock<EpisodeManager>()
+        val playlistManager = mock<PlaylistManager>()
+        val settings = mock<Settings>()
+        val syncManagerSignedOut = mock<SyncManager> {
             on { isLoggedIn() } doReturn false
         }
-        val settingsSignedIn = mock<Settings> {
+        val syncManagerSignedIn = mock<SyncManager> {
             on { isLoggedIn() } doReturn true
         }
 
@@ -53,7 +54,6 @@ class PodcastManagerTest {
         val podcastCacheServer = mock<PodcastCacheServerManager> {
             on { getPodcast(uuid, 0, 3, 1500) } doReturn Single.just(Podcast(uuid))
         }
-        val syncServerManager = mock<SyncServerManager> {}
         val staticServerManager = mock<StaticServerManager> {
             on { getColorsSingle(uuid) } doReturn Single.just(Optional.empty())
         }
@@ -61,10 +61,10 @@ class PodcastManagerTest {
         appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
 
         val refreshServerManager = mock<RefreshServerManager> {}
-        val subscribeManager = SubscribeManager(appDatabase, podcastCacheServer, syncServerManager, staticServerManager, application, settingsSignedOut)
+        val subscribeManager = SubscribeManager(appDatabase, podcastCacheServer, staticServerManager, syncManagerSignedOut, application, settings)
         podcastDao = appDatabase.podcastDao()
-        podcastManagerSignedOut = PodcastManagerImpl(episodeManager, playlistManager, settingsSignedOut, application, subscribeManager, podcastCacheServer, refreshServerManager, appDatabase)
-        podcastManagerSignedIn = PodcastManagerImpl(episodeManager, playlistManager, settingsSignedIn, application, subscribeManager, podcastCacheServer, refreshServerManager, appDatabase)
+        podcastManagerSignedOut = PodcastManagerImpl(episodeManager, playlistManager, settings, application, subscribeManager, podcastCacheServer, refreshServerManager, syncManagerSignedOut, appDatabase)
+        podcastManagerSignedIn = PodcastManagerImpl(episodeManager, playlistManager, settings, application, subscribeManager, podcastCacheServer, refreshServerManager, syncManagerSignedIn, appDatabase)
     }
 
     @After

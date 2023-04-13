@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.user
 
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import io.reactivex.Single
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.rx2.rxSingle
@@ -10,7 +10,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class StatsManagerImpl @Inject constructor(
-    private val syncServerManager: SyncServerManager,
+    private val syncManager: SyncManager,
     private val settings: Settings
 ) : StatsManager {
 
@@ -215,7 +215,7 @@ class StatsManagerImpl @Inject constructor(
     }
 
     override suspend fun getServerStats(): StatsBundle {
-        return syncServerManager.loadStats()
+        return syncManager.loadStats()
     }
 
     override suspend fun cacheMergedStats() {

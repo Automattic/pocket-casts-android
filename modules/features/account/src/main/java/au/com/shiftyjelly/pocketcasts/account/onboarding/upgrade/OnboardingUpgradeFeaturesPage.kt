@@ -49,10 +49,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.IconRow
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusRowButton
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -68,7 +68,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun OnboardingPlusFeaturesPage(
+internal fun OnboardingUpgradeFeaturesPage(
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
     onUpgradePressed: () -> Unit,
@@ -77,7 +77,7 @@ internal fun OnboardingPlusFeaturesPage(
     canUpgrade: Boolean
 ) {
 
-    val viewModel = hiltViewModel<OnboardingPlusFeaturesViewModel>()
+    val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
     val state by viewModel.state.collectAsState()
 
     @Suppress("NAME_SHADOWING")
@@ -109,10 +109,10 @@ internal fun OnboardingPlusFeaturesPage(
     BoxWithConstraints(
         Modifier
             .fillMaxHeight()
-            .background(OnboardingPlusHelper.backgroundColor)
+            .background(OnboardingUpgradeHelper.backgroundColor)
     ) {
 
-        OnboardingPlusHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
+        OnboardingUpgradeHelper.PlusBackground(Modifier.verticalScroll(scrollState)) {
             Column(
                 Modifier
                     .windowInsetsPadding(WindowInsets.statusBars)
@@ -189,7 +189,7 @@ private fun setStatusBarBackground(scrollState: ScrollState) {
     )
 
     val statusBarBackground = if (scrimAlpha > 0) {
-        OnboardingPlusHelper.backgroundColor.copy(alpha = scrimAlpha)
+        OnboardingUpgradeHelper.backgroundColor.copy(alpha = scrimAlpha)
     } else {
         Color.Transparent
     }
@@ -358,8 +358,8 @@ private tailrec suspend fun autoScroll(
 
 @Preview
 @Composable
-private fun OnboardingPlusFeaturesPreview() {
-    OnboardingPlusFeaturesPage(
+private fun OnboardingUpgradeFeaturesPreview() {
+    OnboardingUpgradeFeaturesPage(
         flow = OnboardingFlow.InitialOnboarding,
         source = OnboardingUpgradeSource.RECOMMENDATIONS,
         onBackPressed = {},

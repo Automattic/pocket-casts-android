@@ -1,22 +1,23 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatusMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortTypeMoshiAdapter
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
+import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncUpdateResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.old.SyncUpdateResponseParser
+import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -25,6 +26,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.Dispatcher
 import okhttp3.Interceptor
@@ -108,6 +110,8 @@ class ServersModule {
             .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
             .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
             .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
+            .add(AccessToken::class.java, AccessToken.Adapter)
+            .add(RefreshToken::class.java, RefreshToken.Adapter)
     }
 
     @Provides
@@ -151,10 +155,10 @@ class ServersModule {
         return okHttpClientBuilder.build()
     }
 
-    private fun buildRequestWithToken(original: Request, token: String?): Request {
+    private fun buildRequestWithToken(original: Request, token: AccessToken?): Request {
         val builder = original.newBuilder()
         if (token != null) {
-            builder.addHeader("Authorization", "Bearer $token")
+            builder.addHeader("Authorization", "Bearer ${token.value}")
         }
         return builder.build()
     }
@@ -162,22 +166,19 @@ class ServersModule {
     @Provides
     @TokenInterceptor
     @Singleton
-    internal fun provideTokenInterceptor(
-        settings: Settings,
-        @OnTokenErrorUiShown onTokenErrorUiShown: () -> Unit
-    ): Interceptor {
+    internal fun provideTokenInterceptor(tokenHandler: TokenHandler): Interceptor {
         val unauthenticatedEndpoints = setOf("security") // Don't attach a token to these methods because they get the token
         return Interceptor { chain ->
             val original = chain.request()
             if (unauthenticatedEndpoints.contains(original.url.encodedPathSegments.firstOrNull())) {
                 chain.proceed(original)
             } else {
-                val token = settings.getSyncToken(onTokenErrorUiShown)
+                val token = runBlocking { tokenHandler.getAccessToken() }
                 return@Interceptor if (token != null) {
                     val response = chain.proceed(buildRequestWithToken(original, token))
                     if (response.code == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                        settings.invalidateToken()
-                        val newToken = settings.getSyncToken(onTokenErrorUiShown)
+                        tokenHandler.invalidateAccessToken()
+                        val newToken = runBlocking { tokenHandler.getAccessToken() }
                         chain.proceed(buildRequestWithToken(original, newToken))
                     } else {
                         response
@@ -188,11 +189,6 @@ class ServersModule {
             }
         }
     }
-
-    @Provides
-    @OnTokenErrorUiShown
-    internal fun provideTokenErrorUiTracker(analyticsTracker: AnalyticsTrackerWrapper): () -> Unit =
-        { analyticsTracker.track(AnalyticsEvent.SIGNED_OUT_ALERT_SHOWN) }
 
     @Provides
     @CachedTokenedOkHttpClient
@@ -291,18 +287,6 @@ class ServersModule {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(Settings.SERVER_CACHE_URL)
-            .client(okHttpClient)
-            .build()
-    }
-
-    @Provides
-    @OldSyncServerRetrofit
-    @Singleton
-    internal fun provideSyncOldRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl(Settings.SERVER_API_URL)
             .client(okHttpClient)
             .build()
     }
@@ -427,10 +411,6 @@ annotation class SyncServerRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class OldSyncServerRetrofit
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
 annotation class WpComServerRetrofit
 
 @Qualifier
@@ -440,7 +420,3 @@ annotation class NoCacheOkHttpClientBuilder
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class TokenInterceptor
-
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class OnTokenErrorUiShown

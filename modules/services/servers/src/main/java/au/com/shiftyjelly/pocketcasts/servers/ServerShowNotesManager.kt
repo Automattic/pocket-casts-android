@@ -17,6 +17,8 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class ServerShowNotesManager @Inject constructor(@ShowNotesCache private val httpShowNotesCache: OkHttpClient) {
@@ -62,6 +64,26 @@ class ServerShowNotesManager @Inject constructor(@ShowNotesCache private val htt
             }
         )
     }
+
+    suspend fun loadShowNotes(episodeUuid: String): String? =
+        suspendCoroutine { cont ->
+            loadShowNotes(
+                episodeUuid,
+                object : CachedServerCallback<String> {
+                    override fun cachedDataFound(data: String) {
+                        cont.resume(data)
+                    }
+
+                    override fun networkDataFound(data: String) {
+                        cont.resume(data)
+                    }
+
+                    override fun notFound() {
+                        cont.resume(null)
+                    }
+                }
+            )
+        }
 
     private fun buildUrl(episodeUuid: String): String {
         return Settings.SERVER_CACHE_URL + "/mobile/episode/show_notes/" + episodeUuid

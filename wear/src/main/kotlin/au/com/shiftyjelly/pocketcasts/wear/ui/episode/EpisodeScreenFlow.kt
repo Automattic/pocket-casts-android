@@ -76,12 +76,13 @@ object EpisodeScreenFlow {
                 )
             }
 
-            composable(upNextOptionsScreen) {
+            scrollable(upNextOptionsScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 val episodeScreenBackStackEntry = remember(it.backStackEntry) {
                     navController.getBackStackEntry(episodeScreen)
                 }
                 UpNextOptionsScreen(
+                    columnState = it.columnState,
                     episodeScreenViewModelStoreOwner = episodeScreenBackStackEntry, // Reuse view model from EpisodeScreen
                     onComplete = { navController.popBackStack() },
                 )

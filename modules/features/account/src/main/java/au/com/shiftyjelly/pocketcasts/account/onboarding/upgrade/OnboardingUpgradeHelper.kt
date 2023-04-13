@@ -44,7 +44,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
-object OnboardingPlusHelper {
+object OnboardingUpgradeHelper {
     val plusGradientBrush = Brush.horizontalGradient(
         0f to Color(0xFFFED745),
         1f to Color(0xFFFEB525),
@@ -300,7 +300,7 @@ object OnboardingPlusHelper {
     fun IconRow(modifier: Modifier = Modifier) {
         Row(modifier) {
             Icon(
-                painter = painterResource(au.com.shiftyjelly.pocketcasts.account.R.drawable.pocket_casts_white),
+                painter = painterResource(R.drawable.pocket_casts_white),
                 contentDescription = null,
                 tint = Color.White,
             )
@@ -308,7 +308,7 @@ object OnboardingPlusHelper {
             Spacer(Modifier.width(8.dp))
 
             Icon(
-                painter = painterResource(au.com.shiftyjelly.pocketcasts.account.R.drawable.plus_bw),
+                painter = painterResource(R.drawable.plus_bw),
                 contentDescription = null,
                 tint = Color.White,
             )

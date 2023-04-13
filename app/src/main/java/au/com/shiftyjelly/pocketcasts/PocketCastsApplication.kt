@@ -5,8 +5,6 @@ import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -24,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
@@ -73,7 +72,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
-    @Inject lateinit var auth: AccountAuth
+    @Inject lateinit var syncManager: SyncManager
 
     private val applicationScope = MainScope()
 
@@ -106,7 +105,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     private fun setupAnalytics() {
         AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
-        retrieveUserIdIfNeededAndRefreshMetadata()
+        AnalyticsTracker.refreshMetadata()
     }
 
     private fun setupSentry() {
@@ -120,7 +119,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
         // Link email to Sentry crash reports only if the user has opted in
         if (settings.getLinkCrashReportsToUser()) {
-            settings.getSyncEmail()?.let { syncEmail ->
+            syncManager.getEmail()?.let { syncEmail ->
                 val user = User().apply { email = syncEmail }
                 Sentry.setUser(user)
             }
@@ -206,7 +205,12 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
-                VersionMigrationsJob.run(podcastManager = podcastManager, settings = settings, context = this@PocketCastsApplication)
+                VersionMigrationsJob.run(
+                    podcastManager = podcastManager,
+                    settings = settings,
+                    syncManager = syncManager,
+                    context = this@PocketCastsApplication
+                )
 
                 // check that we have .nomedia files in existing folders
                 fileStorage.checkNoMediaDirs()
@@ -225,21 +229,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         userManager.beginMonitoringAccountManager(playbackManager)
 
         Timber.i("Launched ${BuildConfig.APPLICATION_ID}")
-    }
-
-    private fun retrieveUserIdIfNeededAndRefreshMetadata() {
-        val email = settings.getSyncEmail()
-        val password = settings.getSyncPassword()
-        val uuid = settings.getSyncUuid()
-        if (!email.isNullOrEmpty() && !password.isNullOrEmpty() && uuid.isNullOrEmpty()) {
-            Timber.e("Missing User ID - Retrieving from the server")
-            applicationScope.launch(Dispatchers.IO) {
-                auth.signInWithEmailAndPassword(email, password, SignInSource.PocketCastsApplication)
-                AnalyticsTracker.refreshMetadata()
-            }
-        } else {
-            AnalyticsTracker.refreshMetadata()
-        }
     }
 
     @Suppress("DEPRECATION")

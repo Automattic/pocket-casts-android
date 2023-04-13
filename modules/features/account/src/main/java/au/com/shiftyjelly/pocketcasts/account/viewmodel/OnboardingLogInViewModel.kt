@@ -2,11 +2,13 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
-import au.com.shiftyjelly.pocketcasts.account.SignInSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,9 +21,10 @@ import kotlin.coroutines.CoroutineContext
 
 @HiltViewModel
 class OnboardingLogInViewModel @Inject constructor(
-    private val auth: AccountAuth,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val podcastManager: PodcastManager,
     private val subscriptionManager: SubscriptionManager,
+    private val syncManager: SyncManager,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -56,13 +59,18 @@ class OnboardingLogInViewModel @Inject constructor(
         subscriptionManager.clearCachedStatus()
 
         viewModelScope.launch {
-            val result = auth.signInWithEmailAndPassword(state.email, state.password, SignInSource.Onboarding)
+            val result = syncManager.loginWithEmailAndPassword(
+                email = state.email,
+                password = state.password,
+                signInSource = SignInSource.Onboarding
+            )
             when (result) {
-                is AccountAuth.AuthResult.Success -> {
+                is LoginResult.Success -> {
+                    podcastManager.refreshPodcastsAfterSignIn()
                     onSuccessfulLogin()
                 }
 
-                is AccountAuth.AuthResult.Failed -> {
+                is LoginResult.Failed -> {
                     _state.update {
                         it.copy(
                             isCallInProgress = false,

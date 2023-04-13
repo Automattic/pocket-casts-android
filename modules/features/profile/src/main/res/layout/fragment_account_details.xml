@@ -130,6 +130,12 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btnChangeEmail" />
 
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/changeEmailPasswordGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="dividerView,imgMail,lblChangeEmail,btnChangeEmail,dividerView2,imgPassword,lblChangePassword,btnChangePwd" />
+
             <View
                 android:id="@+id/dividerView3"
                 android:layout_width="0dp"

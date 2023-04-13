@@ -91,6 +91,8 @@ object LocaliseHelper {
         "login_email_invalid" to R.string.server_login_email_invalid,
         "login_email_taken" to R.string.server_login_email_taken,
         "login_user_register_failed" to R.string.server_login_user_register_failed,
+        "login_password_change_failed" to R.string.server_login_password_change_failed,
+        "login_password_change_success" to R.string.server_login_password_change_success,
         "files_invalid_content_type" to R.string.server_files_invalid_content_type,
         "files_invalid_user" to R.string.server_files_invalid_user,
         "files_file_too_large" to R.string.server_files_file_too_large,
@@ -100,7 +102,13 @@ object LocaliseHelper {
         "files_upload_failed_generic" to R.string.server_files_upload_failed_generic,
         "promo_already_plus" to R.string.server_promo_already_plus,
         "promo_code_expired_or_invalid" to R.string.server_promo_code_expired_or_invalid,
-        "promo_already_redeemed" to R.string.server_promo_already_redeemed
+        "promo_already_redeemed" to R.string.server_promo_already_redeemed,
+        "promo_winback_no_plus" to R.string.server_promo_winback_no_plus,
+        "user_email_failed" to R.string.server_user_email_failed,
+        "user_email_success" to R.string.server_user_email_success,
+        "user_email_verification_failed" to R.string.server_user_email_verification_failed,
+        "user_change_email_success" to R.string.server_user_change_email_success,
+        "user_delete_account_with_sub_failed" to R.string.server_user_delete_account_with_sub_failed
     )
 
     fun serverMessageIdToMessage(serverMessageId: String?, getResourceString: (Int) -> String?) =

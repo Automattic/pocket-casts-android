@@ -35,11 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.PlusRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingPlusHelper.UnselectedPlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetState
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingPlusBottomSheetViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedPlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
@@ -52,7 +52,7 @@ import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun OnboardingPlusBottomSheet(
+fun OnboardingUpgradeBottomSheet(
     onClickSubscribe: () -> Unit,
 ) {
 
@@ -60,9 +60,9 @@ fun OnboardingPlusBottomSheet(
     // This is keeps it closed while on this screen.
     KeepKeyboardClosed()
 
-    val viewModel = hiltViewModel<OnboardingPlusBottomSheetViewModel>()
+    val viewModel = hiltViewModel<OnboardingUpgradeBottomSheetViewModel>()
     val state = viewModel.state.collectAsState().value
-    val subscriptions = (state as? OnboardingPlusBottomSheetState.Loaded)?.subscriptions
+    val subscriptions = (state as? OnboardingUpgradeBottomSheetState.Loaded)?.subscriptions
         ?: emptyList()
 
     val resources = LocalContext.current.resources
@@ -85,7 +85,7 @@ fun OnboardingPlusBottomSheet(
             color = Color.White
         )
 
-        if (state is OnboardingPlusBottomSheetState.Loaded) {
+        if (state is OnboardingUpgradeBottomSheetState.Loaded) {
             Spacer(Modifier.height(16.dp))
 
             // Using LazyColumn instead of Column to avoid issue where unselected button that was not
