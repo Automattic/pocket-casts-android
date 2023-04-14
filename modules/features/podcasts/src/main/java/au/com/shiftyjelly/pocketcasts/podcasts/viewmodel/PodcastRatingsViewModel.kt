@@ -62,7 +62,6 @@ class PodcastRatingsViewModel
                 ratingsManager.refreshPodcastRatings(uuid)
             } catch (e: Exception) {
                 Timber.e(e, "Failed to refresh podcast ratings")
-                _stateFlow.update { RatingState.Error }
             }
         }
     }
