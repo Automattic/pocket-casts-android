@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -47,6 +48,18 @@ data class SearchEpisodeResult(
     }
 }
 
+@JsonClass(generateAdapter = true)
+data class PodcastRatingsResponse(
+    @field:Json(name = "average") val average: Double?,
+    @field:Json(name = "total") val total: Int?,
+) {
+    fun toPodcastRatings(podcastUuid: String) = PodcastRatings(
+        podcastUuid = podcastUuid,
+        average = average ?: 0.0,
+        total = total
+    )
+}
+
 interface PodcastCacheServer {
     @GET("/mobile/podcast/full/{podcastUuid}/{pageNumber}/{sortOption}/{episodeLimit}")
     fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String, @Path("pageNumber") pageNumber: Int = 0, @Path("sortOption") sortOption: Int = 3, @Path("episodeLimit") episodeLimit: Int = 0): Single<Response<PodcastResponse>>
@@ -62,4 +75,7 @@ interface PodcastCacheServer {
 
     @POST("/episode/search")
     fun searchEpisodes(@Body body: SearchEpisodesBody): Single<SearchEpisodesResultBody>
+
+    @GET("/podcast/rating/{podcastUuid}")
+    suspend fun getPodcastRatings(@Path("podcastUuid") podcastUuid: String): PodcastRatingsResponse
 }
