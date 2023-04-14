@@ -264,6 +264,14 @@ class SettingsImpl @Inject constructor(
         editor.apply()
     }
 
+    override fun syncOnMeteredNetwork(): Boolean {
+        return getBoolean(Settings.PREFERENCE_SYNC_ON_METERED, true)
+    }
+
+    override fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean) {
+        setBoolean(Settings.PREFERENCE_SYNC_ON_METERED, shouldSyncOnMetered)
+    }
+
     override fun refreshPodcastsAutomatically(): Boolean {
         return getBoolean("backgroundRefresh", true)
     }

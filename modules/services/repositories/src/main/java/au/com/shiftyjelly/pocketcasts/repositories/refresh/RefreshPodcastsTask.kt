@@ -60,8 +60,13 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 return
             }
 
+            var syncNetworkConstraint = NetworkType.CONNECTED
+            if (!settings.syncOnMeteredNetwork()) {
+                syncNetworkConstraint = NetworkType.UNMETERED
+            }
+
             val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiredNetworkType(syncNetworkConstraint)
                 .setRequiresBatteryNotLow(true)
                 .build()
 

@@ -105,6 +105,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
@@ -447,18 +448,32 @@ class MainActivity :
     }
 
     private fun refreshApp() {
-        if (overrideNextRefreshTimer) {
-            podcastManager.refreshPodcasts("open app - ignore timer")
-            overrideNextRefreshTimer = false
-        } else {
-            // delay the refresh to allow the UI to load
-            Observable.timer(1, TimeUnit.SECONDS, Schedulers.io())
-                .doOnNext {
-                    podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
-                }
-                .subscribeBy(onError = { Timber.e(it) })
-                .addTo(disposables)
+        fun doRefresh() {
+            if (overrideNextRefreshTimer) {
+                podcastManager.refreshPodcasts("open app - ignore timer")
+                overrideNextRefreshTimer = false
+            } else {
+                // delay the refresh to allow the UI to load
+                Observable.timer(1, TimeUnit.SECONDS, Schedulers.io())
+                    .doOnNext {
+                        podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
+                    }
+                    .subscribeBy(onError = { Timber.e(it) })
+                    .addTo(disposables)
+            }
         }
+
+        // If the user chooses the advanced option to only sync on unmetered networks
+        // then don't auto-refresh when the app resumes. Still let them swipe down though
+        // to refresh if they wish and still schedule the worker to do updates
+        if (!settings.syncOnMeteredNetwork()) {
+            if (Network.isUnmeteredConnection(this@MainActivity)) {
+                doRefresh()
+            }
+        } else {
+            doRefresh()
+        }
+
         PocketCastsShortcuts.update(playlistManager, true, this)
 
         subscriptionManager.refreshPurchases()

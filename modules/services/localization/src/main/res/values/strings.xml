@@ -1149,6 +1149,7 @@
     <string name="settings_theme">Theme</string>
     <string name="settings_title">Title</string>
     <string name="settings_title_about">About</string>
+    <string name="settings_title_advanced">Advanced</string>
     <string name="settings_title_appearance">Appearance</string>
     <string name="settings_title_auto_add_to_up_next">Auto add to Up Next</string>
     <string name="settings_title_auto_archive" translatable="false">@string/auto_archive</string>
@@ -1300,6 +1301,10 @@
     <string name="settings_privacy_crash_summary">Allow us to collect crash reports.</string>
     <string name="settings_privacy_crash_link">Link your account to crashes</string>
     <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
+
+    <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
+    <string name="settings_advanced_sync_on_metered_on">While on a metered network, synchronization will occur automatically.</string>
+    <string name="settings_advanced_sync_on_metered_off">While on a metered network, synchronization will only occur if performed manually.</string>
 
     <string name="whats_new_folders_title_7_20" translatable="false">@string/folders</string>
     <string name="whats_new_folders_7_20">If you love podcasts half as much as we do, you probably have a lot of them. If you\'re a Pocket Casts Plus subscriber, you can now sort these into folders and file them into neat groups.\n\nThanks to your support, your Home Screen has never looked better!</string>

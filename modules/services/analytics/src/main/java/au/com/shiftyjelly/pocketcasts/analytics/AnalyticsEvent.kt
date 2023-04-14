@@ -515,6 +515,10 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_STORAGE_BACKGROUND_REFRESH_TOGGLED("settings_storage_background_refresh_toggled"),
     SETTINGS_STORAGE_WARN_BEFORE_USING_DATA_TOGGLED("settings_storage_warn_before_using_data_toggled"),
 
+    /* Settings - Advanced */
+    SETTINGS_ADVANCED_SHOWN("settings_advanced_shown"),
+    SETTINGS_ADVANCED_SYNC_ON_METERED("settings_advanced_sync_on_metered"),
+
     /* Search */
     SEARCH_SHOWN("search_shown"),
     SEARCH_DISMISSED("search_dismissed"),
