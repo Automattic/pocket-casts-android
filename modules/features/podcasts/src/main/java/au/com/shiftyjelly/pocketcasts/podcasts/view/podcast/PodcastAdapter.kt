@@ -94,7 +94,7 @@ class PodcastAdapter(
     val settings: Settings,
     val theme: Theme,
     var fromListUuid: String?,
-    private val onHeaderSummaryToggled: (String, Boolean, Boolean) -> Unit,
+    private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
     private val onEpisodesOptionsClicked: () -> Unit,
@@ -280,7 +280,7 @@ class PodcastAdapter(
                 ratingsViewModel.loadRatings(podcast.uuid)
                 ratingsViewModel.refreshPodcastRatings(podcast.uuid)
             }
-            onHeaderSummaryToggled(podcast.uuid, headerExpanded, false)
+            onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
         notifyDataSetChanged()
@@ -391,7 +391,7 @@ class PodcastAdapter(
         val expanded = binding.bottom.root.toggleVisibility()
         binding.top.chevron.isEnabled = expanded
         headerExpanded = expanded
-        onHeaderSummaryToggled(podcast.uuid, expanded, true)
+        onHeaderSummaryToggled(expanded, true)
     }
 
     private fun onWebsiteLinkClicked(context: Context) {

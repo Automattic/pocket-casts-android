@@ -141,10 +141,9 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     override var statusBarColor: StatusBarColor = StatusBarColor.Custom(color = 0xFF1E1F1E.toInt(), isWhiteIcons = true)
 
     private val onHeaderSummaryToggled: (
-        podcastUuid: String,
         expanded: Boolean,
         userInitiated: Boolean,
-    ) -> Unit = { _, expanded, userInitiated ->
+    ) -> Unit = { expanded, userInitiated ->
         if (userInitiated) {
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SCREEN_TOGGLE_SUMMARY,
