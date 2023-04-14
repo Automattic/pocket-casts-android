@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.di
 
-import au.com.shiftyjelly.pocketcasts.account.TokenSerializer
+import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
+import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthDataSerializer
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import com.google.android.horologist.auth.data.tokenshare.impl.TokenBundleRepositoryImpl
 import com.google.android.horologist.data.WearDataLayerRegistry
@@ -16,10 +17,10 @@ object AuthWatchModule {
     @Provides
     fun providesTokenBundleRepository(
         wearDataLayerRegistry: WearDataLayerRegistry,
-    ): TokenBundleRepository<String> {
+    ): TokenBundleRepository<WatchSyncAuthData?> {
         return TokenBundleRepositoryImpl.create(
             registry = wearDataLayerRegistry,
-            serializer = TokenSerializer
+            serializer = WatchSyncAuthDataSerializer
         )
     }
 }

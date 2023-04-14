@@ -17,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
@@ -64,15 +62,6 @@ open class SyncServerManager @Inject constructor(
         val request = LoginRequest(email = email, password = password, scope = SCOPE_MOBILE)
         return server.login(request)
     }
-
-    // FIXME find a better function name
-    suspend fun loginPocketCasts(email: String, password: String): LoginPocketCastsResponse =
-        server.loginPocketCasts(
-            LoginPocketCastsRequest(
-                email = email,
-                password = password
-            )
-        )
 
     suspend fun loginGoogle(idToken: String): LoginTokenResponse {
         val request = LoginGoogleRequest(idToken = idToken, scope = SCOPE_MOBILE)
