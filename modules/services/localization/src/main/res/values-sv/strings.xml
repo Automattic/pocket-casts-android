@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-15 13:54:03+0000
+Translation-Revision-Date: 2023-04-12 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="add_to_up_next_question">Lägg till i Nästa?</string>
+    <string name="wear_show_password">Visa lösenord</string>
+    <string name="wear_hide_password">Dölj lösenord</string>
+    <string name="settings_metered_data_warning">Varning för rörlig kostnad för datatrafik</string>
+    <string name="stream_warning_summary_short">Streaming kommer använda data. Fortsätta?</string>
+    <string name="removed">Borttaget</string>
+    <string name="mark_unplayed">Markera som ej uppspelat</string>
+    <string name="log_out">Logga ut</string>
+    <string name="account">Konto</string>
+    <string name="profile_just_sign_out">Bara logga ut</string>
+    <string name="profile_clear_data_would_you_also_like_question">Vill du även rensa alla data från appen?</string>
+    <string name="profile_clear_data_question">Rensa data?</string>
+    <string name="profile_clear_data">Rensa data</string>
     <string name="discover_sponsored">Sponsrad</string>
     <string name="podcasts_all">Alla podcasts</string>
     <string name="search_results_all_podcasts">Alla podcasts</string>
@@ -139,6 +152,7 @@ Language: sv_SE
     <string name="onboarding_discover_your_next_favorite_podcast">Upptäck din nästa favoritpodcast</string>
     <string name="onboarding_continue_with_google">Fortsätt med Google</string>
     <string name="onboarding_welcome_back">Välkommen tillbaka</string>
+    <string name="log_in">Logga in</string>
     <string name="end_of_year_create_account_to_see">Spara dina podcasts i molnet, få din årsslutsöversikt och synkronisera ditt lyssningsförlopp med andra enheter.</string>
     <string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
     <string name="end_of_year_story_top_categories">Dina favoritkategorier</string>

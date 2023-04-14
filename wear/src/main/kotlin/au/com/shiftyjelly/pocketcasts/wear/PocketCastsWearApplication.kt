@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -30,6 +31,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var episodeManager: EpisodeManager
+    @Inject lateinit var notificationHelper: NotificationHelper
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var playlistManager: PlaylistManager
     @Inject lateinit var podcastManager: PodcastManager
@@ -57,6 +59,9 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
                 analytics = FirebaseAnalytics.getInstance(this@PocketCastsWearApplication),
                 settings = settings
             )
+
+            notificationHelper.setupNotificationChannels()
+
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
                 downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)

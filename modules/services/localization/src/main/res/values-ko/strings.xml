@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-15 23:45:34+0000
+Translation-Revision-Date: 2023-04-10 15:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="add_to_up_next_question">다음 차례에 추가하시겠습니까?</string>
+    <string name="log_out">로그아웃</string>
+    <string name="removed">제거됨</string>
+    <string name="wear_show_password">비밀번호 표시</string>
+    <string name="wear_hide_password">비밀번호 숨기기</string>
+    <string name="settings_metered_data_warning">사용 중인 데이터 경고</string>
+    <string name="stream_warning_summary_short">스트리밍 시 데이터를 사용합니다. 계속하시겠습니까?</string>
+    <string name="mark_unplayed">재생 안 됨 표시</string>
+    <string name="account">계정</string>
+    <string name="profile_just_sign_out">방금 로그아웃했습니다.</string>
+    <string name="profile_clear_data_would_you_also_like_question">앱에 저장된 모든 데이터를 지우시겠나요?</string>
+    <string name="profile_clear_data_question">데이터를 지우시겠나요?</string>
+    <string name="profile_clear_data">데이터 지우기</string>
     <string name="discover_sponsored">후원</string>
     <string name="podcasts_all">모든 팟캐스트</string>
     <string name="search_results_all_podcasts">모든 팟캐스트</string>
@@ -139,6 +152,7 @@ Language: ko_KR
     <string name="onboarding_discover_your_next_favorite_podcast">다음으로 즐겨 찾는 팟캐스트 검색</string>
     <string name="onboarding_continue_with_google">Google로 계속</string>
     <string name="onboarding_welcome_back">다시 오신 것을 환영합니다.</string>
+    <string name="log_in">로그인</string>
     <string name="end_of_year_create_account_to_see">팟캐스트를 클라우드에 저장하고, 연말 리뷰를 받고, 진행률을 다른 기기와 동기화하세요.</string>
     <string name="end_of_year_story_top_categories_share_text">내가 가장 많이 청취하는 팟캐스트 카테고리</string>
     <string name="end_of_year_story_top_categories">회원님의 상위 카테고리</string>

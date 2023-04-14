@@ -1,15 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.composable
@@ -47,19 +52,38 @@ object EpisodeScreenFlow {
                     verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top)
                 )
             ) {
+
+                // Listen for results from streaming confirmation screen
+                navController.currentBackStackEntry?.savedStateHandle
+                    ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey, null)
+                    ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
+                        val viewModel = hiltViewModel<EpisodeViewModel>()
+                        LaunchedEffect(streamingConfirmationResult) {
+                            viewModel.onStreamingConfirmationResult(streamingConfirmationResult)
+                            // Clear result once consumed
+                            navController.currentBackStackEntry?.savedStateHandle
+                                ?.remove<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey)
+                        }
+                    }
+
                 EpisodeScreen(
                     columnState = it.columnState,
                     navigateToPodcast = navigateToPodcast,
                     navigateToUpNextOptions = { navController.navigate(upNextOptionsScreen) },
                     navigateToConfirmDeleteDownload = { navController.navigate(deleteDownloadConfirmationScreen) },
                     navigateToRemoveFromUpNextNotification = { navController.navigate(removeFromUpNextNotificationScreen) },
+                    navigateToStreamingConfirmation = { navController.navigate(StreamingConfirmationScreen.route) },
                 )
             }
 
-            composable(upNextOptionsScreen) {
+            scrollable(upNextOptionsScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+                val episodeScreenBackStackEntry = remember(it.backStackEntry) {
+                    navController.getBackStackEntry(episodeScreen)
+                }
                 UpNextOptionsScreen(
-                    episodeScreenViewModelStoreOwner = navController.getBackStackEntry(episodeScreen), // Reuse view model from EpisodeScreen
+                    columnState = it.columnState,
+                    episodeScreenViewModelStoreOwner = episodeScreenBackStackEntry, // Reuse view model from EpisodeScreen
                     onComplete = { navController.popBackStack() },
                 )
             }
@@ -68,7 +92,9 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
 
                 // Reuse view model from EpisodeScreen
-                val episodeScreenViewModelStoreOwner = navController.getBackStackEntry(episodeScreen)
+                val episodeScreenViewModelStoreOwner = remember(it.backStackEntry) {
+                    navController.getBackStackEntry(episodeScreen)
+                }
                 val viewModel = hiltViewModel<EpisodeViewModel>(episodeScreenViewModelStoreOwner)
 
                 ObtainConfirmationScreen(
@@ -77,7 +103,7 @@ object EpisodeScreenFlow {
                         viewModel.deleteDownloadedEpisode()
                         navController.navigate(deleteDownloadNotificationScreen) {
                             popUpTo(episodeScreen) {
-                                inclusive = true
+                                inclusive = false
                             }
                         }
                     },

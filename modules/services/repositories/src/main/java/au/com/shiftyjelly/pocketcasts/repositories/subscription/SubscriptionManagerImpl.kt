@@ -13,10 +13,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionStatusResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.android.billingclient.api.AcknowledgePurchaseParams
@@ -50,8 +50,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SubscriptionManagerImpl @Inject constructor(private val syncServerManager: SyncServerManager, private val settings: Settings) :
-    SubscriptionManager,
+class SubscriptionManagerImpl @Inject constructor(
+    private val syncManager: SyncManager,
+    private val settings: Settings,
+) : SubscriptionManager,
     PurchasesUpdatedListener,
     AcknowledgePurchaseResponseListener {
 
@@ -100,7 +102,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
             return Single.just(cache)
         }
 
-        return syncServerManager.subscriptionStatus()
+        return syncManager.subscriptionStatus()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .map {
@@ -260,7 +262,7 @@ class SubscriptionManagerImpl @Inject constructor(private val syncServerManager:
             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, "expected 1 product when sending purchase to server, but there were ${purchase.products.size}")
         }
 
-        val response = syncServerManager.subscriptionPurchase(SubscriptionPurchaseRequest(purchase.purchaseToken, purchase.products.first())).await()
+        val response = syncManager.subscriptionPurchase(SubscriptionPurchaseRequest(purchase.purchaseToken, purchase.products.first())).await()
         val newStatus = response.toStatus()
         cachedSubscriptionStatus = newStatus
         subscriptionStatus.accept(Optional.of(newStatus))

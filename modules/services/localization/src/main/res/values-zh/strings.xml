@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-15 13:54:03+0000
+Translation-Revision-Date: 2023-04-11 17:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="add_to_up_next_question">添加到“接下来播放”？</string>
+    <string name="wear_show_password">显示密码</string>
+    <string name="wear_hide_password">隐藏密码</string>
+    <string name="settings_metered_data_warning">数据流量警告</string>
+    <string name="stream_warning_summary_short">流式传输将使用数据。 继续？</string>
+    <string name="removed">已删除</string>
+    <string name="mark_unplayed">标记为未播放</string>
+    <string name="log_out">注销</string>
+    <string name="account">帐户</string>
+    <string name="profile_just_sign_out">注销即可</string>
+    <string name="profile_clear_data_would_you_also_like_question">您是否还想清除应用程序中的所有数据？</string>
+    <string name="profile_clear_data_question">清除数据？</string>
+    <string name="profile_clear_data">清除数据</string>
     <string name="discover_sponsored">已赞助</string>
     <string name="podcasts_all">所有播客</string>
     <string name="search_results_all_podcasts">所有播客</string>
@@ -139,6 +152,7 @@ Language: zh_CN
     <string name="onboarding_discover_your_next_favorite_podcast">发现下一个您喜欢的播客</string>
     <string name="onboarding_continue_with_google">继续使用 Google</string>
     <string name="onboarding_welcome_back">欢迎回来</string>
+    <string name="log_in">登录</string>
     <string name="end_of_year_create_account_to_see">将您的博客保存到云端，获得年终回顾，并与其他设备同步您的进度。</string>
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>

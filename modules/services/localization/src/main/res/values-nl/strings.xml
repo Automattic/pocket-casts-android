@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-15 11:54:04+0000
+Translation-Revision-Date: 2023-04-12 11:54:22+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="add_to_up_next_question">Toevoegen aan Hierna?</string>
+    <string name="wear_show_password">Wachtwoord weergeven</string>
+    <string name="wear_hide_password">Wachtwoord verbergen</string>
+    <string name="settings_metered_data_warning">Datalimietwaarschuwing</string>
+    <string name="stream_warning_summary_short">Voor streamen wordt data gebruikt. Doorgaan?</string>
+    <string name="removed">Verwijderd</string>
+    <string name="mark_unplayed">Markeren als niet-afgespeeld</string>
+    <string name="log_out">Uitloggen</string>
+    <string name="account">Account</string>
+    <string name="profile_just_sign_out">Je kunt je gewoon afmelden</string>
+    <string name="profile_clear_data_would_you_also_like_question">Wil je ook alle gegevens uit de app wissen?</string>
+    <string name="profile_clear_data_question">Gegevens wissen?</string>
+    <string name="profile_clear_data">Gegevens wissen</string>
     <string name="discover_sponsored">Gesponsord</string>
     <string name="podcasts_all">Alle podcasts</string>
     <string name="search_results_all_podcasts">Alle podcasts</string>
@@ -139,6 +152,7 @@ Language: nl
     <string name="onboarding_discover_your_next_favorite_podcast">Ontdek je volgende nieuwe favoriete podcast</string>
     <string name="onboarding_continue_with_google">Doorgaan met Google</string>
     <string name="onboarding_welcome_back">Welkom terug</string>
+    <string name="log_in">Inloggen</string>
     <string name="end_of_year_create_account_to_see">Sla je podcasts op in de cloud, krijg je beoordeling aan het einde van het jaar en synchroniseer je voortgang met andere apparaten.</string>
     <string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
     <string name="end_of_year_story_top_categories">Je beste categorieën</string>

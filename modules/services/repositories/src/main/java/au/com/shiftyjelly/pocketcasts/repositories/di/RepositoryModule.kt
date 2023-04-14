@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.di
 
 import androidx.work.WorkerFactory
+import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
@@ -27,10 +28,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -122,4 +127,16 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideSearchHistoryManager(searchHistoryManagerImpl: SearchHistoryManagerImpl): SearchHistoryManager
+
+    @Binds
+    @Singleton
+    abstract fun provideSyncManager(syncManagerImpl: SyncManagerImpl): SyncManager
+
+    @Binds
+    @Singleton
+    abstract fun provideAccountStatusInfo(syncManager: SyncManager): AccountStatusInfo
+
+    @Binds
+    @Singleton
+    abstract fun provideRatingsManager(ratingsManagerImpl: RatingsManagerImpl): RatingsManager
 }

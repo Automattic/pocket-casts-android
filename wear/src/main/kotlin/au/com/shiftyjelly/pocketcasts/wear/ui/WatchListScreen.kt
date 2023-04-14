@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rxjava2.subscribeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
+import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -50,12 +51,12 @@ object WatchListScreen {
 fun WatchListScreen(
     navigateToRoute: (String) -> Unit,
     scrollState: ScalingLazyListState,
-    viewModel: WatchListViewModel = hiltViewModel(),
-    upNextViewModel: UpNextViewModel = hiltViewModel(),
 ) {
 
-    val signInState by viewModel.signInState.subscribeAsState(null)
-    val upNextState by upNextViewModel.upNextQueue.subscribeAsState(null)
+    val viewModel = hiltViewModel<WatchListScreenViewModel>()
+    val state by viewModel.state.collectAsState()
+
+    val upNextState = state.upNextQueue
 
     ScalingLazyColumn(
         state = scrollState,
@@ -63,46 +64,19 @@ fun WatchListScreen(
     ) {
 
         item {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.primary,
-                text = stringResource(LR.string.app_name)
-            )
+            // Need this to position the first chip correctly when the screen loads
+            Spacer(Modifier)
         }
 
         item {
-            when (signInState?.isSignedIn) {
-                true -> {
-                    WatchListChip(
-                        titleRes = LR.string.sign_out,
-                        iconRes = IR.drawable.ic_signout,
-                        onClick = viewModel::signOut,
-                    )
-                }
-                false -> {
-                    WatchListChip(
-                        titleRes = LR.string.sign_in,
-                        iconRes = IR.drawable.ic_profile,
-                        onClick = { navigateToRoute(authenticationSubGraph) },
-                    )
-                }
-                null -> { /* Do nothing */ }
-            }
-        }
-
-        item {
-            WatchListChip(
-                titleRes = LR.string.player_tab_playing_wide,
-                iconRes = IR.drawable.ic_play_all,
-                secondaryLabel = (upNextState as? UpNextQueue.State.Loaded)?.episode?.title,
+            NowPlayingChip(
                 onClick = { navigateToRoute(NowPlayingScreen.route) },
             )
         }
 
         item {
             WatchListChip(
-                titleRes = LR.string.podcasts,
+                title = stringResource(LR.string.podcasts),
                 iconRes = IR.drawable.ic_podcasts,
                 onClick = { navigateToRoute(PodcastsScreen.route) }
             )
@@ -118,7 +92,7 @@ fun WatchListScreen(
 
         item {
             WatchListChip(
-                titleRes = LR.string.filters,
+                title = stringResource(LR.string.filters),
                 iconRes = IR.drawable.ic_filters,
                 onClick = { navigateToRoute(FiltersScreen.route) }
             )
@@ -126,7 +100,7 @@ fun WatchListScreen(
 
         item {
             WatchListChip(
-                titleRes = LR.string.downloads,
+                title = stringResource(LR.string.downloads),
                 iconRes = IR.drawable.ic_download,
                 onClick = { navigateToRoute(DownloadsScreen.route) }
             )
@@ -134,9 +108,17 @@ fun WatchListScreen(
 
         item {
             WatchListChip(
-                titleRes = LR.string.profile_navigation_files,
+                title = stringResource(LR.string.profile_navigation_files),
                 iconRes = PR.drawable.ic_file,
                 onClick = { navigateToRoute(FilesScreen.route) }
+            )
+        }
+
+        item {
+            WatchListChip(
+                title = stringResource(LR.string.settings),
+                iconRes = IR.drawable.ic_profile_settings,
+                onClick = { navigateToRoute(SettingsScreen.route) }
             )
         }
     }

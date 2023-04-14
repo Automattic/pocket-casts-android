@@ -15,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.HistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.switchInvalidForNow
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -31,7 +30,7 @@ class SyncHistoryTask @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted params: WorkerParameters,
     var episodeManager: EpisodeManager,
-    var serverManager: SyncServerManager,
+    var syncManager: SyncManager,
     var podcastManager: PodcastManager,
     var settings: Settings,
     private val historyManager: HistoryManager,
@@ -89,7 +88,7 @@ class SyncHistoryTask @AssistedInject constructor(
         )
 
         try {
-            val response = serverManager
+            val response = syncManager
                 .historySync(request)
                 .toMaybe()
                 .onErrorComplete { it is HttpException && it.code() == 304 }

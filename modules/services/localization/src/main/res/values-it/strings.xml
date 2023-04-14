@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-14 09:54:04+0000
+Translation-Revision-Date: 2023-04-11 22:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="add_to_up_next_question">Aggiungere al prossimo?</string>
+    <string name="wear_show_password">Mostra password</string>
+    <string name="wear_hide_password">Nascondi password</string>
+    <string name="settings_metered_data_warning">Avviso sui dati misurati</string>
+    <string name="stream_warning_summary_short">Lo streaming utilizzerà i dati. Vuoi procedere?</string>
+    <string name="removed">Rimozione completata</string>
+    <string name="mark_unplayed">Contrassegna non riprodotto</string>
+    <string name="log_out">Esci da questo account</string>
+    <string name="account">Account</string>
+    <string name="profile_just_sign_out">Esci</string>
+    <string name="profile_clear_data_would_you_also_like_question">Vuoi anche cancellare tutti i dati dall\'app?</string>
+    <string name="profile_clear_data_question">Cancellare i dati?</string>
+    <string name="profile_clear_data">Cancella dati</string>
     <string name="discover_sponsored">Sponsorizzato</string>
     <string name="podcasts_all">Tutti i podcast</string>
     <string name="search_results_all_podcasts">Tutti i podcast</string>
@@ -139,6 +152,7 @@ Language: it
     <string name="onboarding_discover_your_next_favorite_podcast">Scopri il tuo prossimo podcast preferito</string>
     <string name="onboarding_continue_with_google">Continua con Google</string>
     <string name="onboarding_welcome_back">Bentornato</string>
+    <string name="log_in">Accedi</string>
     <string name="end_of_year_create_account_to_see">Salva i tuoi podcast nel cloud, ottieni la tua recensione di fine anno e sincronizza i tuoi progressi con altri dispositivi.</string>
     <string name="end_of_year_story_top_categories_share_text">I più ascoltati nelle categorie podcast</string>
     <string name="end_of_year_story_top_categories">Categorie migliori</string>

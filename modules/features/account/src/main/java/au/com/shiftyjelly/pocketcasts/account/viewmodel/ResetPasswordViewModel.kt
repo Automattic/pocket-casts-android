@@ -2,13 +2,15 @@ package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.AccountAuth
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ResetPasswordViewModel @Inject constructor(private val auth: AccountAuth) : AccountViewModel() {
+class ResetPasswordViewModel @Inject constructor(
+    private val syncManager: SyncManager,
+) : AccountViewModel() {
 
     val resetPasswordState = MutableLiveData<ResetPasswordState>().apply { value = ResetPasswordState.Empty }
 
@@ -50,7 +52,7 @@ class ResetPasswordViewModel @Inject constructor(private val auth: AccountAuth) 
         resetPasswordState.postValue(ResetPasswordState.Loading)
 
         viewModelScope.launch {
-            auth.forgotPassword(
+            syncManager.forgotPassword(
                 email = emailString,
                 onSuccess = {
                     resetPasswordState.postValue(ResetPasswordState.Success)

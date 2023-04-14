@@ -18,14 +18,18 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -43,6 +47,7 @@ class EpisodeViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
+    private val showNotesManager: ServerShowNotesManager,
     theme: Theme,
 ) : ViewModel() {
 
@@ -56,6 +61,7 @@ class EpisodeViewModel @Inject constructor(
             val inUpNext: Boolean,
             val tintColor: Color,
             val downloadProgress: Float? = null,
+            val showNotes: String? = null,
         ) : State()
 
         object Empty : State()
@@ -97,7 +103,6 @@ class EpisodeViewModel @Inject constructor(
         val isPlayingEpisodeFlow = playbackManager.playbackStateRelay.asFlow()
             .filter { it.episodeUuid == episodeUuid }
             .map { it.isPlaying }
-            .onStart { emit(false) }
 
         val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow()
 
@@ -112,17 +117,21 @@ class EpisodeViewModel @Inject constructor(
                 episode.uuid == downloadProgressUpdate.episodeUuid
             }.map { (_, downloadProgressUpdate) ->
                 downloadProgressUpdate.downloadProgress
-            }.onStart<Float?> {
-                emit(null)
             }
 
-            combine(
+            val showNotesFlow = flow {
+                emit(showNotesManager.loadShowNotes(episodeUuid))
+            }
+
+            combine6(
                 episodeFlow,
                 podcastFlow,
-                isPlayingEpisodeFlow,
+                // Emitting a value "onStart" for the flows that don't need to block the UI
+                isPlayingEpisodeFlow.onStart { emit(false) },
                 inUpNextFlow,
-                downloadProgressFlow
-            ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress ->
+                downloadProgressFlow.onStart<Float?> { emit(null) },
+                showNotesFlow.onStart { emit(null) }
+            ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotes ->
                 if (podcast != null) {
                     val podcastTint = podcast.getTintColor(theme.isDarkTheme)
 
@@ -141,6 +150,7 @@ class EpisodeViewModel @Inject constructor(
                         downloadProgress = downloadProgress,
                         inUpNext = inUpNext,
                         tintColor = tintColor,
+                        showNotes = showNotes,
                     )
                 } else {
                     State.Empty
@@ -190,7 +200,22 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    fun play() {
+    fun onPlayClicked(showStreamingConfirmation: () -> Unit) {
+        if (playbackManager.shouldWarnAboutPlayback()) {
+            showStreamingConfirmation()
+        } else {
+            play()
+        }
+    }
+
+    fun onStreamingConfirmationResult(result: StreamingConfirmationScreen.Result) {
+        val confirmedStreaming = result == StreamingConfirmationScreen.Result.CONFIRMED
+        if (confirmedStreaming && !playbackManager.isPlaying()) {
+            play()
+        }
+    }
+
+    private fun play() {
         val episode = (stateFlow.value as? State.Loaded)?.episode
             ?: return
         viewModelScope.launch {
@@ -201,7 +226,7 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    fun pause() {
+    fun onPauseClicked() {
         if ((stateFlow.value as? State.Loaded)?.isPlayingEpisode != true) {
             Timber.e("Attempted to pause when not playing")
             return

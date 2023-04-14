@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
@@ -216,23 +215,21 @@ internal class DiscoverAdapter(
             recyclerView?.itemAnimator = null
             recyclerView?.addOnScrollListener(scrollListener)
 
-            if (BuildConfig.DISCOVER_FEATURED_AUTO_SCROLL) {
-                autoScrollHelper = AutoScrollHelper {
-                    if (adapter.itemCount == 0) return@AutoScrollHelper
-                    val currentPosition = binding.pageIndicatorView.position
-                    val nextPosition = (currentPosition + 1)
-                        .takeIf { it < adapter.itemCount } ?: 0
-                    MainScope().launch {
-                        if (nextPosition > currentPosition) {
-                            recyclerView?.smoothScrollToPosition(nextPosition)
-                        } else {
-                            /* Jump to the beginning to avoid a backward scroll animation */
-                            recyclerView?.scrollToPosition(nextPosition)
-                        }
-                        binding.pageIndicatorView.position = nextPosition
-                        trackSponsoredListImpression(nextPosition)
-                        trackPageChanged(nextPosition)
+            autoScrollHelper = AutoScrollHelper {
+                if (adapter.itemCount == 0) return@AutoScrollHelper
+                val currentPosition = binding.pageIndicatorView.position
+                val nextPosition = (currentPosition + 1)
+                    .takeIf { it < adapter.itemCount } ?: 0
+                MainScope().launch {
+                    if (nextPosition > currentPosition) {
+                        recyclerView?.smoothScrollToPosition(nextPosition)
+                    } else {
+                        /* Jump to the beginning to avoid a backward scroll animation */
+                        recyclerView?.scrollToPosition(nextPosition)
                     }
+                    binding.pageIndicatorView.position = nextPosition
+                    trackSponsoredListImpression(nextPosition)
+                    trackPageChanged(nextPosition)
                 }
             }
 
@@ -254,10 +251,11 @@ internal class DiscoverAdapter(
                 addOnWindowFocusChangeListener { hasFocus ->
                     if (!hasFocus) autoScrollHelper?.stopAutoScrollTimer()
                 }
-                /* Manage auto scroll when itemView's visibility changes on going to next screen */
+                /* Manage auto scroll when itemView's visibility changes */
                 addOnGlobalLayoutListener {
                     if (itemView.isShown) {
-                        autoScrollHelper?.startAutoScrollTimer()
+                        /* Start auto scroll with a delay when carousel item view is re-shown */
+                        autoScrollHelper?.startAutoScrollTimer(delay = AutoScrollHelper.AUTO_SCROLL_DELAY)
                     } else {
                         autoScrollHelper?.stopAutoScrollTimer()
                     }

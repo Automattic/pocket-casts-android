@@ -65,7 +65,7 @@ class PodcastViewModel
     private val downloadManager: DownloadManager,
     private val userManager: UserManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val episodeAnalytics: EpisodeAnalytics
+    private val episodeAnalytics: EpisodeAnalytics,
 ) : ViewModel(), CoroutineScope {
 
     private val disposables = CompositeDisposable()

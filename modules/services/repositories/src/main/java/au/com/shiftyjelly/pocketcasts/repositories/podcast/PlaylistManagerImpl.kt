@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -36,6 +37,7 @@ class PlaylistManagerImpl @Inject constructor(
     private val settings: Settings,
     private val downloadManager: DownloadManager,
     private val playlistUpdateAnalytics: PlaylistUpdateAnalytics,
+    private val syncManager: SyncManager,
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase
 ) : PlaylistManager, CoroutineScope {
@@ -246,7 +248,7 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     override fun delete(playlist: Playlist) {
-        val loggedIn = settings.isLoggedIn()
+        val loggedIn = syncManager.isLoggedIn()
         if (loggedIn) {
             playlist.deleted = true
             markAsNotSynced(playlist)
