@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-21 09:54:04+0000
+Translation-Revision-Date: 2023-04-11 09:54:22+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="add_to_up_next_question">新增到「接下來播放」？</string>
+    <string name="wear_show_password">顯示密碼</string>
+    <string name="wear_hide_password">隱藏密碼</string>
+    <string name="settings_metered_data_warning">計量付費數據警告</string>
+    <string name="stream_warning_summary_short">將使用行動數據串流。 要繼續嗎？</string>
+    <string name="removed">已移除</string>
+    <string name="mark_unplayed">標記為未播放</string>
+    <string name="log_out">登出</string>
+    <string name="account">帳號</string>
     <string name="profile_just_sign_out">只要登出</string>
     <string name="profile_clear_data_would_you_also_like_question">你也想清除應用程式所有資料嗎？</string>
     <string name="profile_clear_data_question">是否清除資料？</string>
@@ -143,6 +152,7 @@ Language: zh_TW
     <string name="onboarding_discover_your_next_favorite_podcast">探索下一個最愛的 Podcast 節目</string>
     <string name="onboarding_continue_with_google">繼續使用 Google</string>
     <string name="onboarding_welcome_back">歡迎回來</string>
+    <string name="log_in">登入</string>
     <string name="end_of_year_create_account_to_see">將你的 Podcast 儲存在雲端、查看年末回顧，並與其他裝置同步進度。</string>
     <string name="end_of_year_story_top_categories_share_text">我最常收聽的 Podcast 分類</string>
     <string name="end_of_year_story_top_categories">你最愛的分類</string>
