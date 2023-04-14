@@ -116,7 +116,7 @@ private fun PlusRow(onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.pocket_casts_plus),
         icon = GradientIconData(
-            res = SR.drawable.ic_plus,
+            res = IR.drawable.ic_plus,
             colors = listOf(
                 MaterialTheme.theme.colors.gradient01A,
                 MaterialTheme.theme.colors.gradient01E,
@@ -149,7 +149,7 @@ private fun AppearanceRow(isSignedInAsPlus: Boolean, onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_appearance),
         icon = GradientIconData(SR.drawable.settings_appearance),
-        primaryTextEndDrawable = if (isSignedInAsPlus) null else SR.drawable.ic_plus,
+        primaryTextEndDrawable = if (isSignedInAsPlus) null else IR.drawable.ic_plus,
         modifier = rowModifier(onClick)
     )
 }

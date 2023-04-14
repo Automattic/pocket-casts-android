@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import java.util.UUID
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 private class SettingsDiff : DiffUtil.ItemCallback<SettingsAdapter.Item>() {
     override fun areItemsTheSame(oldItem: SettingsAdapter.Item, newItem: SettingsAdapter.Item): Boolean {
@@ -72,7 +73,7 @@ class SettingsAdapter(
             imageView.setup(drawable, startColor, endColor)
             rowView.contentDescription = title
 
-            val endDrawable = if (section.plusSection) AppCompatResources.getDrawable(context, R.drawable.ic_plus) else null
+            val endDrawable = if (section.plusSection) AppCompatResources.getDrawable(context, IR.drawable.ic_plus) else null
             titleView.setCompoundDrawablesWithIntrinsicBounds(null, null, endDrawable, null)
             titleView.compoundDrawablePadding = 8.dpToPx(context)
 
