@@ -31,6 +31,7 @@ android {
         // Feature Flags
         buildConfigField "boolean", "END_OF_YEAR_ENABLED", "false"
         buildConfigField "boolean", "SHOW_RATINGS", "false"
+        buildConfigField "boolean", "ADD_PATRON_ENABLED", "false"
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
