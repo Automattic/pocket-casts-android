@@ -87,9 +87,9 @@ private fun Stars(
 }
 
 fun Star.mapToIcon() = when (this) {
-    is Star.FilledStar -> Icons.Filled.Star
-    is Star.HalfStar -> Icons.Default.StarHalf
-    is Star.BorderedStar -> Icons.Filled.StarBorder
+    Star.FilledStar -> Icons.Filled.Star
+    Star.HalfStar -> Icons.Default.StarHalf
+    Star.BorderedStar -> Icons.Filled.StarBorder
 }
 
 @Preview

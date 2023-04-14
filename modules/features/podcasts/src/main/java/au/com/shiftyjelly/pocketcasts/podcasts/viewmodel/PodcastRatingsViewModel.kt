@@ -103,11 +103,7 @@ class PodcastRatingsViewModel
         object Error : RatingState()
     }
 
-    sealed class Star {
-        object FilledStar : Star()
-        object HalfStar : Star()
-        object BorderedStar : Star()
-    }
+    enum class Star { FilledStar, HalfStar, BorderedStar }
 
     companion object {
         private object AnalyticsProp {
