@@ -327,6 +327,7 @@ interface Settings {
     fun syncOnMeteredNetwork(): Boolean
     fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean)
     fun getWorkManagerNetworkTypeConstraint(): NetworkType
+    fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
     fun refreshPodcastsAutomatically(): Boolean
     fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean)
     fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean)

@@ -63,7 +63,7 @@ class AdvancedSettingsViewModel
 //        setupStorage()
     }
 
-    fun doPodcastsRefreshAutomatically() : Boolean {
+    fun doPodcastsRefreshAutomatically(): Boolean {
         return settings.refreshPodcastsAutomatically()
     }
 

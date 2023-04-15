@@ -466,11 +466,7 @@ class MainActivity :
         // If the user chooses the advanced option to only sync on unmetered networks
         // then don't auto-refresh when the app resumes. Still let them swipe down though
         // to refresh if they wish and still schedule the worker to do updates
-        if (!settings.syncOnMeteredNetwork()) {
-            if (Network.isUnmeteredConnection(this@MainActivity)) {
-                doRefresh()
-            }
-        } else {
+        if (settings.refreshPodcastsOnResume(Network.isUnmeteredConnection(this@MainActivity))) {
             doRefresh()
         }
 

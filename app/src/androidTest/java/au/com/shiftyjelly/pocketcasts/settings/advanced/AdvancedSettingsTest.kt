@@ -24,14 +24,19 @@ class AdvancedSettingsTest {
         assertEquals(true, settings.isPodcastAutoDownloadUnmeteredOnly())
         assertEquals(false, settings.isPodcastAutoDownloadPowerOnly())
         assertEquals(false, settings.isUpNextAutoDownloaded())
+        assertEquals(true, settings.refreshPodcastsAutomatically())
 
         // Advanced settings
         assertEquals(true, settings.syncOnMeteredNetwork())
+        assertEquals(true, settings.refreshPodcastsOnResume(isUnmetered = false))
+        assertEquals(true, settings.refreshPodcastsOnResume(isUnmetered = true))
         assertEquals(NetworkType.CONNECTED, settings.getWorkManagerNetworkTypeConstraint())
 
         // Now modify the default and check the settings
         settings.setSyncOnMeteredNetwork(false)
         assertEquals(false, settings.syncOnMeteredNetwork())
+        assertEquals(false, settings.refreshPodcastsOnResume(isUnmetered = false))
+        assertEquals(true, settings.refreshPodcastsOnResume(isUnmetered = true))
         assertEquals(NetworkType.UNMETERED, settings.getWorkManagerNetworkTypeConstraint())
     }
 }

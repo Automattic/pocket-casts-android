@@ -281,6 +281,17 @@ class SettingsImpl @Inject constructor(
         return syncNetworkConstraint
     }
 
+    override fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean {
+        return if (!syncOnMeteredNetwork()) {
+            if (isUnmetered) {
+                return true
+            }
+            false
+        } else {
+            true
+        }
+    }
+
     override fun refreshPodcastsAutomatically(): Boolean {
         return getBoolean("backgroundRefresh", true)
     }
