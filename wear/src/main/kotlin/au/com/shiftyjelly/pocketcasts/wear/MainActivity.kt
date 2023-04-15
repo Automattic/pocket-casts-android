@@ -6,6 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationSubGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.episode.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingViewModel
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
@@ -37,6 +41,8 @@ import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -47,22 +53,40 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.startMonitoringAuth()
         setContent {
-            WearApp(theme.activeTheme)
+            val state by viewModel.state.collectAsState()
+            WearApp(
+                themeType = theme.activeTheme,
+                showSignInConfirmation = state.showSignInConfirmation,
+                onSignInConfirmationShown = viewModel::onSignInConfirmationShown,
+            )
         }
     }
 }
 
+private object Routes {
+    const val signedInNotificationScreen = "signedInNotificationScreen"
+}
+
 @Composable
-fun WearApp(themeType: Theme.ThemeType) {
+fun WearApp(
+    themeType: Theme.ThemeType,
+    showSignInConfirmation: Boolean,
+    onSignInConfirmationShown: () -> Unit,
+) {
     WearAppTheme(themeType) {
+
         val navController = rememberSwipeDismissableNavController()
 
         WearNavScaffold(
             navController = navController,
             startDestination = WatchListScreen.route
         ) {
+
+            if (showSignInConfirmation) {
+                navController.navigate(Routes.signedInNotificationScreen)
+                onSignInConfirmationShown()
+            }
 
             scrollable(
                 route = WatchListScreen.route,
@@ -175,6 +199,15 @@ fun WearApp(themeType: Theme.ThemeType) {
             }
 
             authenticationGraph(navController)
+
+            composable(Routes.signedInNotificationScreen) {
+                it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+                NotificationScreen(
+                    text = stringResource(LR.string.profile_logged_in),
+                    delayDuration = 4.seconds,
+                    onClose = { navController.popBackStack() },
+                )
+            }
         }
     }
 }
@@ -182,5 +215,9 @@ fun WearApp(themeType: Theme.ThemeType) {
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    WearApp(Theme.ThemeType.DARK)
+    WearApp(
+        themeType = Theme.ThemeType.DARK,
+        showSignInConfirmation = false,
+        onSignInConfirmationShown = {},
+    )
 }

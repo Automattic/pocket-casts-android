@@ -115,7 +115,7 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
                     text = stringResource(LR.string.removed),
-                    onClick = { navController.popBackStack() },
+                    onClose = { navController.popBackStack() },
                 )
             }
 
@@ -123,7 +123,7 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
                     text = stringResource(LR.string.episode_removed_from_up_next),
-                    onClick = { navController.popBackStack() },
+                    onClose = { navController.popBackStack() },
                 )
             }
         }

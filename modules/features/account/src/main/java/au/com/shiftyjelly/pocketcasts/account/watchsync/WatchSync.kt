@@ -57,31 +57,25 @@ class WatchSync @OptIn(ExperimentalHorologistApi::class)
         }
     }
 
-    suspend fun processAuthDataChange(data: WatchSyncAuthData?) {
+    suspend fun processAuthDataChange(data: WatchSyncAuthData?, onResult: (LoginResult) -> Unit) {
         if (data != null) {
-            Timber.i("Received authData change from phone with refresh token")
-            // Don't do anything if the user is already logged in.
+
+            Timber.i("Received WatchSyncAuthData change from phone")
+
             if (!syncManager.isLoggedIn()) {
                 val result = syncManager.loginWithToken(
                     token = data.refreshToken,
                     loginIdentity = data.loginIdentity,
                     signInSource = SignInSource.WatchPhoneSync
                 )
-                when (result) {
-                    is LoginResult.Failed -> { /* do nothing */ }
-
-                    is LoginResult.Success -> {
-
-                        Timber.e("TODO: notify the user we have signed them in!")
-                    }
-                }
+                onResult(result)
             } else {
                 Timber.i("Received WatchSyncAuthData from phone, but user is already logged in")
             }
         } else {
             // The user either was never logged in on their phone or just logged out.
             // Either way, leave the user's login state on the watch unchanged.
-            Timber.i("Received null WatchSyncAuthDAta change")
+            Timber.i("Received null WatchSyncAuthData change")
         }
     }
 }

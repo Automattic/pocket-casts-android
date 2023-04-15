@@ -22,25 +22,29 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun NotificationScreen(
     text: String,
-    onClick: () -> Unit,
+    delayDuration: Duration? = 2.seconds,
+    onClose: () -> Unit,
 ) {
 
-    LaunchedEffect(Unit) {
-        // Close the screen after a short delay
-        delay(2000)
-        onClick()
+    LaunchedEffect(delayDuration) {
+        if (delayDuration != null) {
+            delay(delayDuration)
+            onClose()
+        }
     }
 
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .clickable { onClick() }
+            .clickable { onClose() }
             .padding(16.dp)
             .fillMaxSize()
     ) {
@@ -64,7 +68,7 @@ private fun NotificationScreenPreview() {
     WearAppTheme(Theme.ThemeType.DARK) {
         NotificationScreen(
             text = "Done",
-            onClick = {}
+            onClose = {}
         )
     }
 }
