@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Base64
 import androidx.core.content.edit
+import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -270,6 +271,14 @@ class SettingsImpl @Inject constructor(
 
     override fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean) {
         setBoolean(Settings.PREFERENCE_SYNC_ON_METERED, shouldSyncOnMetered)
+    }
+
+    override fun getWorkManagerNetworkTypeConstraint(): NetworkType {
+        var syncNetworkConstraint = NetworkType.CONNECTED
+        if (!syncOnMeteredNetwork()) {
+            syncNetworkConstraint = NetworkType.UNMETERED
+        }
+        return syncNetworkConstraint
     }
 
     override fun refreshPodcastsAutomatically(): Boolean {

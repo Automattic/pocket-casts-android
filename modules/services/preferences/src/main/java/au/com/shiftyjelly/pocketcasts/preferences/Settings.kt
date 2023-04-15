@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -325,6 +326,7 @@ interface Settings {
 
     fun syncOnMeteredNetwork(): Boolean
     fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean)
+    fun getWorkManagerNetworkTypeConstraint(): NetworkType
     fun refreshPodcastsAutomatically(): Boolean
     fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean)
     fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean)

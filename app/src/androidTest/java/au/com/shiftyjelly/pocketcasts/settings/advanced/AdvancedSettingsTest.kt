@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings.advanced
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import com.squareup.moshi.Moshi
 import org.junit.Assert.assertEquals
@@ -18,13 +19,19 @@ class AdvancedSettingsTest {
         val moshi = Moshi.Builder().build()
         val settings = SettingsImpl(sharedPreferences, sharedPreferences, context, moshi)
 
-        // Advanced settings
-        assertEquals(true, settings.syncOnMeteredNetwork())
-
         // Non-advanced settings
         assertEquals(false, settings.warnOnMeteredNetwork())
         assertEquals(true, settings.isPodcastAutoDownloadUnmeteredOnly())
         assertEquals(false, settings.isPodcastAutoDownloadPowerOnly())
         assertEquals(false, settings.isUpNextAutoDownloaded())
+
+        // Advanced settings
+        assertEquals(true, settings.syncOnMeteredNetwork())
+        assertEquals(NetworkType.CONNECTED, settings.getWorkManagerNetworkTypeConstraint())
+
+        // Now modify the default and check the settings
+        settings.setSyncOnMeteredNetwork(false)
+        assertEquals(false, settings.syncOnMeteredNetwork())
+        assertEquals(NetworkType.UNMETERED, settings.getWorkManagerNetworkTypeConstraint())
     }
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
@@ -60,10 +59,7 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 return
             }
 
-            var syncNetworkConstraint = NetworkType.CONNECTED
-            if (!settings.syncOnMeteredNetwork()) {
-                syncNetworkConstraint = NetworkType.UNMETERED
-            }
+            val syncNetworkConstraint = settings.getWorkManagerNetworkTypeConstraint()
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(syncNetworkConstraint)
