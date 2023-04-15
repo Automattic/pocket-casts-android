@@ -80,10 +80,10 @@ fun AdvancedSettingsView(
                 .verticalScroll(rememberScrollState())
         ) {
             SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
-                if(automaticRefreshEnabled)  { SyncOnMeteredRow(state.backgroundSyncOnMeteredState) }
-                else {
+                if (automaticRefreshEnabled) { SyncOnMeteredRow(state.backgroundSyncOnMeteredState) } else {
                     SettingRow(
-                        primaryText = stringResource(LR.string.settings_advanced_no_options))
+                        primaryText = stringResource(LR.string.settings_advanced_no_options)
+                    )
                 }
             }
         }
