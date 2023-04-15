@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WearMainActivityViewModel @Inject constructor(
+    private val podcastManager: PodcastManager,
     private val tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
     private val watchSync: WatchSync,
 ) : ViewModel() {
@@ -35,6 +37,9 @@ class WearMainActivityViewModel @Inject constructor(
                             is LoginResult.Failed -> { /* do nothing */ }
                             is LoginResult.Success -> {
                                 _state.update { it.copy(showSignInConfirmation = true) }
+                                viewModelScope.launch {
+                                    podcastManager.refreshPodcastsAfterSignIn()
+                                }
                             }
                         }
                     }
