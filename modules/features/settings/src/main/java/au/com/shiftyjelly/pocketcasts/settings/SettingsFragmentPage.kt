@@ -231,7 +231,7 @@ private fun AboutRow(onClick: () -> Unit) {
 private fun AdvancedRow(onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_advanced),
-        icon = GradientIconData(SR.drawable.settings_about),
+        icon = GradientIconData(SR.drawable.settings_advanced),
         modifier = rowModifier(onClick)
     )
 }
