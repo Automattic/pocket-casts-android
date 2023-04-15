@@ -4,17 +4,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.wear.compose.material.Icon
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
@@ -41,7 +52,7 @@ import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -57,8 +68,8 @@ class MainActivity : ComponentActivity() {
             val state by viewModel.state.collectAsState()
             WearApp(
                 themeType = theme.activeTheme,
-                showSignInConfirmation = state.showSignInConfirmation,
-                onSignInConfirmationShown = viewModel::onSignInConfirmationShown,
+                signInConfirmationAction = state.signInConfirmationAction,
+                onSignInConfirmationActionHandled = viewModel::onSignInConfirmationActionHandled,
             )
         }
     }
@@ -71,8 +82,8 @@ private object Routes {
 @Composable
 fun WearApp(
     themeType: Theme.ThemeType,
-    showSignInConfirmation: Boolean,
-    onSignInConfirmationShown: () -> Unit,
+    signInConfirmationAction: SignInConfirmationAction?,
+    onSignInConfirmationActionHandled: () -> Unit,
 ) {
     WearAppTheme(themeType) {
 
@@ -83,10 +94,11 @@ fun WearApp(
             startDestination = WatchListScreen.route
         ) {
 
-            if (showSignInConfirmation) {
-                navController.navigate(Routes.signedInNotificationScreen)
-                onSignInConfirmationShown()
-            }
+            handleSignInConfirmation(
+                signInConfirmationAction = signInConfirmationAction,
+                onSignInConfirmationActionHandled = onSignInConfirmationActionHandled,
+                navController = navController
+            )
 
             scrollable(
                 route = WatchListScreen.route,
@@ -203,13 +215,57 @@ fun WearApp(
             composable(Routes.signedInNotificationScreen) {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
-                    text = stringResource(LR.string.profile_logged_in),
-                    delayDuration = 4.seconds,
+                    text = stringResource(LR.string.profile_logging_in),
+                    closeAfterDuration = null,
                     onClose = { navController.popBackStack() },
+                    icon = {
+                        val infiniteTransition = rememberInfiniteTransition()
+                        val rotation by infiniteTransition.animateFloat(
+                            initialValue = 0f,
+                            targetValue = 360f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(1000, easing = LinearEasing),
+                                repeatMode = RepeatMode.Restart
+                            )
+                        )
+
+                        Icon(
+                            painter = painterResource(IR.drawable.ic_retry),
+                            contentDescription = null,
+                            modifier = Modifier.graphicsLayer {
+                                rotationZ = rotation
+                            }
+                        )
+                    }
                 )
             }
         }
     }
+}
+
+private fun handleSignInConfirmation(
+    signInConfirmationAction: SignInConfirmationAction?,
+    onSignInConfirmationActionHandled: () -> Unit,
+    navController: NavController,
+) {
+
+    val signInNotificationShowing = navController.currentDestination?.route == Routes.signedInNotificationScreen
+
+    when (signInConfirmationAction) {
+        SignInConfirmationAction.Show -> {
+            if (!signInNotificationShowing) {
+                navController.navigate(Routes.signedInNotificationScreen)
+            }
+        }
+        SignInConfirmationAction.Hide -> {
+            if (signInNotificationShowing) {
+                navController.popBackStack()
+            }
+        }
+        null -> { /* do nothing */ }
+    }
+
+    onSignInConfirmationActionHandled()
 }
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
@@ -217,7 +273,7 @@ fun WearApp(
 fun DefaultPreview() {
     WearApp(
         themeType = Theme.ThemeType.DARK,
-        showSignInConfirmation = false,
-        onSignInConfirmationShown = {},
+        signInConfirmationAction = null,
+        onSignInConfirmationActionHandled = {},
     )
 }

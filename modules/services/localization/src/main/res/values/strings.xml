@@ -833,7 +833,7 @@
     <string name="profile_sign_out" translatable="false">@string/sign_out</string>
     <string name="profile_sign_out_confirm">Are you sure you want to sign out of syncing?</string>
     <string name="profile_signed_in_as">Signed in as</string>
-    <string name="profile_logged_in">Logged in</string>
+    <string name="profile_logging_in">Logging in</string>
     <string name="profile_sonos">Sonos</string>
     <string name="profile_sonos_connect">Connect</string>
     <string name="profile_sonos_connect_account">Connecting to Sonos will allow the Sonos app to access your episode information.\n\nYour email address, password and other sensitive items are never shared.</string>

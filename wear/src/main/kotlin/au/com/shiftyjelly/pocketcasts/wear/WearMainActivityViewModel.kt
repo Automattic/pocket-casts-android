@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
+import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
@@ -12,17 +14,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class WearMainActivityViewModel @Inject constructor(
-    private val podcastManager: PodcastManager,
-    private val tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
-    private val watchSync: WatchSync,
+    podcastManager: PodcastManager,
+    settings: Settings,
+    tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
+    watchSync: WatchSync,
 ) : ViewModel() {
 
     data class State(
-        val showSignInConfirmation: Boolean = false,
+        val signInConfirmationAction: SignInConfirmationAction? = null,
     )
 
     private val _state = MutableStateFlow(State())
@@ -32,25 +36,50 @@ class WearMainActivityViewModel @Inject constructor(
         viewModelScope.launch {
             tokenBundleRepository.flow
                 .collect { watchSyncAuthData ->
-                    watchSync.processAuthDataChange(watchSyncAuthData) { loginResult ->
-                        when (loginResult) {
-                            is LoginResult.Failed -> { /* do nothing */ }
-                            is LoginResult.Success -> {
-                                _state.update { it.copy(showSignInConfirmation = true) }
-                                viewModelScope.launch {
-                                    podcastManager.refreshPodcastsAfterSignIn()
-                                }
-                            }
-                        }
+                    watchSync.processAuthDataChange(watchSyncAuthData) {
+                        onLoginResult(it, podcastManager)
                     }
                 }
+        }
+
+        viewModelScope.launch {
+            settings.refreshStateObservable
+                .asFlow()
+                .collect(::onRefreshStateChange)
+        }
+    }
+
+    private fun onLoginResult(loginResult: LoginResult, podcastManager: PodcastManager) {
+        when (loginResult) {
+            is LoginResult.Failed -> { /* do nothing */ }
+            is LoginResult.Success -> {
+                _state.update { it.copy(signInConfirmationAction = SignInConfirmationAction.Show) }
+                viewModelScope.launch {
+                    podcastManager.refreshPodcastsAfterSignIn()
+                }
+            }
+        }
+    }
+
+    private fun onRefreshStateChange(refreshState: RefreshState) {
+        when (refreshState) {
+            RefreshState.Never,
+            RefreshState.Refreshing -> { /* Do nothing */ }
+
+            is RefreshState.Failed,
+            is RefreshState.Success -> {
+                _state.update { it.copy(signInConfirmationAction = SignInConfirmationAction.Hide) }
+            }
         }
     }
 
     /**
-     * This should be invoked by the UI when it shows the sign in confirmation.
+     * This should be invoked when the UI it has handled showing or hiding the sign in
+     * confirmation.
      */
-    fun onSignInConfirmationShown() {
-        _state.update { it.copy(showSignInConfirmation = false) }
+    fun onSignInConfirmationActionHandled() {
+        _state.update { it.copy(signInConfirmationAction = null) }
     }
 }
+
+enum class SignInConfirmationAction { Show, Hide }

@@ -29,13 +29,21 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun NotificationScreen(
     text: String,
-    delayDuration: Duration? = 2.seconds,
     onClose: () -> Unit,
+    closeAfterDuration: Duration? = 2.seconds,
+    icon: @Composable () -> Unit = {
+        Icon(
+            painter = painterResource(IR.drawable.ic_check_black_24dp),
+            tint = WearColors.FFA1E7B0,
+            contentDescription = null,
+            modifier = Modifier.size(52.dp)
+        )
+    },
 ) {
 
-    LaunchedEffect(delayDuration) {
-        if (delayDuration != null) {
-            delay(delayDuration)
+    LaunchedEffect(closeAfterDuration) {
+        if (closeAfterDuration != null) {
+            delay(closeAfterDuration)
             onClose()
         }
     }
@@ -48,12 +56,7 @@ fun NotificationScreen(
             .padding(16.dp)
             .fillMaxSize()
     ) {
-        Icon(
-            painter = painterResource(IR.drawable.ic_check_black_24dp),
-            tint = WearColors.FFA1E7B0,
-            contentDescription = null,
-            modifier = Modifier.size(52.dp)
-        )
+        icon()
         Spacer(modifier = Modifier.height(4.dp))
         TextH30(
             text = text,
