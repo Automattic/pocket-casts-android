@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -88,6 +89,9 @@ class AdvancedSettingsViewModel
     private fun onSyncOnMeteredCheckedChange(isChecked: Boolean) {
         settings.setSyncOnMeteredNetwork(isChecked)
         updateSyncOnMeteredState()
+
+        // Update worker to take sync setting into account
+        RefreshPodcastsTask.scheduleOrCancel(context, settings)
     }
 
     private fun updateSyncOnMeteredState() {
