@@ -31,7 +31,7 @@ class AdvancedSettingsViewModel
     val snackbarMessage = mutableSnackbarMessage.asSharedFlow()
 
     private val backgroundRefreshSummary: Int
-        get() = if (settings.refreshPodcastsAutomatically()) {
+        get() = if (settings.syncOnMeteredNetwork()) {
             LR.string.settings_advanced_sync_on_metered_on
         } else {
             LR.string.settings_advanced_sync_on_metered_off
@@ -61,6 +61,10 @@ class AdvancedSettingsViewModel
 
     fun onFragmentResume() {
 //        setupStorage()
+    }
+
+    fun doPodcastsRefreshAutomatically() : Boolean {
+        return settings.refreshPodcastsAutomatically()
     }
 
     private fun onSyncOnMeteredCheckedChange(isChecked: Boolean) {

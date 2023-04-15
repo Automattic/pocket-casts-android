@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -41,6 +40,7 @@ fun AdvancedSettingsPage(
     AdvancedSettingsView(
         state = state,
         onBackPressed = onBackPressed,
+        automaticRefreshEnabled = viewModel.doPodcastsRefreshAutomatically(),
 //        onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
 //        onManageDownloadedFilesClick = onManageDownloadedFilesClick,
         modifier = modifier
@@ -62,6 +62,7 @@ fun AdvancedSettingsPage(
 fun AdvancedSettingsView(
     state: AdvancedSettingsViewModel.State,
     onBackPressed: () -> Unit,
+    automaticRefreshEnabled: Boolean,
 //    onClearDownloadCacheClick: () -> Unit,
 //    onManageDownloadedFilesClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -79,7 +80,11 @@ fun AdvancedSettingsView(
                 .verticalScroll(rememberScrollState())
         ) {
             SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
-                SyncOnMeteredRow(state.backgroundSyncOnMeteredState)
+                if(automaticRefreshEnabled)  { SyncOnMeteredRow(state.backgroundSyncOnMeteredState) }
+                else {
+                    SettingRow(
+                        primaryText = stringResource(LR.string.settings_advanced_no_options))
+                }
             }
         }
     }
@@ -116,6 +121,7 @@ private fun AdvancedSettingsPreview(
                 ),
             ),
             onBackPressed = {},
+            automaticRefreshEnabled = true
         )
     }
 }

@@ -1302,8 +1302,9 @@
     <string name="settings_privacy_crash_link">Link your account to crashes</string>
     <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
 
+    <string name="settings_advanced_no_options">Enable background refresh to see advanced options</string>
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
-    <string name="settings_advanced_sync_on_metered_on">While on a metered network, synchronization will occur automatically.</string>
+    <string name="settings_advanced_sync_on_metered_on">While on a metered network, synchronization will occur automatically in the background and when the application is opened.</string>
     <string name="settings_advanced_sync_on_metered_off">While on a metered network, synchronization will only occur if performed manually.</string>
 
     <string name="whats_new_folders_title_7_20" translatable="false">@string/folders</string>
