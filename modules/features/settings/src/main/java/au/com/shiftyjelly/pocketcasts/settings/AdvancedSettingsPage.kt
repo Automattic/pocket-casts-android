@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun AdvancedSettingsPage(
     viewModel: AdvancedSettingsViewModel,
     onBackPressed: () -> Unit,
-//    onManageDownloadedFilesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val state: AdvancedSettingsViewModel.State by viewModel.state.collectAsState()
@@ -41,8 +40,6 @@ fun AdvancedSettingsPage(
         state = state,
         onBackPressed = onBackPressed,
         automaticRefreshEnabled = viewModel.doPodcastsRefreshAutomatically(),
-//        onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
-//        onManageDownloadedFilesClick = onManageDownloadedFilesClick,
         modifier = modifier
     )
 
@@ -63,8 +60,6 @@ fun AdvancedSettingsView(
     state: AdvancedSettingsViewModel.State,
     onBackPressed: () -> Unit,
     automaticRefreshEnabled: Boolean,
-//    onClearDownloadCacheClick: () -> Unit,
-//    onManageDownloadedFilesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column {

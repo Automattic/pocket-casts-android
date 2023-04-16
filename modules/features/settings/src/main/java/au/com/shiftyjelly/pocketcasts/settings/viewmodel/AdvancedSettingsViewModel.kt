@@ -60,7 +60,6 @@ class AdvancedSettingsViewModel
     )
 
     fun onFragmentResume() {
-//        setupStorage()
     }
 
     fun doPodcastsRefreshAutomatically(): Boolean {

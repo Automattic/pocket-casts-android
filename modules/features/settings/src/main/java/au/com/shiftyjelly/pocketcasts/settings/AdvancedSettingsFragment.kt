@@ -31,7 +31,6 @@ class AdvancedSettingsFragment : BaseFragment() {
                             @Suppress("DEPRECATION")
                             activity?.onBackPressed()
                         },
-//                        onManageDownloadedFilesClick = { (activity as? FragmentHostListener)?.addFragment(ManualCleanupFragment.newInstance()) }
                     )
                 }
             }
