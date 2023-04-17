@@ -86,7 +86,7 @@ project.ext {
     versionComposeWear = '1.2.0-alpha07'
     versionDagger = '2.41'
     versionEspresso = '3.4.0'
-    versionExoplayer = '2.18.5'
+    versionMedia3 = '1.0.0'
     versionGlide = '4.13.2'
     versionHilt = '2.43.2'
 
@@ -96,7 +96,6 @@ project.ext {
 
     versionKotlinCoroutines = '1.6.4'
     versionLifecycle = '2.6.0'
-    versionMedia3 = '1.0.0-beta03'
     versionMoshi = '1.13.0'
     versionNavigation = '2.5.1'
     versionPaging = '3.1.1'
@@ -222,12 +221,13 @@ project.ext {
             timber: "com.jakewharton.timber:timber:5.0.1",
             // Android device names for debug email - https://bintray.com/bintray/jcenter/com.jaredrummler%3Aandroid-device-names
             deviceNames: "com.jaredrummler:android-device-names:2.1.0",
-            // ExoPlayer, replacement for MediaPlayer from Google
-            exoplayerCore: "com.google.android.exoplayer:exoplayer-core:$versionExoplayer",
-            exoplayerUi: "com.google.android.exoplayer:exoplayer-ui:$versionExoplayer",
-            exoplayerMediaSession: "com.google.android.exoplayer:extension-mediasession:$versionExoplayer",
-            exoplayerCast: "com.google.android.exoplayer:extension-cast:$versionExoplayer",
-            exoplayerHls: "com.google.android.exoplayer:exoplayer-hls:$versionExoplayer",
+            // Media3
+            media3Cast: "androidx.media3:media3-cast:$versionMedia3",
+            media3Datasource: "androidx.media3:media3-datasource:$versionMedia3",
+            media3Exoplayer: "androidx.media3:media3-exoplayer:$versionMedia3",
+            media3ExoplayerHls: "androidx.media3:media3-exoplayer-hls:$versionMedia3",
+            media3Extractor: "androidx.media3:media3-extractor:$versionMedia3",
+            media3Ui: "androidx.media3:media3-ui:$versionMedia3",
             // Material Dialog - https://github.com/afollestad/material-dialogs
             materialDialog: "com.afollestad.material-dialogs:core:3.3.0",
             // Glide (image loading) - https://github.com/bumptech/glide
@@ -278,6 +278,7 @@ project.ext {
             sentryTimber: 'io.sentry:sentry-android-timber',
             // AboutLibraries - https://github.com/mikepenz/AboutLibraries
             aboutLibrariesCore: 'com.mikepenz:aboutlibraries-core:10.5.0',
-            aboutLibrariesCompose: 'com.mikepenz:aboutlibraries-compose:10.5.0'
+            aboutLibrariesCompose: 'com.mikepenz:aboutlibraries-compose:10.5.0',
+
     ]
 }
