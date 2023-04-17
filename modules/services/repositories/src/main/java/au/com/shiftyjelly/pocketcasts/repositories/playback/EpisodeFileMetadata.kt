@@ -64,9 +64,9 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                                 this.embeddedArtworkPath = filePath
                             }
                         } else if (frame is TextInformationFrame && TAG_TITLE == frame.id) {
-                            this.embeddedTitle = frame.value
+                            this.embeddedTitle = frame.values.firstOrNull()
                         } else if (frame is TextInformationFrame && TAG_LENGTH == frame.id) {
-                            this.embeddedLength = frame.value.toLongOrNull()
+                            this.embeddedLength = frame.values.firstOrNull()?.toLongOrNull()
                         }
                     }
                 }
@@ -94,7 +94,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
             val subFrame = frame.getSubFrame(i)
             if (subFrame is TextInformationFrame) {
                 if ("TIT2" == subFrame.id) {
-                    title = subFrame.value
+                    title = subFrame.values.firstOrNull() ?: ""
                 }
             } else if (subFrame is UrlLinkFrame) {
                 url = subFrame.url

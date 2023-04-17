@@ -86,7 +86,7 @@ project.ext {
     versionComposeWear = '1.2.0-alpha07'
     versionDagger = '2.41'
     versionEspresso = '3.4.0'
-    versionExoplayer = '2.18.2'
+    versionExoplayer = '2.18.5'
     versionGlide = '4.13.2'
     versionHilt = '2.43.2'
 
