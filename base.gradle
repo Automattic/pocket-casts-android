@@ -246,6 +246,7 @@ dependencies {
     implementation libs.media3Exoplayer
     implementation libs.media3ExoplayerHls
     implementation libs.media3Extractor
+    implementation libs.media3Session
     implementation libs.media3Ui
 
     kapt libs.moshiKotlinCompile

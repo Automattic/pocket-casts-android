@@ -227,6 +227,7 @@ project.ext {
             media3Exoplayer: "androidx.media3:media3-exoplayer:$versionMedia3",
             media3ExoplayerHls: "androidx.media3:media3-exoplayer-hls:$versionMedia3",
             media3Extractor: "androidx.media3:media3-extractor:$versionMedia3",
+            media3Session: "androidx.media3:media3-session:$versionMedia3",
             media3Ui: "androidx.media3:media3-ui:$versionMedia3",
             // Material Dialog - https://github.com/afollestad/material-dialogs
             materialDialog: "com.afollestad.material-dialogs:core:3.3.0",
