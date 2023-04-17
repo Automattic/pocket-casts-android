@@ -9,13 +9,14 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
@@ -86,6 +87,7 @@ const val CONTENT_STYLE_GRID_ITEM_HINT_VALUE = 2
 
 private const val EPISODE_LIMIT = 100
 
+@UnstableApi
 @AndroidEntryPoint
 open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     inner class LocalBinder : Binder() {
@@ -373,11 +375,11 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
     }
 
-    override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>) {
+    override fun onLoadChildren(parentId: String, result: Result<List<MediaItem>>) {
         result.detach()
         Timber.d("On load children: $parentId")
         launch {
-            val items: List<MediaBrowserCompat.MediaItem> = when (parentId) {
+            val items: List<MediaItem> = when (parentId) {
                 RECENT_ROOT -> loadRecentChildren()
                 SUGGESTED_ROOT -> loadSuggestedChildren()
                 MEDIA_ID_ROOT -> loadRootChildren()
@@ -396,7 +398,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     private val NUM_SUGGESTED_ITEMS = 8
-    private suspend fun loadSuggestedChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
+    private suspend fun loadSuggestedChildren(): ArrayList<MediaItem> {
         Timber.d("Loading sugggested children")
         val upNext = listOfNotNull(playbackManager.getCurrentEpisode()) + playbackManager.upNextQueue.queueEpisodes
         val mediaUpNext = upNext.take(NUM_SUGGESTED_ITEMS).mapNotNull { playable ->
@@ -426,7 +428,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         return ArrayList(retList)
     }
 
-    private fun loadRecentChildren(): ArrayList<MediaBrowserCompat.MediaItem> {
+    private fun loadRecentChildren(): ArrayList<MediaItem> {
         Timber.d("Loading recent children")
         val upNext = playbackManager.getCurrentEpisode() ?: return arrayListOf()
         val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
@@ -436,16 +438,21 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         return arrayListOf(AutoConverter.convertEpisodeToMediaItem(this, upNext, parentPodcast))
     }
 
-    open suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
-        val rootItems = ArrayList<MediaBrowserCompat.MediaItem>()
+    open suspend fun loadRootChildren(): List<MediaItem> {
+        val rootItems = ArrayList<MediaItem>()
 
         // podcasts
-        val podcastsDescription = MediaDescriptionCompat.Builder()
+        val podcastsDescriptionMetadata = MediaMetadata.Builder()
             .setTitle("Podcasts")
-            .setMediaId(PODCASTS_ROOT)
-            .setIconUri(AutoConverter.getPodcastsBitmapUri(this))
+            .setArtworkUri(AutoConverter.getPodcastsBitmapUri(this))
+            .setIsBrowsable(true)
             .build()
-        val podcastItem = MediaBrowserCompat.MediaItem(podcastsDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+
+        val podcastItem = MediaItem.Builder()
+            .setMediaId(PODCASTS_ROOT)
+            .setMediaMetadata(podcastsDescriptionMetadata)
+            .build()
+
         rootItems.add(podcastItem)
 
         // playlists
@@ -457,27 +464,35 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
 
         // downloads
-        val downloadsDescription = MediaDescriptionCompat.Builder()
+        val downloadsMetadata = MediaMetadata.Builder()
             .setTitle("Downloads")
-            .setMediaId(DOWNLOADS_ROOT)
-            .setIconUri(AutoConverter.getDownloadsBitmapUri(this))
+            .setIsBrowsable(true)
+            .setArtworkUri(AutoConverter.getDownloadsBitmapUri(this))
             .build()
-        val downloadsItem = MediaBrowserCompat.MediaItem(downloadsDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+
+        val downloadsItem = MediaItem.Builder()
+            .setMediaId(DOWNLOADS_ROOT)
+            .setMediaMetadata(downloadsMetadata)
+            .build()
         rootItems.add(downloadsItem)
 
         // files
-        val filesDescription = MediaDescriptionCompat.Builder()
+        val filesMetadata = MediaMetadata.Builder()
             .setTitle("Files")
-            .setMediaId(FILES_ROOT)
-            .setIconUri(AutoConverter.getFilesBitmapUri(this))
+            .setArtworkUri(AutoConverter.getFilesBitmapUri(this))
+            .setIsBrowsable(true)
             .build()
-        val filesItem = MediaBrowserCompat.MediaItem(filesDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+
+        val filesItem = MediaItem.Builder()
+            .setMediaId(FILES_ROOT)
+            .setMediaMetadata(filesMetadata)
+            .build()
         rootItems.add(filesItem)
 
         return rootItems
     }
 
-    suspend fun loadPodcastsChildren(): List<MediaBrowserCompat.MediaItem> {
+    suspend fun loadPodcastsChildren(): List<MediaItem> {
         return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
             folderManager.getHomeFolder().mapNotNull { item ->
                 when (item) {
@@ -492,7 +507,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
     }
 
-    suspend fun loadFolderPodcastsChildren(folderUuid: String): List<MediaBrowserCompat.MediaItem> {
+    suspend fun loadFolderPodcastsChildren(folderUuid: String): List<MediaItem> {
         return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
             folderManager.findFolderPodcastsSorted(folderUuid).mapNotNull { podcast ->
                 convertPodcastToMediaItem(podcast = podcast, context = this)
@@ -502,9 +517,9 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
     }
 
-    suspend fun loadEpisodeChildren(parentId: String): List<MediaBrowserCompat.MediaItem> {
+    suspend fun loadEpisodeChildren(parentId: String): List<MediaItem> {
         // user tapped on a playlist or podcast, show the episodes
-        val episodeItems = ArrayList<MediaBrowserCompat.MediaItem>()
+        val episodeItems = ArrayList<MediaItem>()
 
         val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuid(parentId)
         if (playlist != null) {
@@ -539,14 +554,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         return episodeItems
     }
 
-    protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
+    protected suspend fun loadFilesChildren(): List<MediaItem> {
         return userEpisodeManager.findUserEpisodes().map {
             val podcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, thumbnailUrl = it.artworkUrl)
             AutoConverter.convertEpisodeToMediaItem(this, it, podcast)
         }
     }
 
-    protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
+    protected suspend fun loadStarredChildren(): List<MediaItem> {
         return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
@@ -554,7 +569,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
     }
 
-    protected suspend fun loadListeningHistoryChildren(): List<MediaBrowserCompat.MediaItem> {
+    protected suspend fun loadListeningHistoryChildren(): List<MediaItem> {
         return episodeManager.findPlaybackHistoryEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast)
@@ -562,7 +577,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
     }
 
-    override fun onSearch(query: String, extras: Bundle?, result: Result<List<MediaBrowserCompat.MediaItem>>) {
+    override fun onSearch(query: String, extras: Bundle?, result: Result<List<MediaItem>>) {
         result.detach()
         launch {
             result.sendResult(podcastSearch(query))
@@ -574,7 +589,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
      * Returning an empty list displays "No media available for browsing here"
      * Returning null displays "Something went wrong". There is no way to display our own error message.
      */
-    private suspend fun podcastSearch(term: String): List<MediaBrowserCompat.MediaItem>? {
+    private suspend fun podcastSearch(term: String): List<MediaItem>? {
         val termCleaned = term.trim()
         // search for local podcasts
         val localPodcasts = podcastManager.findSubscribedNoOrder()

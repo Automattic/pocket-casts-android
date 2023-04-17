@@ -242,6 +242,7 @@ dependencies {
     implementation libs.sentryFragment
     implementation libs.sentryTimber
     implementation libs.media3Cast
+    implementation libs.media3Common
     implementation libs.media3Datasource
     implementation libs.media3Exoplayer
     implementation libs.media3ExoplayerHls

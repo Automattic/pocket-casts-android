@@ -3,14 +3,15 @@ package au.com.shiftyjelly.pocketcasts
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaDescriptionCompat
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -42,6 +43,7 @@ const val PROFILE_FILES = "__PROFILE_FILES__"
 const val PROFILE_STARRED = "__PROFILE_STARRED__"
 const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 
+@UnstableApi
 @SuppressLint("LogNotTimber")
 @AndroidEntryPoint
 class AutoPlaybackService : PlaybackService() {
@@ -62,13 +64,13 @@ class AutoPlaybackService : PlaybackService() {
         playbackManager.pause(transientLoss = false, playbackSource = AnalyticsSource.AUTO_PAUSE)
     }
 
-    override fun onLoadChildren(parentId: String, result: Result<List<MediaBrowserCompat.MediaItem>>) {
+    override fun onLoadChildren(parentId: String, result: Result<List<MediaItem>>) {
         result.detach()
         Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Loading section $parentId")
         launch(Dispatchers.IO) {
             Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Running in background $parentId")
             try {
-                val items: List<MediaBrowserCompat.MediaItem> = when (parentId) {
+                val items: List<MediaItem> = when (parentId) {
                     MEDIA_ID_ROOT -> loadRootChildren()
                     PODCASTS_ROOT -> loadPodcastsChildren()
                     FILTERS_ROOT -> loadFiltersRoot()
@@ -96,7 +98,7 @@ class AutoPlaybackService : PlaybackService() {
         }
     }
 
-    override suspend fun loadRootChildren(): List<MediaBrowserCompat.MediaItem> {
+    override suspend fun loadRootChildren(): List<MediaItem> {
         val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
 
         val podcastsItem = buildListMediaItem(id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
@@ -112,7 +114,7 @@ class AutoPlaybackService : PlaybackService() {
         }
     }
 
-    suspend fun loadFiltersRoot(): List<MediaBrowserCompat.MediaItem> {
+    suspend fun loadFiltersRoot(): List<MediaItem> {
         return playlistManager.findAllSuspend().mapNotNull {
             Log.d(Settings.LOG_TAG_AUTO, "Filters ${it.title}")
 
@@ -125,7 +127,7 @@ class AutoPlaybackService : PlaybackService() {
         }
     }
 
-    private fun loadProfileRoot(): List<MediaBrowserCompat.MediaItem> {
+    private fun loadProfileRoot(): List<MediaItem> {
         return buildList {
             // Add the user uploaded Files if they are a Plus subscriber
             val isPlusUser = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
@@ -137,17 +139,19 @@ class AutoPlaybackService : PlaybackService() {
         }
     }
 
-    private fun buildListMediaItem(id: String, @StringRes title: Int, @DrawableRes drawable: Int, extras: Bundle? = null): MediaBrowserCompat.MediaItem {
-        val description = MediaDescriptionCompat.Builder()
+    private fun buildListMediaItem(id: String, @StringRes title: Int, @DrawableRes drawable: Int, extras: Bundle? = null): MediaItem {
+        val description = MediaMetadata.Builder()
             .setTitle(getString(title))
-            .setMediaId(id)
             .setExtras(extras)
-            .setIconUri(AutoConverter.getBitmapUri(drawable = drawable, this))
+            .setArtworkUri(AutoConverter.getBitmapUri(drawable = drawable, this))
             .build()
-        return MediaBrowserCompat.MediaItem(description, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+        return MediaItem.Builder()
+            .setMediaId(id)
+            .setMediaMetadata(description)
+            .build()
     }
 
-    suspend fun loadDiscoverRoot(): List<MediaBrowserCompat.MediaItem> {
+    suspend fun loadDiscoverRoot(): List<MediaItem> {
         Log.d(Settings.LOG_TAG_AUTO, "Loading discover root")
         val discoverFeed: Discover
         try {
@@ -180,14 +184,17 @@ class AutoPlaybackService : PlaybackService() {
                     val artworkUri = PodcastImage.getArtworkUrl(size = 480, uuid = it.uuid)
                     val localUri = AutoConverter.getArtworkUriForContentProvider(Uri.parse(artworkUri), this)
 
-                    val discoverDescription = MediaDescriptionCompat.Builder()
+                    val discoverDescription = MediaMetadata.Builder()
                         .setTitle(it.title)
-                        .setMediaId(it.uuid)
-                        .setIconUri(localUri)
+                        .setArtworkUri(localUri)
                         .setExtras(extras)
+                        .setIsBrowsable(true)
                         .build()
 
-                    return@map MediaBrowserCompat.MediaItem(discoverDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
+                    return@map MediaItem.Builder()
+                        .setMediaId(it.uuid)
+                        .setMediaMetadata(discoverDescription)
+                        .build()
                 }
             }
 

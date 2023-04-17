@@ -223,6 +223,7 @@ project.ext {
             deviceNames: "com.jaredrummler:android-device-names:2.1.0",
             // Media3
             media3Cast: "androidx.media3:media3-cast:$versionMedia3",
+            media3Common: "androidx.media3:media3-common:$versionMedia3",
             media3Datasource: "androidx.media3:media3-datasource:$versionMedia3",
             media3Exoplayer: "androidx.media3:media3-exoplayer:$versionMedia3",
             media3ExoplayerHls: "androidx.media3:media3-exoplayer-hls:$versionMedia3",
