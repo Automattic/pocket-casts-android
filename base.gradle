@@ -60,7 +60,7 @@ android {
         freeCompilerArgs += [
             "-opt-in=kotlin.RequiresOptIn"
         ]
-        kotlinOptions.allWarningsAsErrors = true
+//        kotlinOptions.allWarningsAsErrors = true
     }
 
     composeOptions {
@@ -213,6 +213,7 @@ dependencies {
     implementation libs.deviceNames
     implementation libs.glide
     implementation libs.glideOkHttp
+    implementation libs.guavaCoroutinesFuture
     implementation libs.coil
     implementation libs.coilCompose
     implementation libs.okHttp

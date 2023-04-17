@@ -7,18 +7,20 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import androidx.media.MediaBrowserServiceCompat
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.LibraryResult
+import androidx.media3.session.MediaLibraryService
+import androidx.media3.session.MediaSession
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -32,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertFolderToMediaItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertPodcastToMediaItem
-import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -44,7 +45,11 @@ import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.CompositeDisposable
@@ -53,12 +58,12 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val MEDIA_ID_ROOT = "__ROOT__"
 const val PODCASTS_ROOT = "__PODCASTS__"
@@ -89,7 +94,7 @@ private const val EPISODE_LIMIT = 100
 
 @UnstableApi
 @AndroidEntryPoint
-open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
+open class PlaybackService : MediaLibraryService(), CoroutineScope {
     inner class LocalBinder : Binder() {
         val service: PlaybackService
             get() = this@PlaybackService
@@ -108,15 +113,9 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     @Inject lateinit var notificationHelper: NotificationHelper
     @Inject lateinit var subscriptionManager: SubscriptionManager
 
-    var mediaController: MediaControllerCompat? = null
-        set(value) {
-            field = value
-            if (value != null) {
-                val mediaControllerCallback = MediaControllerCallback(value.metadata)
-                value.registerCallback(mediaControllerCallback)
-                this.mediaControllerCallback = mediaControllerCallback
-            }
-        }
+    private lateinit var mediaLibrarySession: MediaLibrarySession
+    private lateinit var player: ExoPlayer
+    private val librarySessionCallback = CustomMediaLibrarySessionCallback()
 
     private var mediaControllerCallback: MediaControllerCallback? = null
     lateinit var notificationManager: PlayerNotificationManager
@@ -131,16 +130,31 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         return binder ?: LocalBinder() // We return our local binder for tests and use the media session service binder normally
     }
 
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? {
+        return mediaLibrarySession
+    }
+
     override fun onCreate() {
         super.onCreate()
 
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Playback service created")
 
-        val mediaSession = playbackManager.mediaSession
-        sessionToken = mediaSession.sessionToken
+        initializeSessionAndPlayer()
 
-        mediaController = MediaControllerCompat(this, mediaSession)
         notificationManager = PlayerNotificationManagerImpl(this)
+    }
+
+    private fun initializeSessionAndPlayer() {
+        player = ExoPlayer.Builder(this)
+            .setAudioAttributes(AudioAttributes.DEFAULT, /* handleAudioFocus= */ true)
+            .build()
+
+        val mediaSessionBuilder = MediaLibrarySession.Builder(this, player, librarySessionCallback)
+        if (!Util.isAutomotive(this)) { // We can't start activities on automotive
+            mediaSessionBuilder.setSessionActivity(this.getLaunchActivityPendingIntent())
+        }
+
+        mediaLibrarySession = mediaSessionBuilder.build()
     }
 
     override fun onDestroy() {
@@ -317,9 +331,9 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                 return null
             }
 
-            val sessionToken = sessionToken
-            if (metadata == null || metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).isEmpty()) return null
-            return if (state != PlaybackStateCompat.STATE_NONE && sessionToken != null) notificationDrawer.buildPlayingNotification(sessionToken) else null
+//            val sessionToken = sessionToken
+//            if (metadata == null || metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).isEmpty()) return null
+            return /*if (state != PlaybackStateCompat.STATE_NONE && sessionToken != null) notificationDrawer.buildPlayingNotification(sessionToken) else*/ null
         }
     }
 
@@ -337,7 +351,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         mediaControllerCallback?.onPlaybackStateChanged(playbackStateCompat)
     }
 
-    override fun onGetRoot(clientPackageName: String, clientUid: Int, bundle: Bundle?): BrowserRoot? {
+    /*override fun onGetRoot(clientPackageName: String, clientUid: Int, bundle: Bundle?): BrowserRoot? {
         val extras = Bundle()
 
         Timber.d("onGetRoot() $clientPackageName ${bundle?.keySet()?.toList()}")
@@ -373,29 +387,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         } else {
             BrowserRoot(MEDIA_ID_ROOT, extras)
         }
-    }
-
-    override fun onLoadChildren(parentId: String, result: Result<List<MediaItem>>) {
-        result.detach()
-        Timber.d("On load children: $parentId")
-        launch {
-            val items: List<MediaItem> = when (parentId) {
-                RECENT_ROOT -> loadRecentChildren()
-                SUGGESTED_ROOT -> loadSuggestedChildren()
-                MEDIA_ID_ROOT -> loadRootChildren()
-                PODCASTS_ROOT -> loadPodcastsChildren()
-                FILES_ROOT -> loadFilesChildren()
-                else -> {
-                    if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
-                        loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
-                    } else {
-                        loadEpisodeChildren(parentId)
-                    }
-                }
-            }
-            result.sendResult(items)
-        }
-    }
+    }*/
 
     private val NUM_SUGGESTED_ITEMS = 8
     private suspend fun loadSuggestedChildren(): ArrayList<MediaItem> {
@@ -577,13 +569,6 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
     }
 
-    override fun onSearch(query: String, extras: Bundle?, result: Result<List<MediaItem>>) {
-        result.detach()
-        launch {
-            result.sendResult(podcastSearch(query))
-        }
-    }
-
     /**
      * Search for local and remote podcasts.
      * Returning an empty list displays "No media available for browsing here"
@@ -615,5 +600,74 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         val podcasts = (localPodcasts + serverPodcasts).distinctBy { it.uuid }
         // convert podcasts to the media browser format
         return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast) }
+    }
+    private inner class CustomMediaLibrarySessionCallback : MediaLibrarySession.Callback {
+        override fun onSubscribe(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            parentId: String,
+            params: LibraryParams?,
+        ): ListenableFuture<LibraryResult<Void>> {
+            launch {
+                val items: List<MediaItem> = when (parentId) {
+                    RECENT_ROOT -> loadRecentChildren()
+                    SUGGESTED_ROOT -> loadSuggestedChildren()
+                    MEDIA_ID_ROOT -> loadRootChildren()
+                    PODCASTS_ROOT -> loadPodcastsChildren()
+                    FILES_ROOT -> loadFilesChildren()
+                    else -> {
+                        if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
+                            loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
+                        } else {
+                            loadEpisodeChildren(parentId)
+                        }
+                    }
+                }
+                session.notifyChildrenChanged(browser, parentId, items.size, params)
+            }
+
+            return Futures.immediateFuture(LibraryResult.ofVoid())
+        }
+
+        override fun onGetChildren(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            parentId: String,
+            page: Int,
+            pageSize: Int,
+            params: LibraryParams?,
+        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+            var items: List<MediaItem>
+            return future {
+                items = when (parentId) {
+                    RECENT_ROOT -> loadRecentChildren()
+                    SUGGESTED_ROOT -> loadSuggestedChildren()
+                    MEDIA_ID_ROOT -> loadRootChildren()
+                    PODCASTS_ROOT -> loadPodcastsChildren()
+                    FILES_ROOT -> loadFilesChildren()
+                    else -> {
+                        if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
+                            loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
+                        } else {
+                            loadEpisodeChildren(parentId)
+                        }
+                    }
+                }
+                LibraryResult.ofItemList(items, params)
+            }
+        }
+
+        override fun onSearch(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            query: String,
+            params: LibraryParams?,
+        ): ListenableFuture<LibraryResult<Void>> {
+            launch {
+                val results = podcastSearch(query)
+                session.notifySearchResultChanged(browser, query, results?.size ?: 0, params)
+            }
+            return Futures.immediateFuture(LibraryResult.ofVoid())
+        }
     }
 }

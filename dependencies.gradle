@@ -209,7 +209,8 @@ project.ext {
             kotlinCoroutinesPlayServices: "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$versionKotlinCoroutines",
             kotlinCoroutinesRx: "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$versionKotlinCoroutines",
             kotlinCoroutinesTest: "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versionKotlinCoroutines",
-
+            // Guave Future
+            guavaCoroutinesFuture: "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$versionKotlinCoroutines",
             // Retrofit
             retrofit: "com.squareup.retrofit2:retrofit:$versionRetrofit",
             retrofitMoshi: "com.squareup.retrofit2:converter-moshi:$versionRetrofit",
