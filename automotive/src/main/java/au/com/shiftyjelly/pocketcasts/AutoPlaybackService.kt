@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -35,6 +36,7 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
@@ -53,9 +55,6 @@ const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 @SuppressLint("LogNotTimber")
 @AndroidEntryPoint
 open class AutoPlaybackService : PlaybackService() {
-
-    @Inject lateinit var listSource: ListRepository
-
     override fun onCreate() {
         super.onCreate()
         RefreshPodcastsTask.runNow(this)
@@ -70,114 +69,12 @@ open class AutoPlaybackService : PlaybackService() {
         playbackManager.pause(transientLoss = false, playbackSource = AnalyticsSource.AUTO_PAUSE)
     }
 
-    override suspend fun loadRootChildren(): List<MediaItem> {
-        val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
-
-        val podcastsItem = buildListMediaItem(id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
-        val filtersItem = buildListMediaItem(id = FILTERS_ROOT, title = LR.string.filters, drawable = IR.drawable.auto_tab_filter, extras = extrasContentAsList)
-        val discoverItem = buildListMediaItem(id = DISCOVER_ROOT, title = LR.string.discover, drawable = IR.drawable.auto_tab_discover)
-        val profileItem = buildListMediaItem(id = PROFILE_ROOT, title = LR.string.profile, drawable = IR.drawable.auto_tab_profile, extras = extrasContentAsList)
-
-        // show the user's podcast collection first if they are subscribed any
-        return if (podcastManager.countSubscribed() > 0) {
-            listOf(podcastsItem, filtersItem, discoverItem, profileItem)
-        } else {
-            listOf(discoverItem, podcastsItem, filtersItem, profileItem)
-        }
-    }
-
-    suspend fun loadFiltersRoot(): List<MediaItem> {
-        return playlistManager.findAllSuspend().mapNotNull {
-            Log.d(Settings.LOG_TAG_AUTO, "Filters ${it.title}")
-
-            try {
-                AutoConverter.convertPlaylistToMediaItem(this, it)
-            } catch (e: Exception) {
-                Log.e(Settings.LOG_TAG_AUTO, "Filter ${it.title} load failed", e)
-                null
-            }
-        }
-    }
-
-    private fun loadProfileRoot(): List<MediaItem> {
-        return buildList {
-            // Add the user uploaded Files if they are a Plus subscriber
-            val isPlusUser = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
-            if (isPlusUser) {
-                add(buildListMediaItem(id = PROFILE_FILES, title = LR.string.profile_navigation_files, drawable = IR.drawable.automotive_files))
-            }
-            add(buildListMediaItem(id = PROFILE_STARRED, title = LR.string.profile_navigation_starred, drawable = IR.drawable.automotive_filter_star))
-            add(buildListMediaItem(id = PROFILE_LISTENING_HISTORY, title = LR.string.profile_navigation_listening_history, drawable = IR.drawable.automotive_listening_history))
-        }
-    }
-
-    private fun buildListMediaItem(id: String, @StringRes title: Int, @DrawableRes drawable: Int, extras: Bundle? = null): MediaItem {
-        val description = MediaMetadata.Builder()
-            .setTitle(getString(title))
-            .setExtras(extras)
-            .setArtworkUri(AutoConverter.getBitmapUri(drawable = drawable, this))
-            .setIsBrowsable(true)
-            .build()
-        return MediaItem.Builder()
-            .setMediaId(id)
-            .setMediaMetadata(description)
-            .build()
-    }
-
-    suspend fun loadDiscoverRoot(): List<MediaItem> {
-        Log.d(Settings.LOG_TAG_AUTO, "Loading discover root")
-        val discoverFeed: Discover
-        try {
-            discoverFeed = listSource.getDiscoverFeedSuspend()
-        } catch (e: Exception) {
-            Log.e(Settings.LOG_TAG_AUTO, "Error loading discover", e)
-            return emptyList()
-        }
-
-        val region = discoverFeed.regions[discoverFeed.defaultRegionCode] ?: return emptyList()
-        val replacements = mapOf(
-            discoverFeed.regionCodeToken to region.code,
-            discoverFeed.regionNameToken to region.name
-        )
-
-        val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, resources)
-            .filter { it.type is ListType.PodcastList && it.displayStyle !is DisplayStyle.CollectionList && !it.sponsored && it.displayStyle !is DisplayStyle.SinglePodcast }
-            .map { discoverItem ->
-                Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
-                val listFeed = listSource.getListFeedSuspend(discoverItem.source)
-                Pair(discoverItem.title, listFeed.podcasts?.take(6) ?: emptyList())
-            }
-            .flatMap { (title, podcasts) ->
-                Log.d(Settings.LOG_TAG_AUTO, "Mapping $title to media item")
-                val groupTitle = title.tryToLocalise(resources)
-                podcasts.map {
-                    val extras = Bundle()
-                    extras.putString(EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT, groupTitle)
-
-                    val artworkUri = PodcastImage.getArtworkUrl(size = 480, uuid = it.uuid)
-                    val localUri = AutoConverter.getArtworkUriForContentProvider(Uri.parse(artworkUri), this)
-
-                    val discoverDescription = MediaMetadata.Builder()
-                        .setTitle(it.title)
-                        .setArtworkUri(localUri)
-                        .setExtras(extras)
-                        .setIsBrowsable(true)
-                        .build()
-
-                    return@map MediaItem.Builder()
-                        .setMediaId(it.uuid)
-                        .setMediaMetadata(discoverDescription)
-                        .build()
-                }
-            }
-
-        return updatedList
-    }
-
     // TODO: Set on media session
-    inner class AutoMediaLibrarySessionCallback(
+    class AutoMediaLibrarySessionCallback @Inject constructor(
         private val serviceScope: CoroutineScope,
-    ) : CustomMediaLibrarySessionCallback(serviceScope) {
+        @ApplicationContext private val context: Context,
+    ) : CustomMediaLibrarySessionCallback(serviceScope, context) {
+        @Inject lateinit var listSource: ListRepository
         override fun onSubscribe(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
@@ -233,6 +130,110 @@ open class AutoPlaybackService : PlaybackService() {
                     loadEpisodeChildren(parentId)
                 }
             }
+        }
+
+        override suspend fun loadRootChildren(): List<MediaItem> {
+            val extrasContentAsList = bundleOf(DESCRIPTION_EXTRAS_KEY_CONTENT_STYLE_BROWSABLE to DESCRIPTION_EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM)
+
+            val podcastsItem = buildListMediaItem(id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
+            val filtersItem = buildListMediaItem(id = FILTERS_ROOT, title = LR.string.filters, drawable = IR.drawable.auto_tab_filter, extras = extrasContentAsList)
+            val discoverItem = buildListMediaItem(id = DISCOVER_ROOT, title = LR.string.discover, drawable = IR.drawable.auto_tab_discover)
+            val profileItem = buildListMediaItem(id = PROFILE_ROOT, title = LR.string.profile, drawable = IR.drawable.auto_tab_profile, extras = extrasContentAsList)
+
+            // show the user's podcast collection first if they are subscribed any
+            return if (podcastManager.countSubscribed() > 0) {
+                listOf(podcastsItem, filtersItem, discoverItem, profileItem)
+            } else {
+                listOf(discoverItem, podcastsItem, filtersItem, profileItem)
+            }
+        }
+
+        suspend fun loadFiltersRoot(): List<MediaItem> {
+            return playlistManager.findAllSuspend().mapNotNull {
+                Log.d(Settings.LOG_TAG_AUTO, "Filters ${it.title}")
+
+                try {
+                    AutoConverter.convertPlaylistToMediaItem(context, it)
+                } catch (e: Exception) {
+                    Log.e(Settings.LOG_TAG_AUTO, "Filter ${it.title} load failed", e)
+                    null
+                }
+            }
+        }
+
+        suspend fun loadDiscoverRoot(): List<MediaItem> {
+            Log.d(Settings.LOG_TAG_AUTO, "Loading discover root")
+            val discoverFeed: Discover
+            try {
+                discoverFeed = listSource.getDiscoverFeedSuspend()
+            } catch (e: Exception) {
+                Log.e(Settings.LOG_TAG_AUTO, "Error loading discover", e)
+                return emptyList()
+            }
+
+            val region = discoverFeed.regions[discoverFeed.defaultRegionCode] ?: return emptyList()
+            val replacements = mapOf(
+                discoverFeed.regionCodeToken to region.code,
+                discoverFeed.regionNameToken to region.name
+            )
+
+            val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, context.resources)
+                .filter { it.type is ListType.PodcastList && it.displayStyle !is DisplayStyle.CollectionList && !it.sponsored && it.displayStyle !is DisplayStyle.SinglePodcast }
+                .map { discoverItem ->
+                    Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
+                    val listFeed = listSource.getListFeedSuspend(discoverItem.source)
+                    Pair(discoverItem.title, listFeed.podcasts?.take(6) ?: emptyList())
+                }
+                .flatMap { (title, podcasts) ->
+                    Log.d(Settings.LOG_TAG_AUTO, "Mapping $title to media item")
+                    val groupTitle = title.tryToLocalise(context.resources)
+                    podcasts.map {
+                        val extras = Bundle()
+                        extras.putString(EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT, groupTitle)
+
+                        val artworkUri = PodcastImage.getArtworkUrl(size = 480, uuid = it.uuid)
+                        val localUri = AutoConverter.getArtworkUriForContentProvider(Uri.parse(artworkUri), context)
+
+                        val discoverDescription = MediaMetadata.Builder()
+                            .setTitle(it.title)
+                            .setArtworkUri(localUri)
+                            .setExtras(extras)
+                            .setIsBrowsable(true)
+                            .build()
+
+                        return@map MediaItem.Builder()
+                            .setMediaId(it.uuid)
+                            .setMediaMetadata(discoverDescription)
+                            .build()
+                    }
+                }
+
+            return updatedList
+        }
+
+        private fun loadProfileRoot(): List<MediaItem> {
+            return buildList {
+                // Add the user uploaded Files if they are a Plus subscriber
+                val isPlusUser = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
+                if (isPlusUser) {
+                    add(buildListMediaItem(id = PROFILE_FILES, title = LR.string.profile_navigation_files, drawable = IR.drawable.automotive_files))
+                }
+                add(buildListMediaItem(id = PROFILE_STARRED, title = LR.string.profile_navigation_starred, drawable = IR.drawable.automotive_filter_star))
+                add(buildListMediaItem(id = PROFILE_LISTENING_HISTORY, title = LR.string.profile_navigation_listening_history, drawable = IR.drawable.automotive_listening_history))
+            }
+        }
+
+        private fun buildListMediaItem(id: String, @StringRes title: Int, @DrawableRes drawable: Int, extras: Bundle? = null): MediaItem {
+            val description = MediaMetadata.Builder()
+                .setTitle(context.getString(title))
+                .setExtras(extras)
+                .setArtworkUri(AutoConverter.getBitmapUri(drawable = drawable, context))
+                .setIsBrowsable(true)
+                .build()
+            return MediaItem.Builder()
+                .setMediaId(id)
+                .setMediaMetadata(description)
+                .build()
         }
     }
 }
