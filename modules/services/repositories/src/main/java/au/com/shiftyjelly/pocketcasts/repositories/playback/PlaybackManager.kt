@@ -156,7 +156,7 @@ open class PlaybackManager @Inject constructor(
 
     var episodeSubscription: Disposable? = null
 
-    var mediaSessionManager = MediaSessionManager(
+    val mediaSessionManager = MediaSessionManager(
         playbackManager = this,
         podcastManager = podcastManager,
         episodeManager = episodeManager,
