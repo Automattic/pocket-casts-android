@@ -100,13 +100,13 @@ class AutoPlaybackServiceTest {
                 publishedDate = Date()
             )
 
-            service.playlistManager = mock { on { findByUuid(any()) }.doReturn(null) }
-            service.podcastManager =
+            service.librarySessionCallback.playlistManager = mock { on { findByUuid(any()) }.doReturn(null) }
+            service.librarySessionCallback.podcastManager =
                 mock { on { runBlocking { findPodcastByUuidSuspend(any()) } }.doReturn(podcast) }
-            service.episodeManager =
+            service.librarySessionCallback.episodeManager =
                 mock { on { findEpisodesByPodcastOrdered(any()) }.doReturn(listOf(episode)) }
 
-            val episodes = service.loadEpisodeChildren(podcast.uuid)
+            val episodes = service.librarySessionCallback.loadEpisodeChildren(podcast.uuid)
             assertTrue("Episodes should have content", episodes.isNotEmpty())
             assertTrue(
                 "Episode uuid should be equal",
