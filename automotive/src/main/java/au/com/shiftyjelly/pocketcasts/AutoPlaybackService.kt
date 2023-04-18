@@ -201,8 +201,3 @@ class AutoPlaybackService : PlaybackService() {
         return updatedList
     }
 }
-
-private const val ERROR_RESOLUTION_ACTION_LABEL =
-    "android.media.extras.ERROR_RESOLUTION_ACTION_LABEL"
-private const val ERROR_RESOLUTION_ACTION_INTENT =
-    "android.media.extras.ERROR_RESOLUTION_ACTION_INTENT"
