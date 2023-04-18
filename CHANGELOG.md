@@ -5,7 +5,7 @@
         ([#878](https://github.com/Automattic/pocket-casts-android/pull/878)).
 *   Bug Fixes:
     *   Fixed accessibility content desctiption for episode list
-         ([#762](https://github.com/Automattic/pocket-casts-android/issues/890)).
+         ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
         
 
 7.35
