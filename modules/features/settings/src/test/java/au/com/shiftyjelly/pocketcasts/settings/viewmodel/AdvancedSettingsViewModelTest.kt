@@ -15,8 +15,8 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @RunWith(MockitoJUnitRunner::class)
 class AdvancedSettingsViewModelTest {
@@ -46,9 +46,7 @@ class AdvancedSettingsViewModelTest {
 
     @Test
     fun `verify settings methods gets called when they should`() {
-        val isChecked = viewModel.state.value.backgroundSyncOnMeteredState.isChecked
-        // Just ensure it gets called
-        TestCase.assertEquals(isChecked, false)
-        verify(settings).syncOnMeteredNetwork()
+        TestCase.assertEquals(viewModel.state.value.backgroundSyncOnMeteredState.isChecked, false)
+        TestCase.assertEquals(viewModel.state.value.backgroundSyncOnMeteredState.summary, LR.string.settings_advanced_sync_on_metered_off)
     }
 }
