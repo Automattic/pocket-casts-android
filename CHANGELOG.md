@@ -1,12 +1,14 @@
+7.38
+-----
+*   Bug Fixes:
+    *   Fixed accessibility content desctiption for episode list
+         ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
+
 7.37
 -----
 * New Features:
     *   Added capability to sign into Pocket Casts using Google account
-        ([#878](https://github.com/Automattic/pocket-casts-android/pull/878)).
-*   Bug Fixes:
-    *   Fixed accessibility content desctiption for episode list
-         ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
-        
+        ([#878](https://github.com/Automattic/pocket-casts-android/pull/878))
 
 7.35
 -----
