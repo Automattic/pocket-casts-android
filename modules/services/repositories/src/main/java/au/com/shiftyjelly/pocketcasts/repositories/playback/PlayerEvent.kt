@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import com.google.android.exoplayer2.PlaybackException
+import androidx.media3.common.PlaybackException
 
 /**
  * A event on Player
