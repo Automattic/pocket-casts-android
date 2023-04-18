@@ -36,15 +36,4 @@ class AdvancedSettingsFragment : BaseFragment() {
             }
         }
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel.start()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.onFragmentResume()
-    }
 }

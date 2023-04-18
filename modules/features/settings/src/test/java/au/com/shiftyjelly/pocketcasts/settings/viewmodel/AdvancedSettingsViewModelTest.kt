@@ -46,20 +46,9 @@ class AdvancedSettingsViewModelTest {
 
     @Test
     fun `verify settings methods gets called when they should`() {
-        startViewModelAndResumeFragment(sdkVersion = 28)
-
         val isChecked = viewModel.state.value.backgroundSyncOnMeteredState.isChecked
         // Just ensure it gets called
         TestCase.assertEquals(isChecked, false)
         verify(settings).syncOnMeteredNetwork()
-    }
-
-    private fun startViewModelAndResumeFragment(
-        sdkVersion: Int,
-    ) {
-        viewModel.start(
-            sdkVersion = sdkVersion
-        )
-        viewModel.onFragmentResume()
     }
 }

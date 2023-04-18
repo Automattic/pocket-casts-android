@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
-import android.os.Build
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -10,10 +9,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -27,23 +24,12 @@ class AdvancedSettingsViewModel
     private val mutableState = MutableStateFlow(initState())
     val state: StateFlow<State> = mutableState
 
-    private val mutableSnackbarMessage = MutableSharedFlow<Int>()
-    val snackbarMessage = mutableSnackbarMessage.asSharedFlow()
-
     private val backgroundRefreshSummary: Int
         get() = if (settings.syncOnMeteredNetwork()) {
             LR.string.settings_advanced_sync_on_metered_on
         } else {
             LR.string.settings_advanced_sync_on_metered_off
         }
-
-    private var sdkVersion: Int = 0
-
-    fun start(
-        sdkVersion: Int = Build.VERSION.SDK_INT,
-    ) {
-        this.sdkVersion = sdkVersion
-    }
 
     private fun initState() = State(
         backgroundSyncOnMeteredState = State.BackgroundSyncOnMeteredState(
@@ -58,9 +44,6 @@ class AdvancedSettingsViewModel
             }
         )
     )
-
-    fun onFragmentResume() {
-    }
 
     fun doPodcastsRefreshAutomatically(): Boolean {
         return settings.refreshPodcastsAutomatically()
