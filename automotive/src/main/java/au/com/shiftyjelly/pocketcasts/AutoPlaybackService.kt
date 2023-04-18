@@ -144,6 +144,7 @@ class AutoPlaybackService : PlaybackService() {
             .setTitle(getString(title))
             .setExtras(extras)
             .setArtworkUri(AutoConverter.getBitmapUri(drawable = drawable, this))
+            .setIsBrowsable(true)
             .build()
         return MediaItem.Builder()
             .setMediaId(id)
