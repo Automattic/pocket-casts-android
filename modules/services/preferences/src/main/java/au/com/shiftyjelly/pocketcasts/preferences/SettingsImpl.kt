@@ -273,13 +273,12 @@ class SettingsImpl @Inject constructor(
         setBoolean(Settings.PREFERENCE_SYNC_ON_METERED, shouldSyncOnMetered)
     }
 
-    override fun getWorkManagerNetworkTypeConstraint(): NetworkType {
-        var syncNetworkConstraint = NetworkType.CONNECTED
-        if (!syncOnMeteredNetwork()) {
-            syncNetworkConstraint = NetworkType.UNMETERED
+    override fun getWorkManagerNetworkTypeConstraint(): NetworkType =
+        if (syncOnMeteredNetwork()) {
+            NetworkType.CONNECTED
+        } else {
+            NetworkType.UNMETERED
         }
-        return syncNetworkConstraint
-    }
 
     override fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean {
         return if (!syncOnMeteredNetwork()) {
