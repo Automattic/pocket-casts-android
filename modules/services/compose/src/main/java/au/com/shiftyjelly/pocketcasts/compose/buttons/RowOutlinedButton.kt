@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -46,6 +47,7 @@ fun RowOutlinedButton(
     border: BorderStroke? = outlinedBorder,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     textIcon: Painter? = null,
+    fontSize: TextUnit? = null,
     leadingIcon: Painter? = null,
     tintIcon: Boolean = true,
     onClick: () -> Unit,
@@ -82,6 +84,7 @@ fun RowOutlinedButton(
                         text = text,
                         color = colors.contentColor(enabled = true).value,
                         textAlign = TextAlign.Center,
+                        fontSize = fontSize,
                         modifier = Modifier.padding(6.dp)
                     )
                 }

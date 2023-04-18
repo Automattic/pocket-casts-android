@@ -20,10 +20,11 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DataSource
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DataSource
+import androidx.media3.exoplayer.source.ConcatenatingMediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 
 /**
  * Useful extensions for [MediaMetadataCompat].
@@ -231,6 +232,7 @@ inline val MediaMetadataCompat.fullDescription
  *
  * For convenience, place the [MediaDescriptionCompat] into the tag so it can be retrieved later.
  */
+@UnstableApi
 fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory) =
     ProgressiveMediaSource.Factory(dataSourceFactory)
         .createMediaSource(
@@ -245,6 +247,7 @@ fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory) =
  * Extension method for building a [ConcatenatingMediaSource] given a [List]
  * of [MediaMetadataCompat] objects.
  */
+@UnstableApi
 fun List<MediaMetadataCompat>.toMediaSource(
     dataSourceFactory: DataSource.Factory
 ): ConcatenatingMediaSource {
