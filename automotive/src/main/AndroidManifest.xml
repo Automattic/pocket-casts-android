@@ -46,6 +46,7 @@
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
+                <action android:name="androidx.media3.session.MediaLibraryService"/>
             </intent-filter>
         </service>
 
