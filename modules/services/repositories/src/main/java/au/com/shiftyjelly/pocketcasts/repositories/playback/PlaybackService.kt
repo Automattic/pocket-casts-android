@@ -601,7 +601,7 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
         // convert podcasts to the media browser format
         return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast) }
     }
-    private inner class CustomMediaLibrarySessionCallback : MediaLibrarySession.Callback {
+    protected open inner class CustomMediaLibrarySessionCallback : MediaLibrarySession.Callback {
         override fun onSubscribe(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
@@ -609,20 +609,7 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<Void>> {
             launch {
-                val items: List<MediaItem> = when (parentId) {
-                    RECENT_ROOT -> loadRecentChildren()
-                    SUGGESTED_ROOT -> loadSuggestedChildren()
-                    MEDIA_ID_ROOT -> loadRootChildren()
-                    PODCASTS_ROOT -> loadPodcastsChildren()
-                    FILES_ROOT -> loadFilesChildren()
-                    else -> {
-                        if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
-                            loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
-                        } else {
-                            loadEpisodeChildren(parentId)
-                        }
-                    }
-                }
+                val items = mediaItems(parentId)
                 session.notifyChildrenChanged(browser, parentId, items.size, params)
             }
 
@@ -639,20 +626,7 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
             var items: List<MediaItem>
             return future {
-                items = when (parentId) {
-                    RECENT_ROOT -> loadRecentChildren()
-                    SUGGESTED_ROOT -> loadSuggestedChildren()
-                    MEDIA_ID_ROOT -> loadRootChildren()
-                    PODCASTS_ROOT -> loadPodcastsChildren()
-                    FILES_ROOT -> loadFilesChildren()
-                    else -> {
-                        if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
-                            loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
-                        } else {
-                            loadEpisodeChildren(parentId)
-                        }
-                    }
-                }
+                items = mediaItems(parentId)
                 LibraryResult.ofItemList(items, params)
             }
         }
@@ -668,6 +642,27 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
                 session.notifySearchResultChanged(browser, query, results?.size ?: 0, params)
             }
             return Futures.immediateFuture(LibraryResult.ofVoid())
+        }
+
+        private suspend fun mediaItems(
+            parentId: String,
+        ): List<MediaItem> = when (parentId) {
+            RECENT_ROOT -> loadRecentChildren()
+            SUGGESTED_ROOT -> loadSuggestedChildren()
+            MEDIA_ID_ROOT -> loadRootChildren()
+            PODCASTS_ROOT -> loadPodcastsChildren()
+            FILES_ROOT -> loadFilesChildren()
+            else -> {
+                if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
+                    loadFolderPodcastsChildren(
+                        folderUuid = parentId.substring(
+                            FOLDER_ROOT_PREFIX.length
+                        )
+                    )
+                } else {
+                    loadEpisodeChildren(parentId)
+                }
+            }
         }
     }
 }

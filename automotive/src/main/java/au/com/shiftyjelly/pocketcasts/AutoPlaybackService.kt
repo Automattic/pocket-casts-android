@@ -12,6 +12,8 @@ import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_CONTENT_STYL
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.session.LibraryResult
+import androidx.media3.session.MediaSession
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
@@ -29,8 +31,11 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.servers.server.ListRepository
+import com.google.common.collect.ImmutableList
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -46,7 +51,7 @@ const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 @UnstableApi
 @SuppressLint("LogNotTimber")
 @AndroidEntryPoint
-class AutoPlaybackService : PlaybackService() {
+open class AutoPlaybackService : PlaybackService() {
 
     @Inject lateinit var listSource: ListRepository
 
@@ -62,40 +67,6 @@ class AutoPlaybackService : PlaybackService() {
         Log.d(Settings.LOG_TAG_AUTO, "Auto playback service destroyed")
 
         playbackManager.pause(transientLoss = false, playbackSource = AnalyticsSource.AUTO_PAUSE)
-    }
-
-    override fun onLoadChildren(parentId: String, result: Result<List<MediaItem>>) {
-        result.detach()
-        Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Loading section $parentId")
-        launch(Dispatchers.IO) {
-            Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Running in background $parentId")
-            try {
-                val items: List<MediaItem> = when (parentId) {
-                    MEDIA_ID_ROOT -> loadRootChildren()
-                    PODCASTS_ROOT -> loadPodcastsChildren()
-                    FILTERS_ROOT -> loadFiltersRoot()
-                    DISCOVER_ROOT -> loadDiscoverRoot()
-                    PROFILE_ROOT -> loadProfileRoot()
-                    PROFILE_FILES -> loadFilesChildren()
-                    PROFILE_LISTENING_HISTORY -> loadListeningHistoryChildren()
-                    PROFILE_STARRED -> loadStarredChildren()
-                    else -> {
-                        if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
-                            loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
-                        } else {
-                            loadEpisodeChildren(parentId)
-                        }
-                    }
-                }
-                Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Sending results $parentId")
-                result.sendResult(items)
-                Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Results sent $parentId")
-            } catch (e: Exception) {
-                Log.e(Settings.LOG_TAG_AUTO, "onLoadChildren. Could not load $parentId", e)
-                result.sendResult(emptyList())
-            }
-            podcastManager.refreshPodcastsIfRequired("Automotive")
-        }
     }
 
     override suspend fun loadRootChildren(): List<MediaItem> {
@@ -200,5 +171,65 @@ class AutoPlaybackService : PlaybackService() {
             }
 
         return updatedList
+    }
+
+    // TODO: Set on media session
+    protected inner class AutoMediaLibrarySessionCallback : CustomMediaLibrarySessionCallback() {
+        override fun onSubscribe(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            parentId: String,
+            params: LibraryParams?,
+        ): ListenableFuture<LibraryResult<Void>> {
+            launch {
+                val items = mediaItems(parentId)
+                session.notifyChildrenChanged(browser, parentId, items.size, params)
+            }
+
+            return Futures.immediateFuture(LibraryResult.ofVoid())
+        }
+
+        override fun onGetChildren(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            parentId: String,
+            page: Int,
+            pageSize: Int,
+            params: LibraryParams?,
+        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+            var items: List<MediaItem>
+            return future {
+                try {
+                    items = mediaItems(parentId)
+                    Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Sending results $parentId")
+                    LibraryResult.ofItemList(items, params)
+                } catch (e: Exception) {
+                    Log.e(Settings.LOG_TAG_AUTO, "onLoadChildren. Could not load $parentId", e)
+                    LibraryResult.ofItemList(emptyList(), params)
+                } finally {
+                    podcastManager.refreshPodcastsIfRequired("Automotive")
+                }
+            }
+        }
+
+        private suspend fun mediaItems(parentId: String) = when (parentId) {
+            MEDIA_ID_ROOT -> loadRootChildren()
+            PODCASTS_ROOT -> loadPodcastsChildren()
+            FILTERS_ROOT -> loadFiltersRoot()
+            DISCOVER_ROOT -> loadDiscoverRoot()
+            PROFILE_ROOT -> loadProfileRoot()
+            PROFILE_FILES -> loadFilesChildren()
+            PROFILE_LISTENING_HISTORY -> loadListeningHistoryChildren()
+            PROFILE_STARRED -> loadStarredChildren()
+            else -> {
+                if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
+                    loadFolderPodcastsChildren(
+                        folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length)
+                    )
+                } else {
+                    loadEpisodeChildren(parentId)
+                }
+            }
+        }
     }
 }
