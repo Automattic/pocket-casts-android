@@ -218,6 +218,7 @@ class EpisodeViewHolder(
                 } else {
                     updateTimeLeft(textView = lblStatus, episode = episode)
                 }
+                updateRowText(episode, captionColor, tintColor, date, title, lblStatus, isInUpNext)
 
                 val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
                 imgArtwork.alpha = if (episodeGreyedOut) 0.5f else 1f
@@ -266,7 +267,7 @@ class EpisodeViewHolder(
         textView.contentDescription = timeLeft.description
     }
 
-    private fun updateRowText(episode: Episode, captionColor: Int, tintColor: Int, date: TextView, title: TextView, lblStatus: TextView) {
+    private fun updateRowText(episode: Episode, captionColor: Int, tintColor: Int, date: TextView, title: TextView, lblStatus: TextView, isInUpNext: Boolean = false) {
         val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
         val alphaCaptionColor = ColorUtils.colorWithAlpha(captionColor, 128)
         val dateTintColor = if (episodeGreyedOut) alphaCaptionColor else tintColor
@@ -282,7 +283,32 @@ class EpisodeViewHolder(
         val statusColor = if (episodeGreyedOut) alphaCaptionColor else context.getThemeColor(UR.attr.primary_text_02)
         lblStatus.setTextColor(statusColor)
 
-        episodeRow.contentDescription = "${title.text}. ${date.text}. ${lblStatus.contentDescription ?: lblStatus.text}"
+        val attributes = mutableListOf(
+            title.text.toString(),
+            date.text.toString(),
+        )
+        attributes.add(
+            if (!lblStatus.contentDescription.isNullOrEmpty()) {
+                lblStatus.contentDescription.toString()
+            } else {
+                lblStatus.text.toString()
+            }
+        )
+        if (episode.isInProgress) {
+            attributes.add(context.getString(LR.string.in_progress))
+        } else if (isInUpNext) {
+            attributes.add(context.getString(LR.string.episode_in_up_next))
+        }
+        if (episode.isDownloaded) {
+            attributes.add(context.getString(LR.string.downloaded))
+        }
+        if (episode.isDownloading) {
+            attributes.add(context.getString(LR.string.episode_downloading))
+        }
+        if (episode.isStarred) {
+            attributes.add(context.getString(LR.string.starred))
+        }
+        episodeRow.contentDescription = attributes.joinToString(separator = ". ") + ". "
     }
 
     fun clearObservers() {
