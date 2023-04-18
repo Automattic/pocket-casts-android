@@ -138,6 +138,7 @@ object AutoConverter {
             .setTitle(playlist.title.tryToLocaliseFilters(context.resources))
             .setArtworkUri(getPlaylistBitmapUri(playlist, context))
             .setIsBrowsable(true)
+            .setIsPlayable(false)
             .build()
 
         return MediaItem.Builder()

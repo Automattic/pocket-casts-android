@@ -140,6 +140,7 @@ open class AutoPlaybackService : PlaybackService() {
         }
 
         private suspend fun mediaItems(parentId: String) = when (parentId) {
+            "androidx.media3.session.MediaLibraryService", // FIXME
             MEDIA_ID_ROOT -> loadRootChildren()
             PODCASTS_ROOT -> loadPodcastsChildren()
             FILTERS_ROOT -> loadFiltersRoot()
@@ -226,6 +227,7 @@ open class AutoPlaybackService : PlaybackService() {
                             .setArtworkUri(localUri)
                             .setExtras(extras)
                             .setIsBrowsable(true)
+                            .setIsPlayable(false)
                             .build()
 
                         return@map MediaItem.Builder()
@@ -256,6 +258,7 @@ open class AutoPlaybackService : PlaybackService() {
                 .setExtras(extras)
                 .setArtworkUri(AutoConverter.getBitmapUri(drawable = drawable, context))
                 .setIsBrowsable(true)
+                .setIsPlayable(false)
                 .build()
             return MediaItem.Builder()
                 .setMediaId(id)
