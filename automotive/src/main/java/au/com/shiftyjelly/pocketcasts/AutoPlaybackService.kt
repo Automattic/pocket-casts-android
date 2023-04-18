@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -174,14 +175,16 @@ open class AutoPlaybackService : PlaybackService() {
     }
 
     // TODO: Set on media session
-    protected inner class AutoMediaLibrarySessionCallback : CustomMediaLibrarySessionCallback() {
+    inner class AutoMediaLibrarySessionCallback(
+        private val serviceScope: CoroutineScope,
+    ) : CustomMediaLibrarySessionCallback(serviceScope) {
         override fun onSubscribe(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             parentId: String,
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<Void>> {
-            launch {
+            serviceScope.launch {
                 val items = mediaItems(parentId)
                 session.notifyChildrenChanged(browser, parentId, items.size, params)
             }
@@ -198,7 +201,7 @@ open class AutoPlaybackService : PlaybackService() {
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
             var items: List<MediaItem>
-            return future {
+            return serviceScope.future {
                 try {
                     items = mediaItems(parentId)
                     Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Sending results $parentId")

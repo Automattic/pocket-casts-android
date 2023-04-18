@@ -136,6 +136,7 @@ project.ext {
             lifecycleScope: "androidx.lifecycle:lifecycle-runtime-ktx:$versionLifecycle",
             lifecycleLiveData: "androidx.lifecycle:lifecycle-livedata-ktx:$versionLifecycle",
             lifecycleProcess: "androidx.lifecycle:lifecycle-process:$versionLifecycle",
+            lifecycleService: "androidx.lifecycle:lifecycle-service:$versionLifecycle",
             billing: "com.android.billingclient:billing:$versionBillingClient",
             billingKtx: "com.android.billingclient:billing-ktx:$versionBillingClient",
             openSource: 'com.google.android.gms:play-services-oss-licenses:17.0.0',

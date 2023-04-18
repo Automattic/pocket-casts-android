@@ -18,7 +18,6 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.LibraryResult
-import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
@@ -94,7 +93,7 @@ private const val EPISODE_LIMIT = 100
 
 @UnstableApi
 @AndroidEntryPoint
-open class PlaybackService : MediaLibraryService(), CoroutineScope {
+open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
     inner class LocalBinder : Binder() {
         val service: PlaybackService
             get() = this@PlaybackService
@@ -601,14 +600,16 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
         // convert podcasts to the media browser format
         return podcasts.mapNotNull { podcast -> convertPodcastToMediaItem(context = this, podcast = podcast) }
     }
-    protected open inner class CustomMediaLibrarySessionCallback : MediaLibrarySession.Callback {
+    open inner class CustomMediaLibrarySessionCallback(
+        private val serviceScope: CoroutineScope,
+    ) : MediaLibrarySession.Callback {
         override fun onSubscribe(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             parentId: String,
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<Void>> {
-            launch {
+            serviceScope.launch {
                 val items = mediaItems(parentId)
                 session.notifyChildrenChanged(browser, parentId, items.size, params)
             }
@@ -625,7 +626,7 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
             var items: List<MediaItem>
-            return future {
+            return serviceScope.future {
                 items = mediaItems(parentId)
                 LibraryResult.ofItemList(items, params)
             }
@@ -637,7 +638,7 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
             query: String,
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<Void>> {
-            launch {
+            serviceScope.launch {
                 val results = podcastSearch(query)
                 session.notifySearchResultChanged(browser, query, results?.size ?: 0, params)
             }
