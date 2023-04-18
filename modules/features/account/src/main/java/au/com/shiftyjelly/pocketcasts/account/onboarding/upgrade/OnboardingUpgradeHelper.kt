@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import android.os.Build
+import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -26,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -43,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object OnboardingUpgradeHelper {
     val plusGradientBrush = Brush.horizontalGradient(
@@ -50,6 +55,29 @@ object OnboardingUpgradeHelper {
         1f to Color(0xFFFEB525),
     )
     private val unselectedColor = Color(0xFF666666)
+
+    @Composable
+    fun UpgradeRowButton(
+        text: String,
+        backgroundColor: Long,
+        textColor: Long,
+        onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+    ) {
+        Button(
+            onClick = onClick,
+            shape = RoundedCornerShape(12.dp),
+            modifier = modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(backgroundColor),
+            ),
+        ) {
+            TextH30(
+                text = text,
+                color = Color(textColor),
+            )
+        }
+    }
 
     @Composable
     fun PlusRowButton(
@@ -239,15 +267,35 @@ object OnboardingUpgradeHelper {
     val backgroundColor = Color(0xFF121212)
 
     @Composable
-    fun PlusBackground(
+    fun OldPlusBackground(
         modifier: Modifier = Modifier,
-        content: @Composable () -> Unit
+        content: @Composable () -> Unit,
     ) {
         Box(modifier) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                BlurredCanvasBackground()
+                OldBlurredCanvasBackground()
             } else {
-                ImageBackground()
+                ImageBackground(R.drawable.upgrade_background_glows)
+            }
+            content()
+        }
+    }
+
+    @Composable
+    fun UpgradeBackground(
+        modifier: Modifier = Modifier,
+        @StringRes shortNamRes: Int,
+        @DrawableRes backgroundGlowsRes: Int,
+        content: @Composable () -> Unit,
+    ) {
+        Box(modifier) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                when (shortNamRes) {
+                    LR.string.pocket_casts_plus_short -> PlusBlurredCanvasBackground()
+                    LR.string.pocket_casts_patron_short -> PatronBlurredCanvasBackground()
+                }
+            } else {
+                ImageBackground(backgroundGlowsRes)
             }
             content()
         }
@@ -255,7 +303,64 @@ object OnboardingUpgradeHelper {
 
     @Composable
     @RequiresApi(Build.VERSION_CODES.S) // Blur only works on Android >=12
-    private fun BoxScope.BlurredCanvasBackground() {
+    private fun BoxScope.PlusBlurredCanvasBackground() {
+        Canvas(
+            Modifier
+                .matchParentSize()
+                .blur(420.dp)
+        ) {
+            // Background
+            drawRect(backgroundColor)
+
+            drawOval(
+                color = Color(0xFFFFD846),
+                topLeft = Offset(0f, size.height * .3f),
+                size = Size(size.width * 3.5f, size.height),
+                alpha = 0.8f,
+                blendMode = BlendMode.SrcOver,
+            )
+
+            drawCircle(
+                color = Color(0xFFD4B43A),
+                radius = size.width * 1.5f,
+                center = Offset(-size.width, size.height * 1.3f),
+            )
+
+            // Overlay
+            drawRect(Color(0xFF121212), alpha = 0.28f)
+        }
+    }
+
+    @Composable
+    @RequiresApi(Build.VERSION_CODES.S) // Blur only works on Android >=12
+    private fun BoxScope.PatronBlurredCanvasBackground() {
+        Canvas(
+            Modifier
+                .matchParentSize()
+                .blur(173.dp)
+        ) {
+            // Background
+            drawRect(backgroundColor)
+
+            drawOval(
+                color = Color(0xFF503ACC),
+                topLeft = Offset(0f, size.height * .25f),
+                size = Size(size.width * 2f, size.height * .6f),
+                alpha = 0.9f,
+                blendMode = BlendMode.SrcOver,
+            )
+
+            drawCircle(
+                color = Color(0xFF402EA3),
+                radius = size.width * 0.9f,
+                center = Offset(-size.width / 2f, size.height * .7f),
+            )
+        }
+    }
+
+    @Composable
+    @RequiresApi(Build.VERSION_CODES.S) // Blur only works on Android >=12
+    private fun BoxScope.OldBlurredCanvasBackground() {
         val screenHeight = LocalConfiguration.current.screenHeightDp
         Canvas(
             Modifier
@@ -285,9 +390,11 @@ object OnboardingUpgradeHelper {
     }
 
     @Composable
-    private fun BoxScope.ImageBackground() {
+    private fun BoxScope.ImageBackground(
+        @DrawableRes backgroundGlowsRes: Int,
+    ) {
         Image(
-            painterResource(R.drawable.upgrade_background_glows),
+            painterResource(backgroundGlowsRes),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier

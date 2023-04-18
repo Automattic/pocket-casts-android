@@ -6,7 +6,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -44,8 +43,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
 ) : AndroidViewModel(context as Application) {
 
     val showContinueWithGoogleButton =
-        BuildConfig.SINGLE_SIGN_ON_ENABLED &&
-            Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty() &&
+        Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty() &&
             GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(context)
 
     val randomPodcasts = mutableListOf<Podcast>()

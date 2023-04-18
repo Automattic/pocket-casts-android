@@ -2,11 +2,13 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback;
 
 import androidx.annotation.IntDef;
 
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.audio.AudioProcessor;
-import com.google.android.exoplayer2.audio.BaseAudioProcessor;
-import com.google.android.exoplayer2.util.Assertions;
-import com.google.android.exoplayer2.util.Util;
+import androidx.annotation.OptIn;
+import androidx.media3.common.C;
+import androidx.media3.common.audio.AudioProcessor;
+import androidx.media3.common.util.UnstableApi;
+import androidx.media3.exoplayer.audio.BaseAudioProcessor;
+import androidx.media3.common.util.Assertions;
+import androidx.media3.common.util.Util;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -19,6 +21,7 @@ import static java.lang.Math.min;
  * An {@link AudioProcessor} that skips silence in the input stream. Input and output are 16-bit
  * PCM.
  */
+@OptIn(markerClass = UnstableApi.class)
 public final class ShiftyTrimSilenceProcessor extends BaseAudioProcessor {
 
     /**

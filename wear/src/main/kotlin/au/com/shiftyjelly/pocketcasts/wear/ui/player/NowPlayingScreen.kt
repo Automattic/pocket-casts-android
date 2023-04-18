@@ -12,6 +12,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
@@ -28,6 +29,7 @@ object NowPlayingScreen {
     const val route = "now_playing"
 }
 
+@OptIn(ExperimentalWearFoundationApi::class)
 @Composable
 fun NowPlayingScreen(
     modifier: Modifier = Modifier,

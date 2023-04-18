@@ -5,12 +5,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.view.View
 import android.widget.FrameLayout
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.AspectRatioFrameLayout
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 
 class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : FrameLayout(context, attrs, defStyleAttr), SurfaceHolder.Callback, SimplePlayer.VideoChangedListener {
 
@@ -22,6 +22,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
 
     private val view = LayoutInflater.from(context).inflate(R.layout.video_view, this, true)
+    @UnstableApi
     private val aspectRatioLayout = view.findViewById<AspectRatioFrameLayout>(R.id.aspectRatioLayout).apply {
         setAspectRatio(1.78f)
     }
@@ -35,7 +36,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
 
     override fun setVisibility(visibility: Int) {
         super.setVisibility(visibility)
-        if (visibility == View.GONE) {
+        if (visibility == GONE) {
             isSurfaceSet = false
             (playbackManager?.player as? SimplePlayer)?.setDisplay(null)
         }
@@ -63,6 +64,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
     }
 
+    @UnstableApi
     override fun videoSizeChanged(width: Int, height: Int, pixelWidthHeightRatio: Float) {
         val videoAspectRatio = if (height == 0 || width == 0) 1f else width * pixelWidthHeightRatio / height
         aspectRatioLayout.setAspectRatio(videoAspectRatio)

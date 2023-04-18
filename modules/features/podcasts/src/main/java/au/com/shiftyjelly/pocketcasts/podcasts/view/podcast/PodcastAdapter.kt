@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -26,15 +27,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -89,7 +94,7 @@ class PodcastAdapter(
     val settings: Settings,
     val theme: Theme,
     var fromListUuid: String?,
-    private val onHeaderSummaryToggled: (Boolean) -> Unit,
+    private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
     private val onEpisodesOptionsClicked: () -> Unit,
@@ -103,7 +108,8 @@ class PodcastAdapter(
     private val onSearchFocus: () -> Unit,
     private val onShowArchivedClicked: () -> Unit,
     private val multiSelectHelper: MultiSelectHelper,
-    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit
+    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit,
+    private val ratingsViewModel: PodcastRatingsViewModel,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -169,6 +175,12 @@ class PodcastAdapter(
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
         holder.binding.isPlusUser = signedInAsPlus
+
+        holder.binding.bottom.ratings.setContent {
+            AppTheme(theme.activeTheme) {
+                StarRatingView(ratingsViewModel)
+            }
+        }
 
         val context = holder.itemView.context
         val imageLoader = PodcastImageLoaderThemed(context)
@@ -264,6 +276,11 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
+            if (BuildConfig.SHOW_RATINGS) {
+                ratingsViewModel.loadRatings(podcast.uuid)
+                ratingsViewModel.refreshPodcastRatings(podcast.uuid)
+            }
+            onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
         notifyDataSetChanged()
@@ -374,7 +391,7 @@ class PodcastAdapter(
         val expanded = binding.bottom.root.toggleVisibility()
         binding.top.chevron.isEnabled = expanded
         headerExpanded = expanded
-        onHeaderSummaryToggled(expanded)
+        onHeaderSummaryToggled(expanded, true)
     }
 
     private fun onWebsiteLinkClicked(context: Context) {
@@ -451,6 +468,9 @@ class PodcastAdapter(
             binding.bottom.linkText.setOnClickListener {
                 adapter.onWebsiteLinkClicked(it.context)
             }
+            binding.bottom.ratings.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
         }
 
         private fun unsubscribe() {

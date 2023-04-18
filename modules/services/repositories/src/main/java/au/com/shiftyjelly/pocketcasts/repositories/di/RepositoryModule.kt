@@ -28,6 +28,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -133,4 +135,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun provideAccountStatusInfo(syncManager: SyncManager): AccountStatusInfo
+
+    @Binds
+    @Singleton
+    abstract fun provideRatingsManager(ratingsManagerImpl: RatingsManagerImpl): RatingsManager
 }
