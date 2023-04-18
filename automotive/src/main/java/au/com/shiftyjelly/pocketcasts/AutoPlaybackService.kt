@@ -24,9 +24,17 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playback.MEDIA_ID_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PODCASTS_ROOT
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
@@ -36,11 +44,9 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -70,11 +76,32 @@ open class AutoPlaybackService : PlaybackService() {
     }
 
     // TODO: Set on media session
-    class AutoMediaLibrarySessionCallback @Inject constructor(
-        private val serviceScope: CoroutineScope,
-        @ApplicationContext private val context: Context,
-    ) : CustomMediaLibrarySessionCallback(serviceScope, context) {
-        @Inject lateinit var listSource: ListRepository
+    class AutoMediaLibrarySessionCallback constructor(
+        context: Context,
+        episodeManager: EpisodeManager,
+        folderManager: FolderManager,
+        private val listRepository: ListRepository,
+        playbackManager: PlaybackManager,
+        playlistManager: PlaylistManager,
+        podcastManager: PodcastManager,
+        serverManager: ServerManager,
+        serviceScope: CoroutineScope,
+        settings: Settings,
+        subscriptionManager: SubscriptionManager,
+        userEpisodeManager: UserEpisodeManager,
+    ) : CustomMediaLibrarySessionCallback(
+        context = context,
+        episodeManager = episodeManager,
+        folderManager = folderManager,
+        playbackManager = playbackManager,
+        playlistManager = playlistManager,
+        podcastManager = podcastManager,
+        serverManager = serverManager,
+        serviceScope = serviceScope,
+        settings = settings,
+        subscriptionManager = subscriptionManager,
+        userEpisodeManager = userEpisodeManager,
+    ) {
         override fun onSubscribe(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
@@ -165,7 +192,7 @@ open class AutoPlaybackService : PlaybackService() {
             Log.d(Settings.LOG_TAG_AUTO, "Loading discover root")
             val discoverFeed: Discover
             try {
-                discoverFeed = listSource.getDiscoverFeedSuspend()
+                discoverFeed = listRepository.getDiscoverFeedSuspend()
             } catch (e: Exception) {
                 Log.e(Settings.LOG_TAG_AUTO, "Error loading discover", e)
                 return emptyList()
@@ -181,7 +208,7 @@ open class AutoPlaybackService : PlaybackService() {
                 .filter { it.type is ListType.PodcastList && it.displayStyle !is DisplayStyle.CollectionList && !it.sponsored && it.displayStyle !is DisplayStyle.SinglePodcast }
                 .map { discoverItem ->
                     Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
-                    val listFeed = listSource.getListFeedSuspend(discoverItem.source)
+                    val listFeed = listRepository.getListFeedSuspend(discoverItem.source)
                     Pair(discoverItem.title, listFeed.podcasts?.take(6) ?: emptyList())
                 }
                 .flatMap { (title, podcasts) ->

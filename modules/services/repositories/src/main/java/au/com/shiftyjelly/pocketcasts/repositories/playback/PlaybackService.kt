@@ -50,7 +50,6 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
@@ -102,7 +101,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var notificationHelper: NotificationHelper
-    @Inject lateinit var librarySessionCallback: CustomMediaLibrarySessionCallback
+    @Inject lateinit var librarySessionCallback: MediaLibrarySession.Callback
 
     private lateinit var mediaLibrarySession: MediaLibrarySession
     private lateinit var player: ExoPlayer
@@ -379,19 +378,19 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
         }
     }*/
 
-    open class CustomMediaLibrarySessionCallback @Inject constructor(
-        private val serviceScope: CoroutineScope,
-        @ApplicationContext private val context: Context,
+    open class CustomMediaLibrarySessionCallback constructor(
+        protected val context: Context,
+        protected val episodeManager: EpisodeManager,
+        protected val folderManager: FolderManager,
+        protected val playbackManager: PlaybackManager,
+        protected val playlistManager: PlaylistManager,
+        protected val podcastManager: PodcastManager,
+        protected val serverManager: ServerManager,
+        protected val serviceScope: CoroutineScope,
+        protected val settings: Settings,
+        protected val subscriptionManager: SubscriptionManager,
+        protected val userEpisodeManager: UserEpisodeManager,
     ) : MediaLibrarySession.Callback {
-        @Inject lateinit var podcastManager: PodcastManager
-        @Inject lateinit var episodeManager: EpisodeManager
-        @Inject lateinit var folderManager: FolderManager
-        @Inject lateinit var userEpisodeManager: UserEpisodeManager
-        @Inject lateinit var playlistManager: PlaylistManager
-        @Inject lateinit var playbackManager: PlaybackManager
-        @Inject lateinit var settings: Settings
-        @Inject lateinit var serverManager: ServerManager
-        @Inject lateinit var subscriptionManager: SubscriptionManager
 
         override fun onSubscribe(
             session: MediaLibrarySession,

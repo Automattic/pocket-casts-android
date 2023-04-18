@@ -1,17 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.repositories.di
 
 import android.app.Service
-import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.session.MediaLibraryService
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService.CustomMediaLibrarySessionCallback
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,12 +31,4 @@ object PlaybackServiceModule {
             })
         }
     }
-
-    @ServiceScoped
-    @Provides
-    fun librarySessionCallback(
-        serviceCoroutineScope: CoroutineScope,
-        @ApplicationContext context: Context,
-    ): MediaLibraryService.MediaLibrarySession.Callback =
-        CustomMediaLibrarySessionCallback(serviceCoroutineScope, context)
 }
