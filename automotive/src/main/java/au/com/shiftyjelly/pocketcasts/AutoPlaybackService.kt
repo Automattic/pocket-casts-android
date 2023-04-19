@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -24,17 +23,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playback.MEDIA_ID_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PODCASTS_ROOT
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
-import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.model.Discover
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
@@ -44,9 +35,9 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -61,6 +52,10 @@ const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 @SuppressLint("LogNotTimber")
 @AndroidEntryPoint
 open class AutoPlaybackService : PlaybackService() {
+    @Inject lateinit var listRepository: ListRepository
+    override var librarySessionCallback: MediaLibrarySession.Callback =
+        AutoMediaLibrarySessionCallback()
+
     override fun onCreate() {
         super.onCreate()
         RefreshPodcastsTask.runNow(this)
@@ -75,39 +70,14 @@ open class AutoPlaybackService : PlaybackService() {
         playbackManager.pause(transientLoss = false, playbackSource = AnalyticsSource.AUTO_PAUSE)
     }
 
-    class AutoMediaLibrarySessionCallback constructor(
-        context: Context,
-        episodeManager: EpisodeManager,
-        folderManager: FolderManager,
-        private val listRepository: ListRepository,
-        playbackManager: PlaybackManager,
-        playlistManager: PlaylistManager,
-        podcastManager: PodcastManager,
-        serverManager: ServerManager,
-        serviceScope: CoroutineScope,
-        settings: Settings,
-        subscriptionManager: SubscriptionManager,
-        userEpisodeManager: UserEpisodeManager,
-    ) : CustomMediaLibrarySessionCallback(
-        context = context,
-        episodeManager = episodeManager,
-        folderManager = folderManager,
-        playbackManager = playbackManager,
-        playlistManager = playlistManager,
-        podcastManager = podcastManager,
-        serverManager = serverManager,
-        serviceScope = serviceScope,
-        settings = settings,
-        subscriptionManager = subscriptionManager,
-        userEpisodeManager = userEpisodeManager,
-    ) {
+    inner class AutoMediaLibrarySessionCallback : CustomMediaLibrarySessionCallback() {
         override fun onSubscribe(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             parentId: String,
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<Void>> {
-            serviceScope.launch {
+            launch {
                 val items = mediaItems(parentId)
                 session.notifyChildrenChanged(browser, parentId, items.size, params)
             }
@@ -124,7 +94,7 @@ open class AutoPlaybackService : PlaybackService() {
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
             var items: List<MediaItem>
-            return serviceScope.future {
+            return future {
                 try {
                     items = mediaItems(parentId)
                     Log.d(Settings.LOG_TAG_AUTO, "onGetChildren. Sending results $parentId")
@@ -179,7 +149,7 @@ open class AutoPlaybackService : PlaybackService() {
                 Log.d(Settings.LOG_TAG_AUTO, "Filters ${it.title}")
 
                 try {
-                    AutoConverter.convertPlaylistToMediaItem(context, it)
+                    AutoConverter.convertPlaylistToMediaItem(this@AutoPlaybackService, it)
                 } catch (e: Exception) {
                     Log.e(Settings.LOG_TAG_AUTO, "Filter ${it.title} load failed", e)
                     null
@@ -203,7 +173,7 @@ open class AutoPlaybackService : PlaybackService() {
                 discoverFeed.regionNameToken to region.name
             )
 
-            val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, context.resources)
+            val updatedList = discoverFeed.layout.transformWithRegion(region, replacements, this@AutoPlaybackService.resources)
                 .filter { it.type is ListType.PodcastList && it.displayStyle !is DisplayStyle.CollectionList && !it.sponsored && it.displayStyle !is DisplayStyle.SinglePodcast }
                 .map { discoverItem ->
                     Log.d(Settings.LOG_TAG_AUTO, "Loading discover feed ${discoverItem.source}")
@@ -212,13 +182,13 @@ open class AutoPlaybackService : PlaybackService() {
                 }
                 .flatMap { (title, podcasts) ->
                     Log.d(Settings.LOG_TAG_AUTO, "Mapping $title to media item")
-                    val groupTitle = title.tryToLocalise(context.resources)
+                    val groupTitle = title.tryToLocalise(this@AutoPlaybackService.resources)
                     podcasts.map {
                         val extras = Bundle()
                         extras.putString(EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT, groupTitle)
 
                         val artworkUri = PodcastImage.getArtworkUrl(size = 480, uuid = it.uuid)
-                        val localUri = AutoConverter.getArtworkUriForContentProvider(Uri.parse(artworkUri), context)
+                        val localUri = AutoConverter.getArtworkUriForContentProvider(Uri.parse(artworkUri), this@AutoPlaybackService)
 
                         val discoverDescription = MediaMetadata.Builder()
                             .setTitle(it.title)
@@ -252,9 +222,9 @@ open class AutoPlaybackService : PlaybackService() {
 
         private fun buildListMediaItem(id: String, @StringRes title: Int, @DrawableRes drawable: Int, extras: Bundle? = null): MediaItem {
             val description = MediaMetadata.Builder()
-                .setTitle(context.getString(title))
+                .setTitle(this@AutoPlaybackService.getString(title))
                 .setExtras(extras)
-                .setArtworkUri(AutoConverter.getBitmapUri(drawable = drawable, context))
+                .setArtworkUri(AutoConverter.getBitmapUri(drawable = drawable, this@AutoPlaybackService))
                 .setIsBrowsable(true)
                 .setIsPlayable(false)
                 .build()

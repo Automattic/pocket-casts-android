@@ -19,6 +19,7 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.LibraryResult
+import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
@@ -94,19 +95,27 @@ const val CONTENT_STYLE_LIST_ITEM_HINT_VALUE = 1
 const val CONTENT_STYLE_GRID_ITEM_HINT_VALUE = 2
 
 private const val EPISODE_LIMIT = 100
+private const val NUM_SUGGESTED_ITEMS = 8
 
 @UnstableApi
 @AndroidEntryPoint
-open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
+open class PlaybackService : MediaLibraryService(), CoroutineScope {
     inner class LocalBinder : Binder() {
         val service: PlaybackService
             get() = this@PlaybackService
     }
 
-    @Inject lateinit var playbackManager: PlaybackManager
-    @Inject lateinit var settings: Settings
+    @Inject lateinit var episodeManager: EpisodeManager
+    @Inject lateinit var folderManager: FolderManager
     @Inject lateinit var notificationHelper: NotificationHelper
-    @Inject lateinit var librarySessionCallback: MediaLibrarySession.Callback
+    @Inject lateinit var playbackManager: PlaybackManager
+    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var serverManager: ServerManager
+    @Inject lateinit var subscriptionManager: SubscriptionManager
+    @Inject lateinit var settings: Settings
+    @Inject lateinit var userEpisodeManager: UserEpisodeManager
+    open var librarySessionCallback: MediaLibrarySession.Callback = CustomMediaLibrarySessionCallback()
 
     private lateinit var mediaLibrarySession: MediaLibrarySession
     private lateinit var player: ExoPlayer
@@ -345,19 +354,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
         mediaControllerCallback?.onPlaybackStateChanged(playbackStateCompat)
     }
 
-    open class CustomMediaLibrarySessionCallback constructor(
-        protected val context: Context,
-        protected val episodeManager: EpisodeManager,
-        protected val folderManager: FolderManager,
-        protected val playbackManager: PlaybackManager,
-        protected val playlistManager: PlaylistManager,
-        protected val podcastManager: PodcastManager,
-        protected val serverManager: ServerManager,
-        protected val serviceScope: CoroutineScope,
-        protected val settings: Settings,
-        protected val subscriptionManager: SubscriptionManager,
-        protected val userEpisodeManager: UserEpisodeManager,
-    ) : MediaLibrarySession.Callback {
+    open inner class CustomMediaLibrarySessionCallback : MediaLibrarySession.Callback {
 
         override fun onSubscribe(
             session: MediaLibrarySession,
@@ -365,7 +362,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             parentId: String,
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<Void>> {
-            serviceScope.launch {
+            launch {
                 val items = mediaItems(parentId)
                 session.notifyChildrenChanged(browser, parentId, items.size, params)
             }
@@ -379,14 +376,14 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<MediaItem>> {
             // To ensure you are not allowing any arbitrary app to browse your app's contents, check the origin
-            if (!PackageValidator(context, LR.xml.allowed_media_browser_callers).isKnownCaller(
+            if (!PackageValidator(this@PlaybackService, LR.xml.allowed_media_browser_callers).isKnownCaller(
                     browser.packageName,
                     browser.uid
                 ) && !BuildConfig.DEBUG
             ) {
                 // If the request comes from an untrusted package, return null
                 Timber.e("Unknown caller trying to connect to media service ${browser.packageName} ${browser.uid}")
-                return serviceScope.future {
+                return future {
                     LibraryResult.ofError(
                         LibraryResult.RESULT_ERROR_PERMISSION_DENIED,
                         params
@@ -447,7 +444,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo,
             mediaItems: MutableList<MediaItem>,
-        ) = serviceScope.future {
+        ) = future {
             /* See https://github.com/androidx/media/issues/8
                When MediaItems are set on a controller, the localConfiguration (uri, mimeType etc) of MediaItem is removed for security/privacy reasons.
                Without localConfiguration the player can't play the media item. We need to add the missing information back to the MediaItem. */
@@ -457,7 +454,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                 episodeManager.findByUuid(playableId)?.let { episode ->
                     val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid)
                     podcast?.let {
-                        AutoConverter.convertEpisodeToMediaItem(context, episode, podcast)
+                        AutoConverter.convertEpisodeToMediaItem(this@PlaybackService, episode, podcast)
                     }
                 } ?: item
             }
@@ -472,7 +469,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
             var items: List<MediaItem>
-            return serviceScope.future {
+            return future {
                 items = mediaItems(parentId)
                 LibraryResult.ofItemList(items, params)
             }
@@ -484,7 +481,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             query: String,
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<Void>> {
-            serviceScope.launch {
+            launch {
                 val results = podcastSearch(query)
                 session.notifySearchResultChanged(browser, query, results?.size ?: 0, params)
             }
@@ -524,7 +521,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                 val parentPodcast =
                     (if (playable is Episode) podcastManager.findPodcastByUuid(playable.podcastUuid) else filesPodcast)
                         ?: return@mapNotNull null
-                AutoConverter.convertEpisodeToMediaItem(context, playable, parentPodcast)
+                AutoConverter.convertEpisodeToMediaItem(this@PlaybackService, playable, parentPodcast)
             }
 
             if (mediaUpNext.size == NUM_SUGGESTED_ITEMS) {
@@ -561,7 +558,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                     ?: return arrayListOf()
 
             Timber.d("Recent item ${upNext.title}")
-            return arrayListOf(AutoConverter.convertEpisodeToMediaItem(context, upNext, parentPodcast))
+            return arrayListOf(AutoConverter.convertEpisodeToMediaItem(this@PlaybackService, upNext, parentPodcast))
         }
 
         open suspend fun loadRootChildren(): List<MediaItem> {
@@ -570,7 +567,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             // podcasts
             val podcastsDescriptionMetadata = MediaMetadata.Builder()
                 .setTitle("Podcasts")
-                .setArtworkUri(AutoConverter.getPodcastsBitmapUri(context))
+                .setArtworkUri(AutoConverter.getPodcastsBitmapUri(this@PlaybackService))
                 .setIsBrowsable(true)
                 .build()
 
@@ -585,7 +582,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             for (playlist in playlistManager.findAll().filterNot { it.manual }) {
                 if (playlist.title.equals("video", ignoreCase = true)) continue
 
-                val playlistItem = AutoConverter.convertPlaylistToMediaItem(context, playlist)
+                val playlistItem = AutoConverter.convertPlaylistToMediaItem(this@PlaybackService, playlist)
                 rootItems.add(playlistItem)
             }
 
@@ -593,7 +590,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             val downloadsMetadata = MediaMetadata.Builder()
                 .setTitle("Downloads")
                 .setIsBrowsable(true)
-                .setArtworkUri(AutoConverter.getDownloadsBitmapUri(context))
+                .setArtworkUri(AutoConverter.getDownloadsBitmapUri(this@PlaybackService))
                 .build()
 
             val downloadsItem = MediaItem.Builder()
@@ -605,7 +602,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             // files
             val filesMetadata = MediaMetadata.Builder()
                 .setTitle("Files")
-                .setArtworkUri(AutoConverter.getFilesBitmapUri(context))
+                .setArtworkUri(AutoConverter.getFilesBitmapUri(this@PlaybackService))
                 .setIsBrowsable(true)
                 .build()
 
@@ -622,16 +619,16 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
                 folderManager.getHomeFolder().mapNotNull { item ->
                     when (item) {
-                        is FolderItem.Folder -> convertFolderToMediaItem(context, item.folder)
+                        is FolderItem.Folder -> convertFolderToMediaItem(this@PlaybackService, item.folder)
                         is FolderItem.Podcast -> convertPodcastToMediaItem(
                             podcast = item.podcast,
-                            context = context
+                            context = this@PlaybackService
                         )
                     }
                 }
             } else {
                 podcastManager.findSubscribedSorted().mapNotNull { podcast ->
-                    convertPodcastToMediaItem(podcast = podcast, context = context)
+                    convertPodcastToMediaItem(podcast = podcast, context = this@PlaybackService)
                 }
             }
         }
@@ -639,7 +636,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
         suspend fun loadFolderPodcastsChildren(folderUuid: String): List<MediaItem> {
             return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
                 folderManager.findFolderPodcastsSorted(folderUuid).mapNotNull { podcast ->
-                    convertPodcastToMediaItem(podcast = podcast, context = context)
+                    convertPodcastToMediaItem(podcast = podcast, context = this@PlaybackService)
                 }
             } else {
                 emptyList()
@@ -669,7 +666,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                             ?.let { parentPodcast ->
                                 episodeItems.add(
                                     AutoConverter.convertEpisodeToMediaItem(
-                                        context,
+                                        this@PlaybackService,
                                         episode,
                                         parentPodcast,
                                         sourceId = playlist.uuid
@@ -696,7 +693,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                     episodes.forEach { episode ->
                         episodeItems.add(
                             AutoConverter.convertEpisodeToMediaItem(
-                                context,
+                                this@PlaybackService,
                                 episode,
                                 podcast,
                                 groupTrailers = !podcast.isSubscribed
@@ -716,7 +713,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                     title = UserEpisodePodcastSubstitute.substituteTitle,
                     thumbnailUrl = it.artworkUrl
                 )
-                AutoConverter.convertEpisodeToMediaItem(context, it, podcast)
+                AutoConverter.convertEpisodeToMediaItem(this@PlaybackService, it, podcast)
             }
         }
 
@@ -724,7 +721,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
                 podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
                     AutoConverter.convertEpisodeToMediaItem(
-                        context = context,
+                        context = this@PlaybackService,
                         episode = episode,
                         parentPodcast = podcast
                     )
@@ -737,7 +734,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                 .mapNotNull { episode ->
                     podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { podcast ->
                         AutoConverter.convertEpisodeToMediaItem(
-                            context = context,
+                            context = this@PlaybackService,
                             episode = episode,
                             parentPodcast = podcast
                         )
@@ -769,7 +766,7 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                 } else {
                     serverManager.searchForPodcastsSuspend(
                         searchTerm = term,
-                        resources = context.resources
+                        resources = this@PlaybackService.resources
                     ).searchResults
                 }
             } catch (ex: Exception) {
@@ -785,14 +782,10 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             // convert podcasts to the media browser format
             return podcasts.mapNotNull { podcast ->
                 convertPodcastToMediaItem(
-                    context = context,
+                    context = this@PlaybackService,
                     podcast = podcast
                 )
             }
-        }
-
-        companion object {
-            private const val NUM_SUGGESTED_ITEMS = 8
         }
     }
 }
