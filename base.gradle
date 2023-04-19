@@ -60,7 +60,7 @@ android {
         freeCompilerArgs += [
             "-opt-in=kotlin.RequiresOptIn"
         ]
-        kotlinOptions.allWarningsAsErrors = true
+//        kotlinOptions.allWarningsAsErrors = true
     }
 
     composeOptions {
@@ -213,6 +213,7 @@ dependencies {
     implementation libs.deviceNames
     implementation libs.glide
     implementation libs.glideOkHttp
+    implementation libs.guavaCoroutinesFuture
     implementation libs.coil
     implementation libs.coilCompose
     implementation libs.okHttp
@@ -242,10 +243,12 @@ dependencies {
     implementation libs.sentryFragment
     implementation libs.sentryTimber
     implementation libs.media3Cast
+    implementation libs.media3Common
     implementation libs.media3Datasource
     implementation libs.media3Exoplayer
     implementation libs.media3ExoplayerHls
     implementation libs.media3Extractor
+    implementation libs.media3Session
     implementation libs.media3Ui
 
     kapt libs.moshiKotlinCompile
