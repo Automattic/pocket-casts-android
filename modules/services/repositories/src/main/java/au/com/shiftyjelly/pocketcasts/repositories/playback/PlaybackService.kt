@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -340,44 +341,6 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
         mediaControllerCallback?.onPlaybackStateChanged(playbackStateCompat)
     }
 
-    /*override fun onGetRoot(clientPackageName: String, clientUid: Int, bundle: Bundle?): BrowserRoot? {
-        val extras = Bundle()
-
-        Timber.d("onGetRoot() $clientPackageName ${bundle?.keySet()?.toList()}")
-        // tell Android Auto we support media search
-        extras.putBoolean(MEDIA_SEARCH_SUPPORTED, true)
-
-        // tell Android Auto we support grids and lists and that browsable things should be grids, the rest lists
-        extras.putBoolean(CONTENT_STYLE_SUPPORTED, true)
-        extras.putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID_ITEM_HINT_VALUE)
-        extras.putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
-
-        // To ensure you are not allowing any arbitrary app to browse your app's contents, check the origin
-        if (!PackageValidator(this, LR.xml.allowed_media_browser_callers).isKnownCaller(clientPackageName, clientUid) && !BuildConfig.DEBUG) {
-            // If the request comes from an untrusted package, return null
-            Timber.e("Unknown caller trying to connect to media service $clientPackageName $clientUid")
-            return null
-        }
-
-        if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to media session") // Log things like Android Auto or Assistant connecting
-        }
-
-        return if (browserRootHints?.getBoolean(BrowserRoot.EXTRA_RECENT) == true) { // Browser root hints is nullable even though it's not declared as such, come on Google
-            Timber.d("Browser root hint for recent items")
-            if (playbackManager.getCurrentEpisode() != null) {
-                BrowserRoot(RECENT_ROOT, extras)
-            } else {
-                null
-            }
-        } else if (browserRootHints?.getBoolean(BrowserRoot.EXTRA_SUGGESTED) == true) {
-            Timber.d("Browser root hint for suggested items")
-            BrowserRoot(SUGGESTED_ROOT, extras)
-        } else {
-            BrowserRoot(MEDIA_ID_ROOT, extras)
-        }
-    }*/
-
     open class CustomMediaLibrarySessionCallback constructor(
         protected val context: Context,
         protected val episodeManager: EpisodeManager,
@@ -404,6 +367,95 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             }
 
             return Futures.immediateFuture(LibraryResult.ofVoid())
+        }
+
+        override fun onGetLibraryRoot(
+            session: MediaLibrarySession,
+            browser: MediaSession.ControllerInfo,
+            params: LibraryParams?,
+        ): ListenableFuture<LibraryResult<MediaItem>> {
+
+            Timber.i("TEST123, onGetLibraryRoot")
+
+            /*
+            // To ensure you are not allowing any arbitrary app to browse your app's contents, check the origin
+            if (!PackageValidator(context, LR.xml.allowed_media_browser_callers).isKnownCaller(clientPackageName, clientUid) && !BuildConfig.DEBUG) {
+                // If the request comes from an untrusted package, return null
+                Timber.e("Unknown caller trying to connect to media service $clientPackageName $clientUid")
+                return null
+            }
+
+            if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
+                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to media session") // Log things like Android Auto or Assistant connecting
+            }
+
+            return if (browser.connectionHints.getBoolean(BrowserRoot.EXTRA_RECENT) == true) { // Browser root hints is nullable even though it's not declared as such, come on Google
+                Timber.d("Browser root hint for recent items")
+                if (playbackManager.getCurrentEpisode() != null) {
+                    BrowserRoot(RECENT_ROOT, extras)
+                } else {
+                    null
+                }
+            } else if (browserRootHints?.getBoolean(BrowserRoot.EXTRA_SUGGESTED) == true) {
+                Timber.d("Browser root hint for suggested items")
+                BrowserRoot(SUGGESTED_ROOT, extras)
+            } else {
+                BrowserRoot(MEDIA_ID_ROOT, extras)
+            }
+
+
+            return serviceScope.future {
+                val bundle = Bundle().apply {
+                    // FIXME still lots to fill in here with the bundle from the old onGetRoot method
+
+                    Timber.d("onGetRoot() $clientPackageName ${bundle?.keySet()?.toList()}")
+                    // tell Android Auto we support media search
+                    putBoolean(MEDIA_SEARCH_SUPPORTED, true)
+
+                    // tell Android Auto we support grids and lists and that browsable things should be grids, the rest lists
+                    putBoolean(CONTENT_STYLE_SUPPORTED, true)
+                    putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID_ITEM_HINT_VALUE)
+                    putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
+                }
+
+
+                LibraryResult.ofItem(
+                    MediaItem.Builder()
+                        .setMediaId(MEDIA_ID_ROOT)
+                        .build(),
+                    LibraryParams.Builder()
+                        .setExtras(bundle)
+                        .build()
+                )
+            }
+            */
+
+            val bundle = Bundle().apply {
+                // tell Android Auto we support media search
+                putBoolean(MEDIA_SEARCH_SUPPORTED, true)
+
+                // tell Android Auto we support grids and lists and that browsable things should be grids, the rest lists
+                putBoolean(CONTENT_STYLE_SUPPORTED, true)
+                putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID_ITEM_HINT_VALUE)
+                putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
+            }
+
+            val libraryResult = LibraryResult.ofItem(
+                MediaItem.Builder()
+                    .setMediaId(MEDIA_ID_ROOT)
+                    .setMediaMetadata(
+                        MediaMetadata.Builder()
+                            .setIsBrowsable(false) // both true and false seem to work here, but not setting it doesn't
+                            .setIsPlayable(false)
+                            .build()
+                    )
+                    .build(),
+                LibraryParams.Builder()
+                    .setExtras(bundle)
+                    .build()
+            )
+
+            return Futures.immediateFuture(libraryResult)
         }
 
         override fun onGetChildren(

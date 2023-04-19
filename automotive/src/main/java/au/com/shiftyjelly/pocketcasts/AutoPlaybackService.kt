@@ -140,7 +140,6 @@ open class AutoPlaybackService : PlaybackService() {
         }
 
         private suspend fun mediaItems(parentId: String) = when (parentId) {
-            "androidx.media3.session.MediaLibraryService", // FIXME
             MEDIA_ID_ROOT -> loadRootChildren()
             PODCASTS_ROOT -> loadPodcastsChildren()
             FILTERS_ROOT -> loadFiltersRoot()
