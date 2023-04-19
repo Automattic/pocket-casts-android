@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertFolderToMediaItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertPodcastToMediaItem
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -440,6 +441,26 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             } ?: LibraryResult.ofError(LibraryResult.RESULT_ERROR_INVALID_STATE, params)
 
             return Futures.immediateFuture(libraryResult)
+        }
+
+        override fun onAddMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: MutableList<MediaItem>,
+        ) = serviceScope.future {
+            /* See https://github.com/androidx/media/issues/8
+               When MediaItems are set on a controller, the localConfiguration (uri, mimeType etc) of MediaItem is removed for security/privacy reasons.
+               Without localConfiguration the player can't play the media item. We need to add the missing information back to the MediaItem. */
+            mediaItems.map { item ->
+                val autoMediaId = AutoMediaId.fromMediaId(item.mediaId)
+                val playableId = autoMediaId.playableId
+                episodeManager.findByUuid(playableId)?.let { episode ->
+                    val podcast = podcastManager.findPodcastByUuid(episode.podcastUuid)
+                    podcast?.let {
+                        AutoConverter.convertEpisodeToMediaItem(context, episode, podcast)
+                    }
+                } ?: item
+            }
         }
 
         override fun onGetChildren(
