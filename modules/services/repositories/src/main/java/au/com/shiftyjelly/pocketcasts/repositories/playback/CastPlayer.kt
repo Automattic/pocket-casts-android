@@ -26,7 +26,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 
-class CastPlayer(val context: Context, override val onPlayerEvent: (Player, PlayerEvent) -> Unit) : Player {
+class CastPlayer(val context: Context, override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit) : PocketCastsPlayer {
 
     private var customData: JSONObject? = null
     private var podcast: Podcast? = null

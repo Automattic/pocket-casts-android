@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 /**
  * Manages audio focus with local media player.
  */
-abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> Unit) : Player {
+abstract class LocalPlayer(override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit) : PocketCastsPlayer {
 
     companion object {
         // The volume we set the media player to seekToTimeMswhen we lose audio focus, but are allowed to reduce the volume instead of stopping playback.
