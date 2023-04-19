@@ -16,6 +16,7 @@ class AdvancedSettingsTest {
         val fileName = "FILE_NAME"
 
         val sharedPreferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
+        sharedPreferences.edit().clear().commit()
         val moshi = Moshi.Builder().build()
         val settings = SettingsImpl(sharedPreferences, sharedPreferences, context, moshi)
 
