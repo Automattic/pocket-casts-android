@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
-import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -12,7 +11,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class AdvancedSettingsViewModel
@@ -24,24 +22,20 @@ class AdvancedSettingsViewModel
     private val mutableState = MutableStateFlow(initState())
     val state: StateFlow<State> = mutableState
 
-    private val backgroundRefreshSummary: Int
-        get() = if (settings.syncOnMeteredNetwork()) {
-            LR.string.settings_advanced_sync_on_metered_on
-        } else {
-            LR.string.settings_advanced_sync_on_metered_off
-        }
-
     private fun initState() = State(
-        refreshPodcastsAutomatically = settings.refreshPodcastsAutomatically(),
         backgroundSyncOnMeteredState = State.BackgroundSyncOnMeteredState(
-            summary = backgroundRefreshSummary,
             isChecked = settings.syncOnMeteredNetwork(),
+            isEnabled = settings.refreshPodcastsAutomatically(),
             onCheckedChange = {
-                onSyncOnMeteredCheckedChange(it)
-                analyticsTracker.track(
-                    AnalyticsEvent.SETTINGS_ADVANCED_SYNC_ON_METERED,
-                    mapOf("enabled" to it)
-                )
+                // isEnabled controls the grey out of the function but not if it's actually called
+                // here we disable the functionality
+                if (settings.refreshPodcastsAutomatically()) {
+                    onSyncOnMeteredCheckedChange(it)
+                    analyticsTracker.track(
+                        AnalyticsEvent.SETTINGS_ADVANCED_SYNC_ON_METERED,
+                        mapOf("enabled" to it)
+                    )
+                }
             }
         )
     )
@@ -57,8 +51,7 @@ class AdvancedSettingsViewModel
     private fun updateSyncOnMeteredState() {
         mutableState.value = mutableState.value.copy(
             backgroundSyncOnMeteredState = mutableState.value.backgroundSyncOnMeteredState.copy(
-                isChecked = settings.syncOnMeteredNetwork(),
-                summary = backgroundRefreshSummary
+                isChecked = settings.syncOnMeteredNetwork()
             )
         )
     }
@@ -68,13 +61,12 @@ class AdvancedSettingsViewModel
     }
 
     data class State(
-        val refreshPodcastsAutomatically: Boolean,
         val backgroundSyncOnMeteredState: BackgroundSyncOnMeteredState
     ) {
 
         data class BackgroundSyncOnMeteredState(
-            @StringRes val summary: Int,
             val isChecked: Boolean = true,
+            val isEnabled: Boolean = true,
             val onCheckedChange: (Boolean) -> Unit,
         )
     }

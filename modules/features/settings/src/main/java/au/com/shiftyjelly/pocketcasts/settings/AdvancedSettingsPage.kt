@@ -35,7 +35,6 @@ fun AdvancedSettingsPage(
     AdvancedSettingsView(
         state = state,
         onBackPressed = onBackPressed,
-        automaticRefreshEnabled = state.refreshPodcastsAutomatically,
         modifier = modifier
     )
 
@@ -48,7 +47,6 @@ fun AdvancedSettingsPage(
 fun AdvancedSettingsView(
     state: AdvancedSettingsViewModel.State,
     onBackPressed: () -> Unit,
-    automaticRefreshEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column {
@@ -64,11 +62,7 @@ fun AdvancedSettingsView(
                 .verticalScroll(rememberScrollState())
         ) {
             SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
-                if (automaticRefreshEnabled) { SyncOnMeteredRow(state.backgroundSyncOnMeteredState) } else {
-                    SettingRow(
-                        primaryText = stringResource(LR.string.settings_advanced_no_options)
-                    )
-                }
+                SyncOnMeteredRow(state.backgroundSyncOnMeteredState)
             }
         }
     }
@@ -81,13 +75,13 @@ private fun SyncOnMeteredRow(
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_advanced_sync_on_metered),
-        secondaryText = stringResource(state.summary),
-        toggle = SettingRowToggle.Switch(state.isChecked),
+        toggle = SettingRowToggle.Switch(state.isChecked, state.isEnabled),
         modifier = modifier.toggleable(
             value = state.isChecked,
             role = Role.Switch
         ) { state.onCheckedChange(it) }
     )
+    SettingRow(primaryText = "", secondaryText = stringResource(LR.string.settings_advanced_sync_on_metered_summary))
 }
 
 @Preview(showBackground = true)
@@ -98,15 +92,13 @@ private fun AdvancedSettingsPreview(
     AppThemeWithBackground(themeType) {
         AdvancedSettingsView(
             state = AdvancedSettingsViewModel.State(
-                refreshPodcastsAutomatically = true,
                 backgroundSyncOnMeteredState = AdvancedSettingsViewModel.State.BackgroundSyncOnMeteredState(
                     isChecked = true,
-                    summary = LR.string.settings_advanced_sync_on_metered_on,
+                    isEnabled = true,
                     onCheckedChange = {}
                 ),
             ),
-            onBackPressed = {},
-            automaticRefreshEnabled = true
+            onBackPressed = {}
         )
     }
 }

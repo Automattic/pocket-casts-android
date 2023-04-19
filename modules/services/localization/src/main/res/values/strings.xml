@@ -1302,11 +1302,8 @@
     <string name="settings_privacy_crash_link">Link your account to crashes</string>
     <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
 
-    <string name="settings_advanced_no_options">Enable background refresh to see advanced options</string>
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
-    <string name="settings_advanced_sync_on_metered_on">While on a metered network, synchronization will occur automatically in the background and when the application is opened.</string>
-    <string name="settings_advanced_sync_on_metered_off">While on a metered network, synchronization will only occur if performed manually.</string>
-
+    <string name="settings_advanced_sync_on_metered_summary">When enabled (default), synchronization will occur automatically in the background and when the application is opened.\n\nWhen disabled, synchronization will only occur if you manually refresh. Disable this setting if you prefer to avoid automatic playlist modifications and data usage while on mobile data.\n\nThis setting is only applicable when background refresh is turned on.</string>
     <string name="whats_new_folders_title_7_20" translatable="false">@string/folders</string>
     <string name="whats_new_folders_7_20">If you love podcasts half as much as we do, you probably have a lot of them. If you\'re a Pocket Casts Plus subscriber, you can now sort these into folders and file them into neat groups.\n\nThanks to your support, your Home Screen has never looked better!</string>
     <string name="whats_new_grid_title_7_20">Home Grid Syncing</string>
