@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.LiveData
@@ -26,7 +25,7 @@ import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener, Observer<RefreshState> {
+class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), Observer<RefreshState> {
 
     @Inject lateinit var settings: Settings
     @Inject lateinit var podcastManager: PodcastManager
@@ -81,6 +80,30 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedP
                 }
                 .toLiveData()
         refreshObservable?.observe(viewLifecycleOwner, this)
+
+        preferenceSkipForward?.setOnPreferenceChangeListener { _, newValue ->
+            val value = newValue.toString().toIntOrNull() ?: 0
+            if (value > 0) {
+                settings.setSkipForwardInSec(value)
+                settings.setSkipForwardNeedsSync(true)
+                changeSkipTitles()
+                true
+            } else {
+                false
+            }
+        }
+
+        preferenceSkipBackward?.setOnPreferenceChangeListener { _, newValue ->
+            val value = newValue.toString().toIntOrNull() ?: 0
+            if (value > 0) {
+                settings.setSkipBackwardInSec(value)
+                settings.setSkipBackNeedsSync(true)
+                changeSkipTitles()
+                true
+            } else {
+                false
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -108,32 +131,10 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat(), SharedP
         preferenceRefreshNow?.summary = status
     }
 
-    override fun onResume() {
-        super.onResume()
-        preferenceScreen.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        preferenceScreen.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
     private fun changeSkipTitles() {
         val skipForwardSummary = resources.getStringPluralSeconds(settings.getSkipForwardInSecs())
         preferenceSkipForward?.summary = skipForwardSummary
         val skipBackwardSummary = resources.getStringPluralSeconds(settings.getSkipBackwardInSecs())
         preferenceSkipBackward?.summary = skipBackwardSummary
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        if (Settings.PREFERENCE_SKIP_FORWARD == key || Settings.PREFERENCE_SKIP_BACKWARD == key) {
-            changeSkipTitles()
-            settings.updateSkipValues()
-
-            when (key) {
-                Settings.PREFERENCE_SKIP_FORWARD -> settings.setSkipForwardNeedsSync(true)
-                Settings.PREFERENCE_SKIP_BACKWARD -> settings.setSkipBackNeedsSync(true)
-            }
-        }
     }
 }

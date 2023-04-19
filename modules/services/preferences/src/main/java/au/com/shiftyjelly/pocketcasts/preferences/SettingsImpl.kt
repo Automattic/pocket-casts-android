@@ -208,11 +208,6 @@ class SettingsImpl @Inject constructor(
         setBoolean(Settings.PREFERENCE_SKIP_BACK_NEEDS_SYNC, value)
     }
 
-    override fun updateSkipValues() {
-        skipBackwardInSecsObservable.accept(getSkipBackwardInSecs())
-        skipForwardInSecsObservable.accept(getSkipForwardInSecs())
-    }
-
     override fun getMarketingOptIn(): Boolean {
         return getBoolean(Settings.PREFERENCE_MARKETING_OPT_IN, false)
     }
