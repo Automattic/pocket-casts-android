@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-23 09:54:05+0000
+Translation-Revision-Date: 2023-04-11 09:54:22+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="add_to_up_next_question">次のエピソードに追加しますか ?</string>
+    <string name="wear_show_password">パスワードを表示</string>
+    <string name="wear_hide_password">パスワードを隠す</string>
+    <string name="settings_metered_data_warning">従量制データの警告</string>
+    <string name="stream_warning_summary_short">ストリーミングではデータが消費されます。 続行しますか ?</string>
+    <string name="removed">削除</string>
+    <string name="mark_unplayed">未再生としてマーク</string>
+    <string name="log_out">ログアウト</string>
+    <string name="account">アカウント</string>
     <string name="profile_just_sign_out">ログアウトしました</string>
     <string name="profile_clear_data_would_you_also_like_question">アプリからすべてのデータも消去しますか ?</string>
     <string name="profile_clear_data_question">データを消去しますか ?</string>
@@ -143,6 +152,7 @@ Language: ja_JP
     <string name="onboarding_discover_your_next_favorite_podcast">次のお気に入りのポッドキャストを見つける</string>
     <string name="onboarding_continue_with_google">Google で続ける</string>
     <string name="onboarding_welcome_back">おかえりなさい</string>
+    <string name="log_in">ログイン</string>
     <string name="end_of_year_create_account_to_see">ポッドキャストをクラウドに保存して、年末レビューを取得し、他の端末と進捗を同期します。</string>
     <string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
     <string name="end_of_year_story_top_categories">トップカテゴリー</string>

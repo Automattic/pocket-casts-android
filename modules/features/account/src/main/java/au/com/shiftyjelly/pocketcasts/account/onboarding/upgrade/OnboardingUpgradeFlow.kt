@@ -110,6 +110,11 @@ fun OnboardingUpgradeFlow(
                 onNotNowPressed = onProceed,
                 onBackPressed = onBackPressed,
                 canUpgrade = hasSubscriptions,
+                subscriptions = if (hasSubscriptions) {
+                    (state as OnboardingUpgradeBottomSheetState.Loaded).subscriptions
+                } else {
+                    emptyList()
+                },
             )
         },
         sheetContent = {

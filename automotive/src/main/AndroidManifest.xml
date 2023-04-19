@@ -83,7 +83,7 @@
             android:name="pocketcasts_automotive"
             android:value="true" />
         <meta-data
-            android:name="io.sentry.dsn"
+            android:name="au.com.shiftyjelly.pocketcasts.sentryDsn"
             android:value="${sentryDsn}" />
     </application>
 

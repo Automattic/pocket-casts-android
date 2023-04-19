@@ -73,8 +73,8 @@ class PlusSettingsFragment : BaseFragment() {
                 }
 
                 val headerText = PlusSection.TextBlock(LR.string.plus_description_title, LR.string.plus_description_body)
-                val feature1 = PlusSection.Feature(R.drawable.ic_desktop_apps, LR.string.plus_desktop_apps, LR.string.plus_desktop_apps_body)
-                val feature2 = PlusSection.Feature(R.drawable.ic_cloud_storage, LR.string.plus_cloud_storage, LR.string.plus_cloud_storage_body)
+                val feature1 = PlusSection.Feature(R.drawable.ic_desktop_apps_old, LR.string.plus_desktop_apps, LR.string.plus_desktop_apps_body)
+                val feature2 = PlusSection.Feature(R.drawable.ic_cloud_storage_old, LR.string.plus_cloud_storage, LR.string.plus_cloud_storage_body)
                 val feature3 = PlusSection.Feature(R.drawable.ic_themes_icons, LR.string.plus_themes_icons, LR.string.plus_themes_icons_body)
                 val feature4 = PlusSection.Feature(R.drawable.plus_folder, LR.string.plus_folder, LR.string.plus_folder_body)
                 val upgrade = PlusSection.UpgradeButton(

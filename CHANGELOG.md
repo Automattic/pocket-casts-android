@@ -1,3 +1,9 @@
+7.38
+-----
+*   Bug Fixes:
+    *   Fixed accessibility content desctiption for episode list
+         ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
+
 7.37
 -----
 * New Features:

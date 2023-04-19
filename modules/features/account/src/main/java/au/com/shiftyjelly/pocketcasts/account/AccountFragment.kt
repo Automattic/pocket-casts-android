@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.sp
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.activityViewModels
@@ -12,11 +14,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentAccountBinding
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountFragmentViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -24,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -85,6 +90,19 @@ class AccountFragment : BaseFragment() {
             analyticsTracker.track(AnalyticsEvent.SETUP_ACCOUNT_DISMISSED, ACCOUNT_SOURCE)
             FirebaseAnalyticsTracker.closeAccountMissingClicked()
             activity?.finish()
+        }
+
+        binding.btnContinueWithGoogle?.apply {
+            setContent {
+                AppThemeWithBackground(theme.activeTheme) {
+                    ContinueWithGoogleButton(
+                        flow = null,
+                        fontSize = dimensionResource(CR.dimen.car_body2_size).value.sp,
+                        includePadding = false,
+                        onComplete = { activity?.finish() }
+                    )
+                }
+            }
         }
 
         binding.btnCreate.setOnClickListener {

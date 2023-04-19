@@ -11,6 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.toLiveData
+import androidx.media3.datasource.HttpDataSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -50,7 +51,6 @@ import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isPositive
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -156,7 +156,7 @@ open class PlaybackManager @Inject constructor(
 
     var episodeSubscription: Disposable? = null
 
-    var mediaSessionManager = MediaSessionManager(
+    val mediaSessionManager = MediaSessionManager(
         playbackManager = this,
         podcastManager = podcastManager,
         episodeManager = episodeManager,

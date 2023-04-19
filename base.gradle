@@ -30,6 +30,8 @@ android {
 
         // Feature Flags
         buildConfigField "boolean", "END_OF_YEAR_ENABLED", "false"
+        buildConfigField "boolean", "SHOW_RATINGS", "false"
+        buildConfigField "boolean", "ADD_PATRON_ENABLED", "false"
 
         testInstrumentationRunner project.testInstrumentationRunner
         testApplicationId "au.com.shiftyjelly.pocketcasts.test" + project.name.replace("-", "_")
@@ -209,11 +211,6 @@ dependencies {
     implementation libs.kotlinCoroutinesPlayServices
     implementation libs.kotlinCoroutinesRx
     implementation libs.deviceNames
-    implementation libs.exoplayerCore
-    implementation libs.exoplayerUi
-    implementation libs.exoplayerMediaSession
-    implementation libs.exoplayerCast
-    implementation libs.exoplayerHls
     implementation libs.glide
     implementation libs.glideOkHttp
     implementation libs.coil
@@ -244,6 +241,12 @@ dependencies {
     implementation libs.sentry
     implementation libs.sentryFragment
     implementation libs.sentryTimber
+    implementation libs.media3Cast
+    implementation libs.media3Datasource
+    implementation libs.media3Exoplayer
+    implementation libs.media3ExoplayerHls
+    implementation libs.media3Extractor
+    implementation libs.media3Ui
 
     kapt libs.moshiKotlinCompile
     kapt libs.glideCompile
