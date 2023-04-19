@@ -85,6 +85,7 @@ object AutoConverter {
             .setSubtitle(episode.getSummaryText(dateFormatter = RelativeDateFormatter(context), tintColor = Color.WHITE, showDuration = true, context = context).toString())
             .setExtras(extrasForEpisode)
             .setArtworkUri(localUri)
+            .setIsBrowsable(false)
             .setIsPlayable(true)
             .build()
 
@@ -103,6 +104,7 @@ object AutoConverter {
                 .setTitle(podcast.title)
                 .setArtworkUri(localUri)
                 .setIsBrowsable(true)
+                .setIsPlayable(false)
                 .build()
 
             MediaItem.Builder()
@@ -122,6 +124,7 @@ object AutoConverter {
                 .setTitle(folder.name)
                 .setArtworkUri(localUri)
                 .setIsBrowsable(true)
+                .setIsPlayable(false)
                 .build()
 
             MediaItem.Builder()

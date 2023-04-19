@@ -75,7 +75,6 @@ open class AutoPlaybackService : PlaybackService() {
         playbackManager.pause(transientLoss = false, playbackSource = AnalyticsSource.AUTO_PAUSE)
     }
 
-    // TODO: Set on media session
     class AutoMediaLibrarySessionCallback constructor(
         context: Context,
         episodeManager: EpisodeManager,
@@ -128,10 +127,10 @@ open class AutoPlaybackService : PlaybackService() {
             return serviceScope.future {
                 try {
                     items = mediaItems(parentId)
-                    Log.d(Settings.LOG_TAG_AUTO, "onLoadChildren. Sending results $parentId")
+                    Log.d(Settings.LOG_TAG_AUTO, "onGetChildren. Sending results $parentId")
                     LibraryResult.ofItemList(items, params)
                 } catch (e: Exception) {
-                    Log.e(Settings.LOG_TAG_AUTO, "onLoadChildren. Could not load $parentId", e)
+                    Log.e(Settings.LOG_TAG_AUTO, "onGetChildren. Could not load $parentId", e)
                     LibraryResult.ofItemList(emptyList(), params)
                 } finally {
                     podcastManager.refreshPodcastsIfRequired("Automotive")
