@@ -1,17 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.ui
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.ServiceTestRule
-import org.junit.Rule
-import org.junit.runner.RunWith
-
-@RunWith(AndroidJUnit4::class)
+// TODO: Uncomment and fix this tests once the service is migrated properly to MediaLibraryService
+// @RunWith(AndroidJUnit4::class)
 class PlaybackServiceTest {
+    /*
     @get:Rule
     val serviceRule = ServiceTestRule()
 
-    // TODO: Uncomment and fix this tests once the service is migrated properly to MediaLibraryService
-    /*@Test
+    @Test
     @Throws(TimeoutException::class)
     fun testPlaybackServiceEntersAndExitsForeground() {
         val application = ApplicationProvider.getApplicationContext<PocketCastsApplication>()
