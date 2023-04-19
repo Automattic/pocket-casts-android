@@ -32,6 +32,7 @@ class AdvancedSettingsViewModel
         }
 
     private fun initState() = State(
+        refreshPodcastsAutomatically = settings.refreshPodcastsAutomatically(),
         backgroundSyncOnMeteredState = State.BackgroundSyncOnMeteredState(
             summary = backgroundRefreshSummary,
             isChecked = settings.syncOnMeteredNetwork(),
@@ -44,10 +45,6 @@ class AdvancedSettingsViewModel
             }
         )
     )
-
-    fun doPodcastsRefreshAutomatically(): Boolean {
-        return settings.refreshPodcastsAutomatically()
-    }
 
     private fun onSyncOnMeteredCheckedChange(isChecked: Boolean) {
         settings.setSyncOnMeteredNetwork(isChecked)
@@ -71,6 +68,7 @@ class AdvancedSettingsViewModel
     }
 
     data class State(
+        val refreshPodcastsAutomatically: Boolean,
         val backgroundSyncOnMeteredState: BackgroundSyncOnMeteredState
     ) {
 

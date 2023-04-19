@@ -35,7 +35,7 @@ fun AdvancedSettingsPage(
     AdvancedSettingsView(
         state = state,
         onBackPressed = onBackPressed,
-        automaticRefreshEnabled = viewModel.doPodcastsRefreshAutomatically(),
+        automaticRefreshEnabled = state.refreshPodcastsAutomatically,
         modifier = modifier
     )
 
@@ -98,6 +98,7 @@ private fun AdvancedSettingsPreview(
     AppThemeWithBackground(themeType) {
         AdvancedSettingsView(
             state = AdvancedSettingsViewModel.State(
+                refreshPodcastsAutomatically = true,
                 backgroundSyncOnMeteredState = AdvancedSettingsViewModel.State.BackgroundSyncOnMeteredState(
                     isChecked = true,
                     summary = LR.string.settings_advanced_sync_on_metered_on,
