@@ -28,11 +28,13 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.id
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertFolderToMediaItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertPodcastToMediaItem
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -63,6 +65,7 @@ import kotlinx.coroutines.rx2.awaitSingleOrNull
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val MEDIA_ID_ROOT = "__ROOT__"
 const val PODCASTS_ROOT = "__PODCASTS__"
@@ -374,61 +377,40 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
             browser: MediaSession.ControllerInfo,
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<MediaItem>> {
-
-            Timber.i("TEST123, onGetLibraryRoot")
-
-            /*
             // To ensure you are not allowing any arbitrary app to browse your app's contents, check the origin
-            if (!PackageValidator(context, LR.xml.allowed_media_browser_callers).isKnownCaller(clientPackageName, clientUid) && !BuildConfig.DEBUG) {
+            if (!PackageValidator(context, LR.xml.allowed_media_browser_callers).isKnownCaller(
+                    browser.packageName,
+                    browser.uid
+                ) && !BuildConfig.DEBUG
+            ) {
                 // If the request comes from an untrusted package, return null
-                Timber.e("Unknown caller trying to connect to media service $clientPackageName $clientUid")
-                return null
+                Timber.e("Unknown caller trying to connect to media service ${browser.packageName} ${browser.uid}")
+                return serviceScope.future {
+                    LibraryResult.ofError(
+                        LibraryResult.RESULT_ERROR_PERMISSION_DENIED,
+                        params
+                    )
+                }
             }
 
-            if (!clientPackageName.contains("au.com.shiftyjelly.pocketcasts")) {
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: $clientPackageName connected to media session") // Log things like Android Auto or Assistant connecting
+            if (!browser.packageName.contains("au.com.shiftyjelly.pocketcasts")) {
+                LogBuffer.i(
+                    LogBuffer.TAG_PLAYBACK,
+                    "Client: ${browser.packageName} connected to media session"
+                ) // Log things like Android Auto or Assistant connecting
             }
 
-            return if (browser.connectionHints.getBoolean(BrowserRoot.EXTRA_RECENT) == true) { // Browser root hints is nullable even though it's not declared as such, come on Google
-                Timber.d("Browser root hint for recent items")
+            val mediaId = if (params?.isRecent == true) {
                 if (playbackManager.getCurrentEpisode() != null) {
-                    BrowserRoot(RECENT_ROOT, extras)
+                    RECENT_ROOT
                 } else {
                     null
                 }
-            } else if (browserRootHints?.getBoolean(BrowserRoot.EXTRA_SUGGESTED) == true) {
-                Timber.d("Browser root hint for suggested items")
-                BrowserRoot(SUGGESTED_ROOT, extras)
+            } else if (params?.isSuggested == true) {
+                SUGGESTED_ROOT
             } else {
-                BrowserRoot(MEDIA_ID_ROOT, extras)
+                MEDIA_ID_ROOT
             }
-
-
-            return serviceScope.future {
-                val bundle = Bundle().apply {
-                    // FIXME still lots to fill in here with the bundle from the old onGetRoot method
-
-                    Timber.d("onGetRoot() $clientPackageName ${bundle?.keySet()?.toList()}")
-                    // tell Android Auto we support media search
-                    putBoolean(MEDIA_SEARCH_SUPPORTED, true)
-
-                    // tell Android Auto we support grids and lists and that browsable things should be grids, the rest lists
-                    putBoolean(CONTENT_STYLE_SUPPORTED, true)
-                    putInt(CONTENT_STYLE_BROWSABLE_HINT, CONTENT_STYLE_GRID_ITEM_HINT_VALUE)
-                    putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
-                }
-
-
-                LibraryResult.ofItem(
-                    MediaItem.Builder()
-                        .setMediaId(MEDIA_ID_ROOT)
-                        .build(),
-                    LibraryParams.Builder()
-                        .setExtras(bundle)
-                        .build()
-                )
-            }
-            */
 
             val bundle = Bundle().apply {
                 // tell Android Auto we support media search
@@ -440,20 +422,22 @@ open class PlaybackService : LifecycleMediaLibraryService(), CoroutineScope {
                 putInt(CONTENT_STYLE_PLAYABLE_HINT, CONTENT_STYLE_LIST_ITEM_HINT_VALUE)
             }
 
-            val libraryResult = LibraryResult.ofItem(
-                MediaItem.Builder()
-                    .setMediaId(MEDIA_ID_ROOT)
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setIsBrowsable(false) // both true and false seem to work here, but not setting it doesn't
-                            .setIsPlayable(false)
-                            .build()
-                    )
-                    .build(),
-                LibraryParams.Builder()
-                    .setExtras(bundle)
-                    .build()
-            )
+            val libraryResult = mediaId?.let {
+                LibraryResult.ofItem(
+                    MediaItem.Builder()
+                        .setMediaId(mediaId)
+                        .setMediaMetadata(
+                            MediaMetadata.Builder()
+                                .setIsBrowsable(true)
+                                .setIsPlayable(false)
+                                .build()
+                        )
+                        .build(),
+                    LibraryParams.Builder()
+                        .setExtras(bundle)
+                        .build()
+                )
+            } ?: LibraryResult.ofError(LibraryResult.RESULT_ERROR_INVALID_STATE, params)
 
             return Futures.immediateFuture(libraryResult)
         }
