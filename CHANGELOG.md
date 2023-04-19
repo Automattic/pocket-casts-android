@@ -3,6 +3,8 @@
 *   Bug Fixes:
     *   Fixed accessibility content desctiption for episode list
          ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
+    *   Improved the validation of the Automotive skip forward and back time settings
+         ([#890](https://github.com/Automattic/pocket-casts-android/pull/892)).
 
 7.37
 -----

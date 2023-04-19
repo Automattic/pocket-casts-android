@@ -317,7 +317,6 @@ interface Settings {
     fun getSkipForwardInMs(): Long
     fun getSkipBackwardInSecs(): Int
     fun getSkipBackwardInMs(): Long
-    fun updateSkipValues()
 
     fun getLastScreenOpened(): String?
     fun setLastScreenOpened(screenId: String)
