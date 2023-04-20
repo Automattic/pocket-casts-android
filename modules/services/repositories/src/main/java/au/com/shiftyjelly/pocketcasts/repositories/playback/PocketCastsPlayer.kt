@@ -9,7 +9,7 @@ sealed class EpisodeLocation {
     data class Downloaded(val filePath: String?) : EpisodeLocation()
 }
 
-interface Player {
+interface PocketCastsPlayer {
     var isPip: Boolean
     val isRemote: Boolean
     val isStreaming: Boolean
@@ -18,7 +18,7 @@ interface Player {
     val url: String?
     val episodeUuid: String?
     val name: String
-    val onPlayerEvent: (Player, PlayerEvent) -> Unit
+    val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit
 
     suspend fun load(currentPositionMs: Int)
     suspend fun getCurrentPositionMs(): Int

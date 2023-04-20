@@ -66,7 +66,7 @@ class VideoActivity : AppCompatActivity() {
             if (intent.getBooleanExtra(EXTRA_PIP, false)) {
                 enterPictureInPicture()
             } else {
-                playbackManager.player?.isPip = false
+                playbackManager.pocketCastsPlayer?.isPip = false
             }
         }
 
@@ -84,7 +84,7 @@ class VideoActivity : AppCompatActivity() {
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
 
-        playbackManager.player?.isPip = isInPictureInPictureMode
+        playbackManager.pocketCastsPlayer?.isPip = isInPictureInPictureMode
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -94,7 +94,7 @@ class VideoActivity : AppCompatActivity() {
         if (intent?.getBooleanExtra(EXTRA_PIP, false) == true) {
             enterPictureInPicture()
         } else {
-            playbackManager.player?.isPip = false
+            playbackManager.pocketCastsPlayer?.isPip = false
         }
     }
 
@@ -112,7 +112,7 @@ class VideoActivity : AppCompatActivity() {
         }
 
         wasInPiP = true
-        playbackManager.player?.isPip = true
+        playbackManager.pocketCastsPlayer?.isPip = true
 
         // create PiP actions
         if (pipActionsPlaying == null) {
@@ -125,7 +125,7 @@ class VideoActivity : AppCompatActivity() {
             pipActionsPaused = listOf(skipBackward, play, skipForward)
         }
 
-        val player = playbackManager.player as? SimplePlayer ?: return
+        val player = playbackManager.pocketCastsPlayer as? SimplePlayer ?: return
         val width = player.videoWidth
         val height = player.videoHeight
         val aspectRatio = if (width == 0 || height == 0) Rational(16, 9) else Rational(width, height)

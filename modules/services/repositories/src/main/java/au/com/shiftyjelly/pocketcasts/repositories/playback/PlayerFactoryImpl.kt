@@ -12,14 +12,14 @@ class PlayerFactoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : PlayerFactory {
 
-    override fun createCastPlayer(onPlayerEvent: (Player, PlayerEvent) -> Unit): Player {
+    override fun createCastPlayer(onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit): PocketCastsPlayer {
         return CastPlayer(
             context,
             onPlayerEvent
         )
     }
 
-    override fun createSimplePlayer(onPlayerEvent: (Player, PlayerEvent) -> Unit): Player {
+    override fun createSimplePlayer(onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit): PocketCastsPlayer {
         return SimplePlayer(settings, statsManager, context, onPlayerEvent)
     }
 }
