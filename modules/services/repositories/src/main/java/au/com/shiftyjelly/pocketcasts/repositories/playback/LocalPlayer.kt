@@ -29,10 +29,6 @@ abstract class LocalPlayer(
     private var seekingToPositionMs: Int = 0
     private var seekRetryAllowed: Boolean = false
 
-    protected var isHLS: Boolean = false
-
-    override var episodeLocation: EpisodeLocation? = null
-
     override val isRemote: Boolean
         get() = false
 

@@ -60,8 +60,6 @@ class CastPlayer(
             TextUtils.equals(localEpisodeUuid, remoteEpisodeUuid) &&
             state != PlaybackStateCompat.STATE_NONE && state != PlaybackStateCompat.STATE_STOPPED
 
-    override var episodeLocation: EpisodeLocation? = null
-
     override val isRemote: Boolean
         get() = true
 

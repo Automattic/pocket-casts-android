@@ -5,16 +5,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 
-sealed class EpisodeLocation {
-    data class Stream(val uri: String?) : EpisodeLocation()
-    data class Downloaded(val filePath: String?) : EpisodeLocation()
-}
-
 interface PocketCastsPlayer : Player {
     var isPip: Boolean
     val isRemote: Boolean
     val isStreaming: Boolean
-    var episodeLocation: EpisodeLocation?
     var playable: Playable?
     val name: String
     val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit
