@@ -15,9 +15,7 @@ interface PocketCastsPlayer : Player {
     val isRemote: Boolean
     val isStreaming: Boolean
     var episodeLocation: EpisodeLocation?
-    val filePath: String?
-    val url: String?
-    val episodeUuid: String?
+    var playable: Playable?
     val name: String
     val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit
 
@@ -34,5 +32,4 @@ interface PocketCastsPlayer : Player {
     fun supportsVolumeBoost(): Boolean
     fun supportsVideo(): Boolean
     fun setPodcast(podcast: Podcast?)
-    fun setEpisode(episode: Playable)
 }

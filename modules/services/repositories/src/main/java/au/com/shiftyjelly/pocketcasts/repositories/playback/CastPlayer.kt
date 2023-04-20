@@ -62,9 +62,6 @@ class CastPlayer(
 
     override var episodeLocation: EpisodeLocation? = null
 
-    override val url: String?
-        get() = (episodeLocation as? EpisodeLocation.Stream)?.uri
-
     override val isRemote: Boolean
         get() = true
 
@@ -74,10 +71,12 @@ class CastPlayer(
     override val name: String
         get() = "Cast"
 
-    override val episodeUuid: String?
-        get() = episode?.uuid
-
-    override val filePath: String? = null
+    override var playable: Playable? = null
+        set(value) {
+            field = value
+            localEpisodeUuid = value?.uuid
+            buildCustomData()
+        }
 
     private val isConnected: Boolean
         get() {
@@ -206,17 +205,6 @@ class CastPlayer(
         this.podcast = podcast
     }
 
-    override fun setEpisode(episode: Playable) {
-        this.episode = episode
-        this.episodeLocation =
-            EpisodeLocation.Stream(
-                episode.downloadUrl
-            )
-
-        localEpisodeUuid = episode.uuid
-        buildCustomData()
-    }
-
     private fun addRemoteMediaListener() {
         if (remoteListenerAdded) {
             return
@@ -322,7 +310,7 @@ class CastPlayer(
         // Convert the remote playback states to media playback states.
         when (status) {
             MediaStatus.PLAYER_STATE_IDLE -> if (idleReason == MediaStatus.IDLE_REASON_FINISHED) {
-                onPlayerEvent(this, PlayerEvent.Completion(episodeUuid))
+                onPlayerEvent(this, PlayerEvent.Completion(playable?.uuid))
             }
             MediaStatus.PLAYER_STATE_BUFFERING, MediaStatus.PLAYER_STATE_LOADING -> {
                 state = PlaybackStateCompat.STATE_BUFFERING

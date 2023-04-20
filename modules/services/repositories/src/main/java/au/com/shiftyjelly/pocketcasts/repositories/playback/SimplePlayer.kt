@@ -23,6 +23,7 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
+import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -60,6 +61,8 @@ class SimplePlayer(
     override var isPip: Boolean = false
 
     private var videoChangedListener: VideoChangedListener? = null
+
+    override var playable: Playable? = null
 
     @Volatile
     private var prepared = false
@@ -184,7 +187,7 @@ class SimplePlayer(
         setPlayerEffects()
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
-                val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
+                val episodeMetadata = EpisodeFileMetadata(filenamePrefix = playable?.uuid)
                 episodeMetadata.read(tracks, settings, context)
                 onMetadataAvailable(episodeMetadata)
             }

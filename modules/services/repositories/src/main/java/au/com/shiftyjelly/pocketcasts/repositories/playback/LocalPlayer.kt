@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.os.SystemClock
 import androidx.media3.common.Player
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.Dispatchers
@@ -32,20 +31,13 @@ abstract class LocalPlayer(
 
     protected var isHLS: Boolean = false
 
-    override var episodeUuid: String? = null
-
     override var episodeLocation: EpisodeLocation? = null
-    override val url: String?
-        get() = (episodeLocation as? EpisodeLocation.Stream)?.uri
-
-    override val filePath: String?
-        get() = (episodeLocation as? EpisodeLocation.Downloaded)?.filePath
 
     override val isRemote: Boolean
         get() = false
 
     override val isStreaming: Boolean
-        get() = episodeLocation is EpisodeLocation.Stream
+        get() = playable?.isDownloaded == false
 
     override val name: String
         get() = "System"
@@ -70,7 +62,7 @@ abstract class LocalPlayer(
     // downloaded episodes don't buffer
     override suspend fun isBuffering(): Boolean {
         return withContext(Dispatchers.Main) {
-            if (filePath != null) false else handleIsBuffering()
+            if (!isStreaming) false else handleIsBuffering()
         }
     }
 
@@ -149,7 +141,7 @@ abstract class LocalPlayer(
     }
 
     protected fun onCompletion() {
-        onPlayerEvent(this, PlayerEvent.Completion(episodeUuid))
+        onPlayerEvent(this, PlayerEvent.Completion(playable?.uuid))
     }
 
     protected fun onBufferingStateChanged() {
@@ -175,16 +167,6 @@ abstract class LocalPlayer(
                 onSeekStart(positionMs)
                 handleSeekToTimeMs(positionMs)
             }
-        }
-    }
-
-    override fun setEpisode(episode: Playable) {
-        this.episodeUuid = episode.uuid
-        this.isHLS = episode.isHLS
-        episodeLocation = if (episode.isDownloaded) {
-            EpisodeLocation.Downloaded(episode.downloadedFilePath)
-        } else {
-            EpisodeLocation.Stream(episode.downloadUrl)
         }
     }
 
