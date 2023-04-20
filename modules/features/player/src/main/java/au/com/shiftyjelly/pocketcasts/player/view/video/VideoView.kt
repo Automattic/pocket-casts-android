@@ -22,7 +22,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
 
     private val view = LayoutInflater.from(context).inflate(R.layout.video_view, this, true)
-    @UnstableApi
+    @androidx.annotation.OptIn(UnstableApi::class)
     private val aspectRatioLayout = view.findViewById<AspectRatioFrameLayout>(R.id.aspectRatioLayout).apply {
         setAspectRatio(1.78f)
     }
@@ -64,7 +64,7 @@ class VideoView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         }
     }
 
-    @UnstableApi
+    @androidx.annotation.OptIn(UnstableApi::class)
     override fun videoSizeChanged(width: Int, height: Int, pixelWidthHeightRatio: Float) {
         val videoAspectRatio = if (height == 0 || width == 0) 1f else width * pixelWidthHeightRatio / height
         aspectRatioLayout.setAspectRatio(videoAspectRatio)

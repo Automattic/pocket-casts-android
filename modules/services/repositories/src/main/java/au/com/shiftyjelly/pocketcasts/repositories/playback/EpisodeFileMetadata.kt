@@ -20,6 +20,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Collections
 
+@androidx.annotation.OptIn(UnstableApi::class)
 class EpisodeFileMetadata(val filenamePrefix: String? = null) {
 
     companion object {
@@ -37,12 +38,10 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
     var embeddedTitle: String? = null
     var embeddedLength: Long? = null
 
-    @UnstableApi
     fun read(tracks: Tracks?, settings: Settings, context: Context) {
         return read(tracks, settings.getUseEmbeddedArtwork(), context)
     }
 
-    @UnstableApi
     fun read(tracks: Tracks?, loadArtwork: Boolean, context: Context) {
         val newChapters = mutableListOf<Chapter>()
         embeddedArtworkPath = null
@@ -85,7 +84,6 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
         }
     }
 
-    @UnstableApi
     private fun convertFrameToChapter(frame: ChapterFrame?, chapterIndex: Int, context: Context): Chapter? {
         if (frame == null || frame.startTimeMs < 0) {
             return null

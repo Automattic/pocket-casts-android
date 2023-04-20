@@ -163,7 +163,6 @@ class AddFileActivity :
         binding.upgradeLayout.root.isVisible = readOnly && !settings.getUpgradeClosedAddFile() && !loading
     }
 
-    @UnstableApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
@@ -294,7 +293,6 @@ class AddFileActivity :
         startActivity(OnboardingActivity.newInstance(this, onboardingFlow))
     }
 
-    @UnstableApi
     @Suppress("NAME_SHADOWING")
     private fun setupForNewFile(fileUri: Uri?) {
         val fileUri = fileUri ?: return
@@ -372,7 +370,6 @@ class AddFileActivity :
         binding.btnImage.text = getString(LR.string.profile_files_add_custom_image)
     }
 
-    @UnstableApi
     @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -671,7 +668,7 @@ class AddFileActivity :
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), ACTION_PICK_IMAGE)
     }
 
-    @UnstableApi
+    @androidx.annotation.OptIn(UnstableApi::class)
     private fun preparePlayer(uri: Uri) {
         val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(0, 0, 0, 0).build()
         val player = ExoPlayer.Builder(this).setLoadControl(loadControl).build()
