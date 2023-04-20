@@ -137,7 +137,7 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
     open var librarySessionCallback: MediaLibrarySession.Callback = CustomMediaLibrarySessionCallback()
 
     private lateinit var mediaLibrarySession: MediaLibrarySession
-    private lateinit var player: ExoPlayer
+    private lateinit var localPlayer: ExoPlayer
 
     private var mediaControllerCallback: MediaControllerCallback? = null
     lateinit var notificationManager: PlayerNotificationManager
@@ -167,9 +167,9 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
     }
 
     private fun initializeSessionAndPlayer() {
-        player = createExoPlayer()
+        localPlayer = createExoPlayer()
 
-        val mediaSessionBuilder = MediaLibrarySession.Builder(this, player, librarySessionCallback)
+        val mediaSessionBuilder = MediaLibrarySession.Builder(this, localPlayer, librarySessionCallback)
         if (!Util.isAutomotive(this)) { // We can't start activities on automotive
             mediaSessionBuilder.setSessionActivity(this.getLaunchActivityPendingIntent())
         }
@@ -235,6 +235,8 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
 
     override fun onDestroy() {
         super.onDestroy()
+        mediaLibrarySession.release()
+        localPlayer.release()
 
         disposables.clear()
 
