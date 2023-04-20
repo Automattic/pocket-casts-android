@@ -237,10 +237,6 @@ open class PlaybackManager @Inject constructor(
         return playbackStateRelay.blockingFirst().isPlaying
     }
 
-    fun isStreaming(): Boolean {
-        return pocketCastsPlayer?.isStreaming ?: false
-    }
-
     fun updateSleepTimerStatus(running: Boolean, sleepAfterEpisode: Boolean = false) {
         this.sleepAfterEpisode = sleepAfterEpisode
         playbackStateRelay.blockingFirst().let {
