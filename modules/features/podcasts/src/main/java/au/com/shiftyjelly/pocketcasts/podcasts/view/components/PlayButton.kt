@@ -11,8 +11,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -133,7 +133,7 @@ class PlayButton @JvmOverloads constructor(
 
         this.buttonType = buttonType
         this.episodeUuid = episode.uuid
-        if (episode is Episode) {
+        if (episode is PodcastEpisode) {
             this.podcastUuid = episode.podcastUuid
             this.fromListUuid = fromListUuid
         }

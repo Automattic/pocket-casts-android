@@ -9,9 +9,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -61,7 +61,7 @@ class FilterEpisodeListViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    lateinit var episodesList: LiveData<List<Episode>>
+    lateinit var episodesList: LiveData<List<PodcastEpisode>>
     val playlist: MutableLiveData<Playlist> = MutableLiveData()
     val playlistDeleted: MutableLiveData<Boolean> = MutableLiveData(false)
 
@@ -104,7 +104,7 @@ class FilterEpisodeListViewModel @Inject constructor(
 
     @Suppress("UNUSED_PARAMETER")
     fun episodeSwiped(episode: Playable, index: Int) {
-        if (episode !is Episode) return
+        if (episode !is PodcastEpisode) return
 
         launch {
             if (!episode.isArchived) {
@@ -119,7 +119,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun onPlayAllFromHere(episode: Episode) {
+    fun onPlayAllFromHere(episode: PodcastEpisode) {
         launch {
             val episodes = episodesList.value ?: emptyList()
             val startIndex = episodes.indexOf(episode)
@@ -193,7 +193,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun onFromHereCount(episode: Episode): Int {
+    fun onFromHereCount(episode: PodcastEpisode): Int {
         val episodes = episodesList.value ?: return 0
         val index = max(episodes.indexOf(episode), 0) // -1 on not found
         return min(episodes.count() - index, settings.getMaxUpNextEpisodes())

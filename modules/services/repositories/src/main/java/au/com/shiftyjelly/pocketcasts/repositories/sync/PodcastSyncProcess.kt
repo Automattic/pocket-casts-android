@@ -3,10 +3,10 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.content.Context
 import android.os.Build
 import android.os.SystemClock
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -264,7 +264,7 @@ class PodcastSyncProcess(
             }
     }
 
-    private fun uploadChanges(): Pair<String, List<Episode>> {
+    private fun uploadChanges(): Pair<String, List<PodcastEpisode>> {
         val records = JSONArray()
         uploadPodcastChanges(records)
         val episodes = uploadEpisodesChanges(records)
@@ -422,7 +422,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun uploadEpisodesChanges(records: JSONArray): List<Episode> {
+    private fun uploadEpisodesChanges(records: JSONArray): List<PodcastEpisode> {
         try {
             val episodes = episodeManager.findEpisodesToSync()
             episodes.forEach { episode ->
@@ -436,7 +436,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun uploadEpisodeChanges(episode: Episode, records: JSONArray) {
+    private fun uploadEpisodeChanges(episode: PodcastEpisode, records: JSONArray) {
         val fields = JSONObject()
 
         try {
@@ -484,7 +484,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun processServerResponse(response: SyncUpdateResponse, episodes: List<Episode>): Single<String> {
+    private fun processServerResponse(response: SyncUpdateResponse, episodes: List<PodcastEpisode>): Single<String> {
         if (response.lastModified == null) {
             return Single.error(Exception("Server response doesn't return a last modified"))
         }
@@ -507,7 +507,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun markAllLocalItemsSynced(episodes: List<Episode>): Completable {
+    private fun markAllLocalItemsSynced(episodes: List<PodcastEpisode>): Completable {
         return Completable.fromAction {
             podcastManager.markAllPodcastsSynced()
             episodeManager.markAllEpisodesSynced(episodes)
@@ -690,7 +690,7 @@ class PodcastSyncProcess(
         return Maybe.just(podcast)
     }
 
-    private fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<Episode> {
+    private fun importEpisode(episodeSync: SyncUpdateResponse.EpisodeSync): Maybe<PodcastEpisode> {
         val uuid = episodeSync.uuid ?: return Maybe.empty()
 
         // check if the episode already exists
@@ -702,7 +702,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private fun importExistingEpisode(sync: SyncUpdateResponse.EpisodeSync, episode: Episode): Single<Episode> {
+    private fun importExistingEpisode(sync: SyncUpdateResponse.EpisodeSync, episode: PodcastEpisode): Single<PodcastEpisode> {
         return Single.fromCallable {
             val playingEpisodeUuid = playbackManager.getCurrentEpisode()?.uuid
             val episodeInPlayer = playingEpisodeUuid != null && episode.uuid == playingEpisodeUuid

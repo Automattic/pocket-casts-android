@@ -54,8 +54,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
@@ -1189,7 +1189,7 @@ class MainActivity :
                     podcastUuid = podcastUuidFound,
                     forceDark = forceDark
                 )
-            } else if (playable is Episode) {
+            } else if (playable is PodcastEpisode) {
                 EpisodeFragment.newInstance(
                     episodeUuid = episodeUuid,
                     source = source,

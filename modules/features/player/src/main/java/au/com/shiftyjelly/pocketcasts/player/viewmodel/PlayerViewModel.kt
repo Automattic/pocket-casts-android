@@ -11,9 +11,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -202,7 +202,7 @@ class PlayerViewModel @Inject constructor(
         val entry1 = t1 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
         val entry2 = t2 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
 
-        return@distinctUntilChanged (entry1.episode as? Episode)?.isStarred == (entry2.episode as? Episode)?.isStarred && entry1.episode.episodeStatus == entry2.episode.episodeStatus && entry1.podcast?.isUsingEffects == entry2.podcast?.isUsingEffects
+        return@distinctUntilChanged (entry1.episode as? PodcastEpisode)?.isStarred == (entry2.episode as? PodcastEpisode)?.isStarred && entry1.episode.episodeStatus == entry2.episode.episodeStatus && entry1.podcast?.isUsingEffects == entry2.podcast?.isUsingEffects
     }
 
     private val trimmedShelfObservable = Flowables.combineLatest(shelfUpNext.toFlowable(BackpressureStrategy.LATEST), shelfObservable).map { (upNextState, shelf) ->
@@ -252,7 +252,7 @@ class PlayerViewModel @Inject constructor(
         .map { it.episodeUuid }
         .switchMap { episodeManager.observePlayableByUuid(it) }
         .switchMap {
-            if (it is Episode) {
+            if (it is PodcastEpisode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)
             } else {
                 Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, overrideGlobalEffects = false))
@@ -318,7 +318,7 @@ class PlayerViewModel @Inject constructor(
                 isPlaying = playbackState.isPlaying,
                 isPrepared = playbackState.isPrepared,
                 isVideo = episode.isVideo,
-                isStarred = (episode is Episode && episode.isStarred),
+                isStarred = (episode is PodcastEpisode && episode.isStarred),
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,
@@ -420,7 +420,7 @@ class PlayerViewModel @Inject constructor(
             .setOnConfirm { markAsPlayedConfirmed(episode) }
     }
 
-    private fun archiveConfirmed(episode: Episode) {
+    private fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
             episodeManager.archive(episode, playbackManager, true)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
@@ -429,7 +429,7 @@ class PlayerViewModel @Inject constructor(
 
     fun archiveCurrentlyPlaying(resources: Resources): ConfirmationDialog? {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return null
-        if (episode is Episode) {
+        if (episode is PodcastEpisode) {
             return ConfirmationDialog()
                 .setForceDarkTheme(true)
                 .setSummary(resources.getString(LR.string.player_archive_summary))
@@ -518,7 +518,7 @@ class PlayerViewModel @Inject constructor(
 
     fun starToggle() {
         playbackManager.upNextQueue.currentEpisode?.let {
-            if (it is Episode) {
+            if (it is PodcastEpisode) {
                 episodeManager.toggleStarEpisodeAsync(episode = it)
                 val event = if (it.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
                 episodeAnalytics.trackEvent(event, source, it.uuid)

@@ -14,8 +14,8 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -280,7 +280,7 @@ class DownloadManagerImpl @Inject constructor(
                     return@launch
                 }
 
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Added episode to downloads. ${episode.uuid} podcast: ${(episode as? Episode)?.podcastUuid} from: $from")
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Added episode to downloads. ${episode.uuid} podcast: ${(episode as? PodcastEpisode)?.podcastUuid} from: $from")
                 val networkRequirements = getRequirementsAndSetStatusAsync(episode)
                 episodeManager.updateLastDownloadAttemptDate(episode)
                 addWorkManagerTask(episode, networkRequirements)
@@ -318,7 +318,7 @@ class DownloadManagerImpl @Inject constructor(
                 .build()
             val updateData = Data.Builder()
                 .putString(UpdateEpisodeTask.INPUT_EPISODE_UUID, episode.uuid)
-                .putString(UpdateEpisodeTask.INPUT_PODCAST_UUID, (episode as? Episode)?.podcastUuid)
+                .putString(UpdateEpisodeTask.INPUT_PODCAST_UUID, (episode as? PodcastEpisode)?.podcastUuid)
                 .build()
             val updateTask = OneTimeWorkRequestBuilder<UpdateEpisodeTask>()
                 .setInputData(updateData)
@@ -512,7 +512,7 @@ class DownloadManagerImpl @Inject constructor(
                 count = downloadingQueue.size
             }
 
-            val episodeOne: Episode = episodeManager.findByUuid(firstUuid) ?: return@launch
+            val episodeOne: PodcastEpisode = episodeManager.findByUuid(firstUuid) ?: return@launch
             val podcastOneName = podcastManager.findPodcastByUuid(episodeOne.podcastUuid)?.title
                 ?: ""
 

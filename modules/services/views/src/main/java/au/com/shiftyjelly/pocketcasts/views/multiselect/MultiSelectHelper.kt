@@ -14,8 +14,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -286,7 +286,7 @@ class MultiSelectHelper @Inject constructor(
         }
 
         launch {
-            val list = selectedList.filterIsInstance<Episode>().toList()
+            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
             if (!shownWarning && list.size > WARNING_LIMIT) {
                 archiveWarning(list.size, resources = resources, fragmentManager = fragmentManager)
                 return@launch
@@ -309,7 +309,7 @@ class MultiSelectHelper @Inject constructor(
         }
 
         launch {
-            val list = selectedList.filterIsInstance<Episode>().toList()
+            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
 
             episodeManager.unarchiveAllInList(episodes = list)
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_UNARCHIVED, source, list.size)
@@ -328,7 +328,7 @@ class MultiSelectHelper @Inject constructor(
         }
 
         launch {
-            val list = selectedList.filterIsInstance<Episode>().toList()
+            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
             episodeManager.updateAllStarred(list, starred = true)
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_STARRED, source, list.size)
             withContext(Dispatchers.Main) {
@@ -346,7 +346,7 @@ class MultiSelectHelper @Inject constructor(
         }
 
         launch {
-            val list = selectedList.filterIsInstance<Episode>().toList()
+            val list = selectedList.filterIsInstance<PodcastEpisode>().toList()
             episodeManager.updateAllStarred(list, starred = false)
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_UNSTARRED, source, list.size)
             withContext(Dispatchers.Main) {
@@ -407,7 +407,7 @@ class MultiSelectHelper @Inject constructor(
 
         val list = selectedList.toList()
         launch {
-            val episodes = list.filterIsInstance<Episode>()
+            val episodes = list.filterIsInstance<PodcastEpisode>()
             episodeManager.deleteEpisodeFiles(episodes, playbackManager)
 
             val userEpisodes = list.filterIsInstance<UserEpisode>()

@@ -8,8 +8,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
@@ -78,7 +78,7 @@ class EpisodeListAdapter(
     }
 
     private fun bindEpisodeViewHolder(position: Int, holder: EpisodeViewHolder) {
-        val episode = getItem(position) as Episode
+        val episode = getItem(position) as PodcastEpisode
 
         val tintColor = this.tintColor ?: holder.itemView.context.getThemeColor(UR.attr.primary_icon_01)
         holder.setup(episode, fromListUuid, tintColor, playButtonListener, settings.streamingMode(), settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables)
@@ -137,7 +137,7 @@ class EpisodeListAdapter(
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
         return when (item) {
-            is Episode -> R.layout.adapter_episode
+            is PodcastEpisode -> R.layout.adapter_episode
             is UserEpisode -> R.layout.adapter_user_episode
             else -> throw IllegalStateException("Unknown playable type")
         }

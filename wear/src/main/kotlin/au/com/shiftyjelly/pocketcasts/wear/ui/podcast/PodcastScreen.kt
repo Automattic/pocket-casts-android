@@ -18,7 +18,7 @@ import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 
 object PodcastScreen {
@@ -30,7 +30,7 @@ object PodcastScreen {
 
 @Composable
 fun PodcastScreen(
-    onEpisodeTap: (Episode) -> Unit,
+    onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PodcastViewModel = hiltViewModel(),
 ) {
@@ -77,7 +77,7 @@ fun PodcastScreen(
 
 @Composable
 private fun EpisodeChip(
-    episode: Episode,
+    episode: PodcastEpisode,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

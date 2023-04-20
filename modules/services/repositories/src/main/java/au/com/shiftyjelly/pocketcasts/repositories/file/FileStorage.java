@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager;
 import au.com.shiftyjelly.pocketcasts.preferences.Settings;
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum;
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode;
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode;
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable;
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager;
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil;
@@ -55,7 +55,7 @@ public class FileStorage {
 	public File getPodcastEpisodeFile(Playable episode) throws StorageException {
 		String fileName = episode.getUuid() + episode.getFileExtension();
 		File directory;
-		if (episode instanceof Episode) {
+		if (episode instanceof PodcastEpisode) {
 			directory = getPodcastDirectory();
 		} else {
 			directory = getCloudFilesFolder();
@@ -322,7 +322,7 @@ public class FileStorage {
 							if (fileName.length() < 36) {
 								continue;
 							}
-							Episode episode = episodeManager.findByUuid(fileName);
+							PodcastEpisode episode = episodeManager.findByUuid(fileName);
 							if (episode != null) {
 								// Delete the original file if it is already there
 								if (!StringUtil.isBlank(episode.getDownloadedFilePath())) {
@@ -340,8 +340,8 @@ public class FileStorage {
 				}
 
 				// move episodes
-				List<Episode> episodes = episodeManager.observeDownloadedEpisodes().blockingFirst();
-				for (Episode episode : episodes) {
+				List<PodcastEpisode> episodes = episodeManager.observeDownloadedEpisodes().blockingFirst();
+				for (PodcastEpisode episode : episodes) {
 					LogBuffer.INSTANCE.i(LogBuffer.TAG_BACKGROUND_TASKS, "Found downloaded episode " + episode.getTitle());
 					String episodeFilePath = episode.getDownloadedFilePath();
 					if (StringUtil.isBlank(episodeFilePath)) {
@@ -438,7 +438,7 @@ public class FileStorage {
 					if (uuid.length() != 36) {
 						continue;
 					}
-					Episode episode = episodeManager.findByUuid(uuid);
+					PodcastEpisode episode = episodeManager.findByUuid(uuid);
 					if (episode != null) {
 						if (episode.getDownloadedFilePath() != null && new File(episode.getDownloadedFilePath()).exists() && episode.isDownloaded()) {
 							// skip as the episode download already exists

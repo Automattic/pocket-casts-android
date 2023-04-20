@@ -10,8 +10,8 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
@@ -596,7 +596,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
         val progress = bytesDownloadedSoFar.toFloat() / totalSize
         val total = bytesRemaining + bytesDownloadedSoFar
-        val podcastUuid = (episode as? Episode)?.podcastUuid
+        val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
 
         return DownloadProgressUpdate(
             episode.uuid,

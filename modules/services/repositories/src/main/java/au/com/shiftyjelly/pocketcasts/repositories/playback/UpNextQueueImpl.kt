@@ -2,9 +2,9 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -96,7 +96,7 @@ class UpNextQueueImpl @Inject constructor(
         } else {
             val episode: Playable = episodes.removeAt(0)
             val previousState: UpNextQueue.State = changesObservable.blockingFirst()
-            val podcastUuid = if (episode is Episode) episode.podcastUuid else null
+            val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
             val podcast: Podcast? = if (previousState is UpNextQueue.State.Loaded && previousState.podcast?.uuid == podcastUuid) {
                 previousState.podcast
             } else if (podcastUuid != null) {

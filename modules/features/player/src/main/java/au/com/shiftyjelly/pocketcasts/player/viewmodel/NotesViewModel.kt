@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -43,10 +43,10 @@ class NotesViewModel
     }
 
     val showNotes = MutableLiveData<Pair<String, Boolean>>().apply { postValue(Pair("", false)) }
-    val episode = MutableLiveData<Episode>()
+    val episode = MutableLiveData<PodcastEpisode>()
 
     fun loadEpisode(playable: Playable, color: Int) {
-        if (playable !is Episode || (episode.value?.uuid == playable.uuid && ColorUtils.colorIntToHexString(color).equals(showNotesFormatter.backgroundColor, true))) return // Only update show notes when the episode or color changes
+        if (playable !is PodcastEpisode || (episode.value?.uuid == playable.uuid && ColorUtils.colorIntToHexString(color).equals(showNotesFormatter.backgroundColor, true))) return // Only update show notes when the episode or color changes
 
         showNotesFormatter.backgroundColor = "#" + Integer.toHexString(color).substring(2) // Convert the color int to hex value, discard the alpha from the front
         // update the episode live data

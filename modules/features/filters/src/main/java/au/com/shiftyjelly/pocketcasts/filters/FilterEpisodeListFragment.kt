@@ -21,9 +21,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment
@@ -160,7 +160,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     private fun onRowClick(episode: Playable) {
-        if (episode is Episode) {
+        if (episode is PodcastEpisode) {
             val fragment = EpisodeFragment.newInstance(episode = episode, source = EpisodeViewSource.FILTERS)
             fragment.show(parentFragmentManager, "episode_card")
         }
@@ -577,7 +577,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         }
     }
 
-    private fun playAllFromHereWarning(episode: Episode, isFirstEpisode: Boolean = false) {
+    private fun playAllFromHereWarning(episode: PodcastEpisode, isFirstEpisode: Boolean = false) {
         val count = viewModel.onFromHereCount(episode)
         if (count <= 3) {
             viewModel.onPlayAllFromHere(episode)

@@ -19,9 +19,9 @@ import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
@@ -239,7 +239,7 @@ class MediaSessionManager(
                 updateMetadata(upNext.episode)
 
                 val items = upNext.queue.map { episode ->
-                    val podcastUuid = if (episode is Episode) episode.podcastUuid else null
+                    val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
                     val localUri = AutoConverter.getBitmapUriForPodcast(podcast, episode, context)
@@ -318,7 +318,7 @@ class MediaSessionManager(
             return
         }
 
-        val podcastUuid = if (episode is Episode) episode.podcastUuid else null
+        val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
         val podcast = podcastUuid?.let { podcastManager.findPodcastByUuid(it) }
 
         val podcastTitle = episode.displaySubtitle(podcast)
@@ -398,7 +398,7 @@ class MediaSessionManager(
                     }
                 }
                 MediaNotificationControls.Star -> {
-                    if (currentEpisode is Episode) {
+                    if (currentEpisode is PodcastEpisode) {
                         if (currentEpisode.isStarred) {
                             addCustomAction(stateBuilder, APP_ACTION_UNSTAR, "Unstar", IR.drawable.auto_starred)
                         } else {
@@ -614,7 +614,7 @@ class MediaSessionManager(
     private fun starEpisode() {
         launch {
             playbackManager.getCurrentEpisode()?.let {
-                if (it is Episode) {
+                if (it is PodcastEpisode) {
                     it.isStarred = true
                     episodeManager.starEpisode(it, true)
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_STARRED, source, it.uuid)
@@ -626,7 +626,7 @@ class MediaSessionManager(
     private fun unstarEpisode() {
         launch {
             playbackManager.getCurrentEpisode()?.let {
-                if (it is Episode) {
+                if (it is PodcastEpisode) {
                     it.isStarred = false
                     episodeManager.starEpisode(it, false)
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNSTARRED, source, it.uuid)
@@ -648,7 +648,7 @@ class MediaSessionManager(
             }
 
             val episode = playbackManager.getCurrentEpisode() ?: return@launch
-            if (episode is Episode) {
+            if (episode is PodcastEpisode) {
                 // update per podcast playback speed
                 val podcast = podcastManager.findPodcastByUuidSuspend(episode.podcastUuid)
                 if (podcast != null && podcast.overrideGlobalEffects) {
@@ -669,7 +669,7 @@ class MediaSessionManager(
     private fun archive() {
         launch {
             playbackManager.getCurrentEpisode()?.let {
-                if (it is Episode) {
+                if (it is PodcastEpisode) {
                     it.isArchived = true
                     episodeManager.archive(it, playbackManager)
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, it.uuid)
@@ -771,7 +771,7 @@ class MediaSessionManager(
         return Completable.fromAction { performPlayFromSearch(searchTerm) }
     }
 
-    private fun playEpisodes(episodes: List<Episode>, playbackSource: AnalyticsSource) {
+    private fun playEpisodes(episodes: List<PodcastEpisode>, playbackSource: AnalyticsSource) {
         if (episodes.isEmpty()) {
             return
         }

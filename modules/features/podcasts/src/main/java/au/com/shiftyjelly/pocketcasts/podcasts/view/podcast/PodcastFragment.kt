@@ -22,9 +22,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -192,7 +192,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         }
     }
 
-    private val onRowLongPress: (episode: Episode) -> Unit = { episode ->
+    private val onRowLongPress: (episode: PodcastEpisode) -> Unit = { episode ->
         multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = childFragmentManager)
         adapter?.notifyDataSetChanged()
     }
@@ -210,7 +210,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         dialog.show(parentFragmentManager, "confirm_archive_all_")
     }
 
-    private val onRowClicked: (Episode) -> Unit = { episode ->
+    private val onRowClicked: (PodcastEpisode) -> Unit = { episode ->
         fromListUuid?.let { listUuid ->
             FirebaseAnalyticsTracker.podcastEpisodeTappedFromList(listId = listUuid, podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
             analyticsTracker.track(
@@ -707,7 +707,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
     /**
      * Episode search needs at least a page worth of space under the search box so the user can see the results below.
      */
-    private fun addPaddingForEpisodeSearch(episodes: List<Episode>) {
+    private fun addPaddingForEpisodeSearch(episodes: List<PodcastEpisode>) {
         val rowCount = episodes.size
         val binding = binding ?: return
         val pageHeight = binding.episodesRecyclerView.height

@@ -18,9 +18,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -205,7 +205,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     fun getCurrentPodcast(): Podcast? {
-        val currentEpisode = getCurrentEpisode() as? Episode ?: return null
+        val currentEpisode = getCurrentEpisode() as? PodcastEpisode ?: return null
         return currentEpisode.podcastUuid.let { podcastManager.findPodcastByUuid(it) }
     }
 
@@ -275,7 +275,7 @@ open class PlaybackManager @Inject constructor(
             return Completable.complete()
         }
 
-        return if (episode is Episode) {
+        return if (episode is PodcastEpisode) {
             val request = EpisodeSyncRequest(
                 episode.uuid,
                 episode.podcastUuid,
@@ -386,7 +386,7 @@ open class PlaybackManager @Inject constructor(
                 }
             }
 
-            if (episode is Episode) {
+            if (episode is PodcastEpisode) {
                 // We only want to track playing of episodes, not files
                 FirebaseAnalyticsTracker.playedEpisode()
             }
@@ -788,7 +788,7 @@ open class PlaybackManager @Inject constructor(
 
     private suspend fun onRemoteMetaDataNotMatched(episodeUuid: String) {
         val episode = episodeManager.findPlayableByUuid(episodeUuid) ?: return
-        val podcast = if (episode is Episode) podcastManager.findPodcastByUuid(episode.podcastUuid) else null
+        val podcast = if (episode is PodcastEpisode) podcastManager.findPodcastByUuid(episode.podcastUuid) else null
 
         if (player?.isRemote == true && player?.isPlaying() == false) {
             if (castManager.isPlaying()) {
@@ -1017,14 +1017,14 @@ open class PlaybackManager @Inject constructor(
             upNextQueue.removeEpisode(episode)
 
             // stop the downloads
-            episodeManager.updateAutoDownloadStatus(episode, Episode.AUTO_DOWNLOAD_STATUS_IGNORE)
+            episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
             removeEpisodeFromQueue(episode, "finished", downloadManager)
 
             // mark as played
             episodeManager.updatePlayingStatus(episode, EpisodePlayingStatus.COMPLETED)
 
             // auto archive after playing
-            if (episode is Episode) {
+            if (episode is PodcastEpisode) {
                 episodeManager.archivePlayedEpisode(episode, this, podcastManager, sync = true)
             } else if (episode is UserEpisode) {
                 userEpisodeManager.deletePlayedEpisodeIfReq(episode, this)
@@ -1032,7 +1032,7 @@ open class PlaybackManager @Inject constructor(
 
             // Sync played to server straight away
             if (syncManager.isLoggedIn()) {
-                if (episode is Episode) {
+                if (episode is PodcastEpisode) {
                     val syncRequest =
                         EpisodeSyncRequest(
                             episode.uuid,
@@ -1309,7 +1309,7 @@ open class PlaybackManager @Inject constructor(
     private suspend fun loadCurrentEpisode(play: Boolean, forceStream: Boolean = false, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
         // make sure we have the most recent copy from the database
         val currentUpNextEpisode = upNextQueue.currentEpisode
-        val episode: Playable? = if (currentUpNextEpisode is Episode) {
+        val episode: Playable? = if (currentUpNextEpisode is PodcastEpisode) {
             episodeManager.findByUuid(currentUpNextEpisode.uuid)
         } else if (currentUpNextEpisode is UserEpisode) {
             userEpisodeManager.findEpisodeByUuidRx(currentUpNextEpisode.uuid)
@@ -1350,7 +1350,7 @@ open class PlaybackManager @Inject constructor(
             episodeManager.markAsNotPlayed(episode)
         }
         // check we have the latest episode url in the background
-        if (episode is Episode) {
+        if (episode is PodcastEpisode) {
             updateEpisodeUrl(episode)
         }
 
@@ -1400,7 +1400,7 @@ open class PlaybackManager @Inject constructor(
                 }
                 return
             } else {
-                val episodeObservable: Flowable<Playable>? = if (episode is Episode) {
+                val episodeObservable: Flowable<Playable>? = if (episode is PodcastEpisode) {
                     episodeManager.observeByUuid(episode.uuid)
                         .asFlowable()
                         .cast(Playable::class.java)
@@ -1441,9 +1441,9 @@ open class PlaybackManager @Inject constructor(
         lastPlayedEpisodeUuid = episode.uuid
 
         // podcast start from
-        if (episode is Episode) {
+        if (episode is PodcastEpisode) {
             // Auto subscribe to played podcasts (used in Automotive)
-            if (podcast != null && settings.getAutoSubscribeToPlayed() && !podcast.isSubscribed && episode.episodeType !is Episode.EpisodeType.Trailer) {
+            if (podcast != null && settings.getAutoSubscribeToPlayed() && !podcast.isSubscribed && episode.episodeType !is PodcastEpisode.EpisodeType.Trailer) {
                 podcastManager.subscribeToPodcast(podcast.uuid, sync = true)
             }
         }
@@ -1509,7 +1509,7 @@ open class PlaybackManager @Inject constructor(
 
     private fun findPodcastByEpisode(episode: Playable): Podcast? {
         return when (episode) {
-            is Episode -> podcastManager.findPodcastByUuid(episode.podcastUuid)
+            is PodcastEpisode -> podcastManager.findPodcastByUuid(episode.podcastUuid)
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
             else -> null
         }
@@ -1518,7 +1518,7 @@ open class PlaybackManager @Inject constructor(
     /**
      * Check we have the latest episode url in the background.
      */
-    private fun updateEpisodeUrl(episode: Episode) {
+    private fun updateEpisodeUrl(episode: PodcastEpisode) {
         if (episode.isDownloaded) {
             return
         }
@@ -1631,7 +1631,7 @@ open class PlaybackManager @Inject constructor(
                 }
 
                 // Handle skip first
-                if (episode is Episode) {
+                if (episode is PodcastEpisode) {
                     addPodcastStartFromSettings(episode, playbackState.podcast, isPlaying = true)
                 }
             }
@@ -1650,7 +1650,7 @@ open class PlaybackManager @Inject constructor(
         trackPlayback(AnalyticsEvent.PLAYBACK_PLAY, playbackSource)
     }
 
-    private suspend fun addPodcastStartFromSettings(episode: Episode, podcast: Podcast?, isPlaying: Boolean) {
+    private suspend fun addPodcastStartFromSettings(episode: PodcastEpisode, podcast: Podcast?, isPlaying: Boolean) {
         if (episode.playedUpTo != 0.toDouble() ||
             episode.playingStatus == EpisodePlayingStatus.IN_PROGRESS ||
             podcast == null ||

@@ -14,9 +14,9 @@ import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.isPlaying
@@ -90,7 +90,7 @@ class NotificationDrawerImpl @Inject constructor(
 
     private fun getNotificationData(episodeUuid: String?): NotificationData {
         val episode: Playable? = if (episodeUuid == null) null else runBlocking { episodeManager.findPlayableByUuid(episodeUuid) }
-        val podcast: Podcast? = if (episode == null || episode !is Episode) null else podcastManager.findPodcastByUuid(episode.podcastUuid)
+        val podcast: Podcast? = if (episode == null || episode !is PodcastEpisode) null else podcastManager.findPodcastByUuid(episode.podcastUuid)
 
         if (episodeUuid == null || episode == null) {
             return NotificationData()
@@ -103,7 +103,7 @@ class NotificationDrawerImpl @Inject constructor(
         }
 
         val bitmap = if (podcast != null) loadArtwork(podcast) else if (episode is UserEpisode) loadUserEpisodeArtwork(episode) else null
-        val podcastTitle = (if (episode is Episode) podcast?.title else UserEpisodePodcastSubstitute.substituteTitle) ?: ""
+        val podcastTitle = (if (episode is PodcastEpisode) podcast?.title else UserEpisodePodcastSubstitute.substituteTitle) ?: ""
 
         val data = NotificationData(
             episodeUuid = episodeUuid,

@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBinding
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextPlayingBinding
@@ -96,7 +96,7 @@ class UpNextAdapter(
             if (multiSelectHelper.isMultiSelecting) {
                 holder.binding.checkbox.isChecked = multiSelectHelper.toggle(item)
             } else {
-                val podcastUuid = (item as? Episode)?.podcastUuid
+                val podcastUuid = (item as? PodcastEpisode)?.podcastUuid
                 val playOnTap = settings.getTapOnUpNextShouldPlay()
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(WILL_PLAY_KEY to playOnTap))
                 listener.onEpisodeActionsClick(episodeUuid = item.uuid, podcastUuid = podcastUuid)
@@ -106,7 +106,7 @@ class UpNextAdapter(
             if (multiSelectHelper.isMultiSelecting) {
                 multiSelectHelper.defaultLongPress(episode = item, fragmentManager = fragmentManager)
             } else {
-                val podcastUuid = (item as? Episode)?.podcastUuid
+                val podcastUuid = (item as? PodcastEpisode)?.podcastUuid
                 val playOnLongPress = !settings.getTapOnUpNextShouldPlay()
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(WILL_PLAY_KEY to playOnLongPress))
                 listener.onEpisodeActionsLongPress(episodeUuid = item.uuid, podcastUuid = podcastUuid)

@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -380,8 +380,8 @@ class UserEpisodeManagerImpl @Inject constructor(
                 add(newEpisode, playbackManager)
 
                 if (settings.getCloudAutoDownload() && subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
-                    userEpisodeDao.updateAutoDownloadStatus(Episode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
-                    newEpisode.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
+                    userEpisodeDao.updateAutoDownloadStatus(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
+                    newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
                     downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", false)
                 }
             }

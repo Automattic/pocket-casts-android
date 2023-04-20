@@ -7,8 +7,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
@@ -30,7 +30,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    lateinit var episodeList: LiveData<List<Episode>>
+    lateinit var episodeList: LiveData<List<PodcastEpisode>>
     private lateinit var mode: ProfileEpisodeListFragment.Mode
 
     fun setup(mode: ProfileEpisodeListFragment.Mode) {
@@ -46,7 +46,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
 
     @Suppress("UNUSED_PARAMETER")
     fun episodeSwiped(episode: Playable, index: Int) {
-        if (episode !is Episode) return
+        if (episode !is PodcastEpisode) return
 
         launch {
             val source = getAnalyticsSource()
@@ -86,7 +86,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun onArchiveFromHereCount(episode: Episode): Int {
+    fun onArchiveFromHereCount(episode: PodcastEpisode): Int {
         val episodes = episodeList.value ?: return 0
         val index = max(episodes.indexOf(episode), 0) // -1 on not found
         return episodes.count() - index

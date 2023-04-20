@@ -19,11 +19,11 @@ import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_S
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocaliseFilters
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.autoDrawableId
@@ -73,7 +73,7 @@ object AutoConverter {
 
         val extrasForEpisode = extrasForEpisode(episode)
         if (groupTrailers) {
-            val groupTitle = if (episode is Episode && episode.episodeType is Episode.EpisodeType.Trailer) LR.string.episode_trailer else LR.string.episodes
+            val groupTitle = if (episode is PodcastEpisode && episode.episodeType is PodcastEpisode.EpisodeType.Trailer) LR.string.episode_trailer else LR.string.episodes
             extrasForEpisode.putString(EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT, context.resources.getString(groupTitle))
         }
         val mediaId = AutoMediaId(episode.uuid, sourceId).toMediaId()

@@ -10,9 +10,9 @@ import android.widget.RemoteViews
 import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.core.ui.widget.PodcastWidget
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
@@ -65,7 +65,7 @@ class WidgetManagerImpl @Inject constructor(
 
     private fun findPodcastByEpisode(episode: Playable): Podcast? {
         return when (episode) {
-            is Episode -> podcastManager.findPodcastByUuid(episode.podcastUuid)
+            is PodcastEpisode -> podcastManager.findPodcastByUuid(episode.podcastUuid)
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
             else -> null
         }

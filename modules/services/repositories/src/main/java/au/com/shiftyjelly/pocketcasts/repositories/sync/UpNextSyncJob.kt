@@ -11,8 +11,8 @@ import android.os.SystemClock
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -143,7 +143,7 @@ class UpNextSyncJob : JobService() {
             val uuids = change.uuids?.splitIgnoreEmpty(",") ?: listOf()
             val episodes = uuids.map { uuid ->
                 val episode = runBlocking { episodeManager.findPlayableByUuid(uuid) }
-                val podcastUuid = if (episode is Episode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
+                val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
                 UpNextSyncRequest.ChangeEpisode(
                     uuid,
                     episode?.title,
@@ -163,7 +163,7 @@ class UpNextSyncJob : JobService() {
             val uuid = change.uuid
             val episode = if (uuid == null) null else runBlocking { episodeManager.findPlayableByUuid(uuid) }
             val publishedDate = episode?.publishedDate?.switchInvalidForNow()?.toIsoString()
-            val podcastUuid = if (episode is Episode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
+            val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
             return UpNextSyncRequest.Change(
                 action = change.type,
                 modified = change.modified,

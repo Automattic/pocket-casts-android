@@ -5,8 +5,8 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -84,7 +84,7 @@ class AutoArchiveTest {
         val episodeManager = episodeManagerFor(testDb, Settings.AutoArchiveAfterPlaying.Never, Settings.AutoArchiveInactive.Never)
         val podcast = Podcast(UUID.randomUUID().toString())
         val podcastManager = podcastManagerThatReturns(podcast)
-        val episode = Episode(uuid = uuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date())
+        val episode = PodcastEpisode(uuid = uuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date())
         episodeDao.insert(episode)
         assertTrue("Episode should not be archived before running", !episode.isArchived)
         episodeManager.checkForEpisodesToAutoArchive(null, podcastManager)
@@ -103,9 +103,9 @@ class AutoArchiveTest {
         calendar.add(Calendar.DATE, -31)
         val date = calendar.time
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
         val newUUID = UUID.randomUUID().toString()
-        val newEpisode = Episode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
+        val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
         episodeDao.insert(newEpisode)
@@ -129,7 +129,7 @@ class AutoArchiveTest {
         calendar.add(Calendar.DATE, -31)
         val date = calendar.time
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastPlaybackInteraction = Date().time)
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastPlaybackInteraction = Date().time)
 
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
@@ -150,7 +150,7 @@ class AutoArchiveTest {
         calendar.add(Calendar.DATE, -31)
         val date = calendar.time
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastDownloadAttemptDate = Date())
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastDownloadAttemptDate = Date())
 
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
@@ -171,8 +171,8 @@ class AutoArchiveTest {
         val date = calendar.time
         val playedUuid = UUID.randomUUID().toString()
         val unplayedUuid = UUID.randomUUID().toString()
-        val playedEpisode = Episode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
-        val unplayedEpisode = Episode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+        val playedEpisode = PodcastEpisode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
+        val unplayedEpisode = PodcastEpisode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
         episodeDao.insert(playedEpisode)
         episodeDao.insert(unplayedEpisode)
@@ -196,8 +196,8 @@ class AutoArchiveTest {
         val date = calendar.time
         val playedUuid = UUID.randomUUID().toString()
         val unplayedUuid = UUID.randomUUID().toString()
-        val playedEpisode = Episode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time, isStarred = true)
-        val unplayedEpisode = Episode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+        val playedEpisode = PodcastEpisode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time, isStarred = true)
+        val unplayedEpisode = PodcastEpisode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
         episodeDao.insert(playedEpisode)
         episodeDao.insert(unplayedEpisode)
@@ -221,8 +221,8 @@ class AutoArchiveTest {
         val date = calendar.time
         val playedUuid = UUID.randomUUID().toString()
         val unplayedUuid = UUID.randomUUID().toString()
-        val playedEpisode = Episode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time, isStarred = true)
-        val unplayedEpisode = Episode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+        val playedEpisode = PodcastEpisode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time, isStarred = true)
+        val unplayedEpisode = PodcastEpisode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
         episodeDao.insert(playedEpisode)
         episodeDao.insert(unplayedEpisode)
@@ -246,9 +246,9 @@ class AutoArchiveTest {
         calendar.add(Calendar.DATE, -31)
         val date = calendar.time
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, isStarred = true)
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, isStarred = true)
         val newUUID = UUID.randomUUID().toString()
-        val newEpisode = Episode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
+        val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
         episodeDao.insert(newEpisode)
@@ -273,9 +273,9 @@ class AutoArchiveTest {
         calendar.add(Calendar.DATE, -31)
         val date = calendar.time
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, isStarred = true)
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, isStarred = true)
         val newUUID = UUID.randomUUID().toString()
-        val newEpisode = Episode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
+        val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
         episodeDao.insert(newEpisode)
@@ -307,10 +307,10 @@ class AutoArchiveTest {
         val time8Day = calendar8Day.timeInMillis
 
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastArchiveInteraction = time6Day)
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastArchiveInteraction = time6Day)
 
         val newUUID = UUID.randomUUID().toString()
-        val newEpisode = Episode(uuid = newUUID, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastArchiveInteraction = time8Day)
+        val newEpisode = PodcastEpisode(uuid = newUUID, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastArchiveInteraction = time8Day)
 
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
@@ -336,8 +336,8 @@ class AutoArchiveTest {
         val date = calendar.time
         val playedUuid = UUID.randomUUID().toString()
         val unplayedUuid = UUID.randomUUID().toString()
-        val playedEpisode = Episode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
-        val unplayedEpisode = Episode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+        val playedEpisode = PodcastEpisode(uuid = playedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
+        val unplayedEpisode = PodcastEpisode(uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
         episodeDao.insert(playedEpisode)
         episodeDao.insert(unplayedEpisode)
@@ -361,9 +361,9 @@ class AutoArchiveTest {
         calendar.add(Calendar.DATE, -31)
         val date = calendar.time
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
         val newUUID = UUID.randomUUID().toString()
-        val newEpisode = Episode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
+        val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = Date(), isArchived = false)
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
         episodeDao.insert(newEpisode)
@@ -387,9 +387,9 @@ class AutoArchiveTest {
         calendar.add(Calendar.HOUR, -30)
         val date = calendar.time
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date)
         val newUUID = UUID.randomUUID().toString()
-        val newEpisode = Episode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = date, isArchived = false)
+        val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = date, isArchived = false)
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
         episodeDao.insert(newEpisode)
@@ -413,9 +413,9 @@ class AutoArchiveTest {
         calendar.set(2019, 0, 24, 11, 30)
         val date = calendar.time
         val uuid = UUID.randomUUID().toString()
-        val episode = Episode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastPlaybackInteraction = null, lastDownloadAttemptDate = null)
+        val episode = PodcastEpisode(uuid = uuid, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, lastPlaybackInteraction = null, lastDownloadAttemptDate = null)
         val newUUID = UUID.randomUUID().toString()
-        val newEpisode = Episode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = date, isArchived = false)
+        val newEpisode = PodcastEpisode(uuid = newUUID, podcastUuid = podcastUUID, addedDate = Date(), publishedDate = date, isArchived = false)
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(episode)
         episodeDao.insert(newEpisode)
@@ -439,8 +439,8 @@ class AutoArchiveTest {
         val date = calendar.time
         val oldestUuid = UUID.randomUUID().toString()
         val unplayedUuid = UUID.randomUUID().toString()
-        val oldestEpisode = Episode(title = "Oldest", uuid = oldestUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
-        val unplayedEpisode = Episode(title = "Newest", uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+        val oldestEpisode = PodcastEpisode(title = "Oldest", uuid = oldestUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
+        val unplayedEpisode = PodcastEpisode(title = "Newest", uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
         episodeDao.insert(oldestEpisode)
         episodeDao.insert(unplayedEpisode)
@@ -464,8 +464,8 @@ class AutoArchiveTest {
         val date = calendar.time
         val oldestUuid = UUID.randomUUID().toString()
         val unplayedUuid = UUID.randomUUID().toString()
-        val oldestEpisode = Episode(title = "Oldest", uuid = oldestUuid, podcastUuid = podcast.uuid, isArchived = false, excludeFromEpisodeLimit = true, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
-        val unplayedEpisode = Episode(title = "Newest", uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+        val oldestEpisode = PodcastEpisode(title = "Oldest", uuid = oldestUuid, podcastUuid = podcast.uuid, isArchived = false, excludeFromEpisodeLimit = true, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
+        val unplayedEpisode = PodcastEpisode(title = "Newest", uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
 
         episodeDao.insert(oldestEpisode)
         episodeDao.insert(unplayedEpisode)
@@ -488,7 +488,7 @@ class AutoArchiveTest {
         calendar.add(Calendar.DATE, -2)
         val date = calendar.time
         val oldestUuid = UUID.randomUUID().toString()
-        val oldestEpisode = Episode(title = "Oldest", uuid = oldestUuid, podcastUuid = podcast.uuid, isArchived = false, excludeFromEpisodeLimit = true, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
+        val oldestEpisode = PodcastEpisode(title = "Oldest", uuid = oldestUuid, podcastUuid = podcast.uuid, isArchived = false, excludeFromEpisodeLimit = true, publishedDate = date, playingStatus = EpisodePlayingStatus.COMPLETED, lastPlaybackInteraction = date.time)
 
         episodeDao.insert(oldestEpisode)
 
@@ -518,7 +518,7 @@ class AutoArchiveTest {
         val time8Day = calendar8Day.timeInMillis
 
         val newUUID = UUID.randomUUID().toString()
-        val newEpisode = Episode(uuid = newUUID, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, archivedModified = time8Day)
+        val newEpisode = PodcastEpisode(uuid = newUUID, isArchived = false, publishedDate = date, podcastUuid = podcastUUID, addedDate = date, archivedModified = time8Day)
 
         testDb.podcastDao().insert(podcast)
         episodeDao.insert(newEpisode)

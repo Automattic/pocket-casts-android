@@ -13,14 +13,14 @@ import java.io.Serializable
 import java.util.Date
 
 @Entity(
-    tableName = "episodes",
+    tableName = "podcast_episodes",
     indices = [
         Index(name = "episode_last_download_attempt_date", value = arrayOf("last_download_attempt_date")),
         Index(name = "episode_podcast_id", value = arrayOf("podcast_id")),
         Index(name = "episode_published_date", value = arrayOf("published_date"))
     ]
 )
-data class Episode(
+data class PodcastEpisode(
     @PrimaryKey(autoGenerate = false) @ColumnInfo(name = "uuid") override var uuid: String,
     @ColumnInfo(name = "episode_description") override var episodeDescription: String = "",
     @ColumnInfo(name = "published_date") override var publishedDate: Date,

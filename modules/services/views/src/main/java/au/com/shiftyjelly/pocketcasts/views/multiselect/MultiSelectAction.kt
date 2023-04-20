@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -133,7 +133,7 @@ sealed class MultiSelectAction(
                 }
                 R.id.menu_archive -> {
                     for (playable in selected) {
-                        if (playable is Episode && !playable.isArchived) {
+                        if (playable is PodcastEpisode && !playable.isArchived) {
                             return Archive
                         }
                     }
@@ -152,7 +152,7 @@ sealed class MultiSelectAction(
                 R.id.menu_star -> {
                     if (selected.filterIsInstance<UserEpisode>().isNotEmpty()) return null
                     for (playable in selected) {
-                        if (playable is Episode && !playable.isStarred) {
+                        if (playable is PodcastEpisode && !playable.isStarred) {
                             return Star
                         }
                     }

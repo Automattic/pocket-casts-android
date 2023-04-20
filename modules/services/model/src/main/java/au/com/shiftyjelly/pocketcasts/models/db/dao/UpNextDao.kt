@@ -8,8 +8,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
@@ -126,14 +126,14 @@ abstract class UpNextDao {
     @Query("SELECT * FROM up_next_episodes ORDER BY position ASC LIMIT 1")
     abstract fun findCurrentUpNextEpisode(): UpNextEpisode?
 
-    @Query("SELECT episodes.* FROM up_next_episodes JOIN episodes ON episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC LIMIT 1")
-    abstract fun findCurrentEpisode(): Episode?
+    @Query("SELECT podcast_episodes.* FROM up_next_episodes JOIN podcast_episodes ON podcast_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC LIMIT 1")
+    abstract fun findCurrentEpisode(): PodcastEpisode?
 
     @Query("SELECT user_episodes.* FROM up_next_episodes JOIN user_episodes ON user_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC LIMIT 1")
     abstract fun findCurrentUserEpisode(): UserEpisode?
 
-    @Query("SELECT episodes.* FROM up_next_episodes JOIN episodes ON episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC")
-    abstract fun findEpisodes(): List<Episode>
+    @Query("SELECT podcast_episodes.* FROM up_next_episodes JOIN podcast_episodes ON podcast_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC")
+    abstract fun findEpisodes(): List<PodcastEpisode>
 
     @Query("SELECT user_episodes.* FROM up_next_episodes JOIN user_episodes ON user_episodes.uuid = up_next_episodes.episodeUuid ORDER BY up_next_episodes.position ASC")
     abstract fun findUserEpisodes(): List<UserEpisode>
