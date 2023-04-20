@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear
 
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.media3.common.util.UnstableApi
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -11,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -63,7 +65,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
             notificationHelper.setupNotificationChannels()
 
             withContext(Dispatchers.Default) {
-                playbackManager.setup()
+                playbackManager.setup(playbackService)
                 downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
 
                 val storageChoice = settings.getStorageChoice()
@@ -95,5 +97,10 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
             .setExecutor(Executors.newFixedThreadPool(3))
             .setJobSchedulerJobIdRange(1000, 20000)
             .build()
+    }
+
+    companion object {
+        @UnstableApi
+        val playbackService = PlaybackService::class.java
     }
 }

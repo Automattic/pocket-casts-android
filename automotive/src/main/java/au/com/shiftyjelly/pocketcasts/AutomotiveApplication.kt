@@ -6,6 +6,7 @@ import android.app.UiModeManager
 import android.util.Log
 import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.media3.common.util.UnstableApi
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -70,7 +71,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
             FirebaseAnalyticsTracker.setup(FirebaseAnalytics.getInstance(this@AutomotiveApplication), settings)
 
             withContext(Dispatchers.Default) {
-                playbackManager.setup()
+                playbackManager.setup(playbackService)
                 downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
                 RefreshPodcastsTask.runNow(this@AutomotiveApplication)
             }
@@ -118,5 +119,10 @@ class AutomotiveApplication : Application(), Configuration.Provider {
 
     private fun setupAnalytics() {
         AnalyticsTracker.init(settings)
+    }
+
+    companion object {
+        @UnstableApi
+        val playbackService = AutoPlaybackService::class.java
     }
 }

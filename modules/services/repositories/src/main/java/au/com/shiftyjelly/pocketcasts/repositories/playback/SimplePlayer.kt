@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.SurfaceView
 import android.widget.Toast
-import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -35,7 +34,14 @@ import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val context: Context, override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit) : LocalPlayer(onPlayerEvent) {
+@UnstableApi
+class SimplePlayer(
+    val settings: Settings,
+    val statsManager: StatsManager,
+    val context: Context,
+    override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit,
+    val player: Player,
+) : LocalPlayer(onPlayerEvent, player) {
 
     companion object {
         private val BUFFER_TIME_MIN_MILLIS = TimeUnit.MINUTES.toMillis(15).toInt()
@@ -44,8 +50,6 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         // Be careful increasing the size of the back buffer. It can easily lead to OOM errors.
         private val BACK_BUFFER_TIME_MILLIS = TimeUnit.MINUTES.toMillis(2).toInt()
     }
-
-    private var player: ExoPlayer? = null
 
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
@@ -60,39 +64,28 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     @Volatile
     private var prepared = false
 
-    val exoPlayer: ExoPlayer?
-        get() {
-            return player
-        }
-
     override suspend fun bufferedUpToMs(): Int {
         return withContext(Dispatchers.Main) {
-            player?.bufferedPosition?.toInt() ?: 0
+            player.bufferedPosition.toInt()
         }
     }
 
     override suspend fun bufferedPercentage(): Int {
         return withContext(Dispatchers.Main) {
-            player?.bufferedPercentage ?: 0
+            player.bufferedPercentage
         }
     }
 
     override suspend fun durationMs(): Int? {
         return withContext(Dispatchers.Main) {
-            val duration = player?.duration ?: C.TIME_UNSET
+            val duration = player.duration
             if (duration == C.TIME_UNSET) null else duration.toInt()
         }
     }
 
-    override suspend fun isPlaying(): Boolean {
-        return withContext(Dispatchers.Main) {
-            player?.playWhenReady ?: false
-        }
-    }
+    override fun isPlaying(): Boolean = player.playWhenReady
 
-    override fun handleCurrentPositionMs(): Int {
-        return player?.currentPosition?.toInt() ?: -1
-    }
+    override fun handleCurrentPositionMs(): Int = player.currentPosition.toInt()
 
     override fun handlePrepare() {
         if (prepared) {
@@ -102,41 +95,29 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     }
 
     override fun handleStop() {
-        try {
-            player?.stop()
-        } catch (e: Exception) {
-        }
-
-        try {
-            player?.release()
-        } catch (e: Exception) {
-        }
-
-        player = null
         prepared = false
-
         videoChangedListener?.videoNeedsReset()
     }
 
     override fun handlePause() {
-        player?.playWhenReady = false
+        player.playWhenReady = false
     }
 
     override fun handlePlay() {
-        player?.playWhenReady = true
+        player.playWhenReady = true
     }
 
     override fun handleSeekToTimeMs(positionMs: Int) {
-        if (player?.isCurrentMediaItemSeekable == false && player?.isPlaying == true) {
+        if (!player.isCurrentMediaItemSeekable && player.isPlaying) {
             Toast.makeText(context, "Unable to seek. File headers appear to be invalid.", Toast.LENGTH_SHORT).show()
         } else {
-            player?.seekTo(positionMs.toLong())
+            player.seekTo(positionMs.toLong())
             super.onSeekComplete(positionMs)
         }
     }
 
     override fun handleIsBuffering(): Boolean {
-        return (player?.playbackState ?: Player.STATE_ENDED) == Player.STATE_BUFFERING
+        return (player.playbackState) == Player.STATE_BUFFERING
     }
 
     override fun handleIsPrepared(): Boolean {
@@ -163,13 +144,14 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     }
 
     override fun setVolume(volume: Float) {
-        player?.volume = volume
+        player.volume = volume
     }
 
     override fun setPodcast(podcast: Podcast?) {}
 
-    @OptIn(UnstableApi::class)
-    private fun prepare() {
+    override fun prepare() {
+        player.prepare()
+
         val trackSelector = DefaultTrackSelector(context)
 
         val minBufferMillis = if (isStreaming) BUFFER_TIME_MIN_MILLIS else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
@@ -197,7 +179,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         renderer.onAudioSessionId(player.audioSessionId)
 
         handleStop()
-        this.player = player
+//        this.player = player
 
         setPlayerEffects()
         player.addListener(object : Player.Listener {
@@ -291,8 +273,6 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     }
 
     fun setDisplay(surfaceView: SurfaceView?): Boolean {
-        val player = player ?: return false
-
         return try {
             player.setVideoSurfaceHolder(surfaceView?.holder)
             true
@@ -317,7 +297,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     private fun setPlayerEffects() {
         val player = player
         val playbackEffects = playbackEffects
-        if (player == null || playbackEffects == null) return // nothing to set
+            ?: return // nothing to set
 
         renderersFactory?.let {
             it.setPlaybackSpeed(playbackEffects.playbackSpeed.toFloat())

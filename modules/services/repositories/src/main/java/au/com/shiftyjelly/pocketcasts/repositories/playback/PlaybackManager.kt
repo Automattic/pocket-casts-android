@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.support.v4.media.session.MediaSessionCompat
@@ -12,6 +13,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
+import androidx.work.await
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -167,13 +171,25 @@ open class PlaybackManager @Inject constructor(
     )
     var sleepAfterEpisode: Boolean = false
 
+    // TODO - Make this a player instead?
+    private var controller: MediaController? = null
     var pocketCastsPlayer: PocketCastsPlayer? = null
 
     val mediaSession: MediaSessionCompat
         get() = mediaSessionManager.mediaSession
 
     @SuppressLint("CheckResult")
-    fun setup() {
+    fun setup(playbackServiceClass: Class<out PlaybackService>) {
+        val sessionToken =
+            SessionToken(application, ComponentName(application, playbackServiceClass))
+
+        // FIXME do we need to hold onto the controller future so we can release it?
+        // https://developer.android.com/guide/topics/media/media3/getting-started/playing-in-background#handling-ui
+        val controllerFuture = MediaController.Builder(application, sessionToken).buildAsync()
+        launch {
+            controller = controllerFuture.await()
+        }
+
         if (!Util.isAutomotive(application)) {
             widgetManager.updateWidgetFromPlaybackState(this)
         }
@@ -806,11 +822,13 @@ open class PlaybackManager @Inject constructor(
                 pocketCastsPlayer = null
             }
 
-            pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
-            (pocketCastsPlayer as? CastPlayer)?.updateFromRemoteIfRequired()
-            Timber.i("Cast reconnected. Creating media player of type CastPlayer")
+            controller?.let { player ->
+                pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent, player)
+                (pocketCastsPlayer as? CastPlayer)?.updateFromRemoteIfRequired()
+                Timber.i("Cast reconnected. Creating media player of type CastPlayer")
 
-            setupUpdateTimer()
+                setupUpdateTimer()
+            }
         }
     }
 
@@ -1669,12 +1687,14 @@ open class PlaybackManager @Inject constructor(
 
         withContext(Dispatchers.Main) {
             pocketCastsPlayer?.stop()
-            if (castManager.isConnected()) {
-                pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
-                Timber.i("Creating media player of type CastPlayer.")
-            } else {
-                pocketCastsPlayer = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
-                Timber.i("Creating media player of type SimplePlayer.")
+            controller?.let { player ->
+                if (castManager.isConnected()) {
+                    pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent, player)
+                    Timber.i("Creating media player of type CastPlayer.")
+                } else {
+                    pocketCastsPlayer = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent, player)
+                    Timber.i("Creating media player of type SimplePlayer.")
+                }
             }
         }
 
