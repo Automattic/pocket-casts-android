@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager;
 import au.com.shiftyjelly.pocketcasts.preferences.Settings;
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum;
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode;
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable;
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode;
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager;
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil;
 import au.com.shiftyjelly.pocketcasts.utils.StringUtil;
@@ -52,7 +52,7 @@ public class FileStorage {
     }
 
 	@NonNull
-	public File getPodcastEpisodeFile(Playable episode) throws StorageException {
+	public File getPodcastEpisodeFile(Episode episode) throws StorageException {
 		String fileName = episode.getUuid() + episode.getFileExtension();
 		File directory;
 		if (episode instanceof PodcastEpisode) {
@@ -65,7 +65,7 @@ public class FileStorage {
 	}
 
 	@NonNull
-	public File getTempPodcastEpsisodeFile(Playable episode) throws StorageException {
+	public File getTempPodcastEpsisodeFile(Episode episode) throws StorageException {
 		String fileName = episode.getUuid() + episode.getFileExtension();		
 		return new File(getTempPodcastDirectory(), fileName);
 	}

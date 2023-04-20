@@ -14,7 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -89,7 +89,7 @@ class NotificationDrawerImpl @Inject constructor(
     }
 
     private fun getNotificationData(episodeUuid: String?): NotificationData {
-        val episode: Playable? = if (episodeUuid == null) null else runBlocking { episodeManager.findPlayableByUuid(episodeUuid) }
+        val episode: Episode? = if (episodeUuid == null) null else runBlocking { episodeManager.findEpisodeByUuid(episodeUuid) }
         val podcast: Podcast? = if (episode == null || episode !is PodcastEpisode) null else podcastManager.findPodcastByUuid(episode.podcastUuid)
 
         if (episodeUuid == null || episode == null) {

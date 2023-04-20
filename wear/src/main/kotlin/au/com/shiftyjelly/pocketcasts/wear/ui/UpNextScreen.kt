@@ -43,18 +43,18 @@ fun UpNextScreen(
                 modifier = modifier.fillMaxWidth(),
                 state = listState,
             ) {
-                items(list) { playable ->
+                items(list) { episode ->
                     Chip(
                         onClick = {
-                            navigateToEpisode(playable.uuid)
+                            navigateToEpisode(episode.uuid)
                         },
                         colors = ChipDefaults.secondaryChipColors(),
                         label = {
-                            Text(playable.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(episode.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         },
                         icon = {
                             PodcastImage(
-                                uuid = playable.uuid,
+                                uuid = episode.uuid,
                                 dropShadow = false,
                                 modifier = Modifier.size(30.dp)
                             )

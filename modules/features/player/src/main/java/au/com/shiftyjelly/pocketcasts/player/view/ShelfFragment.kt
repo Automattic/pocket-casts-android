@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfItemBinding
@@ -110,8 +110,8 @@ class ShelfFragment : BaseFragment(), ShelfTouchCallback.ItemTouchHelperAdapter 
             adapter.submitList(items)
         }
 
-        playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (playable, _) ->
-            adapter.playable = playable
+        playerViewModel.playingEpisodeLive.observe(viewLifecycleOwner) { (episode, _) ->
+            adapter.episode = episode
         }
     }
 
@@ -224,7 +224,7 @@ private val SHELF_ITEM_DIFF = object : DiffUtil.ItemCallback<Any>() {
 }
 
 class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(SHELF_ITEM_DIFF) {
-    var playable: Playable? = null
+    var episode: Episode? = null
         set(value) {
             field = value
             notifyDataSetChanged()
@@ -287,8 +287,8 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
         if (item is ShelfItem && holder is ItemViewHolder) {
             val binding = holder.binding
 
-            binding.lblTitle.setText(item.title(playable))
-            binding.imgIcon.setImageResource(item.iconRes(playable))
+            binding.lblTitle.setText(item.title(episode))
+            binding.imgIcon.setImageResource(item.iconRes(episode))
             binding.dragHandle.isVisible = editable
 
             if (listener != null) {
@@ -296,7 +296,7 @@ class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? =
             }
 
             val subtitle = item.subtitle
-            binding.lblSubtitle.isVisible = editable && subtitle != null && playable is UserEpisode
+            binding.lblSubtitle.isVisible = editable && subtitle != null && episode is UserEpisode
             if (subtitle != null) {
                 binding.lblSubtitle.setText(subtitle)
             }

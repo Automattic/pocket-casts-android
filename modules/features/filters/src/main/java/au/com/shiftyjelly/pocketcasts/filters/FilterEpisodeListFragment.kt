@@ -21,7 +21,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -159,7 +159,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         }
     }
 
-    private fun onRowClick(episode: Playable) {
+    private fun onRowClick(episode: Episode) {
         if (episode is PodcastEpisode) {
             val fragment = EpisodeFragment.newInstance(episode = episode, source = EpisodeViewSource.FILTERS)
             fragment.show(parentFragmentManager, "episode_card")
@@ -438,7 +438,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                 }
             }
 
-            override fun multiSelectSelectAllUp(episode: Playable) {
+            override fun multiSelectSelectAllUp(episode: Episode) {
                 analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_ABOVE)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
@@ -451,7 +451,7 @@ class FilterEpisodeListFragment : BaseFragment() {
                 }
             }
 
-            override fun multiSelectSelectAllDown(episode: Playable) {
+            override fun multiSelectSelectAllDown(episode: Episode) {
                 analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BELOW)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
@@ -539,7 +539,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             .show(childFragmentManager, "confirm")
     }
 
-    private fun episodeSwipedRightItem1(episode: Playable, index: Int) {
+    private fun episodeSwipedRightItem1(episode: Episode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
@@ -547,7 +547,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         adapter.notifyItemChanged(index)
     }
 
-    private fun episodeSwipedRightItem2(episode: Playable, index: Int) {
+    private fun episodeSwipedRightItem2(episode: Episode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)

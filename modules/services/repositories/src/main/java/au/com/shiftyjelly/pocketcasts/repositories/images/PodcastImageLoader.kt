@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.widget.ImageView
 import androidx.core.graphics.drawable.toBitmap
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -133,13 +133,13 @@ open class PodcastImageLoader(
         return builder
     }
 
-    fun load(playable: Playable): ImageRequest.Builder {
-        return when (playable) {
+    fun load(episode: Episode): ImageRequest.Builder {
+        return when (episode) {
             is PodcastEpisode -> {
-                load(playable)
+                load(episode)
             }
             is UserEpisode -> {
-                load(playable)
+                load(episode)
             }
             else -> {
                 loadNoPodcastCoil()

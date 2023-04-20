@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="au.com.shiftyjelly.pocketcasts.models.entity.Playable" />
+        <import type="au.com.shiftyjelly.pocketcasts.models.entity.Episode" />
         <variable name="episode" type="au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode" />
         <variable name="inUpNext" type="Boolean" />
     </data>

@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -25,13 +25,13 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import io.reactivex.disposables.CompositeDisposable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-val PLAYBACK_DIFF: DiffUtil.ItemCallback<Playable> = object : DiffUtil.ItemCallback<Playable>() {
-    override fun areItemsTheSame(oldItem: Playable, newItem: Playable): Boolean {
+val PLAYBACK_DIFF: DiffUtil.ItemCallback<Episode> = object : DiffUtil.ItemCallback<Episode>() {
+    override fun areItemsTheSame(oldItem: Episode, newItem: Episode): Boolean {
         return oldItem.uuid == newItem.uuid
     }
 
     @SuppressLint("DiffUtilEquals")
-    override fun areContentsTheSame(oldItem: Playable, newItem: Playable): Boolean {
+    override fun areContentsTheSame(oldItem: Episode, newItem: Episode): Boolean {
         return oldItem == newItem
     }
 }
@@ -41,13 +41,13 @@ class EpisodeListAdapter(
     val playbackManager: PlaybackManager,
     val upNextQueue: UpNextQueue,
     val settings: Settings,
-    val onRowClick: (Playable) -> Unit,
+    val onRowClick: (Episode) -> Unit,
     val playButtonListener: PlayButton.OnClickListener,
     val imageLoader: PodcastImageLoader,
     val multiSelectHelper: MultiSelectHelper,
     val fragmentManager: FragmentManager,
     val fromListUuid: String? = null,
-) : ListAdapter<Playable, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
+) : ListAdapter<Episode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
     val disposables = CompositeDisposable()
 

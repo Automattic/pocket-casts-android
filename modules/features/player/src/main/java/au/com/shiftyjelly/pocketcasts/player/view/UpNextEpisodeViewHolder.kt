@@ -18,7 +18,7 @@ import androidx.core.view.marginLeft
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextBinding
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -82,7 +82,7 @@ class UpNextEpisodeViewHolder(
         }
     }
 
-    fun bind(episode: Playable, isMultiSelecting: Boolean, isSelected: Boolean) {
+    fun bind(episode: Episode, isMultiSelecting: Boolean, isSelected: Boolean) {
         val tintColor = ContextThemeWrapper(itemView.context, UR.style.ThemeDark).getAttrTextStyleColor(UR.attr.textSubtitle1)
 
         disposable = episodeManager
@@ -136,7 +136,7 @@ class UpNextEpisodeViewHolder(
 
     override val episodeRow: ViewGroup
         get() = binding.itemContainer
-    override val episode: Playable?
+    override val episode: Episode?
         get() = binding.episode
     override val swipeLeftIcon: ImageView
         get() = binding.archiveIcon

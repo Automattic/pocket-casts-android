@@ -11,7 +11,7 @@ import android.os.SystemClock
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -142,7 +142,7 @@ class UpNextSyncJob : JobService() {
         if (change.type == UpNextChange.ACTION_REPLACE) {
             val uuids = change.uuids?.splitIgnoreEmpty(",") ?: listOf()
             val episodes = uuids.map { uuid ->
-                val episode = runBlocking { episodeManager.findPlayableByUuid(uuid) }
+                val episode = runBlocking { episodeManager.findEpisodeByUuid(uuid) }
                 val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
                 UpNextSyncRequest.ChangeEpisode(
                     uuid,
@@ -161,7 +161,7 @@ class UpNextSyncJob : JobService() {
         // any other action
         else {
             val uuid = change.uuid
-            val episode = if (uuid == null) null else runBlocking { episodeManager.findPlayableByUuid(uuid) }
+            val episode = if (uuid == null) null else runBlocking { episodeManager.findEpisodeByUuid(uuid) }
             val publishedDate = episode?.publishedDate?.switchInvalidForNow()?.toIsoString()
             val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
             return UpNextSyncRequest.Change(
@@ -194,7 +194,7 @@ class UpNextSyncJob : JobService() {
         }
 
         // import missing episodes
-        val findOrDownloadEpisodes: Observable<Playable> = Observable.fromIterable(response.episodes ?: emptyList()).concatMap { responseEpisode ->
+        val findOrDownloadEpisodes: Observable<Episode> = Observable.fromIterable(response.episodes ?: emptyList()).concatMap { responseEpisode ->
             val episodeUuid = responseEpisode.uuid
             val podcastUuid = responseEpisode.podcast
             if (podcastUuid == null) {

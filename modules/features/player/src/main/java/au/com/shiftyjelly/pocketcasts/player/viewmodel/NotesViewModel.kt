@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -45,22 +45,22 @@ class NotesViewModel
     val showNotes = MutableLiveData<Pair<String, Boolean>>().apply { postValue(Pair("", false)) }
     val episode = MutableLiveData<PodcastEpisode>()
 
-    fun loadEpisode(playable: Playable, color: Int) {
-        if (playable !is PodcastEpisode || (episode.value?.uuid == playable.uuid && ColorUtils.colorIntToHexString(color).equals(showNotesFormatter.backgroundColor, true))) return // Only update show notes when the episode or color changes
+    fun loadEpisode(episode: Episode, color: Int) {
+        if (episode !is PodcastEpisode || (this.episode.value?.uuid == episode.uuid && ColorUtils.colorIntToHexString(color).equals(showNotesFormatter.backgroundColor, true))) return // Only update show notes when the episode or color changes
 
         showNotesFormatter.backgroundColor = "#" + Integer.toHexString(color).substring(2) // Convert the color int to hex value, discard the alpha from the front
         // update the episode live data
-        episode.postValue(playable)
+        this.episode.postValue(episode)
         // convert times to links if the episode is now playing
-        showNotesFormatter.setConvertTimesToLinks(playbackManager.upNextQueue.isCurrentEpisode(playable))
-        podcastManager.findPodcastByUuidRx(playable.podcastUuid)
+        showNotesFormatter.setConvertTimesToLinks(playbackManager.upNextQueue.isCurrentEpisode(episode))
+        podcastManager.findPodcastByUuidRx(episode.podcastUuid)
             // update the show notes link tint
             .doOnSuccess { podcast ->
                 val linkColor = if (podcast.tintColorForDarkBg == 0) Color.WHITE else podcast.tintColorForDarkBg
                 showNotesFormatter.linkColor = ColorUtils.colorIntToHexString(linkColor)
             }
             // load the show notes
-            .flatMapCompletable { loadShowNotes(playable.uuid) }
+            .flatMapCompletable { loadShowNotes(episode.uuid) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { Timber.e(it) })

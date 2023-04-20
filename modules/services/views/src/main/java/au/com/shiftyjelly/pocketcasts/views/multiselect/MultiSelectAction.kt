@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.views.R
@@ -120,11 +120,11 @@ sealed class MultiSelectAction(
             return loadedItems + missingItems
         }
 
-        fun actionForGroup(groupId: Int, selected: List<Playable>): MultiSelectAction? {
+        fun actionForGroup(groupId: Int, selected: List<Episode>): MultiSelectAction? {
             when (groupId) {
                 R.id.menu_download -> {
-                    for (playable in selected) {
-                        if (!playable.isDownloaded) {
+                    for (episode in selected) {
+                        if (!episode.isDownloaded) {
                             return Download
                         }
                     }
@@ -132,8 +132,8 @@ sealed class MultiSelectAction(
                     return DeleteDownload
                 }
                 R.id.menu_archive -> {
-                    for (playable in selected) {
-                        if (playable is PodcastEpisode && !playable.isArchived) {
+                    for (episode in selected) {
+                        if (episode is PodcastEpisode && !episode.isArchived) {
                             return Archive
                         }
                     }
@@ -141,8 +141,8 @@ sealed class MultiSelectAction(
                     return if (selected.filterIsInstance<UserEpisode>().size == selected.size) DeleteUserEpisode else Unarchive
                 }
                 R.id.menu_mark_played -> {
-                    for (playable in selected) {
-                        if (!playable.isFinished) {
+                    for (episode in selected) {
+                        if (!episode.isFinished) {
                             return MarkAsPlayed
                         }
                     }
@@ -151,8 +151,8 @@ sealed class MultiSelectAction(
                 }
                 R.id.menu_star -> {
                     if (selected.filterIsInstance<UserEpisode>().isNotEmpty()) return null
-                    for (playable in selected) {
-                        if (playable is PodcastEpisode && !playable.isStarred) {
+                    for (episode in selected) {
+                        if (episode is PodcastEpisode && !episode.isStarred) {
                             return Star
                         }
                     }

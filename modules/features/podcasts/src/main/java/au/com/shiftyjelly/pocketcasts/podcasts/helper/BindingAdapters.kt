@@ -10,7 +10,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButtonType
 import com.google.android.material.button.MaterialButton
@@ -37,7 +37,7 @@ object BindingAdapters {
 
     @BindingAdapter(value = ["episode", "buttonType", "color", "fromListUuid"])
     @JvmStatic
-    fun setupPlayButton(button: PlayButton, episode: Playable, buttonType: PlayButtonType, color: Int, fromListUuid: String?) {
+    fun setupPlayButton(button: PlayButton, episode: Episode, buttonType: PlayButtonType, color: Int, fromListUuid: String?) {
         button.setButtonType(episode, buttonType, color, fromListUuid)
     }
 

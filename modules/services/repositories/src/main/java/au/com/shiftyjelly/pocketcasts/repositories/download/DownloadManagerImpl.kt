@@ -14,7 +14,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -134,7 +134,7 @@ class DownloadManagerImpl @Inject constructor(
                         WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
                             launch(downloadsCoroutineContext) {
                                 pendingQueue[episodeUUID] = DownloadingInfo(episodeUUID, workInfo.id)
-                                episodeManager.findPlayableByUuid(episodeUUID)?.let { episode ->
+                                episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
 
                                     // FIXME this is a hack to avoid an issue where this listener says downloads
                                     //  on the watch app are enqueued when they are actually still running.
@@ -173,7 +173,7 @@ class DownloadManagerImpl @Inject constructor(
                                 }
                                 stopDownloadingEpisode(episodeUUID, "work manager cancel status")
 
-                                episodeManager.findPlayableByUuid(episodeUUID)?.let {
+                                episodeManager.findEpisodeByUuid(episodeUUID)?.let {
                                     episodeManager.updateDownloadTaskId(it, null)
                                     if (!it.isDownloaded && it.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
                                         episodeManager.updateEpisodeStatus(it, EpisodeStatusEnum.NOT_DOWNLOADED)
@@ -264,10 +264,10 @@ class DownloadManagerImpl @Inject constructor(
     private val addDownloadMutex = Mutex()
 
     // We only want to be able to queue one download at a time
-    override fun addEpisodeToQueue(episode: Playable, from: String, fireEvent: Boolean) {
+    override fun addEpisodeToQueue(episode: Episode, from: String, fireEvent: Boolean) {
         launch(downloadsCoroutineContext) {
             addDownloadMutex.withLock {
-                val updatedEpisode = episodeManager.findPlayableByUuid(episode.uuid) ?: return@launch // Get the latest episode so we can check if it's downloaded
+                val updatedEpisode = episodeManager.findEpisodeByUuid(episode.uuid) ?: return@launch // Get the latest episode so we can check if it's downloaded
                 // if this episode is already in the queue or downloading, ignore it
                 if (updatedEpisode.isDownloaded || updatedEpisode.downloadTaskId != null) {
                     LogBuffer.i(
@@ -297,12 +297,12 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun getRequirementsAsync(episode: Playable): NetworkRequirements =
+    private suspend fun getRequirementsAsync(episode: Episode): NetworkRequirements =
         withContext(downloadsCoroutineContext) {
             networkRequiredForEpisode(episode)
         }
 
-    override suspend fun getRequirementsAndSetStatusAsync(episode: Playable): NetworkRequirements {
+    override suspend fun getRequirementsAndSetStatusAsync(episode: Episode): NetworkRequirements {
         return withContext(downloadsCoroutineContext) {
             val networkRequirements = networkRequiredForEpisode(episode)
             updateEpisodeStatusAsync(episode, networkRequirements).await()
@@ -310,7 +310,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private fun addWorkManagerTask(episode: Playable, networkRequirements: NetworkRequirements) {
+    private fun addWorkManagerTask(episode: Episode, networkRequirements: NetworkRequirements) {
         try {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(networkRequirements.toWorkManagerEnum())
@@ -355,7 +355,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private fun updateEpisodeStatusAsync(episode: Playable, networkRequirements: NetworkRequirements): Deferred<Unit> {
+    private fun updateEpisodeStatusAsync(episode: Episode, networkRequirements: NetworkRequirements): Deferred<Unit> {
         return async {
             val status = getEpisodeStatusForRequirements(networkRequirements)
             if (status != episode.episodeStatus) {
@@ -372,7 +372,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    override fun removeEpisodeFromQueue(episode: Playable, from: String) {
+    override fun removeEpisodeFromQueue(episode: Episode, from: String) {
         launch(downloadsCoroutineContext) {
             episode.downloadTaskId?.let {
                 WorkManager.getInstance(context).cancelWorkById(UUID.fromString(it))
@@ -390,7 +390,7 @@ class DownloadManagerImpl @Inject constructor(
     }
 
     private suspend fun episodeDidDownload(result: DownloadResult) = withContext(downloadsCoroutineContext) {
-        val episode = episodeManager.findPlayableByUuid(result.episodeUuid)
+        val episode = episodeManager.findEpisodeByUuid(result.episodeUuid)
 
         try {
             pendingQueue.remove(result.episodeUuid)
@@ -459,7 +459,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private fun networkRequiredForEpisode(episode: Playable): NetworkRequirements {
+    private fun networkRequiredForEpisode(episode: Episode): NetworkRequirements {
         // user has tapped download
         if (!episode.isAutoDownloaded) {
             // user said yes to warning dialog

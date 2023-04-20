@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBinding
@@ -73,7 +73,7 @@ class UpNextAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (item) {
-            is Playable -> bindPlayableRow(holder as UpNextEpisodeViewHolder, item)
+            is Episode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
             is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item)
             is UpNextPlaying -> (holder as PlayingViewHolder).bind(item)
         }
@@ -83,33 +83,33 @@ class UpNextAdapter(
         val item = getItem(position)
         return when (item) {
             is UpNextPlaying -> R.layout.adapter_up_next_playing
-            is Playable -> R.layout.adapter_up_next
+            is Episode -> R.layout.adapter_up_next
             is PlayerViewModel.UpNextSummary -> R.layout.adapter_up_next_footer
             else -> throw IllegalStateException("Unknown item type in up next")
         }
     }
 
-    private fun bindPlayableRow(holder: UpNextEpisodeViewHolder, item: Playable) {
-        holder.bind(item, multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(item))
+    private fun bindEpisodeRow(holder: UpNextEpisodeViewHolder, episode: Episode) {
+        holder.bind(episode, multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode))
 
         holder.binding.itemContainer.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
-                holder.binding.checkbox.isChecked = multiSelectHelper.toggle(item)
+                holder.binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
             } else {
-                val podcastUuid = (item as? PodcastEpisode)?.podcastUuid
+                val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
                 val playOnTap = settings.getTapOnUpNextShouldPlay()
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(WILL_PLAY_KEY to playOnTap))
-                listener.onEpisodeActionsClick(episodeUuid = item.uuid, podcastUuid = podcastUuid)
+                listener.onEpisodeActionsClick(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
             }
         }
         holder.binding.itemContainer.setOnLongClickListener {
             if (multiSelectHelper.isMultiSelecting) {
-                multiSelectHelper.defaultLongPress(episode = item, fragmentManager = fragmentManager)
+                multiSelectHelper.defaultLongPress(episode = episode, fragmentManager = fragmentManager)
             } else {
-                val podcastUuid = (item as? PodcastEpisode)?.podcastUuid
+                val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
                 val playOnLongPress = !settings.getTapOnUpNextShouldPlay()
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(WILL_PLAY_KEY to playOnLongPress))
-                listener.onEpisodeActionsLongPress(episodeUuid = item.uuid, podcastUuid = podcastUuid)
+                listener.onEpisodeActionsLongPress(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
             }
             true
         }
@@ -188,7 +188,7 @@ class UpNextAdapter(
 }
 
 data class UpNextPlaying(
-    val episode: Playable,
+    val episode: Episode,
     val progressPercent: Float
 )
 
@@ -196,7 +196,7 @@ private val UPNEXT_ADAPTER_DIFF = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
         return if (oldItem is PlayerViewModel.UpNextSummary && newItem is PlayerViewModel.UpNextSummary) {
             true
-        } else if (oldItem is Playable && newItem is Playable) {
+        } else if (oldItem is Episode && newItem is Episode) {
             oldItem.uuid == newItem.uuid
         } else if (oldItem is UpNextPlaying && newItem is UpNextPlaying) {
             oldItem.episode.uuid == newItem.episode.uuid
@@ -207,7 +207,7 @@ private val UPNEXT_ADAPTER_DIFF = object : DiffUtil.ItemCallback<Any>() {
 
     @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return if (oldItem is Playable && newItem is Playable) {
+        return if (oldItem is Episode && newItem is Episode) {
             oldItem.uuid == newItem.uuid &&
                 oldItem.title == newItem.title &&
                 oldItem.publishedDate == newItem.publishedDate &&

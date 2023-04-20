@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentUpnextBinding
@@ -93,9 +93,9 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     private var episodeItemTouchHelper: EpisodeItemTouchHelper? = null
     private var itemTouchHelper: ItemTouchHelper? = null
 
-    private var upNextEpisodes: List<Any> = emptyList()
-    private val upNextPlayables: List<Playable>
-        get() = upNextEpisodes.filterIsInstance<Playable>()
+    private var upNextItems: List<Any> = emptyList()
+    private val upNextEpisodes: List<Episode>
+        get() = upNextItems.filterIsInstance<Episode>()
 
     val isEmbedded: Boolean
         get() = arguments?.getBoolean(ARG_EMBEDDED) ?: false
@@ -180,7 +180,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         playerViewModel.upNextLive.observe(viewLifecycleOwner) {
             if (userRearrangingFrom == null) {
                 adapter.submitList(it)
-                upNextEpisodes = it
+                upNextItems = it
             }
         }
 
@@ -224,29 +224,29 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         multiSelectHelper.listener = object : MultiSelectHelper.Listener {
             override fun multiSelectSelectAll() {
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to true))
-                upNextPlayables.forEach { multiSelectHelper.select(it) }
+                upNextEpisodes.forEach { multiSelectHelper.select(it) }
                 adapter.notifyDataSetChanged()
             }
 
             override fun multiSelectSelectNone() {
                 trackUpNextEvent(AnalyticsEvent.UP_NEXT_SELECT_ALL_TAPPED, mapOf(SELECT_ALL_KEY to false))
-                upNextPlayables.forEach { multiSelectHelper.deselect(it) }
+                upNextEpisodes.forEach { multiSelectHelper.deselect(it) }
                 adapter.notifyDataSetChanged()
             }
 
-            override fun multiSelectSelectAllUp(episode: Playable) {
-                val startIndex = upNextPlayables.indexOf(episode)
+            override fun multiSelectSelectAllUp(episode: Episode) {
+                val startIndex = upNextEpisodes.indexOf(episode)
                 if (startIndex > -1) {
-                    upNextPlayables.subList(0, startIndex + 1).forEach { multiSelectHelper.select(it) }
+                    upNextEpisodes.subList(0, startIndex + 1).forEach { multiSelectHelper.select(it) }
                 }
 
                 adapter.notifyDataSetChanged()
             }
 
-            override fun multiSelectSelectAllDown(episode: Playable) {
-                val startIndex = upNextPlayables.indexOf(episode)
+            override fun multiSelectSelectAllDown(episode: Episode) {
+                val startIndex = upNextEpisodes.indexOf(episode)
                 if (startIndex > -1) {
-                    upNextPlayables.subList(startIndex, upNextPlayables.size).forEach { multiSelectHelper.select(it) }
+                    upNextEpisodes.subList(startIndex, upNextEpisodes.size).forEach { multiSelectHelper.select(it) }
                 }
 
                 adapter.notifyDataSetChanged()
@@ -268,7 +268,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         }
     }
 
-    fun moveToTop(episode: Playable, position: Int) {
+    fun moveToTop(episode: Episode, position: Int) {
         val recyclerView = realBinding?.recyclerView ?: return
         recyclerView.findViewHolderForAdapterPosition(position)?.let {
             episodeItemTouchHelper?.clearView(recyclerView, it)
@@ -277,7 +277,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         trackSwipeAction(SwipeAction.UP_NEXT_MOVE_TOP)
     }
 
-    fun moveToBottom(episode: Playable, position: Int) {
+    fun moveToBottom(episode: Episode, position: Int) {
         val recyclerView = realBinding?.recyclerView ?: return
         recyclerView.findViewHolderForAdapterPosition(position)?.let {
             episodeItemTouchHelper?.clearView(recyclerView, it)
@@ -287,7 +287,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun removeFromUpNext(episode: Playable, position: Int) {
+    fun removeFromUpNext(episode: Episode, position: Int) {
         onUpNextEpisodeRemove(position)
         trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
     }
@@ -371,29 +371,29 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         playingEpisodeAtStartOfDrag = playbackManager.upNextQueue.currentEpisode?.uuid
 
         Timber.d("Swapping $fromPosition to $toPosition")
-        val listData = upNextEpisodes.toMutableList()
+        val listData = upNextItems.toMutableList()
 
         listData.add(toPosition, listData.removeAt(fromPosition))
 
         adapter.submitList(listData)
-        upNextEpisodes = listData.toList()
+        upNextItems = listData.toList()
 
         userRearrangingFrom = toPosition
     }
 
     override fun onUpNextEpisodeRemove(position: Int) {
-        (upNextEpisodes.getOrNull(position) as? Playable)?.let {
+        (upNextItems.getOrNull(position) as? Episode)?.let {
             playerViewModel.removeFromUpNext(it)
         }
     }
 
     override fun onUpNextItemTouchHelperFinished(position: Int) {
         if (playingEpisodeAtStartOfDrag == playbackManager.upNextQueue.currentEpisode?.uuid) {
-            playerViewModel.changeUpNextEpisodes(upNextEpisodes.subList(1, upNextEpisodes.size).filterIsInstance<Playable>())
+            playerViewModel.changeUpNextEpisodes(upNextItems.subList(1, upNextItems.size).filterIsInstance<Episode>())
         } else {
             playerViewModel.upNextLive.value?.let {
-                upNextEpisodes = it
-                adapter.submitList(upNextEpisodes)
+                upNextItems = it
+                adapter.submitList(upNextItems)
             }
         }
 

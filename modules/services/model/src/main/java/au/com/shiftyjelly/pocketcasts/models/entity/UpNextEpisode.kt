@@ -29,7 +29,7 @@ data class UpNextEpisode(
     }
 }
 
-fun Playable.toUpNextEpisode(): UpNextEpisode {
+fun Episode.toUpNextEpisode(): UpNextEpisode {
     return UpNextEpisode(
         episodeUuid = uuid,
         podcastUuid = if (this is PodcastEpisode) podcastUuid else null,

@@ -15,7 +15,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.R
@@ -40,7 +40,7 @@ private val MULTI_SELECT_ACTION_DIFF = object : DiffUtil.ItemCallback<Any>() {
 }
 
 class MultiSelectAdapter(val editable: Boolean, val listener: ((MultiSelectAction) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(MULTI_SELECT_ACTION_DIFF) {
-    var playable: Playable? = null
+    var episode: Episode? = null
         set(value) {
             field = value
             notifyDataSetChanged()

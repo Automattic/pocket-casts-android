@@ -11,8 +11,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -291,7 +291,7 @@ class PodcastViewModel
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun episodeSwipeArchive(episode: Playable, index: Int) {
+    fun episodeSwipeArchive(episode: Episode, index: Int) {
         if (episode !is PodcastEpisode) return
 
         launch {
@@ -307,7 +307,7 @@ class PodcastViewModel
         }
     }
 
-    fun episodeSwipeUpNext(episode: Playable) {
+    fun episodeSwipeUpNext(episode: Episode) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.PODCAST_SCREEN)
@@ -319,7 +319,7 @@ class PodcastViewModel
         }
     }
 
-    fun episodeSwipeUpLast(episode: Playable) {
+    fun episodeSwipeUpLast(episode: Episode) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.PODCAST_SCREEN)

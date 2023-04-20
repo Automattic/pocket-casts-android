@@ -8,7 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -152,19 +152,19 @@ abstract class UpNextDao {
     }
 
     @Transaction
-    open fun findAllPlayablesSorted(): List<Playable> {
+    open fun findAllEpisodesSorted(): List<Episode> {
         val episodes = findEpisodes().associateBy { it.uuid }
         val userEpisodes = findUserEpisodes().associateBy { it.uuid }
         val orders = findEpisodeUuids()
 
         return orders.mapNotNull {
-            episodes[it] as Playable? ?: userEpisodes[it] as Playable?
+            episodes[it] as Episode? ?: userEpisodes[it] as Episode?
         }
     }
 
     @Transaction
-    open fun saveAll(episodes: List<Playable>) {
-        val newUpNextEpisodes = episodes.map(Playable::toUpNextEpisode)
+    open fun saveAll(episodes: List<Episode>) {
+        val newUpNextEpisodes = episodes.map(Episode::toUpNextEpisode)
         val databaseUpNextEpisodes = all()
         val uuidToId = databaseUpNextEpisodes.associateBy({ it.episodeUuid }, { it.id })
 
@@ -181,7 +181,7 @@ abstract class UpNextDao {
         }
         // delete old Up Next episodes if they no longer exist
         val databaseUuids = databaseUpNextEpisodes.map(UpNextEpisode::episodeUuid)
-        val newUuids = episodes.map(Playable::uuid)
+        val newUuids = episodes.map(Episode::uuid)
         databaseUuids.minus(newUuids).forEach(this::deleteByUuid)
     }
 }

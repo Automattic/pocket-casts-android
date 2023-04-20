@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
@@ -54,22 +54,22 @@ class UpNextQueueImpl @Inject constructor(
 
     private val disposables = CompositeDisposable()
 
-    override val currentEpisode: Playable?
+    override val currentEpisode: Episode?
         get() = (changesObservable.blockingFirst() as? UpNextQueue.State.Loaded)?.episode
 
-    override val queueEpisodes: List<Playable>
+    override val queueEpisodes: List<Episode>
         get() = (changesObservable.blockingFirst() as? UpNextQueue.State.Loaded)?.queue ?: emptyList()
 
     override val isEmpty: Boolean
         get() = changesObservable.blockingFirst() is UpNextQueue.State.Empty
 
     sealed class UpNextAction(val _onAdd: (() -> Unit)?) {
-        data class PlayNow(val episode: Playable, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class PlayNext(val episode: Playable, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class PlayLast(val episode: Playable, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class Rearrange(val episodes: List<Playable>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class Remove(val episode: Playable, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class Import(val episodes: List<Playable>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
+        data class PlayNow(val episode: Episode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
+        data class PlayNext(val episode: Episode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
+        data class PlayLast(val episode: Episode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
+        data class Rearrange(val episodes: List<Episode>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
+        data class Remove(val episode: Episode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
+        data class Import(val episodes: List<Episode>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
         object ClearAll : UpNextAction(null)
         object ClearAllIncludingChanges : UpNextAction(null)
         object ClearUpNext : UpNextAction(null)
@@ -90,11 +90,11 @@ class UpNextQueueImpl @Inject constructor(
 
     private fun updateState(): UpNextQueue.State {
         val state: UpNextQueue.State
-        val episodes: MutableList<Playable> = upNextDao.findAllPlayablesSorted().toMutableList()
+        val episodes: MutableList<Episode> = upNextDao.findAllEpisodesSorted().toMutableList()
         if (episodes.isEmpty()) {
             state = UpNextQueue.State.Empty
         } else {
-            val episode: Playable = episodes.removeAt(0)
+            val episode: Episode = episodes.removeAt(0)
             val previousState: UpNextQueue.State = changesObservable.blockingFirst()
             val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
             val podcast: Podcast? = if (previousState is UpNextQueue.State.Loaded && previousState.podcast?.uuid == podcastUuid) {
@@ -146,7 +146,7 @@ class UpNextQueueImpl @Inject constructor(
         action._onAdd?.invoke()
     }
 
-    override fun isCurrentEpisode(episode: Playable): Boolean {
+    override fun isCurrentEpisode(episode: Episode): Boolean {
         return currentEpisode?.let { episode.uuid == it.uuid } ?: false
     }
 
@@ -154,7 +154,7 @@ class UpNextQueueImpl @Inject constructor(
         return queueEpisodes.any { it.uuid == uuid } || (currentEpisode?.let { it.uuid == uuid } ?: false)
     }
 
-    override suspend fun playNow(episode: Playable, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
+    override suspend fun playNow(episode: Episode, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
         // Don't build an Up Next if it is already empty
         if (queueEpisodes.isEmpty()) {
             saveChanges(UpNextAction.ClearAll)
@@ -165,11 +165,11 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override suspend fun playNext(episode: Playable, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
+    override suspend fun playNext(episode: Episode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
         playNextNow(episode, downloadManager, onAdd)
     }
 
-    private suspend fun playNextNow(episode: Playable, downloadManager: DownloadManager, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
+    private suspend fun playNextNow(episode: Episode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
         saveChanges(UpNextAction.PlayNext(episode, onAdd))
         downloadIfPossible(episode, downloadManager)
         if (episode.isFinished) {
@@ -177,7 +177,7 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override suspend fun playAllNext(episodes: List<Playable>, downloadManager: DownloadManager) = withContext(coroutineContext) {
+    override suspend fun playAllNext(episodes: List<Episode>, downloadManager: DownloadManager) = withContext(coroutineContext) {
         if (episodes.isEmpty()) {
             return@withContext
         }
@@ -193,7 +193,7 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override suspend fun clearAndPlayAll(episodes: List<Playable>, downloadManager: DownloadManager) = withContext(coroutineContext) {
+    override suspend fun clearAndPlayAll(episodes: List<Episode>, downloadManager: DownloadManager) = withContext(coroutineContext) {
         changeList(episodes)
         episodes.forEach { episode ->
             downloadIfPossible(episode, downloadManager)
@@ -203,11 +203,11 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override suspend fun playLast(episode: Playable, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
+    override suspend fun playLast(episode: Episode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
         playLastNow(episode, downloadManager, onAdd)
     }
 
-    private suspend fun playLastNow(episode: Playable, downloadManager: DownloadManager, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
+    private suspend fun playLastNow(episode: Episode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
         saveChanges(UpNextAction.PlayLast(episode, onAdd))
         downloadIfPossible(episode, downloadManager)
         if (episode.isFinished) {
@@ -215,11 +215,11 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override suspend fun playAllLast(episodes: List<Playable>, downloadManager: DownloadManager) = withContext(coroutineContext) {
+    override suspend fun playAllLast(episodes: List<Episode>, downloadManager: DownloadManager) = withContext(coroutineContext) {
         episodes.forEach { playLastNow(it, downloadManager, null) }
     }
 
-    override suspend fun removeEpisode(episode: Playable) {
+    override suspend fun removeEpisode(episode: Episode) {
         if (contains(episode.uuid)) {
             saveChanges(UpNextAction.Remove(episode))
         }
@@ -232,7 +232,7 @@ class UpNextQueueImpl @Inject constructor(
         saveChanges(UpNextAction.Rearrange(episodes))
     }
 
-    override fun changeList(episodes: List<Playable>) {
+    override fun changeList(episodes: List<Episode>) {
         val mutableEpisodes = episodes.toMutableList()
         currentEpisode?.let { mutableEpisodes.add(0, it) }
         saveChanges(UpNextAction.Rearrange(mutableEpisodes))
@@ -261,7 +261,7 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override fun importServerChanges(episodes: List<Playable>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable {
+    override fun importServerChanges(episodes: List<Episode>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable {
         return Completable.fromAction {
             // don't write over the local Up Next with the server version if we are playing an episode
             val playingEpisode = playbackManager.getCurrentEpisode()
@@ -289,7 +289,7 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    private fun insertUpNextEpisode(episode: Playable, position: Int) {
+    private fun insertUpNextEpisode(episode: Episode, position: Int) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Inserting ${episode.title} in to up next at $position")
         upNextDao.insertAt(upNextEpisode = episode.toUpNextEpisode(), position = position, replaceOneEpisode = false)
         if (episode.isArchived) {
@@ -297,7 +297,7 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    private fun downloadIfPossible(episode: Playable, downloadManager: DownloadManager) {
+    private fun downloadIfPossible(episode: Episode, downloadManager: DownloadManager) {
         if (settings.isUpNextAutoDownloaded()) {
             DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "up next auto download", downloadManager, episodeManager)
         }

@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.BindingConversion
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
@@ -81,7 +81,7 @@ object ViewDataBindings {
 
     @BindingAdapter("timeLeft")
     @JvmStatic
-    fun setTimeLeft(textView: TextView, episode: Playable) {
+    fun setTimeLeft(textView: TextView, episode: Episode) {
         if (episode is UserEpisode && episode.serverStatus == UserEpisodeServerStatus.MISSING) {
             textView.text = textView.resources.getString(LR.string.podcast_episode_file_not_uploaded)
         } else {

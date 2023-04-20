@@ -19,7 +19,7 @@ import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -152,7 +152,7 @@ class MediaSessionManager(
         mediaBrowser.connect()
     }
 
-    private fun getPlaybackStateRx(playbackState: PlaybackState, currentEpisode: Optional<Playable>): Single<PlaybackStateCompat> {
+    private fun getPlaybackStateRx(playbackState: PlaybackState, currentEpisode: Optional<Episode>): Single<PlaybackStateCompat> {
         return Single.fromCallable {
             getPlaybackStateCompat(playbackState, currentEpisode.get())
         }
@@ -163,7 +163,7 @@ class MediaSessionManager(
         mediaSession.setPlaybackState(playbackState)
     }
 
-    private fun getPlaybackStateCompat(playbackState: PlaybackState, currentEpisode: Playable?): PlaybackStateCompat {
+    private fun getPlaybackStateCompat(playbackState: PlaybackState, currentEpisode: Episode?): PlaybackStateCompat {
         if (playbackState.isError) {
             mediaSession.isActive = false
             return PlaybackStateCompat.Builder()
@@ -273,13 +273,13 @@ class MediaSessionManager(
             // ignore buffer position because it isn't displayed in the media session
             "updateBufferPosition"
         )
-        var previousEpisode: Playable? = null
+        var previousEpisode: Episode? = null
 
         playbackManager.playbackStateRelay
             .observeOn(Schedulers.io())
             .switchMap { state ->
                 val episodeSource =
-                    if (state.isEmpty) Observable.just(Optional.empty()) else episodeManager.observePlayableByUuid(state.episodeUuid).distinctUntilChanged(Playable.isMediaSessionEqual).map { Optional.of(it) }.toObservable()
+                    if (state.isEmpty) Observable.just(Optional.empty()) else episodeManager.observeEpisodeByUuid(state.episodeUuid).distinctUntilChanged(Episode.isMediaSessionEqual).map { Optional.of(it) }.toObservable()
                 Observables.combineLatest(Observable.just(state), episodeSource)
             }
             // ignore events until seeking has finished or the progress won't stay where the user requested
@@ -290,7 +290,7 @@ class MediaSessionManager(
             }
             .filter {
                 // allow the playback state and episode through when true
-                (!ignoreStates.contains(it.first.lastChangeFrom) && !seeking) || !Playable.isMediaSessionEqual(it.second.get(), previousEpisode)
+                (!ignoreStates.contains(it.first.lastChangeFrom) && !seeking) || !Episode.isMediaSessionEqual(it.second.get(), previousEpisode)
             }
             .doOnNext {
                 previousEpisode = it.second.get()
@@ -311,7 +311,7 @@ class MediaSessionManager(
             ).addTo(disposables)
     }
 
-    private fun updateMetadata(episode: Playable?) {
+    private fun updateMetadata(episode: Episode?) {
         if (episode == null) {
             Timber.i("MediaSession metadata. Nothing Playing.")
             mediaSession.setMetadata(NOTHING_PLAYING)
@@ -354,7 +354,7 @@ class MediaSessionManager(
         }
     }
 
-    private fun addCustomActions(stateBuilder: PlaybackStateCompat.Builder, currentEpisode: Playable, playbackState: PlaybackState) {
+    private fun addCustomActions(stateBuilder: PlaybackStateCompat.Builder, currentEpisode: Episode, playbackState: PlaybackState) {
         if (!shouldHideCustomSkipButtons()) {
             addCustomAction(stateBuilder, APP_ACTION_SKIP_BACK, "Skip back", IR.drawable.auto_skipback)
             addCustomAction(stateBuilder, APP_ACTION_SKIP_FWD, "Skip forward", IR.drawable.auto_skipforward)
@@ -557,8 +557,8 @@ class MediaSessionManager(
                 logEvent("play from media id", inSessionCallback = false)
 
                 val autoMediaId = AutoMediaId.fromMediaId(mediaId)
-                val playableId = autoMediaId.playableId
-                episodeManager.findPlayableByUuid(playableId)?.let { episode ->
+                val episodeId = autoMediaId.episodeId
+                episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
                     playbackManager.playNow(episode, playbackSource = source)
 
                     playbackManager.lastLoadedFromPodcastOrPlaylistUuid = autoMediaId.sourceId

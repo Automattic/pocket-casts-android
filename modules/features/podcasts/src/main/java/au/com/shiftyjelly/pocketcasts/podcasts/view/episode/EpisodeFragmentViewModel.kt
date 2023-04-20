@@ -87,9 +87,9 @@ class EpisodeFragmentViewModel @Inject constructor(
                 if (episode != null) {
                     Maybe.just(episode)
                 } else {
-                    episodeManager.downloadMissingEpisode(episodeUUID, podcastUUID, PodcastEpisode(uuid = episodeUUID, publishedDate = Date()), podcastManager, downloadMetaData = true).flatMap { playable ->
-                        if (playable is PodcastEpisode) {
-                            Maybe.just(playable)
+                    episodeManager.downloadMissingEpisode(episodeUUID, podcastUUID, PodcastEpisode(uuid = episodeUUID, publishedDate = Date()), podcastManager, downloadMetaData = true).flatMap { missingEpisode ->
+                        if (missingEpisode is PodcastEpisode) {
+                            Maybe.just(missingEpisode)
                         } else {
                             Maybe.empty()
                         }
@@ -97,7 +97,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                 }
             }
         } else {
-            Maybe.empty<PodcastEpisode>()
+            Maybe.empty()
         }
 
         val stateObservable: Flowable<EpisodeFragmentState> = episodeManager.findByUuidRx(episodeUUID)
