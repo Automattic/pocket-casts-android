@@ -544,7 +544,7 @@ open class PlaybackManager @Inject constructor(
 
         cancelUpdateTimer()
 
-        launch {
+        launch(Dispatchers.Main) {
             pocketCastsPlayer?.pause()
         }
     }
