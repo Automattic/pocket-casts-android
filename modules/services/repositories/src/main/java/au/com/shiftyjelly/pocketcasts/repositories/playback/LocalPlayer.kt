@@ -1,19 +1,23 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.os.SystemClock
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import androidx.media3.common.Player
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.math.abs
 
 /**
  * Manages audio focus with local media player.
  */
-abstract class LocalPlayer(override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit) : PocketCastsPlayer {
+abstract class LocalPlayer(
+    override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit,
+    player: Player,
+) : PocketCastsPlayer, Player by player {
 
     companion object {
-        // The volume we set the media player to seekToTimeMswhen we lose audio focus, but are allowed to reduce the volume instead of stopping playback.
+        // The volume we set the media player to seekToTimeMs when we lose audio focus, but are allowed to reduce the volume instead of stopping playback.
         const val VOLUME_DUCK = 1.0f // We don't actually duck the volume
         // The volume we set the media player when we have audio focus.
         const val VOLUME_NORMAL = 1.0f
@@ -25,22 +29,11 @@ abstract class LocalPlayer(override val onPlayerEvent: (PocketCastsPlayer, Playe
     private var seekingToPositionMs: Int = 0
     private var seekRetryAllowed: Boolean = false
 
-    protected var isHLS: Boolean = false
-
-    override var episodeUuid: String? = null
-
-    override var episodeLocation: EpisodeLocation? = null
-    override val url: String?
-        get() = (episodeLocation as? EpisodeLocation.Stream)?.uri
-
-    override val filePath: String?
-        get() = (episodeLocation as? EpisodeLocation.Downloaded)?.filePath
-
     override val isRemote: Boolean
         get() = false
 
     override val isStreaming: Boolean
-        get() = episodeLocation is EpisodeLocation.Stream
+        get() = playable?.isDownloaded == false
 
     override val name: String
         get() = "System"
@@ -65,7 +58,7 @@ abstract class LocalPlayer(override val onPlayerEvent: (PocketCastsPlayer, Playe
     // downloaded episodes don't buffer
     override suspend fun isBuffering(): Boolean {
         return withContext(Dispatchers.Main) {
-            if (filePath != null) false else handleIsBuffering()
+            if (!isStreaming) false else handleIsBuffering()
         }
     }
 
@@ -78,21 +71,17 @@ abstract class LocalPlayer(override val onPlayerEvent: (PocketCastsPlayer, Playe
         }
     }
 
-    override suspend fun pause() {
-        withContext(Dispatchers.Main) {
-            if (isPlaying()) {
-                handlePause()
-                positionMs = handleCurrentPositionMs()
-            }
-            onPlayerEvent(this@LocalPlayer, PlayerEvent.PlayerPaused)
+    override fun pause() {
+        if (isPlaying) {
+            handlePause()
+            positionMs = handleCurrentPositionMs()
         }
+        onPlayerEvent(this@LocalPlayer, PlayerEvent.PlayerPaused)
     }
 
-    override suspend fun stop() {
-        withContext(Dispatchers.Main) {
-            positionMs = handleCurrentPositionMs()
-            handleStop()
-        }
+    override fun stop() {
+        positionMs = handleCurrentPositionMs()
+        handleStop()
     }
 
     override suspend fun getCurrentPositionMs(): Int {
@@ -106,16 +95,16 @@ abstract class LocalPlayer(override val onPlayerEvent: (PocketCastsPlayer, Playe
     }
 
     private suspend fun playIfAllowed() {
-        setVolume(VOLUME_NORMAL)
+        volume = VOLUME_NORMAL
 
         // already playing?
-        if (isPlaying()) {
+        if (isPlaying) {
             onPlayerEvent(this, PlayerEvent.PlayerPlaying)
         } else {
-            // check the player is seeked to the correct position
+            // check the player seeks to the correct position
             val playerPositionMs = getCurrentPositionMs()
             // check if the player is where it's meant to be, allow for a 2 second variance
-            if (Math.abs(positionMs - playerPositionMs) > 2000) {
+            if (abs(positionMs - playerPositionMs) > 2000) {
                 onSeekStart(positionMs)
                 handleSeekToTimeMs(positionMs)
             }
@@ -148,7 +137,7 @@ abstract class LocalPlayer(override val onPlayerEvent: (PocketCastsPlayer, Playe
     }
 
     protected fun onCompletion() {
-        onPlayerEvent(this, PlayerEvent.Completion(episodeUuid))
+        onPlayerEvent(this, PlayerEvent.Completion(playable?.uuid))
     }
 
     protected fun onBufferingStateChanged() {
@@ -174,16 +163,6 @@ abstract class LocalPlayer(override val onPlayerEvent: (PocketCastsPlayer, Playe
                 onSeekStart(positionMs)
                 handleSeekToTimeMs(positionMs)
             }
-        }
-    }
-
-    override fun setEpisode(episode: Playable) {
-        this.episodeUuid = episode.uuid
-        this.isHLS = episode.isHLS
-        episodeLocation = if (episode.isDownloaded) {
-            EpisodeLocation.Downloaded(episode.downloadedFilePath)
-        } else {
-            EpisodeLocation.Stream(episode.downloadUrl)
         }
     }
 

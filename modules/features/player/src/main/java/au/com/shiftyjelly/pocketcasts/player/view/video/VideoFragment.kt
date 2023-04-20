@@ -11,13 +11,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentVideoBinding
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.VideoViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import com.airbnb.lottie.LottieAnimationView
@@ -83,7 +83,7 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
         }
 
         viewModel.playbackState.observe(viewLifecycleOwner) {
-            val newPlayer = (playbackManager.pocketCastsPlayer as? SimplePlayer)?.exoPlayer
+            val newPlayer = playbackManager.pocketCastsPlayer
 
             // setPlayer returns straight away if the player is the same so calling this too much doesn't matter.
             // This ensures while the full screen player is visible, the surface isn't set from somewhere else causing
@@ -157,6 +157,7 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
     override fun onSeekPositionChanging(progress: Int) {
     }
 
+    @UnstableApi
     override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
         viewModel.seekToMs(progress)
         playbackManager.trackPlaybackSeek(progress, AnalyticsSource.FULL_SCREEN_VIDEO)

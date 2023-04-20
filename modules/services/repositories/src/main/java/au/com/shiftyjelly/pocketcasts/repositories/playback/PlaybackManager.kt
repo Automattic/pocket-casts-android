@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.support.v4.media.session.MediaSessionCompat
@@ -12,6 +13,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
+import androidx.work.await
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -33,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper.removeEpisodeFromQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
-import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
@@ -167,13 +170,25 @@ open class PlaybackManager @Inject constructor(
     )
     var sleepAfterEpisode: Boolean = false
 
+    // TODO - Make this a player instead?
+    private var controller: MediaController? = null
     var pocketCastsPlayer: PocketCastsPlayer? = null
 
     val mediaSession: MediaSessionCompat
         get() = mediaSessionManager.mediaSession
 
     @SuppressLint("CheckResult")
-    fun setup() {
+    fun setup(playbackServiceClass: Class<out PlaybackService>) {
+        val sessionToken =
+            SessionToken(application, ComponentName(application, playbackServiceClass))
+
+        // FIXME do we need to hold onto the controller future so we can release it?
+        // https://developer.android.com/guide/topics/media/media3/getting-started/playing-in-background#handling-ui
+        val controllerFuture = MediaController.Builder(application, sessionToken).buildAsync()
+        launch {
+            controller = controllerFuture.await()
+        }
+
         if (!Util.isAutomotive(application)) {
             widgetManager.updateWidgetFromPlaybackState(this)
         }
@@ -295,7 +310,7 @@ open class PlaybackManager @Inject constructor(
         if (player != null) {
             val currentTimeMs = player.getCurrentPositionMs()
             // check the player has been loaded with the latest episode so there isn't side effects like using an old episode's time with a new episode.
-            if (currentTimeMs >= 0 && player.episodeUuid == episode.uuid) {
+            if (currentTimeMs >= 0 && player.playable?.uuid == episode.uuid) {
                 return currentTimeMs
             }
         }
@@ -528,7 +543,7 @@ open class PlaybackManager @Inject constructor(
 
         cancelUpdateTimer()
 
-        launch {
+        launch(Dispatchers.Main) {
             pocketCastsPlayer?.pause()
         }
     }
@@ -649,7 +664,7 @@ open class PlaybackManager @Inject constructor(
             val jumpAmountMs = jumpAmountSeconds * 1000
 
             val currentTimeMs = getCurrentTimeMs(episode = episode)
-            if (currentTimeMs < 0 || pocketCastsPlayer?.episodeUuid != episode.uuid) return@launch // Make sure the player hasn't changed episodes before using the current time to seek
+            if (currentTimeMs < 0 || pocketCastsPlayer?.playable?.uuid != episode.uuid) return@launch // Make sure the player hasn't changed episodes before using the current time to seek
 
             val newPositionMs = currentTimeMs + jumpAmountMs
             val durationMs = pocketCastsPlayer?.durationMs() ?: Int.MAX_VALUE // If we don't have a duration, just let them skip
@@ -757,7 +772,7 @@ open class PlaybackManager @Inject constructor(
             removeMutex.withLock {
                 val currentEpisode = getCurrentEpisode()
 
-                val isCurrentEpisode = currentEpisode != null && currentEpisode.uuid == episodeToRemove.uuid && (pocketCastsPlayer == null || pocketCastsPlayer?.episodeUuid == episodeToRemove.uuid)
+                val isCurrentEpisode = currentEpisode != null && currentEpisode.uuid == episodeToRemove.uuid && (pocketCastsPlayer == null || pocketCastsPlayer?.playable?.uuid == episodeToRemove.uuid)
                 val isPlaying = isPlaying()
 
                 if (isCurrentEpisode) {
@@ -794,7 +809,7 @@ open class PlaybackManager @Inject constructor(
                 loadCurrentEpisode(play = false)
             }
 
-            pocketCastsPlayer?.setEpisode(episode)
+            pocketCastsPlayer?.playable = episode
             pocketCastsPlayer?.setPodcast(podcast)
         }
     }
@@ -806,11 +821,13 @@ open class PlaybackManager @Inject constructor(
                 pocketCastsPlayer = null
             }
 
-            pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
-            (pocketCastsPlayer as? CastPlayer)?.updateFromRemoteIfRequired()
-            Timber.i("Cast reconnected. Creating media player of type CastPlayer")
+            controller?.let { player ->
+                pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent, player)
+                (pocketCastsPlayer as? CastPlayer)?.updateFromRemoteIfRequired()
+                Timber.i("Cast reconnected. Creating media player of type CastPlayer")
 
-            setupUpdateTimer()
+                setupUpdateTimer()
+            }
         }
     }
 
@@ -1223,7 +1240,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     override fun onFocusLoss(mayDuck: Boolean, transientLoss: Boolean) {
-        val player = pocketCastsPlayer
+        /*val player = pocketCastsPlayer
         if (player == null || player.isRemote) {
             return
         }
@@ -1242,22 +1259,22 @@ open class PlaybackManager @Inject constructor(
         // check if we need to reduce the volume
         if (focusManager.canDuck()) {
             player.setVolume(VOLUME_DUCK)
-        }
+        }*/
     }
 
     override fun onFocusRequestFailed() {
-        LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Could not get audio focus, stopping")
-        stopAsync(isAudioFocusFailed = true)
+//        LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Could not get audio focus, stopping")
+//        stopAsync(isAudioFocusFailed = true)
     }
 
     override fun onAudioBecomingNoisy() {
-        val player = pocketCastsPlayer
-        if (player == null || player.isRemote) {
-            return
-        }
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "System fired 'Audio Becoming Noisy' event, pausing playback.")
-        pause(playbackSource = AnalyticsSource.AUTO_PAUSE)
-        focusWasPlaying = null
+//        val player = pocketCastsPlayer
+//        if (player == null || player.isRemote) {
+//            return
+//        }
+//        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "System fired 'Audio Becoming Noisy' event, pausing playback.")
+//        pause(playbackSource = AnalyticsSource.AUTO_PAUSE)
+//        focusWasPlaying = null
     }
 
     /** PRIVATE METHODS  */
@@ -1285,16 +1302,16 @@ open class PlaybackManager @Inject constructor(
     /**
      * Does the media player need to be recreated.
      */
-    private fun isPlayerResetNeeded(episode: Playable, sameEpisode: Boolean, chromeCastConnected: Boolean): Boolean {
+    private fun isPlayerResetNeeded(playable: Playable, sameEpisode: Boolean, chromeCastConnected: Boolean): Boolean {
         // reset the player if local and changing episode
         val playbackOnDevice = !chromeCastConnected
         return if (!sameEpisode) {
             playbackOnDevice
-        } else episode.isDownloaded &&
+        } else playable.isDownloaded &&
             playbackOnDevice &&
-            episode.downloadedFilePath != null &&
+            playable.downloadedFilePath != null &&
             pocketCastsPlayer != null &&
-            episode.downloadedFilePath != pocketCastsPlayer?.filePath
+            playable.downloadedFilePath != pocketCastsPlayer?.playable?.downloadedFilePath
 
         // if the player has a different media file path then it is changing
     }
@@ -1337,7 +1354,7 @@ open class PlaybackManager @Inject constructor(
         cancelBufferUpdateTimer()
 
         val currentPlayer = this.pocketCastsPlayer
-        val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
+        val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.playable?.uuid
 
         sleepAfterEpisode = sleepAfterEpisode && playbackStateRelay.blockingFirst().episodeUuid == episode.uuid
 
@@ -1459,7 +1476,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         pocketCastsPlayer?.setPodcast(podcast)
-        pocketCastsPlayer?.setEpisode(episode)
+        pocketCastsPlayer?.playable = episode
 
         val playbackEffects = if (podcast != null && podcast.overrideGlobalEffects) podcast.playbackEffects else settings.getGlobalPlaybackEffects()
 
@@ -1622,8 +1639,8 @@ open class PlaybackManager @Inject constructor(
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.PLAYING, lastChangeFrom = "play"))
 
-                if (pocketCastsPlayer?.episodeUuid != playbackState.episodeUuid) {
-                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Player playing episode that is not the same as playback state. Player: ${pocketCastsPlayer?.episodeUuid} State: ${playbackState.episodeUuid}")
+                if (pocketCastsPlayer?.playable?.uuid != playbackState.episodeUuid) {
+                    LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Player playing episode that is not the same as playback state. Player: ${pocketCastsPlayer?.playable?.uuid} State: ${playbackState.episodeUuid}")
                 }
 
                 // Handle skip first
@@ -1669,12 +1686,14 @@ open class PlaybackManager @Inject constructor(
 
         withContext(Dispatchers.Main) {
             pocketCastsPlayer?.stop()
-            if (castManager.isConnected()) {
-                pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent)
-                Timber.i("Creating media player of type CastPlayer.")
-            } else {
-                pocketCastsPlayer = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent)
-                Timber.i("Creating media player of type SimplePlayer.")
+            controller?.let { player ->
+                if (castManager.isConnected()) {
+                    pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent, player)
+                    Timber.i("Creating media player of type CastPlayer.")
+                } else {
+                    pocketCastsPlayer = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent, player)
+                    Timber.i("Creating media player of type SimplePlayer.")
+                }
             }
         }
 
@@ -1868,7 +1887,7 @@ open class PlaybackManager @Inject constructor(
     suspend fun preparePlayer() {
         val episode = upNextQueue.currentEpisode ?: return
         val currentPlayer = this.pocketCastsPlayer
-        if (currentPlayer == null || episode.uuid != currentPlayer.episodeUuid) {
+        if (currentPlayer == null || episode.uuid != currentPlayer.playable?.uuid) {
             loadCurrentEpisode(false)
         }
     }
@@ -1881,7 +1900,7 @@ open class PlaybackManager @Inject constructor(
                 withContext(Dispatchers.Main) {
                     updatePausedPlaybackState()
                 }
-            } else if (episode.uuid != currentPlayer.episodeUuid) {
+            } else if (episode.uuid != currentPlayer.playable?.uuid) {
                 loadCurrentEpisode(false)
             }
         }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.media3.common.util.UnstableApi
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
@@ -17,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -154,7 +156,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
             Coil.setImageLoader(coilImageLoader)
 
             withContext(Dispatchers.Default) {
-                playbackManager.setup()
+                playbackManager.setup(playbackService)
                 downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
 
                 val isRestoreFromBackup = settings.isRestoreFromBackup()
@@ -259,5 +261,10 @@ class PocketCastsApplication : Application(), Configuration.Provider {
                 }
             }
         }
+    }
+
+    companion object {
+        @UnstableApi
+        val playbackService = PlaybackService::class.java
     }
 }

@@ -1,12 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.content.Context
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.view.SurfaceView
 import android.widget.Toast
-import androidx.annotation.OptIn
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -15,15 +13,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSource
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.exoplayer.DefaultLoadControl
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.extractor.DefaultExtractorsFactory
-import androidx.media3.extractor.mp3.Mp3Extractor
+import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -32,20 +22,15 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.util.concurrent.TimeUnit
 
-class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val context: Context, override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit) : LocalPlayer(onPlayerEvent) {
-
-    companion object {
-        private val BUFFER_TIME_MIN_MILLIS = TimeUnit.MINUTES.toMillis(15).toInt()
-        private val BUFFER_TIME_MAX_MILLIS = BUFFER_TIME_MIN_MILLIS
-
-        // Be careful increasing the size of the back buffer. It can easily lead to OOM errors.
-        private val BACK_BUFFER_TIME_MILLIS = TimeUnit.MINUTES.toMillis(2).toInt()
-    }
-
-    private var player: ExoPlayer? = null
+@UnstableApi
+class SimplePlayer(
+    val settings: Settings,
+    val statsManager: StatsManager,
+    val context: Context,
+    override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit,
+    val player: Player,
+) : LocalPlayer(onPlayerEvent, player) {
 
     private var renderersFactory: ShiftyRenderersFactory? = null
     private var playbackEffects: PlaybackEffects? = null
@@ -57,42 +42,33 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
 
     private var videoChangedListener: VideoChangedListener? = null
 
+    override var playable: Playable? = null
+
     @Volatile
     private var prepared = false
 
-    val exoPlayer: ExoPlayer?
-        get() {
-            return player
-        }
-
     override suspend fun bufferedUpToMs(): Int {
         return withContext(Dispatchers.Main) {
-            player?.bufferedPosition?.toInt() ?: 0
+            player.bufferedPosition.toInt()
         }
     }
 
     override suspend fun bufferedPercentage(): Int {
         return withContext(Dispatchers.Main) {
-            player?.bufferedPercentage ?: 0
+            player.bufferedPercentage
         }
     }
 
     override suspend fun durationMs(): Int? {
         return withContext(Dispatchers.Main) {
-            val duration = player?.duration ?: C.TIME_UNSET
+            val duration = player.duration
             if (duration == C.TIME_UNSET) null else duration.toInt()
         }
     }
 
-    override suspend fun isPlaying(): Boolean {
-        return withContext(Dispatchers.Main) {
-            player?.playWhenReady ?: false
-        }
-    }
+    override fun isPlaying(): Boolean = player.playWhenReady
 
-    override fun handleCurrentPositionMs(): Int {
-        return player?.currentPosition?.toInt() ?: -1
-    }
+    override fun handleCurrentPositionMs(): Int = player.currentPosition.toInt()
 
     override fun handlePrepare() {
         if (prepared) {
@@ -102,41 +78,29 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     }
 
     override fun handleStop() {
-        try {
-            player?.stop()
-        } catch (e: Exception) {
-        }
-
-        try {
-            player?.release()
-        } catch (e: Exception) {
-        }
-
-        player = null
         prepared = false
-
         videoChangedListener?.videoNeedsReset()
     }
 
     override fun handlePause() {
-        player?.playWhenReady = false
+        player.playWhenReady = false
     }
 
     override fun handlePlay() {
-        player?.playWhenReady = true
+        player.playWhenReady = true
     }
 
     override fun handleSeekToTimeMs(positionMs: Int) {
-        if (player?.isCurrentMediaItemSeekable == false && player?.isPlaying == true) {
+        if (!player.isCurrentMediaItemSeekable && player.isPlaying) {
             Toast.makeText(context, "Unable to seek. File headers appear to be invalid.", Toast.LENGTH_SHORT).show()
         } else {
-            player?.seekTo(positionMs.toLong())
+            player.seekTo(positionMs.toLong())
             super.onSeekComplete(positionMs)
         }
     }
 
     override fun handleIsBuffering(): Boolean {
-        return (player?.playbackState ?: Player.STATE_ENDED) == Player.STATE_BUFFERING
+        return (player.playbackState) == Player.STATE_BUFFERING
     }
 
     override fun handleIsPrepared(): Boolean {
@@ -163,46 +127,17 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     }
 
     override fun setVolume(volume: Float) {
-        player?.volume = volume
+        player.volume = volume
     }
 
     override fun setPodcast(podcast: Podcast?) {}
 
-    @OptIn(UnstableApi::class)
-    private fun prepare() {
-        val trackSelector = DefaultTrackSelector(context)
-
-        val minBufferMillis = if (isStreaming) BUFFER_TIME_MIN_MILLIS else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
-        val maxBufferMillis = if (isStreaming) BUFFER_TIME_MAX_MILLIS else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
-        val backBufferMillis = if (isStreaming) BACK_BUFFER_TIME_MILLIS else DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS
-        val loadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(
-                minBufferMillis,
-                maxBufferMillis,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
-                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
-            )
-            .setBackBuffer(backBufferMillis, DefaultLoadControl.DEFAULT_RETAIN_BACK_BUFFER_FROM_KEYFRAME)
-            .build()
-
-        val renderer = createRenderersFactory()
-        this.renderersFactory = renderer
-        val player = ExoPlayer.Builder(context, renderer)
-            .setTrackSelector(trackSelector)
-            .setLoadControl(loadControl)
-            .setSeekForwardIncrementMs(settings.getSkipForwardInMs())
-            .setSeekBackIncrementMs(settings.getSkipBackwardInMs())
-            .build()
-
-        renderer.onAudioSessionId(player.audioSessionId)
-
-        handleStop()
-        this.player = player
-
+    override fun prepare() {
         setPlayerEffects()
+
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
-                val episodeMetadata = EpisodeFileMetadata(filenamePrefix = episodeUuid)
+                val episodeMetadata = EpisodeFileMetadata(filenamePrefix = playable?.uuid)
                 episodeMetadata.read(tracks, settings, context)
                 onMetadataAvailable(episodeMetadata)
             }
@@ -229,46 +164,18 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
 
         addVideoListener(player)
 
-        val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setUserAgent("Pocket Casts")
-            .setAllowCrossProtocolRedirects(true)
-        val dataSourceFactory = DefaultDataSource.Factory(context, httpDataSourceFactory)
-        val extractorsFactory = DefaultExtractorsFactory().setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_CONSTANT_BITRATE_SEEKING)
-        val location = episodeLocation
-        if (location == null) {
-            onError(PlayerEvent.PlayerError("Episode has no source"))
-            return
+        playable?.uuid?.let {
+            player.setMediaItem(
+                MediaItem.Builder()
+                    .setMediaId(it)
+                    .build()
+            )
+            player.prepare()
+            prepared = true
         }
-
-        val uri: Uri = when (location) {
-            is EpisodeLocation.Stream -> {
-                Uri.parse(location.uri)
-            }
-            is EpisodeLocation.Downloaded -> {
-                val filePath = location.filePath
-                if (filePath != null) {
-                    Uri.fromFile(File(filePath))
-                } else {
-                    onError(PlayerEvent.PlayerError("File has no file path"))
-                    return
-                }
-            }
-        } ?: return
-
-        val mediaItem = MediaItem.fromUri(uri)
-        val source = if (isHLS) {
-            HlsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
-        } else {
-            ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
-                .createMediaSource(mediaItem)
-        }
-        player.setMediaSource(source)
-        player.prepare()
-
-        prepared = true
     }
 
-    private fun addVideoListener(player: ExoPlayer) {
+    private fun addVideoListener(player: Player) {
         player.addListener(object : Player.Listener {
             override fun onVideoSizeChanged(videoSize: VideoSize) {
                 videoWidth = videoSize.width
@@ -281,18 +188,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         })
     }
 
-    private fun createRenderersFactory(): ShiftyRenderersFactory {
-        val playbackEffects: PlaybackEffects? = this.playbackEffects
-        return if (playbackEffects == null) {
-            ShiftyRenderersFactory(context = context, statsManager = statsManager, boostVolume = false)
-        } else {
-            ShiftyRenderersFactory(context = context, statsManager = statsManager, boostVolume = playbackEffects.isVolumeBoosted)
-        }
-    }
-
     fun setDisplay(surfaceView: SurfaceView?): Boolean {
-        val player = player ?: return false
-
         return try {
             player.setVideoSurfaceHolder(surfaceView?.holder)
             true
@@ -317,7 +213,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     private fun setPlayerEffects() {
         val player = player
         val playbackEffects = playbackEffects
-        if (player == null || playbackEffects == null) return // nothing to set
+            ?: return // nothing to set
 
         renderersFactory?.let {
             it.setPlaybackSpeed(playbackEffects.playbackSpeed.toFloat())

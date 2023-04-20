@@ -9,7 +9,6 @@ import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import timber.log.Timber
 
 /**
  * Manages the focus of the player by tracking audio focus and audio noisy events.
@@ -114,7 +113,7 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
 
     override fun onAudioFocusChange(focusChange: Int) {
         // map to our own focus status
-        if (focusChange == AudioManager.AUDIOFOCUS_GAIN ||
+        /*if (focusChange == AudioManager.AUDIOFOCUS_GAIN ||
             focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT ||
             focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK ||
             focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE
@@ -147,7 +146,7 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
             focusChangeListener?.onFocusRequestFailed()
         } else {
             Timber.w("onAudioFocusChange: Ignoring unsupported focusChange: %d", focusChange)
-        }
+        }*/
     }
 
     fun canDuck(): Boolean {
