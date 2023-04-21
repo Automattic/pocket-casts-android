@@ -11,7 +11,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentVideoBinding
 import au.com.shiftyjelly.pocketcasts.player.view.PlayerSeekBar
@@ -157,7 +156,6 @@ class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
     override fun onSeekPositionChanging(progress: Int) {
     }
 
-    @UnstableApi
     override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
         viewModel.seekToMs(progress)
         playbackManager.trackPlaybackSeek(progress, AnalyticsSource.FULL_SCREEN_VIDEO)

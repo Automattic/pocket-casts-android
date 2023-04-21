@@ -48,7 +48,7 @@ const val PROFILE_FILES = "__PROFILE_FILES__"
 const val PROFILE_STARRED = "__PROFILE_STARRED__"
 const val PROFILE_LISTENING_HISTORY = "__LISTENING_HISTORY__"
 
-@UnstableApi
+@androidx.annotation.OptIn(UnstableApi::class)
 @SuppressLint("LogNotTimber")
 @AndroidEntryPoint
 open class AutoPlaybackService : PlaybackService() {
