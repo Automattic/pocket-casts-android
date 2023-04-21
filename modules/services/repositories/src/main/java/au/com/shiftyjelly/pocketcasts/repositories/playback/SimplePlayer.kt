@@ -54,8 +54,6 @@ class SimplePlayer(
 
     override fun isPlaying(): Boolean = player.playWhenReady
 
-    override fun handleCurrentPositionMs(): Int = player.currentPosition.toInt()
-
     override fun handlePrepare() {
         if (prepared) {
             return

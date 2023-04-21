@@ -45,7 +45,6 @@ abstract class LocalPlayer(
     abstract fun handleSeekToTimeMs(positionMs: Int)
     abstract fun handleIsBuffering(): Boolean
     abstract fun handleIsPrepared(): Boolean
-    abstract fun handleCurrentPositionMs(): Int
 
     override suspend fun load(currentPositionMs: Int) {
         withContext(Dispatchers.Main) {
@@ -74,19 +73,19 @@ abstract class LocalPlayer(
     override fun pause() {
         if (isPlaying) {
             handlePause()
-            positionMs = handleCurrentPositionMs()
+            positionMs = currentPosition.toInt()
         }
         onPlayerEvent(this@LocalPlayer, PlayerEvent.PlayerPaused)
     }
 
     override fun stop() {
-        positionMs = handleCurrentPositionMs()
+        positionMs = currentPosition.toInt()
         handleStop()
     }
 
     override suspend fun getCurrentPositionMs(): Int {
         return withContext(Dispatchers.Main) {
-            handleCurrentPositionMs()
+            currentPosition.toInt()
         }
     }
 
