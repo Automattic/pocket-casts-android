@@ -823,7 +823,7 @@ open class PlaybackManager @Inject constructor(
 
             controller?.let { player ->
                 pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent, player)
-                (pocketCastsPlayer as? CastPlayer)?.updateFromRemoteIfRequired()
+                (pocketCastsPlayer as? CastingPlayer)?.updateFromRemoteIfRequired()
                 Timber.i("Cast reconnected. Creating media player of type CastPlayer")
 
                 setupUpdateTimer()
@@ -1293,7 +1293,7 @@ open class PlaybackManager @Inject constructor(
         }
         // using Chrome Cast make sure the player is connected
         return if (!castManager.isConnected()) {
-            pocketCastsPlayer is CastPlayer
+            pocketCastsPlayer is CastingPlayer
         } else {
             pocketCastsPlayer is SimplePlayer
         } // otherwise use the ExoPlayer

@@ -18,7 +18,7 @@ class PlayerFactoryImpl @Inject constructor(
         onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit,
         player: Player,
     ): PocketCastsPlayer {
-        return CastPlayer(
+        return CastingPlayer(
             context = context,
             onPlayerEvent = onPlayerEvent,
             player = player,

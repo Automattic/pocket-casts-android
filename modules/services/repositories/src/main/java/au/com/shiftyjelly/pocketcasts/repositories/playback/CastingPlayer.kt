@@ -27,7 +27,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 
-class CastPlayer(
+class CastingPlayer(
     val context: Context,
     override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit,
     player: Player,
@@ -171,7 +171,7 @@ class CastPlayer(
 
     override suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects) {
         withContext(Dispatchers.Main) {
-            this@CastPlayer.playbackEffects = playbackEffects
+            this@CastingPlayer.playbackEffects = playbackEffects
             setPlayerEffects()
         }
     }

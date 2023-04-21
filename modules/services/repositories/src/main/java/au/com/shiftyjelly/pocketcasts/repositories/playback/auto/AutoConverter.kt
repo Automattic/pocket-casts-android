@@ -93,6 +93,10 @@ object AutoConverter {
             .setMediaId(mediaId)
             .setMediaMetadata(episodeMetadata)
             .setUri(episode.downloadUrl)
+            // FIXME MimeType required, when casting without it we get a "java.lang.IllegalArgumentException: The item must specify its mimeType" error
+            //   I'm currently just hardcoding a random one until we figure out where to get the actual mime type from
+            // TODO Might also need to set a mimeType this when we create MediaItems in the PlaybackService???
+            .setMimeType("audio/mp4")
             .build()
     }
 
