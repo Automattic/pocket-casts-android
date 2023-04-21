@@ -45,12 +45,6 @@ class SimplePlayer(
     @Volatile
     private var prepared = false
 
-    override suspend fun bufferedUpToMs(): Int {
-        return withContext(Dispatchers.Main) {
-            player.bufferedPosition.toInt()
-        }
-    }
-
     override suspend fun bufferedPercentage(): Int {
         return withContext(Dispatchers.Main) {
             player.bufferedPercentage
