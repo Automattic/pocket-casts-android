@@ -20,7 +20,6 @@ interface PocketCastsPlayer : Player {
     suspend fun seekToTimeMs(positionMs: Int)
     suspend fun isBuffering(): Boolean
     suspend fun durationMs(): Int?
-    suspend fun bufferedPercentage(): Int
     fun supportsTrimSilence(): Boolean
     fun supportsVolumeBoost(): Boolean
     fun supportsVideo(): Boolean
