@@ -9,7 +9,7 @@ interface PlayerFactory {
         player: Player,
     ): PocketCastsPlayer
 
-    fun createCastPlayer(
+    fun createCastingPlayer(
         onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit,
         player: Player,
     ): PocketCastsPlayer

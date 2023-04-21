@@ -822,9 +822,9 @@ open class PlaybackManager @Inject constructor(
             }
 
             controller?.let { player ->
-                pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent, player)
+                pocketCastsPlayer = playerManager.createCastingPlayer(this@PlaybackManager::onPlayerEvent, player)
                 (pocketCastsPlayer as? CastingPlayer)?.updateFromRemoteIfRequired()
-                Timber.i("Cast reconnected. Creating media player of type CastPlayer")
+                Timber.i("Cast reconnected. Creating media player of type CastingPlayer")
 
                 setupUpdateTimer()
             }
@@ -1688,8 +1688,8 @@ open class PlaybackManager @Inject constructor(
             pocketCastsPlayer?.stop()
             controller?.let { player ->
                 if (castManager.isConnected()) {
-                    pocketCastsPlayer = playerManager.createCastPlayer(this@PlaybackManager::onPlayerEvent, player)
-                    Timber.i("Creating media player of type CastPlayer.")
+                    pocketCastsPlayer = playerManager.createCastingPlayer(this@PlaybackManager::onPlayerEvent, player)
+                    Timber.i("Creating media player of type CastingPlayer.")
                 } else {
                     pocketCastsPlayer = playerManager.createSimplePlayer(this@PlaybackManager::onPlayerEvent, player)
                     Timber.i("Creating media player of type SimplePlayer.")
