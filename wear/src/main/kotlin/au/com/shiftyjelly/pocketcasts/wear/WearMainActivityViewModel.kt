@@ -10,12 +10,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class WearMainActivityViewModel @Inject constructor(
@@ -31,6 +35,10 @@ class WearMainActivityViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
+
+    // The time that the most recent login notification was shown.
+    private var logInNotificationShownMs: Long? = null
+    private val logInNotificationMinDuration = 5.seconds
 
     init {
         viewModelScope.launch {
@@ -53,6 +61,7 @@ class WearMainActivityViewModel @Inject constructor(
         when (loginResult) {
             is LoginResult.Failed -> { /* do nothing */ }
             is LoginResult.Success -> {
+                logInNotificationShownMs = System.currentTimeMillis()
                 _state.update {
                     it.copy(signInConfirmationAction = SignInConfirmationAction.Show(loginResult.result.email))
                 }
@@ -70,9 +79,28 @@ class WearMainActivityViewModel @Inject constructor(
 
             is RefreshState.Failed,
             is RefreshState.Success -> {
-                _state.update { it.copy(signInConfirmationAction = SignInConfirmationAction.Hide) }
+                viewModelScope.launch {
+                    delayHidingLoginNotification(refreshState)
+                    _state.update { it.copy(signInConfirmationAction = SignInConfirmationAction.Hide) }
+                }
             }
         }
+    }
+
+    private suspend fun delayHidingLoginNotification(refreshState: RefreshState) {
+        if (logInNotificationShownMs == null) {
+            Timber.e("logInNotificationShownMs was null when refresh state changed to $refreshState. This should never happen")
+        }
+
+        val notificationDuration = logInNotificationShownMs?.let {
+            (System.currentTimeMillis() - it).milliseconds
+        } ?: 0.milliseconds
+
+        if (notificationDuration < logInNotificationMinDuration) {
+            val delayAmount = logInNotificationMinDuration - notificationDuration
+            delay(delayAmount)
+        }
+        logInNotificationShownMs = null
     }
 
     /**
