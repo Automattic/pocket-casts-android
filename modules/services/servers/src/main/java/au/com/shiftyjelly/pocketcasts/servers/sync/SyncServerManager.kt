@@ -228,7 +228,7 @@ open class SyncServerManager @Inject constructor(
         server.deleteFile(addBearer(token), episode.uuid)
 
     fun getPlaybackUrl(episode: UserEpisode, token: AccessToken): Single<String> =
-        Single.just("${Settings.SERVER_API_URL}/files/url/${episode.uuid}?token=$token")
+        Single.just("${Settings.SERVER_API_URL}/files/url/${episode.uuid}?token=${token.value}")
 
     fun getUserEpisode(uuid: String, token: AccessToken): Single<Response<ServerFile>> =
         server.getFile(addBearer(token), uuid)
