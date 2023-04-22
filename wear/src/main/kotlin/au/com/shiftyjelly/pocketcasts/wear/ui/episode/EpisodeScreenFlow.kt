@@ -13,6 +13,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults

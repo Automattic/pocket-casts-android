@@ -4,20 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,12 +15,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.wear.compose.material.Icon
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.SettingsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
@@ -39,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationSubGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
-import au.com.shiftyjelly.pocketcasts.wear.ui.episode.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingViewModel
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
@@ -52,8 +41,6 @@ import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -73,10 +60,6 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
-}
-
-private object Routes {
-    const val signedInNotificationScreen = "signedInNotificationScreen"
 }
 
 @Composable
@@ -212,31 +195,20 @@ fun WearApp(
 
             authenticationGraph(navController)
 
-            composable(Routes.signedInNotificationScreen) {
-                it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
-                NotificationScreen(
-                    text = stringResource(LR.string.profile_logging_in),
-                    closeAfterDuration = null,
-                    onClose = { navController.popBackStack() },
-                    icon = {
-                        val infiniteTransition = rememberInfiniteTransition()
-                        val rotation by infiniteTransition.animateFloat(
-                            initialValue = 0f,
-                            targetValue = 360f,
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(1000, easing = LinearEasing),
-                                repeatMode = RepeatMode.Restart
-                            )
-                        )
-
-                        Icon(
-                            painter = painterResource(IR.drawable.ic_retry),
-                            contentDescription = null,
-                            modifier = Modifier.graphicsLayer {
-                                rotationZ = rotation
-                            }
-                        )
+            composable(
+                route = LoggingInScreen.route,
+                arguments = listOf(
+                    navArgument(LoggingInScreen.emailArgument) {
+                        type = NavType.StringType
                     }
+                ),
+            ) { context ->
+                val email = context.backStackEntry.arguments?.getString(LoggingInScreen.emailArgument)
+                LoggingInScreen(
+                    email = email,
+                    onClose = {
+                        navController.popBackStack()
+                    },
                 )
             }
         }
@@ -249,19 +221,28 @@ private fun handleSignInConfirmation(
     navController: NavController,
 ) {
 
-    val signInNotificationShowing = navController.currentDestination?.route == Routes.signedInNotificationScreen
+    val signInNotificationShowing = navController
+        .currentDestination
+        ?.route
+        ?.startsWith(LoggingInScreen.baseRoute)
+        ?: false
 
     when (signInConfirmationAction) {
-        SignInConfirmationAction.Show -> {
+
+        is SignInConfirmationAction.Show -> {
             if (!signInNotificationShowing) {
-                navController.navigate(Routes.signedInNotificationScreen)
+                val email = signInConfirmationAction.email
+                val route = LoggingInScreen.navigateRoute(email)
+                navController.navigate(route)
             }
         }
+
         SignInConfirmationAction.Hide -> {
             if (signInNotificationShowing) {
                 navController.popBackStack()
             }
         }
+
         null -> { /* do nothing */ }
     }
 

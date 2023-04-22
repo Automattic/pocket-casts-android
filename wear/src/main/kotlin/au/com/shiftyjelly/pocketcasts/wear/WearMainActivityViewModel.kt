@@ -53,7 +53,9 @@ class WearMainActivityViewModel @Inject constructor(
         when (loginResult) {
             is LoginResult.Failed -> { /* do nothing */ }
             is LoginResult.Success -> {
-                _state.update { it.copy(signInConfirmationAction = SignInConfirmationAction.Show) }
+                _state.update {
+                    it.copy(signInConfirmationAction = SignInConfirmationAction.Show(loginResult.result.email))
+                }
                 viewModelScope.launch {
                     podcastManager.refreshPodcastsAfterSignIn()
                 }
@@ -82,4 +84,7 @@ class WearMainActivityViewModel @Inject constructor(
     }
 }
 
-enum class SignInConfirmationAction { Show, Hide }
+sealed class SignInConfirmationAction {
+    class Show(val email: String) : SignInConfirmationAction()
+    object Hide : SignInConfirmationAction()
+}

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui.episode
+package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
