@@ -36,5 +36,30 @@ class ShowNotesHelperTest {
         actual = ShowNotesHelper.convertTimesToLinks("<li><a href=\"https://www.theverge.com/2021/12/21/22848957/lg-dualup-32-inch-4k-ultra-fine-monitors-announced-specs\">LG’s new 16:18 monitor looks like a multitasking powerhouse</a></li>")
         expected = "<li><a href=\"https://www.theverge.com/2021/12/21/22848957/lg-dualup-32-inch-4k-ultra-fine-monitors-announced-specs\">LG’s new 16:18 monitor looks like a multitasking powerhouse</a></li>"
         assertEquals(actual, expected)
+
+        actual = ShowNotesHelper.convertTimesToLinks("<p>Example <a>10:30</a></p>")
+        expected = "<p>Example <a>10:30</a></p>"
+        assertEquals(expected, actual)
+
+        // Replace the timestamp if it is outside the <a> tag - https://github.com/Automattic/pocket-casts-android/issues/814
+        actual = ShowNotesHelper.convertTimesToLinks("<p>Example 00:00 <a href=\"https://example.com\">Link</a></p>")
+        expected = "<p>Example <a href=\"http://localhost/#playerJumpTo=00:00\">00:00</a> <a href=\"https://example.com\">Link</a></p>"
+        assertEquals(expected, actual)
+
+        actual = ShowNotesHelper.convertTimesToLinks("<p>Example 00:00 <a>Link</a></p>")
+        expected = "<p>Example <a href=\"http://localhost/#playerJumpTo=00:00\">00:00</a> <a>Link</a></p>"
+        assertEquals(expected, actual)
+
+        actual = ShowNotesHelper.convertTimesToLinks("<p>Example 00:00 <a href=\"https://example00:80.com\">Link</a></p>")
+        expected = "<p>Example <a href=\"http://localhost/#playerJumpTo=00:00\">00:00</a> <a href=\"https://example00:80.com\">Link</a></p>"
+        assertEquals(expected, actual)
+
+        actual = ShowNotesHelper.convertTimesToLinks("<p>Example 00:00 <a href=\"https://example.com\">10:30</a></p>")
+        expected = "<p>Example <a href=\"http://localhost/#playerJumpTo=00:00\">00:00</a> <a href=\"https://example.com\">10:30</a></p>"
+        assertEquals(expected, actual)
+
+        actual = ShowNotesHelper.convertTimesToLinks("<p>Example 00:00 <a>10:30</a></p>")
+        expected = "<p>Example <a href=\"http://localhost/#playerJumpTo=00:00\">00:00</a> <a>10:30</a></p>"
+        assertEquals(expected, actual)
     }
 }
