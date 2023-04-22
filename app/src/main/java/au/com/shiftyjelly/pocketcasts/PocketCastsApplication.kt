@@ -264,7 +264,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     }
 
     companion object {
-        @UnstableApi
+        @androidx.annotation.OptIn(UnstableApi::class)
         val playbackService = PlaybackService::class.java
     }
 }

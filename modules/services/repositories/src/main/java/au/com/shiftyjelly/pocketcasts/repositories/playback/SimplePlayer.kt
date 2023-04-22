@@ -12,7 +12,6 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
-import androidx.media3.common.util.UnstableApi
 import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -23,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@UnstableApi
 class SimplePlayer(
     val settings: Settings,
     val statsManager: StatsManager,
@@ -46,12 +44,6 @@ class SimplePlayer(
 
     @Volatile
     private var prepared = false
-
-    override suspend fun bufferedUpToMs(): Int {
-        return withContext(Dispatchers.Main) {
-            player.bufferedPosition.toInt()
-        }
-    }
 
     override suspend fun bufferedPercentage(): Int {
         return withContext(Dispatchers.Main) {

@@ -64,7 +64,7 @@ data class AutoMediaId(
     }
 }
 
-@UnstableApi
+@androidx.annotation.OptIn(UnstableApi::class)
 object AutoConverter {
 
     private const val THUMBNAIL_IMAGE_SIZE = 200

@@ -99,8 +99,6 @@ class CastingPlayer(
     override fun isPlaying(): Boolean =
         isMediaLoaded && (remoteMediaClient?.isPlaying ?: false)
 
-    override suspend fun bufferedUpToMs(): Int = 0
-
     override suspend fun bufferedPercentage(): Int = 0
 
     override suspend fun durationMs(): Int? = episode?.durationMs

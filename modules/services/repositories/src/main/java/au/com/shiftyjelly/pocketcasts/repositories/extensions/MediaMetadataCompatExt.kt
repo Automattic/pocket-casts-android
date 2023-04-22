@@ -232,7 +232,7 @@ inline val MediaMetadataCompat.fullDescription
  *
  * For convenience, place the [MediaDescriptionCompat] into the tag so it can be retrieved later.
  */
-@UnstableApi
+@androidx.annotation.OptIn(UnstableApi::class)
 fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory) =
     ProgressiveMediaSource.Factory(dataSourceFactory)
         .createMediaSource(
@@ -247,11 +247,10 @@ fun MediaMetadataCompat.toMediaSource(dataSourceFactory: DataSource.Factory) =
  * Extension method for building a [ConcatenatingMediaSource] given a [List]
  * of [MediaMetadataCompat] objects.
  */
-@UnstableApi
+@androidx.annotation.OptIn(UnstableApi::class)
 fun List<MediaMetadataCompat>.toMediaSource(
     dataSourceFactory: DataSource.Factory
 ): ConcatenatingMediaSource {
-
     val concatenatingMediaSource = ConcatenatingMediaSource()
     forEach {
         concatenatingMediaSource.addMediaSource(it.toMediaSource(dataSourceFactory))

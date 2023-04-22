@@ -111,7 +111,7 @@ const val CONTENT_STYLE_GRID_ITEM_HINT_VALUE = 2
 private const val EPISODE_LIMIT = 100
 private const val NUM_SUGGESTED_ITEMS = 8
 
-@UnstableApi
+@androidx.annotation.OptIn(UnstableApi::class)
 @AndroidEntryPoint
 open class PlaybackService : MediaLibraryService(), CoroutineScope, SessionAvailabilityListener, Player.Listener {
     inner class LocalBinder : Binder() {

@@ -144,7 +144,7 @@ open class PlaybackManager @Inject constructor(
 
     private var updateCount = 0
     private var resettingPlayer = false
-    private var lastBufferedUpTo: Int = 0
+    private var lastBufferedUpTo: Long = 0
     private var focusWasPlaying: Date? = null
     private var forcePlayerSwitch = false
     private var updateTimerDisposable: Disposable? = null
@@ -316,10 +316,6 @@ open class PlaybackManager @Inject constructor(
         }
 
         return episode.playedUpToMs
-    }
-
-    suspend fun getBufferedUpToMs(): Int {
-        return pocketCastsPlayer?.bufferedUpToMs() ?: 0
     }
 
     fun isPlaybackLocal(): Boolean {
@@ -916,8 +912,8 @@ open class PlaybackManager @Inject constructor(
     suspend fun onBufferingStateChanged() {
         pocketCastsPlayer?.let {
             val isBuffering = it.isBuffering()
-            val bufferedMs = it.bufferedUpToMs()
             withContext(Dispatchers.Main) {
+                val bufferedMs = it.bufferedPosition
                 playbackStateRelay.blockingFirst().let { playbackState ->
                     if (playbackState.isBuffering == isBuffering) {
                         return@withContext
@@ -925,7 +921,7 @@ open class PlaybackManager @Inject constructor(
                     playbackStateRelay.accept(
                         playbackState.copy(
                             isBuffering = isBuffering,
-                            bufferedMs = bufferedMs,
+                            bufferedMs = bufferedMs.toInt(),
                             lastChangeFrom = "onBufferingStateChanged"
                         )
                     )
@@ -1806,16 +1802,21 @@ open class PlaybackManager @Inject constructor(
         if (episode == null || player == null || !player.isStreaming) {
             return
         }
-        val bufferedUpToMs = getBufferedUpToMs()
-        if (bufferedUpToMs == lastBufferedUpTo) {
-            return
-        }
         withContext(Dispatchers.Main) {
-            playbackStateRelay.blockingFirst().let { playbackState ->
-                playbackStateRelay.accept(playbackState.copy(bufferedMs = bufferedUpToMs, lastChangeFrom = "updateBufferPosition"))
+            val bufferedUpToMs = pocketCastsPlayer?.bufferedPosition ?: 0
+            if (bufferedUpToMs == lastBufferedUpTo) {
+                return@withContext
             }
+            playbackStateRelay.blockingFirst().let { playbackState ->
+                playbackStateRelay.accept(
+                    playbackState.copy(
+                        bufferedMs = bufferedUpToMs.toInt(),
+                        lastChangeFrom = "updateBufferPosition"
+                    )
+                )
+            }
+            lastBufferedUpTo = bufferedUpToMs
         }
-        lastBufferedUpTo = bufferedUpToMs
     }
 
     private fun setupUpdateTimer() {
