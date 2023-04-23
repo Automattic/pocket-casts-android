@@ -92,17 +92,17 @@ fun WatchListScreen(
 
         item {
             WatchListChip(
-                title = stringResource(LR.string.filters),
-                iconRes = IR.drawable.ic_filters,
-                onClick = { navigateToRoute(FiltersScreen.route) }
+                title = stringResource(LR.string.downloads),
+                iconRes = IR.drawable.ic_download,
+                onClick = { navigateToRoute(DownloadsScreen.route) }
             )
         }
 
         item {
             WatchListChip(
-                title = stringResource(LR.string.downloads),
-                iconRes = IR.drawable.ic_download,
-                onClick = { navigateToRoute(DownloadsScreen.route) }
+                title = stringResource(LR.string.filters),
+                iconRes = IR.drawable.ic_filters,
+                onClick = { navigateToRoute(FiltersScreen.route) }
             )
         }
 
