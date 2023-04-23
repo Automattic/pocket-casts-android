@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package au.com.shiftyjelly.pocketcasts.wear
 
 import android.os.Bundle
@@ -10,7 +12,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,8 +21,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material.SwipeToDismissBoxState
-import androidx.wear.compose.material.edgeSwipeToDismiss
 import androidx.wear.compose.material.rememberSwipeToDismissBoxState
 import androidx.wear.compose.navigation.SwipeDismissableNavHostState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -43,7 +42,6 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingViewModel
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
-import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
 import com.google.android.horologist.compose.navscaffold.composable
@@ -68,7 +66,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WearApp(themeType: Theme.ThemeType) {
     WearAppTheme(themeType) {
@@ -77,33 +74,31 @@ fun WearApp(themeType: Theme.ThemeType) {
 
         val swipeDismissState = rememberSwipeToDismissBoxState()
         val navState = rememberSwipeDismissableNavHostState(swipeDismissState)
-        val pagerState = rememberPagerState()
-        val coroutineScope = rememberCoroutineScope()
+//        val pagerState = rememberPagerState()
+//        val coroutineScope = rememberCoroutineScope()
 
-        NowPlayingPager(
+//        NowPlayingPager(
+//            navController = navController,
+// //            swipeToDismissState = swipeDismissState,
+//            pagerState = pagerState,
+//        ) {
+        ListPage(
             navController = navController,
-//            swipeToDismissState = swipeDismissState,
-            pagerState = pagerState,
-        ) {
-            ListPage(
-                navController = navController,
-                state = navState,
-                toNowPlaying = {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(1)
-                    }
-                },
-            )
-        }
+            state = navState,
+//                toNowPlaying = {
+//                    coroutineScope.launch {
+//                        pagerState.animateScrollToPage(1)
+//                    }
+//                },
+        )
+//        }
     }
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun NowPlayingPager(
     navController: NavController,
-//    swipeToDismissState: SwipeToDismissBoxState,
-    pagerState: PagerState,
+    pagerState: PagerState = rememberPagerState(),
     content: @Composable () -> Unit,
 ) {
     PagerScreen(
@@ -155,7 +150,7 @@ private fun NowPlayingPager(
 private fun ListPage(
     navController: NavHostController,
     state: SwipeDismissableNavHostState,
-    toNowPlaying: () -> Unit,
+//    toNowPlaying: () -> Unit,
 ) {
     WearNavScaffold(
         navController = navController,
@@ -166,11 +161,22 @@ private fun ListPage(
         scrollable(
             route = WatchListScreen.route,
         ) {
-            WatchListScreen(
-                scrollState = it.scrollableState,
-                navigateToRoute = navController::navigate,
-                toNowPlaying = toNowPlaying,
-            )
+            val pagerState = rememberPagerState()
+            val coroutineScope = rememberCoroutineScope()
+            NowPlayingPager(
+                navController = navController,
+                pagerState = pagerState,
+            ) {
+                WatchListScreen(
+                    scrollState = it.scrollableState,
+                    navigateToRoute = navController::navigate,
+                    toNowPlaying = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(1)
+                        }
+                    },
+                )
+            }
         }
 
         composable(StreamingConfirmationScreen.route) {
@@ -191,13 +197,14 @@ private fun ListPage(
             route = PodcastsScreen.route,
         ) {
 
-            it.scrollableState
-            PodcastsScreen(
-                listState = it.scrollableState,
-                navigateToPodcast = { podcastUuid ->
-                    navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                }
-            )
+            NowPlayingPager(navController) {
+                PodcastsScreen(
+                    listState = it.scrollableState,
+                    navigateToPodcast = { podcastUuid ->
+                        navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+                    }
+                )
+            }
         }
 
         composable(
