@@ -541,10 +541,9 @@ class SyncManagerImpl @Inject constructor(
         settings.setLastModified(null)
 
         return AuthResultModel(
-            email = response.email,
-            isNewAccount = response.isNew,
             token = response.accessToken,
             uuid = response.uuid,
+            isNewAccount = response.isNew,
         )
     }
 }

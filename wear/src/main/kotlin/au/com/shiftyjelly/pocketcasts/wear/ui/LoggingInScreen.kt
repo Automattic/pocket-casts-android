@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,26 +28,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object LoggingInScreen {
-    const val baseRoute = "loggingInScreen"
-    const val emailArgument = "emailArgument"
-    const val route = "$baseRoute/{$emailArgument}"
-    fun navigateRoute(email: String) = "loggingInScreen/$email"
+    const val route = "loggingInScreen"
 }
 
 @Composable
 fun LoggingInScreen(
-    email: String?,
     onClose: () -> Unit,
 ) {
+
+    val viewModel = hiltViewModel<LoggingInScreenViewModel>()
+    val email = remember { viewModel.getEmail() }
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -54,7 +58,21 @@ fun LoggingInScreen(
             .padding(16.dp)
             .fillMaxSize()
     ) {
-        SpinningIcon()
+        val placeholder = @Composable {
+            SpinningIcon(Modifier.size(48.dp))
+        }
+        if (email == null) {
+            placeholder()
+        } else {
+            GravatarProfileImage(
+                email = email,
+                contentDescription = null,
+                placeholder = placeholder,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(48.dp),
+            )
+        }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = stringResource(LR.string.profile_logging_in),
@@ -74,7 +92,9 @@ fun LoggingInScreen(
 }
 
 @Composable
-private fun SpinningIcon() {
+private fun SpinningIcon(
+    modifier: Modifier = Modifier,
+) {
     val infiniteTransition = rememberInfiniteTransition()
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -88,8 +108,7 @@ private fun SpinningIcon() {
     Icon(
         painter = painterResource(IR.drawable.ic_retry),
         contentDescription = null,
-        modifier = Modifier
-            .size(48.dp)
+        modifier = modifier
             .graphicsLayer {
                 rotationZ = rotation
             }
@@ -101,7 +120,6 @@ private fun SpinningIcon() {
 private fun LoggingInScreenPreview() {
     WearAppTheme(Theme.ThemeType.DARK) {
         LoggingInScreen(
-            email = "iluvpodcasts@pocketcasts.com",
             onClose = {}
         )
     }

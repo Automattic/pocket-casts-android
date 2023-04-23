@@ -63,7 +63,7 @@ class WearMainActivityViewModel @Inject constructor(
             is LoginResult.Success -> {
                 logInNotificationShownMs = System.currentTimeMillis()
                 _state.update {
-                    it.copy(signInConfirmationAction = SignInConfirmationAction.Show(loginResult.result.email))
+                    it.copy(signInConfirmationAction = SignInConfirmationAction.Show)
                 }
                 viewModelScope.launch {
                     podcastManager.refreshPodcastsAfterSignIn()
@@ -113,6 +113,6 @@ class WearMainActivityViewModel @Inject constructor(
 }
 
 sealed class SignInConfirmationAction {
-    class Show(val email: String) : SignInConfirmationAction()
+    object Show : SignInConfirmationAction()
     object Hide : SignInConfirmationAction()
 }

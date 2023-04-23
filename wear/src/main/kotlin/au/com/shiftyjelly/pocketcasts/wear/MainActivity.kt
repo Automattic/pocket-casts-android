@@ -195,20 +195,9 @@ fun WearApp(
 
             authenticationGraph(navController)
 
-            composable(
-                route = LoggingInScreen.route,
-                arguments = listOf(
-                    navArgument(LoggingInScreen.emailArgument) {
-                        type = NavType.StringType
-                    }
-                ),
-            ) { context ->
-                val email = context.backStackEntry.arguments?.getString(LoggingInScreen.emailArgument)
+            composable(LoggingInScreen.route) {
                 LoggingInScreen(
-                    email = email,
-                    onClose = {
-                        navController.popBackStack()
-                    },
+                    onClose = { navController.popBackStack() },
                 )
             }
         }
@@ -221,19 +210,13 @@ private fun handleSignInConfirmation(
     navController: NavController,
 ) {
 
-    val signInNotificationShowing = navController
-        .currentDestination
-        ?.route
-        ?.startsWith(LoggingInScreen.baseRoute)
-        ?: false
+    val signInNotificationShowing = navController.currentDestination?.route == LoggingInScreen.route
 
     when (signInConfirmationAction) {
 
         is SignInConfirmationAction.Show -> {
             if (!signInNotificationShowing) {
-                val email = signInConfirmationAction.email
-                val route = LoggingInScreen.navigateRoute(email)
-                navController.navigate(route)
+                navController.navigate(LoggingInScreen.route)
             }
         }
 
