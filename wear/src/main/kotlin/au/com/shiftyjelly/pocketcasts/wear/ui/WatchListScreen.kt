@@ -68,10 +68,12 @@ fun WatchListScreen(
             Spacer(Modifier)
         }
 
-        item {
-            NowPlayingChip(
-                onClick = { navigateToRoute(NowPlayingScreen.route) },
-            )
+        if (upNextState is UpNextQueue.State.Loaded) {
+            item {
+                NowPlayingChip(
+                    onClick = { navigateToRoute(NowPlayingScreen.route) },
+                )
+            }
         }
 
         item {
