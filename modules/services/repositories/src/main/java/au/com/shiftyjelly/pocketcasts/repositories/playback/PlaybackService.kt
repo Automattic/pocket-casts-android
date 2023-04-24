@@ -13,10 +13,13 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.media3.cast.CastPlayer
+import androidx.media3.cast.SessionAvailabilityListener
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -59,6 +62,7 @@ import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.android.gms.cast.framework.CastContext
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -109,7 +113,7 @@ private const val NUM_SUGGESTED_ITEMS = 8
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @AndroidEntryPoint
-open class PlaybackService : MediaLibraryService(), CoroutineScope {
+open class PlaybackService : MediaLibraryService(), CoroutineScope, SessionAvailabilityListener, Player.Listener {
     inner class LocalBinder : Binder() {
         val service: PlaybackService
             get() = this@PlaybackService
@@ -137,7 +141,7 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
     open var librarySessionCallback: MediaLibrarySession.Callback = CustomMediaLibrarySessionCallback()
 
     private lateinit var mediaLibrarySession: MediaLibrarySession
-    private lateinit var localPlayer: ExoPlayer
+    private lateinit var player: CompositePlayer
 
     private var mediaControllerCallback: MediaControllerCallback? = null
     lateinit var notificationManager: PlayerNotificationManager
@@ -167,15 +171,23 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
     }
 
     private fun initializeSessionAndPlayer() {
-        localPlayer = createExoPlayer()
-
-        val mediaSessionBuilder = MediaLibrarySession.Builder(this, localPlayer, librarySessionCallback)
+        player = CompositePlayer(createCastPlayer(), createExoPlayer()).apply {
+            addListener(this@PlaybackService)
+        }
+        val mediaSessionBuilder = MediaLibrarySession.Builder(this, player, librarySessionCallback)
         if (!Util.isAutomotive(this)) { // We can't start activities on automotive
             mediaSessionBuilder.setSessionActivity(this.getLaunchActivityPendingIntent())
         }
 
         mediaLibrarySession = mediaSessionBuilder.build()
     }
+
+    private fun createCastPlayer(): CastPlayer? =
+        CastContext.getSharedInstance()?.let { castContext ->
+            CastPlayer(castContext).apply {
+                setSessionAvailabilityListener(this@PlaybackService)
+            }
+        }
 
     private fun createExoPlayer(): ExoPlayer {
         val renderersFactory = createRenderersFactory()
@@ -236,7 +248,7 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
     override fun onDestroy() {
         super.onDestroy()
         mediaLibrarySession.release()
-        localPlayer.release()
+        player.release()
 
         disposables.clear()
 
@@ -862,5 +874,22 @@ open class PlaybackService : MediaLibraryService(), CoroutineScope {
                 )
             }
         }
+    }
+
+    /* SessionAvailabilityListener */
+
+    override fun onCastSessionAvailable() {
+        player.setCurrentPlayer(CompositePlayer.PlayerType.CAST)
+    }
+
+    override fun onCastSessionUnavailable() {
+        player.setCurrentPlayer(CompositePlayer.PlayerType.LOCAL)
+    }
+
+    /* Player.Listener */
+
+    // There are other methods we could override here, but using this now to just see what events are coming through.
+    override fun onEvents(player: Player, events: Player.Events) {
+        super.onEvents(player, events)
     }
 }

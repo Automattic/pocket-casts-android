@@ -27,11 +27,11 @@ import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 
-class CastPlayer(
+class CastingPlayer(
     val context: Context,
     override val onPlayerEvent: (PocketCastsPlayer, PlayerEvent) -> Unit,
-    player: Player,
-) : PocketCastsPlayer, Player by player {
+    val player: Player,
+) : PocketCastsPlayer, Player by player, Player.Listener {
 
     private var customData: JSONObject? = null
     private var podcast: Podcast? = null
@@ -87,6 +87,7 @@ class CastPlayer(
             addRemoteMediaListener()
             setMetadataFromRemote()
         }
+        player.addListener(this)
     }
 
     fun updateFromRemoteIfRequired() {
@@ -123,17 +124,20 @@ class CastPlayer(
 
     override suspend fun play(currentPositionMs: Int) {
         withContext(Dispatchers.Main) {
-            episode?.let {
-                state = PlaybackStateCompat.STATE_BUFFERING
-                loadEpisode(it.uuid, currentPositionMs, true)
-            }
+            state = PlaybackStateCompat.STATE_BUFFERING
+            player.play()
+//            episode?.let {
+//                state = PlaybackStateCompat.STATE_BUFFERING
+//                loadEpisode(it.uuid, currentPositionMs, true)
+//            }
         }
     }
 
     override fun pause() {
-        if (isMediaLoaded) {
-            remoteMediaClient?.pause()
-        }
+//        if (isMediaLoaded) {
+        player.pause()
+//            remoteMediaClient?.pause()
+//        }
     }
 
     override fun stop() {
@@ -167,7 +171,7 @@ class CastPlayer(
 
     override suspend fun setPlaybackEffects(playbackEffects: PlaybackEffects) {
         withContext(Dispatchers.Main) {
-            this@CastPlayer.playbackEffects = playbackEffects
+            this@CastingPlayer.playbackEffects = playbackEffects
             setPlayerEffects()
         }
     }
@@ -362,6 +366,11 @@ class CastPlayer(
         override fun onQueueStatusUpdated() {}
 
         override fun onPreloadStatusUpdated() {}
+    }
+
+    override fun onEvents(player: Player, events: Player.Events) {
+        super.onEvents(player, events)
+        updatePlaybackState()
     }
 
     companion object {

@@ -93,6 +93,7 @@ object AutoConverter {
             .setMediaId(mediaId)
             .setMediaMetadata(episodeMetadata)
             .setUri(episode.downloadUrl)
+            .setMimeType(episode.fileType)
             .build()
     }
 
