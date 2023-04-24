@@ -260,7 +260,6 @@ fun NowPlayingPager(
                     navigateToEpisode = { episodeUuid ->
                         coroutineScope.launch {
                             navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
-                            pagerState.scrollToPage(0)
                         }
                     },
                     showStreamingConfirmation = { navController.navigate(StreamingConfirmationScreen.route) },
