@@ -19,7 +19,7 @@ import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_S
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocaliseFilters
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -68,7 +68,7 @@ object AutoConverter {
     private const val THUMBNAIL_IMAGE_SIZE = 200
     private const val FULL_IMAGE_SIZE = 800
 
-    fun convertEpisodeToMediaItem(context: Context, episode: Episode, parentPodcast: Podcast, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
+    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
         val localUri = getBitmapUriForPodcast(parentPodcast, episode, context)
 
         val extrasForEpisode = extrasForEpisode(episode)
@@ -131,7 +131,7 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(mediaDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
-    fun getBitmapUriForPodcast(podcast: Podcast?, episode: Episode?, context: Context): Uri? {
+    fun getBitmapUriForPodcast(podcast: Podcast?, episode: BaseEpisode?, context: Context): Uri? {
         val url = if (episode is UserEpisode) {
             // the artwork for user uploaded episodes are stored on each episode
             episode.artworkUrl
@@ -212,7 +212,7 @@ object AutoConverter {
         return Uri.parse("android.resource://" + context.packageName + "/drawable/" + drawableName)
     }
 
-    private fun extrasForEpisode(episode: Episode): Bundle {
+    private fun extrasForEpisode(episode: BaseEpisode): Bundle {
         val downloadStatus = if (episode.isDownloaded) STATUS_DOWNLOADED else STATUS_NOT_DOWNLOADED
 
         val completionStatus = when (episode.playingStatus) {

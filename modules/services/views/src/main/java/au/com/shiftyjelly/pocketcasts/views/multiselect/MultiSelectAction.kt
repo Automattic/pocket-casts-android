@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.views.R
@@ -120,7 +120,7 @@ sealed class MultiSelectAction(
             return loadedItems + missingItems
         }
 
-        fun actionForGroup(groupId: Int, selected: List<Episode>): MultiSelectAction? {
+        fun actionForGroup(groupId: Int, selected: List<BaseEpisode>): MultiSelectAction? {
             when (groupId) {
                 R.id.menu_download -> {
                     for (episode in selected) {

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
 import androidx.annotation.StringRes
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -21,8 +21,8 @@ object ShelfItems {
 
 sealed class ShelfItem(
     val id: String,
-    var title: (Episode?) -> Int,
-    var iconRes: (Episode?) -> Int,
+    var title: (BaseEpisode?) -> Int,
+    var iconRes: (BaseEpisode?) -> Int,
     val shownWhen: Shown,
     val analyticsValue: String,
     @StringRes val subtitle: Int? = null

@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -55,7 +55,7 @@ class PlayButton @JvmOverloads constructor(
     companion object {
         private const val LIST_ID_KEY = "list_id"
         private const val PODCAST_UUID_KEY = "podcast_uuid"
-        fun calculateButtonType(episode: Episode, streamByDefault: Boolean): PlayButtonType {
+        fun calculateButtonType(episode: BaseEpisode, streamByDefault: Boolean): PlayButtonType {
             return when {
                 episode.lastPlaybackFailed() -> PlayButtonType.PLAYBACK_FAILED
                 episode.playing -> PlayButtonType.PAUSE
@@ -126,7 +126,7 @@ class PlayButton @JvmOverloads constructor(
         popup.show()
     }
 
-    fun setButtonType(episode: Episode, buttonType: PlayButtonType, @ColorInt color: Int, fromListUuid: String?) {
+    fun setButtonType(episode: BaseEpisode, buttonType: PlayButtonType, @ColorInt color: Int, fromListUuid: String?) {
         if (buttonType == this.buttonType && episode.uuid == this.episodeUuid) {
             return
         }

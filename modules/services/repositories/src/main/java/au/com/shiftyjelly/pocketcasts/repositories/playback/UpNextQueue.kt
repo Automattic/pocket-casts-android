@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -13,40 +13,40 @@ import java.util.concurrent.TimeUnit
 interface UpNextQueue {
     val isEmpty: Boolean
     val changesObservable: Observable<State>
-    val currentEpisode: Episode?
-    val queueEpisodes: List<Episode>
+    val currentEpisode: BaseEpisode?
+    val queueEpisodes: List<BaseEpisode>
     val size: Int
         get() = queueEpisodes.size
 
-    val allEpisodes get(): List<Episode> = currentEpisode?.let { listOf(it) + queueEpisodes } ?: queueEpisodes
-    fun isCurrentEpisode(episode: Episode): Boolean
-    suspend fun playNow(episode: Episode, onAdd: (() -> Unit)?)
-    suspend fun playNext(episode: Episode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
-    suspend fun playLast(episode: Episode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
-    suspend fun playAllNext(episodes: List<Episode>, downloadManager: DownloadManager)
-    suspend fun playAllLast(episodes: List<Episode>, downloadManager: DownloadManager)
-    suspend fun removeEpisode(episode: Episode)
-    suspend fun clearAndPlayAll(episodes: List<Episode>, downloadManager: DownloadManager)
+    val allEpisodes get(): List<BaseEpisode> = currentEpisode?.let { listOf(it) + queueEpisodes } ?: queueEpisodes
+    fun isCurrentEpisode(episode: BaseEpisode): Boolean
+    suspend fun playNow(episode: BaseEpisode, onAdd: (() -> Unit)?)
+    suspend fun playNext(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
+    suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
+    suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
+    suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
+    suspend fun removeEpisode(episode: BaseEpisode)
+    suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     fun moveEpisode(from: Int, to: Int)
-    fun changeList(episodes: List<Episode>)
+    fun changeList(episodes: List<BaseEpisode>)
     fun clearUpNext()
     fun removeAll()
     suspend fun removeAllIncludingChanges()
-    fun importServerChanges(episodes: List<Episode>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable
+    fun importServerChanges(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager): Completable
     fun contains(uuid: String): Boolean
 
     sealed class State {
         object Empty : State()
 
         // Loaded state includes the current episode as episode and the episodes in up next in queue. Queue does not include the currently playing episode
-        data class Loaded(val episode: Episode, val podcast: Podcast?, val queue: List<Episode>) : State()
+        data class Loaded(val episode: BaseEpisode, val podcast: Podcast?, val queue: List<BaseEpisode>) : State()
 
         fun queueSize(): Int {
             return if (this is Loaded) queue.size else 0
         }
 
         companion object {
-            fun isEqualWithEpisodeCompare(stateOne: State, stateTwo: State, isPlayingEpisodeEqual: (Episode, Episode) -> Boolean): Boolean {
+            fun isEqualWithEpisodeCompare(stateOne: State, stateTwo: State, isPlayingEpisodeEqual: (BaseEpisode, BaseEpisode) -> Boolean): Boolean {
                 return when {
                     stateOne is Empty && stateTwo is Empty -> true
                     stateOne is Loaded && stateTwo is Loaded -> {

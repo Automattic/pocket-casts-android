@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.hours
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -12,7 +12,7 @@ import java.util.Date
 class ResumptionHelper(val settings: Settings) {
     private var lastPauseTime: Date? = settings.getLastPauseTime()
 
-    fun adjustedStartTimeMsFor(episode: Episode): Int {
+    fun adjustedStartTimeMsFor(episode: BaseEpisode): Int {
         if (!settings.getIntelligentPlaybackResumption() || settings.getLastPausedUUID() != episode.uuid || (settings.getLastPausedAt() ?: 0) != episode.playedUpToMs) return episode.playedUpToMs
         val lastPauseTime = this.lastPauseTime ?: return episode.playedUpToMs
 
@@ -38,7 +38,7 @@ class ResumptionHelper(val settings: Settings) {
         return adjustedTime.toInt().coerceAtLeast(0)
     }
 
-    fun paused(episode: Episode, atPlayedUpToMs: Int) {
+    fun paused(episode: BaseEpisode, atPlayedUpToMs: Int) {
         lastPauseTime = Date()
         settings.setLastPauseTime(Date())
         settings.setLastPausedUUID(episode.uuid)

@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.support.v4.media.session.PlaybackStateCompat
 import android.text.TextUtils
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
@@ -30,7 +30,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
 
     private var customData: JSONObject? = null
     private var podcast: Podcast? = null
-    private var episode: Episode? = null
+    private var episode: BaseEpisode? = null
     private var state: Int = 0
     private var remoteListenerAdded: Boolean = false
     private var localEpisodeUuid: String? = null
@@ -222,7 +222,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
         this.podcast = podcast
     }
 
-    override fun setEpisode(episode: Episode) {
+    override fun setEpisode(episode: BaseEpisode) {
         this.episode = episode
         this.episodeLocation =
             EpisodeLocation.Stream(
@@ -268,7 +268,7 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
             ?.setResultCallback { addRemoteMediaListener() }
     }
 
-    private fun buildMediaInfo(url: String, episode: Episode, podcast: Podcast): MediaInfo {
+    private fun buildMediaInfo(url: String, episode: BaseEpisode, podcast: Podcast): MediaInfo {
         val mediaMetadata = MediaMetadata(if (episode.isVideo) MediaMetadata.MEDIA_TYPE_MOVIE else MediaMetadata.MEDIA_TYPE_MUSIC_TRACK).apply {
             putString(MediaMetadata.KEY_TITLE, episode.title)
             putString(MediaMetadata.KEY_SUBTITLE, podcast.title)

@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -482,7 +482,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding?.episodesRecyclerView?.layoutManager?.onRestoreInstanceState(listState)
     }
 
-    fun episodeSwipeArchive(episode: Episode, index: Int) {
+    fun episodeSwipeArchive(episode: BaseEpisode, index: Int) {
         val binding = binding ?: return
 
         binding.episodesRecyclerView.findViewHolderForAdapterPosition(index)?.let {
@@ -589,7 +589,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
 
-            override fun multiSelectSelectAllUp(episode: Episode) {
+            override fun multiSelectSelectAllUp(episode: BaseEpisode) {
                 val grouped = viewModel.groupedEpisodes.value
                 if (grouped != null) {
                     val group = grouped.find { it.contains(episode) } ?: return
@@ -602,7 +602,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
 
-            override fun multiSelectSelectAllDown(episode: Episode) {
+            override fun multiSelectSelectAllDown(episode: BaseEpisode) {
                 val grouped = viewModel.groupedEpisodes.value
                 if (grouped != null) {
                     val group = grouped.find { it.contains(episode) } ?: return
@@ -735,7 +735,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         binding = null
     }
 
-    private fun episodeSwipedRightItem1(episode: Episode, index: Int) {
+    private fun episodeSwipedRightItem1(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
@@ -750,7 +750,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
         adapter?.notifyItemChanged(index)
     }
 
-    private fun episodeSwipedRightItem2(episode: Episode, index: Int) {
+    private fun episodeSwipedRightItem2(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)

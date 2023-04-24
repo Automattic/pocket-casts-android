@@ -14,7 +14,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -264,7 +264,7 @@ class DownloadManagerImpl @Inject constructor(
     private val addDownloadMutex = Mutex()
 
     // We only want to be able to queue one download at a time
-    override fun addEpisodeToQueue(episode: Episode, from: String, fireEvent: Boolean) {
+    override fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean) {
         launch(downloadsCoroutineContext) {
             addDownloadMutex.withLock {
                 val updatedEpisode = episodeManager.findEpisodeByUuid(episode.uuid) ?: return@launch // Get the latest episode so we can check if it's downloaded
@@ -297,12 +297,12 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun getRequirementsAsync(episode: Episode): NetworkRequirements =
+    private suspend fun getRequirementsAsync(episode: BaseEpisode): NetworkRequirements =
         withContext(downloadsCoroutineContext) {
             networkRequiredForEpisode(episode)
         }
 
-    override suspend fun getRequirementsAndSetStatusAsync(episode: Episode): NetworkRequirements {
+    override suspend fun getRequirementsAndSetStatusAsync(episode: BaseEpisode): NetworkRequirements {
         return withContext(downloadsCoroutineContext) {
             val networkRequirements = networkRequiredForEpisode(episode)
             updateEpisodeStatusAsync(episode, networkRequirements).await()
@@ -310,7 +310,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private fun addWorkManagerTask(episode: Episode, networkRequirements: NetworkRequirements) {
+    private fun addWorkManagerTask(episode: BaseEpisode, networkRequirements: NetworkRequirements) {
         try {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(networkRequirements.toWorkManagerEnum())
@@ -355,7 +355,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private fun updateEpisodeStatusAsync(episode: Episode, networkRequirements: NetworkRequirements): Deferred<Unit> {
+    private fun updateEpisodeStatusAsync(episode: BaseEpisode, networkRequirements: NetworkRequirements): Deferred<Unit> {
         return async {
             val status = getEpisodeStatusForRequirements(networkRequirements)
             if (status != episode.episodeStatus) {
@@ -372,7 +372,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    override fun removeEpisodeFromQueue(episode: Episode, from: String) {
+    override fun removeEpisodeFromQueue(episode: BaseEpisode, from: String) {
         launch(downloadsCoroutineContext) {
             episode.downloadTaskId?.let {
                 WorkManager.getInstance(context).cancelWorkById(UUID.fromString(it))
@@ -459,7 +459,7 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private fun networkRequiredForEpisode(episode: Episode): NetworkRequirements {
+    private fun networkRequiredForEpisode(episode: BaseEpisode): NetworkRequirements {
         // user has tapped download
         if (!episode.isAutoDownloaded) {
             // user said yes to warning dialog

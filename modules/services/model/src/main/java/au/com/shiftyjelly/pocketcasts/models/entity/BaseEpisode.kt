@@ -5,13 +5,13 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import java.util.Date
 import java.util.UUID
 
-interface Episode {
+interface BaseEpisode {
     companion object {
         /**
          * Used to reduce the changes sent out by the media session.
          * Returns true if the objects are the same.
          */
-        val isMediaSessionEqual: (t1: Episode?, t2: Episode?) -> Boolean = { t1, t2 ->
+        val isMediaSessionEqual: (t1: BaseEpisode?, t2: BaseEpisode?) -> Boolean = { t1, t2 ->
             t1 != null && t2 != null && t1.uuid == t2.uuid &&
                 (
                     (t1 is PodcastEpisode && t2 is PodcastEpisode && t1.isStarred == t2.isStarred) ||

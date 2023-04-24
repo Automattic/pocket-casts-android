@@ -57,7 +57,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "exclude_from_episode_limit") var excludeFromEpisodeLimit: Boolean = false,
     @ColumnInfo(name = "download_task_id") override var downloadTaskId: String? = null,
     @ColumnInfo(name = "last_archive_interaction_date") var lastArchiveInteraction: Long? = null
-) : Episode, Serializable {
+) : BaseEpisode, Serializable {
 
     sealed class EpisodeType {
         object Regular : EpisodeType()

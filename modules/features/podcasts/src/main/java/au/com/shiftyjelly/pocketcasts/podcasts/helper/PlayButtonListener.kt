@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -57,7 +57,7 @@ class PlayButtonListener @Inject constructor(
         }
     }
 
-    private fun play(episode: Episode, force: Boolean = true) {
+    private fun play(episode: BaseEpisode, force: Boolean = true) {
         playbackManager.playNow(episode = episode, forceStream = force, playbackSource = source)
         warningsHelper.showBatteryWarningSnackbarIfAppropriate()
     }

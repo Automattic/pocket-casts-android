@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -59,8 +59,8 @@ class MultiSelectHelper @Inject constructor(
     interface Listener {
         fun multiSelectSelectAll()
         fun multiSelectSelectNone()
-        fun multiSelectSelectAllUp(episode: Episode)
-        fun multiSelectSelectAllDown(episode: Episode)
+        fun multiSelectSelectAllUp(episode: BaseEpisode)
+        fun multiSelectSelectAllDown(episode: BaseEpisode)
     }
 
     override val coroutineContext: CoroutineContext
@@ -76,8 +76,8 @@ class MultiSelectHelper @Inject constructor(
             selectedList.clear()
         }
 
-    private val selectedList: MutableList<Episode> = mutableListOf()
-    private val selectedListLive = MutableLiveData<List<Episode>>().apply { value = listOf() }
+    private val selectedList: MutableList<BaseEpisode> = mutableListOf()
+    private val selectedListLive = MutableLiveData<List<BaseEpisode>>().apply { value = listOf() }
     val selectedCount: LiveData<Int> = selectedListLive.map { it.size }
 
     val toolbarActions = settings.multiSelectItemsObservable
@@ -97,7 +97,7 @@ class MultiSelectHelper @Inject constructor(
 
     lateinit var listener: Listener
 
-    fun defaultLongPress(episode: Episode, fragmentManager: FragmentManager) {
+    fun defaultLongPress(episode: BaseEpisode, fragmentManager: FragmentManager) {
         if (!isMultiSelecting) {
             isMultiSelecting = !isMultiSelecting
             select(episode)
@@ -181,7 +181,7 @@ class MultiSelectHelper @Inject constructor(
         }
     }
 
-    fun isSelected(episode: Episode): Boolean {
+    fun isSelected(episode: BaseEpisode): Boolean {
         return selectedList.count { it.uuid == episode.uuid } > 0
     }
 
@@ -193,28 +193,28 @@ class MultiSelectHelper @Inject constructor(
         listener.multiSelectSelectNone()
     }
 
-    fun selectAllAbove(episode: Episode) {
+    fun selectAllAbove(episode: BaseEpisode) {
         listener.multiSelectSelectAllUp(episode)
     }
 
-    fun selectAllBelow(episode: Episode) {
+    fun selectAllBelow(episode: BaseEpisode) {
         listener.multiSelectSelectAllDown(episode)
     }
 
-    fun select(episode: Episode) {
+    fun select(episode: BaseEpisode) {
         if (!isSelected(episode)) {
             selectedList.add(episode)
         }
         selectedListLive.value = selectedList
     }
 
-    fun selectAllInList(episodes: List<Episode>) {
+    fun selectAllInList(episodes: List<BaseEpisode>) {
         val trimmed = episodes.filter { !selectedList.contains(it) }
         selectedList.addAll(trimmed)
         selectedListLive.value = selectedList
     }
 
-    fun deselect(episode: Episode) {
+    fun deselect(episode: BaseEpisode) {
         val foundEpisode = selectedList.find { it.uuid == episode.uuid }
         foundEpisode?.let {
             selectedList.remove(it)
@@ -227,7 +227,7 @@ class MultiSelectHelper @Inject constructor(
         }
     }
 
-    fun toggle(episode: Episode): Boolean {
+    fun toggle(episode: BaseEpisode): Boolean {
         if (isSelected(episode)) {
             deselect(episode)
             return false

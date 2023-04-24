@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -98,7 +98,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             else -> throw IllegalStateException("Unknown mode")
         }
 
-    val onRowClick = { episode: Episode ->
+    val onRowClick = { episode: BaseEpisode ->
         if (episode is PodcastEpisode) {
             val episodeViewSource = when (mode) {
                 Mode.Downloaded -> EpisodeViewSource.DOWNLOADS
@@ -215,7 +215,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
             }
 
-            override fun multiSelectSelectAllUp(episode: Episode) {
+            override fun multiSelectSelectAllUp(episode: BaseEpisode) {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(episode)
@@ -228,7 +228,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
                 }
             }
 
-            override fun multiSelectSelectAllDown(episode: Episode) {
+            override fun multiSelectSelectAllDown(episode: BaseEpisode) {
                 val episodes = viewModel.episodeList.value
                 if (episodes != null) {
                     val startIndex = episodes.indexOf(episode)
@@ -316,7 +316,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         (activity as? FragmentHostListener)?.addFragment(fragment)
     }
 
-    private fun episodeSwipedRightItem1(episode: Episode, index: Int) {
+    private fun episodeSwipedRightItem1(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpNext(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpLast(episode)
@@ -324,7 +324,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         adapter.notifyItemChanged(index)
     }
 
-    private fun episodeSwipedRightItem2(episode: Episode, index: Int) {
+    private fun episodeSwipedRightItem2(episode: BaseEpisode, index: Int) {
         when (settings.getUpNextSwipeAction()) {
             Settings.UpNextAction.PLAY_NEXT -> viewModel.episodeSwipeUpLast(episode)
             Settings.UpNextAction.PLAY_LAST -> viewModel.episodeSwipeUpNext(episode)

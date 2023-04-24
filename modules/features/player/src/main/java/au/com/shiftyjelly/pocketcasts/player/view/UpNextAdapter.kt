@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterUpNextFooterBinding
@@ -73,7 +73,7 @@ class UpNextAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
         when (item) {
-            is Episode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
+            is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
             is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item)
             is UpNextPlaying -> (holder as PlayingViewHolder).bind(item)
         }
@@ -83,13 +83,13 @@ class UpNextAdapter(
         val item = getItem(position)
         return when (item) {
             is UpNextPlaying -> R.layout.adapter_up_next_playing
-            is Episode -> R.layout.adapter_up_next
+            is BaseEpisode -> R.layout.adapter_up_next
             is PlayerViewModel.UpNextSummary -> R.layout.adapter_up_next_footer
             else -> throw IllegalStateException("Unknown item type in up next")
         }
     }
 
-    private fun bindEpisodeRow(holder: UpNextEpisodeViewHolder, episode: Episode) {
+    private fun bindEpisodeRow(holder: UpNextEpisodeViewHolder, episode: BaseEpisode) {
         holder.bind(episode, multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode))
 
         holder.binding.itemContainer.setOnClickListener {
@@ -188,7 +188,7 @@ class UpNextAdapter(
 }
 
 data class UpNextPlaying(
-    val episode: Episode,
+    val episode: BaseEpisode,
     val progressPercent: Float
 )
 
@@ -196,7 +196,7 @@ private val UPNEXT_ADAPTER_DIFF = object : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
         return if (oldItem is PlayerViewModel.UpNextSummary && newItem is PlayerViewModel.UpNextSummary) {
             true
-        } else if (oldItem is Episode && newItem is Episode) {
+        } else if (oldItem is BaseEpisode && newItem is BaseEpisode) {
             oldItem.uuid == newItem.uuid
         } else if (oldItem is UpNextPlaying && newItem is UpNextPlaying) {
             oldItem.episode.uuid == newItem.episode.uuid
@@ -207,7 +207,7 @@ private val UPNEXT_ADAPTER_DIFF = object : DiffUtil.ItemCallback<Any>() {
 
     @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return if (oldItem is Episode && newItem is Episode) {
+        return if (oldItem is BaseEpisode && newItem is BaseEpisode) {
             oldItem.uuid == newItem.uuid &&
                 oldItem.title == newItem.title &&
                 oldItem.publishedDate == newItem.publishedDate &&

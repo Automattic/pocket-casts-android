@@ -10,7 +10,7 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -105,7 +105,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         const val OUTPUT_CANCELLED = "cancelled"
     }
 
-    private lateinit var episode: Episode
+    private lateinit var episode: BaseEpisode
     private val episodeUUID: String? = inputData.getString(INPUT_EPISODE_UUID)
     private val pathToSaveTo: String? = inputData.getString(INPUT_PATH_TO_SAVE_TO)
     private val tempDownloadPath: String? = inputData.getString(INPUT_TEMP_PATH)

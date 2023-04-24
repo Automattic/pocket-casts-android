@@ -9,12 +9,12 @@ import androidx.core.text.toSpannable
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import java.util.Locale
 
-fun Episode.getSummaryText(dateFormatter: RelativeDateFormatter, @ColorInt tintColor: Int, showDuration: Boolean, context: Context): Spannable {
+fun BaseEpisode.getSummaryText(dateFormatter: RelativeDateFormatter, @ColorInt tintColor: Int, showDuration: Boolean, context: Context): Spannable {
     return when (this) {
         is PodcastEpisode -> episodeSummaryText(episode = this, dateFormatter = dateFormatter, tintColor = tintColor, showDuration = showDuration, context = context)
         is UserEpisode -> userEpisodeSummaryText(userEpisode = this, dateFormatter = dateFormatter)

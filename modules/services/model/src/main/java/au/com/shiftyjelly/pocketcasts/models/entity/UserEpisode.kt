@@ -47,7 +47,7 @@ data class UserEpisode(
     @ColumnInfo(name = "tint_color_index") var tintColorIndex: Int = 0,
     @ColumnInfo(name = "has_custom_image") var hasCustomImage: Boolean = false,
     @ColumnInfo(name = "upload_task_id") var uploadTaskId: String? = null
-) : Episode, Serializable {
+) : BaseEpisode, Serializable {
     // temporary variables
     @Ignore
     override var playing: Boolean = false

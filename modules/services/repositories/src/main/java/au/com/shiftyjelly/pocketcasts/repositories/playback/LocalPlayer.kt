@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import android.os.SystemClock
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.Dispatchers
@@ -177,7 +177,7 @@ abstract class LocalPlayer(override val onPlayerEvent: (Player, PlayerEvent) -> 
         }
     }
 
-    override fun setEpisode(episode: Episode) {
+    override fun setEpisode(episode: BaseEpisode) {
         this.episodeUuid = episode.uuid
         this.isHLS = episode.isHLS
         episodeLocation = if (episode.isDownloaded) {

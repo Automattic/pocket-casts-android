@@ -5,7 +5,7 @@
 
     <data>
         <variable name="playbackState" type="au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState" />
-        <variable name="episode" type="au.com.shiftyjelly.pocketcasts.models.entity.Episode" />
+        <variable name="episode" type="au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode" />
         <variable name="podcast" type="au.com.shiftyjelly.pocketcasts.models.entity.Podcast" />
         <variable name="tintColor" type="int"/>
         <variable name="upNextCount" type="int"/>

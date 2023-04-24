@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -35,26 +35,26 @@ abstract class UpNextChangeDao {
     @Query("DELETE FROM up_next_changes")
     abstract fun deleteAll()
 
-    fun savePlayNow(episode: Episode) {
+    fun savePlayNow(episode: BaseEpisode) {
         saveUpdate(episode, UpNextChange.ACTION_PLAY_NOW)
     }
 
-    fun savePlayNext(episode: Episode) {
+    fun savePlayNext(episode: BaseEpisode) {
         saveUpdate(episode, UpNextChange.ACTION_PLAY_NEXT)
     }
 
-    fun savePlayLast(episode: Episode) {
+    fun savePlayLast(episode: BaseEpisode) {
         saveUpdate(episode, UpNextChange.ACTION_PLAY_LAST)
     }
 
-    fun saveRemove(episode: Episode) {
+    fun saveRemove(episode: BaseEpisode) {
         saveUpdate(episode, UpNextChange.ACTION_REMOVE)
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(upNextChange: UpNextChange)
 
-    private fun saveUpdate(episode: Episode, action: Int) {
+    private fun saveUpdate(episode: BaseEpisode, action: Int) {
         val change = UpNextChange(type = action, uuid = episode.uuid, modified = System.currentTimeMillis())
         // an update replaces any other update that is for the same episode, so delete any that might exist
         deleteByUuid(episode.uuid)

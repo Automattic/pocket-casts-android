@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterShelfItemBinding
@@ -224,7 +224,7 @@ private val SHELF_ITEM_DIFF = object : DiffUtil.ItemCallback<Any>() {
 }
 
 class ShelfAdapter(val editable: Boolean, val listener: ((ShelfItem) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(SHELF_ITEM_DIFF) {
-    var episode: Episode? = null
+    var episode: BaseEpisode? = null
         set(value) {
             field = value
             notifyDataSetChanged()

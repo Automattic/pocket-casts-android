@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 
@@ -37,5 +37,5 @@ interface Player {
     fun supportsVideo(): Boolean
     fun setVolume(volume: Float)
     fun setPodcast(podcast: Podcast?)
-    fun setEpisode(episode: Episode)
+    fun setEpisode(episode: BaseEpisode)
 }

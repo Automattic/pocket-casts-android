@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.db
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -61,7 +61,7 @@ class UpNextQueueTest {
 
     @Test
     fun testPlayNextList() {
-        val episodes = mutableListOf<Episode>()
+        val episodes = mutableListOf<BaseEpisode>()
 
         runBlocking {
             for (i in 0..25) {
@@ -102,7 +102,7 @@ class UpNextQueueTest {
 
     @Test
     fun testPlayLastList() {
-        val episodes = mutableListOf<Episode>()
+        val episodes = mutableListOf<BaseEpisode>()
 
         runBlocking {
             for (i in 0..5) {

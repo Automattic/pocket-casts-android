@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -147,7 +147,7 @@ class PlayerViewModel @Inject constructor(
         var chapters: List<Chapter>,
         var currentChapter: Chapter?,
         var upNextExpanded: Boolean,
-        var upNextEpisodes: List<Episode>,
+        var upNextEpisodes: List<BaseEpisode>,
         var upNextSummary: UpNextSummary,
     ) {
         fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
@@ -182,7 +182,7 @@ class PlayerViewModel @Inject constructor(
         .distinctUntilChanged()
         .toFlowable(BackpressureStrategy.LATEST)
     val listDataLive: LiveData<ListData> = listDataRx.toLiveData()
-    val playingEpisodeLive: LiveData<Pair<Episode, Int>> =
+    val playingEpisodeLive: LiveData<Pair<BaseEpisode, Int>> =
         listDataRx.map { Pair(it.podcastHeader.episodeUuid, it.podcastHeader.backgroundColor) }
             .distinctUntilChanged()
             .switchMap { pair -> episodeManager.observeEpisodeByUuid(pair.first).map { Pair(it, pair.second) } }
@@ -213,13 +213,13 @@ class PlayerViewModel @Inject constructor(
     }
 
     val shelfLive: LiveData<List<ShelfItem>> = shelfObservable.toLiveData()
-    val trimmedShelfLive: LiveData<Pair<List<ShelfItem>, Episode?>> = trimmedShelfObservable.toLiveData()
+    val trimmedShelfLive: LiveData<Pair<List<ShelfItem>, BaseEpisode?>> = trimmedShelfObservable.toLiveData()
 
     val upNextPlusData = upNextStateObservable.map { upNextState ->
         var episodeCount = 0
         var totalTime = 0.0
-        var upNextEpisodes = emptyList<Episode>()
-        var nowPlaying: Episode? = null
+        var upNextEpisodes = emptyList<BaseEpisode>()
+        var nowPlaying: BaseEpisode? = null
         if (upNextState is UpNextQueue.State.Loaded) {
             nowPlaying = upNextState.episode
             upNextEpisodes = upNextState.queue
@@ -263,7 +263,7 @@ class PlayerViewModel @Inject constructor(
         .observeOn(AndroidSchedulers.mainThread())
     val effectsLive = effectsObservable.toLiveData()
 
-    var episode: Episode? = null
+    var episode: BaseEpisode? = null
     var podcast: Podcast? = null
 
     val isSleepRunning = MutableLiveData<Boolean>().apply { postValue(false) }
@@ -345,7 +345,7 @@ class PlayerViewModel @Inject constructor(
 
         var episodeCount = 0
         var totalTime = 0.0
-        var upNextEpisodes = emptyList<Episode>()
+        var upNextEpisodes = emptyList<BaseEpisode>()
         if (upNextState is UpNextQueue.State.Loaded) {
             upNextEpisodes = upNextState.queue
             episodeCount = upNextState.queue.size
@@ -403,7 +403,7 @@ class PlayerViewModel @Inject constructor(
         playbackManager.playNextInQueue(playbackSource = source)
     }
 
-    private fun markAsPlayedConfirmed(episode: Episode) {
+    private fun markAsPlayedConfirmed(episode: BaseEpisode) {
         launch {
             episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
@@ -472,7 +472,7 @@ class PlayerViewModel @Inject constructor(
         disposables.clear()
     }
 
-    fun removeFromUpNext(episode: Episode) {
+    fun removeFromUpNext(episode: BaseEpisode) {
         playbackManager.removeEpisode(episodeToRemove = episode, source = source)
     }
 
@@ -526,7 +526,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun changeUpNextEpisodes(episodes: List<Episode>) {
+    fun changeUpNextEpisodes(episodes: List<BaseEpisode>) {
         playbackManager.changeUpNext(episodes)
     }
 

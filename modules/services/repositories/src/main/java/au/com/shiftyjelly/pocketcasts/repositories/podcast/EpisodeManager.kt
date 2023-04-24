@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -27,7 +27,7 @@ interface EpisodeManager {
     fun findByUuid(uuid: String): PodcastEpisode?
     fun findByUuidRx(uuid: String): Maybe<PodcastEpisode>
     fun observeByUuid(uuid: String): Flow<PodcastEpisode>
-    fun observeEpisodeByUuid(uuid: String): Flowable<Episode>
+    fun observeEpisodeByUuid(uuid: String): Flowable<BaseEpisode>
     fun findFirstBySearchQuery(query: String): PodcastEpisode?
 
     fun findAll(rowParser: (PodcastEpisode) -> Boolean)
@@ -66,39 +66,39 @@ interface EpisodeManager {
     /** Update methods  */
     fun update(episode: PodcastEpisode?)
 
-    fun updatePlayedUpTo(episode: Episode?, playedUpTo: Double, forceUpdate: Boolean)
-    fun updateDuration(episode: Episode?, durationInSecs: Double, syncChanges: Boolean)
-    fun updatePlayingStatus(episode: Episode?, status: EpisodePlayingStatus)
-    fun updateEpisodeStatus(episode: Episode?, status: EpisodeStatusEnum)
-    fun updateAutoDownloadStatus(episode: Episode?, autoDownloadStatus: Int)
-    fun updateDownloadFilePath(episode: Episode?, filePath: String, markAsDownloaded: Boolean)
-    fun updateFileType(episode: Episode?, fileType: String)
-    fun updateSizeInBytes(episode: Episode?, sizeInBytes: Long)
-    fun updateDownloadUrl(episode: Episode?, url: String)
-    fun updateDownloadTaskId(episode: Episode, id: String?)
-    fun updateLastDownloadAttemptDate(episode: Episode?)
-    fun updateDownloadErrorDetails(episode: Episode?, message: String?)
+    fun updatePlayedUpTo(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean)
+    fun updateDuration(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
+    fun updatePlayingStatus(episode: BaseEpisode?, status: EpisodePlayingStatus)
+    fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeStatusEnum)
+    fun updateAutoDownloadStatus(episode: BaseEpisode?, autoDownloadStatus: Int)
+    fun updateDownloadFilePath(episode: BaseEpisode?, filePath: String, markAsDownloaded: Boolean)
+    fun updateFileType(episode: BaseEpisode?, fileType: String)
+    fun updateSizeInBytes(episode: BaseEpisode?, sizeInBytes: Long)
+    fun updateDownloadUrl(episode: BaseEpisode?, url: String)
+    fun updateDownloadTaskId(episode: BaseEpisode, id: String?)
+    fun updateLastDownloadAttemptDate(episode: BaseEpisode?)
+    fun updateDownloadErrorDetails(episode: BaseEpisode?, message: String?)
     fun setEpisodeThumbnailStatus(episode: PodcastEpisode?, thumbnailStatus: Int)
 
     fun updateAllEpisodeStatus(episodeStatus: EpisodeStatusEnum)
 
-    fun markAsNotPlayed(episode: Episode?)
+    fun markAsNotPlayed(episode: BaseEpisode?)
     fun markAsNotPlayedRx(episode: PodcastEpisode): Single<PodcastEpisode>
-    suspend fun markAllAsPlayed(episodes: List<Episode>, playbackManager: PlaybackManager, podcastManager: PodcastManager)
+    suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    fun markAsPlayedAsync(episode: Episode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    fun markAsPlayed(episode: Episode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
+    fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
+    fun markAsPlayed(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager)
     fun rxMarkAsPlayed(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager): Completable
-    fun markAsPlaybackError(episode: Episode?, errorMessage: String?)
-    fun markAsPlaybackError(episode: Episode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
+    fun markAsPlaybackError(episode: BaseEpisode?, errorMessage: String?)
+    fun markAsPlaybackError(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
     fun starEpisode(episode: PodcastEpisode, starred: Boolean)
     suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean)
     fun toggleStarEpisodeAsync(episode: PodcastEpisode)
-    fun clearPlaybackError(episode: Episode?)
+    fun clearPlaybackError(episode: BaseEpisode?)
     fun clearDownloadError(episode: PodcastEpisode?)
     fun archive(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true)
-    fun archivePlayedEpisode(episode: Episode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
-    fun unarchive(episode: Episode)
+    fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
+    fun unarchive(episode: BaseEpisode)
     fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
     fun checkForEpisodesToAutoArchive(playbackManager: PlaybackManager?, podcastManager: PodcastManager)
     fun userHasInteractedWithEpisode(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
@@ -113,7 +113,7 @@ interface EpisodeManager {
     fun deleteEpisodesWithoutSync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
 
     fun deleteEpisodeWithoutSync(episode: PodcastEpisode?, playbackManager: PlaybackManager)
-    fun deleteEpisodeFile(episode: Episode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
+    fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean = true, removeFromUpNext: Boolean = true)
     fun deleteCustomFolderEpisode(episode: PodcastEpisode?, playbackManager: PlaybackManager)
     fun deleteFinishedEpisodes(playbackManager: PlaybackManager)
     fun deleteDownloadedEpisodeFiles()
@@ -121,7 +121,7 @@ interface EpisodeManager {
     /** Utility methods  */
     fun countEpisodes(): Int
     fun countEpisodesWhere(queryAfterWhere: String): Int
-    fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<Episode>
+    fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<BaseEpisode>
 
     fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
     fun unarchiveAllInList(episodes: List<PodcastEpisode>)
@@ -130,13 +130,13 @@ interface EpisodeManager {
     fun checkPodcastForEpisodeLimit(podcast: Podcast, playbackManager: PlaybackManager?)
     fun checkPodcastForAutoArchive(podcast: Podcast, playbackManager: PlaybackManager?)
     fun episodeCanBeCleanedUp(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
-    fun markAsUnplayed(episodes: List<Episode>)
+    fun markAsUnplayed(episodes: List<BaseEpisode>)
     fun unarchiveAllInListAsync(episodes: List<PodcastEpisode>)
-    suspend fun findEpisodeByUuid(uuid: String): Episode?
-    fun observeDownloadingEpisodesRx(): Flowable<List<Episode>>
-    fun setDownloadFailed(episode: Episode, errorMessage: String)
+    suspend fun findEpisodeByUuid(uuid: String): BaseEpisode?
+    fun observeDownloadingEpisodesRx(): Flowable<List<BaseEpisode>>
+    fun setDownloadFailed(episode: BaseEpisode, errorMessage: String)
     fun observeEpisodeCount(queryAfterWhere: String): Flowable<Int>
-    suspend fun updatePlaybackInteractionDate(episode: Episode?)
+    suspend fun updatePlaybackInteractionDate(episode: BaseEpisode?)
     suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
     suspend fun findStaleDownloads(): List<PodcastEpisode>
     suspend fun calculateListeningTime(fromEpochMs: Long, toEpochMs: Long): Long?

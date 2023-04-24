@@ -7,7 +7,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.ColorInt
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 
 private const val STROKE_WIDTH = 2
 private const val DRAW_FULL = 0
@@ -71,7 +71,7 @@ class ProgressCircleView @JvmOverloads constructor(
         }
     }
 
-    fun setEpisode(episode: Episode, isPlayed: Boolean) {
+    fun setEpisode(episode: BaseEpisode, isPlayed: Boolean) {
         drawState = when {
             isPlayed -> DRAW_EMPTY
             episode.isInProgress -> {

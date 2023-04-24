@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -25,13 +25,13 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import io.reactivex.disposables.CompositeDisposable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-val PLAYBACK_DIFF: DiffUtil.ItemCallback<Episode> = object : DiffUtil.ItemCallback<Episode>() {
-    override fun areItemsTheSame(oldItem: Episode, newItem: Episode): Boolean {
+val PLAYBACK_DIFF: DiffUtil.ItemCallback<BaseEpisode> = object : DiffUtil.ItemCallback<BaseEpisode>() {
+    override fun areItemsTheSame(oldItem: BaseEpisode, newItem: BaseEpisode): Boolean {
         return oldItem.uuid == newItem.uuid
     }
 
     @SuppressLint("DiffUtilEquals")
-    override fun areContentsTheSame(oldItem: Episode, newItem: Episode): Boolean {
+    override fun areContentsTheSame(oldItem: BaseEpisode, newItem: BaseEpisode): Boolean {
         return oldItem == newItem
     }
 }
@@ -41,13 +41,13 @@ class EpisodeListAdapter(
     val playbackManager: PlaybackManager,
     val upNextQueue: UpNextQueue,
     val settings: Settings,
-    val onRowClick: (Episode) -> Unit,
+    val onRowClick: (BaseEpisode) -> Unit,
     val playButtonListener: PlayButton.OnClickListener,
     val imageLoader: PodcastImageLoader,
     val multiSelectHelper: MultiSelectHelper,
     val fragmentManager: FragmentManager,
     val fromListUuid: String? = null,
-) : ListAdapter<Episode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
+) : ListAdapter<BaseEpisode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
 
     val disposables = CompositeDisposable()
 

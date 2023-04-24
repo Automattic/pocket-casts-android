@@ -11,7 +11,7 @@ import android.os.SystemClock
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -194,7 +194,7 @@ class UpNextSyncJob : JobService() {
         }
 
         // import missing episodes
-        val findOrDownloadEpisodes: Observable<Episode> = Observable.fromIterable(response.episodes ?: emptyList()).concatMap { responseEpisode ->
+        val findOrDownloadEpisodes: Observable<BaseEpisode> = Observable.fromIterable(response.episodes ?: emptyList()).concatMap { responseEpisode ->
             val episodeUuid = responseEpisode.uuid
             val podcastUuid = responseEpisode.podcast
             if (podcastUuid == null) {

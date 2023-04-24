@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -60,7 +60,7 @@ class CloudFilesViewModel @Inject constructor(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun episodeSwipeUpNext(episode: Episode) {
+    fun episodeSwipeUpNext(episode: BaseEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILES)
@@ -73,7 +73,7 @@ class CloudFilesViewModel @Inject constructor(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun episodeSwipeUpLast(episode: Episode) {
+    fun episodeSwipeUpLast(episode: BaseEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILES)
