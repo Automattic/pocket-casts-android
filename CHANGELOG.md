@@ -5,7 +5,8 @@
          ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
     *   Improved the validation of the Automotive skip forward and back time settings
          ([#890](https://github.com/Automattic/pocket-casts-android/pull/892)).
-
+    *   Fixed the show notes' timestamps not getting converted to a link if it contained
+         another link ([#814](https://github.com/Automattic/pocket-casts-android/issues/814))
 7.37
 -----
 * New Features:
