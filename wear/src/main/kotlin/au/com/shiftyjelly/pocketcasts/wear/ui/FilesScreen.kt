@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,10 +18,21 @@ object FilesScreen {
 
 @Composable
 fun FilesScreen() {
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colors.primary,
-        text = stringResource(LR.string.profile_navigation_files)
-    )
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colors.primary,
+            text = stringResource(LR.string.profile_navigation_files)
+        )
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colors.primary.copy(alpha = 0.5f),
+            text = "placeholder screen"
+        )
+    }
 }

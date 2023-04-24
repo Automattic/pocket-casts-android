@@ -12,17 +12,18 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material.SwipeToDismissBoxState
+import androidx.wear.compose.material.edgeSwipeToDismiss
 import androidx.wear.compose.material.rememberSwipeToDismissBoxState
-import androidx.wear.compose.navigation.SwipeDismissableNavHostState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -49,7 +50,6 @@ import com.google.android.horologist.compose.navscaffold.scrollable
 import com.google.android.horologist.compose.pager.PagerScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -60,102 +60,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // TODO add lines for radioactive theme
-            WearApp(theme.activeTheme)
-        }
-    }
-}
-
-@Composable
-fun WearApp(themeType: Theme.ThemeType) {
-    WearAppTheme(themeType) {
-
-        val navController = rememberSwipeDismissableNavController()
-
-        val swipeDismissState = rememberSwipeToDismissBoxState()
-        val navState = rememberSwipeDismissableNavHostState(swipeDismissState)
-//        val pagerState = rememberPagerState()
-//        val coroutineScope = rememberCoroutineScope()
-
-//        NowPlayingPager(
-//            navController = navController,
-// //            swipeToDismissState = swipeDismissState,
-//            pagerState = pagerState,
-//        ) {
-        ListPage(
-            navController = navController,
-            state = navState,
-//                toNowPlaying = {
-//                    coroutineScope.launch {
-//                        pagerState.animateScrollToPage(1)
-//                    }
-//                },
-        )
-//        }
-    }
-}
-
-@Composable
-private fun NowPlayingPager(
-    navController: NavController,
-    pagerState: PagerState = rememberPagerState(),
-    content: @Composable () -> Unit,
-) {
-    PagerScreen(
-        count = 3,
-        state = pagerState,
-//        modifier = Modifier.edgeSwipeToDismiss(swipeToDismissState),
-    ) { page ->
-        when (page) {
-            0 -> content()
-            1 -> Column {
-
-                // Listen for results from streaming confirmation screen
-                navController.currentBackStackEntry?.savedStateHandle
-                    ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey, null)
-                    ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
-
-                        Timber.i("TEST123, collecting streaming confirmation for Now Playing screen")
-
-                        val viewModel = hiltViewModel<NowPlayingViewModel>()
-                        LaunchedEffect(streamingConfirmationResult) {
-                            viewModel.onStreamingConfirmationResult(streamingConfirmationResult)
-                            // Clear result once consumed
-                            navController.currentBackStackEntry?.savedStateHandle
-                                ?.remove<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey)
-                        }
-                    }
-
-                NowPlayingScreen(
-                    navigateToEpisode = { episodeUuid ->
-                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
-                    },
-                    showStreamingConfirmation = { navController.navigate(StreamingConfirmationScreen.route) },
-                )
-            }
-            2 -> Column {
-                val scrollableState = rememberScalingLazyListState()
-                UpNextScreen(
-                    navigateToEpisode = { episodeUuid ->
-                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
-                    },
-                    listState = scrollableState,
-                )
+            WearAppTheme(theme.activeTheme) {
+                WearApp()
             }
         }
     }
 }
 
 @Composable
-private fun ListPage(
-    navController: NavHostController,
-    state: SwipeDismissableNavHostState,
-//    toNowPlaying: () -> Unit,
-) {
+private fun WearApp() {
+
+    val navController = rememberSwipeDismissableNavController()
+    val swipeToDismissState = rememberSwipeToDismissBoxState()
+    val navState = rememberSwipeDismissableNavHostState(swipeToDismissState)
+
     WearNavScaffold(
         navController = navController,
         startDestination = WatchListScreen.route,
-        state = state,
+        state = navState,
     ) {
 
         scrollable(
@@ -197,7 +119,10 @@ private fun ListPage(
             route = PodcastsScreen.route,
         ) {
 
-            NowPlayingPager(navController) {
+            NowPlayingPager(
+                navController = navController,
+                swipeToDismissState = swipeToDismissState,
+            ) {
                 PodcastsScreen(
                     listState = it.scrollableState,
                     navigateToPodcast = { podcastUuid ->
@@ -216,11 +141,16 @@ private fun ListPage(
             ),
         ) {
 
-            PodcastScreen(
-                onEpisodeTap = { episode ->
-                    navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
-                },
-            )
+            NowPlayingPager(
+                navController = navController,
+                swipeToDismissState = swipeToDismissState,
+            ) {
+                PodcastScreen(
+                    onEpisodeTap = { episode ->
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
+                    },
+                )
+            }
         }
 
         episodeGraph(
@@ -228,22 +158,42 @@ private fun ListPage(
                 navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
             },
             navController = navController,
+            swipeToDismissState = swipeToDismissState,
         )
 
-        composable(FiltersScreen.route) { FiltersScreen() }
+        composable(FiltersScreen.route) {
+            NowPlayingPager(
+                navController = navController,
+                swipeToDismissState = swipeToDismissState,
+            ) {
+                FiltersScreen()
+            }
+        }
 
         scrollable(DownloadsScreen.route) {
 
-            DownloadsScreen(
-                columnState = it.columnState,
-                onItemClick = { episode ->
-                    val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
-                    navController.navigate(route)
-                }
-            )
+            NowPlayingPager(
+                navController = navController,
+                swipeToDismissState = swipeToDismissState,
+            ) {
+                DownloadsScreen(
+                    columnState = it.columnState,
+                    onItemClick = { episode ->
+                        val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
+                        navController.navigate(route)
+                    }
+                )
+            }
         }
 
-        composable(FilesScreen.route) { FilesScreen() }
+        composable(FilesScreen.route) {
+            NowPlayingPager(
+                navController = navController,
+                swipeToDismissState = swipeToDismissState,
+            ) {
+                FilesScreen()
+            }
+        }
 
         scrollable(SettingsScreen.route) {
             SettingsScreen(
@@ -256,8 +206,84 @@ private fun ListPage(
     }
 }
 
+/**
+ * Pager with three pages:
+ *
+ * 1. [firstPageContent] (passed in as a composable argument)
+ * 2. [NowPlayingScreen]
+ * 3. [UpNextScreen]
+ *
+ * Pass a null [swipeToDismissState] to disable swipe to dismiss when the backstack would
+ * be empty (i.e., on the first screen in the app).
+ */
+@Composable
+fun NowPlayingPager(
+    navController: NavController,
+    pagerState: PagerState = rememberPagerState(),
+    swipeToDismissState: SwipeToDismissBoxState? = null,
+    firstPageContent: @Composable () -> Unit,
+) {
+    PagerScreen(
+        count = 3,
+        state = pagerState,
+        modifier = if (swipeToDismissState != null) {
+            Modifier.edgeSwipeToDismiss(swipeToDismissState)
+        } else {
+            Modifier
+        }
+    ) { page ->
+        when (page) {
+
+            0 -> firstPageContent()
+
+            1 -> Column {
+
+                // FIXME move this to inside Now Playing Screen???
+
+                // Listen for results from streaming confirmation screen
+                navController.currentBackStackEntry?.savedStateHandle
+                    ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey, null)
+                    ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
+
+                        val viewModel = hiltViewModel<NowPlayingViewModel>()
+                        LaunchedEffect(streamingConfirmationResult) {
+                            viewModel.onStreamingConfirmationResult(streamingConfirmationResult)
+                            // Clear result once consumed
+                            navController.currentBackStackEntry?.savedStateHandle
+                                ?.remove<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey)
+                        }
+                    }
+
+                val coroutineScope = rememberCoroutineScope()
+
+                NowPlayingScreen(
+                    navigateToEpisode = { episodeUuid ->
+                        coroutineScope.launch {
+                            navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
+                            pagerState.scrollToPage(0)
+                        }
+                    },
+                    showStreamingConfirmation = { navController.navigate(StreamingConfirmationScreen.route) },
+                )
+            }
+
+            2 -> Column {
+                val scrollableState = rememberScalingLazyListState()
+                UpNextScreen(
+                    navigateToEpisode = { episodeUuid ->
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
+                    },
+                    listState = scrollableState,
+                )
+            }
+        }
+    }
+}
+
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    WearApp(Theme.ThemeType.DARK)
+    WearAppTheme(Theme.ThemeType.DARK) {
+        WearApp()
+    }
 }
