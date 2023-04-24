@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -32,7 +33,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : AndroidViewModel(app) {
 
-    private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState>
+    private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState> = MutableStateFlow(OnboardingUpgradeFeaturesState.Loading)
     val state: StateFlow<OnboardingUpgradeFeaturesState>
 
     init {
@@ -40,11 +41,11 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
             as? AccessibilityManager
 
         val isTouchExplorationEnabled = accessibiltyManager?.isTouchExplorationEnabled ?: false
-        _state = MutableStateFlow(OnboardingUpgradeFeaturesState(isTouchExplorationEnabled))
+        _state.value = OnboardingUpgradeFeaturesState.Loaded(isTouchExplorationEnabled)
         state = _state
 
         accessibiltyManager?.addTouchExplorationStateChangeListener { enabled ->
-            _state.value = OnboardingUpgradeFeaturesState(enabled)
+            _state.value = OnboardingUpgradeFeaturesState.Loaded(enabled)
         }
     }
 
@@ -65,25 +66,34 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     }
 
     fun onSubscriptionFrequencyChanged(frequency: SubscriptionFrequency) {
-        _state.value = _state.value.copy(currentSubscriptionFrequency = frequency)
+        (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
+            _state.update { loadedState.copy(currentSubscriptionFrequency = frequency) }
+        }
     }
 
     fun onFeatureCardChanged(index: Int) {
-        _state.value = _state.value.copy(currentFeatureCard = UpgradeFeatureCard.values()[index])
+        (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
+            _state.update { loadedState.copy(currentFeatureCard = UpgradeFeatureCard.values()[index]) }
+        }
     }
 
     fun getUpgradePrice(
         subscriptions: List<Subscription>,
         productIdPrefix: String,
-    ) = subscriptions
-        .find {
-            if (_state.value.currentSubscriptionFrequency == SubscriptionFrequency.MONTHLY) {
-                it.recurringPricingPhase is SubscriptionPricingPhase.Months
-            } else {
-                it.recurringPricingPhase is SubscriptionPricingPhase.Years
-            } && it.productDetails.productId.startsWith(productIdPrefix)
-        }
-        ?.recurringPricingPhase?.formattedPrice ?: ""
+    ): String {
+        val loadedState = _state.value as? OnboardingUpgradeFeaturesState.Loaded
+        return loadedState?.let {
+            subscriptions
+                .find {
+                    if (loadedState.currentSubscriptionFrequency == SubscriptionFrequency.MONTHLY) {
+                        it.recurringPricingPhase is SubscriptionPricingPhase.Months
+                    } else {
+                        it.recurringPricingPhase is SubscriptionPricingPhase.Years
+                    } && it.productDetails.productId.startsWith(productIdPrefix)
+                }
+                ?.recurringPricingPhase?.formattedPrice
+        } ?: ""
+    }
 
     companion object {
         private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) =
@@ -91,15 +101,18 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     }
 }
 
-data class OnboardingUpgradeFeaturesState(
-    private val isTouchExplorationEnabled: Boolean,
-    val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
-    val currentSubscriptionFrequency: SubscriptionFrequency = SubscriptionFrequency.YEARLY,
-) {
-    val scrollAutomatically = !isTouchExplorationEnabled
-    val featureCards = UpgradeFeatureCard.values().toList()
-    val subscriptionFrequencies =
-        listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
+sealed class OnboardingUpgradeFeaturesState {
+    object Loading : OnboardingUpgradeFeaturesState()
+    data class Loaded(
+        private val isTouchExplorationEnabled: Boolean,
+        val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
+        val currentSubscriptionFrequency: SubscriptionFrequency = SubscriptionFrequency.YEARLY,
+    ) : OnboardingUpgradeFeaturesState() {
+        val scrollAutomatically = !isTouchExplorationEnabled
+        val featureCards = UpgradeFeatureCard.values().toList()
+        val subscriptionFrequencies =
+            listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
+    }
 }
 
 enum class UpgradeFeatureCard(

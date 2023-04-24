@@ -138,27 +138,33 @@ internal fun OnboardingUpgradeFeaturesPage(
             .fillMaxHeight()
             .background(OnboardingUpgradeHelper.backgroundColor)
     ) {
-        if (BuildConfig.ADD_PATRON_ENABLED) {
-            UpgradeLayout(
-                state = state,
-                scrollState = scrollState,
-                onBackPressed = onBackPressed,
-                onNotNowPressed = onNotNowPressed,
-                onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
-                onUpgradePressed = onUpgradePressed,
-                canUpgrade = canUpgrade,
-                upgradePrice = { productId: String -> viewModel.getUpgradePrice(subscriptions, productId) },
-            )
-        } else {
-            OldUpgradeLayout(
-                state = state,
-                scrollState = scrollState,
-                onBackPressed = onBackPressed,
-                onUpgradePressed = onUpgradePressed,
-                onNotNowPressed = onNotNowPressed,
-                canUpgrade = canUpgrade,
-            )
+        when (state) {
+            is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
+            is OnboardingUpgradeFeaturesState.Loaded -> {
+                val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
+                if (BuildConfig.ADD_PATRON_ENABLED) {
+                    UpgradeLayout(
+                        state = loadedState,
+                        scrollState = scrollState,
+                        onBackPressed = onBackPressed,
+                        onNotNowPressed = onNotNowPressed,
+                        onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
+                        onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
+                        onUpgradePressed = onUpgradePressed,
+                        canUpgrade = canUpgrade,
+                        upgradePrice = { productId: String -> viewModel.getUpgradePrice(subscriptions, productId) },
+                    )
+                } else {
+                    OldUpgradeLayout(
+                        state = loadedState,
+                        scrollState = scrollState,
+                        onBackPressed = onBackPressed,
+                        onUpgradePressed = onUpgradePressed,
+                        onNotNowPressed = onNotNowPressed,
+                        canUpgrade = canUpgrade,
+                    )
+                }
+            }
         }
     }
 }
@@ -166,7 +172,7 @@ internal fun OnboardingUpgradeFeaturesPage(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun BoxWithConstraintsScope.UpgradeLayout(
-    state: OnboardingUpgradeFeaturesState,
+    state: OnboardingUpgradeFeaturesState.Loaded,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
@@ -262,7 +268,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeatureCards(
-    state: OnboardingUpgradeFeaturesState,
+    state: OnboardingUpgradeFeaturesState.Loaded,
     onFeatureCardChanged: (Int) -> Unit,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
@@ -465,7 +471,7 @@ private fun FeatureItem(
 
 @Composable
 private fun BoxWithConstraintsScope.OldUpgradeLayout(
-    state: OnboardingUpgradeFeaturesState,
+    state: OnboardingUpgradeFeaturesState.Loaded,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onUpgradePressed: () -> Unit,
