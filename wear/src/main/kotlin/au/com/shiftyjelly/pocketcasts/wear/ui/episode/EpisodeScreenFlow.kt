@@ -74,6 +74,7 @@ object EpisodeScreenFlow {
                 NowPlayingPager(
                     navController = navController,
                     swipeToDismissState = swipeToDismissState,
+                    scrollableScaffoldContext = it,
                 ) {
                     EpisodeScreen(
                         columnState = it.columnState,

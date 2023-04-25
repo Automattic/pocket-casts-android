@@ -14,7 +14,7 @@ import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 
 @Composable
-fun ChipScreenHeader(
+fun ScreenHeaderChip(
     @StringRes text: Int,
     textColor: Color? = null,
     modifier: Modifier = Modifier,
@@ -31,7 +31,7 @@ fun ChipScreenHeader(
 }
 
 @Composable
-fun ChipSectionHeader(@StringRes text: Int, modifier: Modifier = Modifier) {
+fun SectionHeaderChip(@StringRes text: Int, modifier: Modifier = Modifier) {
     Header(
         text = text,
         modifier = modifier.padding(vertical = verticalPadding, horizontal = horizontalPadding)

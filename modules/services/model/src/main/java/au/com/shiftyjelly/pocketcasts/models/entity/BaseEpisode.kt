@@ -5,7 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import java.util.Date
 import java.util.UUID
 
-interface BaseEpisode {
+sealed interface BaseEpisode {
     companion object {
         /**
          * Used to reduce the changes sent out by the media session.
