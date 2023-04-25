@@ -66,6 +66,8 @@ class MediaSessionManager(
     companion object {
         const val EXTRA_TRANSIENT = "pocketcasts_transient_loss"
 
+        private val MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS = listOf("samsung", "mercedes-benz")
+
         fun calculateSearchQueryOptions(query: String): List<String> {
             val options = mutableListOf<String>()
             options.add(query)
@@ -787,7 +789,7 @@ class MediaSessionManager(
     // there's an issue on Samsung phones that if you don't say you support ACTION_SKIP_TO_PREVIOUS and ACTION_SKIP_TO_NEXT then the skip buttons on the lock screen are disabled.
     // we work around this by hiding our custom buttons on Samsung phones. It means the buttons in Android Auto aren't our custom skip buttons, but it all still works.
     private fun shouldHideCustomSkipButtons(): Boolean {
-        return Build.MANUFACTURER.lowercase() == "samsung"
+        return MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS.contains(Build.MANUFACTURER.lowercase())
     }
 }
 
