@@ -27,6 +27,7 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.UserEpisodeImage
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -51,25 +52,37 @@ fun EpisodeChip(episode: BaseEpisode, onClick: () -> Unit) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+
+                val modifier = Modifier
+                    .size(30.dp)
+                    .clip(RoundedCornerShape(4.dp))
+
                 when (episode) {
                     is PodcastEpisode -> {
                         PodcastImage(
                             uuid = episode.podcastUuid,
                             dropShadow = false,
-                            modifier = Modifier.size(30.dp),
+                            modifier = modifier,
                         )
                     }
                     is UserEpisode -> {
-                        // TODO
+                        UserEpisodeImage(
+                            episode = episode,
+                            contentDescription = null,
+                            modifier = modifier,
+                        )
                     }
                 }
-                Spacer(Modifier.height(4.dp))
-                Icon(
-                    painter = painterResource(R.drawable.ic_downloaded),
-                    contentDescription = null,
-                    tint = MaterialTheme.theme.colors.support02,
-                    modifier = Modifier.size(12.dp),
-                )
+
+                if (episode.isDownloaded) {
+                    Spacer(Modifier.height(4.dp))
+                    Icon(
+                        painter = painterResource(R.drawable.ic_downloaded),
+                        contentDescription = null,
+                        tint = MaterialTheme.theme.colors.support02,
+                        modifier = Modifier.size(12.dp),
+                    )
+                }
             }
 
             Spacer(Modifier.width(6.dp))
