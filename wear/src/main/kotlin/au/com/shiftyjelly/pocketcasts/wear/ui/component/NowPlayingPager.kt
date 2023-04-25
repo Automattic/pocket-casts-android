@@ -7,11 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.SwipeToDismissBoxState
@@ -20,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingViewModel
-import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.pager.PagerScreen
 import kotlinx.coroutines.launch
 
@@ -63,27 +58,6 @@ fun NowPlayingPager(
 
             1 -> Column {
 
-                // FIXME move this to inside Now Playing Screen???
-
-                // Listen for results from streaming confirmation screen
-                navController.currentBackStackEntry?.savedStateHandle
-                    ?.getStateFlow<StreamingConfirmationScreen.Result?>(
-                        StreamingConfirmationScreen.resultKey,
-                        null
-                    )
-                    ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
-
-                        val viewModel = hiltViewModel<NowPlayingViewModel>()
-                        LaunchedEffect(streamingConfirmationResult) {
-                            viewModel.onStreamingConfirmationResult(streamingConfirmationResult)
-                            // Clear result once consumed
-                            navController.currentBackStackEntry?.savedStateHandle
-                                ?.remove<StreamingConfirmationScreen.Result?>(
-                                    StreamingConfirmationScreen.resultKey
-                                )
-                        }
-                    }
-
                 val coroutineScope = rememberCoroutineScope()
 
                 NowPlayingScreen(
@@ -109,7 +83,7 @@ fun NowPlayingPager(
                             }
                         }
                     },
-                    showStreamingConfirmation = { navController.navigate(StreamingConfirmationScreen.route) },
+                    navController = navController,
                 )
             }
 
