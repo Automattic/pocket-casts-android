@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -84,7 +85,11 @@ fun EpisodeScreen(
                 color = WearColors.FFDADCE0,
                 lineHeight = headingLineHeight,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .clickable {
+                        navigateToPodcast(podcast.uuid)
+                    }
             )
         }
 
