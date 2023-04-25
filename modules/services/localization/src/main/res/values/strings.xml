@@ -281,6 +281,7 @@
     <string name="player_up_next_clear_queue_button">Clear Up Next</string>
     <string name="player_up_next_empty">Nothing in Up Next</string>
     <string name="player_up_next_empty_desc">You can queue episodes to play next by swiping right on episode rows, or tapping the icon on an episode card.</string>
+    <string name="player_up_next_empty_desc_watch">You can queue episodes to play next in the episode details screen.</string>
     <string name="player_up_next_move_to_bottom">Move to bottom</string>
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
