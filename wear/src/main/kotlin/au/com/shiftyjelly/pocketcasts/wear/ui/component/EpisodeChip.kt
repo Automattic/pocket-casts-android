@@ -26,13 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.UserEpisodeImage
+import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 
@@ -53,26 +50,12 @@ fun EpisodeChip(episode: BaseEpisode, onClick: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-                val modifier = Modifier
-                    .size(30.dp)
-                    .clip(RoundedCornerShape(4.dp))
-
-                when (episode) {
-                    is PodcastEpisode -> {
-                        PodcastImage(
-                            uuid = episode.podcastUuid,
-                            dropShadow = false,
-                            modifier = modifier,
-                        )
-                    }
-                    is UserEpisode -> {
-                        UserEpisodeImage(
-                            episode = episode,
-                            contentDescription = null,
-                            modifier = modifier,
-                        )
-                    }
-                }
+                EpisodeImage(
+                    episode = episode,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(4.dp)),
+                )
 
                 if (episode.isDownloaded) {
                     Spacer(Modifier.height(4.dp))
