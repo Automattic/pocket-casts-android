@@ -22,9 +22,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -65,7 +65,7 @@ fun NowPlayingChip(
 @Composable
 private fun Content(
     podcast: Podcast?,
-    episode: Playable?,
+    episode: BaseEpisode?,
     isPlaying: Boolean,
     onClick: () -> Unit,
 ) {
@@ -154,7 +154,7 @@ private fun Preview() {
                 uuid = "b643cb50-2c52-013b-ef7a-0acc26574db2",
                 title = "A Podcast Title",
             ),
-            episode = Episode(
+            episode = PodcastEpisode(
                 title = "An Episode",
                 uuid = "57853d71-30ac-4477-af73-e8fe2b1d4dda",
                 publishedDate = Date()

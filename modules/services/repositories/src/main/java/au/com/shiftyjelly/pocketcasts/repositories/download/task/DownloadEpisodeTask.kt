@@ -10,8 +10,8 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
@@ -105,7 +105,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         const val OUTPUT_CANCELLED = "cancelled"
     }
 
-    private lateinit var episode: Playable
+    private lateinit var episode: BaseEpisode
     private val episodeUUID: String? = inputData.getString(INPUT_EPISODE_UUID)
     private val pathToSaveTo: String? = inputData.getString(INPUT_PATH_TO_SAVE_TO)
     private val tempDownloadPath: String? = inputData.getString(INPUT_TEMP_PATH)
@@ -122,7 +122,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         val outputData = Data.Builder().putString(OUTPUT_EPISODE_UUID, episodeUUID).build()
 
         return try {
-            this.episode = runBlocking { episodeManager.findPlayableByUuid(episodeUUID!!) } ?: return Result.failure()
+            this.episode = runBlocking { episodeManager.findEpisodeByUuid(episodeUUID!!) } ?: return Result.failure()
 
             if (this.episode.downloadTaskId != id.toString()) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Mismatched download task id for episode ${episode.title}. Cancelling.")
@@ -596,7 +596,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
         val progress = bytesDownloadedSoFar.toFloat() / totalSize
         val total = bytesRemaining + bytesDownloadedSoFar
-        val podcastUuid = (episode as? Episode)?.podcastUuid
+        val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
 
         return DownloadProgressUpdate(
             episode.uuid,

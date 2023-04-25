@@ -4,15 +4,15 @@ import android.content.Context
 import androidx.fragment.app.FragmentManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper.ShareType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class ShareDialog(
     private val podcast: Podcast,
-    private val episode: Episode?,
+    private val episode: PodcastEpisode?,
     private val fragmentManager: FragmentManager?,
     private val context: Context?,
     private val shouldShowPodcast: Boolean = true,

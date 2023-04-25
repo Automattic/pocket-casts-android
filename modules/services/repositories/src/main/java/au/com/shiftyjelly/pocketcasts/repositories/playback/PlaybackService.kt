@@ -19,8 +19,8 @@ import androidx.media.MediaBrowserServiceCompat
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -401,7 +401,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         val upNext = listOfNotNull(playbackManager.getCurrentEpisode()) + playbackManager.upNextQueue.queueEpisodes
         val mediaUpNext = upNext.take(NUM_SUGGESTED_ITEMS).mapNotNull { playable ->
             val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
-            val parentPodcast = (if (playable is Episode) podcastManager.findPodcastByUuid(playable.podcastUuid) else filesPodcast) ?: return@mapNotNull null
+            val parentPodcast = (if (playable is PodcastEpisode) podcastManager.findPodcastByUuid(playable.podcastUuid) else filesPodcast) ?: return@mapNotNull null
             AutoConverter.convertEpisodeToMediaItem(this, playable, parentPodcast)
         }
 
@@ -430,7 +430,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         Timber.d("Loading recent children")
         val upNext = playbackManager.getCurrentEpisode() ?: return arrayListOf()
         val filesPodcast = Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle)
-        val parentPodcast = (if (upNext is Episode) podcastManager.findPodcastByUuid(upNext.podcastUuid) else filesPodcast) ?: return arrayListOf()
+        val parentPodcast = (if (upNext is PodcastEpisode) podcastManager.findPodcastByUuid(upNext.podcastUuid) else filesPodcast) ?: return arrayListOf()
 
         Timber.d("Recent item ${upNext.title}")
         return arrayListOf(AutoConverter.convertEpisodeToMediaItem(this, upNext, parentPodcast))
@@ -528,7 +528,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
                     .take(EPISODE_LIMIT)
                     .toMutableList()
                 if (!podcast.isSubscribed) {
-                    episodes.sortBy { it.episodeType !is Episode.EpisodeType.Trailer } // Bring trailers to the top
+                    episodes.sortBy { it.episodeType !is PodcastEpisode.EpisodeType.Trailer } // Bring trailers to the top
                 }
                 episodes.forEach { episode ->
                     episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, podcast, groupTrailers = !podcast.isSubscribed))

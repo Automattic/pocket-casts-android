@@ -9,8 +9,8 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -55,7 +55,7 @@ class EpisodeViewModel @Inject constructor(
 
     sealed class State {
         data class Loaded(
-            val episode: Episode,
+            val episode: PodcastEpisode,
             val podcast: Podcast,
             val isPlayingEpisode: Boolean,
             val inUpNext: Boolean,
@@ -175,7 +175,7 @@ class EpisodeViewModel @Inject constructor(
                     uuid = episode.uuid
                 )
             } else if (!episode.isDownloaded) {
-                episode.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+                episode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                 downloadManager.addEpisodeToQueue(episode, fromString, true)
 
                 episodeAnalytics.trackEvent(

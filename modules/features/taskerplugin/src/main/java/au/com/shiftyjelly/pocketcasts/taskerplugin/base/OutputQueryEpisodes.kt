@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.taskerplugin.base
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import com.joaomgcd.taskerpluginlibrary.output.TaskerOutputVariable
 
 private const val OUTPUT_PREFIX = "episode_"
@@ -14,5 +14,5 @@ class OutputQueryEpisodes(
     @get:TaskerOutputVariable("${OUTPUT_PREFIX}duration", labelResIdName = "filters_duration") var duration: Double?,
     @get:TaskerOutputVariable("${OUTPUT_PREFIX}played_percentage", labelResIdName = "played_percentage") var playedPercentage: Int?,
 ) {
-    constructor(episode: Episode) : this(episode.uuid, episode.title.formattedForTasker, episode.downloadUrl, episode.playingStatus.ordinal, episode.publishedDate.formattedForTasker, episode.duration, episode.playedPercentage)
+    constructor(episode: PodcastEpisode) : this(episode.uuid, episode.title.formattedForTasker, episode.downloadUrl, episode.playingStatus.ordinal, episode.publishedDate.formattedForTasker, episode.duration, episode.playedPercentage)
 }

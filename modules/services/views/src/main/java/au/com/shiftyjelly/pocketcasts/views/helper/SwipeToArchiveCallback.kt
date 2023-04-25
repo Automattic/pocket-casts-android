@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.setRippleBackground
@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 interface RowSwipeable {
     val episodeRow: ViewGroup
-    val episode: Playable?
+    val episode: BaseEpisode?
     val swipeLeftIcon: ImageView
     val positionAdapter: Int
     val leftRightIcon1: ImageView
@@ -37,7 +37,7 @@ interface RowSwipeable {
     val rightIconDrawableRes: List<EpisodeItemTouchHelper.IconWithBackground>
 }
 
-class EpisodeItemTouchHelper(onLeftItem1: (episode: Playable, index: Int) -> Unit, onLeftItem2: (episode: Playable, index: Int) -> Unit, onSwipeLeftAction: (episode: Playable, index: Int) -> Unit) : MultiSwipeHelper(object : SwipeToArchiveCallback() {
+class EpisodeItemTouchHelper(onLeftItem1: (episode: BaseEpisode, index: Int) -> Unit, onLeftItem2: (episode: BaseEpisode, index: Int) -> Unit, onSwipeLeftAction: (episode: BaseEpisode, index: Int) -> Unit) : MultiSwipeHelper(object : SwipeToArchiveCallback() {
     override fun onSwiped(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, direction: Int): Boolean {
         val episodeViewHolder = viewHolder as? RowSwipeable
             ?: return false

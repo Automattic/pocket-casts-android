@@ -19,11 +19,11 @@ import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_S
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_VALUE_COMPLETION_STATUS_PARTIALLY_PLAYED
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocaliseFilters
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.autoDrawableId
@@ -43,7 +43,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class AutoMediaId(
-    val playableId: String,
+    val episodeId: String,
     val sourceId: String?
 ) {
     companion object {
@@ -59,7 +59,7 @@ data class AutoMediaId(
     }
 
     fun toMediaId(): String {
-        return "$sourceId$DIVIDER$playableId"
+        return "$sourceId$DIVIDER$episodeId"
     }
 }
 
@@ -68,12 +68,12 @@ object AutoConverter {
     private const val THUMBNAIL_IMAGE_SIZE = 200
     private const val FULL_IMAGE_SIZE = 800
 
-    fun convertEpisodeToMediaItem(context: Context, episode: Playable, parentPodcast: Podcast, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
+    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaBrowserCompat.MediaItem {
         val localUri = getBitmapUriForPodcast(parentPodcast, episode, context)
 
         val extrasForEpisode = extrasForEpisode(episode)
         if (groupTrailers) {
-            val groupTitle = if (episode is Episode && episode.episodeType is Episode.EpisodeType.Trailer) LR.string.episode_trailer else LR.string.episodes
+            val groupTitle = if (episode is PodcastEpisode && episode.episodeType is PodcastEpisode.EpisodeType.Trailer) LR.string.episode_trailer else LR.string.episodes
             extrasForEpisode.putString(EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT, context.resources.getString(groupTitle))
         }
         val mediaId = AutoMediaId(episode.uuid, sourceId).toMediaId()
@@ -131,7 +131,7 @@ object AutoConverter {
         return MediaBrowserCompat.MediaItem(mediaDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
     }
 
-    fun getBitmapUriForPodcast(podcast: Podcast?, episode: Playable?, context: Context): Uri? {
+    fun getBitmapUriForPodcast(podcast: Podcast?, episode: BaseEpisode?, context: Context): Uri? {
         val url = if (episode is UserEpisode) {
             // the artwork for user uploaded episodes are stored on each episode
             episode.artworkUrl
@@ -212,7 +212,7 @@ object AutoConverter {
         return Uri.parse("android.resource://" + context.packageName + "/drawable/" + drawableName)
     }
 
-    private fun extrasForEpisode(episode: Playable): Bundle {
+    private fun extrasForEpisode(episode: BaseEpisode): Bundle {
         val downloadStatus = if (episode.isDownloaded) STATUS_DOWNLOADED else STATUS_NOT_DOWNLOADED
 
         val completionStatus = when (episode.playingStatus) {

@@ -5,9 +5,9 @@ import android.os.IBinder
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ServiceTestRule
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PODCASTS_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
@@ -100,7 +100,7 @@ class AutoPlaybackServiceTest {
     fun testLoadPodcastEpisodes() {
         runBlocking {
             val podcast = Podcast(UUID.randomUUID().toString(), title = "Test podcast")
-            val episode = Episode(UUID.randomUUID().toString(), title = "Test episode", publishedDate = Date())
+            val episode = PodcastEpisode(UUID.randomUUID().toString(), title = "Test episode", publishedDate = Date())
 
             service.playlistManager = mock { on { findByUuid(any()) }.doReturn(null) }
             service.podcastManager = mock { on { runBlocking { findPodcastByUuidSuspend(any()) } }.doReturn(podcast) }

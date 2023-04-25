@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -43,7 +43,7 @@ class ManualCleanupViewModel
         data class DiskSpaceView(
             @StringRes val title: Int,
             val isChecked: Boolean = false,
-            val episodes: List<Episode> = emptyList(),
+            val episodes: List<PodcastEpisode> = emptyList(),
         ) {
             val episodesBytesSize = episodes.sumOf { it.sizeInBytes }
             val episodesSize = episodes.size
@@ -65,7 +65,7 @@ class ManualCleanupViewModel
     private val deleteButton: State.DeleteButton
         get() = State.DeleteButton(isEnabled = episodesToDelete.isNotEmpty())
 
-    private val episodesToDelete: MutableList<Episode> = mutableListOf()
+    private val episodesToDelete: MutableList<PodcastEpisode> = mutableListOf()
     private val switchState: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
     private var deleteButtonAction: (() -> Unit)? = null
 
@@ -126,7 +126,7 @@ class ManualCleanupViewModel
         }
     }
 
-    private fun updateDeleteList(isChecked: Boolean, episodes: List<Episode>) {
+    private fun updateDeleteList(isChecked: Boolean, episodes: List<PodcastEpisode>) {
         if (isChecked) {
             episodesToDelete.addAll(episodes)
         } else {
@@ -164,7 +164,7 @@ class ManualCleanupViewModel
         ManualCleanupConfirmationDialog(context = context, onConfirm = ::onDeleteConfirmed)
 
     private fun Array<EpisodePlayingStatus>.mapToDiskSpaceViewsForEpisodes(
-        episodes: List<Episode>,
+        episodes: List<PodcastEpisode>,
     ) = map { episodePlayingStatus ->
         _state.value.diskSpaceViews.first { it.title == episodePlayingStatus.mapToDiskSpaceViewTitle() }
             .copy(episodes = episodes.filter { it.playingStatus == episodePlayingStatus })

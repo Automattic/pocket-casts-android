@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentCreateFilterCh
 import au.com.shiftyjelly.pocketcasts.filters.databinding.RowCreateEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PLAYBACK_DIFF
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
@@ -214,7 +214,7 @@ class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
     }
 }
 
-private class SimpleEpisodeListAdapter : ListAdapter<Playable, SimpleEpisodeListAdapter.ViewHolder>(PLAYBACK_DIFF) {
+private class SimpleEpisodeListAdapter : ListAdapter<BaseEpisode, SimpleEpisodeListAdapter.ViewHolder>(PLAYBACK_DIFF) {
     class ViewHolder(val binding: RowCreateEpisodeBinding) : RecyclerView.ViewHolder(binding.root) {
         val imageLoader = PodcastImageLoaderThemed(binding.root.context)
     }

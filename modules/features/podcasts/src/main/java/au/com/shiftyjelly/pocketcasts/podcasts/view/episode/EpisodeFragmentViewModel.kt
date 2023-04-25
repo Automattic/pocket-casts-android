@@ -12,8 +12,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -68,7 +68,7 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     val disposables = CompositeDisposable()
 
-    var episode: Episode? = null
+    var episode: PodcastEpisode? = null
     var isFragmentChangingConfigurations: Boolean = false
 
     fun setup(episodeUUID: String, podcastUUID: String?, forceDark: Boolean) {
@@ -87,9 +87,9 @@ class EpisodeFragmentViewModel @Inject constructor(
                 if (episode != null) {
                     Maybe.just(episode)
                 } else {
-                    episodeManager.downloadMissingEpisode(episodeUUID, podcastUUID, Episode(uuid = episodeUUID, publishedDate = Date()), podcastManager, downloadMetaData = true).flatMap { playable ->
-                        if (playable is Episode) {
-                            Maybe.just(playable)
+                    episodeManager.downloadMissingEpisode(episodeUUID, podcastUUID, PodcastEpisode(uuid = episodeUUID, publishedDate = Date()), podcastManager, downloadMetaData = true).flatMap { missingEpisode ->
+                        if (missingEpisode is PodcastEpisode) {
+                            Maybe.just(missingEpisode)
                         } else {
                             Maybe.empty()
                         }
@@ -97,13 +97,13 @@ class EpisodeFragmentViewModel @Inject constructor(
                 }
             }
         } else {
-            Maybe.empty<Episode>()
+            Maybe.empty()
         }
 
         val stateObservable: Flowable<EpisodeFragmentState> = episodeManager.findByUuidRx(episodeUUID)
             .switchIfEmpty(onEmptyHandler)
             .flatMapPublisher { episode ->
-                val zipper: Function3<Episode, Podcast, Float, EpisodeFragmentState> = Function3 { episodeLoaded: Episode, podcast: Podcast, downloadProgress: Float ->
+                val zipper: Function3<PodcastEpisode, Podcast, Float, EpisodeFragmentState> = Function3 { episodeLoaded: PodcastEpisode, podcast: Podcast, downloadProgress: Float ->
                     val tintColor = podcast.getTintColor(isDarkTheme)
                     val podcastColor = podcast.getTintColor(isDarkTheme)
                     EpisodeFragmentState.Loaded(episodeLoaded, podcast, tintColor, podcastColor, downloadProgress)
@@ -133,7 +133,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         disposables.clear()
     }
 
-    fun loadShowNotes(episode: Episode) {
+    fun loadShowNotes(episode: PodcastEpisode) {
         serverShowNotesManager.loadShowNotes(
             episode.uuid,
             object : CachedServerCallback<String> {
@@ -179,7 +179,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                     episodeManager.stopDownloadAndCleanUp(it, "episode card")
                     analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED
                 } else if (!it.isDownloaded) {
-                    it.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+                    it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                     downloadManager.addEpisodeToQueue(it, "episode card", true)
                     analyticsEvent = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED
                 }
@@ -297,6 +297,6 @@ class EpisodeFragmentViewModel @Inject constructor(
 }
 
 sealed class EpisodeFragmentState {
-    data class Loaded(val episode: Episode, val podcast: Podcast, @ColorInt val tintColor: Int, @ColorInt val podcastColor: Int, val downloadProgress: Float) : EpisodeFragmentState()
+    data class Loaded(val episode: PodcastEpisode, val podcast: Podcast, @ColorInt val tintColor: Int, @ColorInt val podcastColor: Int, val downloadProgress: Float) : EpisodeFragmentState()
     data class Error(val error: Throwable) : EpisodeFragmentState()
 }

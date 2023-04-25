@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -71,7 +71,7 @@ class HistoryManager @Inject constructor(
             .toList()
             .await()
 
-        val skeletonEpisodes = mutableListOf<Episode>()
+        val skeletonEpisodes = mutableListOf<PodcastEpisode>()
 
         for (change in changes) {
             val interactionDate = change.modifiedAt.toLong()
@@ -83,7 +83,7 @@ class HistoryManager @Inject constructor(
                 if (episode != null) {
                     if ((episode.lastPlaybackInteraction ?: 0) < interactionDate) {
                         episode.lastPlaybackInteraction = interactionDate
-                        episode.lastPlaybackInteractionSyncStatus = Episode.LAST_PLAYBACK_INTERACTION_SYNCED
+                        episode.lastPlaybackInteractionSyncStatus = PodcastEpisode.LAST_PLAYBACK_INTERACTION_SYNCED
                         episodeManager.update(episode)
                     }
                 } else if (podcastUuid != null) {
