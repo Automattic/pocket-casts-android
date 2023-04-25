@@ -15,7 +15,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.wear.compose.material.SwipeToDismissBoxState
-import au.com.shiftyjelly.pocketcasts.wear.NowPlayingPager
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
@@ -30,7 +30,7 @@ object EpisodeScreenFlow {
     fun navigateRoute(episodeUuid: String) = "episode/$episodeUuid"
 
     // Routes
-    private const val episodeScreen = "episodeScreen"
+    const val episodeScreen = "episodeScreen"
     private const val upNextOptionsScreen = "upNextOptionsScreen"
     private const val deleteDownloadConfirmationScreen = "deleteDownloadConfirmationScreen"
     private const val deleteDownloadNotificationScreen = "deleteDownloadNotificationScreen"

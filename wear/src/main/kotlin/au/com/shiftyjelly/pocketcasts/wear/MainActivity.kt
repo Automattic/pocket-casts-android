@@ -6,23 +6,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material.SwipeToDismissBoxState
-import androidx.wear.compose.material.edgeSwipeToDismiss
 import androidx.wear.compose.material.rememberSwipeToDismissBoxState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
@@ -31,15 +21,13 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.SettingsScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationSubGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
-import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingViewModel
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
@@ -47,7 +35,6 @@ import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
 import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
-import com.google.android.horologist.compose.pager.PagerScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -88,6 +75,7 @@ private fun WearApp() {
             NowPlayingPager(
                 navController = navController,
                 pagerState = pagerState,
+                swipeToDismissState = swipeToDismissState,
             ) {
                 WatchListScreen(
                     scrollState = it.scrollableState,
@@ -203,79 +191,6 @@ private fun WearApp() {
         }
 
         authenticationGraph(navController)
-    }
-}
-
-/**
- * Pager with three pages:
- *
- * 1. [firstPageContent] (passed in as a composable argument)
- * 2. [NowPlayingScreen]
- * 3. [UpNextScreen]
- *
- * Pass a null [swipeToDismissState] to disable swipe to dismiss when the backstack would
- * be empty (i.e., on the first screen in the app).
- */
-@Composable
-fun NowPlayingPager(
-    navController: NavController,
-    pagerState: PagerState = rememberPagerState(),
-    swipeToDismissState: SwipeToDismissBoxState? = null,
-    firstPageContent: @Composable () -> Unit,
-) {
-    PagerScreen(
-        count = 3,
-        state = pagerState,
-        modifier = if (swipeToDismissState != null) {
-            Modifier.edgeSwipeToDismiss(swipeToDismissState)
-        } else {
-            Modifier
-        }
-    ) { page ->
-        when (page) {
-
-            0 -> firstPageContent()
-
-            1 -> Column {
-
-                // FIXME move this to inside Now Playing Screen???
-
-                // Listen for results from streaming confirmation screen
-                navController.currentBackStackEntry?.savedStateHandle
-                    ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey, null)
-                    ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
-
-                        val viewModel = hiltViewModel<NowPlayingViewModel>()
-                        LaunchedEffect(streamingConfirmationResult) {
-                            viewModel.onStreamingConfirmationResult(streamingConfirmationResult)
-                            // Clear result once consumed
-                            navController.currentBackStackEntry?.savedStateHandle
-                                ?.remove<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey)
-                        }
-                    }
-
-                val coroutineScope = rememberCoroutineScope()
-
-                NowPlayingScreen(
-                    navigateToEpisode = { episodeUuid ->
-                        coroutineScope.launch {
-                            navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
-                        }
-                    },
-                    showStreamingConfirmation = { navController.navigate(StreamingConfirmationScreen.route) },
-                )
-            }
-
-            2 -> Column {
-                val scrollableState = rememberScalingLazyListState()
-                UpNextScreen(
-                    navigateToEpisode = { episodeUuid ->
-                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
-                    },
-                    listState = scrollableState,
-                )
-            }
-        }
     }
 }
 
