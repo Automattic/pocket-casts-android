@@ -85,37 +85,37 @@ abstract class PodcastDao {
     @Query("SELECT * FROM podcasts WHERE auto_add_to_up_next > 0")
     abstract suspend fun findAutoAddToUpNextPodcasts(): List<Podcast>
 
-    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN episodes ON podcasts.uuid = episodes.podcast_id AND episodes.uuid = (SELECT episodes.uuid FROM episodes WHERE episodes.archived = 0 AND episodes.podcast_id = podcasts.uuid AND episodes.playing_status != 2 ORDER BY episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN episodes.published_date IS NULL THEN 1 ELSE 0 END, episodes.published_date ASC, podcasts.latest_episode_date ASC")
+    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.archived = 0 AND podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date ASC, podcasts.latest_episode_date ASC")
     abstract fun observeSubscribedOrderByLatestEpisodeAsc(): Flowable<List<Podcast>>
 
-    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN episodes ON podcasts.uuid = episodes.podcast_id AND episodes.uuid = (SELECT episodes.uuid FROM episodes WHERE episodes.archived = 0 AND episodes.podcast_id = podcasts.uuid AND episodes.playing_status != 2 ORDER BY episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN episodes.published_date IS NULL THEN 1 ELSE 0 END, episodes.published_date DESC, podcasts.latest_episode_date DESC")
+    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.archived = 0 AND podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     abstract fun observeSubscribedOrderByLatestEpisodeDesc(): Flowable<List<Podcast>>
 
     fun observeSubscribedOrderByLatestEpisode(orderAsc: Boolean): Flowable<List<Podcast>> {
         return if (orderAsc) observeSubscribedOrderByLatestEpisodeAsc() else observeSubscribedOrderByLatestEpisodeDesc()
     }
 
-    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN episodes ON podcasts.uuid = episodes.podcast_id AND episodes.uuid = (SELECT episodes.uuid FROM episodes WHERE episodes.archived = 0 AND episodes.podcast_id = podcasts.uuid AND episodes.playing_status != 2 ORDER BY episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN episodes.published_date IS NULL THEN 1 ELSE 0 END, episodes.published_date ASC, podcasts.latest_episode_date ASC")
+    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.archived = 0 AND podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date ASC, podcasts.latest_episode_date ASC")
     abstract fun observeFolderOrderByLatestEpisodeAsc(folderUuid: String): Flowable<List<Podcast>>
 
-    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN episodes ON podcasts.uuid = episodes.podcast_id AND episodes.uuid = (SELECT episodes.uuid FROM episodes WHERE episodes.archived = 0 AND episodes.podcast_id = podcasts.uuid AND episodes.playing_status != 2 ORDER BY episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN episodes.published_date IS NULL THEN 1 ELSE 0 END, episodes.published_date DESC, podcasts.latest_episode_date DESC")
+    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.archived = 0 AND podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     abstract fun observeFolderOrderByLatestEpisodeDesc(folderUuid: String): Flowable<List<Podcast>>
 
     fun observeFolderOrderByLatestEpisode(folderUuid: String, orderAsc: Boolean): Flowable<List<Podcast>> {
         return if (orderAsc) observeFolderOrderByLatestEpisodeAsc(folderUuid = folderUuid) else observeFolderOrderByLatestEpisodeDesc(folderUuid = folderUuid)
     }
 
-    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN episodes ON podcasts.uuid = episodes.podcast_id AND episodes.uuid = (SELECT episodes.uuid FROM episodes WHERE episodes.podcast_id = podcasts.uuid AND episodes.playing_status != 2 ORDER BY episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN episodes.published_date IS NULL THEN 1 ELSE 0 END, episodes.published_date ASC, podcasts.latest_episode_date ASC")
+    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date ASC, podcasts.latest_episode_date ASC")
     abstract suspend fun findSubscribedOrderByLatestEpisodeAsc(): List<Podcast>
 
-    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN episodes ON podcasts.uuid = episodes.podcast_id AND episodes.uuid = (SELECT episodes.uuid FROM episodes WHERE episodes.podcast_id = podcasts.uuid AND episodes.playing_status != 2 ORDER BY episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN episodes.published_date IS NULL THEN 1 ELSE 0 END, episodes.published_date DESC, podcasts.latest_episode_date DESC")
+    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     abstract suspend fun findSubscribedOrderByLatestEpisodeDesc(): List<Podcast>
 
     suspend fun findSubscribedOrderByLatestEpisode(orderAsc: Boolean): List<Podcast> {
         return if (orderAsc) findSubscribedOrderByLatestEpisodeAsc() else findSubscribedOrderByLatestEpisodeDesc()
     }
 
-    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN episodes ON podcasts.uuid = episodes.podcast_id AND episodes.uuid = (SELECT episodes.uuid FROM episodes WHERE episodes.podcast_id = podcasts.uuid AND episodes.playing_status != 2 ORDER BY episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN episodes.published_date IS NULL THEN 1 ELSE 0 END, episodes.published_date DESC, podcasts.latest_episode_date DESC")
+    @Query("SELECT podcasts.* FROM podcasts LEFT JOIN podcast_episodes ON podcasts.uuid = podcast_episodes.podcast_id AND podcast_episodes.uuid = (SELECT podcast_episodes.uuid FROM podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.playing_status != 2 ORDER BY podcast_episodes.published_date DESC LIMIT 1) WHERE podcasts.subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN podcast_episodes.published_date IS NULL THEN 1 ELSE 0 END, podcast_episodes.published_date DESC, podcasts.latest_episode_date DESC")
     abstract suspend fun findFolderPodcastsOrderByLatestEpisode(folderUuid: String): List<Podcast>
 
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY sort_order ASC")
@@ -340,7 +340,7 @@ abstract class PodcastDao {
     @Query("SELECT * FROM podcasts WHERE sync_status = " + Podcast.SYNC_STATUS_NOT_SYNCED + " AND uuid IS NOT NULL")
     abstract fun findNotSynced(): List<Podcast>
 
-    @Query("SELECT COUNT(*) FROM episodes WHERE podcast_id = :podcastUuid AND episode_status = :episodeStatus")
+    @Query("SELECT COUNT(*) FROM podcast_episodes WHERE podcast_id = :podcastUuid AND episode_status = :episodeStatus")
     abstract fun countEpisodesInPodcastWithStatus(podcastUuid: String, episodeStatus: EpisodeStatusEnum): Int
 
     @Query("UPDATE podcasts SET grouping = :grouping WHERE uuid = :uuid")
@@ -354,10 +354,10 @@ abstract class PodcastDao {
 
     @Query(
         """
-        SELECT DISTINCT episodes.uuid as episodeId, podcasts.uuid, podcasts.title, podcasts.author, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg, SUM(episodes.played_up_to) as totalPlayedTime, COUNT(episodes.uuid) as numberOfPlayedEpisodes
-        FROM episodes
-        JOIN podcasts ON episodes.podcast_id = podcasts.uuid
-        WHERE episodes.last_playback_interaction_date IS NOT NULL AND episodes.last_playback_interaction_date > :fromEpochMs AND episodes.last_playback_interaction_date < :toEpochMs
+        SELECT DISTINCT podcast_episodes.uuid as episodeId, podcasts.uuid, podcasts.title, podcasts.author, podcasts.primary_color as tintColorForLightBg, podcasts.secondary_color as tintColorForDarkBg, SUM(podcast_episodes.played_up_to) as totalPlayedTime, COUNT(podcast_episodes.uuid) as numberOfPlayedEpisodes
+        FROM podcast_episodes
+        JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
+        WHERE podcast_episodes.last_playback_interaction_date IS NOT NULL AND podcast_episodes.last_playback_interaction_date > :fromEpochMs AND podcast_episodes.last_playback_interaction_date < :toEpochMs
         GROUP BY podcast_id
         ORDER BY totalPlayedTime DESC, numberOfPlayedEpisodes DESC
         LIMIT :limit

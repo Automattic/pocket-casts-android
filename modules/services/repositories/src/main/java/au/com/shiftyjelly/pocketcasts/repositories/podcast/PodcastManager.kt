@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -90,7 +90,7 @@ interface PodcastManager {
     fun updateOverrideGobalSettings(podcast: Podcast, override: Boolean)
     fun updateEpisodesToKeep(podcast: Podcast, episodeToKeep: Int)
     fun updateColors(podcastUuid: String, background: Int, tintForLightBg: Int, tintForDarkBg: Int, fabForLightBg: Int, fabForDarkBg: Int, linkForLightBg: Int, linkForDarkBg: Int, colorLastDownloaded: Long)
-    fun updateLatestEpisode(podcast: Podcast, latestEpisode: Episode)
+    fun updateLatestEpisode(podcast: Podcast, latestEpisode: PodcastEpisode)
     fun updateGrouping(podcast: Podcast, grouping: PodcastGrouping)
     suspend fun updateSkipLastInSec(podcast: Podcast, skipLast: Int)
     suspend fun updateShowArchived(podcast: Podcast, showArchived: Boolean)

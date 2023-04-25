@@ -4,9 +4,9 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
@@ -226,7 +226,7 @@ class PodcastManagerImpl @Inject constructor(
                 existingPodcast.refreshAvailable = updatedPodcast.refreshAvailable
                 val existingEpisodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(existingPodcast)
                 val mostRecentEpisode = existingEpisodes.firstOrNull()
-                val insertEpisodes = mutableListOf<Episode>()
+                val insertEpisodes = mutableListOf<PodcastEpisode>()
                 updatedPodcast.episodes.map { newEpisode ->
                     val existingEpisode = existingEpisodes.find { it.uuid == newEpisode.uuid }
                     if (existingEpisode != null) {
@@ -324,7 +324,7 @@ class PodcastManagerImpl @Inject constructor(
         // podcasts can be deleted if all of the episodes are haven't been interacted with
         val episodes = episodeManager.findEpisodesByPodcastOrdered(podcast)
         var podcastHasChangedEpisodes = false
-        val deleteEpisodes = mutableListOf<Episode>()
+        val deleteEpisodes = mutableListOf<PodcastEpisode>()
         for (episode in episodes) {
             if (episodeManager.userHasInteractedWithEpisode(episode, playbackManager)) {
                 podcastHasChangedEpisodes = true
@@ -666,7 +666,7 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun updateLatestEpisode(podcast: Podcast, latestEpisode: Episode) {
+    override fun updateLatestEpisode(podcast: Podcast, latestEpisode: PodcastEpisode) {
         if (latestEpisode.uuid.isBlank()) {
             return
         }

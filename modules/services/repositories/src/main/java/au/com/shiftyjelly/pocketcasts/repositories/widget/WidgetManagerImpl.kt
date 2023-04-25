@@ -10,9 +10,9 @@ import android.widget.RemoteViews
 import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.core.ui.widget.PodcastWidget
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
@@ -32,7 +32,7 @@ class WidgetManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : WidgetManager {
 
-    override fun updateWidget(podcast: Podcast?, playing: Boolean, playingEpisode: Playable?) {
+    override fun updateWidget(podcast: Podcast?, playing: Boolean, playingEpisode: BaseEpisode?) {
         if (Util.isAutomotive(context)) {
             return
         }
@@ -63,9 +63,9 @@ class WidgetManagerImpl @Inject constructor(
         updateWidget(podcast, playbackManager.isPlaying(), playbackManager.getCurrentEpisode())
     }
 
-    private fun findPodcastByEpisode(episode: Playable): Podcast? {
+    private fun findPodcastByEpisode(episode: BaseEpisode): Podcast? {
         return when (episode) {
-            is Episode -> podcastManager.findPodcastByUuid(episode.podcastUuid)
+            is PodcastEpisode -> podcastManager.findPodcastByUuid(episode.podcastUuid)
             is UserEpisode -> podcastManager.buildUserEpisodePodcast(episode)
             else -> null
         }
@@ -137,7 +137,7 @@ class WidgetManagerImpl @Inject constructor(
         views.setContentDescription(R.id.widget_skip_forward_text, "Skip forward $jumpFwdAmount seconds")
     }
 
-    private fun updateArtWork(podcast: Podcast?, playingEpisode: Playable?, views: RemoteViews, widgetName: ComponentName, context: Context) {
+    private fun updateArtWork(podcast: Podcast?, playingEpisode: BaseEpisode?, views: RemoteViews, widgetName: ComponentName, context: Context) {
         if (playingEpisode == null) {
             views.setImageViewResource(R.id.widget_artwork, IR.drawable.defaultartwork)
             views.setContentDescription(R.id.widget_artwork, "Open Pocket Casts")

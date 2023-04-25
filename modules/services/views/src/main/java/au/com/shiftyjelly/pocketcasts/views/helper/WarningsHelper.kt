@@ -7,8 +7,8 @@ import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -43,7 +43,7 @@ class WarningsHelper @Inject constructor(
 
     @OptIn(DelicateCoroutinesApi::class)
     fun streamingWarningDialog(
-        episode: Playable,
+        episode: BaseEpisode,
         snackbarParentView: View? = null,
         playbackSource: AnalyticsSource
     ): ConfirmationDialog {
@@ -95,7 +95,7 @@ class WarningsHelper @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     private fun upload(episodeUuid: String, waitForWifi: Boolean, source: AnalyticsSource) {
         GlobalScope.launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let {
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let {
                 if (it !is UserEpisode) return@let
 
                 if (!it.isUploaded && !it.isQueuedForUpload && !it.isUploading) {
@@ -109,12 +109,12 @@ class WarningsHelper @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     private fun download(episodeUuid: String, waitForWifi: Boolean, from: String) {
         GlobalScope.launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let {
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let {
                 if (it.isDownloading) {
                     episodeManager.stopDownloadAndCleanUp(episodeUuid, from)
                 } else if (!it.isDownloaded) {
                     if (!waitForWifi) {
-                        it.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                     }
                     downloadManager.addEpisodeToQueue(it, from, true)
                     launch {

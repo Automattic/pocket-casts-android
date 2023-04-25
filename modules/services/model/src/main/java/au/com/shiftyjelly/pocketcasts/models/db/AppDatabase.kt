@@ -31,11 +31,11 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
@@ -47,7 +47,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Database(
     entities = [
         AnonymousBumpStat::class,
-        Episode::class,
+        PodcastEpisode::class,
         Folder::class,
         Playlist::class,
         PlaylistEpisode::class,
@@ -58,7 +58,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class
     ],
-    version = 75,
+    version = 76,
     exportSchema = true
 )
 @TypeConverters(
@@ -426,6 +426,10 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_75_76 = addMigration(75, 76) { database ->
+            database.execSQL("ALTER TABLE episodes RENAME TO podcast_episodes")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -791,6 +795,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_72_73,
                 MIGRATION_73_74,
                 MIGRATION_74_75,
+                MIGRATION_75_76,
             )
         }
 

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.squareup.moshi.Json
@@ -75,10 +75,10 @@ data class EpisodeInfo(
     @field:Json(name = "published") val published: String
 ) {
 
-    fun toEpisode(podcastUuid: String): Episode? {
+    fun toEpisode(podcastUuid: String): PodcastEpisode? {
         val publishedDate = published.parseIsoDate() ?: return null
         val episodeTitle = title ?: ""
-        return Episode(
+        return PodcastEpisode(
             uuid = uuid,
             downloadUrl = url,
             title = episodeTitle,

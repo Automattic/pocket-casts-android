@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -145,7 +145,7 @@ class CreateFilterViewModel @Inject constructor(
         hasBeenInitialised = true
     }
 
-    fun observeFilter(filter: Playlist): LiveData<List<Episode>> =
+    fun observeFilter(filter: Playlist): LiveData<List<PodcastEpisode>> =
         playlistManager
             .observeEpisodesPreview(filter, episodeManager, playbackManager)
             .toLiveData()

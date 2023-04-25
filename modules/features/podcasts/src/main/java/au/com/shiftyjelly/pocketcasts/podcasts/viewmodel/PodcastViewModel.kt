@@ -11,10 +11,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -74,7 +74,7 @@ class PodcastViewModel
     var searchOpen = false
     lateinit var podcastUuid: String
     lateinit var episodes: LiveData<EpisodeState>
-    val groupedEpisodes: MutableLiveData<List<List<Episode>>> = MutableLiveData()
+    val groupedEpisodes: MutableLiveData<List<List<PodcastEpisode>>> = MutableLiveData()
     val signInState = userManager.getSignInState().toLiveData()
 
     val tintColor = MutableLiveData<Int>()
@@ -291,8 +291,8 @@ class PodcastViewModel
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun episodeSwipeArchive(episode: Playable, index: Int) {
-        if (episode !is Episode) return
+    fun episodeSwipeArchive(episode: BaseEpisode, index: Int) {
+        if (episode !is PodcastEpisode) return
 
         launch {
             if (!episode.isArchived) {
@@ -307,7 +307,7 @@ class PodcastViewModel
         }
     }
 
-    fun episodeSwipeUpNext(episode: Playable) {
+    fun episodeSwipeUpNext(episode: BaseEpisode) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.PODCAST_SCREEN)
@@ -319,7 +319,7 @@ class PodcastViewModel
         }
     }
 
-    fun episodeSwipeUpLast(episode: Playable) {
+    fun episodeSwipeUpLast(episode: BaseEpisode) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
                 playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.PODCAST_SCREEN)
@@ -406,7 +406,7 @@ class PodcastViewModel
 
         )
     }
-    private fun trackEpisodeEvent(event: AnalyticsEvent, episode: Episode) {
+    private fun trackEpisodeEvent(event: AnalyticsEvent, episode: PodcastEpisode) {
         episodeAnalytics.trackEvent(
             event,
             source = AnalyticsSource.PODCAST_SCREEN,
@@ -424,7 +424,7 @@ class PodcastViewModel
 
     sealed class EpisodeState {
         data class Loaded(
-            val episodes: List<Episode>,
+            val episodes: List<PodcastEpisode>,
             val showingArchived: Boolean,
             val episodeCount: Int,
             val archivedCount: Int,
@@ -513,7 +513,7 @@ private fun Flowable<CombinedEpisodeData>.loadEpisodes(episodeManager: EpisodeMa
                         }
                     }
 
-                    val indexOf = mutableEpisodeList.filter { showArchived || (it is Episode && !it.isArchived) || it is EpisodeLimitPlaceholder }.indexOfFirst { it is EpisodeLimitPlaceholder }
+                    val indexOf = mutableEpisodeList.filter { showArchived || (it is PodcastEpisode && !it.isArchived) || it is EpisodeLimitPlaceholder }.indexOfFirst { it is EpisodeLimitPlaceholder }
                     episodeLimitIndex = if (indexOf == -1) null else indexOf // Why doesn't indexOfFirst return an optional?!
                 } else {
                     episodeLimitIndex = null

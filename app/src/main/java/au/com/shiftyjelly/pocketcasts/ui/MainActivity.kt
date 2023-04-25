@@ -54,8 +54,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
@@ -643,8 +643,8 @@ class MainActivity :
         viewModel.playbackState.observe(this) { state ->
             if (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) {
                 launch(Dispatchers.Default) {
-                    val playable = episodeManager.findPlayableByUuid(state.episodeUuid)
-                    if (playable?.isVideo == true && state.isPlaying) {
+                    val episode = episodeManager.findEpisodeByUuid(state.episodeUuid)
+                    if (episode?.isVideo == true && state.isPlaying) {
                         launch(Dispatchers.Main) {
                             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                                 binding.playerBottomSheet.openPlayer()
@@ -1178,9 +1178,9 @@ class MainActivity :
         episodeUuid ?: return
 
         launch(Dispatchers.Main.immediate) {
-            val playable =
-                withContext(Dispatchers.Default) { episodeManager.findPlayableByUuid(episodeUuid) }
-            val fragment = if (playable == null) {
+            val episode =
+                withContext(Dispatchers.Default) { episodeManager.findEpisodeByUuid(episodeUuid) }
+            val fragment = if (episode == null) {
                 val podcastUuidFound = podcastUuid ?: return@launch
                 // Assume it's an episode we don't know about
                 EpisodeFragment.newInstance(
@@ -1189,7 +1189,7 @@ class MainActivity :
                     podcastUuid = podcastUuidFound,
                     forceDark = forceDark
                 )
-            } else if (playable is Episode) {
+            } else if (episode is PodcastEpisode) {
                 EpisodeFragment.newInstance(
                     episodeUuid = episodeUuid,
                     source = source,
@@ -1197,7 +1197,7 @@ class MainActivity :
                     forceDark = forceDark
                 )
             } else {
-                CloudFileBottomSheetFragment.newInstance(playable.uuid, forceDark = true)
+                CloudFileBottomSheetFragment.newInstance(episode.uuid, forceDark = true)
             }
 
             fragment.showAllowingStateLoss(supportFragmentManager, "episode_card")

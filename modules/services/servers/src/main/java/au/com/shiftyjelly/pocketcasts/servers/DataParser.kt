@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -115,7 +115,7 @@ object DataParser {
             while (it.hasNext()) {
                 podcastUuid = it.next()
                 updatedEpisodes = refreshMap.getJSONArray(podcastUuid)
-                val newEpisodes = ArrayList<Episode>()
+                val newEpisodes = ArrayList<PodcastEpisode>()
                 for (i in 0 until updatedEpisodes.length()) {
                     parseEpisodeFromJson(updatedEpisodes.getJSONObject(i), podcastUuid)?.let { episode ->
                         newEpisodes.add(episode)
@@ -133,14 +133,14 @@ object DataParser {
         }
     }
 
-    private fun parseEpisodeFromJson(jsonEpisode: JSONObject, podcastUuid: String?): Episode? {
+    private fun parseEpisodeFromJson(jsonEpisode: JSONObject, podcastUuid: String?): PodcastEpisode? {
         val uuid = getString(jsonEpisode, "uuid")
         val publishedAt = getDate(jsonEpisode, "published_at")
         val podcastUuidOrJson = podcastUuid ?: getString(jsonEpisode, "podcast_uuid")
         if (uuid == null || publishedAt == null || podcastUuidOrJson == null) {
             return null
         }
-        return Episode(
+        return PodcastEpisode(
             episodeStatus = EpisodeStatusEnum.NOT_DOWNLOADED,
             playingStatus = EpisodePlayingStatus.NOT_PLAYED,
             title = getString(jsonEpisode, "title") ?: "",
