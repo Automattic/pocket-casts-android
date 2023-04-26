@@ -4,5 +4,5 @@ import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 data class AuthResultModel(
     val token: AccessToken,
     val uuid: String,
-    val isNewAccount: Boolean
+    val isNewAccount: Boolean,
 )

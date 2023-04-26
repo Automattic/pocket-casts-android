@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
+import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -182,6 +183,7 @@ class MainActivity :
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var watchSync: WatchSync
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -718,6 +720,8 @@ class MainActivity :
 
                 settings.setTrialFinishedSeen(true)
             }
+
+            lifecycleScope.launch { watchSync.sendAuthToDataLayer() }
         }
 
         val lastSeenVersionCode = settings.getWhatsNewVersionCode()

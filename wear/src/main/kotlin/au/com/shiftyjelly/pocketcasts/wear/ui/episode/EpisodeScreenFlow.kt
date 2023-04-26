@@ -13,6 +13,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
@@ -115,7 +116,7 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
                     text = stringResource(LR.string.removed),
-                    onClick = { navController.popBackStack() },
+                    onClose = { navController.popBackStack() },
                 )
             }
 
@@ -123,7 +124,7 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
                     text = stringResource(LR.string.episode_removed_from_up_next),
-                    onClick = { navController.popBackStack() },
+                    onClose = { navController.popBackStack() },
                 )
             }
         }

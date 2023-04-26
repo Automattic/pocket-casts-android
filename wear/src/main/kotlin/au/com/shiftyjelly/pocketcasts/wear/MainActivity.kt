@@ -3,12 +3,16 @@ package au.com.shiftyjelly.pocketcasts.wear
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -16,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.SettingsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
@@ -42,24 +47,41 @@ class MainActivity : ComponentActivity() {
 
     @Inject lateinit var theme: Theme
 
+    private val viewModel: WearMainActivityViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // TODO add lines for radioactive theme
-            WearApp(theme.activeTheme)
+            val state by viewModel.state.collectAsState()
+            WearApp(
+                themeType = theme.activeTheme,
+                signInConfirmationAction = state.signInConfirmationAction,
+                onSignInConfirmationActionHandled = viewModel::onSignInConfirmationActionHandled,
+            )
         }
     }
 }
 
 @Composable
-fun WearApp(themeType: Theme.ThemeType) {
+fun WearApp(
+    themeType: Theme.ThemeType,
+    signInConfirmationAction: SignInConfirmationAction?,
+    onSignInConfirmationActionHandled: () -> Unit,
+) {
     WearAppTheme(themeType) {
+
         val navController = rememberSwipeDismissableNavController()
 
         WearNavScaffold(
             navController = navController,
             startDestination = WatchListScreen.route
         ) {
+
+            handleSignInConfirmation(
+                signInConfirmationAction = signInConfirmationAction,
+                onSignInConfirmationActionHandled = onSignInConfirmationActionHandled,
+                navController = navController
+            )
 
             scrollable(
                 route = WatchListScreen.route,
@@ -172,12 +194,50 @@ fun WearApp(themeType: Theme.ThemeType) {
             }
 
             authenticationGraph(navController)
+
+            composable(LoggingInScreen.route) {
+                LoggingInScreen(
+                    onClose = { navController.popBackStack() },
+                )
+            }
         }
     }
+}
+
+private fun handleSignInConfirmation(
+    signInConfirmationAction: SignInConfirmationAction?,
+    onSignInConfirmationActionHandled: () -> Unit,
+    navController: NavController,
+) {
+
+    val signInNotificationShowing = navController.currentDestination?.route == LoggingInScreen.route
+
+    when (signInConfirmationAction) {
+
+        is SignInConfirmationAction.Show -> {
+            if (!signInNotificationShowing) {
+                navController.navigate(LoggingInScreen.route)
+            }
+        }
+
+        SignInConfirmationAction.Hide -> {
+            if (signInNotificationShowing) {
+                navController.popBackStack()
+            }
+        }
+
+        null -> { /* do nothing */ }
+    }
+
+    onSignInConfirmationActionHandled()
 }
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    WearApp(Theme.ThemeType.DARK)
+    WearApp(
+        themeType = Theme.ThemeType.DARK,
+        signInConfirmationAction = null,
+        onSignInConfirmationActionHandled = {},
+    )
 }
