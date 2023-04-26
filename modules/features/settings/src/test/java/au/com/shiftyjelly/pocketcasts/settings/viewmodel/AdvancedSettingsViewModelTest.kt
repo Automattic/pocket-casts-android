@@ -16,7 +16,6 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @RunWith(MockitoJUnitRunner::class)
 class AdvancedSettingsViewModelTest {
