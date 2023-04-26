@@ -101,29 +101,38 @@ fun LoggingInScreen(
                     // Without this if "xxxx@gmail.com" ran just a bit long, it would get shortened
                     // to "xxx@gmail".
                     softWrap = false,
-                    modifier = Modifier
-                        .drawWithContent {
-                            drawContent()
-
-                            // Use < instead of <= because text that doesn't fit will have a width that is equal
-                            // to the available space
-                            val textFits = size.width < widthPx
-
-                            if (!textFits) {
-                                // Apply a fade out gradient to the end of the text to indicate overflow
-                                drawRect(
-                                    // Add a bit of extra width so the gradient goes to the end of the screen
-                                    size = Size(size.width * 1.2f, size.height),
-                                    brush = Brush.horizontalGradient(
-                                        0.7f to Color.Transparent,
-                                        1.0f to background,
-                                    ),
-                                )
-                            }
-                        }
+                    modifier = Modifier.fadeOutOverflow(
+                        overFlowWidthPx = widthPx.toInt(),
+                        backgroundColor = background
+                    )
                 )
             }
         }
+    }
+}
+
+private fun Modifier.fadeOutOverflow(
+    overFlowWidthPx: Int,
+    backgroundColor: Color,
+) = drawWithContent {
+
+    // draw text first
+    drawContent()
+
+    // Use < instead of <= because text that doesn't fit will have a width that is equal
+    // to the available space
+    val textFits = size.width < overFlowWidthPx
+
+    if (!textFits) {
+        // Apply a gradient over the end of the text that fades in the background color to indicate overflow
+        drawRect(
+            // Add a bit of extra width so the gradient goes to the end of the screen
+            size = Size(size.width * 1.2f, size.height),
+            brush = Brush.horizontalGradient(
+                0.7f to Color.Transparent,
+                1.0f to backgroundColor,
+            ),
+        )
     }
 }
 
