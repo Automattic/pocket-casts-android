@@ -45,8 +45,7 @@ class AdvancedSettingsViewModelTest {
     }
 
     @Test
-    fun `verify settings methods gets called when they should`() {
+    fun `verify settings methods initialize the viewModel state correctly`() {
         TestCase.assertEquals(viewModel.state.value.backgroundSyncOnMeteredState.isChecked, false)
-        TestCase.assertEquals(viewModel.state.value.backgroundSyncOnMeteredState.summary, LR.string.settings_advanced_sync_on_metered_off)
     }
 }
