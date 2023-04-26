@@ -65,8 +65,8 @@ class AdvancedSettingsViewModel
     ) {
 
         data class BackgroundSyncOnMeteredState(
-            val isChecked: Boolean = true,
-            val isEnabled: Boolean = true,
+            val isChecked: Boolean,
+            val isEnabled: Boolean,
             val onCheckedChange: (Boolean) -> Unit,
         )
     }
