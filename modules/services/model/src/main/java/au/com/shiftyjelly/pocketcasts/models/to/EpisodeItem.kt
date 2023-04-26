@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import java.util.Date
 
 data class EpisodeItem(
@@ -12,7 +12,7 @@ data class EpisodeItem(
     val podcastTitle: String,
 ) {
     fun toEpisode() =
-        Episode(
+        PodcastEpisode(
             uuid = uuid,
             title = title,
             duration = duration,

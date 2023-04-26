@@ -3,10 +3,10 @@ package au.com.shiftyjelly.pocketcasts.models.to
 import android.content.Context
 import android.content.res.Resources
 import androidx.annotation.StringRes
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((Episode) -> Int)?) {
+sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((PodcastEpisode) -> Int)?) {
     companion object {
         val All
             get() = listOf(None, Downloaded, Unplayed, Season, Starred)
@@ -42,7 +42,7 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
             return groupTitlesList.getOrNull(index) ?: context.getString(LR.string.podcast_no_season)
         }
 
-        override fun formGroups(episodes: List<Episode>, reversedSort: Boolean, resources: Resources): List<List<Episode>> {
+        override fun formGroups(episodes: List<PodcastEpisode>, reversedSort: Boolean, resources: Resources): List<List<PodcastEpisode>> {
             val list = super.formGroups(episodes, reversedSort, resources)
             val titleList = mutableListOf<String>()
             list.forEach {
@@ -77,9 +77,9 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
      * @param episodes A sorted list of episodes
      * @return A pair of episodes and their group indexes
      */
-    open fun formGroups(episodes: List<Episode>, reversedSort: Boolean = false, resources: Resources): List<List<Episode>> {
+    open fun formGroups(episodes: List<PodcastEpisode>, reversedSort: Boolean = false, resources: Resources): List<List<PodcastEpisode>> {
         val sortFunction = this.sortFunction ?: return listOf(episodes)
-        val groups = mutableListOf<MutableList<Episode>>()
+        val groups = mutableListOf<MutableList<PodcastEpisode>>()
 
         episodes.forEach { episode ->
             val groupId = sortFunction(episode)

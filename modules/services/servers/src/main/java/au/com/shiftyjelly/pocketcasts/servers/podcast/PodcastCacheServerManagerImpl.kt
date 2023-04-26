@@ -34,4 +34,7 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
             EpisodeSearch(it.episodes.map { result -> result.toEpisodeItem() })
         }
     }
+
+    override suspend fun getPodcastRatings(podcastUuid: String) =
+        server.getPodcastRatings(podcastUuid).toPodcastRatings(podcastUuid)
 }

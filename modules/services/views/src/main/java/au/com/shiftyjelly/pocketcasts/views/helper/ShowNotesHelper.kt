@@ -15,7 +15,8 @@ object ShowNotesHelper {
 
     // searches for the first closing tag that comes after a potential timeskip and compares it to url closing tag (</a>)
     private fun matchIsInUrl(match: MatchResult, html: String): Boolean {
-        val closingTagRegex = "</\\w+>".toRegex()
-        return closingTagRegex.find(html.substring(match.range.first))?.value == "</a>"
+        // try to find by the <a> tag first (either <a href=...> or <a>)
+        val tagRegex = "<a(?:\\s|>)|</a>".toRegex()
+        return tagRegex.find(html.substring(match.range.first))?.value == "</a>"
     }
 }

@@ -94,7 +94,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
     private fun playNow(episodeUuid: String, forceStream: Boolean) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playNow(episode, forceStream = forceStream, playbackSource = source)
             }
         }
@@ -102,7 +102,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
     private fun downloadEpisode(episodeUuid: String) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 DownloadHelper.manuallyDownloadEpisodeNow(episode, "download from intent", downloadManager, episodeManager)
             }
         }
@@ -110,7 +110,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
     private fun markAsPlayed(episodeUuid: String) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episodeUuid)
             }
@@ -128,7 +128,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
     private fun playNext(episodeUuid: String) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playNext(episode = episode, source = source)
             }
         }
@@ -136,7 +136,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
 
     private fun playLast(episodeUuid: String, playNext: Boolean) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playLast(episode = episode, source = source)
                 if (playNext) {
                     playbackManager.playNextInQueue(playbackSource = source)

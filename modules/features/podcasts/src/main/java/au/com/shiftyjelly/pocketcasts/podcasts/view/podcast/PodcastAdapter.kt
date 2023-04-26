@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -26,15 +27,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterPodcastHeaderBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
+import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -58,7 +63,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
         return when {
             oldItem is Podcast && newItem is Podcast -> true
             oldItem is PodcastAdapter.EpisodeHeader && newItem is PodcastAdapter.EpisodeHeader -> true
-            oldItem is Episode && newItem is Episode -> oldItem.uuid == newItem.uuid
+            oldItem is PodcastEpisode && newItem is PodcastEpisode -> oldItem.uuid == newItem.uuid
             oldItem is PodcastAdapter.DividerRow && newItem is PodcastAdapter.DividerRow -> oldItem.groupIndex == newItem.groupIndex
             else -> oldItem == newItem
         }
@@ -89,21 +94,22 @@ class PodcastAdapter(
     val settings: Settings,
     val theme: Theme,
     var fromListUuid: String?,
-    private val onHeaderSummaryToggled: (Boolean) -> Unit,
+    private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
     private val onEpisodesOptionsClicked: () -> Unit,
-    private val onRowLongPress: (episode: Episode) -> Unit,
+    private val onRowLongPress: (episode: PodcastEpisode) -> Unit,
     private val onFoldersClicked: () -> Unit,
     private val onNotificationsClicked: () -> Unit,
     private val onSettingsClicked: () -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
-    private val onRowClicked: (Episode) -> Unit,
+    private val onRowClicked: (PodcastEpisode) -> Unit,
     private val onSearchQueryChanged: (String) -> Unit,
     private val onSearchFocus: () -> Unit,
     private val onShowArchivedClicked: () -> Unit,
     private val multiSelectHelper: MultiSelectHelper,
-    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit
+    private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit,
+    private val ratingsViewModel: PodcastRatingsViewModel,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -170,6 +176,12 @@ class PodcastAdapter(
         holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
         holder.binding.isPlusUser = signedInAsPlus
 
+        holder.binding.bottom.ratings.setContent {
+            AppTheme(theme.activeTheme) {
+                StarRatingView(ratingsViewModel)
+            }
+        }
+
         val context = holder.itemView.context
         val imageLoader = PodcastImageLoaderThemed(context)
         val imageView = holder.binding.top.artwork
@@ -221,7 +233,7 @@ class PodcastAdapter(
     }
 
     private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, position: Int, fromListUuid: String?) {
-        val episode = getItem(position) as? Episode ?: return
+        val episode = getItem(position) as? PodcastEpisode ?: return
         holder.setup(episode, fromListUuid, ThemeColor.podcastIcon02(theme.activeTheme, tintColor), playButtonListener, settings.streamingMode() || castConnected, settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables)
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
@@ -264,6 +276,11 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
+            if (BuildConfig.SHOW_RATINGS) {
+                ratingsViewModel.loadRatings(podcast.uuid)
+                ratingsViewModel.refreshPodcastRatings(podcast.uuid)
+            }
+            onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
         notifyDataSetChanged()
@@ -278,7 +295,7 @@ class PodcastAdapter(
         notifyItemChanged(0)
     }
 
-    fun setEpisodes(episodes: List<Episode>, showingArchived: Boolean, episodeCount: Int, archivedCount: Int, searchTerm: String, episodeLimit: Int?, episodeLimitIndex: Int?, grouping: PodcastGrouping, episodesSortType: EpisodesSortType, context: Context) {
+    fun setEpisodes(episodes: List<PodcastEpisode>, showingArchived: Boolean, episodeCount: Int, archivedCount: Int, searchTerm: String, episodeLimit: Int?, episodeLimitIndex: Int?, grouping: PodcastGrouping, episodesSortType: EpisodesSortType, context: Context) {
         val groupingFunction = grouping.sortFunction
         val episodesPlusLimit: MutableList<Any> = episodes.toMutableList()
         if (episodeLimit != null && episodeLimitIndex != null && groupingFunction == null) {
@@ -345,7 +362,7 @@ class PodcastAdapter(
             is EpisodeLimitRow -> Long.MAX_VALUE - 2
             is NoEpisodeMessage -> Long.MAX_VALUE - 3
             is DividerRow -> item.groupIndex.toLong()
-            is Episode -> item.adapterId
+            is PodcastEpisode -> item.adapterId
             else -> throw IllegalStateException("Unknown item type")
         }
     }
@@ -374,7 +391,7 @@ class PodcastAdapter(
         val expanded = binding.bottom.root.toggleVisibility()
         binding.top.chevron.isEnabled = expanded
         headerExpanded = expanded
-        onHeaderSummaryToggled(expanded)
+        onHeaderSummaryToggled(expanded, true)
     }
 
     private fun onWebsiteLinkClicked(context: Context) {
@@ -451,6 +468,9 @@ class PodcastAdapter(
             binding.bottom.linkText.setOnClickListener {
                 adapter.onWebsiteLinkClicked(it.context)
             }
+            binding.bottom.ratings.setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
         }
 
         private fun unsubscribe() {

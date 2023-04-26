@@ -34,7 +34,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
@@ -53,7 +53,7 @@ object DownloadsScreen {
 @Composable
 fun DownloadsScreen(
     columnState: ScalingLazyColumnState,
-    onItemClick: (Episode) -> Unit,
+    onItemClick: (PodcastEpisode) -> Unit,
 ) {
 
     val viewModel = hiltViewModel<DownloadsScreenViewModel>()
@@ -65,8 +65,8 @@ fun DownloadsScreen(
 @Composable
 private fun Content(
     columnState: ScalingLazyColumnState,
-    episodes: List<Episode>?,
-    onItemClick: (Episode) -> Unit,
+    episodes: List<PodcastEpisode>?,
+    onItemClick: (PodcastEpisode) -> Unit,
 ) {
     ScalingLazyColumn(
         columnState = columnState,
@@ -93,7 +93,7 @@ private fun Content(
 }
 
 @Composable
-private fun Download(episode: Episode, onClick: () -> Unit) {
+private fun Download(episode: PodcastEpisode, onClick: () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -171,7 +171,7 @@ private fun DownloadsScreenPreview() {
             columnState = ScalingLazyColumnState(),
             onItemClick = {},
             episodes = listOf(
-                Episode(
+                PodcastEpisode(
                     uuid = "57853d71-30ac-4477-af73-e8fe2b1d4dda",
                     podcastUuid = "b643cb50-2c52-013b-ef7a-0acc26574db2",
                     title = "Such a great episode title, but it's so long that it is definitely going to be more than two lines",
@@ -179,7 +179,7 @@ private fun DownloadsScreenPreview() {
                     playedUpTo = 0.0,
                     duration = 20.0,
                 ),
-                Episode(
+                PodcastEpisode(
                     uuid = "c146e703-e408-4979-852c-f9927ce19ef7",
                     podcastUuid = "3df2e780-0063-0135-ec79-4114446340cb",
                     title = "1 line title",

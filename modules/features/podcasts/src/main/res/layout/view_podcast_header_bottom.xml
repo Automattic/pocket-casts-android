@@ -53,6 +53,13 @@
             app:layout_constraintTop_toBottomOf="@+id/title"
             tools:text="@tools:sample/lorem" />
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/ratings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/category"/>
+
         <TextView
             android:id="@+id/description"
             android:layout_width="0dp"
@@ -70,7 +77,7 @@
             app:readMore="@{3}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/category"
+            app:layout_constraintTop_toBottomOf="@+id/ratings"
             tools:text="@tools:sample/lorem/random" />
 
         <TextView

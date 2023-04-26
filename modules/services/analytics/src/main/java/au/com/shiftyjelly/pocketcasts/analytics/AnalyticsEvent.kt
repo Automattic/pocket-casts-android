@@ -538,4 +538,7 @@ enum class AnalyticsEvent(val key: String) {
     CHROMECAST_VIEW_SHOWN("chromecast_view_shown"),
     CHROMECAST_STARTED_CASTING("chromecast_started_casting"),
     CHROMECAST_STOPPED_CASTING("chromecast_stopped_casting"),
+
+    /* Ratings */
+    RATING_STARS_TAPPED("rating_stars_tapped"),
 }

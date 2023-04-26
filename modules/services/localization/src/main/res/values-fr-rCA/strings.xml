@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-03-22 13:54:03+0000
+Translation-Revision-Date: 2023-04-12 15:54:05+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="add_to_up_next_question">Ajouter à la suite ?</string>
+    <string name="wear_show_password">Afficher le mot de passe</string>
+    <string name="wear_hide_password">Masquer le mot de passe</string>
+    <string name="settings_metered_data_warning">Avertissement relatif aux données mesurées</string>
+    <string name="stream_warning_summary_short">La diffusion en streaming va consommer des données. Continuer ?</string>
+    <string name="removed">Supprimés</string>
+    <string name="mark_unplayed">Marquer comme non lu</string>
+    <string name="log_out">Déconnexion</string>
+    <string name="account">Compte</string>
     <string name="profile_just_sign_out">Il suffit de vous déconnecter</string>
     <string name="profile_clear_data_would_you_also_like_question">Voulez-vous aussi effacer toutes les données de l’application ?</string>
     <string name="profile_clear_data_question">Effacer les données ?</string>
@@ -143,6 +152,7 @@ Language: fr
     <string name="onboarding_discover_your_next_favorite_podcast">Découvrir votre prochain podcast préféré</string>
     <string name="onboarding_continue_with_google">Continuer avec Google</string>
     <string name="onboarding_welcome_back">Bon retour</string>
+    <string name="log_in">Connexion</string>
     <string name="end_of_year_create_account_to_see">Enregistrez vos podcasts dans le cloud, obtenez votre bilan de fin d’année et synchronisez votre progression avec d’autres appareils.</string>
     <string name="end_of_year_story_top_categories_share_text">Mes catégories de podcasts les plus écoutés</string>
     <string name="end_of_year_story_top_categories">Vos meilleures catégories</string>

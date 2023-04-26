@@ -23,6 +23,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.extractor.DefaultExtractorsFactory
+import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
@@ -51,16 +62,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.target.Target
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Tracks
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
-import com.google.android.exoplayer2.extractor.mp3.Mp3Extractor
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.upstream.DefaultDataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -162,6 +163,7 @@ class AddFileActivity :
         binding.upgradeLayout.root.isVisible = readOnly && !settings.getUpgradeClosedAddFile() && !loading
     }
 
+    @UnstableApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
@@ -292,6 +294,7 @@ class AddFileActivity :
         startActivity(OnboardingActivity.newInstance(this, onboardingFlow))
     }
 
+    @UnstableApi
     @Suppress("NAME_SHADOWING")
     private fun setupForNewFile(fileUri: Uri?) {
         val fileUri = fileUri ?: return
@@ -369,6 +372,7 @@ class AddFileActivity :
         binding.btnImage.text = getString(LR.string.profile_files_add_custom_image)
     }
 
+    @UnstableApi
     @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -667,6 +671,7 @@ class AddFileActivity :
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), ACTION_PICK_IMAGE)
     }
 
+    @UnstableApi
     private fun preparePlayer(uri: Uri) {
         val loadControl = DefaultLoadControl.Builder().setBufferDurationsMs(0, 0, 0, 0).build()
         val player = ExoPlayer.Builder(this).setLoadControl(loadControl).build()

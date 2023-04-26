@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -132,7 +132,7 @@ class PodcastListViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: Episode) -> Unit) {
+    fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
         podcastManager.findOrDownloadPodcastRx(discoverEpisode.podcast_uuid)
             .flatMapMaybe { episodeManager.findByUuidRx(discoverEpisode.uuid) }
             .subscribeOn(Schedulers.io())
@@ -150,7 +150,7 @@ class PodcastListViewModel @Inject constructor(
             .addTo(disposables)
     }
 
-    fun playEpisode(episode: Episode) {
+    fun playEpisode(episode: PodcastEpisode) {
         playbackManager.playNow(episode, forceStream = true, playbackSource = AnalyticsSource.DISCOVER_PODCAST_LIST)
     }
 

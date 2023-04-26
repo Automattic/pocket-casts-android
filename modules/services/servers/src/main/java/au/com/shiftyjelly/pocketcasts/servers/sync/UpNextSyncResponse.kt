@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
@@ -22,8 +22,8 @@ data class UpNextSyncResponse(
         @field:Json(name = "podcast") val podcast: String?,
         @field:Json(name = "published") val published: String?
     ) {
-        fun toSkeletonEpisode(podcastUuid: String): au.com.shiftyjelly.pocketcasts.models.entity.Episode {
-            return Episode(
+        fun toSkeletonEpisode(podcastUuid: String): PodcastEpisode {
+            return PodcastEpisode(
                 uuid = uuid,
                 publishedDate = published?.parseIsoDate() ?: Date(),
                 addedDate = Date(),

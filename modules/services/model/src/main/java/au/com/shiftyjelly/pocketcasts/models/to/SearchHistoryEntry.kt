@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode as EpisodeModel
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder as FolderModel
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastModel
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as EpisodeModel
 
 sealed class SearchHistoryEntry(
     val id: Long? = null,

@@ -10,11 +10,13 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
+import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
+import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.download.ResponseValidationResult
@@ -32,10 +34,9 @@ import io.reactivex.ObservableEmitter
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.await
 import okhttp3.Call
-import okhttp3.Dispatcher
+import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import timber.log.Timber
@@ -52,8 +53,11 @@ import java.io.RandomAccessFile
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.util.concurrent.TimeUnit
+import javax.inject.Provider
 import javax.net.ssl.SSLHandshakeException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private class UnderscoreInHostName : Exception("Download URL is invalid, as it contains an underscore in the hostname. Please contact the podcast author to resolve this.")
@@ -64,7 +68,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     var downloadManager: DownloadManager,
     var episodeManager: EpisodeManager,
-    var userEpisodeManager: UserEpisodeManager
+    var userEpisodeManager: UserEpisodeManager,
+    @DownloadCallFactory private val callFactory: Call.Factory,
+    @DownloadRequestBuilder private val requestBuilderProvider: Provider<Request.Builder>
 ) : Worker(context, params) {
 
     companion object {
@@ -99,25 +105,13 @@ class DownloadEpisodeTask @AssistedInject constructor(
         const val OUTPUT_CANCELLED = "cancelled"
     }
 
-    private lateinit var episode: Playable
+    private lateinit var episode: BaseEpisode
     private val episodeUUID: String? = inputData.getString(INPUT_EPISODE_UUID)
     private val pathToSaveTo: String? = inputData.getString(INPUT_PATH_TO_SAVE_TO)
     private val tempDownloadPath: String? = inputData.getString(INPUT_TEMP_PATH)
 
     private var bytesDownloadedSoFar: Long = 0
     private var bytesRemaining: Long = 0
-
-    private val okHttpClient by lazy {
-        val dispatcher = Dispatcher()
-        dispatcher.maxRequestsPerHost = 5
-        val builder = OkHttpClient.Builder()
-            .dispatcher(dispatcher)
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-
-        builder.build()
-    }
 
     override fun doWork(): Result {
         if (isStopped) {
@@ -128,7 +122,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         val outputData = Data.Builder().putString(OUTPUT_EPISODE_UUID, episodeUUID).build()
 
         return try {
-            this.episode = runBlocking { episodeManager.findPlayableByUuid(episodeUUID!!) } ?: return Result.failure()
+            this.episode = runBlocking { episodeManager.findEpisodeByUuid(episodeUUID!!) } ?: return Result.failure()
 
             if (this.episode.downloadTaskId != id.toString()) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Mismatched download task id for episode ${episode.title}. Cancelling.")
@@ -228,7 +222,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                         emitter.onComplete()
                     }
                 } else {
-                    downloadFile(tempDownloadPath!!, okHttpClient, 1, emitter)
+                    downloadFile(tempDownloadPath!!, callFactory, 1, emitter)
                     if (!emitter.isDisposed) {
                         emitter.onComplete()
                     }
@@ -243,7 +237,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
         }
     }
 
-    private fun downloadFile(tempDownloadPath: String, httpClient: OkHttpClient, tryCount: Int, emitter: ObservableEmitter<DownloadProgressUpdate>) {
+    private fun downloadFile(tempDownloadPath: String, httpClient: Call.Factory, tryCount: Int, emitter: ObservableEmitter<DownloadProgressUpdate>) {
         if (emitter.isDisposed || isStopped || pathToSaveTo == null) {
             return
         }
@@ -269,7 +263,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 throw UnderscoreInHostName()
             }
 
-            val requestBuilder = Request.Builder()
+            val requestBuilder = requestBuilderProvider.get()
                 .url(downloadUrl)
                 .header("User-Agent", "Pocket Casts")
 
@@ -294,7 +288,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                     .header("Accept-Encoding", "identity")
                     .build()
                 call = httpClient.newCall(request)
-                response = call.execute()
+                response = call.blockingEnqueue()
 
                 if (response.code != HTTP_RESUME_SUPPORTED) {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Resuming ${episode.title} not supported, restarting download.")
@@ -313,7 +307,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
             if (response == null) {
                 val request = requestBuilder.build()
                 call = httpClient.newCall(request)
-                response = call.execute()
+                response = call.blockingEnqueue()
             }
 
             if (emitter.isDisposed || isStopped) {
@@ -602,7 +596,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
         val progress = bytesDownloadedSoFar.toFloat() / totalSize
         val total = bytesRemaining + bytesDownloadedSoFar
-        val podcastUuid = (episode as? Episode)?.podcastUuid
+        val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
 
         return DownloadProgressUpdate(
             episode.uuid,
@@ -646,3 +640,22 @@ class DownloadEpisodeTask @AssistedInject constructor(
 
     class DownloadFailed(val exception: Exception?, message: String, val retry: Boolean) : Exception(message)
 }
+
+/**
+ * Have to use enqueue for high bandwidth requests on the watch app
+ * See https://github.com/google/horologist/blob/7bd044a4766e379f85ee3f5a01272853eec3155d/network-awareness/src/main/java/com/google/android/horologist/networks/okhttp/impl/HighBandwidthCall.kt#L93-L92
+ */
+private fun Call.blockingEnqueue(): Response =
+    runBlocking {
+        suspendCoroutine { cont ->
+            this@blockingEnqueue.enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    cont.resumeWithException(e)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    cont.resume(response)
+                }
+            })
+        }
+    }

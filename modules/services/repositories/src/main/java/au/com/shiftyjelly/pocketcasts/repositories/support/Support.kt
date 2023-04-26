@@ -12,8 +12,8 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.toPublisher
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -293,7 +293,7 @@ class Support @Inject constructor(
                 } else {
                     val episode = queue.first()
                     output.append("Episode: ").append(episode.title).append(eol)
-                    if (episode is Episode) {
+                    if (episode is PodcastEpisode) {
                         output.append("Podcast: ").append(episode.podcastUuid).append(eol)
                     } else {
                         output.append("Cloud File")

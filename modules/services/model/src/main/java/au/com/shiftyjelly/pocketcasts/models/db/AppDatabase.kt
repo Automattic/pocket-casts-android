@@ -25,16 +25,18 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastRatingsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SearchHistoryDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
@@ -45,7 +47,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Database(
     entities = [
         AnonymousBumpStat::class,
-        Episode::class,
+        PodcastEpisode::class,
         Folder::class,
         Playlist::class,
         PlaylistEpisode::class,
@@ -54,8 +56,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UpNextChange::class,
         UpNextEpisode::class,
         UserEpisode::class,
+        PodcastRatings::class
     ],
-    version = 74,
+    version = 76,
     exportSchema = true
 )
 @TypeConverters(
@@ -81,6 +84,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun folderDao(): FolderDao
     abstract fun bumpStatsDao(): BumpStatsDao
     abstract fun searchHistoryDao(): SearchHistoryDao
+    abstract fun podcastRatingsDao(): PodcastRatingsDao
 
     companion object {
         // This seems dodgy but I got it from Google, https://github.com/googlesamples/android-sunflower/blob/master/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt
@@ -407,6 +411,23 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_podcast_uuid` ON search_history (`podcast_uuid`);")
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_folder_uuid` ON search_history (`folder_uuid`)")
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_episode_uuid` ON search_history (`episode_uuid`)")
+        }
+
+        val MIGRATION_74_75 = addMigration(74, 75) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS podcast_ratings (
+                        podcast_uuid TEXT NOT NULL, 
+                        average REAL NOT NULL, 
+                        total INTEGER, 
+                        PRIMARY KEY(`podcast_uuid`)
+                    );
+                """.trimIndent()
+            )
+        }
+
+        val MIGRATION_75_76 = addMigration(75, 76) { database ->
+            database.execSQL("ALTER TABLE episodes RENAME TO podcast_episodes")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
@@ -772,7 +793,9 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_70_71,
                 MIGRATION_71_72,
                 MIGRATION_72_73,
-                MIGRATION_73_74
+                MIGRATION_73_74,
+                MIGRATION_74_75,
+                MIGRATION_75_76,
             )
         }
 
