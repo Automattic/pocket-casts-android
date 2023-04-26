@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,8 +37,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun EpisodeChip(episode: BaseEpisode, onClick: () -> Unit) {
@@ -58,12 +63,19 @@ fun EpisodeChip(episode: BaseEpisode, onClick: () -> Unit) {
             .observeByUuid(episode)
             .collectAsState()
 
+        val queueState by viewModel.upNextQueue.collectAsState(UpNextQueue.State.Empty)
+        val upNextQueue = (queueState as? UpNextQueue.State.Loaded)
+            ?.queue
+            ?: emptyList()
+        val isInUpNextQueue = upNextQueue.any { it.uuid == episode.uuid }
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.height(IntrinsicSize.Max)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
 
                 EpisodeImage(
@@ -73,14 +85,29 @@ fun EpisodeChip(episode: BaseEpisode, onClick: () -> Unit) {
                         .clip(RoundedCornerShape(4.dp)),
                 )
 
-                if (episode.isDownloaded) {
-                    Spacer(Modifier.height(4.dp))
-                    Icon(
-                        painter = painterResource(R.drawable.ic_downloaded),
-                        contentDescription = null,
-                        tint = MaterialTheme.theme.colors.support02,
-                        modifier = Modifier.size(12.dp),
-                    )
+                if (episode.isDownloaded || isInUpNextQueue) {
+                    Row(
+                        horizontalArrangement = spacedBy(4.dp),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        if (isInUpNextQueue) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_upnext),
+                                contentDescription = stringResource(LR.string.episode_in_up_next),
+                                tint = MaterialTheme.theme.colors.support01,
+                                modifier = Modifier.size(12.dp),
+                            )
+                        }
+
+                        if (episode.isDownloaded) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_downloaded),
+                                contentDescription = stringResource(LR.string.downloaded),
+                                tint = MaterialTheme.theme.colors.support02,
+                                modifier = Modifier.size(12.dp),
+                            )
+                        }
+                    }
                 }
             }
 
