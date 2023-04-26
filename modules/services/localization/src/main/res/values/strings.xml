@@ -1261,6 +1261,7 @@
     <string name="settings_notification_default_sound">Default sound</string>
     <string name="settings_import_title">Import subscriptions</string>
     <string name="settings_status_page">Status Page</string>
+    <string name="settings_logs">Logs</string>
     <string name="settings_status_description">Check your connection with important services. This helps diagnose issues with your network, proxies, VPN, ad-blocking and security apps.</string>
     <string name="settings_status_service_internet">Internet Connection</string>
     <string name="settings_status_run">Run now</string>

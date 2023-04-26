@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_logs"
+        android:title="@string/settings_logs"
+        android:icon="@drawable/baseline_view_list_24"
+        app:showAsAction="always" />
     <item android:id="@+id/menu_status_page"
         android:title="@string/settings_status_page"
         android:icon="@drawable/ic_status_page"
