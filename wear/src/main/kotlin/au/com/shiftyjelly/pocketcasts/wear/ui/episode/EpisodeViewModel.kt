@@ -9,9 +9,12 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
@@ -29,6 +32,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -55,11 +59,11 @@ class EpisodeViewModel @Inject constructor(
 
     sealed class State {
         data class Loaded(
-            val episode: PodcastEpisode,
-            val podcast: Podcast,
+            val episode: BaseEpisode,
+            val podcast: Podcast?,
             val isPlayingEpisode: Boolean,
             val inUpNext: Boolean,
-            val tintColor: Color,
+            val tintColor: Color?,
             val downloadProgress: Float? = null,
             val showNotes: String? = null,
         ) : State()
@@ -94,11 +98,13 @@ class EpisodeViewModel @Inject constructor(
             ?: throw IllegalStateException("EpisodeViewModel must have an episode uuid in the SavedStateHandle")
 
         val episodeFlow = episodeManager
-            .observeByUuid(episodeUuid)
+            .observeEpisodeByUuid(episodeUuid)
 
-        val podcastFlow = episodeFlow.map {
-            podcastManager.findPodcastByUuidSuspend(it.podcastUuid)
-        }
+        val podcastFlow = episodeFlow
+            .filterIsInstance<PodcastEpisode>()
+            .map {
+                podcastManager.findPodcastByUuidSuspend(it.podcastUuid)
+            }
 
         val isPlayingEpisodeFlow = playbackManager.playbackStateRelay.asFlow()
             .filter { it.episodeUuid == episodeUuid }
@@ -125,20 +131,21 @@ class EpisodeViewModel @Inject constructor(
 
             combine6(
                 episodeFlow,
-                podcastFlow,
                 // Emitting a value "onStart" for the flows that don't need to block the UI
+                podcastFlow.onStart { emit(null) },
                 isPlayingEpisodeFlow.onStart { emit(false) },
                 inUpNextFlow,
                 downloadProgressFlow.onStart<Float?> { emit(null) },
                 showNotesFlow.onStart { emit(null) }
             ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotes ->
+
+                val inUpNext = (upNext is UpNextQueue.State.Loaded) &&
+                    (upNext.queue + upNext.episode)
+                        .map { it.uuid }
+                        .contains(episode.uuid)
+
                 if (podcast != null) {
                     val podcastTint = podcast.getTintColor(theme.isDarkTheme)
-
-                    val inUpNext = (upNext is UpNextQueue.State.Loaded) &&
-                        (upNext.queue + upNext.episode)
-                            .map { it.uuid }
-                            .contains(episode.uuid)
 
                     val tint = ThemeColor.podcastIcon02(theme.activeTheme, podcastTint)
                     val tintColor = Color(tint)
@@ -153,7 +160,22 @@ class EpisodeViewModel @Inject constructor(
                         showNotes = showNotes,
                     )
                 } else {
-                    State.Empty
+
+                    val tintColor = AddFileActivity.darkThemeColors().find {
+                        (episode as? UserEpisode)?.tintColorIndex == it.tintColorIndex
+                    }?.let {
+                        Color(it.color)
+                    }
+
+                    State.Loaded(
+                        episode = episode,
+                        podcast = null,
+                        isPlayingEpisode = isPlayingEpisode,
+                        downloadProgress = downloadProgress,
+                        inUpNext = inUpNext,
+                        tintColor = tintColor,
+                        showNotes = showNotes,
+                    )
                 }
             }.collect {
                 _stateFlow.value = it
@@ -167,7 +189,14 @@ class EpisodeViewModel @Inject constructor(
             val fromString = "wear episode screen"
 
             if (episode.downloadTaskId != null) {
-                episodeManager.stopDownloadAndCleanUp(episode, fromString)
+                when (episode) {
+                    is PodcastEpisode -> {
+                        episodeManager.stopDownloadAndCleanUp(episode, fromString)
+                    }
+                    is UserEpisode -> {
+                        downloadManager.removeEpisodeFromQueue(episode, fromString)
+                    }
+                }
 
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED,
@@ -273,6 +302,10 @@ class EpisodeViewModel @Inject constructor(
 
     fun onArchiveClicked() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
+        if (episode !is PodcastEpisode) {
+            Timber.e("Attempted to archive a non-podcast episode")
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             if (episode.isArchived) {
                 episodeManager.unarchive(episode)
@@ -286,6 +319,11 @@ class EpisodeViewModel @Inject constructor(
 
     fun onStarClicked() {
         (stateFlow.value as? State.Loaded)?.episode?.let { episode ->
+            if (episode !is PodcastEpisode) {
+                Timber.e("Attempted to star a non-podcast episode")
+                return
+            }
+
             episodeManager.toggleStarEpisodeAsync(episode)
             val event = if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
             episodeAnalytics.trackEvent(event, analyticsSource, episode.uuid)
