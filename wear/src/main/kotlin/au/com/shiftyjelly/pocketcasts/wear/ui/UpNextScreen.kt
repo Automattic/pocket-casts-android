@@ -42,44 +42,51 @@ fun UpNextScreen(
 
         null -> { /* Show nothing while loading */ }
 
-        UpNextQueue.State.Empty -> {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(
-                    text = stringResource(LR.string.player_up_next_empty),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.title3,
-                )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(LR.string.player_up_next_empty_desc_watch),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.body2,
-                )
-            }
-        }
+        UpNextQueue.State.Empty -> EmptyQueueState()
 
         is UpNextQueue.State.Loaded -> {
             val list = (queueState as UpNextQueue.State.Loaded).queue
-            ScalingLazyColumn(
-                state = listState,
-                modifier = modifier.fillMaxWidth(),
-            ) {
+            if (list.isEmpty()) {
+                EmptyQueueState()
+            } else {
+                ScalingLazyColumn(
+                    state = listState,
+                    modifier = modifier.fillMaxWidth(),
+                ) {
 
-                item { ScreenHeaderChip(LR.string.up_next) }
+                    item { ScreenHeaderChip(LR.string.up_next) }
 
-                items(list) { episode ->
-                    EpisodeChip(
-                        episode = episode,
-                        onClick = {
-                            navigateToEpisode(episode.uuid)
-                        },
-                    )
+                    items(list) { episode ->
+                        EpisodeChip(
+                            episode = episode,
+                            onClick = {
+                                navigateToEpisode(episode.uuid)
+                            },
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyQueueState() {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = stringResource(LR.string.player_up_next_empty),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.title3,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = stringResource(LR.string.player_up_next_empty_desc_watch),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.body2,
+        )
     }
 }
