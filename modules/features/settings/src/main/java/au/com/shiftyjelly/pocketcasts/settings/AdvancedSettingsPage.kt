@@ -75,13 +75,13 @@ private fun SyncOnMeteredRow(
 ) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_advanced_sync_on_metered),
+        secondaryText = stringResource(LR.string.settings_advanced_sync_on_metered_summary),
         toggle = SettingRowToggle.Switch(state.isChecked, state.isEnabled),
         modifier = modifier.toggleable(
             value = state.isChecked,
             role = Role.Switch
         ) { state.onCheckedChange(it) }
     )
-    SettingRow(primaryText = "", secondaryText = stringResource(LR.string.settings_advanced_sync_on_metered_summary))
 }
 
 @Preview(showBackground = true)
