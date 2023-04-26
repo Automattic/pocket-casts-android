@@ -177,14 +177,14 @@ class EpisodeManagerImpl @Inject constructor(
     }
 
     override fun findEpisodesWhere(queryAfterWhere: String): List<PodcastEpisode> {
-        return episodeDao.findEpisodes(SimpleSQLiteQuery("SELECT episodes.* FROM episodes JOIN podcasts ON episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND $queryAfterWhere"))
+        return episodeDao.findEpisodes(SimpleSQLiteQuery("SELECT podcast_episodes.* FROM podcast_episodes JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND $queryAfterWhere"))
     }
 
     override fun observeEpisodeCount(queryAfterWhere: String): Flowable<Int> {
         return appDatabase.podcastDao().observeUnsubscribedUuid()
             .switchMap {
                 val podcastList = it.joinToString(separator = "', '", prefix = "podcast_id NOT IN ('", postfix = "')")
-                val query = "SELECT COUNT(*) FROM episodes WHERE $podcastList AND $queryAfterWhere"
+                val query = "SELECT COUNT(*) FROM podcast_episodes WHERE $podcastList AND $queryAfterWhere"
                 return@switchMap Flowable.just(query)
             }
             .switchMap {
@@ -196,7 +196,7 @@ class EpisodeManagerImpl @Inject constructor(
         return appDatabase.podcastDao().observeUnsubscribedUuid()
             .switchMap {
                 val podcastList = it.joinToString(separator = "', '", prefix = "podcast_id NOT IN ('", postfix = "')")
-                val query = "SELECT episodes.* FROM episodes WHERE $podcastList AND $queryAfterWhere"
+                val query = "SELECT podcast_episodes.* FROM podcast_episodes WHERE $podcastList AND $queryAfterWhere"
                 return@switchMap Flowable.just(query)
             }
             .switchMap {

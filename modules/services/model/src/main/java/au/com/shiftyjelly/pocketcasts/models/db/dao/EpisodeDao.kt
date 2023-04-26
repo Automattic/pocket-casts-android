@@ -289,7 +289,7 @@ abstract class EpisodeDao {
     abstract fun updatePlayedUpToIfChanged(playedUpTo: Double, playedUpToMin: Double, playedUpToMax: Double, modified: Long, uuid: String)
 
     fun countWhere(queryAfterWhere: String, appDatabase: AppDatabase): Int {
-        val result = QueryHelper.firstRowArray("SELECT count(*) FROM episodes JOIN podcasts ON episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND $queryAfterWhere", null, appDatabase) ?: return 0
+        val result = QueryHelper.firstRowArray("SELECT count(*) FROM podcast_episodes JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND $queryAfterWhere", null, appDatabase) ?: return 0
         val firstResult = result[0] ?: return 0
         return Integer.parseInt(firstResult)
     }
