@@ -177,12 +177,17 @@ private fun WearApp() {
             }
         }
 
-        composable(FilesScreen.route) {
+        scrollable(FilesScreen.route) {
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
             ) {
-                FilesScreen()
+                FilesScreen(
+                    columnState = it.columnState,
+                    navigateToEpisode = { episodeUuid ->
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
+                    },
+                )
             }
         }
 
