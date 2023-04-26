@@ -2,9 +2,11 @@ package au.com.shiftyjelly.pocketcasts.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,12 +21,20 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AdvancedSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.*
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+/**
+ * The advanced settings page is for settings that we are not sure many users will need, or that we are
+ * worried might create a worse user experience for most users. Basically, this is a place where we can
+ * add settings without complicating things for the typical user.
+ */
 @Composable
 fun AdvancedSettingsPage(
     viewModel: AdvancedSettingsViewModel,
@@ -61,7 +71,15 @@ fun AdvancedSettingsView(
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
         ) {
-            SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_mobile_data)) {
+            TextP50(
+                text = stringResource(LR.string.settings_description_advanced),
+                color = MaterialTheme.theme.colors.primaryText02,
+                modifier = Modifier.padding(SettingsSection.horizontalPadding)
+            )
+            SettingSection(
+                heading = stringResource(LR.string.settings_storage_section_heading_mobile_data),
+                indent = false,
+            ) {
                 SyncOnMeteredRow(state.backgroundSyncOnMeteredState)
             }
         }
@@ -77,10 +95,12 @@ private fun SyncOnMeteredRow(
         primaryText = stringResource(LR.string.settings_advanced_sync_on_metered),
         secondaryText = stringResource(LR.string.settings_advanced_sync_on_metered_summary),
         toggle = SettingRowToggle.Switch(state.isChecked, state.isEnabled),
+        indent = false,
         modifier = modifier.toggleable(
             value = state.isChecked,
-            role = Role.Switch
-        ) { state.onCheckedChange(it) }
+            role = Role.Switch,
+            onValueChange = { state.onCheckedChange(it) }
+        ),
     )
 }
 
