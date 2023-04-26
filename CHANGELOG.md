@@ -1,5 +1,10 @@
 7.38
 -----
+*   Updates:
+    *   Added Advanced Settings section for experimental settings
+        ([#885](https://github.com/Automattic/pocket-casts-android/pull/885/)).
+    *   Added setting to disable sync on metered networks
+        ([#885](https://github.com/Automattic/pocket-casts-android/pull/885/)).
 *   Bug Fixes:
     *   Fixed accessibility content desctiption for episode list
          ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
