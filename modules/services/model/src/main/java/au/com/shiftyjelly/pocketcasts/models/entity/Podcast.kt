@@ -78,7 +78,7 @@ data class Podcast(
     @ColumnInfo(name = "licensing") var licensing: Licensing = Licensing.KEEP_EPISODES,
     @ColumnInfo(name = "isPaid") var isPaid: Boolean = false,
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
-    @Ignore val episodes: MutableList<Episode> = mutableListOf()
+    @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf()
 ) : Serializable {
 
     constructor() : this(uuid = "")
@@ -152,7 +152,7 @@ data class Podcast(
         return podcastCategory.split(delimiters = arrayOf("\n")).first().tryToLocalise(resources)
     }
 
-    fun addEpisode(episode: Episode) {
+    fun addEpisode(episode: PodcastEpisode) {
         this.episodes.add(episode)
     }
 

@@ -8,7 +8,7 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -54,7 +54,7 @@ class UpdateEpisodeDetailsTest {
         server.enqueue(redirectResponse)
         server.enqueue(finalResponse)
 
-        val episode = Episode(uuid = UUID.randomUUID().toString(), publishedDate = Date(), downloadUrl = firstUrl.toString())
+        val episode = PodcastEpisode(uuid = UUID.randomUUID().toString(), publishedDate = Date(), downloadUrl = firstUrl.toString())
         val episodeManager = mock<EpisodeManager> { on { findByUuid(episode.uuid) }.doReturn(episode) }
 
         val episodeUuids = listOf(episode.uuid).toTypedArray()

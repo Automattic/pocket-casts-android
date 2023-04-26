@@ -29,7 +29,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -84,7 +84,7 @@ class EpisodeFragment : BaseDialogFragment() {
             }
         }
         fun newInstance(
-            episode: Episode,
+            episode: PodcastEpisode,
             source: EpisodeViewSource,
             overridePodcastLink: Boolean = false,
             fromListUuid: String? = null,

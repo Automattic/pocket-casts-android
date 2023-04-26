@@ -13,7 +13,7 @@ import androidx.core.view.marginLeft
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterUserEpisodeBinding
@@ -62,7 +62,7 @@ class UserEpisodeViewHolder(
         get() = binding.leftRightIcon1
     override val leftRightIcon2: ImageView
         get() = binding.leftRightIcon2
-    override val episode: Playable?
+    override val episode: BaseEpisode?
         get() = binding.episode
     override val positionAdapter: Int
         get() = bindingAdapterPosition

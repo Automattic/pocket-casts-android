@@ -16,8 +16,8 @@ import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
@@ -65,7 +65,7 @@ class EpisodeViewHolder(
         get() = binding.leftRightIcon1
     override val leftRightIcon2: ImageView
         get() = binding.leftRightIcon2
-    override val episode: Playable?
+    override val episode: BaseEpisode?
         get() = binding.episode
     override val positionAdapter: Int
         get() = bindingAdapterPosition
@@ -113,7 +113,7 @@ class EpisodeViewHolder(
                 listOf(EpisodeItemTouchHelper.IconWithBackground(IR.drawable.ic_archive, binding.episodeRow.context.getThemeColor(UR.attr.support_06)))
         }
 
-    fun setup(episode: Episode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable) {
+    fun setup(episode: PodcastEpisode, fromListUuid: String?, tintColor: Int, playButtonListener: PlayButton.OnClickListener, streamByDefault: Boolean, upNextAction: Settings.UpNextAction, multiSelectEnabled: Boolean = false, isSelected: Boolean = false, disposables: CompositeDisposable) {
         this.upNextAction = upNextAction
         this.isMultiSelecting = multiSelectEnabled
 
@@ -261,13 +261,13 @@ class EpisodeViewHolder(
         TransitionManager.endTransitions(episodeRow)
     }
 
-    private fun updateTimeLeft(textView: TextView, episode: Episode) {
+    private fun updateTimeLeft(textView: TextView, episode: PodcastEpisode) {
         val timeLeft = TimeHelper.getTimeLeft(episode.playedUpToMs, episode.durationMs.toLong(), episode.isInProgress, context)
         textView.text = timeLeft.text
         textView.contentDescription = timeLeft.description
     }
 
-    private fun updateRowText(episode: Episode, captionColor: Int, tintColor: Int, date: TextView, title: TextView, lblStatus: TextView, isInUpNext: Boolean = false) {
+    private fun updateRowText(episode: PodcastEpisode, captionColor: Int, tintColor: Int, date: TextView, title: TextView, lblStatus: TextView, isInUpNext: Boolean = false) {
         val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
         val alphaCaptionColor = ColorUtils.colorWithAlpha(captionColor, 128)
         val dateTintColor = if (episodeGreyedOut) alphaCaptionColor else tintColor

@@ -16,8 +16,8 @@ import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
@@ -288,7 +288,7 @@ class RefreshPodcastsThread(
 
         var newEpisodeCount = 0
 
-        val episodesToAddToUpNext: MutableList<Pair<AddToUpNext, Episode>> = mutableListOf()
+        val episodesToAddToUpNext: MutableList<Pair<AddToUpNext, PodcastEpisode>> = mutableListOf()
         val episodeUuidsAdded = ArrayList<String>()
 
         for (podcastUuid in result.getPodcastsWithUpdates()) {
@@ -392,7 +392,7 @@ class RefreshPodcastsThread(
             val intentId = 675578
 
             try {
-                val notificationsEpisodeAndPodcast = ArrayList<Pair<Episode, Podcast>>()
+                val notificationsEpisodeAndPodcast = ArrayList<Pair<PodcastEpisode, Podcast>>()
 
                 val episodes = episodeManager.findNotificationEpisodes(lastSeen)
                 for (episode in episodes) {
@@ -444,7 +444,7 @@ class RefreshPodcastsThread(
         @Suppress("NAME_SHADOWING", "DEPRECATION")
         private fun showEpisodeNotification(
             podcast: Podcast,
-            episode: Episode,
+            episode: PodcastEpisode,
             episodeIndex: Int,
             intentId: Int,
             isGroupNotification: Boolean,
@@ -550,7 +550,7 @@ class RefreshPodcastsThread(
             manager.notify(notificationTag, NotificationBroadcastReceiver.NOTIFICATION_ID, notification)
         }
 
-        private fun buildNotificationIntent(intentId: Int, intentName: String, episode: Episode, notificationTag: String, context: Context): PendingIntent {
+        private fun buildNotificationIntent(intentId: Int, intentName: String, episode: PodcastEpisode, notificationTag: String, context: Context): PendingIntent {
             val intent = Intent(context, NotificationBroadcastReceiver::class.java)
             intent.action = (System.currentTimeMillis() + intentId).toString()
             intent.putExtra(NotificationBroadcastReceiver.INTENT_EXTRA_ACTION, intentName)

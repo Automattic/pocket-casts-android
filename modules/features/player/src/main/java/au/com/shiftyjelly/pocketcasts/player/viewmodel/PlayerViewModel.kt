@@ -11,9 +11,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -147,7 +147,7 @@ class PlayerViewModel @Inject constructor(
         var chapters: List<Chapter>,
         var currentChapter: Chapter?,
         var upNextExpanded: Boolean,
-        var upNextEpisodes: List<Playable>,
+        var upNextEpisodes: List<BaseEpisode>,
         var upNextSummary: UpNextSummary,
     ) {
         fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
@@ -182,10 +182,10 @@ class PlayerViewModel @Inject constructor(
         .distinctUntilChanged()
         .toFlowable(BackpressureStrategy.LATEST)
     val listDataLive: LiveData<ListData> = listDataRx.toLiveData()
-    val playingEpisodeLive: LiveData<Pair<Playable, Int>> =
+    val playingEpisodeLive: LiveData<Pair<BaseEpisode, Int>> =
         listDataRx.map { Pair(it.podcastHeader.episodeUuid, it.podcastHeader.backgroundColor) }
             .distinctUntilChanged()
-            .switchMap { pair -> episodeManager.observePlayableByUuid(pair.first).map { Pair(it, pair.second) } }
+            .switchMap { pair -> episodeManager.observeEpisodeByUuid(pair.first).map { Pair(it, pair.second) } }
             .toLiveData()
 
     private val shelfObservable = settings.shelfItemsObservable.map { list ->
@@ -202,7 +202,7 @@ class PlayerViewModel @Inject constructor(
         val entry1 = t1 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
         val entry2 = t2 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
 
-        return@distinctUntilChanged (entry1.episode as? Episode)?.isStarred == (entry2.episode as? Episode)?.isStarred && entry1.episode.episodeStatus == entry2.episode.episodeStatus && entry1.podcast?.isUsingEffects == entry2.podcast?.isUsingEffects
+        return@distinctUntilChanged (entry1.episode as? PodcastEpisode)?.isStarred == (entry2.episode as? PodcastEpisode)?.isStarred && entry1.episode.episodeStatus == entry2.episode.episodeStatus && entry1.podcast?.isUsingEffects == entry2.podcast?.isUsingEffects
     }
 
     private val trimmedShelfObservable = Flowables.combineLatest(shelfUpNext.toFlowable(BackpressureStrategy.LATEST), shelfObservable).map { (upNextState, shelf) ->
@@ -213,23 +213,23 @@ class PlayerViewModel @Inject constructor(
     }
 
     val shelfLive: LiveData<List<ShelfItem>> = shelfObservable.toLiveData()
-    val trimmedShelfLive: LiveData<Pair<List<ShelfItem>, Playable?>> = trimmedShelfObservable.toLiveData()
+    val trimmedShelfLive: LiveData<Pair<List<ShelfItem>, BaseEpisode?>> = trimmedShelfObservable.toLiveData()
 
     val upNextPlusData = upNextStateObservable.map { upNextState ->
         var episodeCount = 0
         var totalTime = 0.0
-        var upNextEpisodes = emptyList<Playable>()
-        var nowPlaying: Playable? = null
+        var upNextEpisodes = emptyList<BaseEpisode>()
+        var nowPlaying: BaseEpisode? = null
         if (upNextState is UpNextQueue.State.Loaded) {
             nowPlaying = upNextState.episode
             upNextEpisodes = upNextState.queue
             episodeCount = upNextState.queue.size
 
             val countEpisodes = listOf(nowPlaying) + upNextEpisodes
-            for (playable in countEpisodes) {
-                totalTime += playable.duration
-                if (playable.isInProgress) {
-                    totalTime -= playable.playedUpTo
+            for (countEpisode in countEpisodes) {
+                totalTime += countEpisode.duration
+                if (countEpisode.isInProgress) {
+                    totalTime -= countEpisode.playedUpTo
                 }
             }
         }
@@ -250,9 +250,9 @@ class PlayerViewModel @Inject constructor(
     val effectsObservable: Flowable<PodcastEffectsPair> = playbackStateObservable
         .toFlowable(BackpressureStrategy.LATEST)
         .map { it.episodeUuid }
-        .switchMap { episodeManager.observePlayableByUuid(it) }
+        .switchMap { episodeManager.observeEpisodeByUuid(it) }
         .switchMap {
-            if (it is Episode) {
+            if (it is PodcastEpisode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)
             } else {
                 Flowable.just(Podcast(uuid = UserEpisodePodcastSubstitute.substituteUuid, title = UserEpisodePodcastSubstitute.substituteTitle, overrideGlobalEffects = false))
@@ -263,7 +263,7 @@ class PlayerViewModel @Inject constructor(
         .observeOn(AndroidSchedulers.mainThread())
     val effectsLive = effectsObservable.toLiveData()
 
-    var episode: Playable? = null
+    var episode: BaseEpisode? = null
     var podcast: Podcast? = null
 
     val isSleepRunning = MutableLiveData<Boolean>().apply { postValue(false) }
@@ -318,7 +318,7 @@ class PlayerViewModel @Inject constructor(
                 isPlaying = playbackState.isPlaying,
                 isPrepared = playbackState.isPrepared,
                 isVideo = episode.isVideo,
-                isStarred = (episode is Episode && episode.isStarred),
+                isStarred = (episode is PodcastEpisode && episode.isStarred),
                 isPlaybackRemote = playbackManager.isPlaybackRemote(),
                 chapters = playbackState.chapters,
                 backgroundColor = playerBackground,
@@ -345,14 +345,14 @@ class PlayerViewModel @Inject constructor(
 
         var episodeCount = 0
         var totalTime = 0.0
-        var upNextEpisodes = emptyList<Playable>()
+        var upNextEpisodes = emptyList<BaseEpisode>()
         if (upNextState is UpNextQueue.State.Loaded) {
             upNextEpisodes = upNextState.queue
             episodeCount = upNextState.queue.size
-            for (playable in upNextState.queue) {
-                totalTime += playable.duration
-                if (playable.isInProgress) {
-                    totalTime -= playable.playedUpTo
+            for (upNextEpisode in upNextState.queue) {
+                totalTime += upNextEpisode.duration
+                if (upNextEpisode.isInProgress) {
+                    totalTime -= upNextEpisode.playedUpTo
                 }
             }
         }
@@ -376,7 +376,7 @@ class PlayerViewModel @Inject constructor(
 
     fun playEpisode(uuid: String, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
         launch {
-            val episode = episodeManager.findPlayableByUuid(uuid) ?: return@launch
+            val episode = episodeManager.findEpisodeByUuid(uuid) ?: return@launch
             playbackManager.playNow(episode = episode, playbackSource = playbackSource)
         }
     }
@@ -403,7 +403,7 @@ class PlayerViewModel @Inject constructor(
         playbackManager.playNextInQueue(playbackSource = source)
     }
 
-    private fun markAsPlayedConfirmed(episode: Playable) {
+    private fun markAsPlayedConfirmed(episode: BaseEpisode) {
         launch {
             episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
@@ -420,7 +420,7 @@ class PlayerViewModel @Inject constructor(
             .setOnConfirm { markAsPlayedConfirmed(episode) }
     }
 
-    private fun archiveConfirmed(episode: Episode) {
+    private fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
             episodeManager.archive(episode, playbackManager, true)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
@@ -429,7 +429,7 @@ class PlayerViewModel @Inject constructor(
 
     fun archiveCurrentlyPlaying(resources: Resources): ConfirmationDialog? {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return null
-        if (episode is Episode) {
+        if (episode is PodcastEpisode) {
             return ConfirmationDialog()
                 .setForceDarkTheme(true)
                 .setSummary(resources.getString(LR.string.player_archive_summary))
@@ -472,7 +472,7 @@ class PlayerViewModel @Inject constructor(
         disposables.clear()
     }
 
-    fun removeFromUpNext(episode: Playable) {
+    fun removeFromUpNext(episode: BaseEpisode) {
         playbackManager.removeEpisode(episodeToRemove = episode, source = source)
     }
 
@@ -518,7 +518,7 @@ class PlayerViewModel @Inject constructor(
 
     fun starToggle() {
         playbackManager.upNextQueue.currentEpisode?.let {
-            if (it is Episode) {
+            if (it is PodcastEpisode) {
                 episodeManager.toggleStarEpisodeAsync(episode = it)
                 val event = if (it.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
                 episodeAnalytics.trackEvent(event, source, it.uuid)
@@ -526,7 +526,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun changeUpNextEpisodes(episodes: List<Playable>) {
+    fun changeUpNextEpisodes(episodes: List<BaseEpisode>) {
         playbackManager.changeUpNext(episodes)
     }
 
