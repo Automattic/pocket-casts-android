@@ -77,6 +77,7 @@ fun SettingsFragmentPage(
             ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
             PrivacyRow(onClick = { openFragment(PrivacyFragment()) })
             AboutRow(onClick = { openFragment(AboutFragment()) })
+            AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
         }
     }
 }
@@ -222,6 +223,15 @@ private fun AboutRow(onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_about),
         icon = GradientIconData(SR.drawable.settings_about),
+        modifier = rowModifier(onClick)
+    )
+}
+
+@Composable
+private fun AdvancedRow(onClick: () -> Unit) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_title_advanced),
+        icon = GradientIconData(SR.drawable.settings_advanced),
         modifier = rowModifier(onClick)
     )
 }

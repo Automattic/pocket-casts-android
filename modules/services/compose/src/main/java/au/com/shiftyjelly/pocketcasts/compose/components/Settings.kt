@@ -39,8 +39,8 @@ private val endPadding = 24.dp
 private val verticalPadding = 12.dp
 
 sealed class SettingRowToggle {
-    data class Checkbox(val checked: Boolean) : SettingRowToggle()
-    data class Switch(val checked: Boolean) : SettingRowToggle()
+    data class Checkbox(val checked: Boolean, val enabled: Boolean = true) : SettingRowToggle()
+    data class Switch(val checked: Boolean, val enabled: Boolean = true) : SettingRowToggle()
     object None : SettingRowToggle()
 }
 
@@ -174,6 +174,7 @@ fun SettingRow(
                 Spacer(Modifier.width(12.dp))
                 Checkbox(
                     checked = toggle.checked,
+                    enabled = toggle.enabled,
                     onCheckedChange = null,
                 )
             }
@@ -181,6 +182,7 @@ fun SettingRow(
                 Spacer(Modifier.width(12.dp))
                 Switch(
                     checked = toggle.checked,
+                    enabled = toggle.enabled,
                     onCheckedChange = null,
                     colors = SwitchDefaults.colors(
                         uncheckedThumbColor = Color.Gray,
