@@ -55,7 +55,7 @@ fun EpisodeChip(episode: BaseEpisode, onClick: () -> Unit) {
         @Suppress("NAME_SHADOWING")
         val episode by viewModel
             .observeByUuid(episode)
-            .collectAsState(episode)
+            .collectAsState()
 
         Row {
             Column(

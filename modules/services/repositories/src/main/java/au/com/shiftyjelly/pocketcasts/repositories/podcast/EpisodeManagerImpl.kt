@@ -50,6 +50,8 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.asFlowable
@@ -99,11 +101,17 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.observeByUuid(uuid)
     }
 
-    override fun observeEpisodeByUuid(uuid: String): Flowable<BaseEpisode> {
+    override fun observeEpisodeByUuidRx(uuid: String): Flowable<BaseEpisode> {
         return findByUuidRx(uuid)
             .flatMapPublisher<BaseEpisode> { episodeDao.observeByUuid(uuid).asFlowable() }
-            .switchIfEmpty(userEpisodeManager.observeEpisode(uuid))
+            .switchIfEmpty(userEpisodeManager.observeEpisodeRx(uuid))
     }
+
+    override fun observeEpisodeByUuid(uuid: String): Flow<BaseEpisode> =
+        merge(
+            episodeDao.observeByUuid(uuid), // if it is a PodcastEpisode
+            userEpisodeManager.observeEpisode(uuid) // if it is a UserEpisode
+        ).filterNotNull() // because it is not going to be both a PodcastEpisode and a UserEpisode
 
     override fun findFirstBySearchQuery(query: String): PodcastEpisode? {
         return episodeDao.findFirstBySearchQuery(query)
@@ -1066,7 +1074,7 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.existsRx(episodeUuid)
             .flatMapMaybe { episodeExists ->
                 if (episodeExists || podcastUuid == UserEpisodePodcastSubstitute.substituteUuid) {
-                    observeEpisodeByUuid(episodeUuid).firstElement()
+                    observeEpisodeByUuidRx(episodeUuid).firstElement()
                 } else {
                     podcastCacheServerManager.getPodcastAndEpisode(podcastUuid, episodeUuid).flatMapMaybe { response ->
                         val episode = response.episodes.firstOrNull() ?: skeletonEpisode
