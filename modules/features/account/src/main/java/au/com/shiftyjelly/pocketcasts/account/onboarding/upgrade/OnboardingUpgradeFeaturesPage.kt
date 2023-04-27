@@ -141,13 +141,14 @@ internal fun OnboardingUpgradeFeaturesPage(
         when (state) {
             is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
             is OnboardingUpgradeFeaturesState.Loaded -> {
+                val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
                 UpgradeLayout(
-                    state = state as OnboardingUpgradeFeaturesState.Loaded,
+                    state = loadedState,
                     scrollState = scrollState,
                     onBackPressed = onBackPressed,
                     onNotNowPressed = onNotNowPressed,
                     onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                    onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
+                    onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCards[it]) },
                     onUpgradePressed = onUpgradePressed,
                     canUpgrade = canUpgrade,
                     upgradePrice = { subscriptionTier: SubscriptionTier -> viewModel.getUpgradePrice(subscriptions, subscriptionTier) },

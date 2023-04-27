@@ -96,9 +96,9 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         }
     }
 
-    fun onFeatureCardChanged(index: Int) {
+    fun onFeatureCardChanged(upgradeFeatureCard: UpgradeFeatureCard) {
         (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
-            _state.update { loadedState.copy(currentFeatureCard = UpgradeFeatureCard.values()[index]) }
+            _state.update { loadedState.copy(currentFeatureCard = upgradeFeatureCard) }
         }
     }
 
