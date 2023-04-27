@@ -97,9 +97,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun OnboardingUpgradeFeaturesPage(
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
-    onUpgradePressed: () -> Unit,
-    onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
+    onClickSubscribe: () -> Unit,
+    onNotNowPressed: () -> Unit,
+    onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
 ) {
 
@@ -148,7 +149,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                     onNotNowPressed = onNotNowPressed,
                     onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
                     onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCards[it]) },
-                    onUpgradePressed = onUpgradePressed,
+                    onClickSubscribe = onClickSubscribe,
                     canUpgrade = canUpgrade,
                 )
             }
@@ -175,7 +176,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     onNotNowPressed: () -> Unit,
     onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
-    onUpgradePressed: () -> Unit,
+    onClickSubscribe: () -> Unit,
     canUpgrade: Boolean,
 ) {
     OnboardingUpgradeHelper.UpgradeBackground(
@@ -250,7 +251,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                 FeatureCards(
                     state = state,
                     onFeatureCardChanged = onFeatureCardChanged,
-                    onUpgradePressed = onUpgradePressed,
+                    onClickSubscribe = onClickSubscribe,
                     canUpgrade = canUpgrade,
                 )
             }
@@ -265,7 +266,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
     onFeatureCardChanged: (Int) -> Unit,
-    onUpgradePressed: () -> Unit,
+    onClickSubscribe: () -> Unit,
     canUpgrade: Boolean,
 ) {
     val resources = LocalContext.current.resources
@@ -326,7 +327,7 @@ fun FeatureCards(
             secondaryText = secondaryText,
             backgroundColor = button.backgroundColor,
             textColor = button.textColor,
-            onClick = onUpgradePressed,
+            onClick = onClickSubscribe,
             modifier = Modifier
                 .padding(horizontal = 20.dp, vertical = 24.dp)
                 .fillMaxWidth(),
@@ -667,8 +668,9 @@ private fun OnboardingUpgradeFeaturesPreview() {
         flow = OnboardingFlow.InitialOnboarding,
         source = OnboardingUpgradeSource.RECOMMENDATIONS,
         onBackPressed = {},
-        onUpgradePressed = {},
+        onClickSubscribe = {},
         onNotNowPressed = {},
+        onUpgradePressed = {},
         canUpgrade = true,
     )
 }
