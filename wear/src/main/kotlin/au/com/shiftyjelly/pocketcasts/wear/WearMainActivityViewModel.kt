@@ -104,8 +104,7 @@ class WearMainActivityViewModel @Inject constructor(
     }
 
     /**
-     * This should be invoked when the UI it has handled showing or hiding the sign in
-     * confirmation.
+     * This should be invoked when the UI has handled showing or hiding the sign in confirmation.
      */
     fun onSignInConfirmationActionHandled() {
         _state.update { it.copy(signInConfirmationAction = null) }
