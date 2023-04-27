@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 import com.android.billingclient.api.ProductDetails
 
 sealed interface Subscription {
+    val tier: SubscriptionTier
     val recurringPricingPhase: RecurringSubscriptionPricingPhase
     val trialPricingPhase: TrialSubscriptionPricingPhase?
     val productDetails: ProductDetails
@@ -16,6 +17,7 @@ sealed interface Subscription {
 
     // Simple subscriptions do not have a trial phase
     class Simple(
+        override val tier: SubscriptionTier,
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val productDetails: ProductDetails,
         override val offerToken: String
@@ -25,6 +27,7 @@ sealed interface Subscription {
     }
 
     class WithTrial(
+        override val tier: SubscriptionTier,
         override val recurringPricingPhase: RecurringSubscriptionPricingPhase,
         override val trialPricingPhase: TrialSubscriptionPricingPhase, // override to not be nullable
         override val productDetails: ProductDetails,
@@ -42,6 +45,8 @@ sealed interface Subscription {
             )
         }
     }
+
+    enum class SubscriptionTier { PLUS, PATRON, UNKNOWN }
 
     companion object {
         const val PATRON_PRODUCT_BASE = "com.pocketcasts.patron"

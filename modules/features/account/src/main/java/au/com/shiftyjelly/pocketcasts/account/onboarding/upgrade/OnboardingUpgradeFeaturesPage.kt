@@ -84,6 +84,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -149,7 +150,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                     onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
                     onUpgradePressed = onUpgradePressed,
                     canUpgrade = canUpgrade,
-                    upgradePrice = { productId: String -> viewModel.getUpgradePrice(subscriptions, productId) },
+                    upgradePrice = { subscriptionTier: SubscriptionTier -> viewModel.getUpgradePrice(subscriptions, subscriptionTier) },
                 )
             }
             is OnboardingUpgradeFeaturesState.OldLoaded -> {
@@ -178,7 +179,7 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     onFeatureCardChanged: (Int) -> Unit,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
-    upgradePrice: (String) -> String,
+    upgradePrice: (SubscriptionTier) -> String,
 ) {
     OnboardingUpgradeHelper.UpgradeBackground(
         modifier = Modifier.verticalScroll(scrollState),
@@ -270,7 +271,7 @@ fun FeatureCards(
     onFeatureCardChanged: (Int) -> Unit,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
-    upgradePrice: (String) -> String,
+    upgradePrice: (SubscriptionTier) -> String,
 ) {
     val pagerState = rememberPagerState()
 
@@ -324,7 +325,7 @@ fun FeatureCard(
     card: UpgradeFeatureCard,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
-    upgradePrice: (String) -> String,
+    upgradePrice: (SubscriptionTier) -> String,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -353,7 +354,7 @@ fun FeatureCard(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 AnimatedContent(
-                    targetState = upgradePrice(card.productIdPrefix),
+                    targetState = upgradePrice(card.subscriptionTier),
                     label = "price"
                 ) { price ->
                     TextH10(

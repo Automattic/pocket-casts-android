@@ -12,10 +12,11 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeat
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.models.type.RecurringSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_PRODUCT_BASE
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_PRODUCT_BASE
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -60,16 +61,9 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     ) {
         val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions) // TODO: Patron or Plus?
         defaultSelected?.let {
-            val currentSubscriptionFrequency = when (defaultSelected.recurringPricingPhase) {
-                is SubscriptionPricingPhase.Months -> SubscriptionFrequency.MONTHLY
-                is SubscriptionPricingPhase.Years -> SubscriptionFrequency.YEARLY
-            }
-            val currentFeatureCard =
-                if (defaultSelected.productDetails.productId.startsWith(PLUS_PRODUCT_BASE)) {
-                    UpgradeFeatureCard.PLUS
-                } else {
-                    UpgradeFeatureCard.PATRON
-                }
+            val currentSubscriptionFrequency = defaultSelected.recurringPricingPhase.toSubscriptionFrequency()
+            val defaultTier = SubscriptionMapper.mapProductIdToTier(defaultSelected.productDetails.productId)
+            val currentFeatureCard = defaultTier.toUpgradeFeatureCard()
             _state.update {
                 OnboardingUpgradeFeaturesState.Loaded(
                     currentSubscription = defaultSelected,
@@ -110,7 +104,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
     fun getUpgradePrice(
         subscriptions: List<Subscription>,
-        productIdPrefix: String,
+        subscriptionTier: SubscriptionTier,
     ): String {
         val loadedState = _state.value as? OnboardingUpgradeFeaturesState.Loaded
         return loadedState?.let {
@@ -120,7 +114,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                         it.recurringPricingPhase is SubscriptionPricingPhase.Months
                     } else {
                         it.recurringPricingPhase is SubscriptionPricingPhase.Years
-                    } && it.productDetails.productId.startsWith(productIdPrefix)
+                    } && SubscriptionMapper.mapProductIdToTier(it.productDetails.productId) == subscriptionTier
                 }
                 ?.recurringPricingPhase?.formattedPrice
         } ?: ""
@@ -153,6 +147,17 @@ sealed class OnboardingUpgradeFeaturesState {
     }
 }
 
+private fun SubscriptionTier.toUpgradeFeatureCard() = when (this) {
+    SubscriptionTier.PLUS -> UpgradeFeatureCard.PLUS
+    SubscriptionTier.PATRON -> UpgradeFeatureCard.PATRON
+    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+}
+
+private fun RecurringSubscriptionPricingPhase.toSubscriptionFrequency() = when (this) {
+    is SubscriptionPricingPhase.Months -> SubscriptionFrequency.MONTHLY
+    is SubscriptionPricingPhase.Years -> SubscriptionFrequency.YEARLY
+}
+
 enum class UpgradeFeatureCard(
     @StringRes val titleRes: Int,
     @StringRes val shortNameRes: Int,
@@ -162,7 +167,7 @@ enum class UpgradeFeatureCard(
     val buttonBackgroundColor: Long,
     val buttonTextColor: Long,
     val featureItems: List<UpgradeFeatureItem>,
-    val productIdPrefix: String,
+    val subscriptionTier: SubscriptionTier,
 ) {
     PLUS(
         titleRes = LR.string.onboarding_plus_features_title,
@@ -173,7 +178,7 @@ enum class UpgradeFeatureCard(
         buttonBackgroundColor = 0xFFFFD846,
         buttonTextColor = 0xFF000000,
         featureItems = PlusUpgradeFeatureItem.values().toList(),
-        productIdPrefix = PLUS_PRODUCT_BASE,
+        subscriptionTier = SubscriptionTier.PLUS,
     ),
     PATRON(
         titleRes = LR.string.onboarding_patron_features_title,
@@ -184,6 +189,6 @@ enum class UpgradeFeatureCard(
         buttonBackgroundColor = 0xFF6046F5,
         buttonTextColor = 0xFFFFFFFF,
         featureItems = PatronUpgradeFeatureItem.values().toList(),
-        productIdPrefix = PATRON_PRODUCT_BASE,
+        subscriptionTier = SubscriptionTier.PATRON,
     )
 }
