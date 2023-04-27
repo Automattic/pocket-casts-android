@@ -29,14 +29,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection.horizontalPadding
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection.indentedStartPadding
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection.verticalPadding
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
-private val startPadding = 72.dp
-private val endPadding = 24.dp
-private val verticalPadding = 12.dp
+object SettingsSection {
+    val horizontalPadding = 24.dp
+    val indentedStartPadding = horizontalPadding + 48.dp
+    val verticalPadding = 12.dp
+}
 
 sealed class SettingRowToggle {
     data class Checkbox(val checked: Boolean, val enabled: Boolean = true) : SettingRowToggle()
@@ -48,22 +53,20 @@ sealed class SettingRowToggle {
 fun SettingSection(
     modifier: Modifier = Modifier,
     heading: String? = null,
-    content: @Composable () -> Unit = {}
+    indent: Boolean = true,
+    content: @Composable () -> Unit = {},
 ) {
     Column(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(
-                top = verticalPadding,
-                bottom = verticalPadding,
-            )
+            modifier = Modifier.padding(vertical = verticalPadding)
         ) {
             if (heading != null) {
                 TextH40(
                     text = heading,
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                     modifier = Modifier.padding(
-                        start = startPadding,
-                        end = endPadding,
+                        start = if (indent) indentedStartPadding else horizontalPadding,
+                        end = horizontalPadding,
                         top = verticalPadding,
                         bottom = verticalPadding
                     )
@@ -124,14 +127,14 @@ fun SettingRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .padding(
-                end = endPadding,
+                end = horizontalPadding,
                 top = verticalPadding,
                 bottom = verticalPadding
             )
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.width(if (indent || icon != null) startPadding else 16.dp)
+            modifier = Modifier.width(if (indent || icon != null) indentedStartPadding else horizontalPadding)
         ) {
             GradientIcon(icon)
         }

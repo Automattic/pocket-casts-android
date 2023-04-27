@@ -75,9 +75,9 @@ fun SettingsFragmentPage(
             AutoAddToUpNextRow(onClick = { openFragment(AutoAddSettingsFragment()) })
             HelpAndFeedbackRow(onClick = { openFragment(HelpFragment()) })
             ImportAndExportOpmlRow(onClick = { openFragment(ExportSettingsFragment()) })
+            AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
             PrivacyRow(onClick = { openFragment(PrivacyFragment()) })
             AboutRow(onClick = { openFragment(AboutFragment()) })
-            AdvancedRow(onClick = { openFragment(AdvancedSettingsFragment()) })
         }
     }
 }
