@@ -104,6 +104,29 @@ class AddFileActivity :
             intent.putExtra(EXTRA_EXISTING_EPISODE_UUID, fileUuid)
             return intent
         }
+
+        fun darkThemeColors() = listOf(
+            AddFileColourAdapter.Item.Colour(1, ThemeColor.primaryText02Dark, false),
+            AddFileColourAdapter.Item.Colour(2, ThemeColor.filter01Dark, true),
+            AddFileColourAdapter.Item.Colour(3, ThemeColor.filter05Dark, true),
+            AddFileColourAdapter.Item.Colour(4, ThemeColor.filter04Dark, true),
+            AddFileColourAdapter.Item.Colour(5, ThemeColor.filter03Dark, true),
+            AddFileColourAdapter.Item.Colour(6, ThemeColor.filter02Dark, true),
+            AddFileColourAdapter.Item.Colour(7, ThemeColor.filter06Dark, true),
+            AddFileColourAdapter.Item.Colour(8, ThemeColor.filter07Dark, true),
+        )
+
+        private fun lightThemeColors() = listOf(
+
+            AddFileColourAdapter.Item.Colour(1, ThemeColor.primaryText02Light, false),
+            AddFileColourAdapter.Item.Colour(2, ThemeColor.filter01Light, true),
+            AddFileColourAdapter.Item.Colour(3, ThemeColor.filter05Light, true),
+            AddFileColourAdapter.Item.Colour(4, ThemeColor.filter04Light, true),
+            AddFileColourAdapter.Item.Colour(5, ThemeColor.filter03Light, true),
+            AddFileColourAdapter.Item.Colour(6, ThemeColor.filter02Light, true),
+            AddFileColourAdapter.Item.Colour(7, ThemeColor.filter06Light, true),
+            AddFileColourAdapter.Item.Colour(8, ThemeColor.filter07Light, true),
+        )
     }
 
     override val coroutineContext: CoroutineContext
@@ -325,31 +348,15 @@ class AddFileActivity :
     }
 
     private fun updateColorItems() {
-
-        val colors = mutableListOf<AddFileColourAdapter.Item.Colour>()
-        if (Theme.isDark(this)) {
-            colors.add(AddFileColourAdapter.Item.Colour(1, ThemeColor.primaryText02Dark, false))
-            colors.add(AddFileColourAdapter.Item.Colour(2, ThemeColor.filter01Dark, true))
-            colors.add(AddFileColourAdapter.Item.Colour(3, ThemeColor.filter05Dark, true))
-            colors.add(AddFileColourAdapter.Item.Colour(4, ThemeColor.filter04Dark, true))
-            colors.add(AddFileColourAdapter.Item.Colour(5, ThemeColor.filter03Dark, true))
-            colors.add(AddFileColourAdapter.Item.Colour(6, ThemeColor.filter02Dark, true))
-            colors.add(AddFileColourAdapter.Item.Colour(7, ThemeColor.filter06Dark, true))
-            colors.add(AddFileColourAdapter.Item.Colour(8, ThemeColor.filter07Dark, true))
-        } else {
-            colors.add(AddFileColourAdapter.Item.Colour(1, ThemeColor.primaryText02Light, false))
-            colors.add(AddFileColourAdapter.Item.Colour(2, ThemeColor.filter01Light, true))
-            colors.add(AddFileColourAdapter.Item.Colour(3, ThemeColor.filter05Light, true))
-            colors.add(AddFileColourAdapter.Item.Colour(4, ThemeColor.filter04Light, true))
-            colors.add(AddFileColourAdapter.Item.Colour(5, ThemeColor.filter03Light, true))
-            colors.add(AddFileColourAdapter.Item.Colour(6, ThemeColor.filter02Light, true))
-            colors.add(AddFileColourAdapter.Item.Colour(7, ThemeColor.filter06Light, true))
-            colors.add(AddFileColourAdapter.Item.Colour(8, ThemeColor.filter07Light, true))
-        }
-
         val listItems = mutableListOf<AddFileColourAdapter.Item>()
         listItems.add(AddFileColourAdapter.Item.Image(bitmap))
-        listItems.addAll(colors)
+        listItems.addAll(
+            if (Theme.isDark(this)) {
+                darkThemeColors()
+            } else {
+                lightThemeColors()
+            }
+        )
         colorAdapter.submitList(listItems)
     }
 

@@ -8,14 +8,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 
 @Composable
-fun EpisodeDateTimeText(episode: PodcastEpisode, modifier: Modifier = Modifier) {
+fun EpisodeDateTimeText(episode: BaseEpisode, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val shortDate = episode.publishedDate.toLocalizedFormatPattern("dd MMM")
     val timeLeft = TimeHelper.getTimeLeft(
