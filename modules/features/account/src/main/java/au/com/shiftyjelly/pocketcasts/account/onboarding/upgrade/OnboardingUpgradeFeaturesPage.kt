@@ -85,7 +85,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -141,32 +140,31 @@ internal fun OnboardingUpgradeFeaturesPage(
         when (state) {
             is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
             is OnboardingUpgradeFeaturesState.Loaded -> {
-                val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
-                if (BuildConfig.ADD_PATRON_ENABLED) {
-                    UpgradeLayout(
-                        state = loadedState,
-                        scrollState = scrollState,
-                        onBackPressed = onBackPressed,
-                        onNotNowPressed = onNotNowPressed,
-                        onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                        onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
-                        onUpgradePressed = onUpgradePressed,
-                        canUpgrade = canUpgrade,
-                        upgradePrice = { productId: String -> viewModel.getUpgradePrice(subscriptions, productId) },
-                    )
-                } else {
-                    OldUpgradeLayout(
-                        state = loadedState,
-                        scrollState = scrollState,
-                        onBackPressed = onBackPressed,
-                        onUpgradePressed = onUpgradePressed,
-                        onNotNowPressed = onNotNowPressed,
-                        canUpgrade = canUpgrade,
-                    )
-                }
+                UpgradeLayout(
+                    state = state as OnboardingUpgradeFeaturesState.Loaded,
+                    scrollState = scrollState,
+                    onBackPressed = onBackPressed,
+                    onNotNowPressed = onNotNowPressed,
+                    onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
+                    onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
+                    onUpgradePressed = onUpgradePressed,
+                    canUpgrade = canUpgrade,
+                    upgradePrice = { productId: String -> viewModel.getUpgradePrice(subscriptions, productId) },
+                )
+            }
+            is OnboardingUpgradeFeaturesState.OldLoaded -> {
+                OldUpgradeLayout(
+                    state = state as OnboardingUpgradeFeaturesState.OldLoaded,
+                    scrollState = scrollState,
+                    onBackPressed = onBackPressed,
+                    onUpgradePressed = onUpgradePressed,
+                    onNotNowPressed = onNotNowPressed,
+                    canUpgrade = canUpgrade,
+                )
             }
         }
     }
+    viewModel.start(subscriptions)
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -471,7 +469,7 @@ private fun FeatureItem(
 
 @Composable
 private fun BoxWithConstraintsScope.OldUpgradeLayout(
-    state: OnboardingUpgradeFeaturesState.Loaded,
+    state: OnboardingUpgradeFeaturesState.OldLoaded,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onUpgradePressed: () -> Unit,

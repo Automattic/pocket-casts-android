@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PATRON_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -23,6 +25,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -31,22 +34,50 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     app: Application,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val subscriptionManager: SubscriptionManager,
 ) : AndroidViewModel(app) {
 
     private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState> = MutableStateFlow(OnboardingUpgradeFeaturesState.Loading)
-    val state: StateFlow<OnboardingUpgradeFeaturesState>
+    val state: StateFlow<OnboardingUpgradeFeaturesState> = _state
 
-    init {
-        val accessibiltyManager = getApplication<Application>().getSystemService(Context.ACCESSIBILITY_SERVICE)
-            as? AccessibilityManager
+    fun start(subscriptions: List<Subscription>) {
+        if (BuildConfig.ADD_PATRON_ENABLED) {
+            updateState(subscriptions)
+        } else {
+            val accessibiltyManager = getApplication<Application>().getSystemService(Context.ACCESSIBILITY_SERVICE)
+                as? AccessibilityManager
 
-        val isTouchExplorationEnabled = accessibiltyManager?.isTouchExplorationEnabled ?: false
-        _state.value = OnboardingUpgradeFeaturesState.Loaded(isTouchExplorationEnabled)
-        state = _state
-
-        accessibiltyManager?.addTouchExplorationStateChangeListener { enabled ->
-            _state.value = OnboardingUpgradeFeaturesState.Loaded(enabled)
+            var isTouchExplorationEnabled = accessibiltyManager?.isTouchExplorationEnabled ?: false
+            accessibiltyManager?.addTouchExplorationStateChangeListener {
+                isTouchExplorationEnabled = it
+            }
+            _state.update { OnboardingUpgradeFeaturesState.OldLoaded(isTouchExplorationEnabled) }
         }
+    }
+
+    private fun updateState(
+        subscriptions: List<Subscription>,
+    ) {
+        val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions) // TODO: Patron or Plus?
+        defaultSelected?.let {
+            val currentSubscriptionFrequency = when (defaultSelected.recurringPricingPhase) {
+                is SubscriptionPricingPhase.Months -> SubscriptionFrequency.MONTHLY
+                is SubscriptionPricingPhase.Years -> SubscriptionFrequency.YEARLY
+            }
+            val currentFeatureCard =
+                if (defaultSelected.productDetails.productId.startsWith(PLUS_PRODUCT_BASE)) {
+                    UpgradeFeatureCard.PLUS
+                } else {
+                    UpgradeFeatureCard.PATRON
+                }
+            _state.update {
+                OnboardingUpgradeFeaturesState.Loaded(
+                    currentSubscription = defaultSelected,
+                    currentFeatureCard = currentFeatureCard,
+                    currentSubscriptionFrequency = currentSubscriptionFrequency
+                )
+            }
+        } ?: Timber.e("No subscriptions found")
     }
 
     fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
@@ -103,12 +134,19 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
 sealed class OnboardingUpgradeFeaturesState {
     object Loading : OnboardingUpgradeFeaturesState()
-    data class Loaded(
+
+    data class OldLoaded(
         private val isTouchExplorationEnabled: Boolean,
-        val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
-        val currentSubscriptionFrequency: SubscriptionFrequency = SubscriptionFrequency.YEARLY,
     ) : OnboardingUpgradeFeaturesState() {
         val scrollAutomatically = !isTouchExplorationEnabled
+    }
+
+    data class Loaded(
+        val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
+        val currentSubscriptionFrequency: SubscriptionFrequency = SubscriptionFrequency.YEARLY,
+        val currentSubscription: Subscription,
+    ) : OnboardingUpgradeFeaturesState() {
+
         val featureCards = UpgradeFeatureCard.values().toList()
         val subscriptionFrequencies =
             listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
