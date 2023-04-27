@@ -7,6 +7,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PatronUpgradeFeatureItem
@@ -20,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
@@ -44,10 +46,14 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     app: Application,
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val subscriptionManager: SubscriptionManager,
+    private val settings: Settings,
+    savedStateHandle: SavedStateHandle,
 ) : AndroidViewModel(app) {
 
     private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState> = MutableStateFlow(OnboardingUpgradeFeaturesState.Loading)
     val state: StateFlow<OnboardingUpgradeFeaturesState> = _state
+
+    private val source = savedStateHandle.get<OnboardingUpgradeSource>("source")
 
     init {
         if (BuildConfig.ADD_PATRON_ENABLED) {
@@ -84,15 +90,23 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private fun updateState(
         subscriptions: List<Subscription>,
     ) {
-        val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions)
-        defaultSelected?.let {
-            val currentSubscriptionFrequency = defaultSelected.recurringPricingPhase.toSubscriptionFrequency()
-            val defaultTier = SubscriptionMapper.mapProductIdToTier(defaultSelected.productDetails.productId)
-            val currentFeatureCard = defaultTier.toUpgradeFeatureCard()
+        val lastSelectedTier = settings.getLastSelectedSubscriptionTier().takeIf { source == OnboardingUpgradeSource.LOGIN }
+        val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source == OnboardingUpgradeSource.LOGIN }
+
+        val selectedSubscription = subscriptionManager.getDefaultSubscription(
+            subscriptions = subscriptions,
+            tier = lastSelectedTier,
+            frequency = lastSelectedFrequency
+        )
+
+        selectedSubscription?.let {
+            val currentSubscriptionFrequency = selectedSubscription.recurringPricingPhase.toSubscriptionFrequency()
+            val currentTier = SubscriptionMapper.mapProductIdToTier(selectedSubscription.productDetails.productId)
+            val currentFeatureCard = currentTier.toUpgradeFeatureCard()
             _state.update {
                 OnboardingUpgradeFeaturesState.Loaded(
                     subscriptions = subscriptions,
-                    currentSubscription = defaultSelected,
+                    currentSubscription = selectedSubscription,
                     currentFeatureCard = currentFeatureCard,
                     currentSubscriptionFrequency = currentSubscriptionFrequency
                 )
@@ -124,6 +138,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     tier = loadedState.currentFeatureCard.subscriptionTier,
                     frequency = frequency
                 )
+            settings.setLastSelectedSubscriptionFrequency(frequency)
             currentSubscription?.let {
                 _state.update {
                     loadedState.copy(
@@ -143,6 +158,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     tier = upgradeFeatureCard.subscriptionTier,
                     frequency = loadedState.currentSubscriptionFrequency
                 )
+            settings.setLastSelectedSubscriptionTier(upgradeFeatureCard.subscriptionTier)
             currentSubscription?.let {
                 _state.update {
                     loadedState.copy(

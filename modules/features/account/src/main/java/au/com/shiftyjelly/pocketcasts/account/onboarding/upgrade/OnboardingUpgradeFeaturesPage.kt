@@ -240,8 +240,9 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                     contentAlignment = Alignment.Center
                 ) {
                     StyledToggle(
-                        state.subscriptionFrequencies
+                        items = state.subscriptionFrequencies
                             .map { stringResource(id = it.localisedLabelRes) },
+                        defaultSelectedItemIndex = state.subscriptionFrequencies.indexOf(state.currentSubscriptionFrequency),
                     ) {
                         val selectedFrequency = state.subscriptionFrequencies[it]
                         onSubscriptionFrequencyChanged(selectedFrequency)
@@ -270,8 +271,7 @@ fun FeatureCards(
     canUpgrade: Boolean,
 ) {
     val resources = LocalContext.current.resources
-    val pagerState = rememberPagerState()
-
+    val pagerState = rememberPagerState(initialPage = state.featureCards.indexOf(state.currentFeatureCard))
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { index ->
             onFeatureCardChanged(index)

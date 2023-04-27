@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import io.reactivex.Observable
@@ -605,4 +607,10 @@ interface Settings {
 
     fun isNotificationsDisabledMessageShown(): Boolean
     fun setNotificationsDisabledMessageShown(value: Boolean)
+
+    fun setLastSelectedSubscriptionTier(tier: Subscription.SubscriptionTier)
+    fun getLastSelectedSubscriptionTier(): Subscription.SubscriptionTier?
+
+    fun setLastSelectedSubscriptionFrequency(frequency: SubscriptionFrequency)
+    fun getLastSelectedSubscriptionFrequency(): SubscriptionFrequency?
 }
