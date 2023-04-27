@@ -36,13 +36,14 @@ import coil.request.SuccessResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.withTimeoutOrNull
@@ -101,21 +102,17 @@ class EpisodeViewModel @Inject constructor(
         ),
     )
 
-    private val _stateFlow = MutableStateFlow<State>(State.Empty)
-    val stateFlow = _stateFlow.asStateFlow()
+    val stateFlow: StateFlow<State>
 
     init {
         val episodeUuid = savedStateHandle.get<String>(EpisodeScreenFlow.episodeUuidArgument)
             ?: throw IllegalStateException("EpisodeViewModel must have an episode uuid in the SavedStateHandle")
 
-        val episodeFlow = episodeManager
-            .observeEpisodeByUuid(episodeUuid)
+        val episodeFlow = episodeManager.observeEpisodeByUuid(episodeUuid)
 
         val podcastFlow = episodeFlow
             .filterIsInstance<PodcastEpisode>()
-            .map {
-                podcastManager.findPodcastByUuidSuspend(it.podcastUuid)
-            }
+            .map { podcastManager.findPodcastByUuidSuspend(it.podcastUuid) }
 
         val isPlayingEpisodeFlow = playbackManager.playbackStateRelay.asFlow()
             .filter { it.episodeUuid == episodeUuid }
@@ -123,45 +120,40 @@ class EpisodeViewModel @Inject constructor(
 
         val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow()
 
-        viewModelScope.launch {
-
-            val downloadProgressFlow = combine(
-                episodeFlow,
-                downloadManager.progressUpdateRelay.asFlow()
-            ) { episode, downloadProgressUpdate ->
-                (episode to downloadProgressUpdate)
-            }.filter { (episode, downloadProgressUpdate) ->
-                episode.uuid == downloadProgressUpdate.episodeUuid
-            }.map { (_, downloadProgressUpdate) ->
-                downloadProgressUpdate.downloadProgress
-            }
-
-            val showNotesFlow = episodeFlow
-                .filterIsInstance<PodcastEpisode>() // user episodes don't have show notes
-                .map { showNotesManager.loadShowNotes(it.uuid) }
-
-            combine6(
-                episodeFlow,
-                // Emitting a value "onStart" for the flows that shouldn't block the UI
-                podcastFlow.onStart { emit(null) },
-                isPlayingEpisodeFlow.onStart { emit(false) },
-                inUpNextFlow,
-                downloadProgressFlow.onStart<Float?> { emit(null) },
-                showNotesFlow.onStart { emit(null) }
-            ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotes ->
-                State.Loaded(
-                    episode = episode,
-                    podcast = podcast,
-                    isPlayingEpisode = isPlayingEpisode,
-                    downloadProgress = downloadProgress,
-                    inUpNext = isInUpNext(upNext, episode),
-                    tintColor = getTintColor(episode, podcast, theme),
-                    showNotes = showNotes,
-                )
-            }.collect {
-                _stateFlow.value = it
-            }
+        val downloadProgressFlow = combine(
+            episodeFlow,
+            downloadManager.progressUpdateRelay.asFlow()
+        ) { episode, downloadProgressUpdate ->
+            (episode to downloadProgressUpdate)
+        }.filter { (episode, downloadProgressUpdate) ->
+            episode.uuid == downloadProgressUpdate.episodeUuid
+        }.map { (_, downloadProgressUpdate) ->
+            downloadProgressUpdate.downloadProgress
         }
+
+        val showNotesFlow = episodeFlow
+            .filterIsInstance<PodcastEpisode>() // user episodes don't have show notes
+            .map { showNotesManager.loadShowNotes(it.uuid) }
+
+        stateFlow = combine6(
+            episodeFlow,
+            // Emitting a value "onStart" for the flows that shouldn't block the UI
+            podcastFlow.onStart { emit(null) },
+            isPlayingEpisodeFlow.onStart { emit(false) },
+            inUpNextFlow,
+            downloadProgressFlow.onStart<Float?> { emit(null) },
+            showNotesFlow.onStart { emit(null) }
+        ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotes ->
+            State.Loaded(
+                episode = episode,
+                podcast = podcast,
+                isPlayingEpisode = isPlayingEpisode,
+                downloadProgress = downloadProgress,
+                inUpNext = isInUpNext(upNext, episode),
+                tintColor = getTintColor(episode, podcast, theme),
+                showNotes = showNotes,
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), State.Empty)
     }
 
     private fun isInUpNext(
