@@ -259,11 +259,14 @@ sealed class OnboardingUpgradeFeaturesState {
         val purchaseFailed: Boolean = false,
     ) : OnboardingUpgradeFeaturesState() {
 
-        val featureCards = UpgradeFeatureCard.values().toList()
+        val featureCards = SubscriptionTier.values().toList()
+            .filter { tier -> tier != SubscriptionTier.UNKNOWN && tier in subscriptions.map { it.tier } }
+            .map { it.toUpgradeFeatureCard() }
         val subscriptionFrequencies =
             listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
         val currentUpgradeButton: UpgradeButton
             get() = currentSubscription.toUpgradeButton()
+        val showPageIndicator = featureCards.size > 1
     }
 }
 

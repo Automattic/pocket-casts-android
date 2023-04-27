@@ -295,24 +295,25 @@ fun FeatureCards(
         )
     }
 
-    // Page indicator
-    Row(
-        Modifier
-            .height(40.dp)
-            .fillMaxWidth()
-            .padding(top = 24.dp),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        repeat(state.featureCards.size) { iteration ->
-            val color =
-                if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clip(CircleShape)
-                    .background(color)
-                    .size(8.dp)
-            )
+    if (state.showPageIndicator) {
+        Row(
+            Modifier
+                .height(40.dp)
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            repeat(state.featureCards.size) { iteration ->
+                val color =
+                    if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(8.dp)
+                )
+            }
         }
     }
 
