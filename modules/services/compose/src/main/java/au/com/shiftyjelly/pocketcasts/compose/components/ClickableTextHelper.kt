@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -32,6 +33,7 @@ fun ClickableTextHelper(
     text: String,
     clickables: List<Clickable>,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    lineHeight: TextUnit,
     textAlign: TextAlign = TextAlign.Start,
     modifier: Modifier = Modifier,
 ) {
@@ -108,7 +110,7 @@ fun ClickableTextHelper(
         text = annotatedString,
         style = TextStyle(
             color = color,
-            lineHeight = 16.sp,
+            lineHeight = lineHeight,
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
             textAlign = textAlign,

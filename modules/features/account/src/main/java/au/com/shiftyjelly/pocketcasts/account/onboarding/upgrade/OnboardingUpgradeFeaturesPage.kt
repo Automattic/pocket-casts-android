@@ -64,6 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
@@ -395,6 +396,11 @@ fun FeatureCard(
                 card.featureItems.forEach {
                     FeatureItem(it)
                 }
+                OnboardingUpgradeHelper.PrivacyPolicy(
+                    color = Color(0xA3000000).copy(alpha = .8f),
+                    textAlign = TextAlign.Start,
+                    lineHeight = 18.sp
+                )
             }
 
             if (canUpgrade) {

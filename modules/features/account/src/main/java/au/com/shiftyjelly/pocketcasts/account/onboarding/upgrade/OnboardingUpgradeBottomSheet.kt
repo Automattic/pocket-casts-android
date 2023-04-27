@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,12 +40,9 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
-import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
-import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -193,32 +189,9 @@ fun OnboardingUpgradeBottomSheet(
 
         Spacer(Modifier.height(16.dp))
 
-        val privacyPolicyText = stringResource(LR.string.onboarding_plus_privacy_policy)
-        val termsAndConditionsText = stringResource(LR.string.onboarding_plus_terms_and_conditions)
-        val text = stringResource(
-            LR.string.onboarding_plus_continuing_agrees_to,
-            privacyPolicyText,
-            termsAndConditionsText
-        )
-        val uriHandler = LocalUriHandler.current
-        ClickableTextHelper(
-            text = text,
+        OnboardingUpgradeHelper.PrivacyPolicy(
             color = Color.White,
             textAlign = TextAlign.Center,
-            clickables = listOf(
-                Clickable(
-                    text = privacyPolicyText,
-                    onClick = {
-                        uriHandler.openUri(Settings.INFO_PRIVACY_URL)
-                    }
-                ),
-                Clickable(
-                    text = termsAndConditionsText,
-                    onClick = {
-                        uriHandler.openUri(Settings.INFO_TOS_URL)
-                    }
-                ),
-            )
         )
     }
 }
