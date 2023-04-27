@@ -111,7 +111,9 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     currentSubscriptionFrequency = currentSubscriptionFrequency
                 )
             }
-        } ?: Timber.e("No subscriptions found")
+        } ?: _state.update { // In ideal world, we should never get here
+            OnboardingUpgradeFeaturesState.NoSubscriptions
+        }
     }
 
     fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
@@ -240,6 +242,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
 sealed class OnboardingUpgradeFeaturesState {
     object Loading : OnboardingUpgradeFeaturesState()
+
+    object NoSubscriptions : OnboardingUpgradeFeaturesState()
 
     data class OldLoaded(
         private val isTouchExplorationEnabled: Boolean,

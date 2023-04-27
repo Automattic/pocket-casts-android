@@ -163,6 +163,12 @@ internal fun OnboardingUpgradeFeaturesPage(
                     canUpgrade = canUpgrade,
                 )
             }
+            is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
+                NoSubscriptionsLayout(
+                    onBackPressed = onBackPressed,
+                    onNotNowPressed = onNotNowPressed,
+                )
+            }
         }
     }
 }
@@ -642,6 +648,53 @@ private fun OldFeatureItem(
             color = Color.White,
             modifier = Modifier.alpha(0.72f),
         )
+    }
+}
+
+@Composable
+fun BoxWithConstraintsScope.NoSubscriptionsLayout(
+    onBackPressed: () -> Unit,
+    onNotNowPressed: () -> Unit,
+) {
+    Column(
+        Modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .heightIn(min = this.calculateMinimumHeightWithInsets())
+            .fillMaxWidth()
+    ) {
+
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            NavigationIconButton(
+                onNavigationClick = onBackPressed,
+                iconColor = Color.White,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(48.dp)
+            )
+            TextH30(
+                text = stringResource(LR.string.not_now),
+                color = Color.White,
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .clickable { onNotNowPressed() },
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            TextH30(
+                text = stringResource(id = LR.string.onboarding_upgrade_no_subscriptions_found)
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 

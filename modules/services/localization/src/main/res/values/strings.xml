@@ -1543,6 +1543,7 @@
     <string name="onboarding_recommendations_more">More %s</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket&#160;Casts, plus more</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customization options</string>
+    <string name="onboarding_upgrade_no_subscriptions_found">No subscriptions found.</string>
     <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
     <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
