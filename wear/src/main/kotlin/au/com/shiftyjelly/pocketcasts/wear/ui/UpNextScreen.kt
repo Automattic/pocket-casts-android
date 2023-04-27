@@ -59,6 +59,7 @@ fun UpNextScreen(
                     items(list) { episode ->
                         EpisodeChip(
                             episode = episode,
+                            useUpNextIcon = false,
                             onClick = {
                                 navigateToEpisode(episode.uuid)
                             },

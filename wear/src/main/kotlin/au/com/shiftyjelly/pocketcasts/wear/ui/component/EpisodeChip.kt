@@ -43,7 +43,11 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun EpisodeChip(episode: BaseEpisode, onClick: () -> Unit) {
+fun EpisodeChip(
+    episode: BaseEpisode,
+    useUpNextIcon: Boolean = true,
+    onClick: () -> Unit,
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -85,12 +89,13 @@ fun EpisodeChip(episode: BaseEpisode, onClick: () -> Unit) {
                         .clip(RoundedCornerShape(4.dp)),
                 )
 
-                if (episode.isDownloaded || isInUpNextQueue) {
+                val showUpNextIcon = useUpNextIcon && isInUpNextQueue
+                if (episode.isDownloaded || showUpNextIcon) {
                     Row(
                         horizontalArrangement = spacedBy(4.dp),
                         modifier = Modifier.padding(top = 4.dp)
                     ) {
-                        if (isInUpNextQueue) {
+                        if (showUpNextIcon) {
                             Icon(
                                 painter = painterResource(R.drawable.ic_upnext),
                                 contentDescription = stringResource(LR.string.episode_in_up_next),
