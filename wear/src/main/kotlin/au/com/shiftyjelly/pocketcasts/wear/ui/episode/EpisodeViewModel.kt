@@ -1,11 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
+import android.app.Application
+import android.content.Context
+import android.graphics.drawable.BitmapDrawable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.palette.graphics.Palette
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
@@ -26,7 +30,11 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,8 +46,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -53,7 +64,8 @@ class EpisodeViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val showNotesManager: ServerShowNotesManager,
     theme: Theme,
-) : ViewModel() {
+    @ApplicationContext appContext: Context,
+) : AndroidViewModel(appContext as Application) {
 
     private val analyticsSource = AnalyticsSource.WATCH_EPISODE_DETAILS
 
@@ -126,61 +138,60 @@ class EpisodeViewModel @Inject constructor(
             }
 
             val showNotesFlow = flow {
+                // FIXME don't load show notes for user episodes
                 emit(showNotesManager.loadShowNotes(episodeUuid))
             }
 
             combine6(
                 episodeFlow,
-                // Emitting a value "onStart" for the flows that don't need to block the UI
+                // Emitting a value "onStart" for the flows that shouldn't block the UI
                 podcastFlow.onStart { emit(null) },
                 isPlayingEpisodeFlow.onStart { emit(false) },
                 inUpNextFlow,
                 downloadProgressFlow.onStart<Float?> { emit(null) },
                 showNotesFlow.onStart { emit(null) }
             ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotes ->
-
-                val inUpNext = (upNext is UpNextQueue.State.Loaded) &&
-                    (upNext.queue + upNext.episode)
-                        .map { it.uuid }
-                        .contains(episode.uuid)
-
-                if (podcast != null) {
-                    val podcastTint = podcast.getTintColor(theme.isDarkTheme)
-
-                    val tint = ThemeColor.podcastIcon02(theme.activeTheme, podcastTint)
-                    val tintColor = Color(tint)
-
-                    State.Loaded(
-                        episode = episode,
-                        podcast = podcast,
-                        isPlayingEpisode = isPlayingEpisode,
-                        downloadProgress = downloadProgress,
-                        inUpNext = inUpNext,
-                        tintColor = tintColor,
-                        showNotes = showNotes,
-                    )
-                } else {
-
-                    val tintColor = AddFileActivity.darkThemeColors().find {
-                        (episode as? UserEpisode)?.tintColorIndex == it.tintColorIndex
-                    }?.let {
-                        Color(it.color)
-                    }
-
-                    State.Loaded(
-                        episode = episode,
-                        podcast = null,
-                        isPlayingEpisode = isPlayingEpisode,
-                        downloadProgress = downloadProgress,
-                        inUpNext = inUpNext,
-                        tintColor = tintColor,
-                        showNotes = showNotes,
-                    )
-                }
+                State.Loaded(
+                    episode = episode,
+                    podcast = podcast,
+                    isPlayingEpisode = isPlayingEpisode,
+                    downloadProgress = downloadProgress,
+                    inUpNext = isInUpNext(upNext, episode),
+                    tintColor = getTintColor(episode, podcast, theme),
+                    showNotes = showNotes,
+                )
             }.collect {
                 _stateFlow.value = it
             }
         }
+    }
+
+    private fun isInUpNext(
+        upNext: UpNextQueue.State?,
+        episode: BaseEpisode,
+    ) =
+        (upNext is UpNextQueue.State.Loaded) &&
+            (upNext.queue + upNext.episode)
+                .map { it.uuid }
+                .contains(episode.uuid)
+
+    private suspend fun getTintColor(
+        episode: BaseEpisode,
+        podcast: Podcast?,
+        theme: Theme,
+    ): Color? = when (episode) {
+        is PodcastEpisode ->
+            podcast?.getTintColor(theme.isDarkTheme)?.let { podcastTint ->
+                val tint = ThemeColor.podcastIcon02(theme.activeTheme, podcastTint)
+                Color(tint)
+            }
+        is UserEpisode ->
+            // First check if the user has set a custom color for this episode
+            AddFileActivity.darkThemeColors().find {
+                episode.tintColorIndex == it.tintColorIndex
+            }?.let {
+                Color(it.color)
+            } ?: extractColorFromEpisodeArtwork(episode)
     }
 
     fun downloadEpisode() {
@@ -204,7 +215,8 @@ class EpisodeViewModel @Inject constructor(
                     uuid = episode.uuid
                 )
             } else if (!episode.isDownloaded) {
-                episode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+                episode.autoDownloadStatus =
+                    PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                 downloadManager.addEpisodeToQueue(episode, fromString, true)
 
                 episodeAnalytics.trackEvent(
@@ -220,7 +232,12 @@ class EpisodeViewModel @Inject constructor(
     fun deleteDownloadedEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, removeFromUpNext = true)
+            episodeManager.deleteEpisodeFile(
+                episode,
+                playbackManager,
+                disableAutoDownload = true,
+                removeFromUpNext = true
+            )
             episodeAnalytics.trackEvent(
                 event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
                 source = analyticsSource,
@@ -278,7 +295,10 @@ class EpisodeViewModel @Inject constructor(
 
     private fun removeFromUpNext() {
         val state = stateFlow.value as? State.Loaded ?: return
-        playbackManager.removeEpisode(episodeToRemove = state.episode, source = AnalyticsSource.WATCH_EPISODE_DETAILS)
+        playbackManager.removeEpisode(
+            episodeToRemove = state.episode,
+            source = AnalyticsSource.WATCH_EPISODE_DETAILS
+        )
     }
 
     fun onUpNextClicked(
@@ -309,10 +329,18 @@ class EpisodeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             if (episode.isArchived) {
                 episodeManager.unarchive(episode)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, analyticsSource, episode.uuid)
+                episodeAnalytics.trackEvent(
+                    AnalyticsEvent.EPISODE_UNARCHIVED,
+                    analyticsSource,
+                    episode.uuid
+                )
             } else {
                 episodeManager.archive(episode, playbackManager)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, analyticsSource, episode.uuid)
+                episodeAnalytics.trackEvent(
+                    AnalyticsEvent.EPISODE_ARCHIVED,
+                    analyticsSource,
+                    episode.uuid
+                )
             }
         }
     }
@@ -325,7 +353,8 @@ class EpisodeViewModel @Inject constructor(
             }
 
             episodeManager.toggleStarEpisodeAsync(episode)
-            val event = if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
+            val event =
+                if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
             episodeAnalytics.trackEvent(event, analyticsSource, episode.uuid)
         }
     }
@@ -344,4 +373,32 @@ class EpisodeViewModel @Inject constructor(
             }
         }
     }
+
+    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color? =
+        userEpisode.artworkUrl?.let { artworkUrl ->
+            val context = getApplication<Application>()
+            val loader = ImageLoader(context)
+            val request = ImageRequest.Builder(context)
+                .data(artworkUrl)
+                .allowHardware(false) // Disable hardware bitmaps.
+                .build()
+
+            val result = (loader.execute(request) as SuccessResult).drawable
+            val bitmap = (result as BitmapDrawable).bitmap
+
+            // Set a timeout to make sure the user isn't blocked for too long just
+            // because we're trying to extract a tint color.
+            withTimeoutOrNull(2000L) {
+                suspendCoroutine { continuation ->
+                    Palette.from(bitmap).generate { palette ->
+                        val lightVibrantHsl = palette?.lightVibrantSwatch?.hsl
+                        continuation.resume(
+                            lightVibrantHsl?.let { hsl ->
+                                Color.hsl(hsl[0], hsl[1], hsl[2])
+                            }
+                        )
+                    }
+                }
+            }
+        }
 }
