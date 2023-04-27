@@ -129,24 +129,6 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         }
     }
 
-    fun getUpgradePrice(
-        subscriptions: List<Subscription>,
-        subscriptionTier: SubscriptionTier,
-    ): String {
-        val loadedState = _state.value as? OnboardingUpgradeFeaturesState.Loaded
-        return loadedState?.let {
-            subscriptions
-                .find {
-                    if (loadedState.currentSubscriptionFrequency == SubscriptionFrequency.MONTHLY) {
-                        it.recurringPricingPhase is SubscriptionPricingPhase.Months
-                    } else {
-                        it.recurringPricingPhase is SubscriptionPricingPhase.Years
-                    } && SubscriptionMapper.mapProductIdToTier(it.productDetails.productId) == subscriptionTier
-                }
-                ?.recurringPricingPhase?.formattedPrice
-        } ?: ""
-    }
-
     companion object {
         private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) =
             mapOf("flow" to flow.analyticsValue, "source" to source.analyticsValue)
@@ -189,7 +171,6 @@ private fun RecurringSubscriptionPricingPhase.toSubscriptionFrequency() = when (
 enum class UpgradeFeatureCard(
     @StringRes val titleRes: Int,
     @StringRes val shortNameRes: Int,
-    @StringRes val descriptionRes: Int,
     @DrawableRes val backgroundGlowsRes: Int,
     @DrawableRes val iconRes: Int,
     val buttonBackgroundColor: Long,
@@ -200,7 +181,6 @@ enum class UpgradeFeatureCard(
     PLUS(
         titleRes = LR.string.onboarding_plus_features_title,
         shortNameRes = LR.string.pocket_casts_plus_short,
-        descriptionRes = LR.string.onboarding_plus_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         iconRes = IR.drawable.ic_plus,
         buttonBackgroundColor = 0xFFFFD846,
@@ -211,7 +191,6 @@ enum class UpgradeFeatureCard(
     PATRON(
         titleRes = LR.string.onboarding_patron_features_title,
         shortNameRes = LR.string.pocket_casts_patron_short,
-        descriptionRes = LR.string.onboarding_patron_features_description,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
         iconRes = IR.drawable.ic_patron,
         buttonBackgroundColor = 0xFF6046F5,

@@ -81,11 +81,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -152,7 +150,6 @@ internal fun OnboardingUpgradeFeaturesPage(
                     onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCards[it]) },
                     onUpgradePressed = onUpgradePressed,
                     canUpgrade = canUpgrade,
-                    upgradePrice = { subscriptionTier: SubscriptionTier -> viewModel.getUpgradePrice(subscriptions, subscriptionTier) },
                 )
             }
             is OnboardingUpgradeFeaturesState.OldLoaded -> {
@@ -181,7 +178,6 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
     onFeatureCardChanged: (Int) -> Unit,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
-    upgradePrice: (SubscriptionTier) -> String,
 ) {
     OnboardingUpgradeHelper.UpgradeBackground(
         modifier = Modifier.verticalScroll(scrollState),
@@ -257,7 +253,6 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                     onFeatureCardChanged = onFeatureCardChanged,
                     onUpgradePressed = onUpgradePressed,
                     canUpgrade = canUpgrade,
-                    upgradePrice = upgradePrice,
                 )
             }
 
@@ -273,7 +268,6 @@ fun FeatureCards(
     onFeatureCardChanged: (Int) -> Unit,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
-    upgradePrice: (SubscriptionTier) -> String,
 ) {
     val pagerState = rememberPagerState()
 
@@ -290,11 +284,9 @@ fun FeatureCards(
         contentPadding = PaddingValues(horizontal = 32.dp),
     ) { index ->
         FeatureCard(
-            subscriptionFrequency = state.currentSubscriptionFrequency,
             card = state.featureCards[index],
             onUpgradePressed = onUpgradePressed,
             canUpgrade = canUpgrade,
-            upgradePrice = upgradePrice,
         )
     }
 
@@ -320,14 +312,11 @@ fun FeatureCards(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FeatureCard(
-    subscriptionFrequency: SubscriptionFrequency,
     card: UpgradeFeatureCard,
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
-    upgradePrice: (SubscriptionTier) -> String,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -349,46 +338,6 @@ fun FeatureCard(
             ) {
                 FeaturePill(card.iconRes, card.shortNameRes)
             }
-
-            Row(
-                modifier = modifier
-                    .padding(bottom = 8.dp),
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                AnimatedContent(
-                    targetState = upgradePrice(card.subscriptionTier),
-                    label = "price"
-                ) { price ->
-                    TextH10(
-                        text = price,
-                        color = Color.Black,
-                        modifier = modifier.padding(end = 8.dp)
-                    )
-                }
-
-                TextH30(
-                    text = stringResource(
-                        id = when (subscriptionFrequency) {
-                            SubscriptionFrequency.YEARLY -> LR.string.slash_year
-                            SubscriptionFrequency.MONTHLY -> LR.string.slash_month
-                            SubscriptionFrequency.NONE -> throw IllegalStateException("Unknown subscription frequency: $subscriptionFrequency")
-                        }
-                    ),
-                    color = Color.Black,
-                    modifier = modifier
-                        .alpha(.6f)
-                        .padding(bottom = 6.dp)
-                )
-            }
-
-            TextH70(
-                text = stringResource(id = card.descriptionRes),
-                color = Color.Black,
-                textAlign = TextAlign.Start,
-                modifier = modifier
-                    .padding(bottom = 8.dp)
-                    .alpha(.6f)
-            )
 
             Column(
                 modifier = modifier.padding(bottom = 18.dp)
