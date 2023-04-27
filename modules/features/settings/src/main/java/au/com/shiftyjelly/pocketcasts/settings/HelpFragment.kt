@@ -103,15 +103,23 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
         return view
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        return if (item.itemId == R.id.menu_status_page) {
-            val fragment = StatusFragment()
-            (activity as? FragmentHostListener)?.addFragment(fragment)
-            true
-        } else {
-            false
+    override fun onMenuItemClick(item: MenuItem): Boolean =
+        when (item.itemId) {
+
+            R.id.menu_logs -> {
+                val fragment = LogsFragment()
+                (activity as? FragmentHostListener)?.addFragment(fragment)
+                true
+            }
+
+            R.id.menu_status_page -> {
+                val fragment = StatusFragment()
+                (activity as? FragmentHostListener)?.addFragment(fragment)
+                true
+            }
+
+            else -> false
         }
-    }
 
     override fun onBackPressed(): Boolean {
         webView?.let {
@@ -188,7 +196,12 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val intent = support.sendEmail(subject = "Android feedback.", intro = "It's a great app, but it really needs...", context)
+                val intent = support.shareLogs(
+                    subject = "Android feedback.",
+                    intro = "It's a great app, but it really needs...",
+                    emailSupport = true,
+                    context = context,
+                )
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
                 UiUtil.displayDialogNoEmailApp(context)
@@ -203,7 +216,12 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val intent = support.sendEmail(subject = "Android support.", intro = "Hi there, just needed help with something...", context)
+                val intent = support.shareLogs(
+                    subject = "Android support.",
+                    intro = "Hi there, just needed help with something...",
+                    emailSupport = true,
+                    context = context,
+                )
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
                 UiUtil.displayDialogNoEmailApp(context)

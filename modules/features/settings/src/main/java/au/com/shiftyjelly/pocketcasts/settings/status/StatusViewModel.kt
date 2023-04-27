@@ -113,7 +113,12 @@ class StatusViewModel @Inject constructor(
 
         launch {
             try {
-                val intent = support.sendEmail(subject = "Android status report.", intro = "Hi there, just needed help with something...", context)
+                val intent = support.shareLogs(
+                    subject = "Android status report.",
+                    intro = "Hi there, just needed help with something...",
+                    emailSupport = true,
+                    context = context,
+                )
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
                 UiUtil.displayDialogNoEmailApp(context)
