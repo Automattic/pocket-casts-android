@@ -14,6 +14,7 @@ sealed interface Subscription {
         get() = productDetails.title.split(" (").first()
 
     fun numFreeThenPricePerPeriod(res: Resources): String?
+    fun tryFreeThenPricePerPeriod(res: Resources): String?
 
     // Simple subscriptions do not have a trial phase
     class Simple(
@@ -24,6 +25,7 @@ sealed interface Subscription {
     ) : Subscription {
         override val trialPricingPhase = null
         override fun numFreeThenPricePerPeriod(res: Resources): String? = null
+        override fun tryFreeThenPricePerPeriod(res: Resources): String? = null
     }
 
     class WithTrial(
@@ -37,6 +39,17 @@ sealed interface Subscription {
             val stringRes = when (recurringPricingPhase) {
                 is SubscriptionPricingPhase.Years -> R.string.plus_trial_then_slash_year
                 is SubscriptionPricingPhase.Months -> R.string.plus_trial_then_slash_month
+            }
+            return res.getString(
+                stringRes,
+                trialPricingPhase.periodValuePlural(res),
+                recurringPricingPhase.formattedPrice
+            )
+        }
+        override fun tryFreeThenPricePerPeriod(res: Resources): String {
+            val stringRes = when (recurringPricingPhase) {
+                is SubscriptionPricingPhase.Years -> R.string.trial_then_per_year
+                is SubscriptionPricingPhase.Months -> R.string.trial_then_per_month
             }
             return res.getString(
                 stringRes,

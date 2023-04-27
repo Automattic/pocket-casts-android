@@ -80,6 +80,7 @@
     <string name="stop_downloading">Stop downloading</string>
     <string name="stream">Stream</string>
     <string name="subscribe">Subscribe</string>
+    <string name="subscribe_to">Subscribe to %s</string>
     <string name="unarchive_all">Unarchive all</string>
     <string name="unplayed">Unplayed</string>
     <string name="unsubscribe">Unsubscribe</string>
@@ -956,6 +957,12 @@
     <string name="plus_day">day</string>
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
+
+    <!-- Trial -->
+
+    <string name="trial_start">Start my free trial</string>
+    <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
+    <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
 
     <!-- Settings -->
 

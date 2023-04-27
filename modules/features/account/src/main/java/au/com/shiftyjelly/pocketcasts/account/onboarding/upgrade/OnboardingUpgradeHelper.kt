@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -64,11 +65,12 @@ object OnboardingUpgradeHelper {
 
     @Composable
     fun UpgradeRowButton(
-        text: String,
+        primaryText: String,
         backgroundColor: Long,
         textColor: Long,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
+        secondaryText: String? = null,
     ) {
         Button(
             onClick = onClick,
@@ -78,10 +80,21 @@ object OnboardingUpgradeHelper {
                 backgroundColor = Color(backgroundColor),
             ),
         ) {
-            TextH30(
-                text = text,
-                color = Color(textColor),
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                TextH30(
+                    text = primaryText,
+                    color = Color(textColor),
+                )
+                secondaryText?.let { subTitle ->
+                    TextP60(
+                        text = subTitle,
+                        color = Color(textColor),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
         }
     }
 

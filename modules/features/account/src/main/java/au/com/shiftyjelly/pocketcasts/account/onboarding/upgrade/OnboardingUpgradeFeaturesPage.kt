@@ -57,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -269,6 +270,7 @@ fun FeatureCards(
     onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
 ) {
+    val resources = LocalContext.current.resources
     val pagerState = rememberPagerState()
 
     LaunchedEffect(pagerState) {
@@ -285,8 +287,6 @@ fun FeatureCards(
     ) { index ->
         FeatureCard(
             card = state.featureCards[index],
-            onUpgradePressed = onUpgradePressed,
-            canUpgrade = canUpgrade,
         )
     }
 
@@ -310,13 +310,35 @@ fun FeatureCards(
             )
         }
     }
+
+    if (canUpgrade) {
+        val button = state.currentUpgradeButton
+        val subscription = button.subscription
+        val pricePerPeriod = subscription.recurringPricingPhase.pricePerPeriod(resources)
+        val primaryText = when (subscription) {
+            is Subscription.Simple -> stringResource(LR.string.subscribe_to, resources.getString(button.shortNameRes))
+            is Subscription.WithTrial -> stringResource(LR.string.trial_start)
+        }
+        val secondaryText = when (subscription) {
+            is Subscription.Simple -> pricePerPeriod
+            is Subscription.WithTrial -> subscription.tryFreeThenPricePerPeriod(resources)
+        }
+        UpgradeRowButton(
+            primaryText = primaryText,
+            secondaryText = secondaryText,
+            backgroundColor = button.backgroundColor,
+            textColor = button.textColor,
+            onClick = onUpgradePressed,
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 24.dp)
+                .fillMaxWidth(),
+        )
+    }
 }
 
 @Composable
 fun FeatureCard(
     card: UpgradeFeatureCard,
-    onUpgradePressed: () -> Unit,
-    canUpgrade: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -349,15 +371,6 @@ fun FeatureCard(
                     color = Color(0xA3000000).copy(alpha = .8f),
                     textAlign = TextAlign.Start,
                     lineHeight = 18.sp
-                )
-            }
-
-            if (canUpgrade) {
-                UpgradeRowButton(
-                    text = stringResource(LR.string.subscribe),
-                    backgroundColor = card.buttonBackgroundColor,
-                    textColor = card.buttonTextColor,
-                    onClick = onUpgradePressed,
                 )
             }
         }

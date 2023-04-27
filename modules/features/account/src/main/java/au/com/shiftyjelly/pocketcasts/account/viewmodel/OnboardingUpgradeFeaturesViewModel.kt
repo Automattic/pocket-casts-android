@@ -149,17 +149,26 @@ sealed class OnboardingUpgradeFeaturesState {
         val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
         val currentSubscriptionFrequency: SubscriptionFrequency = SubscriptionFrequency.YEARLY,
         val currentSubscription: Subscription,
+
     ) : OnboardingUpgradeFeaturesState() {
 
         val featureCards = UpgradeFeatureCard.values().toList()
         val subscriptionFrequencies =
             listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
+        val currentUpgradeButton: UpgradeButton
+            get() = currentSubscription.toUpgradeButton()
     }
 }
 
 private fun SubscriptionTier.toUpgradeFeatureCard() = when (this) {
     SubscriptionTier.PLUS -> UpgradeFeatureCard.PLUS
     SubscriptionTier.PATRON -> UpgradeFeatureCard.PATRON
+    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+}
+
+private fun Subscription.toUpgradeButton() = when (this.tier) {
+    SubscriptionTier.PLUS -> UpgradeButton.Plus(this)
+    SubscriptionTier.PATRON -> UpgradeButton.Patron(this)
     SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
 }
 
@@ -173,8 +182,6 @@ enum class UpgradeFeatureCard(
     @StringRes val shortNameRes: Int,
     @DrawableRes val backgroundGlowsRes: Int,
     @DrawableRes val iconRes: Int,
-    val buttonBackgroundColor: Long,
-    val buttonTextColor: Long,
     val featureItems: List<UpgradeFeatureItem>,
     val subscriptionTier: SubscriptionTier,
 ) {
@@ -183,8 +190,6 @@ enum class UpgradeFeatureCard(
         shortNameRes = LR.string.pocket_casts_plus_short,
         backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
         iconRes = IR.drawable.ic_plus,
-        buttonBackgroundColor = 0xFFFFD846,
-        buttonTextColor = 0xFF000000,
         featureItems = PlusUpgradeFeatureItem.values().toList(),
         subscriptionTier = SubscriptionTier.PLUS,
     ),
@@ -193,9 +198,32 @@ enum class UpgradeFeatureCard(
         shortNameRes = LR.string.pocket_casts_patron_short,
         backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
         iconRes = IR.drawable.ic_patron,
-        buttonBackgroundColor = 0xFF6046F5,
-        buttonTextColor = 0xFFFFFFFF,
         featureItems = PatronUpgradeFeatureItem.values().toList(),
         subscriptionTier = SubscriptionTier.PATRON,
+    )
+}
+
+sealed class UpgradeButton(
+    @StringRes val shortNameRes: Int,
+    val backgroundColor: Long,
+    val textColor: Long,
+    open val subscription: Subscription,
+) {
+    data class Plus(
+        override val subscription: Subscription,
+    ) : UpgradeButton(
+        shortNameRes = LR.string.pocket_casts_plus_short,
+        backgroundColor = 0xFFFFD846,
+        textColor = 0xFF000000,
+        subscription = subscription,
+    )
+
+    data class Patron(
+        override val subscription: Subscription,
+    ) : UpgradeButton(
+        shortNameRes = LR.string.pocket_casts_patron_short,
+        backgroundColor = 0xFF6046F5,
+        textColor = 0xFFFFFFFF,
+        subscription = subscription,
     )
 }
