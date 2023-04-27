@@ -84,7 +84,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private fun updateState(
         subscriptions: List<Subscription>,
     ) {
-        val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions) // TODO: Patron or Plus?
+        val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions)
         defaultSelected?.let {
             val currentSubscriptionFrequency = defaultSelected.recurringPricingPhase.toSubscriptionFrequency()
             val defaultTier = SubscriptionMapper.mapProductIdToTier(defaultSelected.productDetails.productId)
@@ -119,7 +119,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     fun onSubscriptionFrequencyChanged(frequency: SubscriptionFrequency) {
         (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
             val currentSubscription = subscriptionManager
-                .getSubscriptionByTierAndFrequency(
+                .getDefaultSubscription(
                     subscriptions = loadedState.subscriptions,
                     tier = loadedState.currentFeatureCard.subscriptionTier,
                     frequency = frequency
@@ -138,7 +138,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     fun onFeatureCardChanged(upgradeFeatureCard: UpgradeFeatureCard) {
         (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
             val currentSubscription = subscriptionManager
-                .getSubscriptionByTierAndFrequency(
+                .getDefaultSubscription(
                     subscriptions = loadedState.subscriptions,
                     tier = upgradeFeatureCard.subscriptionTier,
                     frequency = loadedState.currentSubscriptionFrequency
@@ -162,7 +162,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         (state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
             _state.update { loadedState.copy(purchaseFailed = false) }
             val currentSubscription = subscriptionManager
-                .getSubscriptionByTierAndFrequency(
+                .getDefaultSubscription(
                     subscriptions = loadedState.subscriptions,
                     tier = loadedState.currentFeatureCard.subscriptionTier,
                     frequency = loadedState.currentSubscriptionFrequency
@@ -233,8 +233,8 @@ sealed class OnboardingUpgradeFeaturesState {
 
     data class Loaded(
         val subscriptions: List<Subscription>,
-        val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
-        val currentSubscriptionFrequency: SubscriptionFrequency = SubscriptionFrequency.YEARLY,
+        val currentFeatureCard: UpgradeFeatureCard,
+        val currentSubscriptionFrequency: SubscriptionFrequency,
         val currentSubscription: Subscription,
         val purchaseFailed: Boolean = false,
     ) : OnboardingUpgradeFeaturesState() {

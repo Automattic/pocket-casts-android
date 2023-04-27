@@ -34,10 +34,9 @@ interface SubscriptionManager {
     fun clearCachedStatus()
     fun isFreeTrialEligible(): Boolean
     fun updateFreeTrialEligible(eligible: Boolean)
-    fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription?
-    fun getSubscriptionByTierAndFrequency(
+    fun getDefaultSubscription(
         subscriptions: List<Subscription>,
-        tier: Subscription.SubscriptionTier,
-        frequency: SubscriptionFrequency,
+        tier: Subscription.SubscriptionTier? = null,
+        frequency: SubscriptionFrequency? = null,
     ): Subscription?
 }

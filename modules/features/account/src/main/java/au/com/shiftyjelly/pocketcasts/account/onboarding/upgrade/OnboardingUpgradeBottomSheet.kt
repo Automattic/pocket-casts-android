@@ -60,6 +60,8 @@ fun OnboardingUpgradeBottomSheet(
     val state = viewModel.state.collectAsState().value
     val subscriptions = (state as? OnboardingUpgradeBottomSheetState.Loaded)?.subscriptions
         ?: emptyList()
+    val selectedSubscription = (state as? OnboardingUpgradeBottomSheetState.Loaded)?.selectedSubscription
+    val selectedTier = selectedSubscription?.tier
 
     val resources = LocalContext.current.resources
 
@@ -89,43 +91,44 @@ fun OnboardingUpgradeBottomSheet(
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                subscriptions.forEach { subscription ->
+                (selectedTier?.let { subscriptions.filter { it.tier == selectedTier } } ?: subscriptions)
+                    .forEach { subscription ->
 
-                    // Have to remember the interaction source here instead of inside the RowButtons
-                    // because otherwise the interaction sources get misapplied to the wrong button
-                    // as the user changes selections.
-                    val interactionSource = remember(subscription) { MutableInteractionSource() }
+                        // Have to remember the interaction source here instead of inside the RowButtons
+                        // because otherwise the interaction sources get misapplied to the wrong button
+                        // as the user changes selections.
+                        val interactionSource = remember(subscription) { MutableInteractionSource() }
 
-                    val text = subscription.recurringPricingPhase.pricePerPeriod(resources)
-                    val topText = subscription
-                        .trialPricingPhase
-                        ?.numPeriodFreeTrial(resources)
-                        ?.uppercase(Locale.getDefault())
+                        val text = subscription.recurringPricingPhase.pricePerPeriod(resources)
+                        val topText = subscription
+                            .trialPricingPhase
+                            ?.numPeriodFreeTrial(resources)
+                            ?.uppercase(Locale.getDefault())
 
-                    Column {
+                        Column {
 
-                        if (topText == null) {
-                            Spacer(Modifier.height(8.dp))
-                        }
+                            if (topText == null) {
+                                Spacer(Modifier.height(8.dp))
+                            }
 
-                        if (subscription == state.selectedSubscription) {
-                            PlusOutlinedRowButton(
-                                text = text,
-                                topText = topText,
-                                onClick = { viewModel.updateSelectedSubscription(subscription) },
-                                interactionSource = interactionSource,
-                                selectedCheckMark = true,
-                            )
-                        } else {
-                            UnselectedPlusOutlinedRowButton(
-                                text = text,
-                                topText = topText,
-                                onClick = { viewModel.updateSelectedSubscription(subscription) },
-                                interactionSource = interactionSource,
-                            )
+                            if (subscription == state.selectedSubscription) {
+                                PlusOutlinedRowButton(
+                                    text = text,
+                                    topText = topText,
+                                    onClick = { viewModel.updateSelectedSubscription(subscription) },
+                                    interactionSource = interactionSource,
+                                    selectedCheckMark = true,
+                                )
+                            } else {
+                                UnselectedPlusOutlinedRowButton(
+                                    text = text,
+                                    topText = topText,
+                                    onClick = { viewModel.updateSelectedSubscription(subscription) },
+                                    interactionSource = interactionSource,
+                                )
+                            }
                         }
                     }
-                }
             }
 
             val descriptionText = state.selectedSubscription.trialPricingPhase.let { trialPhase ->
