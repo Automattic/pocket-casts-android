@@ -10,9 +10,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
@@ -151,11 +151,11 @@ class SubscriptionManagerImpl @Inject constructor(
         val productList =
             mutableListOf(
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(MONTHLY_PRODUCT_ID)
+                    .setProductId(PLUS_MONTHLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(YEARLY_PRODUCT_ID)
+                    .setProductId(PLUS_YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
             )
