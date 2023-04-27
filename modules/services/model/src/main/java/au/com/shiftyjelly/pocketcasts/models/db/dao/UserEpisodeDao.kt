@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
+import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 @Dao
@@ -63,7 +64,10 @@ abstract class UserEpisodeDao {
     abstract fun observeDownloadingUserEpisodes(): Flowable<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
-    abstract fun observeEpisode(uuid: String): Flowable<UserEpisode>
+    abstract fun observeEpisodeRx(uuid: String): Flowable<UserEpisode>
+
+    @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
+    abstract fun observeEpisode(uuid: String): Flow<UserEpisode>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
     abstract fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode>

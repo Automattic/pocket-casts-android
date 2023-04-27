@@ -185,7 +185,7 @@ class PlayerViewModel @Inject constructor(
     val playingEpisodeLive: LiveData<Pair<BaseEpisode, Int>> =
         listDataRx.map { Pair(it.podcastHeader.episodeUuid, it.podcastHeader.backgroundColor) }
             .distinctUntilChanged()
-            .switchMap { pair -> episodeManager.observeEpisodeByUuid(pair.first).map { Pair(it, pair.second) } }
+            .switchMap { pair -> episodeManager.observeEpisodeByUuidRx(pair.first).map { Pair(it, pair.second) } }
             .toLiveData()
 
     private val shelfObservable = settings.shelfItemsObservable.map { list ->
@@ -250,7 +250,7 @@ class PlayerViewModel @Inject constructor(
     val effectsObservable: Flowable<PodcastEffectsPair> = playbackStateObservable
         .toFlowable(BackpressureStrategy.LATEST)
         .map { it.episodeUuid }
-        .switchMap { episodeManager.observeEpisodeByUuid(it) }
+        .switchMap { episodeManager.observeEpisodeByUuidRx(it) }
         .switchMap {
             if (it is PodcastEpisode) {
                 podcastManager.observePodcastByUuid(it.podcastUuid)

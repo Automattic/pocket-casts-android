@@ -72,12 +72,12 @@ interface UpNextQueue {
             if (state is State.Loaded) {
                 if (state.podcast != null) {
                     // If we have a podcast we need to observe its effects state as well to ensure it updates when the global override changes
-                    episodeManager.observeEpisodeByUuid(state.episode.uuid)
+                    episodeManager.observeEpisodeByUuidRx(state.episode.uuid)
                         .combineLatest(podcastManager.observePodcastByUuid(state.podcast.uuid).distinctUntilChanged { t1, t2 -> t1.isUsingEffects == t2.isUsingEffects })
                         .map { State.Loaded(it.first, it.second, state.queue) }
                         .toObservable()
                 } else {
-                    episodeManager.observeEpisodeByUuid(state.episode.uuid)
+                    episodeManager.observeEpisodeByUuidRx(state.episode.uuid)
                         .map { State.Loaded(it, state.podcast, state.queue) }
                         .toObservable()
                 }

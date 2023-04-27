@@ -43,6 +43,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
@@ -67,7 +68,8 @@ interface UserEpisodeManager {
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     fun observeUserEpisodes(): Flowable<List<UserEpisode>>
     suspend fun findUserEpisodes(): List<UserEpisode>
-    fun observeEpisode(uuid: String): Flowable<UserEpisode>
+    fun observeEpisodeRx(uuid: String): Flowable<UserEpisode>
+    fun observeEpisode(uuid: String): Flow<UserEpisode>
     fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
     fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean)
@@ -228,7 +230,11 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.observeDownloadingUserEpisodes()
     }
 
-    override fun observeEpisode(uuid: String): Flowable<UserEpisode> {
+    override fun observeEpisodeRx(uuid: String): Flowable<UserEpisode> {
+        return userEpisodeDao.observeEpisodeRx(uuid)
+    }
+
+    override fun observeEpisode(uuid: String): Flow<UserEpisode> {
         return userEpisodeDao.observeEpisode(uuid)
     }
 

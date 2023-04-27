@@ -28,8 +28,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
-import au.com.shiftyjelly.pocketcasts.wear.ui.component.ChipScreenHeader
-import au.com.shiftyjelly.pocketcasts.wear.ui.component.ChipSectionHeader
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
@@ -71,7 +71,7 @@ private fun Content(
     ScalingLazyColumn(columnState = scrollState) {
 
         item {
-            ChipScreenHeader(LR.string.settings)
+            ScreenHeaderChip(LR.string.settings)
         }
 
         item {
@@ -83,7 +83,7 @@ private fun Content(
         }
 
         item {
-            ChipSectionHeader(LR.string.account)
+            SectionHeaderChip(LR.string.account)
         }
 
         item {

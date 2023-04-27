@@ -1407,7 +1407,7 @@ open class PlaybackManager @Inject constructor(
                         .asFlowable()
                         .cast(BaseEpisode::class.java)
                 } else if (episode is UserEpisode) {
-                    userEpisodeManager.observeEpisode(episode.uuid).cast(BaseEpisode::class.java)
+                    userEpisodeManager.observeEpisodeRx(episode.uuid).cast(BaseEpisode::class.java)
                 } else {
                     null
                 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -17,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
+import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
+import com.google.android.horologist.compose.navscaffold.ScrollableScaffoldContext
 import com.google.android.horologist.compose.pager.PagerScreen
 import kotlinx.coroutines.launch
 
@@ -32,8 +35,11 @@ fun NowPlayingPager(
     navController: NavController,
     pagerState: PagerState = rememberPagerState(),
     swipeToDismissState: SwipeToDismissBoxState,
+    scrollableScaffoldContext: ScrollableScaffoldContext? = null,
     firstPageContent: @Composable () -> Unit,
 ) {
+
+    val defaultTimeTextMode = remember { scrollableScaffoldContext?.timeTextMode }
 
     // Don't allow swipe to dismiss on first screen (because there is no where to swipe back to--instead
     // just let the app close) or when the pager is not on the initial page (because we want to avoid
@@ -45,6 +51,14 @@ fun NowPlayingPager(
         Modifier.edgeSwipeToDismiss(swipeToDismissState)
     } else {
         Modifier
+    }
+
+    if (defaultTimeTextMode != null) {
+        scrollableScaffoldContext?.timeTextMode = if (pagerState.currentPage == 0) {
+            defaultTimeTextMode
+        } else {
+            NavScaffoldViewModel.TimeTextMode.Off
+        }
     }
 
     PagerScreen(
@@ -88,12 +102,11 @@ fun NowPlayingPager(
             }
 
             2 -> Column {
-                val scrollableState = rememberScalingLazyListState()
                 UpNextScreen(
                     navigateToEpisode = { episodeUuid ->
                         navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
                     },
-                    listState = scrollableState,
+                    listState = rememberScalingLazyListState(),
                 )
             }
         }

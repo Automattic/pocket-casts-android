@@ -96,6 +96,7 @@ fun WearApp(
                 navController = navController,
                 pagerState = pagerState,
                 swipeToDismissState = swipeToDismissState,
+                scrollableScaffoldContext = it,
             ) {
                 WatchListScreen(
                     scrollState = it.scrollableState,
@@ -129,6 +130,7 @@ fun WearApp(
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
+                scrollableScaffoldContext = it,
             ) {
                 PodcastsScreen(
                     listState = it.scrollableState,
@@ -182,6 +184,7 @@ fun WearApp(
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
+                scrollableScaffoldContext = it,
             ) {
                 DownloadsScreen(
                     columnState = it.columnState,
