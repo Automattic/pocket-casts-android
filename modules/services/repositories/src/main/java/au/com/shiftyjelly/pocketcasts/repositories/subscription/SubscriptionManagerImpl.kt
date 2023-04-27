@@ -345,6 +345,26 @@ class SubscriptionManagerImpl @Inject constructor(
             it.recurringPricingPhase is SubscriptionPricingPhase.Months
         } ?: trialsIfPresent.firstOrNull() // if no monthly subscriptions, just display the first
     }
+
+    override fun getSubscriptionByTierAndFrequency(
+        subscriptions: List<Subscription>,
+        tier: Subscription.SubscriptionTier,
+        frequency: SubscriptionFrequency,
+    ): Subscription? {
+        val tierSubscriptions = subscriptions.filter { it.tier == tier }
+        val trialsIfPresent = tierSubscriptions
+            .filterIsInstance<Subscription.WithTrial>()
+
+        return trialsIfPresent.find {
+            it.recurringPricingPhase is SubscriptionPricingPhase.Months // trial is available for monthly only
+        } ?: tierSubscriptions.firstOrNull {
+            when (frequency) {
+                SubscriptionFrequency.MONTHLY -> it.recurringPricingPhase is SubscriptionPricingPhase.Months
+                SubscriptionFrequency.YEARLY -> it.recurringPricingPhase is SubscriptionPricingPhase.Years
+                SubscriptionFrequency.NONE -> throw IllegalStateException("Unknown subscription frequency found")
+            }
+        } ?: tierSubscriptions.firstOrNull() // If no matching subscription is found, select first available one
+    }
 }
 
 sealed class ProductDetailsState {

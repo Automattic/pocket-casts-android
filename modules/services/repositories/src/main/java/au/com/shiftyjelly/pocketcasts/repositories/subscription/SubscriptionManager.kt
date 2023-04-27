@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
@@ -34,4 +35,9 @@ interface SubscriptionManager {
     fun isFreeTrialEligible(): Boolean
     fun updateFreeTrialEligible(eligible: Boolean)
     fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription?
+    fun getSubscriptionByTierAndFrequency(
+        subscriptions: List<Subscription>,
+        tier: Subscription.SubscriptionTier,
+        frequency: SubscriptionFrequency,
+    ): Subscription?
 }

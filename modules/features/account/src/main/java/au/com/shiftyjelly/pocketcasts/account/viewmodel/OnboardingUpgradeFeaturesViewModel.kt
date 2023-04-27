@@ -66,6 +66,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
             val currentFeatureCard = defaultTier.toUpgradeFeatureCard()
             _state.update {
                 OnboardingUpgradeFeaturesState.Loaded(
+                    subscriptions = subscriptions,
                     currentSubscription = defaultSelected,
                     currentFeatureCard = currentFeatureCard,
                     currentSubscriptionFrequency = currentSubscriptionFrequency
@@ -92,13 +93,39 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 
     fun onSubscriptionFrequencyChanged(frequency: SubscriptionFrequency) {
         (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
-            _state.update { loadedState.copy(currentSubscriptionFrequency = frequency) }
+            val currentSubscription = subscriptionManager
+                .getSubscriptionByTierAndFrequency(
+                    subscriptions = loadedState.subscriptions,
+                    tier = loadedState.currentFeatureCard.subscriptionTier,
+                    frequency = frequency
+                )
+            currentSubscription?.let {
+                _state.update {
+                    loadedState.copy(
+                        currentSubscription = currentSubscription,
+                        currentSubscriptionFrequency = frequency
+                    )
+                }
+            }
         }
     }
 
     fun onFeatureCardChanged(upgradeFeatureCard: UpgradeFeatureCard) {
         (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
-            _state.update { loadedState.copy(currentFeatureCard = upgradeFeatureCard) }
+            val currentSubscription = subscriptionManager
+                .getSubscriptionByTierAndFrequency(
+                    subscriptions = loadedState.subscriptions,
+                    tier = upgradeFeatureCard.subscriptionTier,
+                    frequency = loadedState.currentSubscriptionFrequency
+                )
+            currentSubscription?.let {
+                _state.update {
+                    loadedState.copy(
+                        currentSubscription = currentSubscription,
+                        currentFeatureCard = upgradeFeatureCard
+                    )
+                }
+            }
         }
     }
 
@@ -136,6 +163,7 @@ sealed class OnboardingUpgradeFeaturesState {
     }
 
     data class Loaded(
+        val subscriptions: List<Subscription>,
         val currentFeatureCard: UpgradeFeatureCard = UpgradeFeatureCard.PLUS,
         val currentSubscriptionFrequency: SubscriptionFrequency = SubscriptionFrequency.YEARLY,
         val currentSubscription: Subscription,
