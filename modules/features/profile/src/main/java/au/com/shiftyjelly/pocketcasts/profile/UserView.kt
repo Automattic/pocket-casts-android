@@ -14,9 +14,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.days
-import au.com.shiftyjelly.pocketcasts.utils.extensions.md5Hex
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -54,9 +54,7 @@ open class UserView @JvmOverloads constructor(
             is SignInState.SignedIn -> {
                 val strPocketCastsPlus = context.getString(LR.string.pocket_casts_plus).uppercase()
                 val strSignedInAs = context.getString(LR.string.profile_signed_in_as).uppercase()
-                /* https://en.gravatar.com/site/implement/images/
-                   d=404: display no image if there is not one associated with the requested email hash */
-                val gravatarUrl = "https://www.gravatar.com/avatar/${signInState.email.md5Hex()}?d=404"
+                val gravatarUrl = Gravatar.getUrl(signInState.email)
 
                 lblUsername.text = signInState.email
                 lblSignInStatus.text = if (signInState.isSignedInAsPlus) strPocketCastsPlus else strSignedInAs

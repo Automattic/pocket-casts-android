@@ -8,6 +8,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
@@ -32,6 +34,9 @@ import retrofit2.http.Url
 interface SyncServer {
     @POST("/user/login_pocket_casts")
     suspend fun login(@Body request: LoginRequest): LoginTokenResponse
+
+    @POST("/user/login_pocket_casts")
+    suspend fun loginPocketCasts(@Body request: LoginPocketCastsRequest): LoginPocketCastsResponse
 
     @POST("/user/login_google")
     suspend fun loginGoogle(@Body request: LoginGoogleRequest): LoginTokenResponse

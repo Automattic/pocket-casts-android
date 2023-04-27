@@ -112,7 +112,10 @@ class SyncManagerImpl @Inject constructor(
         syncAccountManager.isLoggedIn()
 
     override fun isGoogleLogin(): Boolean =
-        syncAccountManager.isGoogleLogin()
+        getLoginIdentity() == LoginIdentity.Google
+
+    override fun getLoginIdentity(): LoginIdentity? =
+        syncAccountManager.getLoginIdentity()
 
     override fun getEmail(): String? =
         syncAccountManager.getEmail()
@@ -120,6 +123,9 @@ class SyncManagerImpl @Inject constructor(
     override suspend fun getAccessToken(account: Account): AccessToken? =
         syncAccountManager.peekAccessToken(account)
             ?: fetchAccessToken(account)
+
+    override fun getRefreshToken(): RefreshToken? =
+        syncAccountManager.getRefreshToken()
 
     private suspend fun fetchAccessToken(account: Account): AccessToken? {
         val refreshToken = syncAccountManager.getRefreshToken(account) ?: return null
@@ -151,23 +157,37 @@ class SyncManagerImpl @Inject constructor(
         isLoggedInObservable.accept(false)
     }
 
-    override suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult {
-        val loginResult = try {
-            val response = syncServerManager.loginGoogle(idToken)
-            val result = handleTokenResponse(loginIdentity = LoginIdentity.Google, response = response)
-            LoginResult.Success(result)
-        } catch (ex: Exception) {
-            Timber.e(ex, "Failed to sign in with Google")
-            exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
-        }
-        trackSignIn(loginResult, signInSource)
-        return loginResult
+    override suspend fun loginWithGoogle(
+        idToken: String,
+        signInSource: SignInSource,
+    ): LoginResult = handleLogin(signInSource, LoginIdentity.Google) {
+        syncServerManager.loginGoogle(idToken)
     }
 
-    override suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult {
+    override suspend fun loginWithToken(
+        token: RefreshToken,
+        loginIdentity: LoginIdentity,
+        signInSource: SignInSource,
+    ): LoginResult = handleLogin(signInSource, loginIdentity) {
+        syncServerManager.loginToken(token)
+    }
+
+    override suspend fun loginWithEmailAndPassword(
+        email: String,
+        password: String,
+        signInSource: SignInSource
+    ): LoginResult = handleLogin(signInSource, LoginIdentity.PocketCasts) {
+        syncServerManager.login(email = email, password = password)
+    }
+
+    private suspend fun handleLogin(
+        signInSource: SignInSource,
+        loginIdentity: LoginIdentity,
+        loginFunction: suspend () -> LoginTokenResponse,
+    ): LoginResult {
         val loginResult = try {
-            val response = syncServerManager.login(email = email, password = password)
-            val result = handleTokenResponse(loginIdentity = LoginIdentity.PocketCasts, response = response)
+            val response = loginFunction()
+            val result = handleTokenResponse(loginIdentity = loginIdentity, response = response)
             LoginResult.Success(result)
         } catch (ex: Exception) {
             Timber.e(ex, "Failed to sign in with Pocket Casts")
@@ -523,7 +543,7 @@ class SyncManagerImpl @Inject constructor(
         return AuthResultModel(
             token = response.accessToken,
             uuid = response.uuid,
-            isNewAccount = response.isNew
+            isNewAccount = response.isNew,
         )
     }
 }

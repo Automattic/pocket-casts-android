@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
+import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
@@ -39,13 +40,16 @@ interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
     override fun getUuid(): String?
     override fun isLoggedIn(): Boolean
     fun isGoogleLogin(): Boolean
+    fun getLoginIdentity(): LoginIdentity?
     fun getEmail(): String?
     fun signOut(action: () -> Unit = {})
     suspend fun loginWithGoogle(idToken: String, signInSource: SignInSource): LoginResult
     suspend fun loginWithEmailAndPassword(email: String, password: String, signInSource: SignInSource): LoginResult
+    suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
     suspend fun createUserWithEmailAndPassword(email: String, password: String): LoginResult
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
     suspend fun getAccessToken(account: Account): AccessToken?
+    fun getRefreshToken(): RefreshToken?
     fun emailChange(newEmail: String, password: String): Single<UserChangeResponse>
     fun deleteAccount(): Single<UserChangeResponse>
     suspend fun updatePassword(newPassword: String, oldPassword: String)

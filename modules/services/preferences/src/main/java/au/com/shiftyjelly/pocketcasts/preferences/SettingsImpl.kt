@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Base64
 import androidx.core.content.edit
+import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -258,6 +259,24 @@ class SettingsImpl @Inject constructor(
         editor.putString(Settings.LAST_MAIN_NAV_SCREEN_OPENED, screenId)
         editor.apply()
     }
+
+    override fun syncOnMeteredNetwork(): Boolean {
+        return getBoolean(Settings.PREFERENCE_SYNC_ON_METERED, true)
+    }
+
+    override fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean) {
+        setBoolean(Settings.PREFERENCE_SYNC_ON_METERED, shouldSyncOnMetered)
+    }
+
+    override fun getWorkManagerNetworkTypeConstraint(): NetworkType =
+        if (syncOnMeteredNetwork()) {
+            NetworkType.CONNECTED
+        } else {
+            NetworkType.UNMETERED
+        }
+
+    override fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean =
+        syncOnMeteredNetwork() || isUnmetered
 
     override fun refreshPodcastsAutomatically(): Boolean {
         return getBoolean("backgroundRefresh", true)

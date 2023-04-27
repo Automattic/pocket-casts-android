@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.work.NetworkType
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -79,6 +80,7 @@ interface Settings {
         const val PREFERENCE_PODCAST_LIBRARY_SORT_NEEDS_SYNC = "podcastLibrarySortNeedsSync"
         const val PREFERENCE_SELECT_PODCAST_LIBRARY_SORT = "selectPodcastLibrarySort"
         const val PREFERENCE_WARN_WHEN_NOT_ON_WIFI = "warnWhenNotOnWifi"
+        const val PREFERENCE_SYNC_ON_METERED = "SyncWhenOnMetered"
         const val PREFERENCE_OVERRIDE_AUDIO = "overrideAudioInterruption"
         const val PREFERENCE_USE_EMBEDDED_ARTWORK = "useEmbeddedArtwork"
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
@@ -321,6 +323,10 @@ interface Settings {
     fun getLastScreenOpened(): String?
     fun setLastScreenOpened(screenId: String)
 
+    fun syncOnMeteredNetwork(): Boolean
+    fun setSyncOnMeteredNetwork(shouldSyncOnMetered: Boolean)
+    fun getWorkManagerNetworkTypeConstraint(): NetworkType
+    fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean
     fun refreshPodcastsAutomatically(): Boolean
     fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean)
     fun setPodcastsSortType(sortType: PodcastsSortType, sync: Boolean)

@@ -39,7 +39,7 @@ value class AccessToken(val value: String) {
 @JvmInline
 value class RefreshToken(val value: String) {
     object Adapter : JsonAdapter<RefreshToken>() {
-        override fun fromJson(reader: JsonReader) = RefreshToken((reader.nextString()))
+        override fun fromJson(reader: JsonReader) = RefreshToken(reader.nextString())
 
         override fun toJson(writer: JsonWriter, refreshToken: RefreshToken?) {
             writer.value(refreshToken?.value)

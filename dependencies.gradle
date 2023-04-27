@@ -184,9 +184,13 @@ project.ext {
 
             wearComposeMaterial: "androidx.wear.compose:compose-material:$versionComposeWear",
             wearComposeFoundation: "androidx.wear.compose:compose-foundation:$versionComposeWear",
-            wearComposeNavigation:  "androidx.wear.compose:compose-navigation:$versionComposeWear",
+            wearComposeNavigation: "androidx.wear.compose:compose-navigation:$versionComposeWear",
+            wearPlayServices: "com.google.android.gms:play-services-wearable:18.0.0",
 
+            horologistAuthData: "com.google.android.horologist:horologist-auth-data:$versionHorologist",
+            horologistAuthDataPhone: "com.google.android.horologist:horologist-auth-data-phone:$versionHorologist",
             horologistComposeLayout: "com.google.android.horologist:horologist-compose-layout:$versionHorologist",
+            horologistDatalayer: "com.google.android.horologist:horologist-datalayer:$versionHorologist",
             horologistMedia: "com.google.android.horologist:horologist-media:$versionHorologist",
             horologistMediaUi: "com.google.android.horologist:horologist-media-ui:$versionHorologist",
             horologistMediaData: "com.google.android.horologist:horologist-media-data:$versionHorologist",
