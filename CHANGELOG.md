@@ -1,7 +1,11 @@
 7.38
 -----
 *   Updates:
-    *   Added ability to view/share app logs from the "Help & feedback" screen
+    *   Added Advanced Settings section for experimental settings
+        ([#885](https://github.com/Automattic/pocket-casts-android/pull/885/)).
+    *   Added setting to disable sync on metered networks
+        ([#885](https://github.com/Automattic/pocket-casts-android/pull/885/)).
+    *   Added ability to view and share app logs from the "Help & feedback" screen
         ([911](https://github.com/Automattic/pocket-casts-android/pull/911)).
 *   Bug Fixes:
     *   Fixed accessibility content desctiption for episode list
