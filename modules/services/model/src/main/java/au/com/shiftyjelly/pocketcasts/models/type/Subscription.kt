@@ -44,6 +44,11 @@ sealed interface Subscription {
     }
 
     companion object {
+        const val PATRON_PRODUCT_BASE = "com.pocketcasts.patron"
+        const val PLUS_PRODUCT_BASE = "com.pocketcasts.plus"
+        const val PLUS_MONTHLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.monthly"
+        const val PLUS_YEARLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.yearly"
+
         fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? =
             SubscriptionMapper.map(productDetails, isFreeTrialEligible)
     }

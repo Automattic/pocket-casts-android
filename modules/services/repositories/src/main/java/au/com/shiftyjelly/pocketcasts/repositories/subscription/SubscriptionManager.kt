@@ -14,13 +14,6 @@ import io.reactivex.Single
 
 interface SubscriptionManager {
 
-    companion object {
-        const val PATRON_PRODUCT_BASE = "com.pocketcasts.patron"
-        const val PLUS_PRODUCT_BASE = "com.pocketcasts.plus"
-        const val PLUS_MONTHLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.monthly"
-        const val PLUS_YEARLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.yearly"
-    }
-
     fun signOut()
     fun observeSubscriptionChangeEvents(): Flowable<SubscriptionChangedEvent>
     fun observeProductDetails(): Flowable<ProductDetailsState>
