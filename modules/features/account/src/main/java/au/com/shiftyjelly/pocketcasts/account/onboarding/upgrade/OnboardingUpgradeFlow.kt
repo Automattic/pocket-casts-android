@@ -112,11 +112,15 @@ fun OnboardingUpgradeFlow(
                 onBackPressed = onBackPressed,
                 onClickSubscribe = {
                     if (activity != null) {
-                        mainSheetViewModel.onClickSubscribe(
-                            activity = activity,
-                            flow = flow,
-                            onComplete = onProceed,
-                        )
+                        if (isLoggedIn) {
+                            mainSheetViewModel.onClickSubscribe(
+                                activity = activity,
+                                flow = flow,
+                                onComplete = onProceed,
+                            )
+                        } else {
+                            onNeedLogin()
+                        }
                     } else {
                         LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                     }
