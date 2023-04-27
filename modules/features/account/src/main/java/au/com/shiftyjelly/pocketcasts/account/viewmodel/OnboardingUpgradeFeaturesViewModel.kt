@@ -6,6 +6,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PatronUpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeatureItem
@@ -19,13 +20,17 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -41,9 +46,26 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val _state: MutableStateFlow<OnboardingUpgradeFeaturesState> = MutableStateFlow(OnboardingUpgradeFeaturesState.Loading)
     val state: StateFlow<OnboardingUpgradeFeaturesState> = _state
 
-    fun start(subscriptions: List<Subscription>) {
+    init {
         if (BuildConfig.ADD_PATRON_ENABLED) {
-            updateState(subscriptions)
+            viewModelScope.launch {
+                subscriptionManager
+                    .observeProductDetails()
+                    .asFlow()
+                    .stateIn(viewModelScope)
+                    .collect { productDetails ->
+                        val subscriptions = when (productDetails) {
+                            is ProductDetailsState.Error -> null
+                            is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
+                                Subscription.fromProductDetails(
+                                    productDetails = productDetailsState,
+                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                                )
+                            }
+                        } ?: emptyList()
+                        updateState(subscriptions)
+                    }
+            }
         } else {
             val accessibiltyManager = getApplication<Application>().getSystemService(Context.ACCESSIBILITY_SERVICE)
                 as? AccessibilityManager

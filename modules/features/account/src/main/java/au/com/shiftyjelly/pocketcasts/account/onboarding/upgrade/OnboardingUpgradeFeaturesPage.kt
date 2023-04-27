@@ -101,7 +101,6 @@ internal fun OnboardingUpgradeFeaturesPage(
     onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
     canUpgrade: Boolean,
-    subscriptions: List<Subscription>,
 ) {
 
     val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
@@ -165,7 +164,6 @@ internal fun OnboardingUpgradeFeaturesPage(
             }
         }
     }
-    viewModel.start(subscriptions)
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -672,6 +670,5 @@ private fun OnboardingUpgradeFeaturesPreview() {
         onUpgradePressed = {},
         onNotNowPressed = {},
         canUpgrade = true,
-        subscriptions = emptyList()
     )
 }
