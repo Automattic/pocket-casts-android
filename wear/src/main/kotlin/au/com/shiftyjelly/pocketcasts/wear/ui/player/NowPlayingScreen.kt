@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,6 +13,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.material.MaterialTheme
@@ -36,8 +39,31 @@ fun NowPlayingScreen(
     playerViewModel: NowPlayingViewModel = hiltViewModel(),
     volumeViewModel: PCVolumeViewModel = hiltViewModel(),
     navigateToEpisode: (episodeUuid: String) -> Unit,
-    showStreamingConfirmation: () -> Unit,
+    navController: NavController,
 ) {
+
+    // Listen for results from streaming confirmation screen
+    navController.currentBackStackEntry?.savedStateHandle
+        ?.getStateFlow<StreamingConfirmationScreen.Result?>(
+            key = StreamingConfirmationScreen.resultKey,
+            initialValue = null
+        )
+        ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
+
+            LaunchedEffect(streamingConfirmationResult) {
+
+                playerViewModel.onStreamingConfirmationResult(streamingConfirmationResult)
+
+                // Clear result once consumed
+                navController
+                    .currentBackStackEntry
+                    ?.savedStateHandle
+                    ?.remove<StreamingConfirmationScreen.Result?>(
+                        key = StreamingConfirmationScreen.resultKey
+                    )
+            }
+        }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -67,7 +93,13 @@ fun NowPlayingScreen(
             controlButtons = {
                 if (state is NowPlayingViewModel.State.Loaded) {
                     PodcastControlButtons(
-                        onPlayButtonClick = { playerViewModel.onPlayButtonClick(showStreamingConfirmation) },
+                        onPlayButtonClick = {
+                            playerViewModel.onPlayButtonClick(
+                                showStreamingConfirmation = {
+                                    navController.navigate(StreamingConfirmationScreen.route)
+                                }
+                            )
+                        },
                         onPauseButtonClick = playerViewModel::onPauseButtonClick,
                         playPauseButtonEnabled = true,
                         playing = state.playing,
