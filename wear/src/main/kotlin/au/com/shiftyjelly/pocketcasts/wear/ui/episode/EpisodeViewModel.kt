@@ -41,7 +41,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -137,10 +136,9 @@ class EpisodeViewModel @Inject constructor(
                 downloadProgressUpdate.downloadProgress
             }
 
-            val showNotesFlow = flow {
-                // FIXME don't load show notes for user episodes
-                emit(showNotesManager.loadShowNotes(episodeUuid))
-            }
+            val showNotesFlow = episodeFlow
+                .filterIsInstance<PodcastEpisode>() // user episodes don't have show notes
+                .map { showNotesManager.loadShowNotes(it.uuid) }
 
             combine6(
                 episodeFlow,
