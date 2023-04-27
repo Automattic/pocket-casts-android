@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.BuildConfig
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedPlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
@@ -46,15 +47,29 @@ fun OnboardingUpgradeFlow(
     val hasSubscriptions = state is OnboardingUpgradeBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
 
     val coroutineScope = rememberCoroutineScope()
+    val activity = LocalContext.current.getActivity()
 
     val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.PlusUpsell &&
         (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
+
+    if (BuildConfig.ADD_PATRON_ENABLED && userSignedInOrSignedUpInUpsellFlow) {
+        activity?.let {
+            LaunchedEffect(Unit) {
+                mainSheetViewModel.onClickSubscribe(
+                    activity = activity,
+                    flow = flow,
+                    onComplete = onProceed
+                )
+            }
+        }
+    }
+
     val startInExpandedState =
         // Only start with expanded state if there are any subscriptions
         hasSubscriptions && (
             // The hidden state is shown as the first screen in the PlusUpsell flow, so when we return
             // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
-            userSignedInOrSignedUpInUpsellFlow ||
+            (!BuildConfig.ADD_PATRON_ENABLED && userSignedInOrSignedUpInUpsellFlow) ||
                 // User already indicated they want to upgrade, so go straight to purchase modal
                 flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
                 flow is OnboardingFlow.PlusAccountUpgrade
@@ -91,7 +106,6 @@ fun OnboardingUpgradeFlow(
         }
     }
 
-    val activity = LocalContext.current.getActivity()
     @OptIn(ExperimentalMaterialApi::class)
     ModalBottomSheetLayout(
         sheetState = sheetState,
