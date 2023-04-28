@@ -377,7 +377,7 @@ fun FeatureCard(
                     FeatureItem(it)
                 }
                 OnboardingUpgradeHelper.PrivacyPolicy(
-                    color = Color(0xA3000000).copy(alpha = .8f),
+                    color = Color.Black.copy(alpha = .5f),
                     textAlign = TextAlign.Start,
                     lineHeight = 18.sp
                 )
