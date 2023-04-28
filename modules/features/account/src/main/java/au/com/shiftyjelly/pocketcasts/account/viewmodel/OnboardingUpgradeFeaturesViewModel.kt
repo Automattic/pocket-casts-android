@@ -99,6 +99,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
             frequency = lastSelectedFrequency
         )
 
+        val showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS
         selectedSubscription?.let {
             val currentSubscriptionFrequency = selectedSubscription.recurringPricingPhase.toSubscriptionFrequency()
             val currentTier = SubscriptionMapper.mapProductIdToTier(selectedSubscription.productDetails.productId)
@@ -108,11 +109,12 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                     subscriptions = subscriptions,
                     currentSubscription = selectedSubscription,
                     currentFeatureCard = currentFeatureCard,
-                    currentSubscriptionFrequency = currentSubscriptionFrequency
+                    currentSubscriptionFrequency = currentSubscriptionFrequency,
+                    showNotNow = showNotNow
                 )
             }
         } ?: _state.update { // In ideal world, we should never get here
-            OnboardingUpgradeFeaturesState.NoSubscriptions
+            OnboardingUpgradeFeaturesState.NoSubscriptions(showNotNow)
         }
     }
 
@@ -243,7 +245,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
 sealed class OnboardingUpgradeFeaturesState {
     object Loading : OnboardingUpgradeFeaturesState()
 
-    object NoSubscriptions : OnboardingUpgradeFeaturesState()
+    data class NoSubscriptions(val showNotNow: Boolean) : OnboardingUpgradeFeaturesState()
 
     data class OldLoaded(
         private val isTouchExplorationEnabled: Boolean,
@@ -257,6 +259,7 @@ sealed class OnboardingUpgradeFeaturesState {
         val currentSubscriptionFrequency: SubscriptionFrequency,
         val currentSubscription: Subscription,
         val purchaseFailed: Boolean = false,
+        val showNotNow: Boolean,
     ) : OnboardingUpgradeFeaturesState() {
 
         val featureCards = SubscriptionTier.values().toList()

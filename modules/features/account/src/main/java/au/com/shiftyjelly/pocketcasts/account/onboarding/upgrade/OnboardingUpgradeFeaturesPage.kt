@@ -165,6 +165,7 @@ internal fun OnboardingUpgradeFeaturesPage(
             }
             is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
                 NoSubscriptionsLayout(
+                    showNotNow = (state as OnboardingUpgradeFeaturesState.NoSubscriptions).showNotNow,
                     onBackPressed = onBackPressed,
                     onNotNowPressed = onNotNowPressed,
                 )
@@ -211,13 +212,15 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                         .height(48.dp)
                         .width(48.dp)
                 )
-                TextH30(
-                    text = stringResource(LR.string.not_now),
-                    color = Color.White,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .clickable { onNotNowPressed() },
-                )
+                if (state.showNotNow) {
+                    TextH30(
+                        text = stringResource(LR.string.not_now),
+                        color = Color.White,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .clickable { onNotNowPressed() },
+                    )
+                }
             }
 
             Spacer(Modifier.weight(1f))
@@ -656,6 +659,7 @@ private fun OldFeatureItem(
 fun BoxWithConstraintsScope.NoSubscriptionsLayout(
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
+    showNotNow: Boolean,
 ) {
     Column(
         Modifier
@@ -678,13 +682,15 @@ fun BoxWithConstraintsScope.NoSubscriptionsLayout(
                     .height(48.dp)
                     .width(48.dp)
             )
-            TextH30(
-                text = stringResource(LR.string.not_now),
-                color = Color.White,
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .clickable { onNotNowPressed() },
-            )
+            if (showNotNow) {
+                TextH30(
+                    text = stringResource(LR.string.not_now),
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .clickable { onNotNowPressed() },
+                )
+            }
         }
         Spacer(modifier = Modifier.weight(1f))
         Box(
