@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -282,8 +283,17 @@ class AccountDetailsFragment : BaseFragment() {
         // Sign out first to make sure no data changes get synced
         userManager.signOut(playbackManager, wasInitiatedByUser = true)
 
-        // Block while clearing data so that we don't return to the app until the users data has been cleared
+        // Need to stop playback before we start clearing data
+        playbackManager.removeEpisode(
+            episodeToRemove = playbackManager.getCurrentEpisode(),
+            // Unknown is fine here because we don't send analytics when the user did not initiate the action
+            source = AnalyticsSource.UNKNOWN,
+            userInitiated = false,
+        )
+
+        // Block while clearing data so that users cannot interact with the until we're done clearing data
         runBlocking(Dispatchers.IO) {
+
             upNextQueue.removeAllIncludingChanges()
 
             playlistManager.resetDb()
