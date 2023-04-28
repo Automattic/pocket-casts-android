@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-12 11:54:20+0000
+Translation-Revision-Date: 2023-04-26 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="episode_downloading">Wird heruntergeladen</string>
+    <string name="episode_in_up_next">In „Als Nächstes“</string>
+    <string name="onboarding_plus_feature_gratitude_title">Die unendliche Dankbarkeit von allen bei Pocket Casts</string>
+    <string name="onboarding_plus_features_description">Bringe dein Podcast-Erlebnis auf die nächste Ebene mit exklusivem Zugriff auf Funktionen und Anpassungsoptionen.</string>
+    <string name="onboarding_patron_feature_special_icons_title">Besondere Pocket Casts-App-Icons</string>
+    <string name="onboarding_patron_feature_profile_badge_title">Profil-Badge für Unterstützer</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">50 GB Cloud-Speicher</string>
+    <string name="onboarding_patron_feature_everything_in_plus_title">Alle Vorteile von Plus</string>
+    <string name="onboarding_patron_features_description">Werde Pocket Casts-Förderer und unterstütze uns dabei, weiterhin das beste verfügbare Podcast-Erlebnis bereitzustellen.</string>
+    <string name="onboarding_patron_features_title">Du glaubst an uns und möchtest uns unterstützen?</string>
+    <string name="slash_month">pro Monat</string>
+    <string name="slash_year">pro Jahr</string>
+    <string name="server_user_delete_account_with_sub_failed">Für dein Konto ist ein Pocket Casts Plus-Abonnement aktiviert. Bitte storniere es, bevor du dein Konto löschst.</string>
+    <string name="server_user_change_email_success">Deine E-Mail-Adresse wurde erfolgreich geändert.</string>
+    <string name="server_user_email_verification_failed">Die E-Mail-Überprüfung ist fehlgeschlagen.</string>
+    <string name="server_user_email_success">Die E-Mail wurde erfolgreich gesendet.</string>
+    <string name="server_user_email_failed">Beim Senden der E-Mail ist ein Fehler aufgetreten.</string>
+    <string name="server_promo_winback_no_plus">Dieser Gutschein kann nicht eingelöst werden, da du Plus derzeit nicht abonniert hast.</string>
+    <string name="server_login_password_change_failed">Passwort kann nicht geändert werden</string>
+    <string name="server_login_password_change_success">Passwort erfolgreich geändert</string>
     <string name="add_to_up_next_question">Zu „Als Nächstes“ hinzufügen?</string>
     <string name="wear_show_password">Passwort anzeigen</string>
     <string name="wear_hide_password">Passwort verbergen</string>
@@ -138,7 +158,7 @@ Language: de
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop-Apps</string>
     <string name="onboarding_upgrade_unlock_all_features">Alle Funktionen nutzen</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">Erhalte Zugriff auf exklusive Funktionen und Anpassungsoptionen</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles, was du an Pocket Casts liebst, und noch viel mehr</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Alles, was du an Pocket Casts liebst, und noch viel mehr</string>
     <string name="onboarding_recommendations_import">Importieren</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Wähle deine Lieblings-Podcasts aus oder importiere sie aus einem anderen Podcast Player und gestalte Pocket Casts ganz individuell. Das kannst du auch jederzeit später erledigen.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Suche deine Lieblings-Podcasts</string>

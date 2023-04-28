@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-12 11:54:22+0000
+Translation-Revision-Date: 2023-04-25 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="episode_downloading">Downloaden</string>
+    <string name="episode_in_up_next">In Hierna</string>
+    <string name="onboarding_plus_feature_gratitude_title">De eeuwige dank van iedereen bij Pocket Casts</string>
+    <string name="onboarding_plus_features_description">Til je podcast-ervaring naar het volgende niveau met exclusieve toegang tot functies en aanpassingsmogelijkheden.</string>
+    <string name="onboarding_patron_feature_special_icons_title">Speciale Pocket Casts app-pictogrammen</string>
+    <string name="onboarding_patron_feature_profile_badge_title">Profielbadge voor supporters</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">50 GB cloudopslag</string>
+    <string name="onboarding_patron_feature_everything_in_plus_title">Alles in plus</string>
+    <string name="onboarding_patron_features_description">Word een patron van Pocket Casts en help ons de beste podcastervaring te blijven leveren.</string>
+    <string name="onboarding_patron_features_title">Geloof je in wat we doen en wil je laten zien dat je ons steunt?</string>
+    <string name="slash_month">/maand</string>
+    <string name="slash_year">/jaar</string>
+    <string name="server_user_delete_account_with_sub_failed">Je account heeft een actief Pocket Casts Plus abonnement. Annuleer dit abonnement voordat je je account verwijdert.</string>
+    <string name="server_user_change_email_success">Het e-mailadres is met succes gewijzigd.</string>
+    <string name="server_user_email_verification_failed">E-mailverificatie is mislukt.</string>
+    <string name="server_user_email_success">Verzending van e-mail is gelukt.</string>
+    <string name="server_user_email_failed">Fout bij het versturen van de e-mail.</string>
+    <string name="server_promo_winback_no_plus">Deze promo kan niet ingeruild worden omdat je momenteel geen plus abonnement hebt.</string>
+    <string name="server_login_password_change_failed">Kan wachtwoord niet wijzigen.</string>
+    <string name="server_login_password_change_success">Wachtwoord gewijzigd</string>
     <string name="add_to_up_next_question">Toevoegen aan Hierna?</string>
     <string name="wear_show_password">Wachtwoord weergeven</string>
     <string name="wear_hide_password">Wachtwoord verbergen</string>
