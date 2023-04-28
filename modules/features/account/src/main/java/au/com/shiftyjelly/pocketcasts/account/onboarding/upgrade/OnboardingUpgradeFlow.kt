@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.BuildConfig
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedPlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.launch
 
+private const val NULL_ACTIVITY_ERROR = "Activity is null when attempting subscription"
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OnboardingUpgradeFlow(
@@ -45,15 +47,29 @@ fun OnboardingUpgradeFlow(
     val hasSubscriptions = state is OnboardingUpgradeBottomSheetState.Loaded && state.subscriptions.isNotEmpty()
 
     val coroutineScope = rememberCoroutineScope()
+    val activity = LocalContext.current.getActivity()
 
     val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.PlusUpsell &&
         (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
+
+    if (BuildConfig.ADD_PATRON_ENABLED && userSignedInOrSignedUpInUpsellFlow) {
+        activity?.let {
+            LaunchedEffect(Unit) {
+                mainSheetViewModel.onClickSubscribe(
+                    activity = activity,
+                    flow = flow,
+                    onComplete = onProceed
+                )
+            }
+        }
+    }
+
     val startInExpandedState =
         // Only start with expanded state if there are any subscriptions
         hasSubscriptions && (
             // The hidden state is shown as the first screen in the PlusUpsell flow, so when we return
             // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
-            userSignedInOrSignedUpInUpsellFlow ||
+            (!BuildConfig.ADD_PATRON_ENABLED && userSignedInOrSignedUpInUpsellFlow) ||
                 // User already indicated they want to upgrade, so go straight to purchase modal
                 flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
                 flow is OnboardingFlow.PlusAccountUpgrade
@@ -90,7 +106,6 @@ fun OnboardingUpgradeFlow(
         }
     }
 
-    val activity = LocalContext.current.getActivity()
     @OptIn(ExperimentalMaterialApi::class)
     ModalBottomSheetLayout(
         sheetState = sheetState,
@@ -109,12 +124,22 @@ fun OnboardingUpgradeFlow(
                 },
                 onNotNowPressed = onProceed,
                 onBackPressed = onBackPressed,
-                canUpgrade = hasSubscriptions,
-                subscriptions = if (hasSubscriptions) {
-                    (state as OnboardingUpgradeBottomSheetState.Loaded).subscriptions
-                } else {
-                    emptyList()
+                onClickSubscribe = {
+                    if (activity != null) {
+                        if (isLoggedIn) {
+                            mainSheetViewModel.onClickSubscribe(
+                                activity = activity,
+                                flow = flow,
+                                onComplete = onProceed,
+                            )
+                        } else {
+                            onNeedLogin()
+                        }
+                    } else {
+                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
+                    }
                 },
+                canUpgrade = hasSubscriptions,
             )
         },
         sheetContent = {
@@ -127,10 +152,7 @@ fun OnboardingUpgradeFlow(
                             onComplete = onProceed,
                         )
                     } else {
-                        LogBuffer.e(
-                            LogBuffer.TAG_SUBSCRIPTIONS,
-                            "Activity is null when attempting subscription"
-                        )
+                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                     }
                 }
             )

@@ -57,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -64,6 +65,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
@@ -80,12 +82,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
-import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -97,11 +97,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun OnboardingUpgradeFeaturesPage(
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
-    onUpgradePressed: () -> Unit,
-    onNotNowPressed: () -> Unit,
     onBackPressed: () -> Unit,
+    onClickSubscribe: () -> Unit,
+    onNotNowPressed: () -> Unit,
+    onUpgradePressed: () -> Unit,
     canUpgrade: Boolean,
-    subscriptions: List<Subscription>,
 ) {
 
     val viewModel = hiltViewModel<OnboardingUpgradeFeaturesViewModel>()
@@ -138,27 +138,38 @@ internal fun OnboardingUpgradeFeaturesPage(
             .fillMaxHeight()
             .background(OnboardingUpgradeHelper.backgroundColor)
     ) {
-        if (BuildConfig.ADD_PATRON_ENABLED) {
-            UpgradeLayout(
-                state = state,
-                scrollState = scrollState,
-                onBackPressed = onBackPressed,
-                onNotNowPressed = onNotNowPressed,
-                onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                onFeatureCardChanged = { viewModel.onFeatureCardChanged(it) },
-                onUpgradePressed = onUpgradePressed,
-                canUpgrade = canUpgrade,
-                upgradePrice = { productId: String -> viewModel.getUpgradePrice(subscriptions, productId) },
-            )
-        } else {
-            OldUpgradeLayout(
-                state = state,
-                scrollState = scrollState,
-                onBackPressed = onBackPressed,
-                onUpgradePressed = onUpgradePressed,
-                onNotNowPressed = onNotNowPressed,
-                canUpgrade = canUpgrade,
-            )
+        when (state) {
+            is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
+            is OnboardingUpgradeFeaturesState.Loaded -> {
+                val loadedState = state as OnboardingUpgradeFeaturesState.Loaded
+                UpgradeLayout(
+                    state = loadedState,
+                    scrollState = scrollState,
+                    onBackPressed = onBackPressed,
+                    onNotNowPressed = onNotNowPressed,
+                    onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
+                    onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCards[it]) },
+                    onClickSubscribe = onClickSubscribe,
+                    canUpgrade = canUpgrade,
+                )
+            }
+            is OnboardingUpgradeFeaturesState.OldLoaded -> {
+                OldUpgradeLayout(
+                    state = state as OnboardingUpgradeFeaturesState.OldLoaded,
+                    scrollState = scrollState,
+                    onBackPressed = onBackPressed,
+                    onUpgradePressed = onUpgradePressed,
+                    onNotNowPressed = onNotNowPressed,
+                    canUpgrade = canUpgrade,
+                )
+            }
+            is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
+                NoSubscriptionsLayout(
+                    showNotNow = (state as OnboardingUpgradeFeaturesState.NoSubscriptions).showNotNow,
+                    onBackPressed = onBackPressed,
+                    onNotNowPressed = onNotNowPressed,
+                )
+            }
         }
     }
 }
@@ -166,15 +177,14 @@ internal fun OnboardingUpgradeFeaturesPage(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun BoxWithConstraintsScope.UpgradeLayout(
-    state: OnboardingUpgradeFeaturesState,
+    state: OnboardingUpgradeFeaturesState.Loaded,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onNotNowPressed: () -> Unit,
     onSubscriptionFrequencyChanged: (SubscriptionFrequency) -> Unit,
     onFeatureCardChanged: (Int) -> Unit,
-    onUpgradePressed: () -> Unit,
+    onClickSubscribe: () -> Unit,
     canUpgrade: Boolean,
-    upgradePrice: (String) -> String,
 ) {
     OnboardingUpgradeHelper.UpgradeBackground(
         modifier = Modifier.verticalScroll(scrollState),
@@ -202,13 +212,15 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                         .height(48.dp)
                         .width(48.dp)
                 )
-                TextH30(
-                    text = stringResource(LR.string.not_now),
-                    color = Color.White,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .clickable { onNotNowPressed() },
-                )
+                if (state.showNotNow) {
+                    TextH30(
+                        text = stringResource(LR.string.not_now),
+                        color = Color.White,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .clickable { onNotNowPressed() },
+                    )
+                }
             }
 
             Spacer(Modifier.weight(1f))
@@ -237,8 +249,9 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                     contentAlignment = Alignment.Center
                 ) {
                     StyledToggle(
-                        state.subscriptionFrequencies
+                        items = state.subscriptionFrequencies
                             .map { stringResource(id = it.localisedLabelRes) },
+                        defaultSelectedItemIndex = state.subscriptionFrequencies.indexOf(state.currentSubscriptionFrequency),
                     ) {
                         val selectedFrequency = state.subscriptionFrequencies[it]
                         onSubscriptionFrequencyChanged(selectedFrequency)
@@ -248,9 +261,8 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
                 FeatureCards(
                     state = state,
                     onFeatureCardChanged = onFeatureCardChanged,
-                    onUpgradePressed = onUpgradePressed,
+                    onClickSubscribe = onClickSubscribe,
                     canUpgrade = canUpgrade,
-                    upgradePrice = upgradePrice,
                 )
             }
 
@@ -262,14 +274,13 @@ private fun BoxWithConstraintsScope.UpgradeLayout(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FeatureCards(
-    state: OnboardingUpgradeFeaturesState,
+    state: OnboardingUpgradeFeaturesState.Loaded,
     onFeatureCardChanged: (Int) -> Unit,
-    onUpgradePressed: () -> Unit,
+    onClickSubscribe: () -> Unit,
     canUpgrade: Boolean,
-    upgradePrice: (String) -> String,
 ) {
-    val pagerState = rememberPagerState()
-
+    val resources = LocalContext.current.resources
+    val pagerState = rememberPagerState(initialPage = state.featureCards.indexOf(state.currentFeatureCard))
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { index ->
             onFeatureCardChanged(index)
@@ -283,44 +294,60 @@ fun FeatureCards(
         contentPadding = PaddingValues(horizontal = 32.dp),
     ) { index ->
         FeatureCard(
-            subscriptionFrequency = state.currentSubscriptionFrequency,
             card = state.featureCards[index],
-            onUpgradePressed = onUpgradePressed,
-            canUpgrade = canUpgrade,
-            upgradePrice = upgradePrice,
         )
     }
 
-    // Page indicator
-    Row(
-        Modifier
-            .height(40.dp)
-            .fillMaxWidth()
-            .padding(top = 24.dp),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        repeat(state.featureCards.size) { iteration ->
-            val color =
-                if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clip(CircleShape)
-                    .background(color)
-                    .size(8.dp)
-            )
+    if (state.showPageIndicator) {
+        Row(
+            Modifier
+                .height(40.dp)
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            repeat(state.featureCards.size) { iteration ->
+                val color =
+                    if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .size(8.dp)
+                )
+            }
         }
+    }
+
+    if (canUpgrade) {
+        val button = state.currentUpgradeButton
+        val subscription = button.subscription
+        val pricePerPeriod = subscription.recurringPricingPhase.pricePerPeriod(resources)
+        val primaryText = when (subscription) {
+            is Subscription.Simple -> stringResource(LR.string.subscribe_to, resources.getString(button.shortNameRes))
+            is Subscription.WithTrial -> stringResource(LR.string.trial_start)
+        }
+        val secondaryText = when (subscription) {
+            is Subscription.Simple -> pricePerPeriod
+            is Subscription.WithTrial -> subscription.tryFreeThenPricePerPeriod(resources)
+        }
+        UpgradeRowButton(
+            primaryText = primaryText,
+            secondaryText = secondaryText,
+            backgroundColor = button.backgroundColor,
+            textColor = button.textColor,
+            onClick = onClickSubscribe,
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 24.dp)
+                .fillMaxWidth(),
+        )
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FeatureCard(
-    subscriptionFrequency: SubscriptionFrequency,
     card: UpgradeFeatureCard,
-    onUpgradePressed: () -> Unit,
-    canUpgrade: Boolean,
-    upgradePrice: (String) -> String,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -343,60 +370,16 @@ fun FeatureCard(
                 FeaturePill(card.iconRes, card.shortNameRes)
             }
 
-            Row(
-                modifier = modifier
-                    .padding(bottom = 8.dp),
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                AnimatedContent(
-                    targetState = upgradePrice(card.productIdPrefix),
-                    label = "price"
-                ) { price ->
-                    TextH10(
-                        text = price,
-                        color = Color.Black,
-                        modifier = modifier.padding(end = 8.dp)
-                    )
-                }
-
-                TextH30(
-                    text = stringResource(
-                        id = when (subscriptionFrequency) {
-                            SubscriptionFrequency.YEARLY -> LR.string.slash_year
-                            SubscriptionFrequency.MONTHLY -> LR.string.slash_month
-                            SubscriptionFrequency.NONE -> throw IllegalStateException("Unknown subscription frequency: $subscriptionFrequency")
-                        }
-                    ),
-                    color = Color.Black,
-                    modifier = modifier
-                        .alpha(.6f)
-                        .padding(bottom = 6.dp)
-                )
-            }
-
-            TextH70(
-                text = stringResource(id = card.descriptionRes),
-                color = Color.Black,
-                textAlign = TextAlign.Start,
-                modifier = modifier
-                    .padding(bottom = 8.dp)
-                    .alpha(.6f)
-            )
-
             Column(
                 modifier = modifier.padding(bottom = 18.dp)
             ) {
                 card.featureItems.forEach {
                     FeatureItem(it)
                 }
-            }
-
-            if (canUpgrade) {
-                UpgradeRowButton(
-                    text = stringResource(LR.string.subscribe),
-                    backgroundColor = card.buttonBackgroundColor,
-                    textColor = card.buttonTextColor,
-                    onClick = onUpgradePressed,
+                OnboardingUpgradeHelper.PrivacyPolicy(
+                    color = Color.Black.copy(alpha = .5f),
+                    textAlign = TextAlign.Start,
+                    lineHeight = 18.sp
                 )
             }
         }
@@ -465,7 +448,7 @@ private fun FeatureItem(
 
 @Composable
 private fun BoxWithConstraintsScope.OldUpgradeLayout(
-    state: OnboardingUpgradeFeaturesState,
+    state: OnboardingUpgradeFeaturesState.OldLoaded,
     scrollState: ScrollState,
     onBackPressed: () -> Unit,
     onUpgradePressed: () -> Unit,
@@ -672,6 +655,56 @@ private fun OldFeatureItem(
     }
 }
 
+@Composable
+fun BoxWithConstraintsScope.NoSubscriptionsLayout(
+    onBackPressed: () -> Unit,
+    onNotNowPressed: () -> Unit,
+    showNotNow: Boolean,
+) {
+    Column(
+        Modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .heightIn(min = this.calculateMinimumHeightWithInsets())
+            .fillMaxWidth()
+    ) {
+
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            NavigationIconButton(
+                onNavigationClick = onBackPressed,
+                iconColor = Color.White,
+                modifier = Modifier
+                    .height(48.dp)
+                    .width(48.dp)
+            )
+            if (showNotNow) {
+                TextH30(
+                    text = stringResource(LR.string.not_now),
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .clickable { onNotNowPressed() },
+                )
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            TextH30(
+                text = stringResource(id = LR.string.onboarding_upgrade_no_subscriptions_found)
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
 // Based on https://stackoverflow.com/a/71344813/1910286
 private tailrec suspend fun autoScroll(
     scrollDelay: Long,
@@ -695,9 +728,9 @@ private fun OnboardingUpgradeFeaturesPreview() {
         flow = OnboardingFlow.InitialOnboarding,
         source = OnboardingUpgradeSource.RECOMMENDATIONS,
         onBackPressed = {},
-        onUpgradePressed = {},
+        onClickSubscribe = {},
         onNotNowPressed = {},
+        onUpgradePressed = {},
         canUpgrade = true,
-        subscriptions = emptyList()
     )
 }

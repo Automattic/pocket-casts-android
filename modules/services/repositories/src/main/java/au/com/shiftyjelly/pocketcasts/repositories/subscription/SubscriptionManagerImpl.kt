@@ -5,14 +5,14 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_PRODUCT_BASE
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.MONTHLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.PLUS_PRODUCT_BASE
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager.Companion.YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
@@ -151,11 +151,11 @@ class SubscriptionManagerImpl @Inject constructor(
         val productList =
             mutableListOf(
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(MONTHLY_PRODUCT_ID)
+                    .setProductId(PLUS_MONTHLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId(YEARLY_PRODUCT_ID)
+                    .setProductId(PLUS_YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
             )
@@ -336,14 +336,27 @@ class SubscriptionManagerImpl @Inject constructor(
         freeTrialEligible = eligible
     }
 
-    override fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription? {
-        val trialsIfPresent = subscriptions
+    override fun getDefaultSubscription(
+        subscriptions: List<Subscription>,
+        tier: Subscription.SubscriptionTier?,
+        frequency: SubscriptionFrequency?,
+    ): Subscription? {
+        val subscriptionTier = tier ?: Subscription.SubscriptionTier.PLUS
+        val subscriptionFrequency = frequency ?: SubscriptionFrequency.YEARLY
+
+        val tierSubscriptions = subscriptions.filter { it.tier == subscriptionTier }
+        val trialsIfPresent = tierSubscriptions
             .filterIsInstance<Subscription.WithTrial>()
-            .ifEmpty { subscriptions }
 
         return trialsIfPresent.find {
-            it.recurringPricingPhase is SubscriptionPricingPhase.Months
-        } ?: trialsIfPresent.firstOrNull() // if no monthly subscriptions, just display the first
+            it.recurringPricingPhase is SubscriptionPricingPhase.Months // trial is available for monthly only
+        } ?: tierSubscriptions.firstOrNull {
+            when (subscriptionFrequency) {
+                SubscriptionFrequency.MONTHLY -> it.recurringPricingPhase is SubscriptionPricingPhase.Months
+                SubscriptionFrequency.YEARLY -> it.recurringPricingPhase is SubscriptionPricingPhase.Years
+                SubscriptionFrequency.NONE -> throw IllegalStateException("Unknown subscription frequency found")
+            }
+        } ?: tierSubscriptions.firstOrNull() // If no matching subscription is found, select first available one
     }
 }
 

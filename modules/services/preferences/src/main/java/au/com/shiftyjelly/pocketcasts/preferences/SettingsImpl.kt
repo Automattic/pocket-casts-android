@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
@@ -60,6 +62,8 @@ class SettingsImpl @Inject constructor(
         private const val END_OF_YEAR_MODAL_HAS_BEEN_SHOWN_KEY = "EndOfYearModalHasBeenShownKey"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY = "CustomMediaActionsVisibleKey"
+        private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
+        private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
     }
 
     private var languageCode: String? = null
@@ -1380,4 +1384,22 @@ class SettingsImpl @Inject constructor(
     override fun setNotificationsDisabledMessageShown(value: Boolean) {
         setBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, value)
     }
+
+    override fun setLastSelectedSubscriptionTier(tier: Subscription.SubscriptionTier) {
+        setString(LAST_SELECTED_SUBSCRIPTION_TIER_KEY, tier.name)
+    }
+
+    override fun getLastSelectedSubscriptionTier() =
+        getString(LAST_SELECTED_SUBSCRIPTION_TIER_KEY)?.let {
+            Subscription.SubscriptionTier.valueOf(it)
+        }
+
+    override fun setLastSelectedSubscriptionFrequency(frequency: SubscriptionFrequency) {
+        setString(LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY, frequency.name)
+    }
+
+    override fun getLastSelectedSubscriptionFrequency() =
+        getString(LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY)?.let {
+            SubscriptionFrequency.valueOf(it)
+        }
 }

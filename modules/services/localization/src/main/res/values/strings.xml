@@ -69,8 +69,6 @@
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
     <string name="skip_forward">Skip forward</string>
-    <string name="slash_year">/year</string>
-    <string name="slash_month">/month</string>
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
     <string name="star_episode">Star episode</string>
@@ -82,6 +80,7 @@
     <string name="stop_downloading">Stop downloading</string>
     <string name="stream">Stream</string>
     <string name="subscribe">Subscribe</string>
+    <string name="subscribe_to">Subscribe to %s</string>
     <string name="unarchive_all">Unarchive all</string>
     <string name="unplayed">Unplayed</string>
     <string name="unsubscribe">Unsubscribe</string>
@@ -960,6 +959,12 @@
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
 
+    <!-- Trial -->
+
+    <string name="trial_start">Start my free trial</string>
+    <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
+    <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
+
     <!-- Settings -->
 
     <string name="settings">Settings</string>
@@ -1539,16 +1544,15 @@
     <string name="onboarding_recommendations_more">More %s</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket&#160;Casts, plus more</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customization options</string>
+    <string name="onboarding_upgrade_no_subscriptions_found">No subscriptions found.</string>
     <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
     <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
-    <string name="onboarding_patron_features_description">Become a Pocket Casts Patron and help us continue to deliver the best podcasting experience available.</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
     <string name="onboarding_patron_feature_cloud_storage_title">50GB Cloud Storage</string>
     <string name="onboarding_patron_feature_profile_badge_title">Supporters profile badge</string>
     <string name="onboarding_patron_feature_special_icons_title">Special Pocket Casts app icons</string>
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
-    <string name="onboarding_plus_features_description">Take your podcasting experience to the next level with exclusive access to features and customization options.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
     <string name="onboarding_plus_feature_folders_title">Folders</string>
