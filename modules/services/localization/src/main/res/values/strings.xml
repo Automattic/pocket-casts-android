@@ -30,6 +30,7 @@
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
     <string name="log_in">Log in</string>
+    <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
     <string name="log_out">Log out</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
@@ -1532,6 +1533,11 @@
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
+    <string name="log_in_with_google">Log in with Google</string>
+    <string name="log_in_on_phone">Log in on phone</string>
+    <string name="log_in_with_email">Log in with email</string>
+    <string name="log_in_watch_from_phone_instructions_1">Log into Pocket Casts on a paired Android phone.</string>
+    <string name="log_in_watch_from_phone_instructions_2">The next time you open Pocket Casts on your watch and have a network connection, you will be logged in.</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
     <string name="onboarding_get_the_newsletter">Get the newsletter</string>
