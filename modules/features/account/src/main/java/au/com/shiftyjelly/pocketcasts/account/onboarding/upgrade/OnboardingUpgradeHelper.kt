@@ -91,6 +91,7 @@ object OnboardingUpgradeHelper {
                 secondaryText?.let { subTitle ->
                     TextP60(
                         text = subTitle,
+                        textAlign = TextAlign.Center,
                         color = Color(textColor),
                         modifier = Modifier.padding(top = 4.dp)
                     )

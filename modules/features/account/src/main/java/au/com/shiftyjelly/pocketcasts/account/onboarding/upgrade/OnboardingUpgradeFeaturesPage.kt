@@ -2,8 +2,6 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -180,7 +178,6 @@ internal fun OnboardingUpgradeFeaturesPage(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun UpgradeLayout(
     state: OnboardingUpgradeFeaturesState.Loaded,
@@ -244,17 +241,17 @@ private fun UpgradeLayout(
                     Spacer(Modifier.weight(1f))
 
                     Column {
-                        AnimatedContent(
-                            targetState = state.currentFeatureCard.titleRes,
-                            label = "titleRes"
-                        ) { titleRes ->
+                        Box(
+                            modifier = Modifier.heightIn(min = 70.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
                             AutoResizeText(
-                                text = stringResource(titleRes),
+                                text = stringResource(state.currentFeatureCard.titleRes),
                                 color = Color.White,
                                 maxFontSize = 22.sp,
                                 lineHeight = 30.sp,
                                 fontWeight = FontWeight.W700,
-                                maxLines = 3,
+                                maxLines = 2,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .padding(horizontal = 24.dp)
