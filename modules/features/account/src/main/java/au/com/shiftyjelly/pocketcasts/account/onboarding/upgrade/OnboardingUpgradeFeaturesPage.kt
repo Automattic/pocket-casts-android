@@ -200,7 +200,7 @@ private fun UpgradeLayout(
 
             OnboardingUpgradeHelper.UpgradeBackground(
                 modifier = Modifier.verticalScroll(scrollState),
-                shortNamRes = state.currentFeatureCard.shortNameRes,
+                tier = state.currentFeatureCard.subscriptionTier,
                 backgroundGlowsRes = state.currentFeatureCard.backgroundGlowsRes,
             ) {
                 Column(
