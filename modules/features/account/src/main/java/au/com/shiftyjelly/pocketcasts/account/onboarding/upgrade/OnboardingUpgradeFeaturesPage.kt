@@ -49,7 +49,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +62,8 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -94,6 +98,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import java.lang.Long.max
@@ -311,15 +316,40 @@ fun FeatureCards(
         }
     }
 
+    var pagerHeight by remember { mutableStateOf(0) }
     HorizontalPager(
         pageCount = state.featureCards.size,
         state = pagerState,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
     ) { index ->
-        FeatureCard(
-            card = state.featureCards[index],
-        )
+        var pageHeight by remember { mutableStateOf(0) }
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    /* https://github.com/google/accompanist/issues/1050#issuecomment-1097483476 */
+                    val placeable = measurable.measure(constraints)
+                    pageHeight = placeable.height
+                    /* Restrict page height to the pager height */
+                    layout(constraints.maxWidth, pagerHeight) {
+                        placeable.placeRelative(0, 0)
+                    }
+                }
+                .onGloballyPositioned {
+                    /* Update pager height to the tallest page */
+                    if (pageHeight > pagerHeight) {
+                        pagerHeight = pageHeight
+                    }
+                }
+        ) {
+            FeatureCard(
+                card = state.featureCards[index],
+                modifier = if (pagerHeight > 0) {
+                    Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
+                } else Modifier
+            )
+        }
     }
 
     if (state.showPageIndicator) {
@@ -359,10 +389,10 @@ fun FeatureCard(
             .fillMaxWidth()
     ) {
         Column(
-            modifier = modifier.padding(24.dp)
+            modifier = Modifier.padding(24.dp)
         ) {
             Box(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp),
                 contentAlignment = Alignment.TopStart
@@ -370,12 +400,11 @@ fun FeatureCard(
                 FeaturePill(card.iconRes, card.shortNameRes)
             }
 
-            Column(
-                modifier = modifier.padding(bottom = 18.dp)
-            ) {
+            Column {
                 card.featureItems.forEach {
                     FeatureItem(it)
                 }
+                Spacer(modifier = Modifier.weight(1f))
                 OnboardingUpgradeHelper.PrivacyPolicy(
                     color = Color.Black.copy(alpha = .5f),
                     textAlign = TextAlign.Start,
