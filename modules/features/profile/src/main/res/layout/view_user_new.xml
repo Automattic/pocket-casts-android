@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:layout_height="wrap_content">
+
+    <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
+        android:id="@+id/imgProfilePicture"
+        android:layout_width="@dimen/profile_picture_size_new"
+        android:layout_height="@dimen/profile_picture_size_new"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="W,1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/lblUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textAppearance="@style/H40"
+        android:textAlignment="center"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintTop_toBottomOf="@id/imgProfilePicture"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="xxx@gmail.com" />
+
+    <Button
+        android:id="@+id/btnAccount"
+        android:text="@string/profile_set_up_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:gravity="center"
+        android:textAllCaps="false"
+        android:textAppearance="@style/H40"
+        android:textColor="?attr/primary_text_01"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lblUsername"
+        tools:text="Set Up Account" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,7 +28,7 @@
             <au.com.shiftyjelly.pocketcasts.profile.UserView
                 android:id="@+id/userView"
                 android:layout_width="0dp"
-                android:layout_height="80dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
                 android:layout_marginTop="30dp"
                 app:layout_constraintStart_toStartOf="parent"

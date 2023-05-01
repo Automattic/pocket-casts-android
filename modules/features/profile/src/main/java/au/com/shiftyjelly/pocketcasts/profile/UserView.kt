@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.profile
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
@@ -17,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.days
+import au.com.shiftyjelly.pocketcasts.utils.extensions.isLandscape
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -27,7 +30,12 @@ open class UserView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
-    open val layoutResource = R.layout.view_user
+    val isNewLayout = BuildConfig.ADD_PATRON_ENABLED && !context.isLandscape()
+    open val layoutResource = if (isNewLayout) {
+        R.layout.view_user_new
+    } else {
+        R.layout.view_user
+    }
 
     var signedInState: SignInState? = null
         set(value) {
@@ -38,14 +46,16 @@ open class UserView @JvmOverloads constructor(
     var accountStartDate: Date = Date()
     val maxSubscriptionExpiryMs = 30L * 24L * 60L * 60L * 1000L
     val lblUsername: TextView
-    val lblSignInStatus: TextView
+    val lblSignInStatus: TextView?
     val imgProfilePicture: ProfileCircleView
+    val btnAccount: Button?
 
     init {
         LayoutInflater.from(context).inflate(layoutResource, this, true)
         lblUsername = findViewById(R.id.lblUsername)
         lblSignInStatus = findViewById(R.id.lblSignInStatus)
         imgProfilePicture = findViewById(R.id.imgProfilePicture)
+        btnAccount = findViewById(R.id.btnAccount)
         setBackgroundResource(R.drawable.background_user_view)
     }
 
@@ -57,8 +67,14 @@ open class UserView @JvmOverloads constructor(
                 val gravatarUrl = Gravatar.getUrl(signInState.email)
 
                 lblUsername.text = signInState.email
-                lblSignInStatus.text = if (signInState.isSignedInAsPlus) strPocketCastsPlus else strSignedInAs
-                lblSignInStatus.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
+                if (isNewLayout) {
+                    lblUsername.visibility = View.VISIBLE
+                    btnAccount?.text = context.getString(LR.string.profile_account)
+                } else {
+                    btnAccount?.visibility = View.GONE
+                }
+                lblSignInStatus?.text = if (signInState.isSignedInAsPlus) strPocketCastsPlus else strSignedInAs
+                lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
 
                 setDaysRemainingText(signInState)
 
@@ -71,13 +87,19 @@ open class UserView @JvmOverloads constructor(
             }
             is SignInState.SignedOut -> {
                 lblUsername.text = context.getString(LR.string.profile_set_up_account)
-                lblSignInStatus.text = context.getString(LR.string.profile_not_signed_in)
+                if (isNewLayout) {
+                    lblUsername.visibility = View.GONE
+                    btnAccount?.text = context.getString(LR.string.profile_set_up_account)
+                } else {
+                    btnAccount?.visibility = View.GONE
+                }
+                lblSignInStatus?.text = context.getString(LR.string.profile_not_signed_in)
 
                 imgProfilePicture.setup(0.0f, false)
             }
             else -> {
                 lblUsername.text = null
-                lblSignInStatus.text = null
+                lblSignInStatus?.text = null
 
                 imgProfilePicture.setup(0.0f, false)
             }
@@ -107,8 +129,8 @@ open class UserView @JvmOverloads constructor(
 
         if (timeLeftMs <= maxSubscriptionExpiryMs) {
             val expiresIn = resources.getStringPluralSecondsMinutesHoursDaysOrYears(timeLeftMs)
-            lblSignInStatus.text = context.getString(LR.string.profile_plus_expires_in, expiresIn).uppercase()
-            lblSignInStatus.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_05))
+            lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires_in, expiresIn).uppercase()
+            lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_05))
         }
     }
 }
@@ -136,7 +158,7 @@ class ExpandedUserView @JvmOverloads constructor(
         when (status) {
             is SubscriptionStatus.Free -> {
                 lblPaymentStatus.text = ""
-                lblSignInStatus.text = ""
+                lblSignInStatus?.text = ""
             }
             is SubscriptionStatus.Plus -> {
                 val activeSubscription = status.subscriptions.getOrNull(status.index)
@@ -154,12 +176,12 @@ class ExpandedUserView @JvmOverloads constructor(
             val strMonthly = context.getString(LR.string.profile_monthly)
             val strYearly = context.getString(LR.string.profile_yearly)
             lblPaymentStatus.text = context.getString(LR.string.profile_next_payment, status.expiry.toLocalizedFormatLongStyle())
-            lblSignInStatus.text = when (status.frequency) {
+            lblSignInStatus?.text = when (status.frequency) {
                 SubscriptionFrequency.MONTHLY -> strMonthly
                 SubscriptionFrequency.YEARLY -> strYearly
                 else -> null
             }
-            lblSignInStatus.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
+            lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
         } else {
             if (status.platform == SubscriptionPlatform.GIFT) {
                 if (signInState.isLifetimePlus) {
@@ -173,11 +195,11 @@ class ExpandedUserView @JvmOverloads constructor(
             }
 
             if (signInState.isLifetimePlus) {
-                lblSignInStatus.text = context.resources.getString(LR.string.plus_lifetime_member)
-                lblSignInStatus.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_02))
+                lblSignInStatus?.text = context.resources.getString(LR.string.plus_lifetime_member)
+                lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_02))
             } else {
-                lblSignInStatus.text = context.getString(LR.string.profile_plus_expires, status.expiry.toLocalizedFormatLongStyle())
-                lblSignInStatus.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
+                lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires, status.expiry.toLocalizedFormatLongStyle())
+                lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
             }
         }
     }
@@ -185,17 +207,17 @@ class ExpandedUserView @JvmOverloads constructor(
     private fun setupLabelsForSupporter(subscription: SubscriptionStatus.Subscription) {
         if (subscription.autoRenewing) {
             lblPaymentStatus.text = context.getString(LR.string.supporter)
-            lblPaymentStatus.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_02))
+            lblPaymentStatus.setTextColor(lblPaymentStatus.context.getThemeColor(UR.attr.support_02))
 
-            lblSignInStatus.text = context.getString(LR.string.supporter_check_contributions)
-            lblSignInStatus.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
+            lblSignInStatus?.text = context.getString(LR.string.supporter_check_contributions)
+            lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
         } else {
             lblPaymentStatus.text = context.getString(LR.string.supporter_payment_cancelled)
-            lblPaymentStatus.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_05))
+            lblPaymentStatus.setTextColor(lblPaymentStatus.context.getThemeColor(UR.attr.support_05))
 
             val expiryDate = subscription.expiryDate?.let { it.toLocalizedFormatLongStyle() } ?: context.getString(LR.string.profile_expiry_date_unknown)
-            lblSignInStatus.text = context.getString(LR.string.supporter_subscription_ends, expiryDate)
-            lblSignInStatus.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
+            lblSignInStatus?.text = context.getString(LR.string.supporter_subscription_ends, expiryDate)
+            lblSignInStatus?.setTextColor(context.getThemeColor(UR.attr.primary_text_02))
         }
     }
 }

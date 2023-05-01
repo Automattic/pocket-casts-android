@@ -193,13 +193,12 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
-        binding.userView.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
-            if (viewModel.isSignedIn) {
-                val fragment = AccountDetailsFragment.newInstance()
-                (activity as FragmentHostListener).addFragment(fragment)
+        with(binding.userView) {
+            if (isNewLayout) {
+                imgProfilePicture.setOnClickListener { onProfileAccountButtonClicked() }
+                btnAccount?.setOnClickListener { onProfileAccountButtonClicked() }
             } else {
-                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
+                setOnClickListener { onProfileAccountButtonClicked() }
             }
         }
 
@@ -229,6 +228,16 @@ class ProfileFragment : BaseFragment() {
 
         if (!viewModel.isFragmentChangingConfigurations) {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SHOWN)
+        }
+    }
+
+    private fun onProfileAccountButtonClicked() {
+        analyticsTracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
+        if (viewModel.isSignedIn) {
+            val fragment = AccountDetailsFragment.newInstance()
+            (activity as FragmentHostListener).addFragment(fragment)
+        } else {
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
         }
     }
 
