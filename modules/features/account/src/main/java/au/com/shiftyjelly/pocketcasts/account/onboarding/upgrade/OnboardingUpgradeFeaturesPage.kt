@@ -210,7 +210,8 @@ private fun UpgradeLayout(
                     Modifier
                         .windowInsetsPadding(WindowInsets.statusBars)
                         .windowInsetsPadding(WindowInsets.navigationBars)
-                        .heightIn(min = this.calculateMinimumHeightWithInsets()),
+                        .heightIn(min = this.calculateMinimumHeightWithInsets())
+                        .padding(bottom = 100.dp), // Added to allow scrolling feature cards beyond upgrade button in large font sizes
                 ) {
 
                     Spacer(Modifier.height(8.dp))
