@@ -27,8 +27,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.SettingsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationGraph
-import au.com.shiftyjelly.pocketcasts.wear.ui.authenticationSubGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationNavGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationSubGraph
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
@@ -217,7 +217,7 @@ fun WearApp(
             )
         }
 
-        authenticationGraph(navController)
+        authenticationNavGraph(navController)
 
         composable(LoggingInScreen.route) {
             LoggingInScreen(
