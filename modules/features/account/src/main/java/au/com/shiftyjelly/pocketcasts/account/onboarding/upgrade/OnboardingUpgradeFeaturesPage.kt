@@ -809,14 +809,12 @@ private fun Modifier.fadeBackground() = this
 
 @Preview
 @Composable
-private fun OnboardingUpgradeFeaturesPreview() {
-    OnboardingUpgradeFeaturesPage(
-        flow = OnboardingFlow.InitialOnboarding,
-        source = OnboardingUpgradeSource.RECOMMENDATIONS,
-        onBackPressed = {},
-        onClickSubscribe = {},
-        onNotNowPressed = {},
-        onUpgradePressed = {},
-        canUpgrade = true,
-    )
+private fun OnboardingPlusFeatureCardPreview() {
+    FeatureCard(card = UpgradeFeatureCard.PLUS)
+}
+
+@Preview
+@Composable
+private fun OnboardingPatonFeatureCardPreview() {
+    FeatureCard(card = UpgradeFeatureCard.PATRON)
 }
