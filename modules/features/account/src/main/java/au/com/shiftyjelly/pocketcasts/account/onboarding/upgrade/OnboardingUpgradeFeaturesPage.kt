@@ -597,9 +597,9 @@ private fun setStatusBarBackground(scrollState: ScrollState) {
     val systemUiController = rememberSystemUiController()
     val hasScrolled = scrollState.value > 0
 
-    val scrimAlpha by animateFloatAsState(
+    val scrimAlpha: Float by animateFloatAsState(
         targetValue = if (hasScrolled) 0.6f else 0f,
-        animationSpec = tween(durationMillis = 400)
+        animationSpec = tween(durationMillis = 400), label = "scrimAlpha"
     )
 
     val statusBarBackground = if (scrimAlpha > 0) {
