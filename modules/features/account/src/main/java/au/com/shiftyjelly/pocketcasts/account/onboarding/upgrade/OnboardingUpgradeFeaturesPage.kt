@@ -65,6 +65,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -81,9 +82,9 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
+import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
@@ -242,10 +243,14 @@ private fun UpgradeLayout(
                             targetState = state.currentFeatureCard.titleRes,
                             label = "titleRes"
                         ) { titleRes ->
-                            TextH20(
+                            AutoResizeText(
                                 text = stringResource(titleRes),
-                                textAlign = TextAlign.Center,
                                 color = Color.White,
+                                maxFontSize = 22.sp,
+                                lineHeight = 30.sp,
+                                fontWeight = FontWeight.W700,
+                                maxLines = 3,
+                                textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .padding(horizontal = 24.dp)
                                     .fillMaxWidth(),
