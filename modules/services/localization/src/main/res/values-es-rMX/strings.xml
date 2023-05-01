@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-11 15:54:02+0000
+Translation-Revision-Date: 2023-04-26 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="episode_downloading">Descargando</string>
+    <string name="episode_in_up_next">A continuación</string>
+    <string name="onboarding_plus_feature_gratitude_title">El eterno agradecimiento del equipo de Pocket Casts</string>
+    <string name="onboarding_plus_features_description">Lleva tu experiencia con los pódcast al siguiente nivel con acceso exclusivo a funciones y opciones de personalización.</string>
+    <string name="onboarding_patron_feature_special_icons_title">Iconos especiales de la aplicación Pocket Casts</string>
+    <string name="onboarding_patron_feature_profile_badge_title">Insignia de perfil de miembro de pago</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">Almacenamiento en la nube de 50 GB</string>
+    <string name="onboarding_patron_feature_everything_in_plus_title">Todas las funciones con Plus</string>
+    <string name="onboarding_patron_features_description">Conviértete en miembro de pago de Pocket Casts y ayúdanos a continuar ofreciendo la mejor experiencia de pódcast posible.</string>
+    <string name="onboarding_patron_features_title">¿Confías en nuestro trabajo y quieres mostrarnos tu apoyo?</string>
+    <string name="slash_month">al mes</string>
+    <string name="slash_year">al año</string>
+    <string name="server_user_delete_account_with_sub_failed">Tu cuenta tiene una suscripción de Pocket Casts Plus activa. Cancélala antes de eliminar tu cuenta.</string>
+    <string name="server_user_change_email_success">Tu dirección correo electrónico se ha cambiado correctamente.</string>
+    <string name="server_user_email_verification_failed">No se ha podido verificar la dirección de correo electrónico.</string>
+    <string name="server_user_email_success">El correo electrónico se ha enviado correctamente.</string>
+    <string name="server_user_email_failed">Se ha producido un error al enviar el correo electrónico.</string>
+    <string name="server_promo_winback_no_plus">No se ha podido canjear esta promoción debido a que no tienes una suscripción a Plus.</string>
+    <string name="server_login_password_change_failed">No se puede cambiar la contraseña.</string>
+    <string name="server_login_password_change_success">La contraseña se ha cambiado correctamente.</string>
     <string name="add_to_up_next_question">¿Quieres añadirlo a \"A continuación\"?</string>
     <string name="wear_show_password">Mostrar contraseña</string>
     <string name="wear_hide_password">Ocultar contraseña</string>
@@ -138,7 +158,7 @@ Language: es
     <string name="onboarding_plus_feature_desktop_apps_title">Aplicaciones para ordenador</string>
     <string name="onboarding_upgrade_unlock_all_features">Disfruta de todas las funciones</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">Obtén acceso a funciones y opciones de personalización exclusivas</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Todo lo que te encanta de Pocket Casts y mucho más</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Todo lo que te encanta de Pocket Casts y mucho más</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Haz tuya la aplicación Pocket Casts seleccionando tus pódcast favoritos o impórtalos desde otro reproductor de pódcast. Siempre puedes hacerlo más adelante.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Encuentra tus pódcast favoritos</string>

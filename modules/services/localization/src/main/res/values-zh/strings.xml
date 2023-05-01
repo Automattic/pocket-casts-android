@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-11 17:54:03+0000
+Translation-Revision-Date: 2023-04-25 17:54:02+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="episode_downloading">正在下载</string>
+    <string name="episode_in_up_next">在下一个中</string>
+    <string name="onboarding_plus_feature_gratitude_title">Pocket Casts 的每个人始终心怀感激</string>
+    <string name="onboarding_plus_features_description">通过专享的功能和定制选项，将您的播客体验提升到新的水平。</string>
+    <string name="onboarding_patron_feature_special_icons_title">特别的 Pocket Casts 应用图标</string>
+    <string name="onboarding_patron_feature_profile_badge_title">支持者个人资料徽章</string>
+    <string name="onboarding_patron_feature_cloud_storage_title">50GB 云存储空间</string>
+    <string name="onboarding_patron_feature_everything_in_plus_title">Plus 版的所有功能</string>
+    <string name="onboarding_patron_features_description">成为 Pocket Casts 赞助人，帮助我们继续提供更好的播客体验。</string>
+    <string name="onboarding_patron_features_title">相信我们的使命，想要表达您的支持？</string>
+    <string name="slash_month">/月</string>
+    <string name="slash_year">/年</string>
+    <string name="server_user_delete_account_with_sub_failed">您的账户有一个有效的 Pocket casting Plus 订阅。 请先将其取消，然后再删除您的账户。</string>
+    <string name="server_user_change_email_success">已成功更改您的电子邮件。</string>
+    <string name="server_user_email_verification_failed">SSL验证失败。</string>
+    <string name="server_user_email_success">已成功发送电子邮件。</string>
+    <string name="server_user_email_failed">发送电子邮件时出错。</string>
+    <string name="server_promo_winback_no_plus">Could not redeem this promo, because you are not currently a plus subscriber.</string>
+    <string name="server_login_password_change_failed">无法更改密码。</string>
+    <string name="server_login_password_change_success">Successfully changed password</string>
     <string name="add_to_up_next_question">添加到“接下来播放”？</string>
     <string name="wear_show_password">显示密码</string>
     <string name="wear_hide_password">隐藏密码</string>
