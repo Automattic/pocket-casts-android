@@ -51,7 +51,7 @@ open class UserView @JvmOverloads constructor(
 
     var accountStartDate: Date = Date()
     val maxSubscriptionExpiryMs = 30L * 24L * 60L * 60L * 1000L
-    val lblUsername: TextView
+    val lblUserEmail: TextView
     val lblSignInStatus: TextView?
     val imgProfilePicture: ProfileCircleView
     val btnAccount: Button?
@@ -59,7 +59,7 @@ open class UserView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(layoutResource, this, true)
-        lblUsername = findViewById(R.id.lblUsername)
+        lblUserEmail = findViewById(R.id.lblUserEmail)
         lblSignInStatus = findViewById(R.id.lblSignInStatus)
         imgProfilePicture = findViewById(R.id.imgProfilePicture)
         btnAccount = findViewById(R.id.btnAccount)
@@ -74,9 +74,9 @@ open class UserView @JvmOverloads constructor(
                 val strSignedInAs = context.getString(LR.string.profile_signed_in_as).uppercase()
                 val gravatarUrl = Gravatar.getUrl(signInState.email)
 
-                lblUsername.text = signInState.email
+                lblUserEmail.text = signInState.email
                 if (isNewLayout) {
-                    lblUsername.visibility = View.VISIBLE
+                    lblUserEmail.visibility = View.VISIBLE
                     btnAccount?.text = context.getString(LR.string.profile_account)
                 } else {
                     btnAccount?.visibility = View.GONE
@@ -94,9 +94,9 @@ open class UserView @JvmOverloads constructor(
                 imgProfilePicture.setup(percent, signInState.isSignedInAsPlus, gravatarUrl)
             }
             is SignInState.SignedOut -> {
-                lblUsername.text = context.getString(LR.string.profile_set_up_account)
+                lblUserEmail.text = context.getString(LR.string.profile_set_up_account)
                 if (isNewLayout) {
-                    lblUsername.visibility = View.GONE
+                    lblUserEmail.visibility = View.GONE
                     btnAccount?.text = context.getString(LR.string.profile_set_up_account)
                 } else {
                     btnAccount?.visibility = View.GONE
@@ -107,7 +107,7 @@ open class UserView @JvmOverloads constructor(
                 updateSubscriptionTierPill(show = false)
             }
             else -> {
-                lblUsername.text = null
+                lblUserEmail.text = null
                 lblSignInStatus?.text = null
 
                 imgProfilePicture.setup(0.0f, false)
