@@ -27,6 +27,20 @@
         app:layout_constraintBottom_toBottomOf="@id/imgProfilePicture" />
 
     <TextView
+        android:id="@+id/lblUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:textAppearance="@style/H20"
+        android:textAlignment="center"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintTop_toBottomOf="@id/subscriptionTierPill"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Kevin Jones" />
+
+    <TextView
         android:id="@+id/lblUserEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,7 +49,7 @@
         android:textAppearance="@style/H70"
         android:textAlignment="center"
         android:textColor="?attr/primary_text_01"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionTierPill"
+        app:layout_constraintTop_toBottomOf="@id/lblUsername"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="xxx@gmail.com" />

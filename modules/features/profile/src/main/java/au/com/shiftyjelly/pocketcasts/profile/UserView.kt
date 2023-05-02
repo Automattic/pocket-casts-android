@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.days
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isLandscape
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import java.util.Date
@@ -51,6 +52,7 @@ open class UserView @JvmOverloads constructor(
 
     var accountStartDate: Date = Date()
     val maxSubscriptionExpiryMs = 30L * 24L * 60L * 60L * 1000L
+    val lblUsername: TextView?
     val lblUserEmail: TextView
     val lblSignInStatus: TextView?
     val imgProfilePicture: ProfileCircleView
@@ -59,6 +61,7 @@ open class UserView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(layoutResource, this, true)
+        lblUsername = findViewById(R.id.lblUsername)
         lblUserEmail = findViewById(R.id.lblUserEmail)
         lblSignInStatus = findViewById(R.id.lblSignInStatus)
         imgProfilePicture = findViewById(R.id.imgProfilePicture)
@@ -68,24 +71,20 @@ open class UserView @JvmOverloads constructor(
     }
 
     open fun update(signInState: SignInState?) {
+        val isPatron = false // TODO: Patron - get Patron state from subscription status
+        updateProfileImageAndDaysRemaining(signInState)
+        updateSignInStatus(signInState) // Visible only in old layout
+        updateUsername(signInState, isPatron)
+        updateEmail(signInState, isPatron)
+        updateSubscriptionTierPill(signInState, isPatron)
+        updateAccountButton(signInState) // Visible only in new layout
+    }
+
+    private fun updateProfileImageAndDaysRemaining(signInState: SignInState?) {
         when (signInState) {
             is SignInState.SignedIn -> {
-                val strPocketCastsPlus = context.getString(LR.string.pocket_casts_plus).uppercase()
-                val strSignedInAs = context.getString(LR.string.profile_signed_in_as).uppercase()
                 val gravatarUrl = Gravatar.getUrl(signInState.email)
-
-                lblUserEmail.text = signInState.email
-                if (isNewLayout) {
-                    lblUserEmail.visibility = View.VISIBLE
-                    btnAccount?.text = context.getString(LR.string.profile_account)
-                } else {
-                    btnAccount?.visibility = View.GONE
-                }
-                lblSignInStatus?.text = if (signInState.isSignedInAsPlus) strPocketCastsPlus else strSignedInAs
-                lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
-
                 setDaysRemainingText(signInState)
-
                 var percent = 1.0f
                 val daysLeft = daysLeft(signInState, 30)
                 if (daysLeft != null && daysLeft > 0 && daysLeft <= 30) {
@@ -93,30 +92,12 @@ open class UserView @JvmOverloads constructor(
                 }
                 imgProfilePicture.setup(percent, signInState.isSignedInAsPlus, gravatarUrl)
             }
-            is SignInState.SignedOut -> {
-                lblUserEmail.text = context.getString(LR.string.profile_set_up_account)
-                if (isNewLayout) {
-                    lblUserEmail.visibility = View.GONE
-                    btnAccount?.text = context.getString(LR.string.profile_set_up_account)
-                } else {
-                    btnAccount?.visibility = View.GONE
-                }
-                lblSignInStatus?.text = context.getString(LR.string.profile_not_signed_in)
-
-                imgProfilePicture.setup(0.0f, false)
-                updateSubscriptionTierPill(show = false)
-            }
-            else -> {
-                lblUserEmail.text = null
-                lblSignInStatus?.text = null
-
-                imgProfilePicture.setup(0.0f, false)
-                updateSubscriptionTierPill(show = false)
-            }
+            is SignInState.SignedOut -> imgProfilePicture.setup(0.0f, false)
+            else -> imgProfilePicture.setup(0.0f, false)
         }
     }
 
-    fun daysLeft(signInState: SignInState.SignedIn, maxDays: Int): Int? {
+    private fun daysLeft(signInState: SignInState.SignedIn, maxDays: Int): Int? {
         val timeInXDays = Date(Date().time + maxDays.days())
         val plusStatus = signInState.subscriptionStatus as? SubscriptionStatus.Plus
         if (plusStatus != null && plusStatus.expiry.before(timeInXDays)) {
@@ -126,7 +107,7 @@ open class UserView @JvmOverloads constructor(
         return null
     }
 
-    fun setDaysRemainingText(signInState: SignInState.SignedIn) {
+    private fun setDaysRemainingText(signInState: SignInState.SignedIn) {
         val status = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Plus) ?: return
         if (status.autoRenew) {
             return
@@ -144,11 +125,61 @@ open class UserView @JvmOverloads constructor(
         }
     }
 
-    private fun updateSubscriptionTierPill(show: Boolean) {
+    private fun updateSignInStatus(signInState: SignInState?) {
+        when (signInState) {
+            is SignInState.SignedIn -> {
+                val strPocketCastsPlus = context.getString(LR.string.pocket_casts_plus).uppercase()
+                val strSignedInAs = context.getString(LR.string.profile_signed_in_as).uppercase()
+
+                lblSignInStatus?.text = if (signInState.isSignedInAsPlus) strPocketCastsPlus else strSignedInAs
+                lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
+            }
+
+            is SignInState.SignedOut ->
+                lblSignInStatus?.text = context.getString(LR.string.profile_not_signed_in)
+
+            else -> lblSignInStatus?.text = null
+        }
+    }
+
+    private fun updateUsername(signInState: SignInState?, isPatron: Boolean) {
+        lblUsername?.visibility = View.GONE
+        if (signInState is SignInState.SignedIn && isNewLayout && isPatron) {
+            lblUsername?.visibility = View.VISIBLE
+            // TODO: Patron - update user name logic
+            lblUsername?.text = signInState.email
+                .split("@").first()
+                .replace(".", " ")
+                .replace("_", " ")
+        }
+    }
+
+    private fun updateEmail(signInState: SignInState?, isPatron: Boolean) {
+        when (signInState) {
+            is SignInState.SignedIn -> {
+                lblUserEmail.text = signInState.email
+                lblUserEmail.visibility = View.VISIBLE
+                if (isNewLayout) {
+                    val marginLayoutParams = lblUserEmail.layoutParams as MarginLayoutParams
+                    val marginTop = if (isPatron) 4 else 16
+                    lblUserEmail.layoutParams = marginLayoutParams.apply {
+                        topMargin = marginTop.dpToPx(context)
+                    }
+                }
+            }
+            is SignInState.SignedOut -> {
+                lblUserEmail.text = context.getString(LR.string.profile_set_up_account)
+                if (isNewLayout) lblUserEmail.visibility = View.GONE
+            }
+            null -> lblUserEmail.text = null
+        }
+    }
+
+    private fun updateSubscriptionTierPill(signInState: SignInState?, isPatron: Boolean) {
         subscriptionTierPill?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                if (show) {
+                if (signInState is SignInState.SignedIn && isNewLayout && isPatron) {
                     SubscriptionTierPill(
                         iconRes = IR.drawable.ic_patron,
                         shortNameRes = LR.string.pocket_casts_patron_short,
@@ -157,6 +188,14 @@ open class UserView @JvmOverloads constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun updateAccountButton(signInState: SignInState?) {
+        btnAccount?.text = when (signInState) {
+            is SignInState.SignedIn -> context.getString(LR.string.profile_account)
+            is SignInState.SignedOut -> context.getString(LR.string.profile_set_up_account)
+            else -> null
         }
     }
 }
