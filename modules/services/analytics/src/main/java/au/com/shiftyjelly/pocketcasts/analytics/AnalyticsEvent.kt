@@ -10,7 +10,9 @@ enum class AnalyticsEvent(val key: String) {
 
     /* User lifecycle events */
     USER_SIGNED_IN("user_signed_in"),
+    USER_SIGNED_IN_WATCH_FROM_PHONE("user_signed_in_watch_from_phone"),
     USER_SIGNIN_FAILED("user_signin_failed"),
+    USER_SIGNIN_WATCH_FROM_PHONE_FAILED("user_signin_watch_from_phone_failed"),
     USER_ACCOUNT_DELETED("user_account_deleted"),
     USER_PASSWORD_UPDATED("user_password_updated"),
     USER_EMAIL_UPDATED("user_email_updated"),

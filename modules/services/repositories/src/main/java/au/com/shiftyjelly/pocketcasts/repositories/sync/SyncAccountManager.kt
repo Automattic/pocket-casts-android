@@ -152,7 +152,6 @@ class SyncAccountManager @Inject constructor(
 }
 
 enum class SignInSource(val analyticsValue: String) {
-    AccountAuthenticator("account_manager"),
     SignInViewModel("sign_in_view_model"),
     Onboarding("onboarding"),
 }
