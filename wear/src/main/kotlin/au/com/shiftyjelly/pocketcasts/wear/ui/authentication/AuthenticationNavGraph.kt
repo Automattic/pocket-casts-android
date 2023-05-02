@@ -81,10 +81,16 @@ fun NavGraphBuilder.authenticationNavGraph(navController: NavController) {
         composable(AuthenticationNavRoutes.loginWithGoogle) {
             LoginWithGoogleScreen(
                 onAuthSucceed = {
-                    navController.popBackStack(
+                    val popped = navController.popBackStack(
                         route = WatchListScreen.route,
                         inclusive = false,
                     )
+                    if (popped) {
+                        navController
+                            .currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set(WatchListScreen.scrollToTop, true)
+                    }
                 },
                 onAuthCanceled = {
                     navController.popBackStack()

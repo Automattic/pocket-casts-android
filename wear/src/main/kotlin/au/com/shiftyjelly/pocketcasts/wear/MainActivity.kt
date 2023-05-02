@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -98,6 +99,20 @@ fun WearApp(
                 swipeToDismissState = swipeToDismissState,
                 scrollableScaffoldContext = it,
             ) {
+
+                navController.currentBackStackEntry?.savedStateHandle
+                    ?.getStateFlow(WatchListScreen.scrollToTop, false)
+                    ?.collectAsStateWithLifecycle()?.value?.let { scrollToTop ->
+                        if (scrollToTop) {
+                            coroutineScope.launch {
+                                it.scrollableState.scrollToItem(0)
+                            }
+                            // Reset once consumed
+                            navController.currentBackStackEntry?.savedStateHandle
+                                ?.set(WatchListScreen.scrollToTop, false)
+                        }
+                    }
+
                 WatchListScreen(
                     scrollState = it.scrollableState,
                     navigateToRoute = navController::navigate,

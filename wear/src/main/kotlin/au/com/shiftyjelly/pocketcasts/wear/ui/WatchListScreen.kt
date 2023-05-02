@@ -27,6 +27,9 @@ import au.com.shiftyjelly.pocketcasts.profile.R as PR
 
 object WatchListScreen {
     const val route = "watch_list_screen"
+
+    // Key for boolean value in SavedStateHandle that is used to have this screen scroll to the top
+    const val scrollToTop = "scroll_to_top"
 }
 
 @Composable
