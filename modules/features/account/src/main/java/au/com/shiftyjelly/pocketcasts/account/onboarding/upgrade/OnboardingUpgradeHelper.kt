@@ -47,6 +47,7 @@ import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -84,13 +85,18 @@ object OnboardingUpgradeHelper {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                TextH30(
+                AutoResizeText(
                     text = primaryText,
                     color = Color(textColor),
+                    maxFontSize = 18.sp,
+                    lineHeight = 21.sp,
+                    fontWeight = FontWeight.W600,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
                 )
-                secondaryText?.let { subTitle ->
+                secondaryText?.let {
                     TextP60(
-                        text = subTitle,
+                        text = it,
                         textAlign = TextAlign.Center,
                         color = Color(textColor),
                         modifier = Modifier.padding(top = 4.dp)
