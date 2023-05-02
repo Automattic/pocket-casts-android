@@ -6,8 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.colorResource
 import androidx.constraintlayout.widget.ConstraintLayout
 import au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDaysMonthsOrYears
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -22,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isLandscape
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import java.util.Date
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -49,6 +55,7 @@ open class UserView @JvmOverloads constructor(
     val lblSignInStatus: TextView?
     val imgProfilePicture: ProfileCircleView
     val btnAccount: Button?
+    private val subscriptionTierPill: ComposeView?
 
     init {
         LayoutInflater.from(context).inflate(layoutResource, this, true)
@@ -56,6 +63,7 @@ open class UserView @JvmOverloads constructor(
         lblSignInStatus = findViewById(R.id.lblSignInStatus)
         imgProfilePicture = findViewById(R.id.imgProfilePicture)
         btnAccount = findViewById(R.id.btnAccount)
+        subscriptionTierPill = findViewById(R.id.subscriptionTierPill)
         setBackgroundResource(R.drawable.background_user_view)
     }
 
@@ -96,12 +104,14 @@ open class UserView @JvmOverloads constructor(
                 lblSignInStatus?.text = context.getString(LR.string.profile_not_signed_in)
 
                 imgProfilePicture.setup(0.0f, false)
+                updateSubscriptionTierPill(show = false)
             }
             else -> {
                 lblUsername.text = null
                 lblSignInStatus?.text = null
 
                 imgProfilePicture.setup(0.0f, false)
+                updateSubscriptionTierPill(show = false)
             }
         }
     }
@@ -131,6 +141,22 @@ open class UserView @JvmOverloads constructor(
             val expiresIn = resources.getStringPluralSecondsMinutesHoursDaysOrYears(timeLeftMs)
             lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires_in, expiresIn).uppercase()
             lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_05))
+        }
+    }
+
+    private fun updateSubscriptionTierPill(show: Boolean) {
+        subscriptionTierPill?.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                if (show) {
+                    SubscriptionTierPill(
+                        iconRes = IR.drawable.ic_patron,
+                        shortNameRes = LR.string.pocket_casts_patron_short,
+                        iconColor = Color.White,
+                        backgroundColor = colorResource(id = R.color.patron_purple),
+                    )
+                }
+            }
         }
     }
 }
