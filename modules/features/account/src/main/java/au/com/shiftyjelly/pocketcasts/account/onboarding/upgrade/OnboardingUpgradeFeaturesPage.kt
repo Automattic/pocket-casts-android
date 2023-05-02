@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -74,6 +72,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
@@ -395,7 +394,11 @@ fun FeatureCard(
                     .padding(bottom = 12.dp),
                 contentAlignment = Alignment.TopStart
             ) {
-                FeaturePill(card.iconRes, card.shortNameRes)
+                SubscriptionTierPill(
+                    iconRes = card.iconRes,
+                    shortNameRes = card.shortNameRes,
+                    modifier = Modifier.background(Color.Black)
+                )
             }
 
             Column {
@@ -409,38 +412,6 @@ fun FeatureCard(
                     lineHeight = 18.sp
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun FeaturePill(
-    @DrawableRes iconRes: Int,
-    @StringRes shortNameRes: Int,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        shape = RoundedCornerShape(800.dp),
-        backgroundColor = Color.Black,
-    ) {
-        Row(
-            modifier = modifier
-                .semantics(mergeDescendants = true) {}
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                modifier = modifier
-                    .size(16.dp),
-                tint = Color.Unspecified,
-            )
-            Spacer(Modifier.width(4.dp))
-            TextH50(
-                text = stringResource(shortNameRes),
-                color = Color.White,
-            )
         }
     }
 }
