@@ -66,14 +66,17 @@ open class UserView @JvmOverloads constructor(
 
     open fun update(signInState: SignInState?) {
         val isPatron = false // TODO: Patron - get Patron state from subscription status
-        updateProfileImageAndDaysRemaining(signInState)
+        updateProfileImageAndDaysRemaining(signInState, isPatron)
         updateUsername(signInState, isPatron)
         updateEmail(signInState, isPatron)
         updateSubscriptionTierPill(signInState, isPatron)
         updateAccountButton(signInState)
     }
 
-    private fun updateProfileImageAndDaysRemaining(signInState: SignInState?) {
+    private fun updateProfileImageAndDaysRemaining(
+        signInState: SignInState?,
+        isPatron: Boolean,
+    ) {
         when (signInState) {
             is SignInState.SignedIn -> {
                 val gravatarUrl = Gravatar.getUrl(signInState.email)
@@ -83,10 +86,23 @@ open class UserView @JvmOverloads constructor(
                 if (daysLeft != null && daysLeft > 0 && daysLeft <= 30) {
                     percent = daysLeft / 30f
                 }
-                imgProfilePicture.setup(percent, signInState.isSignedInAsPlus, gravatarUrl)
+                imgProfilePicture.setup(
+                    percent = percent,
+                    plusOnly = signInState.isSignedInAsPlus,
+                    isPatron = isPatron,
+                    gravatarUrl = gravatarUrl
+                )
             }
-            is SignInState.SignedOut -> imgProfilePicture.setup(0.0f, false)
-            else -> imgProfilePicture.setup(0.0f, false)
+            is SignInState.SignedOut -> imgProfilePicture.setup(
+                percent = 0.0f,
+                plusOnly = false,
+                isPatron = false
+            )
+            else -> imgProfilePicture.setup(
+                percent = 0.0f,
+                plusOnly = false,
+                isPatron = false
+            )
         }
     }
 
@@ -175,7 +191,7 @@ open class UserView @JvmOverloads constructor(
                         iconRes = IR.drawable.ic_patron,
                         shortNameRes = LR.string.pocket_casts_patron_short,
                         iconColor = Color.White,
-                        backgroundColor = colorResource(id = R.color.patron_purple),
+                        backgroundColor = colorResource(UR.color.patron_purple),
                     )
                 }
             }
