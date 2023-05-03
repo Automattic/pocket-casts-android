@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    tools:layout_height="wrap_content">
+
+    <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
+        android:id="@+id/imgProfilePicture"
+        android:layout_width="@dimen/profile_picture_size_new"
+        android:layout_height="@dimen/profile_picture_size_new"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="W,1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/subscriptionTierPill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/imgProfilePicture"
+        app:layout_constraintEnd_toEndOf="@id/imgProfilePicture"
+        app:layout_constraintStart_toStartOf="@id/imgProfilePicture"
+        app:layout_constraintTop_toBottomOf="@id/imgProfilePicture" />
+
+    <TextView
+        android:id="@+id/lblUsername"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="start"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/H20"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imgProfilePicture"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Kevin Jones" />
+
+    <TextView
+        android:id="@+id/lblUserEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:gravity="start"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/H70"
+        android:textColor="?attr/primary_text_01"
+        app:layout_constraintBottom_toTopOf="@id/btnAccount"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imgProfilePicture"
+        app:layout_constraintTop_toBottomOf="@id/lblUsername"
+        tools:text="xxx@gmail.com" />
+
+    <Button
+        android:id="@+id/btnAccount"
+        style="@style/PCAccountOutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:gravity="start"
+        android:text="@string/profile_set_up_account"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imgProfilePicture"
+        app:layout_constraintTop_toBottomOf="@id/lblUserEmail"
+        tools:text="Set Up Account" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

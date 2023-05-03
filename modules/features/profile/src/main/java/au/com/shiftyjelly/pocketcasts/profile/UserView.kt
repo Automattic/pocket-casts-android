@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.extensions.isLandscape
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -37,7 +36,7 @@ open class UserView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
-    val isNewLayout = BuildConfig.ADD_PATRON_ENABLED && !context.isLandscape()
+    val isNewLayout = BuildConfig.ADD_PATRON_ENABLED
     open val layoutResource = if (isNewLayout) {
         R.layout.view_user_new
     } else {
