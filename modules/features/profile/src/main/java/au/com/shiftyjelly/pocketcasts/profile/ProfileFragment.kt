@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -41,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
-import au.com.shiftyjelly.pocketcasts.settings.util.SettingsHelper
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -150,12 +148,6 @@ class ProfileFragment : BaseFragment() {
             }
 
             section.action?.invoke()
-        }
-
-        SettingsHelper.loadHeaderImageInto(binding.imgBannerBackground)
-        binding.imgBannerBackground.setOnLongClickListener {
-            theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity)
-            true
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

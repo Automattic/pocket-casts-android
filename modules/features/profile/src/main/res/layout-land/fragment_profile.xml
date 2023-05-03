@@ -12,18 +12,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="?attr/primary_ui_02"
             android:focusableInTouchMode="true">
-
-            <ImageView
-                android:id="@+id/imgBannerBackground"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@color/black"
-                android:foreground="@drawable/background_profile_header"
-                android:scaleType="centerCrop"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <au.com.shiftyjelly.pocketcasts.profile.UserView
                 android:id="@+id/userView"
@@ -47,7 +37,7 @@
                 style="@style/label_profile_stats"
                 android:layout_marginStart="16dp"
                 android:text="0"
-                android:textColor="?attr/contrast_01"
+                android:textColor="?attr/primary_text_01"
                 app:layout_constraintBottom_toTopOf="@+id/lblPodcastCountLabel"
                 app:layout_constraintEnd_toStartOf="@+id/lblDaysListened"
                 app:layout_constraintStart_toEndOf="@+id/barrier"
@@ -59,7 +49,7 @@
                 android:id="@+id/lblDaysListened"
                 style="@style/label_profile_stats"
                 android:text="0"
-                android:textColor="?attr/contrast_01"
+                android:textColor="?attr/primary_text_01"
                 app:layout_constraintEnd_toStartOf="@+id/lblDaysSaved"
                 app:layout_constraintStart_toEndOf="@+id/lblPodcastCount"
                 app:layout_constraintTop_toTopOf="@id/lblPodcastCount"
@@ -70,7 +60,7 @@
                 style="@style/label_profile_stats"
                 android:layout_marginEnd="48dp"
                 android:text="0"
-                android:textColor="?attr/contrast_01"
+                android:textColor="?attr/primary_text_01"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/lblDaysListened"
                 app:layout_constraintTop_toTopOf="@id/lblPodcastCount"
@@ -81,8 +71,8 @@
                 style="@style/label_profile_stat_label"
                 android:layout_marginTop="4dp"
                 android:text="@string/profile_stat_podcasts"
-                android:textColor="?attr/contrast_02"
-                app:layout_constraintBottom_toBottomOf="@id/imgBannerBackground"
+                android:textColor="?attr/primary_text_01"
+                app:layout_constraintBottom_toBottomOf="@id/userView"
                 app:layout_constraintEnd_toEndOf="@+id/lblPodcastCount"
                 app:layout_constraintStart_toStartOf="@+id/lblPodcastCount"
                 app:layout_constraintTop_toBottomOf="@+id/lblPodcastCount" />
@@ -92,7 +82,7 @@
                 style="@style/label_profile_stat_label"
                 android:layout_marginTop="4dp"
                 android:text="@string/profile_stat_days_listened"
-                android:textColor="?attr/contrast_02"
+                android:textColor="?attr/primary_text_01"
                 app:layout_constraintEnd_toEndOf="@+id/lblDaysListened"
                 app:layout_constraintStart_toStartOf="@+id/lblDaysListened"
                 app:layout_constraintTop_toBottomOf="@+id/lblDaysListened" />
@@ -102,7 +92,7 @@
                 style="@style/label_profile_stat_label"
                 android:layout_marginTop="4dp"
                 android:text="@string/profile_stats_days_saved"
-                android:textColor="?attr/contrast_02"
+                android:textColor="?attr/primary_text_01"
                 app:layout_constraintEnd_toEndOf="@+id/lblDaysSaved"
                 app:layout_constraintStart_toStartOf="@+id/lblDaysSaved"
                 app:layout_constraintTop_toBottomOf="@+id/lblDaysSaved" />
@@ -116,7 +106,7 @@
                 android:paddingTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imgBannerBackground" />
+                app:layout_constraintTop_toBottomOf="@+id/userView" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -186,7 +176,6 @@
         android:background="?android:attr/actionBarItemBackground"
         android:contentDescription="@string/settings"
         android:src="@drawable/ic_profile_settings"
-        android:theme="@style/ThemeDark"
-        android:tint="?attr/contrast_01" />
+        android:tint="?attr/primary_text_01" />
 
 </FrameLayout>
