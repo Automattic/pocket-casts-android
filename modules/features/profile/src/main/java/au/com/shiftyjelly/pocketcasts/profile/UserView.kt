@@ -36,12 +36,7 @@ open class UserView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
-    val isNewLayout = BuildConfig.ADD_PATRON_ENABLED
-    open val layoutResource = if (isNewLayout) {
-        R.layout.view_user_new
-    } else {
-        R.layout.view_user
-    }
+    open val layoutResource = R.layout.view_user_new
 
     var signedInState: SignInState? = null
         set(value) {
@@ -72,11 +67,10 @@ open class UserView @JvmOverloads constructor(
     open fun update(signInState: SignInState?) {
         val isPatron = false // TODO: Patron - get Patron state from subscription status
         updateProfileImageAndDaysRemaining(signInState)
-        updateSignInStatus(signInState) // Visible only in old layout
         updateUsername(signInState, isPatron)
         updateEmail(signInState, isPatron)
         updateSubscriptionTierPill(signInState, isPatron)
-        updateAccountButton(signInState) // Visible only in new layout
+        updateAccountButton(signInState)
     }
 
     private fun updateProfileImageAndDaysRemaining(signInState: SignInState?) {
@@ -143,7 +137,7 @@ open class UserView @JvmOverloads constructor(
 
     private fun updateUsername(signInState: SignInState?, isPatron: Boolean) {
         lblUsername?.visibility = View.GONE
-        if (signInState is SignInState.SignedIn && isNewLayout && isPatron) {
+        if (signInState is SignInState.SignedIn && isPatron) {
             lblUsername?.visibility = View.VISIBLE
             // TODO: Patron - update user name logic
             lblUsername?.text = signInState.email
@@ -158,17 +152,15 @@ open class UserView @JvmOverloads constructor(
             is SignInState.SignedIn -> {
                 lblUserEmail.text = signInState.email
                 lblUserEmail.visibility = View.VISIBLE
-                if (isNewLayout) {
-                    val marginLayoutParams = lblUserEmail.layoutParams as MarginLayoutParams
-                    val marginTop = if (isPatron) 4 else 16
-                    lblUserEmail.layoutParams = marginLayoutParams.apply {
-                        topMargin = marginTop.dpToPx(context)
-                    }
+                val marginLayoutParams = lblUserEmail.layoutParams as MarginLayoutParams
+                val marginTop = if (isPatron) 4 else 16
+                lblUserEmail.layoutParams = marginLayoutParams.apply {
+                    topMargin = marginTop.dpToPx(context)
                 }
             }
             is SignInState.SignedOut -> {
                 lblUserEmail.text = context.getString(LR.string.profile_set_up_account)
-                if (isNewLayout) lblUserEmail.visibility = View.GONE
+                lblUserEmail.visibility = View.GONE
             }
             null -> lblUserEmail.text = null
         }
@@ -178,7 +170,7 @@ open class UserView @JvmOverloads constructor(
         subscriptionTierPill?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                if (signInState is SignInState.SignedIn && isNewLayout && isPatron) {
+                if (signInState is SignInState.SignedIn && isPatron) {
                     SubscriptionTierPill(
                         iconRes = IR.drawable.ic_patron,
                         shortNameRes = LR.string.pocket_casts_patron_short,

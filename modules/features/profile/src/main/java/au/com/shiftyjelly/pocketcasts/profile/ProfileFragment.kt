@@ -186,12 +186,8 @@ class ProfileFragment : BaseFragment() {
         }
 
         with(binding.userView) {
-            if (isNewLayout) {
-                imgProfilePicture.setOnClickListener { onProfileAccountButtonClicked() }
-                btnAccount?.setOnClickListener { onProfileAccountButtonClicked() }
-            } else {
-                setOnClickListener { onProfileAccountButtonClicked() }
-            }
+            imgProfilePicture.setOnClickListener { onProfileAccountButtonClicked() }
+            btnAccount?.setOnClickListener { onProfileAccountButtonClicked() }
         }
 
         binding.btnRefresh.setOnClickListener {
