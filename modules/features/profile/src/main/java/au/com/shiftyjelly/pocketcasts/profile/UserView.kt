@@ -36,7 +36,7 @@ open class UserView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
-    open val layoutResource = R.layout.view_user_new
+    open val layoutResource = R.layout.view_user
 
     var signedInState: SignInState? = null
         set(value) {
