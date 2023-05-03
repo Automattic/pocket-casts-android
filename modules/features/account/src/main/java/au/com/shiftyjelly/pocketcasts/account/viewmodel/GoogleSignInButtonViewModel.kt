@@ -185,7 +185,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
         onSuccess: (GoogleSignInState) -> Unit,
         onError: suspend () -> Unit
     ) =
-        when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.Onboarding)) {
+        when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
             is LoginResult.Success -> {
                 podcastManager.refreshPodcastsAfterSignIn()
                 onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))

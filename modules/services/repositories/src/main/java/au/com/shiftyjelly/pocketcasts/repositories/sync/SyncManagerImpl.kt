@@ -420,12 +420,10 @@ class SyncManagerImpl @Inject constructor(
             is LoginResult.Success -> {
                 when (signInSource) {
 
-                    SignInSource.WatchPhoneSync -> {
+                    SignInSource.WatchPhoneSync ->
                         analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN_WATCH_FROM_PHONE)
-                    }
 
-                    SignInSource.SignInViewModel,
-                    SignInSource.Onboarding -> {
+                    is SignInSource.UserInitiated ->
                         analyticsTracker.track(
                             event = if (loginResult.result.isNewAccount) {
                                 AnalyticsEvent.USER_ACCOUNT_CREATED
@@ -437,24 +435,21 @@ class SyncManagerImpl @Inject constructor(
                                 TRACKS_KEY_SOURCE_IN_CODE to signInSource.analyticsValue,
                             )
                         )
-                    }
                 }
             }
             is LoginResult.Failed -> {
                 val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
                 when (signInSource) {
 
-                    SignInSource.WatchPhoneSync -> {
+                    SignInSource.WatchPhoneSync ->
                         analyticsTracker.track(
                             AnalyticsEvent.USER_SIGNIN_WATCH_FROM_PHONE_FAILED,
                             mapOf(
                                 TRACKS_KEY_ERROR_CODE to errorCodeValue,
                             )
                         )
-                    }
 
-                    SignInSource.SignInViewModel,
-                    SignInSource.Onboarding -> {
+                    is SignInSource.UserInitiated ->
                         analyticsTracker.track(
                             AnalyticsEvent.USER_SIGNIN_FAILED,
                             mapOf(
@@ -463,7 +458,6 @@ class SyncManagerImpl @Inject constructor(
                                 TRACKS_KEY_ERROR_CODE to errorCodeValue,
                             )
                         )
-                    }
                 }
             }
         }
