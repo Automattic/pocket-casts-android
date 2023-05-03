@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.models.type.Username
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.StateFlow
@@ -621,4 +622,7 @@ interface Settings {
     // account management settings).
     fun setFullySignedOut(boolean: Boolean)
     fun getFullySignedOut(): Boolean
+
+    fun setUsername(username: Username?)
+    fun getUsername(): Username
 }
