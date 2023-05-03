@@ -72,7 +72,7 @@ class SignInViewModel
             val result = syncManager.loginWithEmailAndPassword(
                 email = emailString,
                 password = pwdString,
-                signInSource = SignInSource.SignInViewModel
+                signInSource = SignInSource.UserInitiated.SignInViewModel
             )
             when (result) {
                 is LoginResult.Success -> {

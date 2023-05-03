@@ -148,9 +148,10 @@ class SyncAccountManager @Inject constructor(
     }
 }
 
-enum class SignInSource(val analyticsValue: String) {
-    AccountAuthenticator("account_manager"),
-    SignInViewModel("sign_in_view_model"),
-    Onboarding("onboarding"),
-    WatchPhoneSync("watch_phone_sync"),
+sealed class SignInSource {
+    sealed class UserInitiated(val analyticsValue: String) : SignInSource() {
+        object SignInViewModel : UserInitiated("sign_in_view_model")
+        object Onboarding : UserInitiated("onboarding")
+    }
+    object WatchPhoneSync : SignInSource()
 }
