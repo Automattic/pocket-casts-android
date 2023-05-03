@@ -80,7 +80,6 @@ open class UserView @JvmOverloads constructor(
         when (signInState) {
             is SignInState.SignedIn -> {
                 val gravatarUrl = Gravatar.getUrl(signInState.email)
-                setDaysRemainingText(signInState)
                 var percent = 1.0f
                 val daysLeft = daysLeft(signInState, 30)
                 if (daysLeft != null && daysLeft > 0 && daysLeft <= 30) {
@@ -116,7 +115,7 @@ open class UserView @JvmOverloads constructor(
         return null
     }
 
-    private fun setDaysRemainingText(signInState: SignInState.SignedIn) {
+    private fun setDaysRemainingTextIfNeeded(signInState: SignInState.SignedIn, isPatron: Boolean) {
         val status = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Plus) ?: return
         if (status.autoRenew) {
             return
@@ -129,25 +128,9 @@ open class UserView @JvmOverloads constructor(
 
         if (timeLeftMs <= maxSubscriptionExpiryMs) {
             val expiresIn = resources.getStringPluralSecondsMinutesHoursDaysOrYears(timeLeftMs)
-            lblSignInStatus?.text = context.getString(LR.string.profile_plus_expires_in, expiresIn).uppercase()
-            lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.support_05))
-        }
-    }
-
-    private fun updateSignInStatus(signInState: SignInState?) {
-        when (signInState) {
-            is SignInState.SignedIn -> {
-                val strPocketCastsPlus = context.getString(LR.string.pocket_casts_plus).uppercase()
-                val strSignedInAs = context.getString(LR.string.profile_signed_in_as).uppercase()
-
-                lblSignInStatus?.text = if (signInState.isSignedInAsPlus) strPocketCastsPlus else strSignedInAs
-                lblSignInStatus?.setTextColor(lblSignInStatus.context.getThemeColor(UR.attr.primary_text_02))
-            }
-
-            is SignInState.SignedOut ->
-                lblSignInStatus?.text = context.getString(LR.string.profile_not_signed_in)
-
-            else -> lblSignInStatus?.text = null
+            val messagesRes = if (isPatron) LR.string.profile_patron_expires_in else LR.string.profile_plus_expires_in
+            lblUserEmail.text = context.getString(messagesRes, expiresIn).uppercase()
+            lblUserEmail.setTextColor(lblUserEmail.context.getThemeColor(UR.attr.support_05))
         }
     }
 
@@ -168,11 +151,13 @@ open class UserView @JvmOverloads constructor(
             is SignInState.SignedIn -> {
                 lblUserEmail.text = signInState.email
                 lblUserEmail.visibility = View.VISIBLE
+                lblUserEmail.setTextColor(context.getThemeColor(UR.attr.primary_text_01))
                 val marginLayoutParams = lblUserEmail.layoutParams as MarginLayoutParams
                 val marginTop = if (isPatron) 4 else 16
                 lblUserEmail.layoutParams = marginLayoutParams.apply {
                     topMargin = marginTop.dpToPx(context)
                 }
+                if (this !is ExpandedUserView) setDaysRemainingTextIfNeeded(signInState, isPatron)
             }
             is SignInState.SignedOut -> {
                 lblUserEmail.text = context.getString(LR.string.profile_set_up_account)
