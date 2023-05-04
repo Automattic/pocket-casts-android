@@ -124,12 +124,12 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun fetchAccessToken(account: Account): AccessToken? {
         val refreshToken = syncAccountManager.getRefreshToken(account) ?: return null
         return try {
-            Timber.d("Refreshing the access token")
+            val signInType = syncAccountManager.getSignInType(account)
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Fetching the access token, SignInType: $signInType")
             val tokenResponse = downloadTokens(
                 email = account.name,
                 refreshToken = refreshToken,
-                syncServerManager = syncServerManager,
-                signInType = syncAccountManager.getSignInType(account),
+                signInType = signInType,
                 signInSource = SignInSource.AccountAuthenticator
             )
 
@@ -419,9 +419,8 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun downloadTokens(
         email: String,
         refreshToken: RefreshToken,
-        syncServerManager: SyncServerManager,
         signInSource: SignInSource,
-        signInType: AccountConstants.SignInType
+        signInType: AccountConstants.SignInType,
     ): LoginTokenResponse {
         val properties = mapOf(TRACKS_KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
         try {
