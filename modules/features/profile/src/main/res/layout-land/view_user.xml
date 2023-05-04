@@ -52,6 +52,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
         android:gravity="start"
         android:text="@string/profile_set_up_account"
         app:layout_constraintBottom_toBottomOf="parent"

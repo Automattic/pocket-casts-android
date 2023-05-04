@@ -102,8 +102,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="?attr/primary_ui_02"
-                android:paddingBottom="8dp"
-                android:paddingTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/userView" />

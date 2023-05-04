@@ -37,7 +37,7 @@
             <TextView
                 android:id="@+id/lblPodcastCount"
                 style="@style/label_profile_stats"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="8dp"
                 android:textColor="?attr/primary_text_01"
                 app:layout_constraintEnd_toStartOf="@+id/lblDaysListened"
                 app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +47,7 @@
             <TextView
                 android:id="@+id/lblDaysListened"
                 style="@style/label_profile_stats"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="8dp"
                 android:textColor="?attr/primary_text_01"
                 app:layout_constraintEnd_toStartOf="@+id/lblDaysSaved"
                 app:layout_constraintStart_toEndOf="@+id/lblPodcastCount"
@@ -57,7 +57,7 @@
             <TextView
                 android:id="@+id/lblDaysSaved"
                 style="@style/label_profile_stats"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="8dp"
                 android:textColor="?attr/primary_text_01"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/lblDaysListened"
@@ -98,10 +98,8 @@
                 android:id="@+id/endOfYearPromptCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="24dp"
                 android:background="?attr/primary_ui_02"
-                android:paddingBottom="8dp"
-                android:paddingTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lblPodcastCountLabel" />
