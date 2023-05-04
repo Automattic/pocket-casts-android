@@ -135,6 +135,7 @@ class SyncAccountManager @Inject constructor(
     fun setRefreshToken(refreshToken: RefreshToken) {
         val account = getAccount() ?: return
         accountManager.setPassword(account, refreshToken.value)
+        accountManager.setUserData(account, AccountConstants.SIGN_IN_TYPE_KEY, AccountConstants.SignInType.Tokens.value)
     }
 
     fun setAccessToken(accessToken: AccessToken) {
