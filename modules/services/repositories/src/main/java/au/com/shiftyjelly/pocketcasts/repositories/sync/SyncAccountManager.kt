@@ -115,8 +115,15 @@ class SyncAccountManager @Inject constructor(
             AccountConstants.SIGN_IN_TYPE_KEY to AccountConstants.SignInType.Tokens.value,
             AccountConstants.LOGIN_IDENTITY to loginIdentity.value
         )
-        accountManager.addAccountExplicitly(account, refreshToken.value, userData)
+        val accountAdded = accountManager.addAccountExplicitly(account, refreshToken.value, userData)
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)
+
+        // When the account was already added, set the sign in type to Tokens because the account
+        // does not seem to get updated with this from the userData in the addAccountExplicitly call
+        if (!accountAdded) {
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Account already added, setting sign in type to Tokens")
+            accountManager.setUserData(account, AccountConstants.SIGN_IN_TYPE_KEY, AccountConstants.SignInType.Tokens.value)
+        }
     }
 
     fun signOut() {
