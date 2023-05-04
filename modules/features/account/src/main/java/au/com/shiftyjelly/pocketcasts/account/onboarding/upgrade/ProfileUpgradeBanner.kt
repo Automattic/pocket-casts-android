@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel.State
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,7 +34,35 @@ fun ProfileUpgradeBanner(
     val state by hiltViewModel<ProfileUpgradeBannerViewModel>()
         .state
         .collectAsState()
+    when (state) {
+        is State.Loaded ->
+            ProfileUpgradeBannerView(
+                state = state as State.Loaded,
+                onClick = onClick,
+            )
 
+        is State.OldLoaded ->
+            ProfileOldUpgradeBannerView(
+                state = state as State.OldLoaded,
+                onClick = onClick,
+            )
+
+        is State.Empty -> Unit // Do nothing
+    }
+}
+
+@Composable
+fun ProfileUpgradeBannerView(
+    state: State.Loaded,
+    onClick: () -> Unit
+) {
+}
+
+@Composable
+fun ProfileOldUpgradeBannerView(
+    state: State.OldLoaded,
+    onClick: () -> Unit
+) {
     OnboardingUpgradeHelper.OldPlusBackground {
         Column(Modifier.padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(24.dp))
