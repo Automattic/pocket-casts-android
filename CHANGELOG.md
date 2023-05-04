@@ -1,6 +1,11 @@
 7.38
 -----
 
+7.37.1
+-----
+* Bug Fixes:
+    *    Fixed an issue that could cause users to be repeatedly logged out of the app.
+         ([#930](https://github.com/Automattic/pocket-casts-android/pull/930)).
 
 7.37
 -----
