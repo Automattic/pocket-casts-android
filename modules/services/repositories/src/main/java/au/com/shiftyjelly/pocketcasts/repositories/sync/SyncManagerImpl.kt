@@ -498,7 +498,7 @@ class SyncManagerImpl @Inject constructor(
 
     private suspend fun refreshTokenSuspend(): AccessToken {
         syncAccountManager.invalidateAccessToken()
-        return syncAccountManager.getAccessToken() ?: throw Exception("Failed to get refresh token")
+        return syncAccountManager.getAccessToken() ?: throw Exception("Failed to get access token")
     }
 
     private fun isHttpUnauthorized(throwable: Throwable?): Boolean {
