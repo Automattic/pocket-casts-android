@@ -41,6 +41,7 @@ class AutomotiveSettingsFragment : Fragment() {
                 }
 
                 userView.signedInState = signInState
+                userView.lblUserEmail.setOnClickListener { onProfileAccountButtonClicked(loggedIn) }
                 userView.imgProfilePicture.setOnClickListener { onProfileAccountButtonClicked(loggedIn) }
                 userView.btnAccount?.setOnClickListener { onProfileAccountButtonClicked(loggedIn) }
             }
