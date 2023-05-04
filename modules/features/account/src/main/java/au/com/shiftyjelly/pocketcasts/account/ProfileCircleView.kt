@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.RectF
@@ -12,6 +11,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.toRect
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -36,8 +36,8 @@ class ProfileCircleView @JvmOverloads constructor(
     private var plusAccount = false
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var color0 = Color.parseColor("#feb525")
-    private var color1 = Color.parseColor("#fed745")
+    private var color0 = ContextCompat.getColor(context, UR.color.plus_gold_dark)
+    private var color1 = ContextCompat.getColor(context, UR.color.plus_gold_light)
     private var colorGrey = context.getThemeColor(UR.attr.primary_icon_02)
 
     private val inset = 2 * context.resources.displayMetrics.density
@@ -52,6 +52,7 @@ class ProfileCircleView @JvmOverloads constructor(
     private var iconDrawable0: Drawable? = context.getTintedDrawable(R.drawable.ic_plus_account, iconColor)
     private var iconDrawable1: Drawable? = context.getTintedDrawable(R.drawable.ic_free_account, iconColor)
     private var bitmap: Bitmap? = null
+    private var isPatron: Boolean = false
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -59,6 +60,10 @@ class ProfileCircleView @JvmOverloads constructor(
     }
 
     fun update() {
+        val color0Res = if (isPatron) UR.color.patron_purple else UR.color.plus_gold_dark
+        val color1Res = if (isPatron) UR.color.patron_purple else UR.color.plus_gold_light
+        color0 = ContextCompat.getColor(context, color0Res)
+        color1 = ContextCompat.getColor(context, color1Res)
         // -- outer circle
         val cx = width / 2f
         bounds0Rect = RectF(0f, 0f, width.toFloat(), height.toFloat())
@@ -125,6 +130,7 @@ class ProfileCircleView @JvmOverloads constructor(
     fun setup(
         percent: Float,
         plusOnly: Boolean,
+        isPatron: Boolean = false,
         gravatarUrl: String? = null,
     ) {
         drawState = DRAW_FULL
@@ -142,8 +148,11 @@ class ProfileCircleView @JvmOverloads constructor(
             }
         }
 
-        color0 = context.getThemeColor(UR.attr.gradient_01_a)
-        color1 = context.getThemeColor(UR.attr.gradient_01_e)
+        this.isPatron = isPatron
+        val color0Res = if (isPatron) UR.attr.gradient_05_e else UR.attr.gradient_01_a
+        val color1Res = if (isPatron) UR.attr.gradient_05_e else UR.attr.gradient_01_e
+        color0 = context.getThemeColor(color0Res)
+        color1 = context.getThemeColor(color1Res)
         update()
         invalidate()
     }

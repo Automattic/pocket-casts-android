@@ -21,6 +21,11 @@
     <color name="extradarktheme_background">#000000</color>
     <color name="podcast_header_background">#1E1F1E</color>
 
+    <!-- Plan colors -->
+    <color name="plus_gold_dark">#feb525</color>
+    <color name="plus_gold_light">#fed745</color>
+    <color name="patron_purple">#6046f5</color>
+
     <!-- Material components -->
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#884f4f4f</color>
 

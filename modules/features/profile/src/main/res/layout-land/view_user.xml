@@ -4,15 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:layout_height="wrap_content">
 
     <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
         android:id="@+id/imgProfilePicture"
         android:layout_width="@dimen/profile_picture_size_new"
         android:layout_height="@dimen/profile_picture_size_new"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:importantForAccessibility="no"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="W,1:1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,38 +23,41 @@
         android:id="@+id/subscriptionTierPill"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imgProfilePicture"
-        app:layout_constraintBottom_toBottomOf="@id/imgProfilePicture" />
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/imgProfilePicture"
+        app:layout_constraintEnd_toEndOf="@id/imgProfilePicture"
+        app:layout_constraintStart_toStartOf="@id/imgProfilePicture"
+        app:layout_constraintTop_toBottomOf="@id/imgProfilePicture" />
 
     <TextView
         android:id="@+id/lblUserEmail"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:focusable="true"
-        android:gravity="center"
+        android:gravity="start"
+        android:textAlignment="textStart"
         android:textAppearance="@style/H70"
-        android:textAlignment="center"
         android:textColor="?attr/primary_text_01"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionTierPill"
+        app:layout_constraintBottom_toTopOf="@id/btnAccount"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imgProfilePicture"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="xxx@gmail.com" />
 
     <Button
         android:id="@+id/btnAccount"
-        android:text="@string/profile_set_up_account"
+        style="@style/PCAccountOutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/PCAccountOutlinedButton"
-        android:gravity="center"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
-        android:layout_marginTop="16dp"
+        android:gravity="start"
+        android:text="@string/profile_set_up_account"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imgProfilePicture"
         app:layout_constraintTop_toBottomOf="@id/lblUserEmail"
         tools:text="Set Up Account" />
 

@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class CloudSettingsFragment : BaseFragment() {
@@ -59,8 +60,8 @@ class CloudSettingsFragment : BaseFragment() {
 
         context?.let { context ->
             AppCompatResources.getDrawable(context, R.drawable.ic_lock)?.let {
-                val color0 = ContextCompat.getColor(context, R.color.plus_gold_dark)
-                val color1 = ContextCompat.getColor(context, R.color.plus_gold_light)
+                val color0 = ContextCompat.getColor(context, UR.color.plus_gold_dark)
+                val color1 = ContextCompat.getColor(context, UR.color.plus_gold_light)
                 binding.imgLock.setup(it, color0, color1)
             }
         }
