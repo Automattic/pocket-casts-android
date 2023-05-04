@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.days
-import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -46,7 +45,6 @@ open class UserView @JvmOverloads constructor(
 
     var accountStartDate: Date = Date()
     val maxSubscriptionExpiryMs = 30L * 24L * 60L * 60L * 1000L
-    val lblUsername: TextView?
     val lblUserEmail: TextView
     val lblSignInStatus: TextView?
     val imgProfilePicture: ProfileCircleView
@@ -55,7 +53,6 @@ open class UserView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(layoutResource, this, true)
-        lblUsername = findViewById(R.id.lblUsername)
         lblUserEmail = findViewById(R.id.lblUserEmail)
         lblSignInStatus = findViewById(R.id.lblSignInStatus)
         imgProfilePicture = findViewById(R.id.imgProfilePicture)
@@ -67,7 +64,6 @@ open class UserView @JvmOverloads constructor(
     open fun update(signInState: SignInState?) {
         val isPatron = false // TODO: Patron - get Patron state from subscription status
         updateProfileImageAndDaysRemaining(signInState, isPatron)
-        updateUsername(signInState, isPatron)
         updateEmail(signInState, isPatron)
         updateSubscriptionTierPill(signInState, isPatron)
         updateAccountButton(signInState)
@@ -134,29 +130,13 @@ open class UserView @JvmOverloads constructor(
         }
     }
 
-    private fun updateUsername(signInState: SignInState?, isPatron: Boolean) {
-        lblUsername?.visibility = View.GONE
-        if (signInState is SignInState.SignedIn && isPatron) {
-            lblUsername?.visibility = View.VISIBLE
-            // TODO: Patron - update user name logic
-            lblUsername?.text = signInState.email
-                .split("@").first()
-                .replace(".", " ")
-                .replace("_", " ")
-        }
-    }
-
     private fun updateEmail(signInState: SignInState?, isPatron: Boolean) {
         when (signInState) {
             is SignInState.SignedIn -> {
                 lblUserEmail.text = signInState.email
                 lblUserEmail.visibility = View.VISIBLE
                 lblUserEmail.setTextColor(context.getThemeColor(UR.attr.primary_text_01))
-                val marginLayoutParams = lblUserEmail.layoutParams as MarginLayoutParams
-                val marginTop = if (isPatron) 4 else 16
-                lblUserEmail.layoutParams = marginLayoutParams.apply {
-                    topMargin = marginTop.dpToPx(context)
-                }
+
                 if (this !is ExpandedUserView) setDaysRemainingTextIfNeeded(signInState, isPatron)
             }
             is SignInState.SignedOut -> {

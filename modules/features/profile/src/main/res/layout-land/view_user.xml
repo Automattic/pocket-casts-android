@@ -30,27 +30,11 @@
         app:layout_constraintTop_toBottomOf="@id/imgProfilePicture" />
 
     <TextView
-        android:id="@+id/lblUsername"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:focusable="true"
-        android:gravity="start"
-        android:textAlignment="textStart"
-        android:textAppearance="@style/H20"
-        android:textColor="?attr/primary_text_01"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/imgProfilePicture"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Kevin Jones" />
-
-    <TextView
         android:id="@+id/lblUserEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:focusable="true"
         android:gravity="start"
         android:textAlignment="textStart"
@@ -59,7 +43,7 @@
         app:layout_constraintBottom_toTopOf="@id/btnAccount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/imgProfilePicture"
-        app:layout_constraintTop_toBottomOf="@id/lblUsername"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="xxx@gmail.com" />
 
     <Button
