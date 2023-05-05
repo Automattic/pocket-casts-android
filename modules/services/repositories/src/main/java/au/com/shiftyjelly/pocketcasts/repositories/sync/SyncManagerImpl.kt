@@ -133,7 +133,6 @@ class SyncManagerImpl @Inject constructor(
         return try {
             val signInType = syncAccountManager.getSignInType(account)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Fetching the access token, SignInType: $signInType")
-            Timber.d("Refreshing the access token")
             val tokenResponse = downloadTokens(
                 email = account.name,
                 refreshToken = refreshToken,
