@@ -131,12 +131,12 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun fetchAccessToken(account: Account): AccessToken? {
         val refreshToken = syncAccountManager.getRefreshToken(account) ?: return null
         return try {
-            Timber.d("Refreshing the access token")
+            val signInType = syncAccountManager.getSignInType(account)
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Fetching the access token, SignInType: $signInType")
             val tokenResponse = downloadTokens(
                 email = account.name,
                 refreshToken = refreshToken,
-                syncServerManager = syncServerManager,
-                signInType = syncAccountManager.getSignInType(account),
+                signInType = signInType,
             )
 
             // update the refresh token as the expiry may have been increased
@@ -486,7 +486,6 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun downloadTokens(
         email: String,
         refreshToken: RefreshToken,
-        syncServerManager: SyncServerManager,
         signInType: AccountConstants.SignInType
     ): LoginTokenResponse =
         when (signInType) {
@@ -555,7 +554,7 @@ class SyncManagerImpl @Inject constructor(
 
     private suspend fun refreshTokenSuspend(): AccessToken {
         syncAccountManager.invalidateAccessToken()
-        return syncAccountManager.getAccessToken() ?: throw Exception("Failed to get refresh token")
+        return syncAccountManager.getAccessToken() ?: throw Exception("Failed to get access token")
     }
 
     private fun isHttpUnauthorized(throwable: Throwable?): Boolean {
