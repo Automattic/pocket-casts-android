@@ -5,8 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -40,7 +40,7 @@ class PlayButtonListener @Inject constructor(
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "In app play button pushed for $episodeUuid")
         launch {
             // show the stream warning if the episode isn't downloaded
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 if (playbackManager.shouldWarnAboutPlayback(episodeUuid)) {
                     launch(Dispatchers.Main) {
                         if (episode.isDownloaded) {
@@ -57,7 +57,7 @@ class PlayButtonListener @Inject constructor(
         }
     }
 
-    private fun play(episode: Playable, force: Boolean = true) {
+    private fun play(episode: BaseEpisode, force: Boolean = true) {
         playbackManager.playNow(episode = episode, forceStream = force, playbackSource = source)
         warningsHelper.showBatteryWarningSnackbarIfAppropriate()
     }
@@ -68,7 +68,7 @@ class PlayButtonListener @Inject constructor(
 
     override fun onPlayedClicked(episodeUuid: String) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 episodeManager.markAsNotPlayed(episode)
             }
         }
@@ -76,7 +76,7 @@ class PlayButtonListener @Inject constructor(
 
     override fun onPlayNext(episodeUuid: String) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playNext(episode = episode, source = source)
             }
         }
@@ -84,7 +84,7 @@ class PlayButtonListener @Inject constructor(
 
     override fun onPlayLast(episodeUuid: String) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let { episode ->
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playLast(episode = episode, source = source)
             }
         }
@@ -101,14 +101,14 @@ class PlayButtonListener @Inject constructor(
 
     private fun download(episodeUuid: String, waitForWifi: Boolean = false) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let {
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let {
                 if (it.isDownloading) {
                     episodeManager.stopDownloadAndCleanUp(episodeUuid, "play button")
                 } else if (!it.isDownloaded) {
                     if (!waitForWifi) {
-                        it.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                     } else {
-                        it.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
+                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
                     }
                     downloadManager.addEpisodeToQueue(it, "play button", true)
                     episodeAnalytics.trackEvent(
@@ -126,7 +126,7 @@ class PlayButtonListener @Inject constructor(
 
     override fun onStopDownloading(episodeUuid: String) {
         launch {
-            episodeManager.findPlayableByUuid(episodeUuid)?.let {
+            episodeManager.findEpisodeByUuid(episodeUuid)?.let {
                 if (it.isDownloading || it.isQueued) {
                     downloadManager.removeEpisodeFromQueue(it, "play button")
                 }

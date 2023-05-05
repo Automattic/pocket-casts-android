@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,18 +35,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
+import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -58,11 +65,12 @@ object OnboardingUpgradeHelper {
 
     @Composable
     fun UpgradeRowButton(
-        text: String,
+        primaryText: String,
         backgroundColor: Long,
         textColor: Long,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
+        secondaryText: String? = null,
     ) {
         Button(
             onClick = onClick,
@@ -72,10 +80,21 @@ object OnboardingUpgradeHelper {
                 backgroundColor = Color(backgroundColor),
             ),
         ) {
-            TextH30(
-                text = text,
-                color = Color(textColor),
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                TextH30(
+                    text = primaryText,
+                    color = Color(textColor),
+                )
+                secondaryText?.let { subTitle ->
+                    TextP60(
+                        text = subTitle,
+                        color = Color(textColor),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
         }
     }
 
@@ -420,5 +439,43 @@ object OnboardingUpgradeHelper {
                 tint = Color.White,
             )
         }
+    }
+
+    @Composable
+    fun PrivacyPolicy(
+        color: Color,
+        textAlign: TextAlign,
+        modifier: Modifier = Modifier,
+        lineHeight: TextUnit = 16.sp,
+    ) {
+        val privacyPolicyText = stringResource(LR.string.onboarding_plus_privacy_policy)
+        val termsAndConditionsText = stringResource(LR.string.onboarding_plus_terms_and_conditions)
+        val text = stringResource(
+            LR.string.onboarding_plus_continuing_agrees_to,
+            privacyPolicyText,
+            termsAndConditionsText
+        )
+        val uriHandler = LocalUriHandler.current
+        ClickableTextHelper(
+            text = text,
+            color = color,
+            lineHeight = lineHeight,
+            textAlign = textAlign,
+            clickables = listOf(
+                Clickable(
+                    text = privacyPolicyText,
+                    onClick = {
+                        uriHandler.openUri(Settings.INFO_PRIVACY_URL)
+                    }
+                ),
+                Clickable(
+                    text = termsAndConditionsText,
+                    onClick = {
+                        uriHandler.openUri(Settings.INFO_TOS_URL)
+                    }
+                ),
+            ),
+            modifier = modifier,
+        )
     }
 }

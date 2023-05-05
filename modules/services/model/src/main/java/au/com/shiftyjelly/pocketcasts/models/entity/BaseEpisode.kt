@@ -5,16 +5,16 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import java.util.Date
 import java.util.UUID
 
-interface Playable {
+sealed interface BaseEpisode {
     companion object {
         /**
          * Used to reduce the changes sent out by the media session.
          * Returns true if the objects are the same.
          */
-        val isMediaSessionEqual: (t1: Playable?, t2: Playable?) -> Boolean = { t1, t2 ->
+        val isMediaSessionEqual: (t1: BaseEpisode?, t2: BaseEpisode?) -> Boolean = { t1, t2 ->
             t1 != null && t2 != null && t1.uuid == t2.uuid &&
                 (
-                    (t1 is Episode && t2 is Episode && t1.isStarred == t2.isStarred) ||
+                    (t1 is PodcastEpisode && t2 is PodcastEpisode && t1.isStarred == t2.isStarred) ||
                         (t1 is UserEpisode && t2 is UserEpisode && t1.tintColorIndex == t2.tintColorIndex)
                     )
         }
@@ -85,13 +85,13 @@ interface Playable {
         get() = !isVideo
 
     val isManualDownloadOverridingWifiSettings: Boolean
-        get() = autoDownloadStatus == Episode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
 
     val isAutoDownloaded: Boolean
-        get() = autoDownloadStatus == Episode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
+        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
 
     val isExemptFromAutoDownload: Boolean
-        get() = autoDownloadStatus == Episode.AUTO_DOWNLOAD_STATUS_IGNORE
+        get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE
 
     // fall back to something that most podcasts are
     fun getFileExtension(): String {

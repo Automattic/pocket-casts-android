@@ -53,7 +53,7 @@ class ShelfBottomSheet : BaseDialogFragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         playerViewModel.trimmedShelfLive.observe(viewLifecycleOwner) {
-            adapter.playable = it.second
+            adapter.episode = it.second
             adapter.submitList(it.first.drop(4))
         }
 

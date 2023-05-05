@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.account.PromoCodeUpgradedFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
+import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -54,8 +55,8 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.views.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.navigation.BottomNavigator
@@ -105,6 +106,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
@@ -182,6 +184,7 @@ class MainActivity :
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var watchSync: WatchSync
 
     private lateinit var bottomNavHideManager: BottomNavHideManager
     private lateinit var observeUpNext: LiveData<UpNextQueue.State>
@@ -447,18 +450,28 @@ class MainActivity :
     }
 
     private fun refreshApp() {
-        if (overrideNextRefreshTimer) {
-            podcastManager.refreshPodcasts("open app - ignore timer")
-            overrideNextRefreshTimer = false
-        } else {
-            // delay the refresh to allow the UI to load
-            Observable.timer(1, TimeUnit.SECONDS, Schedulers.io())
-                .doOnNext {
-                    podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
-                }
-                .subscribeBy(onError = { Timber.e(it) })
-                .addTo(disposables)
+        fun doRefresh() {
+            if (overrideNextRefreshTimer) {
+                podcastManager.refreshPodcasts("open app - ignore timer")
+                overrideNextRefreshTimer = false
+            } else {
+                // delay the refresh to allow the UI to load
+                Observable.timer(1, TimeUnit.SECONDS, Schedulers.io())
+                    .doOnNext {
+                        podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
+                    }
+                    .subscribeBy(onError = { Timber.e(it) })
+                    .addTo(disposables)
+            }
         }
+
+        // If the user chooses the advanced option to only sync on unmetered networks
+        // then don't auto-refresh when the app resumes. Still let them swipe down though
+        // to refresh if they wish and still schedule the worker to do updates
+        if (settings.refreshPodcastsOnResume(Network.isUnmeteredConnection(this@MainActivity))) {
+            doRefresh()
+        }
+
         PocketCastsShortcuts.update(playlistManager, true, this)
 
         subscriptionManager.refreshPurchases()
@@ -643,8 +656,8 @@ class MainActivity :
         viewModel.playbackState.observe(this) { state ->
             if (viewModel.lastPlaybackState?.episodeUuid != state.episodeUuid || (viewModel.lastPlaybackState?.isPlaying == false && state.isPlaying)) {
                 launch(Dispatchers.Default) {
-                    val playable = episodeManager.findPlayableByUuid(state.episodeUuid)
-                    if (playable?.isVideo == true && state.isPlaying) {
+                    val episode = episodeManager.findEpisodeByUuid(state.episodeUuid)
+                    if (episode?.isVideo == true && state.isPlaying) {
                         launch(Dispatchers.Main) {
                             if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
                                 binding.playerBottomSheet.openPlayer()
@@ -718,6 +731,8 @@ class MainActivity :
 
                 settings.setTrialFinishedSeen(true)
             }
+
+            lifecycleScope.launch { watchSync.sendAuthToDataLayer() }
         }
 
         val lastSeenVersionCode = settings.getWhatsNewVersionCode()
@@ -1178,9 +1193,9 @@ class MainActivity :
         episodeUuid ?: return
 
         launch(Dispatchers.Main.immediate) {
-            val playable =
-                withContext(Dispatchers.Default) { episodeManager.findPlayableByUuid(episodeUuid) }
-            val fragment = if (playable == null) {
+            val episode =
+                withContext(Dispatchers.Default) { episodeManager.findEpisodeByUuid(episodeUuid) }
+            val fragment = if (episode == null) {
                 val podcastUuidFound = podcastUuid ?: return@launch
                 // Assume it's an episode we don't know about
                 EpisodeFragment.newInstance(
@@ -1189,7 +1204,7 @@ class MainActivity :
                     podcastUuid = podcastUuidFound,
                     forceDark = forceDark
                 )
-            } else if (playable is Episode) {
+            } else if (episode is PodcastEpisode) {
                 EpisodeFragment.newInstance(
                     episodeUuid = episodeUuid,
                     source = source,
@@ -1197,7 +1212,7 @@ class MainActivity :
                     forceDark = forceDark
                 )
             } else {
-                CloudFileBottomSheetFragment.newInstance(playable.uuid, forceDark = true)
+                CloudFileBottomSheetFragment.newInstance(episode.uuid, forceDark = true)
             }
 
             fragment.showAllowingStateLoss(supportFragmentManager, "episode_card")

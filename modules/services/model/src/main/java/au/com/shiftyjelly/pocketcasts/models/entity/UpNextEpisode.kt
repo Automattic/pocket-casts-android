@@ -18,8 +18,8 @@ data class UpNextEpisode(
     @ColumnInfo(name = "podcastUuid") var podcastUuid: String? = null
 ) : Serializable {
 
-    fun toSimpleEpisode(): Episode {
-        return Episode(
+    fun toSimpleEpisode(): PodcastEpisode {
+        return PodcastEpisode(
             uuid = episodeUuid,
             podcastUuid = podcastUuid ?: "",
             title = title,
@@ -29,10 +29,10 @@ data class UpNextEpisode(
     }
 }
 
-fun Playable.toUpNextEpisode(): UpNextEpisode {
+fun BaseEpisode.toUpNextEpisode(): UpNextEpisode {
     return UpNextEpisode(
         episodeUuid = uuid,
-        podcastUuid = if (this is Episode) podcastUuid else null,
+        podcastUuid = if (this is PodcastEpisode) podcastUuid else null,
         title = title,
         downloadUrl = downloadUrl,
         publishedDate = publishedDate

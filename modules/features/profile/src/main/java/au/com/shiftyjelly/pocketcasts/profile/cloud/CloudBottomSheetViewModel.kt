@@ -46,7 +46,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     fun setup(uuid: String) {
         val isPlayingFlowable = playbackManager.playbackStateRelay.filter { it.episodeUuid == uuid }.map { it.isPlaying }.startWith(false).toFlowable(BackpressureStrategy.LATEST)
         val inUpNextFlowable = playbackManager.upNextQueue.changesObservable.containsUuid(uuid).toFlowable(BackpressureStrategy.LATEST)
-        val episodeFlowable = userEpisodeManager.observeEpisode(uuid)
+        val episodeFlowable = userEpisodeManager.observeEpisodeRx(uuid)
         val combined = Flowables.combineLatest(episodeFlowable, inUpNextFlowable, isPlayingFlowable) { episode, inUpNext, isPlaying ->
             BottomSheetState(episode, inUpNext, isPlaying)
         }

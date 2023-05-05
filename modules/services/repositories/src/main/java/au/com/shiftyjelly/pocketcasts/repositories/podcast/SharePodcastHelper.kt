@@ -5,8 +5,8 @@ import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import okhttp3.Call
@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class SharePodcastHelper(
     val podcast: Podcast, // Share just a podcast.
-    val episode: Episode? = null, // Share an episode of a podcast.
+    val episode: PodcastEpisode? = null, // Share an episode of a podcast.
     val upToInSeconds: Double? = null, // Share a position in an episode of a podcast.
     val context: Context,
     private val shareType: ShareType,

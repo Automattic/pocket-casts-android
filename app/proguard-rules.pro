@@ -63,7 +63,7 @@
 -dontwarn com.google.android.gms.measurement.**
 
 # chrome cast
--keep class com.google.android.exoplayer2.ext.cast.DefaultCastOptionsProvider { *; }
+-keep class androidx.media3.cast.DefaultCastOptionsProvider { *; }
 -keep class androidx.mediarouter.app.MediaRouteActionProvider { *; }
 -keep class au.com.shiftyjelly.pocketcasts.CastOptionsProvider { *; }
 

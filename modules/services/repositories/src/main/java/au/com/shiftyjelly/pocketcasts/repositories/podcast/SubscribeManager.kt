@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -229,7 +229,7 @@ class SubscribeManager @Inject constructor(
         return podcast
     }
 
-    private fun cleanEpisode(episode: Episode, podcast: Podcast): Episode {
+    private fun cleanEpisode(episode: PodcastEpisode, podcast: Podcast): PodcastEpisode {
         episode.addedDate = podcast.addedDate ?: Date()
         episode.podcastUuid = podcast.uuid
         episode.playedUpTo = 0.0

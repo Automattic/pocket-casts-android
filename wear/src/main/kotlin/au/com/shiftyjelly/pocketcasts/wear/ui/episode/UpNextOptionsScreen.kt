@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.wear.compose.foundation.lazy.items
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
-import au.com.shiftyjelly.pocketcasts.wear.ui.component.ChipScreenHeader
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
@@ -44,7 +44,7 @@ private fun Content(
         modifier = Modifier.padding(horizontal = 16.dp)
     ) {
         item {
-            ChipScreenHeader(
+            ScreenHeaderChip(
                 text = LR.string.add_to_up_next_question,
                 textColor = Color.White,
             )

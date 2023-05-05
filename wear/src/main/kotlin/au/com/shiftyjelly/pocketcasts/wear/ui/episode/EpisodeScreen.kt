@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButtonState
@@ -77,15 +77,21 @@ fun EpisodeScreen(
             )
         }
 
-        item {
-            TextP50(
-                text = podcast.title,
-                maxLines = 1,
-                color = WearColors.FFDADCE0,
-                lineHeight = headingLineHeight,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
+        if (podcast != null) {
+            item {
+                TextP50(
+                    text = podcast.title,
+                    maxLines = 1,
+                    color = WearColors.FFDADCE0,
+                    lineHeight = headingLineHeight,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .clickable {
+                            navigateToPodcast(podcast.uuid)
+                        }
+                )
+            }
         }
 
         item {
@@ -98,8 +104,11 @@ fun EpisodeScreen(
             ) {
                 val downloadSize = Util.formattedBytes(episode.sizeInBytes, context)
                     .replace("-", stringResource(LR.string.podcasts_download_download))
+
+                val tintColor = state.tintColor ?: MaterialTheme.colors.primary
+
                 DownloadButton(
-                    tint = state.tintColor,
+                    tint = tintColor,
                     onClick = {
                         if (episode.isDownloaded) {
                             navigateToConfirmDeleteDownload()
@@ -127,7 +136,7 @@ fun EpisodeScreen(
                 )
 
                 PlayButton(
-                    backgroundColor = state.tintColor,
+                    backgroundColor = tintColor,
                     onClick = {
                         if (state.isPlayingEpisode) {
                             viewModel.onPauseClicked()
@@ -140,7 +149,7 @@ fun EpisodeScreen(
 
                 QueueButton(
                     inUpNext = state.inUpNext,
-                    tint = state.tintColor,
+                    tint = tintColor,
                     onClick = {
                         viewModel.onUpNextClicked(
                             onRemoveFromUpNext = navigateToRemoveFromUpNextNotification,
@@ -197,32 +206,36 @@ fun EpisodeScreen(
         val episodeIsMarkedPlayed = episode.playingStatus == EpisodePlayingStatus.COMPLETED
         items(
             listOf(
-                EpisodeScreenItem(
-                    title = if (episode.isArchived) {
-                        LR.string.podcasts_unarchive
-                    } else {
-                        LR.string.archive
-                    },
-                    iconRes = if (episode.isArchived) {
-                        IR.drawable.ic_unarchive
-                    } else {
-                        IR.drawable.ic_archive
-                    },
-                    onClick = viewModel::onArchiveClicked,
-                ),
-                EpisodeScreenItem(
-                    title = if (episode.isStarred) {
-                        LR.string.unstar
-                    } else {
-                        LR.string.star
-                    },
-                    iconRes = if (episode.isStarred) {
-                        IR.drawable.ic_star_filled
-                    } else {
-                        IR.drawable.ic_star
-                    },
-                    onClick = viewModel::onStarClicked,
-                ),
+                if (episode is PodcastEpisode) {
+                    EpisodeScreenItem(
+                        title = if (episode.isArchived) {
+                            LR.string.podcasts_unarchive
+                        } else {
+                            LR.string.archive
+                        },
+                        iconRes = if (episode.isArchived) {
+                            IR.drawable.ic_unarchive
+                        } else {
+                            IR.drawable.ic_archive
+                        },
+                        onClick = viewModel::onArchiveClicked,
+                    )
+                } else null,
+                if (episode is PodcastEpisode) {
+                    EpisodeScreenItem(
+                        title = if (episode.isStarred) {
+                            LR.string.unstar
+                        } else {
+                            LR.string.star
+                        },
+                        iconRes = if (episode.isStarred) {
+                            IR.drawable.ic_star_filled
+                        } else {
+                            IR.drawable.ic_star
+                        },
+                        onClick = viewModel::onStarClicked,
+                    )
+                } else null,
                 EpisodeScreenItem(
                     title = if (episodeIsMarkedPlayed) {
                         LR.string.mark_unplayed
@@ -236,12 +249,15 @@ fun EpisodeScreen(
                     },
                     onClick = viewModel::onMarkAsPlayedClicked,
                 ),
-                EpisodeScreenItem(
-                    title = LR.string.go_to_podcast,
-                    iconRes = IR.drawable.ic_goto_32,
-                    onClick = { navigateToPodcast(podcast.uuid) },
-                ),
+                if (podcast != null) {
+                    EpisodeScreenItem(
+                        title = LR.string.go_to_podcast,
+                        iconRes = IR.drawable.ic_goto_32,
+                        onClick = { navigateToPodcast(podcast.uuid) },
+                    )
+                } else null,
             )
+                .filterNotNull()
         ) {
             EpisodeListChip(it)
         }

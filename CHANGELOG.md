@@ -1,4 +1,4 @@
-7.38
+7.39
 -----
 
 7.37.1
@@ -7,11 +7,30 @@
     *    Fixed an issue that could cause users to be repeatedly logged out of the app.
          ([#930](https://github.com/Automattic/pocket-casts-android/pull/930)).
 
+7.38
+-----
+*   Updates:
+    *   Added Advanced Settings section for experimental settings
+        ([#885](https://github.com/Automattic/pocket-casts-android/pull/885/)).
+    *   Added setting to disable sync on metered networks
+        ([#885](https://github.com/Automattic/pocket-casts-android/pull/885/)).
+    *   Added ability to view and share app logs from the "Help & feedback" screen
+        ([911](https://github.com/Automattic/pocket-casts-android/pull/911)).
+*   Bug Fixes:
+    *   Fixed accessibility content desctiption for episode list
+        ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
+    *   Improved the validation of the Automotive skip forward and back time settings
+        ([#890](https://github.com/Automattic/pocket-casts-android/pull/892)).
+    *   Fixed the show notes' timestamps not getting converted to a link if it contained another link 
+        ([#814](https://github.com/Automattic/pocket-casts-android/issues/814)).
+    *   Prevented crash when signing out of Android Automotive and clearing data while playback is in progress
+        ([#919](https://github.com/Automattic/pocket-casts-android/pull/919)).    
+
 7.37
 -----
-* New Features:
+*   New Features:
     *   Added capability to sign into Pocket Casts using Google account
-        ([#878](https://github.com/Automattic/pocket-casts-android/pull/878))
+        ([#878](https://github.com/Automattic/pocket-casts-android/pull/878)).
 
 7.35
 -----

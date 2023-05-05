@@ -205,17 +205,13 @@ dependencies {
     implementation androidLibs.composeUiToolingPreview
     implementation androidLibs.composeViewModel
     implementation androidLibs.composeUiUtil
+    implementation androidLibs.wearPlayServices
 
     implementation libs.kotlinCoroutines
     implementation libs.kotlinCoroutinesAndroid
     implementation libs.kotlinCoroutinesPlayServices
     implementation libs.kotlinCoroutinesRx
     implementation libs.deviceNames
-    implementation libs.exoplayerCore
-    implementation libs.exoplayerUi
-    implementation libs.exoplayerMediaSession
-    implementation libs.exoplayerCast
-    implementation libs.exoplayerHls
     implementation libs.glide
     implementation libs.glideOkHttp
     implementation libs.coil
@@ -246,6 +242,12 @@ dependencies {
     implementation libs.sentry
     implementation libs.sentryFragment
     implementation libs.sentryTimber
+    implementation libs.media3Cast
+    implementation libs.media3Datasource
+    implementation libs.media3Exoplayer
+    implementation libs.media3ExoplayerHls
+    implementation libs.media3Extractor
+    implementation libs.media3Ui
 
     kapt libs.moshiKotlinCompile
     kapt libs.glideCompile

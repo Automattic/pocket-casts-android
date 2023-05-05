@@ -9,8 +9,8 @@ import android.content.ComponentName
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -167,7 +167,7 @@ class VersionMigrationsJob : JobService() {
     private fun removeCustomEpisodes() {
         val customPodcastUuid = "customFolderPodcast"
         val podcast: Podcast = podcastManager.findPodcastByUuid(customPodcastUuid) ?: return
-        val episodes: List<Episode> = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
+        val episodes: List<PodcastEpisode> = episodeManager.findEpisodesByPodcastOrderedByPublishDate(podcast)
         episodes.forEach { episode ->
             playbackManager.removeEpisode(
                 episodeToRemove = episode,

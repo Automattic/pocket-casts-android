@@ -46,10 +46,7 @@ class SyncAccountManager @Inject constructor(
             accountManager.getUserData(account, AccountConstants.UUID)
         }
 
-    fun isGoogleLogin(): Boolean =
-        getLoginIdentity() == LoginIdentity.Google
-
-    private fun getLoginIdentity(): LoginIdentity? {
+    fun getLoginIdentity(): LoginIdentity? {
         val account = getAccount() ?: return null
         val loginIdentity = accountManager.getUserData(account, AccountConstants.LOGIN_IDENTITY)
         return LoginIdentity.valueOf(loginIdentity) ?: LoginIdentity.PocketCasts
@@ -143,15 +140,15 @@ class SyncAccountManager @Inject constructor(
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)
     }
 
-    fun getRefreshToken(account: Account): RefreshToken? {
-        return accountManager.getPassword(account)?.let {
-            if (it.isNotEmpty()) {
-                RefreshToken(it)
+    fun getRefreshToken(account: Account? = null): RefreshToken? =
+        (account ?: getAccount())?.let {
+            val refreshToken = accountManager.getPassword(it)
+            if (refreshToken.isNotEmpty()) {
+                RefreshToken(refreshToken)
             } else {
                 null
             }
         }
-    }
 
     fun setEmail(email: String) {
         val account = getAccount() ?: return
@@ -163,4 +160,5 @@ enum class SignInSource(val analyticsValue: String) {
     AccountAuthenticator("account_manager"),
     SignInViewModel("sign_in_view_model"),
     Onboarding("onboarding"),
+    WatchPhoneSync("watch_phone_sync"),
 }

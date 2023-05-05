@@ -8,6 +8,7 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "../base.gradle"
 
 android {
+
     defaultConfig {
         minSdk project.minSdkVersionWear
         applicationId project.applicationId
@@ -78,11 +79,15 @@ dependencies {
     implementation androidLibs.wearComposeNavigation
 
     // Horologist Dependencies
-    implementation androidLibs.horologistMedia
-    implementation androidLibs.horologistMediaUi
-    implementation androidLibs.horologistMediaData
-    implementation androidLibs.horologistMedia3Backend
     implementation androidLibs.horologistAudioUi
+    implementation androidLibs.horologistAuthData
+    implementation androidLibs.horologistAuthUi
+    implementation androidLibs.horologistBaseUi
+    implementation androidLibs.horologistDatalayer
+    implementation androidLibs.horologistMedia
+    implementation androidLibs.horologistMedia3Backend
+    implementation androidLibs.horologistMediaData
+    implementation androidLibs.horologistMediaUi
     implementation androidLibs.horologistNetworkAwarness
 
     implementation androidLibs.media3DatasourceOkhttp

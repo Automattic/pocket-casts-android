@@ -3,14 +3,15 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.media3.common.Tracks
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.extractor.metadata.id3.ApicFrame
+import androidx.media3.extractor.metadata.id3.ChapterFrame
+import androidx.media3.extractor.metadata.id3.TextInformationFrame
+import androidx.media3.extractor.metadata.id3.UrlLinkFrame
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import com.google.android.exoplayer2.Tracks
-import com.google.android.exoplayer2.metadata.id3.ApicFrame
-import com.google.android.exoplayer2.metadata.id3.ChapterFrame
-import com.google.android.exoplayer2.metadata.id3.TextInformationFrame
-import com.google.android.exoplayer2.metadata.id3.UrlLinkFrame
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.BufferedOutputStream
@@ -36,10 +37,12 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
     var embeddedTitle: String? = null
     var embeddedLength: Long? = null
 
+    @UnstableApi
     fun read(tracks: Tracks?, settings: Settings, context: Context) {
         return read(tracks, settings.getUseEmbeddedArtwork(), context)
     }
 
+    @UnstableApi
     fun read(tracks: Tracks?, loadArtwork: Boolean, context: Context) {
         val newChapters = mutableListOf<Chapter>()
         embeddedArtworkPath = null
@@ -64,9 +67,9 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
                                 this.embeddedArtworkPath = filePath
                             }
                         } else if (frame is TextInformationFrame && TAG_TITLE == frame.id) {
-                            this.embeddedTitle = frame.value
+                            this.embeddedTitle = frame.values.firstOrNull()
                         } else if (frame is TextInformationFrame && TAG_LENGTH == frame.id) {
-                            this.embeddedLength = frame.value.toLongOrNull()
+                            this.embeddedLength = frame.values.firstOrNull()?.toLongOrNull()
                         }
                     }
                 }
@@ -82,6 +85,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
         }
     }
 
+    @UnstableApi
     private fun convertFrameToChapter(frame: ChapterFrame?, chapterIndex: Int, context: Context): Chapter? {
         if (frame == null || frame.startTimeMs < 0) {
             return null
@@ -94,7 +98,7 @@ class EpisodeFileMetadata(val filenamePrefix: String? = null) {
             val subFrame = frame.getSubFrame(i)
             if (subFrame is TextInformationFrame) {
                 if ("TIT2" == subFrame.id) {
-                    title = subFrame.value
+                    title = subFrame.values.firstOrNull() ?: ""
                 }
             } else if (subFrame is UrlLinkFrame) {
                 url = subFrame.url

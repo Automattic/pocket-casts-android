@@ -30,6 +30,7 @@
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
     <string name="log_in">Log in</string>
+    <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
     <string name="log_out">Log out</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
@@ -69,8 +70,6 @@
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
     <string name="skip_forward">Skip forward</string>
-    <string name="slash_year">/year</string>
-    <string name="slash_month">/month</string>
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
     <string name="star_episode">Star episode</string>
@@ -82,6 +81,7 @@
     <string name="stop_downloading">Stop downloading</string>
     <string name="stream">Stream</string>
     <string name="subscribe">Subscribe</string>
+    <string name="subscribe_to">Subscribe to %s</string>
     <string name="unarchive_all">Unarchive all</string>
     <string name="unplayed">Unplayed</string>
     <string name="unsubscribe">Unsubscribe</string>
@@ -281,6 +281,7 @@
     <string name="player_up_next_clear_queue_button">Clear Up Next</string>
     <string name="player_up_next_empty">Nothing in Up Next</string>
     <string name="player_up_next_empty_desc">You can queue episodes to play next by swiping right on episode rows, or tapping the icon on an episode card.</string>
+    <string name="player_up_next_empty_desc_watch">You can queue episodes to play next in the episode details screen.</string>
     <string name="player_up_next_move_to_bottom">Move to bottom</string>
     <string name="player_up_next_move_to_top">Move to top</string>
     <string name="player_up_next_select">Select</string>
@@ -525,6 +526,8 @@
     <string name="episode_short_episode">E%d</string>
     <string name="episode_added_to_up_next">Added to up next</string>
     <string name="episode_removed_from_up_next">Removed from up next</string>
+    <string name="episode_in_up_next">In up next</string>
+    <string name="episode_downloading">Downloading</string>
 
     <!-- Supporter -->
 
@@ -833,6 +836,7 @@
     <string name="profile_sign_out" translatable="false">@string/sign_out</string>
     <string name="profile_sign_out_confirm">Are you sure you want to sign out of syncing?</string>
     <string name="profile_signed_in_as">Signed in as</string>
+    <string name="profile_logging_in">Logging in…</string>
     <string name="profile_sonos">Sonos</string>
     <string name="profile_sonos_connect">Connect</string>
     <string name="profile_sonos_connect_account">Connecting to Sonos will allow the Sonos app to access your episode information.\n\nYour email address, password and other sensitive items are never shared.</string>
@@ -955,6 +959,12 @@
     <string name="plus_day">day</string>
     <string name="plus_yearly">Yearly</string>
     <string name="plus_monthly">Monthly</string>
+
+    <!-- Trial -->
+
+    <string name="trial_start">Start my free trial</string>
+    <string name="trial_then_per_month">Try %1$s, then %2$s per month</string>
+    <string name="trial_then_per_year">Try %1$s, then %2$s per year</string>
 
     <!-- Settings -->
 
@@ -1153,6 +1163,8 @@
     <string name="settings_theme">Theme</string>
     <string name="settings_title">Title</string>
     <string name="settings_title_about">About</string>
+    <string name="settings_title_advanced">Advanced</string>
+    <string name="settings_description_advanced">These settings are experimental. We recommend that most users not change these from their default values.</string>
     <string name="settings_title_appearance">Appearance</string>
     <string name="settings_title_auto_add_to_up_next">Auto add to Up Next</string>
     <string name="settings_title_auto_archive" translatable="false">@string/auto_archive</string>
@@ -1258,6 +1270,7 @@
     <string name="settings_notification_default_sound">Default sound</string>
     <string name="settings_import_title">Import subscriptions</string>
     <string name="settings_status_page">Status Page</string>
+    <string name="settings_logs">Logs</string>
     <string name="settings_status_description">Check your connection with important services. This helps diagnose issues with your network, proxies, VPN, ad-blocking and security apps.</string>
     <string name="settings_status_service_internet">Internet Connection</string>
     <string name="settings_status_run">Run now</string>
@@ -1305,6 +1318,8 @@
     <string name="settings_privacy_crash_link">Link your account to crashes</string>
     <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
 
+    <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
+    <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>
     <string name="whats_new_folders_title_7_20" translatable="false">@string/folders</string>
     <string name="whats_new_folders_7_20">If you love podcasts half as much as we do, you probably have a lot of them. If you\'re a Pocket Casts Plus subscriber, you can now sort these into folders and file them into neat groups.\n\nThanks to your support, your Home Screen has never looked better!</string>
     <string name="whats_new_grid_title_7_20">Home Grid Syncing</string>
@@ -1518,6 +1533,11 @@
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
+    <string name="log_in_with_google">Log in with Google</string>
+    <string name="log_in_on_phone">Log in on phone</string>
+    <string name="log_in_with_email">Log in with email</string>
+    <string name="log_in_watch_from_phone_instructions_1">Log into Pocket Casts on a paired Android phone.</string>
+    <string name="log_in_watch_from_phone_instructions_2">The next time you open Pocket Casts on your watch and have a network connection, you will be logged in.</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>
     <string name="onboarding_get_the_newsletter">Get the newsletter</string>
@@ -1530,16 +1550,15 @@
     <string name="onboarding_recommendations_more">More %s</string>
     <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Everything you love about Pocket&#160;Casts, plus more</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">Get access to exclusive features and customization options</string>
+    <string name="onboarding_upgrade_no_subscriptions_found">No subscriptions found.</string>
     <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
     <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
-    <string name="onboarding_patron_features_description">Become a Pocket Casts Patron and help us continue to deliver the best podcasting experience available.</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
     <string name="onboarding_patron_feature_cloud_storage_title">50GB Cloud Storage</string>
     <string name="onboarding_patron_feature_profile_badge_title">Supporters profile badge</string>
     <string name="onboarding_patron_feature_special_icons_title">Special Pocket Casts app icons</string>
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
-    <string name="onboarding_plus_features_description">Take your podcasting experience to the next level with exclusive access to features and customization options.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
     <string name="onboarding_plus_feature_folders_title">Folders</string>

@@ -7,7 +7,7 @@
 
         <variable
             name="episode"
-            type="au.com.shiftyjelly.pocketcasts.models.entity.Episode" />
+            type="au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode" />
 
         <variable
             name="podcast"

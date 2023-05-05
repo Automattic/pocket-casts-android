@@ -37,7 +37,7 @@ import au.com.shiftyjelly.pocketcasts.discover.viewmodel.CarouselSponsoredPodcas
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServerManagerImpl
@@ -538,8 +538,8 @@ internal class DiscoverAdapter(
                             binding.podcastTitle.text = episode.podcast_title
 
                             // Set the play button text to either Play Trailer or Play Episode
-                            val episodeType = Episode.EpisodeType.fromString(episode.type)
-                            binding.btnPlay.setText(if (episodeType == Episode.EpisodeType.Trailer) LR.string.discover_button_play_trailer else LR.string.discover_button_play_episode)
+                            val episodeType = PodcastEpisode.EpisodeType.fromString(episode.type)
+                            binding.btnPlay.setText(if (episodeType == PodcastEpisode.EpisodeType.Trailer) LR.string.discover_button_play_trailer else LR.string.discover_button_play_episode)
                             binding.btnPlay.show()
 
                             imageLoader.loadSmallImage(episode.podcast_uuid).into(binding.imgPodcast)

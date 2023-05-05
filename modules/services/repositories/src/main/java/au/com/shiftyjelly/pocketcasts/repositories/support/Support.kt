@@ -12,8 +12,8 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.toPublisher
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -72,7 +72,7 @@ class Support @Inject constructor(
         get() = context.resources.getStringArray(R.array.settings_auto_archive_inactive_values)
 
     @Suppress("DEPRECATION")
-    suspend fun sendEmail(subject: String, intro: String, context: Context): Intent {
+    suspend fun shareLogs(subject: String, intro: String, emailSupport: Boolean, context: Context): Intent {
         val dialog = withContext(Dispatchers.Main) {
             android.app.ProgressDialog.show(context, context.getString(R.string.loading), context.getString(R.string.settings_support_please_wait), true)
         }
@@ -80,7 +80,9 @@ class Support @Inject constructor(
 
         withContext(Dispatchers.IO) {
             intent.type = "text/html"
-            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
+            if (emailSupport) {
+                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
+            }
             val isPlus = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
@@ -135,7 +137,7 @@ class Support @Inject constructor(
     }
 
     @Suppress("DEPRECATION")
-    private suspend fun getUserDebug(html: Boolean): String {
+    suspend fun getUserDebug(html: Boolean): String {
         val output = StringBuilder()
         try {
             val eol = if (html) "<br/>" else "\n"
@@ -293,7 +295,7 @@ class Support @Inject constructor(
                 } else {
                     val episode = queue.first()
                     output.append("Episode: ").append(episode.title).append(eol)
-                    if (episode is Episode) {
+                    if (episode is PodcastEpisode) {
                         output.append("Podcast: ").append(episode.podcastUuid).append(eol)
                     } else {
                         output.append("Cloud File")

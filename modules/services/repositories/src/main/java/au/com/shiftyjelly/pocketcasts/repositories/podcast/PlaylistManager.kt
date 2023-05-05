@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -22,8 +22,8 @@ interface PlaylistManager {
 
     fun findFirstByTitle(title: String): Playlist?
     fun findPlaylistsToSync(): List<Playlist>
-    fun findEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<Episode>
-    fun observeEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<Episode>>
+    fun findEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<PodcastEpisode>
+    fun observeEpisodes(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>>
 
     fun count(): Int
     fun countEpisodesNotCompleted(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int
@@ -57,5 +57,5 @@ interface PlaylistManager {
     fun markAllSynced()
 
     fun updateAll(playlists: List<Playlist>)
-    fun observeEpisodesPreview(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<Episode>>
+    fun observeEpisodesPreview(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>>
 }

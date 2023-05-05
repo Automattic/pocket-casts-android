@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -13,6 +14,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import androidx.wear.compose.material.SwipeToDismissBoxState
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.NotificationScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
@@ -27,7 +31,7 @@ object EpisodeScreenFlow {
     fun navigateRoute(episodeUuid: String) = "episode/$episodeUuid"
 
     // Routes
-    private const val episodeScreen = "episodeScreen"
+    const val episodeScreen = "episodeScreen"
     private const val upNextOptionsScreen = "upNextOptionsScreen"
     private const val deleteDownloadConfirmationScreen = "deleteDownloadConfirmationScreen"
     private const val deleteDownloadNotificationScreen = "deleteDownloadNotificationScreen"
@@ -36,6 +40,7 @@ object EpisodeScreenFlow {
     fun NavGraphBuilder.episodeGraph(
         navigateToPodcast: (podcastUuid: String) -> Unit,
         navController: NavController,
+        swipeToDismissState: SwipeToDismissBoxState,
     ) {
         navigation(
             route = this@EpisodeScreenFlow.route,
@@ -66,14 +71,27 @@ object EpisodeScreenFlow {
                         }
                     }
 
-                EpisodeScreen(
-                    columnState = it.columnState,
-                    navigateToPodcast = navigateToPodcast,
-                    navigateToUpNextOptions = { navController.navigate(upNextOptionsScreen) },
-                    navigateToConfirmDeleteDownload = { navController.navigate(deleteDownloadConfirmationScreen) },
-                    navigateToRemoveFromUpNextNotification = { navController.navigate(removeFromUpNextNotificationScreen) },
-                    navigateToStreamingConfirmation = { navController.navigate(StreamingConfirmationScreen.route) },
-                )
+                @OptIn(ExperimentalFoundationApi::class)
+                NowPlayingPager(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                    scrollableScaffoldContext = it,
+                ) {
+                    EpisodeScreen(
+                        columnState = it.columnState,
+                        navigateToPodcast = navigateToPodcast,
+                        navigateToUpNextOptions = { navController.navigate(upNextOptionsScreen) },
+                        navigateToConfirmDeleteDownload = {
+                            navController.navigate(deleteDownloadConfirmationScreen)
+                        },
+                        navigateToRemoveFromUpNextNotification = {
+                            navController.navigate(removeFromUpNextNotificationScreen)
+                        },
+                        navigateToStreamingConfirmation = {
+                            navController.navigate(StreamingConfirmationScreen.route)
+                        },
+                    )
+                }
             }
 
             scrollable(upNextOptionsScreen) {
@@ -115,7 +133,7 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
                     text = stringResource(LR.string.removed),
-                    onClick = { navController.popBackStack() },
+                    onClose = { navController.popBackStack() },
                 )
             }
 
@@ -123,7 +141,7 @@ object EpisodeScreenFlow {
                 it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
                 NotificationScreen(
                     text = stringResource(LR.string.episode_removed_from_up_next),
-                    onClick = { navController.popBackStack() },
+                    onClose = { navController.popBackStack() },
                 )
             }
         }

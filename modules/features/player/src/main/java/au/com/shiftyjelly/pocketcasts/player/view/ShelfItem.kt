@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
 import androidx.annotation.StringRes
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -21,8 +21,8 @@ object ShelfItems {
 
 sealed class ShelfItem(
     val id: String,
-    var title: (Playable?) -> Int,
-    var iconRes: (Playable?) -> Int,
+    var title: (BaseEpisode?) -> Int,
+    var iconRes: (BaseEpisode?) -> Int,
     val shownWhen: Shown,
     val analyticsValue: String,
     @StringRes val subtitle: Int? = null
@@ -51,9 +51,9 @@ sealed class ShelfItem(
 
     object Star : ShelfItem(
         id = "star",
-        title = { if (it is Episode && it.isStarred) LR.string.unstar_episode else LR.string.star_episode },
+        title = { if (it is PodcastEpisode && it.isStarred) LR.string.unstar_episode else LR.string.star_episode },
         subtitle = LR.string.player_actions_hidden_for_custom,
-        iconRes = { if (it is Episode && it.isStarred) IR.drawable.ic_star_filled else IR.drawable.ic_star },
+        iconRes = { if (it is PodcastEpisode && it.isStarred) IR.drawable.ic_star_filled else IR.drawable.ic_star },
         shownWhen = Shown.EpisodeOnly,
         analyticsValue = "star_episode"
     )

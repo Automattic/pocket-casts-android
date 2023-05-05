@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -46,7 +46,7 @@ class EpisodeAnalytics @Inject constructor(
         analyticsTracker.track(event, AnalyticsProp.bulkMap(source, count))
     }
 
-    fun trackBulkEvent(event: AnalyticsEvent, source: AnalyticsSource, episodes: List<Playable>) {
+    fun trackBulkEvent(event: AnalyticsEvent, source: AnalyticsSource, episodes: List<BaseEpisode>) {
         if (event == AnalyticsEvent.EPISODE_BULK_DOWNLOAD_QUEUED) {
             downloadEpisodeUuidQueue.clear()
             downloadEpisodeUuidQueue.addAll(downloadEpisodeUuidQueue.union(episodes.map { it.uuid }))

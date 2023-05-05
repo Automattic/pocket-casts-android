@@ -8,7 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShareBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
@@ -60,7 +60,7 @@ class ShareFragment : BaseDialogFragment() {
             close()
         }
         binding.buttonShareEpisode.setOnClickListener {
-            if (podcast != null && episode is Episode) {
+            if (podcast != null && episode is PodcastEpisode) {
                 SharePodcastHelper(
                     podcast,
                     episode,
@@ -74,7 +74,7 @@ class ShareFragment : BaseDialogFragment() {
             close()
         }
         binding.buttonShareCurrentPosition.setOnClickListener {
-            if (podcast != null && episode is Episode) {
+            if (podcast != null && episode is PodcastEpisode) {
                 SharePodcastHelper(
                     podcast,
                     episode,
@@ -88,7 +88,7 @@ class ShareFragment : BaseDialogFragment() {
             close()
         }
         binding.buttonOpenFileIn.setOnClickListener {
-            if (podcast != null && episode is Episode) {
+            if (podcast != null && episode is PodcastEpisode) {
                 SharePodcastHelper(
                     podcast,
                     episode,

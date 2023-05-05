@@ -28,8 +28,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.ChangeBounds
 import androidx.transition.TransitionManager
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
@@ -63,7 +63,7 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
         return when {
             oldItem is Podcast && newItem is Podcast -> true
             oldItem is PodcastAdapter.EpisodeHeader && newItem is PodcastAdapter.EpisodeHeader -> true
-            oldItem is Episode && newItem is Episode -> oldItem.uuid == newItem.uuid
+            oldItem is PodcastEpisode && newItem is PodcastEpisode -> oldItem.uuid == newItem.uuid
             oldItem is PodcastAdapter.DividerRow && newItem is PodcastAdapter.DividerRow -> oldItem.groupIndex == newItem.groupIndex
             else -> oldItem == newItem
         }
@@ -98,12 +98,12 @@ class PodcastAdapter(
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
     private val onEpisodesOptionsClicked: () -> Unit,
-    private val onRowLongPress: (episode: Episode) -> Unit,
+    private val onRowLongPress: (episode: PodcastEpisode) -> Unit,
     private val onFoldersClicked: () -> Unit,
     private val onNotificationsClicked: () -> Unit,
     private val onSettingsClicked: () -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
-    private val onRowClicked: (Episode) -> Unit,
+    private val onRowClicked: (PodcastEpisode) -> Unit,
     private val onSearchQueryChanged: (String) -> Unit,
     private val onSearchFocus: () -> Unit,
     private val onShowArchivedClicked: () -> Unit,
@@ -233,7 +233,7 @@ class PodcastAdapter(
     }
 
     private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, position: Int, fromListUuid: String?) {
-        val episode = getItem(position) as? Episode ?: return
+        val episode = getItem(position) as? PodcastEpisode ?: return
         holder.setup(episode, fromListUuid, ThemeColor.podcastIcon02(theme.activeTheme, tintColor), playButtonListener, settings.streamingMode() || castConnected, settings.getUpNextSwipeAction(), multiSelectHelper.isMultiSelecting, multiSelectHelper.isSelected(episode), disposables)
         holder.episodeRow.setOnClickListener {
             if (multiSelectHelper.isMultiSelecting) {
@@ -295,7 +295,7 @@ class PodcastAdapter(
         notifyItemChanged(0)
     }
 
-    fun setEpisodes(episodes: List<Episode>, showingArchived: Boolean, episodeCount: Int, archivedCount: Int, searchTerm: String, episodeLimit: Int?, episodeLimitIndex: Int?, grouping: PodcastGrouping, episodesSortType: EpisodesSortType, context: Context) {
+    fun setEpisodes(episodes: List<PodcastEpisode>, showingArchived: Boolean, episodeCount: Int, archivedCount: Int, searchTerm: String, episodeLimit: Int?, episodeLimitIndex: Int?, grouping: PodcastGrouping, episodesSortType: EpisodesSortType, context: Context) {
         val groupingFunction = grouping.sortFunction
         val episodesPlusLimit: MutableList<Any> = episodes.toMutableList()
         if (episodeLimit != null && episodeLimitIndex != null && groupingFunction == null) {
@@ -362,7 +362,7 @@ class PodcastAdapter(
             is EpisodeLimitRow -> Long.MAX_VALUE - 2
             is NoEpisodeMessage -> Long.MAX_VALUE - 3
             is DividerRow -> item.groupIndex.toLong()
-            is Episode -> item.adapterId
+            is PodcastEpisode -> item.adapterId
             else -> throw IllegalStateException("Unknown item type")
         }
     }

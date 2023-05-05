@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import io.reactivex.Flowable
@@ -27,7 +27,7 @@ class ManualCleanupViewModelTest {
     private lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private lateinit var viewModel: ManualCleanupViewModel
 
-    private val episode: Episode = Episode(uuid = "1", publishedDate = Date())
+    private val episode: PodcastEpisode = PodcastEpisode(uuid = "1", publishedDate = Date())
     private val episodes = listOf(episode)
     private val diskSpaceView =
         ManualCleanupViewModel.State.DiskSpaceView(title = LR.string.unplayed, episodes = episodes)

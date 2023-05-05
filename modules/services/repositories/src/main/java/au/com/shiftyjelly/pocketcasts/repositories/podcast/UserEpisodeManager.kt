@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.entity.Episode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -43,6 +43,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
@@ -67,7 +68,8 @@ interface UserEpisodeManager {
     suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager)
     fun observeUserEpisodes(): Flowable<List<UserEpisode>>
     suspend fun findUserEpisodes(): List<UserEpisode>
-    fun observeEpisode(uuid: String): Flowable<UserEpisode>
+    fun observeEpisodeRx(uuid: String): Flowable<UserEpisode>
+    fun observeEpisode(uuid: String): Flow<UserEpisode>
     fun findEpisodeByUuidRx(uuid: String): Maybe<UserEpisode>
     suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
     fun uploadToServer(userEpisode: UserEpisode, waitForWifi: Boolean)
@@ -228,7 +230,11 @@ class UserEpisodeManagerImpl @Inject constructor(
         return userEpisodeDao.observeDownloadingUserEpisodes()
     }
 
-    override fun observeEpisode(uuid: String): Flowable<UserEpisode> {
+    override fun observeEpisodeRx(uuid: String): Flowable<UserEpisode> {
+        return userEpisodeDao.observeEpisodeRx(uuid)
+    }
+
+    override fun observeEpisode(uuid: String): Flow<UserEpisode> {
         return userEpisodeDao.observeEpisode(uuid)
     }
 
@@ -380,8 +386,8 @@ class UserEpisodeManagerImpl @Inject constructor(
                 add(newEpisode, playbackManager)
 
                 if (settings.getCloudAutoDownload() && subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
-                    userEpisodeDao.updateAutoDownloadStatus(Episode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
-                    newEpisode.autoDownloadStatus = Episode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
+                    userEpisodeDao.updateAutoDownloadStatus(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
+                    newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
                     downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", false)
                 }
             }

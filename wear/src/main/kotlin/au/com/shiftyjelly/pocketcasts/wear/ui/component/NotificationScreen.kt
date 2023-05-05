@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui.episode
+package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,34 +22,41 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun NotificationScreen(
     text: String,
-    onClick: () -> Unit,
-) {
-
-    LaunchedEffect(Unit) {
-        // Close the screen after a short delay
-        delay(2000)
-        onClick()
-    }
-
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clickable { onClick() }
-            .padding(16.dp)
-            .fillMaxSize()
-    ) {
+    onClose: () -> Unit,
+    closeAfterDuration: Duration? = 2.seconds,
+    icon: @Composable () -> Unit = {
         Icon(
             painter = painterResource(IR.drawable.ic_check_black_24dp),
             tint = WearColors.FFA1E7B0,
             contentDescription = null,
             modifier = Modifier.size(52.dp)
         )
+    },
+) {
+
+    LaunchedEffect(closeAfterDuration) {
+        if (closeAfterDuration != null) {
+            delay(closeAfterDuration)
+            onClose()
+        }
+    }
+
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable { onClose() }
+            .padding(16.dp)
+            .fillMaxSize()
+    ) {
+        icon()
         Spacer(modifier = Modifier.height(4.dp))
         TextH30(
             text = text,
@@ -64,7 +71,7 @@ private fun NotificationScreenPreview() {
     WearAppTheme(Theme.ThemeType.DARK) {
         NotificationScreen(
             text = "Done",
-            onClick = {}
+            onClose = {}
         )
     }
 }

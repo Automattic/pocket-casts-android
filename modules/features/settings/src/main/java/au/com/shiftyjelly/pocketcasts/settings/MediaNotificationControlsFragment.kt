@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
-import au.com.shiftyjelly.pocketcasts.models.entity.Playable
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterMediaActionItemBinding
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterMediaActionTitleBinding
@@ -309,7 +309,7 @@ private val MEDIA_ACTION_ITEM_DIFF = object : DiffUtil.ItemCallback<Any>() {
 }
 
 class MediaActionAdapter(val listener: ((Settings.MediaNotificationControls) -> Unit)? = null, val dragListener: ((ItemViewHolder) -> Unit)?) : ListAdapter<Any, RecyclerView.ViewHolder>(MEDIA_ACTION_ITEM_DIFF) {
-    var playable: Playable? = null
+    var episode: BaseEpisode? = null
         set(value) {
             field = value
             notifyDataSetChanged()

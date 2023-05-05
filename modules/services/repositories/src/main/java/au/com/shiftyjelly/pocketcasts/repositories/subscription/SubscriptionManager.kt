@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
@@ -13,13 +14,6 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 
 interface SubscriptionManager {
-
-    companion object {
-        const val PATRON_PRODUCT_BASE = "com.pocketcasts.patron"
-        const val PLUS_PRODUCT_BASE = "com.pocketcasts.plus"
-        const val MONTHLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.monthly"
-        const val YEARLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.yearly"
-    }
 
     fun signOut()
     fun observeSubscriptionChangeEvents(): Flowable<SubscriptionChangedEvent>
@@ -40,5 +34,9 @@ interface SubscriptionManager {
     fun clearCachedStatus()
     fun isFreeTrialEligible(): Boolean
     fun updateFreeTrialEligible(eligible: Boolean)
-    fun getDefaultSubscription(subscriptions: List<Subscription>): Subscription?
+    fun getDefaultSubscription(
+        subscriptions: List<Subscription>,
+        tier: Subscription.SubscriptionTier? = null,
+        frequency: SubscriptionFrequency? = null,
+    ): Subscription?
 }
