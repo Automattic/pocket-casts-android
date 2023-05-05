@@ -188,6 +188,9 @@ class SyncManagerImpl @Inject constructor(
         val loginResult = try {
             val response = loginFunction()
             val result = handleTokenResponse(loginIdentity = loginIdentity, response = response)
+
+            settings.setFullySignedOut(false)
+
             LoginResult.Success(result)
         } catch (ex: Exception) {
             Timber.e(ex, "Failed to sign in with Pocket Casts")

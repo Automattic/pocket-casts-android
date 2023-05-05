@@ -64,6 +64,7 @@ class SettingsImpl @Inject constructor(
         private const val CUSTOM_MEDIA_ACTIONS_VISIBLE_KEY = "CustomMediaActionsVisibleKey"
         private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
         private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
+        private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
     }
 
     private var languageCode: String? = null
@@ -1402,4 +1403,11 @@ class SettingsImpl @Inject constructor(
         getString(LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY)?.let {
             SubscriptionFrequency.valueOf(it)
         }
+
+    override fun setFullySignedOut(boolean: Boolean) {
+        setBoolean(PROCESSED_SIGNOUT_KEY, boolean)
+    }
+
+    override fun getFullySignedOut(): Boolean =
+        getBoolean(PROCESSED_SIGNOUT_KEY, true)
 }

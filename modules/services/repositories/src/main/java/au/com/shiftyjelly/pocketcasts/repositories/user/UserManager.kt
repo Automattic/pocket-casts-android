@@ -91,6 +91,7 @@ class UserManagerImpl @Inject constructor(
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
+        val hasProcessedSignOut = settings.getFullySignedOut()
         val wasSignedIn = syncManager.isLoggedIn()
 
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
@@ -104,7 +105,7 @@ class UserManagerImpl @Inject constructor(
             settings.setMarketingOptIn(false)
             settings.setMarketingOptInNeedsSync(false)
             settings.setEndOfYearModalHasBeenShown(false)
-            if (wasSignedIn) {
+            if (wasSignedIn || !hasProcessedSignOut) {
                 analyticsTracker.track(
                     AnalyticsEvent.USER_SIGNED_OUT,
                     mapOf(KEY_USER_INITIATED to wasInitiatedByUser)
@@ -114,5 +115,6 @@ class UserManagerImpl @Inject constructor(
             analyticsTracker.clearAllData()
             analyticsTracker.refreshMetadata()
         }
+        settings.setFullySignedOut(true)
     }
 }
