@@ -1,5 +1,8 @@
 7.39
 -----
+*   Bug Fixes:
+    *   Fixed the discover categories sorting so that it is alphabetical in the device language
+        ([#942](https://github.com/Automattic/pocket-casts-android/pull/942)).
 
 7.38
 -----
