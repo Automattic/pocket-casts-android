@@ -91,29 +91,26 @@ class UserManagerImpl @Inject constructor(
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
-        val hasProcessedSignOut = settings.getFullySignedOut()
-        val wasSignedIn = syncManager.isLoggedIn()
+        if (wasInitiatedByUser || !settings.getFullySignedOut()) {
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
+            subscriptionManager.clearCachedStatus()
+            syncManager.signOut {
+                settings.clearPlusPreferences()
+                GlobalScope.launch {
+                    userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
+                }
 
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
-        subscriptionManager.clearCachedStatus()
-        syncManager.signOut {
-            settings.clearPlusPreferences()
-            GlobalScope.launch {
-                userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
-            }
-
-            settings.setMarketingOptIn(false)
-            settings.setMarketingOptInNeedsSync(false)
-            settings.setEndOfYearModalHasBeenShown(false)
-            if (wasSignedIn || !hasProcessedSignOut) {
+                settings.setMarketingOptIn(false)
+                settings.setMarketingOptInNeedsSync(false)
+                settings.setEndOfYearModalHasBeenShown(false)
                 analyticsTracker.track(
                     AnalyticsEvent.USER_SIGNED_OUT,
                     mapOf(KEY_USER_INITIATED to wasInitiatedByUser)
                 )
+                analyticsTracker.flush()
+                analyticsTracker.clearAllData()
+                analyticsTracker.refreshMetadata()
             }
-            analyticsTracker.flush()
-            analyticsTracker.clearAllData()
-            analyticsTracker.refreshMetadata()
         }
         settings.setFullySignedOut(true)
     }
