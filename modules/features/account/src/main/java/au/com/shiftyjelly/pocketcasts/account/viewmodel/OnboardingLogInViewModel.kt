@@ -62,7 +62,7 @@ class OnboardingLogInViewModel @Inject constructor(
             val result = syncManager.loginWithEmailAndPassword(
                 email = state.email,
                 password = state.password,
-                signInSource = SignInSource.Onboarding
+                signInSource = SignInSource.UserInitiated.Onboarding
             )
             when (result) {
                 is LoginResult.Success -> {

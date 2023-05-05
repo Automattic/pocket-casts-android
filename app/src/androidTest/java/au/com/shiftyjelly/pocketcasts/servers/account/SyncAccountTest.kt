@@ -96,7 +96,7 @@ internal class SyncAccountTest {
             syncManager.loginWithEmailAndPassword(
                 email = "support+signin@pocketcasts.com",
                 password = "password_signin",
-                signInSource = SignInSource.Onboarding
+                signInSource = SignInSource.UserInitiated.Onboarding
             )
         }
         assert(result is LoginResult.Success)

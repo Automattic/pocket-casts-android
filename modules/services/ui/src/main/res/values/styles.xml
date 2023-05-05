@@ -145,6 +145,17 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="PCAccountOutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">8dp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/primary_text_01</item>
+        <item name="android:textAppearance">@style/H40</item>
+    </style>
+
     <style name="PCButton" parent="Widget.MaterialComponents.Button">
         <item name="background">?attr/primary_interactive_01</item>
         <item name="android:fontFamily">sans-serif-medium</item>

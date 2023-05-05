@@ -636,6 +636,7 @@
     <string name="profile">Profile</string>
     <string name="profile_access_ended">Access ended: %s</string>
     <string name="profile_access_ends">Access ends: %s</string>
+    <string name="profile_account">Account</string>
     <string name="profile_account_upgraded">Account Upgraded</string>
     <string name="profile_account_created">Account Created</string>
     <string name="profile_account_delete" translatable="false">@string/delete</string>
@@ -792,6 +793,7 @@
     <string name="profile_password">Password</string>
     <string name="profile_password_changed">Password Changed</string>
     <string name="profile_password_changed_successful">Successful!</string>
+    <string name="profile_patron_expires_in">Patron expires in %s</string>
     <string name="profile_payment_cancelled">Payment Cancelled</string>
     <string name="profile_payment_failed">Payment Failed</string>
     <string name="profile_payment_failed_detail">It looks like there was a problem processing your payment. Please try again.</string>
@@ -829,7 +831,7 @@
     <string name="profile_reset_password_sent">Password Reset Link Sent</string>
     <string name="profile_reset_password_check_email">Please check your email</string>
     <string name="profile_save_your_podcasts">Save your podcasts in the cloud and sync your progress with other devices</string>
-    <string name="profile_set_up_account">Set Up Account</string>
+    <string name="profile_set_up_account">Set up account</string>
     <string name="profile_share_stats">Share stats</string>
     <string name="profile_sign_in" translatable="false">@string/sign_in</string>
     <string name="profile_sign_in_or_create_account">Sign in or create account</string>

@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
@@ -41,11 +40,9 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.stats.StatsFragment
-import au.com.shiftyjelly.pocketcasts.settings.util.SettingsHelper
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,8 +56,6 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment() {
-
-    override var statusBarColor: StatusBarColor = StatusBarColor.Dark
 
     @Inject lateinit var podcastManager: PodcastManager
     @Inject lateinit var settings: Settings
@@ -152,12 +147,6 @@ class ProfileFragment : BaseFragment() {
             section.action?.invoke()
         }
 
-        SettingsHelper.loadHeaderImageInto(binding.imgBannerBackground)
-        binding.imgBannerBackground.setOnLongClickListener {
-            theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity)
-            true
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 val isEligible = viewModel.isEndOfYearStoriesEligible()
@@ -193,14 +182,10 @@ class ProfileFragment : BaseFragment() {
             }
         }
 
-        binding.userView.setOnClickListener {
-            analyticsTracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
-            if (viewModel.isSignedIn) {
-                val fragment = AccountDetailsFragment.newInstance()
-                (activity as FragmentHostListener).addFragment(fragment)
-            } else {
-                OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
-            }
+        with(binding.userView) {
+            lblUserEmail.setOnClickListener { onProfileAccountButtonClicked() }
+            imgProfilePicture.setOnClickListener { onProfileAccountButtonClicked() }
+            btnAccount?.setOnClickListener { onProfileAccountButtonClicked() }
         }
 
         binding.btnRefresh.setOnClickListener {
@@ -229,6 +214,16 @@ class ProfileFragment : BaseFragment() {
 
         if (!viewModel.isFragmentChangingConfigurations) {
             analyticsTracker.track(AnalyticsEvent.PROFILE_SHOWN)
+        }
+    }
+
+    private fun onProfileAccountButtonClicked() {
+        analyticsTracker.track(AnalyticsEvent.PROFILE_ACCOUNT_BUTTON_TAPPED)
+        if (viewModel.isSignedIn) {
+            val fragment = AccountDetailsFragment.newInstance()
+            (activity as FragmentHostListener).addFragment(fragment)
+        } else {
+            OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.LoggedOut)
         }
     }
 
