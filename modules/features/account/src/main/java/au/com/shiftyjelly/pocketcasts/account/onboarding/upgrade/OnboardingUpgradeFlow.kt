@@ -112,35 +112,37 @@ fun OnboardingUpgradeFlow(
         scrimColor = Color.Black.copy(alpha = 0.5f),
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         content = {
-            OnboardingUpgradeFeaturesPage(
-                flow = flow,
-                source = source,
-                onUpgradePressed = {
-                    if (isLoggedIn) {
-                        coroutineScope.launch { sheetState.show() }
-                    } else {
-                        onNeedLogin()
-                    }
-                },
-                onNotNowPressed = onProceed,
-                onBackPressed = onBackPressed,
-                onClickSubscribe = {
-                    if (activity != null) {
+            if (source != OnboardingUpgradeSource.PROFILE) {
+                OnboardingUpgradeFeaturesPage(
+                    flow = flow,
+                    source = source,
+                    onUpgradePressed = {
                         if (isLoggedIn) {
-                            mainSheetViewModel.onClickSubscribe(
-                                activity = activity,
-                                flow = flow,
-                                onComplete = onProceed,
-                            )
+                            coroutineScope.launch { sheetState.show() }
                         } else {
                             onNeedLogin()
                         }
-                    } else {
-                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
-                    }
-                },
-                canUpgrade = hasSubscriptions,
-            )
+                    },
+                    onNotNowPressed = onProceed,
+                    onBackPressed = onBackPressed,
+                    onClickSubscribe = {
+                        if (activity != null) {
+                            if (isLoggedIn) {
+                                mainSheetViewModel.onClickSubscribe(
+                                    activity = activity,
+                                    flow = flow,
+                                    onComplete = onProceed,
+                                )
+                            } else {
+                                onNeedLogin()
+                            }
+                        } else {
+                            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
+                        }
+                    },
+                    canUpgrade = hasSubscriptions,
+                )
+            }
         },
         sheetContent = {
             OnboardingUpgradeBottomSheet(
