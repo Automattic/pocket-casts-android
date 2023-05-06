@@ -112,7 +112,7 @@ fun OnboardingUpgradeFlow(
         scrimColor = Color.Black.copy(alpha = 0.5f),
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         content = {
-            if (source != OnboardingUpgradeSource.PROFILE) {
+            if (flow !is OnboardingFlow.PlusAccountUpgrade) {
                 OnboardingUpgradeFeaturesPage(
                     flow = flow,
                     source = source,

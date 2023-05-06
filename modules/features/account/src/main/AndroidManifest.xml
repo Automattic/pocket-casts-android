@@ -2,6 +2,7 @@
     <application>
         <activity
             android:name="au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Transparent"/>
     </application>
 </manifest>

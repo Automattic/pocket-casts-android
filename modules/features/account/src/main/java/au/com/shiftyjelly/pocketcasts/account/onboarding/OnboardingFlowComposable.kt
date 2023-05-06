@@ -26,192 +26,219 @@ fun OnboardingFlowComposable(
     completeOnboardingToDiscover: () -> Unit,
     signInState: SignInState
 ) {
-    AppThemeWithBackground(theme) {
-        val navController = rememberNavController()
-
-        val startDestination = when (flow) {
-            OnboardingFlow.LoggedOut,
-            is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-            OnboardingFlow.InitialOnboarding -> OnboardingNavRoute.logInOrSignUp
-
-            // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
-            // see https://stackoverflow.com/a/70410872/1910286
-            is OnboardingFlow.PlusAccountUpgrade, // FIXME this should just open the purchase modal
-            is OnboardingFlow.PlusFlow -> OnboardingNavRoute.PlusUpgrade.route
-        }
-
-        val onAccountCreated = {
-            navController.navigate(OnboardingRecommendationsFlow.route) {
-                // clear backstack after account is created
-                popUpTo(OnboardingNavRoute.logInOrSignUp) {
-                    inclusive = true
-                }
-            }
-        }
-
-        NavHost(navController, startDestination) {
-
-            importFlowGraph(theme, navController, flow)
-
-            onboardingRecommendationsFlowGraph(
+    if (flow is OnboardingFlow.PlusAccountUpgrade) {
+        Content(
+            theme = theme,
+            flow = flow,
+            exitOnboarding = exitOnboarding,
+            completeOnboardingToDiscover = completeOnboardingToDiscover,
+            signInState = signInState
+        )
+    } else {
+        AppThemeWithBackground(theme) {
+            Content(
                 theme = theme,
                 flow = flow,
-                onBackPressed = exitOnboarding,
-                onComplete = {
-                    navController.navigate(
-                        if (signInState.isSignedInAsPlus) {
-                            OnboardingNavRoute.welcome
-                        } else {
-                            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
-                        }
-                    )
-                },
-                navController = navController,
+                exitOnboarding = exitOnboarding,
+                completeOnboardingToDiscover = completeOnboardingToDiscover,
+                signInState = signInState
             )
+        }
+    }
+}
 
-            composable(OnboardingNavRoute.logInOrSignUp) {
-                OnboardingLoginOrSignUpPage(
-                    theme = theme,
-                    flow = flow,
-                    onDismiss = {
-                        when (flow) {
-                            // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
-                            is OnboardingFlow.PlusAccountUpgrade -> throw IllegalStateException("PlusAccountUpgrade flow tried to present LoginOrSignupPage")
+@Composable
+private fun Content(
+    theme: Theme.ThemeType,
+    flow: OnboardingFlow,
+    exitOnboarding: () -> Unit,
+    completeOnboardingToDiscover: () -> Unit,
+    signInState: SignInState
+) {
+    val navController = rememberNavController()
 
-                            OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-                            is OnboardingFlow.PlusUpsell -> {
-                                val popped = navController.popBackStack()
-                                if (!popped) {
-                                    exitOnboarding()
-                                }
-                            }
+    val startDestination = when (flow) {
+        OnboardingFlow.LoggedOut,
+        is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+        OnboardingFlow.InitialOnboarding -> OnboardingNavRoute.logInOrSignUp
 
-                            OnboardingFlow.InitialOnboarding,
-                            OnboardingFlow.LoggedOut -> exitOnboarding()
-                        }
-                    },
-                    onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
-                    onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
-                    onContinueWithGoogleComplete = { state ->
-                        if (state.isNewAccount) {
-                            onAccountCreated()
-                        } else {
-                            exitOnboarding()
-                        }
-                    },
-                )
+        // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
+        // see https://stackoverflow.com/a/70410872/1910286
+        is OnboardingFlow.PlusAccountUpgrade, // FIXME this should just open the purchase modal
+        is OnboardingFlow.PlusFlow -> OnboardingNavRoute.PlusUpgrade.route
+    }
+
+    val onAccountCreated = {
+        navController.navigate(OnboardingRecommendationsFlow.route) {
+            // clear backstack after account is created
+            popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                inclusive = true
             }
+        }
+    }
 
-            composable(OnboardingNavRoute.createFreeAccount) {
-                OnboardingCreateAccountPage(
-                    theme = theme,
-                    onBackPressed = { navController.popBackStack() },
-                    onAccountCreated = onAccountCreated,
-                )
-            }
+    NavHost(navController, startDestination) {
 
-            composable(OnboardingNavRoute.logIn) {
-                OnboardingLoginPage(
-                    theme = theme,
-                    onBackPressed = { navController.popBackStack() },
-                    onLoginComplete = {
-                        when (flow) {
-                            OnboardingFlow.InitialOnboarding,
-                            OnboardingFlow.LoggedOut -> exitOnboarding()
+        importFlowGraph(theme, navController, flow)
 
-                            is OnboardingFlow.PlusAccountUpgrade,
-                            OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-                            is OnboardingFlow.PlusUpsell -> navController.navigate(
-                                OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
-                            ) {
-                                // clear backstack after successful login
-                                popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
-                            }
-                        }
-                    },
-                    onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
-                )
-            }
-
-            composable(OnboardingNavRoute.forgotPassword) {
-                OnboardingForgotPasswordPage(
-                    theme = theme,
-                    onBackPressed = { navController.popBackStack() },
-                    onCompleted = exitOnboarding,
-                )
-            }
-
-            composable(
-                route = OnboardingNavRoute.PlusUpgrade.route,
-                arguments = listOf(
-                    navArgument(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey) {
-                        type = NavType.EnumType(OnboardingUpgradeSource::class.java)
-                        /* Set default value for onboarding flows with startDestination. */
-                        when (flow) {
-                            is OnboardingFlow.PlusAccountUpgrade -> defaultValue = flow.source
-                            is OnboardingFlow.PlusFlow -> defaultValue = flow.source
-                            else -> Unit // Not a startDestination, default value should not be set.
-                        }
+        onboardingRecommendationsFlowGraph(
+            theme = theme,
+            flow = flow,
+            onBackPressed = exitOnboarding,
+            onComplete = {
+                navController.navigate(
+                    if (signInState.isSignedInAsPlus) {
+                        OnboardingNavRoute.welcome
+                    } else {
+                        OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
                     }
                 )
-            ) { navBackStackEntry ->
+            },
+            navController = navController,
+        )
 
-                val upgradeSource = navBackStackEntry.arguments
-                    ?.getSerializableCompat(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey, OnboardingUpgradeSource::class.java)
-                    // upgradeSource should always be present. If startDestination, it is passed as a default argument.
-                    ?: throw IllegalStateException("upgradeSource not set")
+        composable(OnboardingNavRoute.logInOrSignUp) {
+            OnboardingLoginOrSignUpPage(
+                theme = theme,
+                flow = flow,
+                onDismiss = {
+                    when (flow) {
+                        // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
+                        is OnboardingFlow.PlusAccountUpgrade -> throw IllegalStateException("PlusAccountUpgrade flow tried to present LoginOrSignupPage")
 
-                val userCreatedNewAccount = when (upgradeSource) {
-                    OnboardingUpgradeSource.APPEARANCE,
-                    OnboardingUpgradeSource.FILES,
-                    OnboardingUpgradeSource.FOLDERS,
-                    OnboardingUpgradeSource.LOGIN,
-                    OnboardingUpgradeSource.PLUS_DETAILS,
-                    OnboardingUpgradeSource.PROFILE -> false
+                        OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+                        is OnboardingFlow.PlusUpsell -> {
+                            val popped = navController.popBackStack()
+                            if (!popped) {
+                                exitOnboarding()
+                            }
+                        }
 
-                    OnboardingUpgradeSource.RECOMMENDATIONS -> true
+                        OnboardingFlow.InitialOnboarding,
+                        OnboardingFlow.LoggedOut -> exitOnboarding()
+                    }
+                },
+                onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
+                onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
+                onContinueWithGoogleComplete = { state ->
+                    if (state.isNewAccount) {
+                        onAccountCreated()
+                    } else {
+                        exitOnboarding()
+                    }
+                },
+            )
+        }
+
+        composable(OnboardingNavRoute.createFreeAccount) {
+            OnboardingCreateAccountPage(
+                theme = theme,
+                onBackPressed = { navController.popBackStack() },
+                onAccountCreated = onAccountCreated,
+            )
+        }
+
+        composable(OnboardingNavRoute.logIn) {
+            OnboardingLoginPage(
+                theme = theme,
+                onBackPressed = { navController.popBackStack() },
+                onLoginComplete = {
+                    when (flow) {
+                        OnboardingFlow.InitialOnboarding,
+                        OnboardingFlow.LoggedOut -> exitOnboarding()
+
+                        is OnboardingFlow.PlusAccountUpgrade,
+                        OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+                        is OnboardingFlow.PlusUpsell -> navController.navigate(
+                            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
+                        ) {
+                            // clear backstack after successful login
+                            popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
+                        }
+                    }
+                },
+                onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
+            )
+        }
+
+        composable(OnboardingNavRoute.forgotPassword) {
+            OnboardingForgotPasswordPage(
+                theme = theme,
+                onBackPressed = { navController.popBackStack() },
+                onCompleted = exitOnboarding,
+            )
+        }
+
+        composable(
+            route = OnboardingNavRoute.PlusUpgrade.route,
+            arguments = listOf(
+                navArgument(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey) {
+                    type = NavType.EnumType(OnboardingUpgradeSource::class.java)
+                    /* Set default value for onboarding flows with startDestination. */
+                    when (flow) {
+                        is OnboardingFlow.PlusAccountUpgrade -> defaultValue = flow.source
+                        is OnboardingFlow.PlusFlow -> defaultValue = flow.source
+                        else -> Unit // Not a startDestination, default value should not be set.
+                    }
                 }
+            )
+        ) { navBackStackEntry ->
 
-                OnboardingUpgradeFlow(
-                    flow = flow,
-                    source = upgradeSource,
-                    isLoggedIn = signInState.isSignedIn,
-                    onBackPressed = {
-                        if (userCreatedNewAccount) {
-                            navController.popBackStack()
-                        } else {
-                            exitOnboarding()
-                        }
-                    },
-                    onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
-                    onProceed = {
-                        if (userCreatedNewAccount) {
-                            navController.navigate(OnboardingNavRoute.welcome)
-                        } else {
-                            exitOnboarding()
-                        }
+            val upgradeSource = navBackStackEntry.arguments
+                ?.getSerializableCompat(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey, OnboardingUpgradeSource::class.java)
+                // upgradeSource should always be present. If startDestination, it is passed as a default argument.
+                ?: throw IllegalStateException("upgradeSource not set")
+
+            val userCreatedNewAccount = when (upgradeSource) {
+                OnboardingUpgradeSource.APPEARANCE,
+                OnboardingUpgradeSource.FILES,
+                OnboardingUpgradeSource.FOLDERS,
+                OnboardingUpgradeSource.LOGIN,
+                OnboardingUpgradeSource.PLUS_DETAILS,
+                OnboardingUpgradeSource.PROFILE -> false
+
+                OnboardingUpgradeSource.RECOMMENDATIONS -> true
+            }
+
+            OnboardingUpgradeFlow(
+                flow = flow,
+                source = upgradeSource,
+                isLoggedIn = signInState.isSignedIn,
+                onBackPressed = {
+                    if (userCreatedNewAccount) {
+                        navController.popBackStack()
+                    } else {
+                        exitOnboarding()
                     }
-                )
-            }
+                },
+                onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
+                onProceed = {
+                    if (userCreatedNewAccount) {
+                        navController.navigate(OnboardingNavRoute.welcome)
+                    } else {
+                        exitOnboarding()
+                    }
+                }
+            )
+        }
 
-            composable(OnboardingNavRoute.welcome) {
-                OnboardingWelcomePage(
-                    activeTheme = theme,
-                    flow = flow,
-                    isSignedInAsPlus = signInState.isSignedInAsPlus,
-                    onDone = exitOnboarding,
-                    onContinueToDiscover = completeOnboardingToDiscover,
-                    onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
-                    onBackPressed = {
-                        // Don't allow navigation back to the upgrade screen after the user upgrades
-                        if (signInState.isSignedInAsPlus) {
-                            exitOnboarding()
-                        } else {
-                            navController.popBackStack()
-                        }
-                    },
-                )
-            }
+        composable(OnboardingNavRoute.welcome) {
+            OnboardingWelcomePage(
+                activeTheme = theme,
+                flow = flow,
+                isSignedInAsPlus = signInState.isSignedInAsPlus,
+                onDone = exitOnboarding,
+                onContinueToDiscover = completeOnboardingToDiscover,
+                onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
+                onBackPressed = {
+                    // Don't allow navigation back to the upgrade screen after the user upgrades
+                    if (signInState.isSignedInAsPlus) {
+                        exitOnboarding()
+                    } else {
+                        navController.popBackStack()
+                    }
+                },
+            )
         }
     }
 }
