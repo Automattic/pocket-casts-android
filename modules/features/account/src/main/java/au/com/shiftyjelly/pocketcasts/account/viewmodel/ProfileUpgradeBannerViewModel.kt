@@ -88,7 +88,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                                         subscriptions = subscriptions,
                                         currentFeatureCard = currentTier.toUpgradeFeatureCard()
                                     ),
-                                    upgradeButtons = upgradeButtons,
+                                    upgradeButtons = upgradeButtons
                                 )
                             }
                         } else {

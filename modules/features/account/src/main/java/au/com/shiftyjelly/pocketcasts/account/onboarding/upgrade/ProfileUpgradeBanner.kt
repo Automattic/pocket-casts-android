@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,9 +25,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
@@ -36,7 +41,9 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerView
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -105,16 +112,19 @@ private fun FeatureCard(
     Column(
         modifier = modifier.padding(horizontal = 16.dp)
     ) {
-        Box(
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
-            contentAlignment = Alignment.TopStart
         ) {
             SubscriptionTierPill(
                 iconRes = card.iconRes,
                 shortNameRes = card.shortNameRes,
+                modifier = Modifier.background(Color.Black)
             )
+
+            AmountView(button.subscription)
         }
 
         Column {
@@ -124,23 +134,46 @@ private fun FeatureCard(
                     color = MaterialTheme.theme.colors.primaryText01,
                 )
             }
-
-            Spacer(modifier = Modifier.weight(1f))
-            Spacer(modifier = Modifier.height(8.dp))
-
-            val primaryText = stringResource(LR.string.upgrade_to, stringResource(button.shortNameRes))
-            OnboardingUpgradeHelper.UpgradeRowButton(
-                primaryText = primaryText,
-                backgroundColor = colorResource(button.backgroundColorRes),
-                fontWeight = FontWeight.W500,
-                textColor = colorResource(button.textColorRes),
-                onClick = onClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-            )
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        val primaryText = stringResource(LR.string.upgrade_to, stringResource(button.shortNameRes))
+        OnboardingUpgradeHelper.UpgradeRowButton(
+            primaryText = primaryText,
+            backgroundColor = colorResource(button.backgroundColorRes),
+            fontWeight = FontWeight.W500,
+            textColor = colorResource(button.textColorRes),
+            onClick = onClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp),
+        )
     }
+}
+
+@Composable
+private fun AmountView(
+    subscription: Subscription,
+) {
+    Text(
+        fontSize = 22.sp,
+        lineHeight = 30.sp,
+        color = MaterialTheme.theme.colors.primaryText01,
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.W700)) {
+                append("${subscription.recurringPricingPhase.formattedPrice} ")
+            }
+
+            withStyle(style = SpanStyle(fontWeight = FontWeight.W400)) {
+                append(
+                    stringResource(subscription.recurringPricingPhase.perPeriod)
+                        .lowercase(Locale.getDefault())
+                )
+            }
+        }
+    )
 }
 
 @Composable
