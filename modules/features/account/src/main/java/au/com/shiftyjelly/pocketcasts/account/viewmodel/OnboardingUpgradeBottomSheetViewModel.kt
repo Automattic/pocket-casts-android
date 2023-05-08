@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.Loaded
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.Loading
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.NoSubscriptions
@@ -191,7 +192,7 @@ sealed class OnboardingUpgradeBottomSheetState {
         val purchaseFailed: Boolean = false
     ) : OnboardingUpgradeBottomSheetState() {
         val showTrialInfo = selectedSubscription.trialPricingPhase != null
-
+        val upgradeButton = selectedSubscription.toUpgradeButton()
         init {
             if (subscriptions.isEmpty()) {
                 LogBuffer.e(

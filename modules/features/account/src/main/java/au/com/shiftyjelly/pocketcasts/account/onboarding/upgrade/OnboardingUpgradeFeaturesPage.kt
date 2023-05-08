@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -66,7 +67,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.OutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
@@ -382,8 +383,8 @@ private fun UpgradeButton(
             UpgradeRowButton(
                 primaryText = primaryText,
                 secondaryText = secondaryText,
-                backgroundColor = button.backgroundColor,
-                textColor = button.textColor,
+                backgroundColor = colorResource(button.backgroundColorRes),
+                textColor = colorResource(button.textColorRes),
                 onClick = onClickSubscribe,
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 24.dp)
@@ -466,9 +467,10 @@ private fun OldUpgradeLayout(
 
                 Spacer(Modifier.height(16.dp))
 
-                PlusOutlinedRowButton(
+                OutlinedRowButton(
                     text = stringResource(LR.string.not_now),
                     onClick = onNotNowPressed,
+                    brush = OnboardingUpgradeHelper.plusGradientBrush,
                     modifier = Modifier.padding(horizontal = 24.dp),
                 )
 

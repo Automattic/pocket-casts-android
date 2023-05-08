@@ -63,13 +63,18 @@ object OnboardingUpgradeHelper {
         0f to Color(0xFFFED745),
         1f to Color(0xFFFEB525),
     )
+    val patronGradientBrush = Brush.horizontalGradient(
+        0f to Color(0xFFAFA2fA),
+        1f to Color(0xFFAFA2fA),
+    )
+
     private val unselectedColor = Color(0xFF666666)
 
     @Composable
     fun UpgradeRowButton(
         primaryText: String,
-        backgroundColor: Long,
-        textColor: Long,
+        backgroundColor: Color,
+        textColor: Color,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         fontWeight: FontWeight = FontWeight.W600,
@@ -80,7 +85,7 @@ object OnboardingUpgradeHelper {
             shape = RoundedCornerShape(12.dp),
             modifier = modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(backgroundColor),
+                backgroundColor = backgroundColor,
             ),
         ) {
             Column(
@@ -88,7 +93,7 @@ object OnboardingUpgradeHelper {
             ) {
                 AutoResizeText(
                     text = primaryText,
-                    color = Color(textColor),
+                    color = textColor,
                     maxFontSize = 18.sp,
                     lineHeight = 21.sp,
                     fontWeight = fontWeight,
@@ -99,7 +104,7 @@ object OnboardingUpgradeHelper {
                     TextP60(
                         text = it,
                         textAlign = TextAlign.Center,
-                        color = Color(textColor),
+                        color = textColor,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -141,8 +146,9 @@ object OnboardingUpgradeHelper {
     }
 
     @Composable
-    fun PlusOutlinedRowButton(
+    fun OutlinedRowButton(
         text: String,
+        brush: Brush,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         topText: String? = null,
@@ -156,7 +162,7 @@ object OnboardingUpgradeHelper {
             Button(
                 onClick = onClick,
                 shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(2.dp, plusGradientBrush),
+                border = BorderStroke(2.dp, brush),
                 elevation = null,
                 interactionSource = interactionSource,
                 colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent),
@@ -170,16 +176,16 @@ object OnboardingUpgradeHelper {
                         text = text,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
+                            .brush(brush)
                             .padding(vertical = 6.dp, horizontal = 24.dp)
                             .align(Alignment.Center)
-                            .brush(plusGradientBrush)
                     )
                     if (selectedCheckMark) {
                         Icon(
                             painter = painterResource(IR.drawable.plus_check),
                             contentDescription = null,
                             modifier = Modifier
-                                .brush(plusGradientBrush)
+                                .brush(brush)
                                 .align(Alignment.CenterEnd)
                                 .width(24.dp)
                         )
@@ -198,7 +204,7 @@ object OnboardingUpgradeHelper {
     }
 
     @Composable
-    fun UnselectedPlusOutlinedRowButton(
+    fun UnselectedOutlinedRowButton(
         text: String,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,

@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
@@ -34,18 +35,22 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedPlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.OutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+private const val UNKNOWN_TIER = "unknown_tier"
 
 @Composable
 fun OnboardingUpgradeBottomSheet(
@@ -77,21 +82,24 @@ fun OnboardingUpgradeBottomSheet(
         Pill()
 
         Spacer(Modifier.height(32.dp))
-        TextH20(
-            text = stringResource(LR.string.onboarding_plus_become_a_plus_member),
-            textAlign = TextAlign.Center,
-            color = Color.White
-        )
+
+        selectedTier?.let {
+            TextH20(
+                text = stringResource(selectedTier.toSubscribeTitle()),
+                textAlign = TextAlign.Center,
+                color = Color.White
+            )
+        }
 
         if (state is OnboardingUpgradeBottomSheetState.Loaded) {
             Spacer(Modifier.height(16.dp))
-
+            val subscriptionTier = requireNotNull(selectedTier)
             // Using LazyColumn instead of Column to avoid issue where unselected button that was not
             // being tapped would sometimes display the on-touch ripple effect
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                (selectedTier?.let { subscriptions.filter { it.tier == selectedTier } } ?: subscriptions)
+                subscriptions.filter { it.tier == subscriptionTier }
                     .forEach { subscription ->
 
                         // Have to remember the interaction source here instead of inside the RowButtons
@@ -112,15 +120,16 @@ fun OnboardingUpgradeBottomSheet(
                             }
 
                             if (subscription == state.selectedSubscription) {
-                                PlusOutlinedRowButton(
+                                OutlinedRowButton(
                                     text = text,
                                     topText = topText,
+                                    brush = subscriptionTier.toOutlinedButtonBrush(),
                                     onClick = { viewModel.updateSelectedSubscription(subscription) },
                                     interactionSource = interactionSource,
                                     selectedCheckMark = true,
                                 )
                             } else {
-                                UnselectedPlusOutlinedRowButton(
+                                UnselectedOutlinedRowButton(
                                     text = text,
                                     topText = topText,
                                     onClick = { viewModel.updateSelectedSubscription(subscription) },
@@ -178,14 +187,16 @@ fun OnboardingUpgradeBottomSheet(
                     .alpha(0.24f)
             )
 
-            PlusRowButton(
-                text = stringResource(
+            UpgradeRowButton(
+                primaryText = stringResource(
                     if (state.selectedSubscription.trialPricingPhase != null) {
                         LR.string.onboarding_plus_start_free_trial_and_subscribe
                     } else {
                         LR.string.subscribe
                     }
                 ),
+                backgroundColor = colorResource(state.upgradeButton.backgroundColorRes),
+                textColor = colorResource(state.upgradeButton.textColorRes),
                 onClick = onClickSubscribe,
             )
         }
@@ -229,3 +240,15 @@ private fun recurringAfterString(
     trialSubscriptionPricingPhase: TrialSubscriptionPricingPhase,
     res: Resources
 ) = "${trialSubscriptionPricingPhase.numPeriodFreeTrial(res)} (${trialSubscriptionPricingPhase.trialEnd()})"
+
+fun SubscriptionTier.toSubscribeTitle() = when (this) {
+    SubscriptionTier.PLUS -> R.string.onboarding_plus_subscribe
+    SubscriptionTier.PATRON -> R.string.onboarding_patron_subscribe
+    SubscriptionTier.UNKNOWN -> throw IllegalStateException(UNKNOWN_TIER)
+}
+
+fun SubscriptionTier.toOutlinedButtonBrush() = when (this) {
+    SubscriptionTier.PLUS -> OnboardingUpgradeHelper.plusGradientBrush
+    SubscriptionTier.PATRON -> OnboardingUpgradeHelper.patronGradientBrush
+    SubscriptionTier.UNKNOWN -> throw IllegalStateException(UNKNOWN_TIER)
+}

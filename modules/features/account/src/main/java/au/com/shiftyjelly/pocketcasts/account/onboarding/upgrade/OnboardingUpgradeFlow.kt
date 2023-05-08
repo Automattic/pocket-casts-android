@@ -18,8 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.BuildConfig
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedPlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.OutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
@@ -170,22 +170,24 @@ fun OnboardingUpgradeFlow(
 @Composable
 private fun OutlinedButtonPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        PlusOutlinedRowButton(
+        OutlinedRowButton(
             text = "one this is way too long | | | | | | | | | | |",
+            brush = OnboardingUpgradeHelper.plusGradientBrush,
             selectedCheckMark = true,
             onClick = {},
         )
-        PlusOutlinedRowButton(
+        OutlinedRowButton(
             text = "two",
             topText = "woohoo!",
+            brush = OnboardingUpgradeHelper.plusGradientBrush,
             selectedCheckMark = true,
             onClick = {},
         )
-        UnselectedPlusOutlinedRowButton(
+        UnselectedOutlinedRowButton(
             text = "three",
             onClick = {},
         )
-        UnselectedPlusOutlinedRowButton(
+        UnselectedOutlinedRowButton(
             text = "four this is also way too long | | | | | | |",
             topText = "woohoo!",
             onClick = {},
