@@ -142,6 +142,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
         val lastSelectedTier = settings.getLastSelectedSubscriptionTier().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
         val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
 
+        val fromProfile = source == OnboardingUpgradeSource.PROFILE
         val defaultSelected = subscriptionManager.getDefaultSubscription(
             subscriptions = subscriptions,
             tier = lastSelectedTier,
@@ -151,7 +152,7 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
             NoSubscriptions
         } else {
             Loaded(
-                subscriptions = subscriptions,
+                subscriptions = if (fromProfile) subscriptions.filter { it.tier == defaultSelected.tier } else subscriptions,
                 selectedSubscription = defaultSelected,
                 purchaseFailed = false,
             )
