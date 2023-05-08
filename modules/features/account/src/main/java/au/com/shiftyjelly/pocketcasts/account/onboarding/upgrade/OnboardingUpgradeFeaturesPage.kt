@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
@@ -79,7 +80,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -339,13 +339,14 @@ private fun FeatureCard(
                 SubscriptionTierPill(
                     iconRes = card.iconRes,
                     shortNameRes = card.shortNameRes,
-                    modifier = Modifier.background(Color.Black)
+                    backgroundColor = Color.Black,
+                    textColor = Color.White,
                 )
             }
 
             Column {
                 card.featureItems.forEach {
-                    FeatureItem(it)
+                    UpgradeFeatureItem(it)
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 OnboardingUpgradeHelper.PrivacyPolicy(
@@ -355,34 +356,6 @@ private fun FeatureCard(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun FeatureItem(
-    content: UpgradeFeatureItem,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .semantics(mergeDescendants = true) {}
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Icon(
-            painter = painterResource(content.image),
-            contentDescription = null,
-            tint = Color.Black,
-            modifier = modifier
-                .size(20.dp)
-                .padding(2.dp),
-        )
-        Spacer(Modifier.width(16.dp))
-        TextH50(
-            text = stringResource(content.title),
-            color = Color.Black,
-        )
     }
 }
 

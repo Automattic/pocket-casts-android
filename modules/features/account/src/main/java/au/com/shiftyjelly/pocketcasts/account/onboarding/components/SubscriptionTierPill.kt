@@ -2,12 +2,14 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +20,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val iconSizeInDp = 14.dp
 private val pillCornerRadiusInDp = 800.dp
@@ -29,11 +32,14 @@ fun SubscriptionTierPill(
     @StringRes shortNameRes: Int,
     modifier: Modifier = Modifier,
     iconColor: Color = Color.Unspecified,
-    backgroundColor: Color = Color.Black,
+    backgroundColor: Color? = null,
+    textColor: Color? = null,
 ) {
+    val isLight = MaterialTheme.colors.isLight
+    val bgColor = backgroundColor ?: if (isLight) Color.Black else Color.White
     Card(
         shape = RoundedCornerShape(pillCornerRadiusInDp),
-        backgroundColor = backgroundColor,
+        backgroundColor = backgroundColor ?: bgColor,
     ) {
         Row(
             modifier = Modifier
@@ -46,12 +52,14 @@ fun SubscriptionTierPill(
                 contentDescription = null,
                 modifier = modifier
                     .size(iconSizeInDp)
-                    .padding(end = 4.dp),
+                    .background(bgColor),
                 tint = iconColor,
             )
             TextH50(
                 text = stringResource(shortNameRes),
-                color = Color.White,
+                color = textColor ?: if (isLight) Color.White else Color.Black,
+                modifier = Modifier
+                    .padding(start = 4.dp),
             )
         }
     }
@@ -61,8 +69,7 @@ fun SubscriptionTierPill(
 @Composable
 private fun SubscriptionTierPillPreview() {
     SubscriptionTierPill(
-        iconRes = R.drawable.ic_patron,
-        shortNameRes = au.com.shiftyjelly.pocketcasts.localization.R.string.pocket_casts_patron_short,
-        backgroundColor = Color.Black,
+        iconRes = IR.drawable.ic_patron,
+        shortNameRes = LR.string.pocket_casts_patron_short,
     )
 }
