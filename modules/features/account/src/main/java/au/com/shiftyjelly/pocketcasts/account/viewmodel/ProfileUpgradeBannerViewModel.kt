@@ -5,8 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.BuildConfig
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.FeatureCardsState
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -30,6 +33,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
         data class Loaded(
             override val numPeriodFree: String?,
             val featureCardsState: FeatureCardsState,
+            val upgradeButtons: List<UpgradeButton>,
         ) : State(numPeriodFree)
 
         data class OldLoaded(
@@ -66,13 +70,22 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                         }
                         if (BuildConfig.ADD_PATRON_ENABLED) {
                             defaultSubscription?.let {
+                                val upgradeButtons = subscriptions.map { it.tier }
+                                    .mapNotNull { tier ->
+                                        subscriptionManager.getDefaultSubscription(
+                                            subscriptions = subscriptions,
+                                            tier = tier,
+                                            frequency = SubscriptionFrequency.YEARLY
+                                        )?.toUpgradeButton()
+                                    }
                                 val currentTier = SubscriptionMapper.mapProductIdToTier(defaultSubscription.productDetails.productId)
                                 _state.value = State.Loaded(
                                     numPeriodFree = numPeriodFree?.uppercase(Locale.getDefault()),
                                     featureCardsState = FeatureCardsState(
                                         subscriptions = subscriptions,
                                         currentFeatureCard = currentTier.toUpgradeFeatureCard()
-                                    )
+                                    ),
+                                    upgradeButtons = upgradeButtons,
                                 )
                             }
                         } else {

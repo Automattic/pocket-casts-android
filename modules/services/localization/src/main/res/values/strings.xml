@@ -82,6 +82,7 @@
     <string name="stream">Stream</string>
     <string name="subscribe">Subscribe</string>
     <string name="subscribe_to">Subscribe to %s</string>
+    <string name="upgrade_to">Upgrade to %s</string>
     <string name="unarchive_all">Unarchive all</string>
     <string name="unplayed">Unplayed</string>
     <string name="unsubscribe">Unsubscribe</string>

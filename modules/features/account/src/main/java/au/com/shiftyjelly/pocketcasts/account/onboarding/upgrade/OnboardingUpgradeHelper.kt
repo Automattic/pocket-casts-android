@@ -72,6 +72,7 @@ object OnboardingUpgradeHelper {
         textColor: Long,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
+        fontWeight: FontWeight = FontWeight.W600,
         secondaryText: String? = null,
     ) {
         Button(
@@ -90,7 +91,7 @@ object OnboardingUpgradeHelper {
                     color = Color(textColor),
                     maxFontSize = 18.sp,
                     lineHeight = 21.sp,
-                    fontWeight = FontWeight.W600,
+                    fontWeight = fontWeight,
                     maxLines = 1,
                     textAlign = TextAlign.Center,
                 )
@@ -142,11 +143,11 @@ object OnboardingUpgradeHelper {
     @Composable
     fun PlusOutlinedRowButton(
         text: String,
-        topText: String? = null,
         onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        topText: String? = null,
         selectedCheckMark: Boolean = false,
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-        modifier: Modifier = Modifier,
     ) {
 
         ConstraintLayout(modifier) {
@@ -199,10 +200,10 @@ object OnboardingUpgradeHelper {
     @Composable
     fun UnselectedPlusOutlinedRowButton(
         text: String,
-        topText: String? = null,
         onClick: () -> Unit,
-        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
         modifier: Modifier = Modifier,
+        topText: String? = null,
+        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
         ConstraintLayout(modifier) {
 
