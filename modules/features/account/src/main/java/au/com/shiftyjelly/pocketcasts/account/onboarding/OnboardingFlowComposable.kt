@@ -64,7 +64,7 @@ private fun Content(
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
-        is OnboardingFlow.PlusAccountUpgrade, // FIXME this should just open the purchase modal
+        is OnboardingFlow.PlusAccountUpgrade,
         is OnboardingFlow.PlusFlow -> OnboardingNavRoute.PlusUpgrade.route
     }
 
