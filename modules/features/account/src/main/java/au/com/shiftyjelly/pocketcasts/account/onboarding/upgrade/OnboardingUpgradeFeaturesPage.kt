@@ -80,7 +80,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeButton
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
@@ -150,7 +149,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                 onBackPressed = onBackPressed,
                 onNotNowPressed = onNotNowPressed,
                 onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCards[it]) },
+                onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
                 onClickSubscribe = onClickSubscribe,
                 canUpgrade = canUpgrade,
             )
@@ -306,7 +305,7 @@ fun FeatureCards(
     onFeatureCardChanged: (Int) -> Unit,
 ) {
     val pagerState =
-        rememberPagerState(initialPage = state.featureCards.indexOf(state.currentFeatureCard))
+        rememberPagerState(initialPage = state.featureCardsState.featureCards.indexOf(state.currentFeatureCard))
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { index ->
             onFeatureCardChanged(index)
@@ -315,7 +314,7 @@ fun FeatureCards(
 
     var pagerHeight by remember { mutableStateOf(0) }
     HorizontalPager(
-        pageCount = state.featureCards.size,
+        pageCount = state.featureCardsState.featureCards.size,
         state = pagerState,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
@@ -341,7 +340,7 @@ fun FeatureCards(
                 }
         ) {
             FeatureCard(
-                card = state.featureCards[index],
+                card = state.featureCardsState.featureCards[index],
                 modifier = if (pagerHeight > 0) {
                     Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
                 } else Modifier
@@ -349,7 +348,7 @@ fun FeatureCards(
         }
     }
 
-    if (state.showPageIndicator) {
+    if (state.featureCardsState.showPageIndicator) {
         Row(
             Modifier
                 .height(40.dp)
@@ -357,7 +356,7 @@ fun FeatureCards(
                 .padding(top = 16.dp),
             horizontalArrangement = Arrangement.Center,
         ) {
-            repeat(state.featureCards.size) { iteration ->
+            repeat(state.featureCardsState.featureCards.size) { iteration ->
                 val color =
                     if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
                 Box(
