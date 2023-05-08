@@ -613,4 +613,12 @@ interface Settings {
 
     fun setLastSelectedSubscriptionFrequency(frequency: SubscriptionFrequency)
     fun getLastSelectedSubscriptionFrequency(): SubscriptionFrequency?
+
+    // This boolean should be update to false when a user signs in and should be set to
+    // true once a user signs out and that sign out has been fully handled
+    // by the app. This field helps make sure the app fully handles signing a user
+    // out even if they sign out from outside the app (i.e., from the Android OS's
+    // account management settings).
+    fun setFullySignedOut(boolean: Boolean)
+    fun getFullySignedOut(): Boolean
 }
