@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -82,6 +83,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -636,7 +638,7 @@ fun NoSubscriptionsLayout(
         ) {
             NavigationIconButton(
                 onNavigationClick = onBackPressed,
-                iconColor = Color.White,
+                iconColor = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier
                     .height(48.dp)
                     .width(48.dp)
@@ -644,7 +646,7 @@ fun NoSubscriptionsLayout(
             if (showNotNow) {
                 TextH30(
                     text = stringResource(LR.string.not_now),
-                    color = Color.White,
+                    color = MaterialTheme.theme.colors.primaryText01,
                     modifier = Modifier
                         .padding(horizontal = 24.dp)
                         .clickable { onNotNowPressed() },
