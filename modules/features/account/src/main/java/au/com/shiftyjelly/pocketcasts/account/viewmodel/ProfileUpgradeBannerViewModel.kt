@@ -6,11 +6,13 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.BuildConfig
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.FeatureCardsState
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +25,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileUpgradeBannerViewModel @Inject constructor(
-    subscriptionManager: SubscriptionManager,
+    private val subscriptionManager: SubscriptionManager,
+    private val settings: Settings,
     app: Application,
 ) : AndroidViewModel(app) {
 
@@ -95,6 +98,13 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                         }
                     }
             }
+        }
+    }
+
+    fun onFeatureCardChanged(upgradeFeatureCard: UpgradeFeatureCard) {
+        (_state.value as? State.Loaded)?.let {
+            settings.setLastSelectedSubscriptionFrequency(SubscriptionFrequency.YEARLY)
+            settings.setLastSelectedSubscriptionTier(upgradeFeatureCard.subscriptionTier)
         }
     }
 }

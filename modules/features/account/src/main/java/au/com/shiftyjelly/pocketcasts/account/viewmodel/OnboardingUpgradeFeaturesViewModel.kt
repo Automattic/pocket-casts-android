@@ -86,8 +86,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private fun updateState(
         subscriptions: List<Subscription>,
     ) {
-        val lastSelectedTier = settings.getLastSelectedSubscriptionTier().takeIf { source == OnboardingUpgradeSource.LOGIN }
-        val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source == OnboardingUpgradeSource.LOGIN }
+        val lastSelectedTier = settings.getLastSelectedSubscriptionTier().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
+        val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
 
         val selectedSubscription = subscriptionManager.getDefaultSubscription(
             subscriptions = subscriptions,

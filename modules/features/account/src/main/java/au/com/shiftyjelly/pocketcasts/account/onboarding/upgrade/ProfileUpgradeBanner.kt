@@ -42,17 +42,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ProfileUpgradeBanner(
     onClick: () -> Unit,
 ) {
-    val state by hiltViewModel<ProfileUpgradeBannerViewModel>()
-        .state
-        .collectAsState()
+    val viewModel = hiltViewModel<ProfileUpgradeBannerViewModel>()
+    val state by viewModel.state.collectAsState()
+
     when (state) {
-        is State.Loaded ->
+        is State.Loaded -> {
+            val loadedState = state as State.Loaded
             ProfileUpgradeBannerView(
-                state = state as State.Loaded,
+                state = loadedState,
                 onClick = onClick,
                 onFeatureCardChanged = {
+                    viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it])
                 }
             )
+        }
 
         is State.OldLoaded ->
             ProfileOldUpgradeBannerView(
