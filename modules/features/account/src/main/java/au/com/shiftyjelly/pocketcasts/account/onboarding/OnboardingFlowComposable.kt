@@ -34,8 +34,8 @@ fun OnboardingFlowComposable(
             is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
             OnboardingFlow.InitialOnboarding -> OnboardingNavRoute.logInOrSignUp
 
-            // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here because
-            // the startDestination cannot be dynamic, see https://stackoverflow.com/a/70410872/1910286
+            // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
+            // see https://stackoverflow.com/a/70410872/1910286
             is OnboardingFlow.PlusAccountUpgrade, // FIXME this should just open the purchase modal
             is OnboardingFlow.PlusFlow -> OnboardingNavRoute.PlusUpgrade.route
         }
@@ -146,21 +146,20 @@ fun OnboardingFlowComposable(
                 arguments = listOf(
                     navArgument(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey) {
                         type = NavType.EnumType(OnboardingUpgradeSource::class.java)
+                        /* Set default value for onboarding flows with startDestination. */
+                        when (flow) {
+                            is OnboardingFlow.PlusAccountUpgrade -> defaultValue = flow.source
+                            is OnboardingFlow.PlusFlow -> defaultValue = flow.source
+                            else -> Unit // Not a startDestination, default value should not be set.
+                        }
                     }
                 )
             ) { navBackStackEntry ->
 
                 val upgradeSource = navBackStackEntry.arguments
                     ?.getSerializableCompat(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey, OnboardingUpgradeSource::class.java)
-                    // If null, that means upgradeSource was not passed as an argument, so this must be the
-                    // startDestination. We have to use the flow to get the upgradeSource when this is
-                    // the startDestination because arguments can not be passed in the startDestination,
-                    // see https://stackoverflow.com/a/70410872/1910286. In that case, the flow should
-                    // always be a PlusFlow, but the compiler doesn't enforce that.
-                    ?: when (flow) {
-                        is OnboardingFlow.PlusFlow -> flow.source
-                        else -> throw IllegalStateException("upgradeSource not set")
-                    }
+                    // upgradeSource should always be present. If startDestination, it is passed as a default argument.
+                    ?: throw IllegalStateException("upgradeSource not set")
 
                 val userCreatedNewAccount = when (upgradeSource) {
                     OnboardingUpgradeSource.APPEARANCE,
