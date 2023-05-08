@@ -32,11 +32,8 @@ import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
@@ -45,21 +42,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -83,6 +74,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeButton
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
@@ -304,75 +296,26 @@ fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
     onFeatureCardChanged: (Int) -> Unit,
 ) {
-    val pagerState =
-        rememberPagerState(initialPage = state.featureCardsState.featureCards.indexOf(state.currentFeatureCard))
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { index ->
-            onFeatureCardChanged(index)
-        }
-    }
-
-    var pagerHeight by remember { mutableStateOf(0) }
-    HorizontalPager(
-        pageCount = state.featureCardsState.featureCards.size,
-        state = pagerState,
+    val featureCardsState = state.featureCardsState
+    HorizontalPagerWrapper(
+        pageCount = featureCardsState.featureCards.size,
+        initialPage = featureCardsState.featureCards.indexOf(state.currentFeatureCard),
+        onPageChanged = onFeatureCardChanged,
+        showPageIndicator = featureCardsState.showPageIndicator,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
-    ) { index ->
-        var pageHeight by remember { mutableStateOf(0) }
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .layout { measurable, constraints ->
-                    /* https://github.com/google/accompanist/issues/1050#issuecomment-1097483476 */
-                    val placeable = measurable.measure(constraints)
-                    pageHeight = placeable.height
-                    /* Restrict page height to the pager height */
-                    layout(constraints.maxWidth, pagerHeight) {
-                        placeable.placeRelative(0, 0)
-                    }
-                }
-                .onGloballyPositioned {
-                    /* Update pager height to the tallest page */
-                    if (pageHeight > pagerHeight) {
-                        pagerHeight = pageHeight
-                    }
-                }
-        ) {
-            FeatureCard(
-                card = state.featureCardsState.featureCards[index],
-                modifier = if (pagerHeight > 0) {
-                    Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
-                } else Modifier
-            )
-        }
-    }
-
-    if (state.featureCardsState.showPageIndicator) {
-        Row(
-            Modifier
-                .height(40.dp)
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            repeat(state.featureCardsState.featureCards.size) { iteration ->
-                val color =
-                    if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
-                Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                        .size(8.dp)
-                )
-            }
-        }
+    ) { index, pagerHeight ->
+        FeatureCard(
+            card = featureCardsState.featureCards[index],
+            modifier = if (pagerHeight > 0) {
+                Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
+            } else Modifier
+        )
     }
 }
 
 @Composable
-fun FeatureCard(
+private fun FeatureCard(
     card: UpgradeFeatureCard,
     modifier: Modifier = Modifier,
 ) {
