@@ -137,13 +137,65 @@
                 app:constraint_referenced_ids="dividerView,imgMail,lblChangeEmail,btnChangeEmail,dividerView2,imgPassword,lblChangePassword,btnChangePwd" />
 
             <View
+                android:id="@+id/dividerViewUpgradeAccount"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnChangePwd" />
+
+            <ImageView
+                android:id="@+id/imgUpgradeAccount"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="16dp"
+                app:tint="@color/patron_purple"
+                app:layout_constraintBottom_toBottomOf="@id/btnUpgradeAccount"
+                app:layout_constraintStart_toStartOf="@id/btnUpgradeAccount"
+                app:layout_constraintTop_toTopOf="@id/btnUpgradeAccount"
+                app:srcCompat="@drawable/ic_patron" />
+
+            <TextView
+                android:id="@+id/lblUpgradeAccount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/profile_upgrade_to_patron"
+                android:textAppearance="@style/H40"
+                android:textColor="@color/patron_purple"
+                android:importantForAccessibility="no"
+                app:layout_constraintBottom_toBottomOf="@+id/btnUpgradeAccount"
+                app:layout_constraintStart_toEndOf="@id/imgUpgradeAccount"
+                app:layout_constraintTop_toTopOf="@+id/btnUpgradeAccount" />
+
+            <View
+                android:id="@+id/btnUpgradeAccount"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:contentDescription="@string/profile_change_password"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnChangePwd" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/upgradeAccountGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="dividerViewUpgradeAccount,imgUpgradeAccount,lblUpgradeAccount,btnUpgradeAccount" />
+
+            <View
                 android:id="@+id/dividerView3"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/divider_height"
                 android:background="?attr/primary_ui_05"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnChangePwd" />
+                app:layout_constraintTop_toBottomOf="@+id/btnUpgradeAccount" />
 
             <ImageView
                 android:id="@+id/imgSub"
@@ -183,7 +235,7 @@
                 android:contentDescription="@string/profile_cancel_subscription"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnChangePwd" />
+                app:layout_constraintTop_toBottomOf="@+id/btnUpgradeAccount" />
 
             <View
                 android:id="@+id/dividerView4"

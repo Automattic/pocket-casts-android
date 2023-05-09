@@ -910,6 +910,7 @@
     <string name="profile_updates_ended">Updates ended: %s</string>
     <string name="profile_updates_ends">Updates end: %s</string>
     <string name="profile_upgrade_to_plus">Upgrade to Plus</string>
+    <string name="profile_upgrade_to_patron">Upgrade to Patron</string>
     <string name="profile_web_player">Web Player</string>
     <string name="profile_welcome_to_free">Welcome to Pocket Casts!</string>
     <string name="profile_welcome_to_plus">Welcome to Pocket Casts Plus!</string>

@@ -116,6 +116,8 @@ class AccountDetailsFragment : BaseFragment() {
 
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPlusPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPlusPaid
+            // TODO: Patron - hide if upgraded to patron
+            binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus && BuildConfig.ADD_PATRON_ENABLED
 
             binding.userUpgradeComposeView?.apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -160,6 +162,12 @@ class AccountDetailsFragment : BaseFragment() {
         binding.btnChangePwd?.setOnClickListener {
             val fragment = ChangePwdFragment.newInstance()
             (this.activity as FragmentHostListener).addFragment(fragment)
+        }
+
+        binding.btnUpgradeAccount?.setOnClickListener {
+            val source = OnboardingUpgradeSource.ACCOUNT_DETAILS
+            val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
+            OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
         }
 
         binding.btnCancelSub?.setOnClickListener {
