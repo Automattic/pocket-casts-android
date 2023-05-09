@@ -18,11 +18,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.BuildConfig
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedPlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.OutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UnselectedOutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -90,6 +91,10 @@ fun OnboardingUpgradeFlow(
                 // Don't fire event when initially loading the screen and both current and target are "Hidden"
                 if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
                     bottomSheetViewModel.onSelectPaymentFrequencyDismissed(flow)
+                    if (flow is OnboardingFlow.PlusAccountUpgrade) {
+                        mainSheetViewModel.onDismiss(flow, source)
+                        onBackPressed()
+                    }
                 }
             }
             ModalBottomSheetValue.Expanded -> bottomSheetViewModel.onSelectPaymentFrequencyShown(flow)
@@ -112,35 +117,37 @@ fun OnboardingUpgradeFlow(
         scrimColor = Color.Black.copy(alpha = 0.5f),
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         content = {
-            OnboardingUpgradeFeaturesPage(
-                flow = flow,
-                source = source,
-                onUpgradePressed = {
-                    if (isLoggedIn) {
-                        coroutineScope.launch { sheetState.show() }
-                    } else {
-                        onNeedLogin()
-                    }
-                },
-                onNotNowPressed = onProceed,
-                onBackPressed = onBackPressed,
-                onClickSubscribe = {
-                    if (activity != null) {
+            if (flow !is OnboardingFlow.PlusAccountUpgrade) {
+                OnboardingUpgradeFeaturesPage(
+                    flow = flow,
+                    source = source,
+                    onUpgradePressed = {
                         if (isLoggedIn) {
-                            mainSheetViewModel.onClickSubscribe(
-                                activity = activity,
-                                flow = flow,
-                                onComplete = onProceed,
-                            )
+                            coroutineScope.launch { sheetState.show() }
                         } else {
                             onNeedLogin()
                         }
-                    } else {
-                        LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
-                    }
-                },
-                canUpgrade = hasSubscriptions,
-            )
+                    },
+                    onNotNowPressed = onProceed,
+                    onBackPressed = onBackPressed,
+                    onClickSubscribe = {
+                        if (activity != null) {
+                            if (isLoggedIn) {
+                                mainSheetViewModel.onClickSubscribe(
+                                    activity = activity,
+                                    flow = flow,
+                                    onComplete = onProceed,
+                                )
+                            } else {
+                                onNeedLogin()
+                            }
+                        } else {
+                            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
+                        }
+                    },
+                    canUpgrade = hasSubscriptions,
+                )
+            }
         },
         sheetContent = {
             OnboardingUpgradeBottomSheet(
@@ -164,24 +171,30 @@ fun OnboardingUpgradeFlow(
 @Composable
 private fun OutlinedButtonPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        PlusOutlinedRowButton(
+        OutlinedRowButton(
             text = "one this is way too long | | | | | | | | | | |",
+            brush = OnboardingUpgradeHelper.plusGradientBrush,
             selectedCheckMark = true,
+            subscriptionTier = Subscription.SubscriptionTier.PLUS,
             onClick = {},
         )
-        PlusOutlinedRowButton(
+        OutlinedRowButton(
             text = "two",
             topText = "woohoo!",
+            brush = OnboardingUpgradeHelper.plusGradientBrush,
+            subscriptionTier = Subscription.SubscriptionTier.PLUS,
             selectedCheckMark = true,
             onClick = {},
         )
-        UnselectedPlusOutlinedRowButton(
+        UnselectedOutlinedRowButton(
             text = "three",
+            subscriptionTier = Subscription.SubscriptionTier.PLUS,
             onClick = {},
         )
-        UnselectedPlusOutlinedRowButton(
+        UnselectedOutlinedRowButton(
             text = "four this is also way too long | | | | | | |",
             topText = "woohoo!",
+            subscriptionTier = Subscription.SubscriptionTier.PLUS,
             onClick = {},
         )
     }

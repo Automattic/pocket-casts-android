@@ -4,20 +4,18 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.R
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PatronUpgradeFeatureItem
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.PlusUpgradeFeatureItem
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureItem
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.FeatureCardsState
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureCard
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.RecurringSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
@@ -38,8 +36,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class OnboardingUpgradeFeaturesViewModel @Inject constructor(
@@ -90,8 +86,8 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private fun updateState(
         subscriptions: List<Subscription>,
     ) {
-        val lastSelectedTier = settings.getLastSelectedSubscriptionTier().takeIf { source == OnboardingUpgradeSource.LOGIN }
-        val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source == OnboardingUpgradeSource.LOGIN }
+        val lastSelectedTier = settings.getLastSelectedSubscriptionTier().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
+        val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
 
         val selectedSubscription = subscriptionManager.getDefaultSubscription(
             subscriptions = subscriptions,
@@ -106,7 +102,10 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
             val currentFeatureCard = currentTier.toUpgradeFeatureCard()
             _state.update {
                 OnboardingUpgradeFeaturesState.Loaded(
-                    subscriptions = subscriptions,
+                    featureCardsState = FeatureCardsState(
+                        subscriptions = subscriptions,
+                        currentFeatureCard = currentFeatureCard,
+                    ),
                     currentSubscription = selectedSubscription,
                     currentFeatureCard = currentFeatureCard,
                     currentSubscriptionFrequency = currentSubscriptionFrequency,
@@ -138,7 +137,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
             val currentSubscription = subscriptionManager
                 .getDefaultSubscription(
-                    subscriptions = loadedState.subscriptions,
+                    subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = loadedState.currentFeatureCard.subscriptionTier,
                     frequency = frequency
                 )
@@ -158,7 +157,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
         (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
             val currentSubscription = subscriptionManager
                 .getDefaultSubscription(
-                    subscriptions = loadedState.subscriptions,
+                    subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = upgradeFeatureCard.subscriptionTier,
                     frequency = loadedState.currentSubscriptionFrequency
                 )
@@ -183,7 +182,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
             _state.update { loadedState.copy(purchaseFailed = false) }
             val currentSubscription = subscriptionManager
                 .getDefaultSubscription(
-                    subscriptions = loadedState.subscriptions,
+                    subscriptions = loadedState.featureCardsState.subscriptions,
                     tier = loadedState.currentFeatureCard.subscriptionTier,
                     frequency = loadedState.currentSubscriptionFrequency
                 )
@@ -254,89 +253,21 @@ sealed class OnboardingUpgradeFeaturesState {
     }
 
     data class Loaded(
-        val subscriptions: List<Subscription>,
         val currentFeatureCard: UpgradeFeatureCard,
+        val featureCardsState: FeatureCardsState,
         val currentSubscriptionFrequency: SubscriptionFrequency,
         val currentSubscription: Subscription,
         val purchaseFailed: Boolean = false,
         val showNotNow: Boolean,
     ) : OnboardingUpgradeFeaturesState() {
-
-        val featureCards = SubscriptionTier.values().toList()
-            .filter { tier -> tier != SubscriptionTier.UNKNOWN && tier in subscriptions.map { it.tier } }
-            .map { it.toUpgradeFeatureCard() }
         val subscriptionFrequencies =
             listOf(SubscriptionFrequency.YEARLY, SubscriptionFrequency.MONTHLY)
         val currentUpgradeButton: UpgradeButton
             get() = currentSubscription.toUpgradeButton()
-        val showPageIndicator = featureCards.size > 1
     }
-}
-
-private fun SubscriptionTier.toUpgradeFeatureCard() = when (this) {
-    SubscriptionTier.PLUS -> UpgradeFeatureCard.PLUS
-    SubscriptionTier.PATRON -> UpgradeFeatureCard.PATRON
-    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
-}
-
-private fun Subscription.toUpgradeButton() = when (this.tier) {
-    SubscriptionTier.PLUS -> UpgradeButton.Plus(this)
-    SubscriptionTier.PATRON -> UpgradeButton.Patron(this)
-    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
 }
 
 private fun RecurringSubscriptionPricingPhase.toSubscriptionFrequency() = when (this) {
     is SubscriptionPricingPhase.Months -> SubscriptionFrequency.MONTHLY
     is SubscriptionPricingPhase.Years -> SubscriptionFrequency.YEARLY
-}
-
-enum class UpgradeFeatureCard(
-    @StringRes val titleRes: Int,
-    @StringRes val shortNameRes: Int,
-    @DrawableRes val backgroundGlowsRes: Int,
-    @DrawableRes val iconRes: Int,
-    val featureItems: List<UpgradeFeatureItem>,
-    val subscriptionTier: SubscriptionTier,
-) {
-    PLUS(
-        titleRes = LR.string.onboarding_plus_features_title,
-        shortNameRes = LR.string.pocket_casts_plus_short,
-        backgroundGlowsRes = R.drawable.upgrade_background_plus_glows,
-        iconRes = IR.drawable.ic_plus,
-        featureItems = PlusUpgradeFeatureItem.values().toList(),
-        subscriptionTier = SubscriptionTier.PLUS,
-    ),
-    PATRON(
-        titleRes = LR.string.onboarding_patron_features_title,
-        shortNameRes = LR.string.pocket_casts_patron_short,
-        backgroundGlowsRes = R.drawable.upgrade_background_patron_glows,
-        iconRes = IR.drawable.ic_patron,
-        featureItems = PatronUpgradeFeatureItem.values().toList(),
-        subscriptionTier = SubscriptionTier.PATRON,
-    )
-}
-
-sealed class UpgradeButton(
-    @StringRes val shortNameRes: Int,
-    val backgroundColor: Long,
-    val textColor: Long,
-    open val subscription: Subscription,
-) {
-    data class Plus(
-        override val subscription: Subscription,
-    ) : UpgradeButton(
-        shortNameRes = LR.string.pocket_casts_plus_short,
-        backgroundColor = 0xFFFFD846,
-        textColor = 0xFF000000,
-        subscription = subscription,
-    )
-
-    data class Patron(
-        override val subscription: Subscription,
-    ) : UpgradeButton(
-        shortNameRes = LR.string.pocket_casts_patron_short,
-        backgroundColor = 0xFF6046F5,
-        textColor = 0xFFFFFFFF,
-        subscription = subscription,
-    )
 }

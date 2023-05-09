@@ -533,6 +533,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <View
+                android:id="@+id/dividerView15"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/divider_height"
+                android:background="?attr/primary_ui_05"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/userView" />
+
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/userUpgradeComposeView"
                 android:layout_width="match_parent"

@@ -122,6 +122,7 @@ class AccountDetailsFragment : BaseFragment() {
                 setContent {
                     AppTheme(theme.activeTheme) {
                         if (subscription != null && (signInState.isSignedInAsFree || giftExpiring)) {
+                            binding.dividerView15?.isVisible = BuildConfig.ADD_PATRON_ENABLED
                             ProfileUpgradeBanner(
                                 onClick = {
                                     val source = OnboardingUpgradeSource.PROFILE

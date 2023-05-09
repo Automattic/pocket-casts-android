@@ -157,6 +157,7 @@ open class UserView @JvmOverloads constructor(
                         shortNameRes = LR.string.pocket_casts_patron_short,
                         iconColor = Color.White,
                         backgroundColor = colorResource(UR.color.patron_purple),
+                        textColor = colorResource(UR.color.patron_purple_light),
                     )
                 }
             }
