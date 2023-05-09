@@ -292,6 +292,7 @@ class SubscriptionManagerImpl @Inject constructor(
             .build()
 
         billingClient.queryPurchaseHistoryAsync(queryPurchaseHistoryParams) { _, purchases ->
+            // TODO: Patron - Update free trial eligibility for Patron
             if (purchases?.any { it.products.toString().contains(PLUS_PRODUCT_BASE) } == true) {
                 updateFreeTrialEligible(false)
             }
