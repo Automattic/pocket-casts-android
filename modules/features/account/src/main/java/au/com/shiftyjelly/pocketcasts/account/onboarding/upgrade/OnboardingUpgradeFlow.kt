@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -174,22 +175,26 @@ private fun OutlinedButtonPreview() {
             text = "one this is way too long | | | | | | | | | | |",
             brush = OnboardingUpgradeHelper.plusGradientBrush,
             selectedCheckMark = true,
+            subscriptionTier = Subscription.SubscriptionTier.PLUS,
             onClick = {},
         )
         OutlinedRowButton(
             text = "two",
             topText = "woohoo!",
             brush = OnboardingUpgradeHelper.plusGradientBrush,
+            subscriptionTier = Subscription.SubscriptionTier.PLUS,
             selectedCheckMark = true,
             onClick = {},
         )
         UnselectedOutlinedRowButton(
             text = "three",
+            subscriptionTier = Subscription.SubscriptionTier.PLUS,
             onClick = {},
         )
         UnselectedOutlinedRowButton(
             text = "four this is also way too long | | | | | | |",
             topText = "woohoo!",
+            subscriptionTier = Subscription.SubscriptionTier.PLUS,
             onClick = {},
         )
     }

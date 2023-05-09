@@ -85,6 +85,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -474,6 +475,7 @@ private fun OldUpgradeLayout(
                     onClick = onNotNowPressed,
                     brush = OnboardingUpgradeHelper.plusGradientBrush,
                     modifier = Modifier.padding(horizontal = 24.dp),
+                    subscriptionTier = SubscriptionTier.PLUS
                 )
 
                 Spacer(Modifier.height(16.dp))

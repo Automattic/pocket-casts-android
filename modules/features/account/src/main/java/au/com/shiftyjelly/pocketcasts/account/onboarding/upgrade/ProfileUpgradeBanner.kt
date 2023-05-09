@@ -41,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import java.util.Locale
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -70,7 +71,7 @@ fun ProfileUpgradeBanner(
                 onClick = onClick,
             )
 
-        is State.Empty -> Unit // Do nothing
+        is State.Loading -> Unit // Do nothing
     }
 }
 
@@ -193,7 +194,10 @@ fun ProfileOldUpgradeBannerView(
 
             state.numPeriodFree?.let { numPeriodFree ->
                 Spacer(Modifier.height(16.dp))
-                OnboardingUpgradeHelper.TopText(topText = numPeriodFree)
+                OnboardingUpgradeHelper.TopText(
+                    topText = numPeriodFree,
+                    subscriptionTier = SubscriptionTier.PLUS,
+                )
             }
 
             Spacer(Modifier.height(20.dp))

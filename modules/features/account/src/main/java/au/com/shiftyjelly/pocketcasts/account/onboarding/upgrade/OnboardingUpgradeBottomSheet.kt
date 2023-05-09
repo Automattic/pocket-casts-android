@@ -123,6 +123,7 @@ fun OnboardingUpgradeBottomSheet(
                                 OutlinedRowButton(
                                     text = text,
                                     topText = topText,
+                                    subscriptionTier = subscriptionTier,
                                     brush = subscriptionTier.toOutlinedButtonBrush(),
                                     onClick = { viewModel.updateSelectedSubscription(subscription) },
                                     interactionSource = interactionSource,
@@ -132,6 +133,7 @@ fun OnboardingUpgradeBottomSheet(
                                 UnselectedOutlinedRowButton(
                                     text = text,
                                     topText = topText,
+                                    subscriptionTier = subscriptionTier,
                                     onClick = { viewModel.updateSelectedSubscription(subscription) },
                                     interactionSource = interactionSource,
                                 )

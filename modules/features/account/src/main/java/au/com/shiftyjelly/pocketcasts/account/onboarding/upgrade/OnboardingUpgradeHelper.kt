@@ -53,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -152,6 +152,7 @@ object OnboardingUpgradeHelper {
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         topText: String? = null,
+        subscriptionTier: SubscriptionTier,
         selectedCheckMark: Boolean = false,
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
@@ -197,6 +198,7 @@ object OnboardingUpgradeHelper {
                 ConstrainedTopText(
                     buttonRef = buttonRef,
                     topText = it,
+                    subscriptionTier = subscriptionTier,
                     isSelected = true
                 )
             }
@@ -209,6 +211,7 @@ object OnboardingUpgradeHelper {
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         topText: String? = null,
+        subscriptionTier: SubscriptionTier,
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
         ConstraintLayout(modifier) {
@@ -239,7 +242,8 @@ object OnboardingUpgradeHelper {
                 ConstrainedTopText(
                     buttonRef = buttonRef,
                     topText = it,
-                    isSelected = false
+                    isSelected = false,
+                    subscriptionTier = subscriptionTier,
                 )
             }
         }
@@ -248,13 +252,24 @@ object OnboardingUpgradeHelper {
     @Composable
     fun TopText(
         topText: String,
+        subscriptionTier: SubscriptionTier,
         modifier: Modifier = Modifier,
         selected: Boolean = true,
     ) {
+        val brush = when (subscriptionTier) {
+            SubscriptionTier.PLUS -> plusGradientBrush
+            SubscriptionTier.PATRON -> patronGradientBrush
+            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+        }
+        val textColor = when (subscriptionTier) {
+            SubscriptionTier.PLUS -> Color.Black
+            SubscriptionTier.PATRON -> Color.White
+            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+        }
         Box(
             modifier = if (selected) {
                 modifier.background(
-                    brush = plusGradientBrush,
+                    brush = brush,
                     shape = RoundedCornerShape(4.dp)
                 )
             } else {
@@ -266,7 +281,7 @@ object OnboardingUpgradeHelper {
         ) {
             TextP60(
                 text = topText,
-                color = Color.Black,
+                color = textColor,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(
@@ -281,6 +296,7 @@ object OnboardingUpgradeHelper {
     private fun ConstraintLayoutScope.ConstrainedTopText(
         buttonRef: ConstrainedLayoutReference,
         topText: String,
+        subscriptionTier: SubscriptionTier,
         isSelected: Boolean,
     ) {
         val topTextRef = createRef()
@@ -293,6 +309,7 @@ object OnboardingUpgradeHelper {
             }
         TopText(
             topText = topText,
+            subscriptionTier = subscriptionTier,
             selected = isSelected,
             modifier = topTextModifier
         )
@@ -318,16 +335,16 @@ object OnboardingUpgradeHelper {
     @Composable
     fun UpgradeBackground(
         modifier: Modifier = Modifier,
-        tier: Subscription.SubscriptionTier,
+        tier: SubscriptionTier,
         @DrawableRes backgroundGlowsRes: Int,
         content: @Composable () -> Unit,
     ) {
         Box(modifier) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 when (tier) {
-                    Subscription.SubscriptionTier.PLUS -> PlusBlurredCanvasBackground()
-                    Subscription.SubscriptionTier.PATRON -> PatronBlurredCanvasBackground()
-                    Subscription.SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown tier")
+                    SubscriptionTier.PLUS -> PlusBlurredCanvasBackground()
+                    SubscriptionTier.PATRON -> PatronBlurredCanvasBackground()
+                    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown tier")
                 }
             } else {
                 ImageBackground(backgroundGlowsRes)

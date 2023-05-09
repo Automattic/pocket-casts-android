@@ -30,74 +30,69 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
     app: Application,
 ) : AndroidViewModel(app) {
 
-    sealed class State(
-        open val numPeriodFree: String?
-    ) {
+    sealed class State {
         data class Loaded(
-            override val numPeriodFree: String?,
             val featureCardsState: FeatureCardsState,
             val upgradeButtons: List<UpgradeButton>,
-        ) : State(numPeriodFree)
+        ) : State()
 
         data class OldLoaded(
-            override val numPeriodFree: String?
-        ) : State(numPeriodFree)
+            val numPeriodFree: String?
+        ) : State()
 
-        object Empty : State(null)
+        object Loading : State()
     }
 
-    private val _state: MutableStateFlow<State> = MutableStateFlow(State.Empty)
+    private val _state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
     val state = _state as StateFlow<State>
 
     init {
-        val isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
-        if (isFreeTrialEligible) {
-            viewModelScope.launch {
-                subscriptionManager
-                    .observeProductDetails()
-                    .asFlow()
-                    .collect { productDetailsState ->
-                        val subscriptions = (productDetailsState as? ProductDetailsState.Loaded)
-                            ?.productDetails
-                            ?.mapNotNull { details ->
-                                Subscription.fromProductDetails(
-                                    productDetails = details,
-                                    isFreeTrialEligible = isFreeTrialEligible
-                                )
-                            } ?: emptyList()
-                        val defaultSubscription = subscriptionManager.getDefaultSubscription(subscriptions)
+        viewModelScope.launch {
+            subscriptionManager
+                .observeProductDetails()
+                .asFlow()
+                .collect { productDetailsState ->
+                    val isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                    val subscriptions = (productDetailsState as? ProductDetailsState.Loaded)
+                        ?.productDetails
+                        ?.mapNotNull { details ->
+                            Subscription.fromProductDetails(
+                                productDetails = details,
+                                isFreeTrialEligible = isFreeTrialEligible
+                            )
+                        } ?: emptyList()
+                    val defaultSubscription = subscriptionManager.getDefaultSubscription(subscriptions)
+                    if (BuildConfig.ADD_PATRON_ENABLED) {
+                        defaultSubscription?.let {
+                            val upgradeButtons = subscriptions.map { it.tier }
+                                .mapNotNull { tier ->
+                                    subscriptionManager.getDefaultSubscription(
+                                        subscriptions = subscriptions,
+                                        tier = tier,
+                                        frequency = SubscriptionFrequency.YEARLY
+                                    )?.toUpgradeButton()
+                                }
+
+                            val currentTier = SubscriptionMapper.mapProductIdToTier(defaultSubscription.productDetails.productId)
+                            _state.value = State.Loaded(
+                                featureCardsState = FeatureCardsState(
+                                    subscriptions = subscriptions,
+                                    currentFeatureCard = currentTier.toUpgradeFeatureCard()
+                                ),
+                                upgradeButtons = upgradeButtons
+                            )
+                        }
+                    } else {
                         val numPeriodFree = if (defaultSubscription is Subscription.WithTrial) {
                             defaultSubscription.trialPricingPhase.numPeriodFreeTrial(getApplication<Application>().resources)
                         } else {
                             null
                         }
-                        if (BuildConfig.ADD_PATRON_ENABLED) {
-                            defaultSubscription?.let {
-                                val upgradeButtons = subscriptions.map { it.tier }
-                                    .mapNotNull { tier ->
-                                        subscriptionManager.getDefaultSubscription(
-                                            subscriptions = subscriptions,
-                                            tier = tier,
-                                            frequency = SubscriptionFrequency.YEARLY
-                                        )?.toUpgradeButton()
-                                    }
-                                val currentTier = SubscriptionMapper.mapProductIdToTier(defaultSubscription.productDetails.productId)
-                                _state.value = State.Loaded(
-                                    numPeriodFree = numPeriodFree?.uppercase(Locale.getDefault()),
-                                    featureCardsState = FeatureCardsState(
-                                        subscriptions = subscriptions,
-                                        currentFeatureCard = currentTier.toUpgradeFeatureCard()
-                                    ),
-                                    upgradeButtons = upgradeButtons
-                                )
-                            }
-                        } else {
-                            _state.value = State.OldLoaded(
-                                numPeriodFree = numPeriodFree?.uppercase(Locale.getDefault())
-                            )
-                        }
+                        _state.value = State.OldLoaded(
+                            numPeriodFree = numPeriodFree?.uppercase(Locale.getDefault())
+                        )
                     }
-            }
+                }
         }
     }
 
