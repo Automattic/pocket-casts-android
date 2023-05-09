@@ -5,6 +5,8 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_MONTHLY_PRODUCT_ID
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
@@ -13,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionPurchaseRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.SubscriptionResponse
@@ -158,7 +161,22 @@ class SubscriptionManagerImpl @Inject constructor(
                     .setProductId(PLUS_YEARLY_PRODUCT_ID)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
-            )
+            ).apply {
+                if (BuildConfig.ADD_PATRON_ENABLED) {
+                    add(
+                        QueryProductDetailsParams.Product.newBuilder()
+                            .setProductId(PATRON_MONTHLY_PRODUCT_ID)
+                            .setProductType(BillingClient.ProductType.SUBS)
+                            .build(),
+                    )
+                    add(
+                        QueryProductDetailsParams.Product.newBuilder()
+                            .setProductId(PATRON_YEARLY_PRODUCT_ID)
+                            .setProductType(BillingClient.ProductType.SUBS)
+                            .build(),
+                    )
+                }
+            }
 
         val params = QueryProductDetailsParams.newBuilder()
             .setProductList(productList)
