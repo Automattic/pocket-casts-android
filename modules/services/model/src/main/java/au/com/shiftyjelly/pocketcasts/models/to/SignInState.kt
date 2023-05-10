@@ -26,9 +26,6 @@ sealed class SignInState {
     val isSignedInAsPlusPaid: Boolean
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && paidSubscriptionPlatforms.contains(this.subscriptionStatus.platform)
 
-    val isSignedInAsPlusGifted: Boolean
-        get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && this.subscriptionStatus.platform == SubscriptionPlatform.GIFT && this.subscriptionStatus.giftDays != 0
-
     val isLifetimePlus: Boolean
         get() = this is SignedIn && this.subscriptionStatus.isLifetimePlus
 
