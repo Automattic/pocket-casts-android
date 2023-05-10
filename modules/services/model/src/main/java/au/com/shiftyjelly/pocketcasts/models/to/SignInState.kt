@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
+import au.com.shiftyjelly.pocketcasts.model.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
@@ -21,7 +22,7 @@ sealed class SignInState {
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && this.subscriptionStatus.type == SubscriptionType.PLUS
 
     val isSignedInAsPatron: Boolean
-        get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && this.subscriptionStatus.type == SubscriptionType.PATRON
+        get() = BuildConfig.ADD_PATRON_ENABLED && this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && this.subscriptionStatus.type == SubscriptionType.PATRON
 
     val isSignedInAsPlusPaid: Boolean
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && paidSubscriptionPlatforms.contains(this.subscriptionStatus.platform)
