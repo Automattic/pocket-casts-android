@@ -20,8 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.images.R
 
 private val iconSizeInDp = 14.dp
 private val pillCornerRadiusInDp = 800.dp
@@ -40,6 +39,7 @@ fun SubscriptionTierPill(
     Card(
         shape = RoundedCornerShape(pillCornerRadiusInDp),
         backgroundColor = backgroundColor ?: bgColor,
+        modifier = modifier,
     ) {
         Row(
             modifier = Modifier
@@ -50,7 +50,7 @@ fun SubscriptionTierPill(
             Icon(
                 painter = painterResource(iconRes),
                 contentDescription = null,
-                modifier = modifier
+                modifier = Modifier
                     .size(iconSizeInDp)
                     .background(bgColor),
                 tint = iconColor,
@@ -69,7 +69,8 @@ fun SubscriptionTierPill(
 @Composable
 private fun SubscriptionTierPillPreview() {
     SubscriptionTierPill(
-        iconRes = IR.drawable.ic_patron,
-        shortNameRes = LR.string.pocket_casts_patron_short,
+        iconRes = R.drawable.ic_patron,
+        shortNameRes = au.com.shiftyjelly.pocketcasts.localization.R.string.pocket_casts_patron_short,
+        backgroundColor = Color.Black,
     )
 }

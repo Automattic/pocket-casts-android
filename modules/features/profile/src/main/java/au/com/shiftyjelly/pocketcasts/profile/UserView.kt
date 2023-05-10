@@ -6,13 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
 import au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDaysMonthsOrYears
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -21,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.days
@@ -50,6 +55,8 @@ open class UserView @JvmOverloads constructor(
     val imgProfilePicture: ProfileCircleView
     val btnAccount: Button?
     private val subscriptionTierPill: ComposeView?
+    private val isDarkTheme: Boolean
+        get() = Theme.isDark(context)
 
     init {
         LayoutInflater.from(context).inflate(layoutResource, this, true)
@@ -149,14 +156,28 @@ open class UserView @JvmOverloads constructor(
         subscriptionTierPill?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                if (signInState is SignInState.SignedIn && signInState.isSignedInAsPatron) {
-                    SubscriptionTierPill(
-                        iconRes = IR.drawable.ic_patron,
-                        shortNameRes = LR.string.pocket_casts_patron_short,
-                        iconColor = Color.White,
-                        backgroundColor = colorResource(UR.color.patron_purple),
-                        textColor = colorResource(UR.color.patron_purple_light),
-                    )
+                AppTheme(if (isDarkTheme) Theme.ThemeType.DARK else Theme.ThemeType.LIGHT) {
+                    if (signInState is SignInState.SignedIn) {
+                        val isExpandedUserView = this@UserView is ExpandedUserView
+                        val modifier = Modifier.padding(top = 16.dp)
+                        if (signInState.isSignedInAsPatron) {
+                            SubscriptionTierPill(
+                                iconRes = IR.drawable.ic_patron,
+                                shortNameRes = LR.string.pocket_casts_patron_short,
+                                iconColor = if (!isExpandedUserView) Color.White else Color.Unspecified,
+                                backgroundColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple) else null,
+                                textColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple_light) else null,
+                                modifier = if (isExpandedUserView) modifier else Modifier,
+                            )
+                        } else if (signInState.isSignedInAsPlus) {
+                            SubscriptionTierPill(
+                                iconRes = IR.drawable.ic_plus,
+                                shortNameRes = LR.string.pocket_casts_plus_short,
+                                iconColor = colorResource(UR.color.plus_gold),
+                                modifier = if (isExpandedUserView) modifier else Modifier,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -178,17 +199,11 @@ class ExpandedUserView @JvmOverloads constructor(
 ) : UserView(context, attrs, defStyleAttr) {
     override val layoutResource: Int
         get() = R.layout.view_expanded_user
-    val lblAccountType: TextView
-        get() = findViewById(R.id.lblAccountType)
     val lblPaymentStatus: TextView
         get() = findViewById(R.id.lblPaymentStatus)
 
     override fun update(signInState: SignInState?) {
         super.update(signInState)
-
-        val strPocketCasts = context.getString(LR.string.pocket_casts)
-        val strPocketCastsPlus = context.getString(LR.string.pocket_casts_plus)
-        lblAccountType.text = if (signInState?.isSignedInAsPlus == true) strPocketCastsPlus else strPocketCasts
 
         val status = (signInState as? SignInState.SignedIn)?.subscriptionStatus ?: return
         when (status) {

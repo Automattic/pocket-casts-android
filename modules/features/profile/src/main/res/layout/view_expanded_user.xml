@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="?attr/primary_ui_02"
     android:paddingBottom="8dp"
-    tools:layout_height="200dp">
+    tools:layout_height="wrap_content">
 
     <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
         android:id="@+id/imgProfilePicture"
@@ -30,16 +30,13 @@
         app:layout_constraintTop_toBottomOf="@+id/imgProfilePicture"
         tools:text="Setup Account" />
 
-    <TextView
-        android:id="@+id/lblAccountType"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/subscriptionTierPill"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/H40"
-        android:textColor="?attr/primary_text_02"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblUserEmail"
-        tools:text="Pocket Casts Plus" />
+        app:layout_constraintTop_toBottomOf="@id/lblUserEmail" />
 
     <TextView
         android:id="@+id/lblPaymentStatus"
@@ -53,7 +50,7 @@
         android:gravity="start"
         app:layout_constraintEnd_toStartOf="@id/lblSignInStatus"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblAccountType"
+        app:layout_constraintTop_toBottomOf="@+id/subscriptionTierPill"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Next payment:" />
 
@@ -68,7 +65,7 @@
         android:textColor="?attr/primary_text_01"
         android:gravity="end"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblAccountType"
+        app:layout_constraintTop_toBottomOf="@+id/subscriptionTierPill"
         app:layout_constraintStart_toEndOf="@id/lblPaymentStatus"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Not signed in" />

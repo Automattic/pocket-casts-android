@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -125,7 +124,6 @@ private fun FeatureCard(
             SubscriptionTierPill(
                 iconRes = card.iconRes,
                 shortNameRes = card.shortNameRes,
-                modifier = Modifier.background(Color.Black)
             )
 
             AmountView(button.subscription)
