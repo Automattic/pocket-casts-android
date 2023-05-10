@@ -14,13 +14,18 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusFragment
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.HelpViewModel
@@ -33,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
@@ -42,9 +48,11 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 @AndroidEntryPoint
 class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
+    @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     @Inject lateinit var settings: Settings
-    @Inject lateinit var theme: Theme
+    @Inject lateinit var subscriptionManager: SubscriptionManager
     @Inject lateinit var support: Support
+    @Inject lateinit var theme: Theme
 
     val viewModel by viewModels<HelpViewModel>()
 
@@ -98,7 +106,9 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
         loadingView = view.findViewById(VR.id.progress_circle)
         layoutError = view.findViewById(VR.id.layoutLoadingError)
 
-        view.findViewById<Button>(VR.id.btnContactSupport).setOnClickListener { sendSupportEmail() }
+        view.findViewById<Button>(VR.id.btnContactSupport).setOnClickListener {
+            contactSupport()
+        }
 
         return view
     }
@@ -148,7 +158,9 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
             when {
                 url.lowercase(Locale.ROOT).contains("feedback") -> sendFeedbackEmail()
-                url.startsWith("mailto:support@shiftyjelly.com") || url.startsWith("mailto:support@pocketcasts.com") -> sendSupportEmail()
+                url.startsWith("mailto:support@shiftyjelly.com") || url.startsWith("mailto:support@pocketcasts.com") -> {
+                    contactSupport()
+                }
                 url.startsWith("https://support.pocketcasts.com") -> {
                     if (!url.contains("device=android")) {
                         url += (if (url.contains("?")) "&" else "?") + "device=android"
@@ -208,12 +220,41 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
             }
         }
 
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_LEAVE_FEEDBACK)
         FirebaseAnalyticsTracker.userGuideEmailFeedback()
+    }
+
+    private fun contactSupport() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val subscriptionStatus = subscriptionManager.getSubscriptionStatus().await()
+
+            if (subscriptionStatus is SubscriptionStatus.Free) {
+                useForumPopup()
+            } else {
+                sendSupportEmail()
+            }
+        }
+
+        analyticsTracker.track(AnalyticsEvent.SETTINGS_GET_SUPPORT)
+        FirebaseAnalyticsTracker.userGuideEmailSupport()
+    }
+
+    private fun useForumPopup() {
+        val context = context ?: return
+        val forumUrl = "https://forums.pocketcasts.com/"
+        AlertDialog.Builder(context)
+            .setTitle(LR.string.settings_forums)
+            .setMessage(context.getString(LR.string.settings_forums_description, forumUrl))
+            .setPositiveButton(LR.string.settings_take_me_there) { _, _ ->
+                val intent =
+                    Intent(Intent.ACTION_VIEW, Uri.parse(forumUrl))
+                startActivity(intent)
+            }
+            .show()
     }
 
     private fun sendSupportEmail() {
         val context = context ?: return
-
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val intent = support.shareLogs(
@@ -227,7 +268,5 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
                 UiUtil.displayDialogNoEmailApp(context)
             }
         }
-
-        FirebaseAnalyticsTracker.userGuideEmailSupport()
     }
 }

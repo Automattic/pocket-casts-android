@@ -1295,6 +1295,9 @@
     <string name="settings_status_service_hosts_help">The most common cause is that you have an ad-blocker configured on your phone or network. You’ll need to unblock this domain to download podcasts. Please note Pocket Casts doesn’t host or choose where podcasts are hosted, that’s up to the author of the show and is out of our control.</string>
     <string name="settings_status_service_support">Support</string>
     <string name="settings_status_service_support_summary">Access to the support FAQ and contact us.</string>
+    <string name="settings_forums">Pocket Casts Forums</string>
+    <string name="settings_forums_description">Please go to Pocket Casts\' forums (%1$s) where our support team can help you.</string>
+    <string name="settings_take_me_there">Take me there</string>
     <string name="settings_about_share_with_friends">Share with friends</string>
     <string name="settings_about_share_with_friends_message">Hey! Here is a link to download the Pocket Casts app. I\'m really enjoying it and thought you might too. \nhttps://www.pocketcasts.com</string>
     <string name="settings_about_rate_us">Rate us</string>
