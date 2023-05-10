@@ -9,8 +9,8 @@
 
     <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
         android:id="@+id/imgProfilePicture"
-        android:layout_width="@dimen/profile_picture_size_new"
-        android:layout_height="@dimen/profile_picture_size_new"
+        android:layout_width="@dimen/profile_picture_size"
+        android:layout_height="@dimen/profile_picture_size"
         android:importantForAccessibility="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="W,1:1"
