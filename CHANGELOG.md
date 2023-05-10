@@ -1,5 +1,8 @@
 7.39
 -----
+*   New Features:
+    *   Added the ability to see ratings for podcasts
+        ([#951](https://github.com/Automattic/pocket-casts-android/pull/951)).
 
 7.38
 -----

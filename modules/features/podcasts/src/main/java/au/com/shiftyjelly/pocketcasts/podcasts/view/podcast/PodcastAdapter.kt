@@ -276,10 +276,8 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
-            if (BuildConfig.SHOW_RATINGS) {
-                ratingsViewModel.loadRatings(podcast.uuid)
-                ratingsViewModel.refreshPodcastRatings(podcast.uuid)
-            }
+            ratingsViewModel.loadRatings(podcast.uuid)
+            ratingsViewModel.refreshPodcastRatings(podcast.uuid)
             onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast
