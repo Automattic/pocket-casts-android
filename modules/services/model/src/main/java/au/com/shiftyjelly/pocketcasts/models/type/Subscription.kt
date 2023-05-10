@@ -62,10 +62,11 @@ sealed interface Subscription {
     enum class SubscriptionTier { PLUS, PATRON, UNKNOWN }
 
     companion object {
-        const val PATRON_PRODUCT_BASE = "com.pocketcasts.patron"
         const val PLUS_PRODUCT_BASE = "com.pocketcasts.plus"
         const val PLUS_MONTHLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.monthly"
         const val PLUS_YEARLY_PRODUCT_ID = "$PLUS_PRODUCT_BASE.yearly"
+        const val PATRON_MONTHLY_PRODUCT_ID = "com.pocketcasts.monthly.patron"
+        const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
 
         fun fromProductDetails(productDetails: ProductDetails, isFreeTrialEligible: Boolean): Subscription? =
             SubscriptionMapper.map(productDetails, isFreeTrialEligible)

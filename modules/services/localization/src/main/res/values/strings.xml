@@ -82,6 +82,7 @@
     <string name="stream">Stream</string>
     <string name="subscribe">Subscribe</string>
     <string name="subscribe_to">Subscribe to %s</string>
+    <string name="upgrade_to">Upgrade to %s</string>
     <string name="unarchive_all">Unarchive all</string>
     <string name="unplayed">Unplayed</string>
     <string name="unsubscribe">Unsubscribe</string>
@@ -636,6 +637,7 @@
     <string name="profile">Profile</string>
     <string name="profile_access_ended">Access ended: %s</string>
     <string name="profile_access_ends">Access ends: %s</string>
+    <string name="profile_account">Account</string>
     <string name="profile_account_upgraded">Account Upgraded</string>
     <string name="profile_account_created">Account Created</string>
     <string name="profile_account_delete" translatable="false">@string/delete</string>
@@ -792,6 +794,7 @@
     <string name="profile_password">Password</string>
     <string name="profile_password_changed">Password Changed</string>
     <string name="profile_password_changed_successful">Successful!</string>
+    <string name="profile_patron_expires_in">Patron expires in %s</string>
     <string name="profile_payment_cancelled">Payment Cancelled</string>
     <string name="profile_payment_failed">Payment Failed</string>
     <string name="profile_payment_failed_detail">It looks like there was a problem processing your payment. Please try again.</string>
@@ -829,7 +832,7 @@
     <string name="profile_reset_password_sent">Password Reset Link Sent</string>
     <string name="profile_reset_password_check_email">Please check your email</string>
     <string name="profile_save_your_podcasts">Save your podcasts in the cloud and sync your progress with other devices</string>
-    <string name="profile_set_up_account">Set Up Account</string>
+    <string name="profile_set_up_account">Set up account</string>
     <string name="profile_share_stats">Share stats</string>
     <string name="profile_sign_in" translatable="false">@string/sign_in</string>
     <string name="profile_sign_in_or_create_account">Sign in or create account</string>
@@ -907,6 +910,7 @@
     <string name="profile_updates_ended">Updates ended: %s</string>
     <string name="profile_updates_ends">Updates end: %s</string>
     <string name="profile_upgrade_to_plus">Upgrade to Plus</string>
+    <string name="profile_upgrade_to_patron">Upgrade to Patron</string>
     <string name="profile_web_player">Web Player</string>
     <string name="profile_welcome_to_free">Welcome to Pocket Casts!</string>
     <string name="profile_welcome_to_plus">Welcome to Pocket Casts Plus!</string>
@@ -1558,6 +1562,7 @@
     <string name="onboarding_patron_feature_profile_badge_title">Supporters profile badge</string>
     <string name="onboarding_patron_feature_special_icons_title">Special Pocket Casts app icons</string>
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
+    <string name="onboarding_patron_subscribe">Subscribe to Pocket&#160;Casts Patron</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
@@ -1573,6 +1578,7 @@
     <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
     <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start free trial &amp; subscribe</string>
+    <string name="onboarding_plus_subscribe">Subscribe to Pocket&#160;Casts Plus</string>
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Can be canceled at any time.</string>
     <string name="onboarding_welcome_get_you_listening">Welcome, now let\'s get you listening!</string>

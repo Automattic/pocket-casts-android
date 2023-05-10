@@ -1,12 +1,6 @@
 7.39
 -----
 
-7.37.1
------
-* Bug Fixes:
-    *    Fixed an issue that could cause users to be repeatedly logged out of the app.
-         ([#930](https://github.com/Automattic/pocket-casts-android/pull/930)).
-
 7.38
 -----
 *   Updates:
@@ -24,9 +18,16 @@
     *   Fixed the show notes' timestamps not getting converted to a link if it contained another link 
         ([#814](https://github.com/Automattic/pocket-casts-android/issues/814)).
     *   Prevented crash when signing out of Android Automotive and clearing data while playback is in progress
-        ([#919](https://github.com/Automattic/pocket-casts-android/pull/919)).    
+        ([#919](https://github.com/Automattic/pocket-casts-android/pull/919)).
     *   Fixed keyboard not appearing when creating or editing folders.
         ([#946](https://github.com/Automattic/pocket-casts-android/pull/946)).
+
+ 
+7.37.1
+-----
+* Bug Fixes:
+    *    Fixed an issue that could cause users to be repeatedly logged out of the app.
+         ([#930](https://github.com/Automattic/pocket-casts-android/pull/930)).
 
 7.37
 -----

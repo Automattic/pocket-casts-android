@@ -70,7 +70,8 @@ class SyncManagerImpl @Inject constructor(
     }
 
     companion object {
-        private const val TRACKS_KEY_SIGN_IN_SOURCE = "sign_in_source"
+        private const val TRACKS_KEY_SOURCE_IN_CODE = "source_in_code"
+        private const val TRACKS_KEY_SOURCE = "source"
         private const val TRACKS_KEY_ERROR_CODE = "error_code"
     }
 
@@ -136,7 +137,6 @@ class SyncManagerImpl @Inject constructor(
                 email = account.name,
                 refreshToken = refreshToken,
                 signInType = signInType,
-                signInSource = SignInSource.AccountAuthenticator
             )
 
             // update the refresh token as the expiry may have been increased
@@ -188,12 +188,17 @@ class SyncManagerImpl @Inject constructor(
         val loginResult = try {
             val response = loginFunction()
             val result = handleTokenResponse(loginIdentity = loginIdentity, response = response)
+
+            settings.setFullySignedOut(false)
+
             LoginResult.Success(result)
         } catch (ex: Exception) {
             Timber.e(ex, "Failed to sign in with Pocket Casts")
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
         }
-        trackSignIn(loginResult, signInSource)
+
+        trackSignIn(loginResult, signInSource, loginIdentity)
+
         return loginResult
     }
 
@@ -405,16 +410,58 @@ class SyncManagerImpl @Inject constructor(
         return LoginResult.Failed(message = message, messageId = messageId)
     }
 
-    private fun trackSignIn(loginResult: LoginResult, signInSource: SignInSource) {
-        val properties = mapOf(TRACKS_KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
+    private fun trackSignIn(
+        loginResult: LoginResult,
+        signInSource: SignInSource,
+        loginIdentity: LoginIdentity,
+    ) {
+        val source = when (loginIdentity) {
+            LoginIdentity.Google -> "google"
+            LoginIdentity.PocketCasts -> "password"
+        }
         when (loginResult) {
             is LoginResult.Success -> {
-                analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
+                when (signInSource) {
+
+                    SignInSource.WatchPhoneSync ->
+                        analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN_WATCH_FROM_PHONE)
+
+                    is SignInSource.UserInitiated ->
+                        analyticsTracker.track(
+                            event = if (loginResult.result.isNewAccount) {
+                                AnalyticsEvent.USER_ACCOUNT_CREATED
+                            } else {
+                                AnalyticsEvent.USER_SIGNED_IN
+                            },
+                            properties = mapOf(
+                                TRACKS_KEY_SOURCE to source,
+                                TRACKS_KEY_SOURCE_IN_CODE to signInSource.analyticsValue,
+                            )
+                        )
+                }
             }
             is LoginResult.Failed -> {
                 val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
-                val errorProperties = properties.plus(TRACKS_KEY_ERROR_CODE to errorCodeValue)
-                analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, errorProperties)
+                when (signInSource) {
+
+                    SignInSource.WatchPhoneSync ->
+                        analyticsTracker.track(
+                            AnalyticsEvent.USER_SIGNIN_WATCH_FROM_PHONE_FAILED,
+                            mapOf(
+                                TRACKS_KEY_ERROR_CODE to errorCodeValue,
+                            )
+                        )
+
+                    is SignInSource.UserInitiated ->
+                        analyticsTracker.track(
+                            AnalyticsEvent.USER_SIGNIN_FAILED,
+                            mapOf(
+                                TRACKS_KEY_SOURCE to source,
+                                TRACKS_KEY_SOURCE_IN_CODE to signInSource.analyticsValue,
+                                TRACKS_KEY_ERROR_CODE to errorCodeValue,
+                            )
+                        )
+                }
             }
         }
     }
@@ -422,7 +469,10 @@ class SyncManagerImpl @Inject constructor(
     private fun trackRegister(loginResult: LoginResult) {
         when (loginResult) {
             is LoginResult.Success -> {
-                analyticsTracker.track(AnalyticsEvent.USER_ACCOUNT_CREATED)
+                analyticsTracker.track(
+                    AnalyticsEvent.USER_ACCOUNT_CREATED,
+                    mapOf(TRACKS_KEY_SOURCE to "password") // This method is only used when creating an account with a password
+                )
             }
             is LoginResult.Failed -> {
                 val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
@@ -439,22 +489,12 @@ class SyncManagerImpl @Inject constructor(
     private suspend fun downloadTokens(
         email: String,
         refreshToken: RefreshToken,
-        signInSource: SignInSource,
-        signInType: AccountConstants.SignInType,
-    ): LoginTokenResponse {
-        val properties = mapOf(TRACKS_KEY_SIGN_IN_SOURCE to signInSource.analyticsValue)
-        try {
-            val response = when (signInType) {
-                AccountConstants.SignInType.Password -> syncServerManager.login(email = email, password = refreshToken.value)
-                AccountConstants.SignInType.Tokens -> syncServerManager.loginToken(refreshToken = refreshToken)
-            }
-            analyticsTracker.track(AnalyticsEvent.USER_SIGNED_IN, properties)
-            return response
-        } catch (ex: Exception) {
-            analyticsTracker.track(AnalyticsEvent.USER_SIGNIN_FAILED, properties)
-            throw ex
+        signInType: AccountConstants.SignInType
+    ): LoginTokenResponse =
+        when (signInType) {
+            AccountConstants.SignInType.Password -> syncServerManager.login(email = email, password = refreshToken.value)
+            AccountConstants.SignInType.Tokens -> syncServerManager.loginToken(refreshToken = refreshToken)
         }
-    }
 
     private suspend fun <T : Any> getCacheTokenOrLogin(serverCall: suspend (token: AccessToken) -> T): T {
         if (isLoggedIn()) {

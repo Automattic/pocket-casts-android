@@ -92,7 +92,7 @@ internal class DiscoverAdapter(
     val staticServerManager: StaticServerManagerImpl,
     val listener: Listener,
     val theme: Theme,
-    val loadPodcastList: (String) -> Flowable<PodcastList>,
+    loadPodcastList: (String) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
@@ -106,6 +106,10 @@ internal class DiscoverAdapter(
         fun onSearchClicked()
     }
 
+    val loadPodcastList = { s: String ->
+        loadPodcastList(s)
+            .distinctUntilChanged()
+    }
     var onChangeRegion: (() -> Unit)? = null
 
     init {

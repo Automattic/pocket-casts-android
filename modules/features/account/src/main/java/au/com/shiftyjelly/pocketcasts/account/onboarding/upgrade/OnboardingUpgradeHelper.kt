@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
-import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -33,6 +32,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalUriHandler
@@ -47,11 +47,13 @@ import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintLayoutScope
 import au.com.shiftyjelly.pocketcasts.account.R
+import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.Clickable
 import au.com.shiftyjelly.pocketcasts.compose.components.ClickableTextHelper
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.extensions.brush
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -61,15 +63,21 @@ object OnboardingUpgradeHelper {
         0f to Color(0xFFFED745),
         1f to Color(0xFFFEB525),
     )
+    val patronGradientBrush = Brush.horizontalGradient(
+        0f to Color(0xFFAFA2fA),
+        1f to Color(0xFFAFA2fA),
+    )
+
     private val unselectedColor = Color(0xFF666666)
 
     @Composable
     fun UpgradeRowButton(
         primaryText: String,
-        backgroundColor: Long,
-        textColor: Long,
+        backgroundColor: Color,
+        textColor: Color,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
+        fontWeight: FontWeight = FontWeight.W600,
         secondaryText: String? = null,
     ) {
         Button(
@@ -77,20 +85,26 @@ object OnboardingUpgradeHelper {
             shape = RoundedCornerShape(12.dp),
             modifier = modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(backgroundColor),
+                backgroundColor = backgroundColor,
             ),
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                TextH30(
+                AutoResizeText(
                     text = primaryText,
-                    color = Color(textColor),
+                    color = textColor,
+                    maxFontSize = 18.sp,
+                    lineHeight = 21.sp,
+                    fontWeight = fontWeight,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
                 )
-                secondaryText?.let { subTitle ->
+                secondaryText?.let {
                     TextP60(
-                        text = subTitle,
-                        color = Color(textColor),
+                        text = it,
+                        textAlign = TextAlign.Center,
+                        color = textColor,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -132,13 +146,15 @@ object OnboardingUpgradeHelper {
     }
 
     @Composable
-    fun PlusOutlinedRowButton(
+    fun OutlinedRowButton(
         text: String,
-        topText: String? = null,
+        brush: Brush,
         onClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        topText: String? = null,
+        subscriptionTier: SubscriptionTier,
         selectedCheckMark: Boolean = false,
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-        modifier: Modifier = Modifier,
     ) {
 
         ConstraintLayout(modifier) {
@@ -147,7 +163,7 @@ object OnboardingUpgradeHelper {
             Button(
                 onClick = onClick,
                 shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(2.dp, plusGradientBrush),
+                border = BorderStroke(2.dp, brush),
                 elevation = null,
                 interactionSource = interactionSource,
                 colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent),
@@ -161,16 +177,16 @@ object OnboardingUpgradeHelper {
                         text = text,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
+                            .brush(brush)
                             .padding(vertical = 6.dp, horizontal = 24.dp)
                             .align(Alignment.Center)
-                            .brush(plusGradientBrush)
                     )
                     if (selectedCheckMark) {
                         Icon(
                             painter = painterResource(IR.drawable.plus_check),
                             contentDescription = null,
                             modifier = Modifier
-                                .brush(plusGradientBrush)
+                                .brush(brush)
                                 .align(Alignment.CenterEnd)
                                 .width(24.dp)
                         )
@@ -182,6 +198,7 @@ object OnboardingUpgradeHelper {
                 ConstrainedTopText(
                     buttonRef = buttonRef,
                     topText = it,
+                    subscriptionTier = subscriptionTier,
                     isSelected = true
                 )
             }
@@ -189,12 +206,13 @@ object OnboardingUpgradeHelper {
     }
 
     @Composable
-    fun UnselectedPlusOutlinedRowButton(
+    fun UnselectedOutlinedRowButton(
         text: String,
-        topText: String? = null,
         onClick: () -> Unit,
-        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
         modifier: Modifier = Modifier,
+        topText: String? = null,
+        subscriptionTier: SubscriptionTier,
+        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
         ConstraintLayout(modifier) {
 
@@ -224,7 +242,8 @@ object OnboardingUpgradeHelper {
                 ConstrainedTopText(
                     buttonRef = buttonRef,
                     topText = it,
-                    isSelected = false
+                    isSelected = false,
+                    subscriptionTier = subscriptionTier,
                 )
             }
         }
@@ -233,13 +252,24 @@ object OnboardingUpgradeHelper {
     @Composable
     fun TopText(
         topText: String,
+        subscriptionTier: SubscriptionTier,
         modifier: Modifier = Modifier,
         selected: Boolean = true,
     ) {
+        val brush = when (subscriptionTier) {
+            SubscriptionTier.PLUS -> plusGradientBrush
+            SubscriptionTier.PATRON -> patronGradientBrush
+            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+        }
+        val textColor = when (subscriptionTier) {
+            SubscriptionTier.PLUS -> Color.Black
+            SubscriptionTier.PATRON -> Color.White
+            SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown subscription tier")
+        }
         Box(
             modifier = if (selected) {
                 modifier.background(
-                    brush = plusGradientBrush,
+                    brush = brush,
                     shape = RoundedCornerShape(4.dp)
                 )
             } else {
@@ -251,7 +281,7 @@ object OnboardingUpgradeHelper {
         ) {
             TextP60(
                 text = topText,
-                color = Color.Black,
+                color = textColor,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(
@@ -266,6 +296,7 @@ object OnboardingUpgradeHelper {
     private fun ConstraintLayoutScope.ConstrainedTopText(
         buttonRef: ConstrainedLayoutReference,
         topText: String,
+        subscriptionTier: SubscriptionTier,
         isSelected: Boolean,
     ) {
         val topTextRef = createRef()
@@ -278,6 +309,7 @@ object OnboardingUpgradeHelper {
             }
         TopText(
             topText = topText,
+            subscriptionTier = subscriptionTier,
             selected = isSelected,
             modifier = topTextModifier
         )
@@ -303,15 +335,16 @@ object OnboardingUpgradeHelper {
     @Composable
     fun UpgradeBackground(
         modifier: Modifier = Modifier,
-        @StringRes shortNamRes: Int,
+        tier: SubscriptionTier,
         @DrawableRes backgroundGlowsRes: Int,
         content: @Composable () -> Unit,
     ) {
         Box(modifier) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                when (shortNamRes) {
-                    LR.string.pocket_casts_plus_short -> PlusBlurredCanvasBackground()
-                    LR.string.pocket_casts_patron_short -> PatronBlurredCanvasBackground()
+                when (tier) {
+                    SubscriptionTier.PLUS -> PlusBlurredCanvasBackground()
+                    SubscriptionTier.PATRON -> PatronBlurredCanvasBackground()
+                    SubscriptionTier.UNKNOWN -> throw IllegalStateException("Unknown tier")
                 }
             } else {
                 ImageBackground(backgroundGlowsRes)
@@ -323,57 +356,45 @@ object OnboardingUpgradeHelper {
     @Composable
     @RequiresApi(Build.VERSION_CODES.S) // Blur only works on Android >=12
     private fun BoxScope.PlusBlurredCanvasBackground() {
+        val width = LocalConfiguration.current.screenWidthDp.dp
         Canvas(
             Modifier
                 .matchParentSize()
-                .blur(420.dp)
+                .blur(width * 0.8f)
         ) {
-            // Background
             drawRect(backgroundColor)
 
-            drawOval(
-                color = Color(0xFFFFD846),
-                topLeft = Offset(0f, size.height * .3f),
-                size = Size(size.width * 3.5f, size.height),
-                alpha = 0.8f,
-                blendMode = BlendMode.SrcOver,
-            )
-
-            drawCircle(
-                color = Color(0xFFD4B43A),
-                radius = size.width * 1.5f,
-                center = Offset(-size.width, size.height * 1.3f),
-            )
-
-            // Overlay
-            drawRect(Color(0xFF121212), alpha = 0.28f)
+            withTransform({ rotate(6f) }) {
+                drawOval(
+                    color = Color(0xFFD4B43A),
+                    topLeft = Offset(-size.width * 2.4f, 0f),
+                    size = Size(size.width * 3f, size.height * 1.3f),
+                    alpha = 0.66f,
+                    blendMode = BlendMode.SrcOver,
+                )
+            }
         }
     }
 
     @Composable
     @RequiresApi(Build.VERSION_CODES.S) // Blur only works on Android >=12
     private fun BoxScope.PatronBlurredCanvasBackground() {
+        val width = LocalConfiguration.current.screenWidthDp.dp
         Canvas(
             Modifier
                 .matchParentSize()
-                .blur(173.dp)
+                .blur(width * 0.5f)
         ) {
-            // Background
             drawRect(backgroundColor)
 
-            drawOval(
-                color = Color(0xFF503ACC),
-                topLeft = Offset(0f, size.height * .25f),
-                size = Size(size.width * 2f, size.height * .6f),
-                alpha = 0.9f,
-                blendMode = BlendMode.SrcOver,
-            )
-
-            drawCircle(
-                color = Color(0xFF402EA3),
-                radius = size.width * 0.9f,
-                center = Offset(-size.width / 2f, size.height * .7f),
-            )
+            withTransform({ rotate(6f) }) {
+                drawOval(
+                    color = Color(0xFF402EA3),
+                    topLeft = Offset(-size.width * 1.5f, size.height * .35f),
+                    size = Size(size.width * 2f, size.width * 1.8f),
+                    blendMode = BlendMode.SrcOver,
+                )
+            }
         }
     }
 

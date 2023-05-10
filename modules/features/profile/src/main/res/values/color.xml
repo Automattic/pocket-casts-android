@@ -2,4 +2,6 @@
 <resources>
     <color name="plus_gold_dark">#feb525</color>
     <color name="plus_gold_light">#fed745</color>
+    <color name="patron_purple">#6046f5</color>
+    <color name="patron_purple_light">#e4e0fd</color>
 </resources>

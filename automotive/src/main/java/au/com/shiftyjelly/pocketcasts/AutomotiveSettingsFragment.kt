@@ -41,15 +41,19 @@ class AutomotiveSettingsFragment : Fragment() {
                 }
 
                 userView.signedInState = signInState
-                userView.setOnClickListener {
-                    if (loggedIn) {
-                        val fragment = AccountDetailsFragment.newInstance()
-                        (activity as? AutomotiveSettingsActivity)?.addFragment(fragment)
-                    } else {
-                        signIn()
-                    }
-                }
+                userView.lblUserEmail.setOnClickListener { onProfileAccountButtonClicked(loggedIn) }
+                userView.imgProfilePicture.setOnClickListener { onProfileAccountButtonClicked(loggedIn) }
+                userView.btnAccount?.setOnClickListener { onProfileAccountButtonClicked(loggedIn) }
             }
+    }
+
+    private fun onProfileAccountButtonClicked(loggedIn: Boolean) {
+        if (loggedIn) {
+            val fragment = AccountDetailsFragment.newInstance()
+            (activity as? AutomotiveSettingsActivity)?.addFragment(fragment)
+        } else {
+            signIn()
+        }
     }
 
     fun signIn() {

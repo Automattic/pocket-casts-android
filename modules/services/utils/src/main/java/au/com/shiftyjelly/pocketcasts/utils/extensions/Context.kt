@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.PendingIntent
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.res.Configuration
 import android.view.accessibility.AccessibilityManager
 import androidx.appcompat.app.AppCompatActivity
 
@@ -23,3 +24,6 @@ fun Context.getActivity(): AppCompatActivity? = when (this) {
     is ContextWrapper -> baseContext.getActivity()
     else -> null
 }
+
+fun Context.isLandscape() =
+    resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE

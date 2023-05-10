@@ -26,8 +26,6 @@ class OnboardingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        theme.setupThemeForConfig(this, resources.configuration)
-
         // Make content edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -46,6 +44,10 @@ class OnboardingActivity : AppCompatActivity() {
                     }
                 } ?: throw IllegalStateException("Analytics flow not set")
 
+                if (shouldSetupTheme(onboardingFlow)) {
+                    theme.setupThemeForConfig(this, resources.configuration)
+                }
+
                 OnboardingFlowComposable(
                     theme = theme.activeTheme,
                     flow = onboardingFlow,
@@ -57,6 +59,11 @@ class OnboardingActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        theme.setupThemeForConfig(this, resources.configuration)
+    }
+
     private fun finishWithResult(result: OnboardingFinish) {
         setResult(
             Activity.RESULT_OK,
@@ -66,6 +73,9 @@ class OnboardingActivity : AppCompatActivity() {
         )
         finish()
     }
+
+    private fun shouldSetupTheme(onboardingFlow: OnboardingFlow) =
+        (onboardingFlow !is OnboardingFlow.PlusAccountUpgrade)
 
     companion object {
         fun newInstance(context: Context, onboardingFlow: OnboardingFlow) =

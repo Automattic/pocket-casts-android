@@ -10,7 +10,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
@@ -116,18 +119,22 @@ class AccountDetailsFragment : BaseFragment() {
 
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPlusPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPlusPaid
+            // TODO: Patron - hide if upgraded to patron
+            binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus && BuildConfig.ADD_PATRON_ENABLED
 
             binding.userUpgradeComposeView?.apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     AppTheme(theme.activeTheme) {
                         if (subscription != null && (signInState.isSignedInAsFree || giftExpiring)) {
+                            binding.dividerView15?.isVisible = BuildConfig.ADD_PATRON_ENABLED
                             ProfileUpgradeBanner(
                                 onClick = {
                                     val source = OnboardingUpgradeSource.PROFILE
                                     val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source)
                                     OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
-                                }
+                                },
+                                modifier = Modifier.padding(top = 16.dp)
                             )
                         }
                     }
@@ -159,6 +166,12 @@ class AccountDetailsFragment : BaseFragment() {
         binding.btnChangePwd?.setOnClickListener {
             val fragment = ChangePwdFragment.newInstance()
             (this.activity as FragmentHostListener).addFragment(fragment)
+        }
+
+        binding.btnUpgradeAccount?.setOnClickListener {
+            val source = OnboardingUpgradeSource.ACCOUNT_DETAILS
+            val onboardingFlow = OnboardingFlow.PatronAccountUpgrade(source)
+            OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
         }
 
         binding.btnCancelSub?.setOnClickListener {
