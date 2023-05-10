@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ProfileUpgradeBanner(
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<ProfileUpgradeBannerViewModel>()
     val state by viewModel.state.collectAsState()
@@ -61,7 +62,8 @@ fun ProfileUpgradeBanner(
                 onClick = onClick,
                 onFeatureCardChanged = {
                     viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it])
-                }
+                },
+                modifier = modifier,
             )
         }
 
@@ -80,7 +82,8 @@ fun ProfileUpgradeBanner(
 fun ProfileUpgradeBannerView(
     state: State.Loaded,
     onFeatureCardChanged: (Int) -> Unit,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val featureCardsState = state.featureCardsState
     HorizontalPagerWrapper(
@@ -89,6 +92,7 @@ fun ProfileUpgradeBannerView(
         onPageChanged = onFeatureCardChanged,
         showPageIndicator = featureCardsState.showPageIndicator,
         pageIndicatorColor = MaterialTheme.theme.colors.primaryText01,
+        modifier = modifier,
     ) { index, pagerHeight ->
         val currentTier = featureCardsState.featureCards[index].subscriptionTier
         FeatureCard(

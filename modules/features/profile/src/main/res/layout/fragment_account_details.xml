@@ -590,7 +590,6 @@
                 android:layout_width="0dp"
                 android:layout_height="@dimen/divider_height"
                 android:background="?attr/primary_ui_05"
-                android:layout_marginBottom="20dp"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -603,7 +602,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/userView" />
+                app:layout_constraintTop_toBottomOf="@+id/dividerView15" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
