@@ -62,16 +62,14 @@ open class UserView @JvmOverloads constructor(
     }
 
     open fun update(signInState: SignInState?) {
-        val isPatron = false // TODO: Patron - get Patron state from subscription status
-        updateProfileImageAndDaysRemaining(signInState, isPatron)
-        updateEmail(signInState, isPatron)
-        updateSubscriptionTierPill(signInState, isPatron)
+        updateProfileImageAndDaysRemaining(signInState)
+        updateEmail(signInState)
+        updateSubscriptionTierPill(signInState)
         updateAccountButton(signInState)
     }
 
     private fun updateProfileImageAndDaysRemaining(
         signInState: SignInState?,
-        isPatron: Boolean,
     ) {
         when (signInState) {
             is SignInState.SignedIn -> {
@@ -84,7 +82,7 @@ open class UserView @JvmOverloads constructor(
                 imgProfilePicture.setup(
                     percent = percent,
                     plusOnly = signInState.isSignedInAsPlus,
-                    isPatron = isPatron,
+                    isPatron = signInState.isSignedInAsPatron,
                     gravatarUrl = gravatarUrl
                 )
             }
@@ -111,7 +109,7 @@ open class UserView @JvmOverloads constructor(
         return null
     }
 
-    private fun setDaysRemainingTextIfNeeded(signInState: SignInState.SignedIn, isPatron: Boolean) {
+    private fun setDaysRemainingTextIfNeeded(signInState: SignInState.SignedIn) {
         val status = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Plus) ?: return
         if (status.autoRenew) {
             return
@@ -124,20 +122,20 @@ open class UserView @JvmOverloads constructor(
 
         if (timeLeftMs <= maxSubscriptionExpiryMs) {
             val expiresIn = resources.getStringPluralSecondsMinutesHoursDaysOrYears(timeLeftMs)
-            val messagesRes = if (isPatron) LR.string.profile_patron_expires_in else LR.string.profile_plus_expires_in
+            val messagesRes = if (signInState.isSignedInAsPatron) LR.string.profile_patron_expires_in else LR.string.profile_plus_expires_in
             lblUserEmail.text = context.getString(messagesRes, expiresIn).uppercase()
             lblUserEmail.setTextColor(lblUserEmail.context.getThemeColor(UR.attr.support_05))
         }
     }
 
-    private fun updateEmail(signInState: SignInState?, isPatron: Boolean) {
+    private fun updateEmail(signInState: SignInState?) {
         when (signInState) {
             is SignInState.SignedIn -> {
                 lblUserEmail.text = signInState.email
                 lblUserEmail.visibility = View.VISIBLE
                 lblUserEmail.setTextColor(context.getThemeColor(UR.attr.primary_text_01))
 
-                if (this !is ExpandedUserView) setDaysRemainingTextIfNeeded(signInState, isPatron)
+                if (this !is ExpandedUserView) setDaysRemainingTextIfNeeded(signInState)
             }
             is SignInState.SignedOut -> {
                 lblUserEmail.text = context.getString(LR.string.profile_set_up_account)
@@ -147,11 +145,11 @@ open class UserView @JvmOverloads constructor(
         }
     }
 
-    private fun updateSubscriptionTierPill(signInState: SignInState?, isPatron: Boolean) {
+    private fun updateSubscriptionTierPill(signInState: SignInState?) {
         subscriptionTierPill?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                if (signInState is SignInState.SignedIn && isPatron) {
+                if (signInState is SignInState.SignedIn && signInState.isSignedInAsPatron) {
                     SubscriptionTierPill(
                         iconRes = IR.drawable.ic_patron,
                         shortNameRes = LR.string.pocket_casts_patron_short,
