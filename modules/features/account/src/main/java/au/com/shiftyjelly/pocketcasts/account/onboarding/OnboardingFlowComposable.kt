@@ -104,7 +104,8 @@ private fun Content(
                 onDismiss = {
                     when (flow) {
                         // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
-                        is OnboardingFlow.PlusAccountUpgrade -> throw IllegalStateException("PlusAccountUpgrade flow tried to present LoginOrSignupPage")
+                        is OnboardingFlow.PlusAccountUpgrade,
+                        is OnboardingFlow.PatronAccountUpgrade -> throw IllegalStateException("Account upgrade flow tried to present LoginOrSignupPage")
 
                         OnboardingFlow.PlusAccountUpgradeNeedsLogin,
                         is OnboardingFlow.PlusUpsell -> {
@@ -148,6 +149,7 @@ private fun Content(
                         OnboardingFlow.LoggedOut -> exitOnboarding()
 
                         is OnboardingFlow.PlusAccountUpgrade,
+                        is OnboardingFlow.PatronAccountUpgrade,
                         OnboardingFlow.PlusAccountUpgradeNeedsLogin,
                         is OnboardingFlow.PlusUpsell -> navController.navigate(
                             OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)
@@ -195,7 +197,8 @@ private fun Content(
                 OnboardingUpgradeSource.FOLDERS,
                 OnboardingUpgradeSource.LOGIN,
                 OnboardingUpgradeSource.PLUS_DETAILS,
-                OnboardingUpgradeSource.PROFILE -> false
+                OnboardingUpgradeSource.PROFILE,
+                OnboardingUpgradeSource.ACCOUNT_DETAILS -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
             }

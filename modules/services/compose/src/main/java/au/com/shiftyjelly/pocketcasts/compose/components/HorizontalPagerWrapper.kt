@@ -38,6 +38,7 @@ fun HorizontalPagerWrapper(
     pageCount: Int,
     initialPage: Int,
     onPageChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     showPageIndicator: Boolean = true,
     pageIndicatorColor: Color = Color.White,
     pageSize: PageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 1.dp), // With full page width, height is not adjusted properly
@@ -53,7 +54,7 @@ fun HorizontalPagerWrapper(
     }
 
     var pagerHeight by remember { mutableStateOf(0) }
-    Column {
+    Column(modifier = modifier) {
         HorizontalPager(
             pageCount = pageCount,
             state = pagerState,
