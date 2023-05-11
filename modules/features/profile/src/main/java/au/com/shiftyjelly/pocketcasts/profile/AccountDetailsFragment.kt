@@ -126,8 +126,9 @@ class AccountDetailsFragment : BaseFragment() {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     AppTheme(theme.activeTheme) {
-                        if (subscription != null && (signInState.isSignedInAsFree || giftExpiring)) {
-                            binding.dividerView15?.isVisible = BuildConfig.ADD_PATRON_ENABLED
+                        val showUpgradeBanner = subscription != null && (signInState.isSignedInAsFree || giftExpiring)
+                        binding.dividerView15?.isVisible = showUpgradeBanner && BuildConfig.ADD_PATRON_ENABLED
+                        if (showUpgradeBanner) {
                             ProfileUpgradeBanner(
                                 onClick = {
                                     val source = OnboardingUpgradeSource.PROFILE

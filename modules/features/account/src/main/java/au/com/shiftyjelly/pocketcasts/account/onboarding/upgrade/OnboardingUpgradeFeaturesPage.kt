@@ -65,7 +65,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.OutlinedRowButton
@@ -339,7 +339,7 @@ private fun FeatureCard(
                     .padding(bottom = 12.dp),
                 contentAlignment = Alignment.TopStart
             ) {
-                SubscriptionTierPill(
+                SubscriptionBadge(
                     iconRes = card.iconRes,
                     shortNameRes = card.shortNameRes,
                     backgroundColor = Color.Black,

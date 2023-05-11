@@ -29,16 +29,14 @@
         app:layout_constraintTop_toBottomOf="@+id/imgProfilePicture"
         tools:text="Setup Account" />
 
-    <TextView
-        android:id="@+id/lblAccountType"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/subscriptionBadge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.Car.Display3"
-        android:textColor="?attr/primary_text_02"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblUserEmail"
-        tools:text="Pocket Casts Plus" />
+        app:layout_constraintTop_toBottomOf="@id/lblUserEmail" />
 
     <TextView
         android:id="@+id/lblPaymentStatus"
@@ -49,7 +47,7 @@
         android:textAppearance="@style/TextAppearance.Car.Body3"
         android:textColor="?attr/primary_text_02"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblAccountType"
+        app:layout_constraintTop_toBottomOf="@+id/subscriptionBadge"
         tools:text="Next payment:" />
 
     <TextView
@@ -61,7 +59,7 @@
         android:textAppearance="@style/TextAppearance.Car.Body3"
         android:textColor="?attr/primary_text_02"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblAccountType"
+        app:layout_constraintTop_toBottomOf="@+id/subscriptionBadge"
         tools:text="Not signed in" />
 
 
