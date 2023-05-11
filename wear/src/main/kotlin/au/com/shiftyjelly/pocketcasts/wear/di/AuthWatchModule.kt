@@ -4,11 +4,9 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthDataSerializer
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.GoogleSignInEventListenerImpl
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.horologist.auth.data.googlesignin.GoogleSignInEventListener
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import com.google.android.horologist.auth.data.tokenshare.impl.TokenBundleRepositoryImpl
 import com.google.android.horologist.data.WearDataLayerRegistry
@@ -43,9 +41,4 @@ object AuthWatchModule {
                 .build()
         )
     }
-
-    @Provides
-    fun providesGoogleSignInEventListener(
-        googleSignInEventListenerImpl: GoogleSignInEventListenerImpl
-    ): GoogleSignInEventListener = googleSignInEventListenerImpl
 }
