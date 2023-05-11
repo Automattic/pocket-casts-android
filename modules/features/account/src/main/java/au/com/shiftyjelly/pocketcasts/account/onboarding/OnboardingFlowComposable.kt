@@ -182,6 +182,13 @@ private fun Content(
                         is OnboardingFlow.PlusFlow -> defaultValue = flow.source
                         else -> Unit // Not a startDestination, default value should not be set.
                     }
+                },
+                navArgument(OnboardingNavRoute.PlusUpgrade.showPatronOnlyArgumentKey) {
+                    type = NavType.BoolType
+                    when (flow) {
+                        is OnboardingFlow.PlusUpsell -> defaultValue = flow.showPatronOnly
+                        else -> Unit // Not a startDestination, default value should not be set.
+                    }
                 }
             )
         ) { navBackStackEntry ->
@@ -258,9 +265,10 @@ private object OnboardingNavRoute {
         private const val routeBase = "plus_upgrade"
 
         const val sourceArgumentKey = "source"
+        const val showPatronOnlyArgumentKey = "show_patron_only"
         // The route variable should only be used to navigate to the PlusUpgrade screens
         // when they are the startDestination. In all other cases, use the routeWithSource function.
-        const val route = "$routeBase/{$sourceArgumentKey}"
+        const val route = "$routeBase/{$sourceArgumentKey}/{$showPatronOnlyArgumentKey}"
         fun routeWithSource(source: OnboardingUpgradeSource) = "$routeBase/$source"
     }
 }
