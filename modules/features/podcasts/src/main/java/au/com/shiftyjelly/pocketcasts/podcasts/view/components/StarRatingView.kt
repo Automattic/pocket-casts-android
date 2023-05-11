@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
@@ -66,7 +66,12 @@ private fun Content(
             stars = state.stars,
             color = MaterialTheme.theme.colors.filter03
         )
-        state.total?.let { TextP50(text = it.abbreviated) }
+        state.total?.let {
+            TextP40(
+                text = it.abbreviated,
+                modifier = Modifier.padding(start = 6.dp)
+            )
+        }
     }
 }
 
