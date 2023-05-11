@@ -169,12 +169,12 @@ open class UserView @JvmOverloads constructor(
                                 textColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple_light) else null,
                                 modifier = if (isExpandedUserView) modifier else Modifier,
                             )
-                        } else if (signInState.isSignedInAsPlus) {
+                        } else if (signInState.isSignedInAsPlus && isExpandedUserView) {
                             SubscriptionBadge(
                                 iconRes = IR.drawable.ic_plus,
                                 shortNameRes = LR.string.pocket_casts_plus_short,
                                 iconColor = colorResource(UR.color.plus_gold),
-                                modifier = if (isExpandedUserView) modifier else Modifier,
+                                modifier = modifier,
                             )
                         }
                     }
