@@ -31,7 +31,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.ProfileUpgradeBannerViewModel
@@ -121,7 +121,7 @@ private fun FeatureCard(
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
         ) {
-            SubscriptionTierPill(
+            SubscriptionBadge(
                 iconRes = card.iconRes,
                 shortNameRes = card.shortNameRes,
             )

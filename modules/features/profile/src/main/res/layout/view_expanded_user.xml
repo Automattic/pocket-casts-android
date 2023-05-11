@@ -31,7 +31,7 @@
         tools:text="Setup Account" />
 
     <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/subscriptionTierPill"
+        android:id="@+id/subscriptionBadge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,7 +50,7 @@
         android:gravity="start"
         app:layout_constraintEnd_toStartOf="@id/lblSignInStatus"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subscriptionTierPill"
+        app:layout_constraintTop_toBottomOf="@+id/subscriptionBadge"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Next payment:" />
 
@@ -65,7 +65,7 @@
         android:textColor="?attr/primary_text_01"
         android:gravity="end"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/subscriptionTierPill"
+        app:layout_constraintTop_toBottomOf="@+id/subscriptionBadge"
         app:layout_constraintStart_toEndOf="@id/lblPaymentStatus"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Not signed in" />

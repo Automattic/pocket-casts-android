@@ -15,7 +15,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
 import au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
-import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDaysMonthsOrYears
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
@@ -54,7 +54,7 @@ open class UserView @JvmOverloads constructor(
     val lblSignInStatus: TextView?
     val imgProfilePicture: ProfileCircleView
     val btnAccount: Button?
-    private val subscriptionTierPill: ComposeView?
+    private val subscriptionBadge: ComposeView?
     private val isDarkTheme: Boolean
         get() = Theme.isDark(context)
 
@@ -64,14 +64,14 @@ open class UserView @JvmOverloads constructor(
         lblSignInStatus = findViewById(R.id.lblSignInStatus)
         imgProfilePicture = findViewById(R.id.imgProfilePicture)
         btnAccount = findViewById(R.id.btnAccount)
-        subscriptionTierPill = findViewById(R.id.subscriptionTierPill)
+        subscriptionBadge = findViewById(R.id.subscriptionBadge)
         setBackgroundResource(R.drawable.background_user_view)
     }
 
     open fun update(signInState: SignInState?) {
         updateProfileImageAndDaysRemaining(signInState)
         updateEmail(signInState)
-        updateSubscriptionTierPill(signInState)
+        updateSubscriptionBadge(signInState)
         updateAccountButton(signInState)
     }
 
@@ -152,8 +152,8 @@ open class UserView @JvmOverloads constructor(
         }
     }
 
-    private fun updateSubscriptionTierPill(signInState: SignInState?) {
-        subscriptionTierPill?.apply {
+    private fun updateSubscriptionBadge(signInState: SignInState?) {
+        subscriptionBadge?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 AppTheme(if (isDarkTheme) Theme.ThemeType.DARK else Theme.ThemeType.LIGHT) {
@@ -161,7 +161,7 @@ open class UserView @JvmOverloads constructor(
                         val isExpandedUserView = this@UserView is ExpandedUserView
                         val modifier = Modifier.padding(top = 16.dp)
                         if (signInState.isSignedInAsPatron) {
-                            SubscriptionTierPill(
+                            SubscriptionBadge(
                                 iconRes = IR.drawable.ic_patron,
                                 shortNameRes = LR.string.pocket_casts_patron_short,
                                 iconColor = if (!isExpandedUserView) Color.White else Color.Unspecified,
@@ -170,7 +170,7 @@ open class UserView @JvmOverloads constructor(
                                 modifier = if (isExpandedUserView) modifier else Modifier,
                             )
                         } else if (signInState.isSignedInAsPlus) {
-                            SubscriptionTierPill(
+                            SubscriptionBadge(
                                 iconRes = IR.drawable.ic_plus,
                                 shortNameRes = LR.string.pocket_casts_plus_short,
                                 iconColor = colorResource(UR.color.plus_gold),

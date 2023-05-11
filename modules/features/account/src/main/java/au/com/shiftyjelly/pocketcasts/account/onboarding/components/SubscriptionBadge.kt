@@ -27,7 +27,7 @@ private val iconSizeInDp = 14.dp
 private val pillCornerRadiusInDp = 800.dp
 
 @Composable
-fun SubscriptionTierPill(
+fun SubscriptionBadge(
     @DrawableRes iconRes: Int,
     @StringRes shortNameRes: Int,
     modifier: Modifier = Modifier,
@@ -68,8 +68,8 @@ fun SubscriptionTierPill(
 
 @Preview
 @Composable
-private fun SubscriptionTierPillPreview() {
-    SubscriptionTierPill(
+private fun SubscriptionBadgePreview() {
+    SubscriptionBadge(
         iconRes = R.drawable.ic_patron,
         shortNameRes = LR.string.pocket_casts_patron_short,
         backgroundColor = Color.Black,
