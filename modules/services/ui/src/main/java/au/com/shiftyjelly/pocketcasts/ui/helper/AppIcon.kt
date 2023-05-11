@@ -145,13 +145,21 @@ class AppIcon @Inject constructor(
             launcherIcon = IR.mipmap.ic_launcher_patron_chrome,
             aliasName = ".ui.MainActivity_14"
         ),
+        PATRON_ROUND(
+            id = "patron_round",
+            labelId = LR.string.settings_app_icon_patron_round,
+            settingsIcon = IR.drawable.appicon_patron_round,
+            type = SubscriptionType.PATRON,
+            launcherIcon = IR.mipmap.ic_launcher_patron_round,
+            aliasName = ".ui.MainActivity_15"
+        ),
         PATRON_DARK(
             id = "patron_dark",
             labelId = LR.string.settings_app_icon_patron_dark,
             settingsIcon = IR.drawable.appicon_patron_dark,
             type = SubscriptionType.PATRON,
             launcherIcon = IR.mipmap.ic_launcher_patron_dark,
-            aliasName = ".ui.MainActivity_15"
+            aliasName = ".ui.MainActivity_16"
         );
 
         companion object {
