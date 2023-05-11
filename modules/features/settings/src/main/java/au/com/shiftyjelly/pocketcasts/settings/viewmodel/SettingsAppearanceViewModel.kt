@@ -96,6 +96,7 @@ class SettingsAppearanceViewModel @Inject constructor(
                     AppIcon.AppIconType.HALLOWEEN -> "halloween"
                     AppIcon.AppIconType.PATRON_CHROME -> "patron_chrome"
                     AppIcon.AppIconType.PATRON_ROUND -> "patron_round"
+                    AppIcon.AppIconType.PATRON_GLOW -> "patron_glow"
                     AppIcon.AppIconType.PATRON_DARK -> "patron_dark"
                 }
             )

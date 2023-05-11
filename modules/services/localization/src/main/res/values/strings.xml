@@ -1262,6 +1262,7 @@
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_app_icon_patron_chrome">Patron Chrome</string>
     <string name="settings_app_icon_patron_round">Patron Round</string>
+    <string name="settings_app_icon_patron_glow">Patron Glow</string>
     <string name="settings_app_icon_patron_dark">Patron Dark</string>
     <string name="settings_support_please_wait">Please wait just a moment while we collect details to help our support team</string>
     <string name="settings_no_email_app_title">Unable to email</string>
