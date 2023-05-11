@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val iconSizeInDp = 14.dp
 private val pillCornerRadiusInDp = 800.dp
@@ -70,7 +71,7 @@ fun SubscriptionTierPill(
 private fun SubscriptionTierPillPreview() {
     SubscriptionTierPill(
         iconRes = R.drawable.ic_patron,
-        shortNameRes = au.com.shiftyjelly.pocketcasts.localization.R.string.pocket_casts_patron_short,
+        shortNameRes = LR.string.pocket_casts_patron_short,
         backgroundColor = Color.Black,
     )
 }
