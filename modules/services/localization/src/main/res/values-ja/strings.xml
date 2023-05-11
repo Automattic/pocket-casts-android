@@ -239,8 +239,8 @@ Language: ja_JP
     <string name="end_of_year_launch_modal_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。 友達と共有したり、お気に入りのクリエイターにエールを送ったりしましょう。</string>
     <string name="end_of_year_launch_modal_title">ポッドキャストで振り返る1年</string>
     <string name="settings_app_icon_halloween">ハロウィーン</string>
-    <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
-    <string name="settings_show_played">Show played episodes</string>
+    <string name="settings_show_played_summary">プレイを終了したエピソードは、引き続き表示されます。</string>
+    <string name="settings_show_played">「再生されたエピソードを表示」</string>
     <string name="settings_privacy_crash_link_summary">クラッシュレポートへの Pocket Casts アカウントのリンクを許可します。 </string>
     <string name="settings_privacy_crash_link">アカウントをクラッシュにリンク</string>
     <string name="settings_privacy_crash_summary">クラッシュレポートの収集を許可します。</string>
