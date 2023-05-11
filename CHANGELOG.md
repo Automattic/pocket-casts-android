@@ -3,6 +3,9 @@
 *   New Features:
     *   Added the ability to see ratings for podcasts
         ([#951](https://github.com/Automattic/pocket-casts-android/pull/951)).
+*   Bug Fixes:
+    *   Fixed Japanese translations for the 'Show played episodes' setting in Automotive.
+        ([#890](https://github.com/Automattic/pocket-casts-android/issues/955)).
 
 7.38
 -----
