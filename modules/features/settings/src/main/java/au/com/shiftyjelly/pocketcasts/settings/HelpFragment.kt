@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
@@ -225,14 +224,9 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
     }
 
     private fun contactSupport() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val subscriptionStatus = subscriptionManager.getSubscriptionStatus().await()
-
-            if (subscriptionStatus is SubscriptionStatus.Free) {
-                useForumPopup()
-            } else {
-                sendSupportEmail()
-            }
+        when (subscriptionManager.getCachedStatus()) {
+            null, is SubscriptionStatus.Free -> useForumPopup()
+            is SubscriptionStatus.Plus -> sendSupportEmail()
         }
 
         analyticsTracker.track(AnalyticsEvent.SETTINGS_GET_SUPPORT)
