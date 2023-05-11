@@ -8,6 +8,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.edit
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -23,12 +24,12 @@ class AppIcon @Inject constructor(
     @PublicSharedPreferences private val sharedPreferences: SharedPreferences
 ) {
 
-    enum class AppIconType(val id: String, @StringRes val labelId: Int, @DrawableRes val settingsIcon: Int, val isPlus: Boolean, @DrawableRes val launcherIcon: Int, val aliasName: String) {
+    enum class AppIconType(val id: String, @StringRes val labelId: Int, @DrawableRes val settingsIcon: Int, val type: SubscriptionType, @DrawableRes val launcherIcon: Int, val aliasName: String) {
         DEFAULT(
             id = "default",
             labelId = LR.string.settings_app_icon_default,
             settingsIcon = IR.drawable.ic_appicon0,
-            isPlus = false,
+            type = SubscriptionType.NONE,
             launcherIcon = IR.mipmap.ic_launcher,
             aliasName = ".ui.MainActivity_0"
         ),
@@ -36,7 +37,7 @@ class AppIcon @Inject constructor(
             id = "dark",
             labelId = LR.string.settings_app_icon_dark,
             settingsIcon = IR.drawable.ic_appicon1,
-            isPlus = false,
+            type = SubscriptionType.NONE,
             launcherIcon = IR.mipmap.ic_launcher_1,
             aliasName = ".ui.MainActivity_1"
         ),
@@ -44,7 +45,7 @@ class AppIcon @Inject constructor(
             id = "roundedLight",
             labelId = LR.string.settings_app_icon_round_light,
             settingsIcon = IR.drawable.ic_appicon2,
-            isPlus = false,
+            type = SubscriptionType.NONE,
             launcherIcon = IR.mipmap.ic_launcher_2,
             aliasName = ".ui.MainActivity_2"
         ),
@@ -52,7 +53,7 @@ class AppIcon @Inject constructor(
             id = "roundedDark",
             labelId = LR.string.settings_app_icon_round_dark,
             settingsIcon = IR.drawable.ic_appicon3,
-            isPlus = false,
+            type = SubscriptionType.NONE,
             launcherIcon = IR.mipmap.ic_launcher_3,
             aliasName = ".ui.MainActivity_3"
         ),
@@ -60,7 +61,7 @@ class AppIcon @Inject constructor(
             id = "indigo",
             labelId = LR.string.settings_app_icon_indigo,
             settingsIcon = IR.drawable.ic_appicon_indigo,
-            isPlus = false,
+            type = SubscriptionType.NONE,
             launcherIcon = IR.mipmap.ic_launcher_indigo,
             aliasName = ".ui.MainActivity_9"
         ),
@@ -68,7 +69,7 @@ class AppIcon @Inject constructor(
             id = "rose",
             labelId = LR.string.settings_app_icon_rose,
             settingsIcon = IR.drawable.appicon_rose,
-            isPlus = false,
+            type = SubscriptionType.NONE,
             launcherIcon = IR.mipmap.ic_launcher_rose,
             aliasName = ".ui.MainActivity_12"
         ),
@@ -76,7 +77,7 @@ class AppIcon @Inject constructor(
             id = "cat",
             labelId = LR.string.settings_app_icon_pocket_cats,
             settingsIcon = IR.drawable.ic_appicon_pocket_cats,
-            isPlus = false,
+            type = SubscriptionType.NONE,
             launcherIcon = IR.mipmap.ic_launcher_cat,
             aliasName = ".ui.MainActivity_10"
         ),
@@ -84,7 +85,7 @@ class AppIcon @Inject constructor(
             id = "redvelvet",
             labelId = LR.string.settings_app_icon_red_velvet,
             settingsIcon = IR.drawable.appicon_red_velvet,
-            isPlus = false,
+            type = SubscriptionType.NONE,
             launcherIcon = IR.mipmap.ic_launcher_redvelvet,
             aliasName = ".ui.MainActivity_11"
         ),
@@ -92,7 +93,7 @@ class AppIcon @Inject constructor(
             id = "plus",
             labelId = LR.string.settings_app_icon_plus,
             settingsIcon = IR.drawable.ic_appicon4,
-            isPlus = true,
+            type = SubscriptionType.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_4,
             aliasName = ".ui.MainActivity_4"
         ),
@@ -100,7 +101,7 @@ class AppIcon @Inject constructor(
             id = "classic",
             labelId = LR.string.settings_app_icon_classic,
             settingsIcon = IR.drawable.ic_appicon5,
-            isPlus = true,
+            type = SubscriptionType.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_5,
             aliasName = ".ui.MainActivity_5"
         ),
@@ -108,7 +109,7 @@ class AppIcon @Inject constructor(
             id = "electricBlue",
             labelId = LR.string.settings_app_icon_electric_blue,
             settingsIcon = IR.drawable.ic_appicon6,
-            isPlus = true,
+            type = SubscriptionType.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_6,
             aliasName = ".ui.MainActivity_6"
         ),
@@ -116,7 +117,7 @@ class AppIcon @Inject constructor(
             id = "electricPink",
             labelId = LR.string.settings_app_icon_electric_pink,
             settingsIcon = IR.drawable.ic_appicon7,
-            isPlus = true,
+            type = SubscriptionType.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_7,
             aliasName = ".ui.MainActivity_7"
         ),
@@ -124,7 +125,7 @@ class AppIcon @Inject constructor(
             id = "radioactive",
             labelId = LR.string.settings_app_icon_radioactivity,
             settingsIcon = IR.drawable.appicon_radioactive,
-            isPlus = true,
+            type = SubscriptionType.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_radioactive,
             aliasName = ".ui.MainActivity_8"
         ),
@@ -132,7 +133,7 @@ class AppIcon @Inject constructor(
             id = "halloween",
             labelId = LR.string.settings_app_icon_halloween,
             settingsIcon = IR.drawable.appicon_halloween,
-            isPlus = true,
+            type = SubscriptionType.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_halloween,
             aliasName = ".ui.MainActivity_13"
         );

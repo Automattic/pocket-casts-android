@@ -8,6 +8,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterAppearanceAppiconItemBinding
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
@@ -82,7 +83,7 @@ class AppearanceIconSettingsAdapter(
         }
 
         fun bind(appIcon: AppIcon.AppIconType, selected: Boolean) {
-            val showOption = !appIcon.isPlus || isPlusSignedIn
+            val showOption = (appIcon.type == SubscriptionType.NONE) || isPlusSignedIn
             binding.appIconItem.alpha = if (showOption) 1.0f else 0.65f
 
             val drawable = AppCompatResources.getDrawable(itemView.context, appIcon.settingsIcon)
@@ -107,7 +108,7 @@ class AppearanceIconSettingsAdapter(
             }
             val beforeAppIcon = selectedAppIcon
             val afterAppIcon = list[bindingAdapterPosition]
-            val validAppIcon = !afterAppIcon.isPlus || isPlusSignedIn
+            val validAppIcon = (afterAppIcon.type == SubscriptionType.NONE) || isPlusSignedIn
 
             selectedAppIcon = afterAppIcon
             clickListener(beforeAppIcon, afterAppIcon, validAppIcon)
