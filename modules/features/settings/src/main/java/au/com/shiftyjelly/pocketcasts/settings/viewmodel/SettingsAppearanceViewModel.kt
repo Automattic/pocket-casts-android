@@ -94,6 +94,7 @@ class SettingsAppearanceViewModel @Inject constructor(
                     AppIcon.AppIconType.ELECTRIC_PINK -> "electric_pink"
                     AppIcon.AppIconType.RADIOACTIVE -> "radioactive"
                     AppIcon.AppIconType.HALLOWEEN -> "halloween"
+                    AppIcon.AppIconType.PATRON_DARK -> "patron_dark"
                 }
             )
         )

@@ -136,6 +136,14 @@ class AppIcon @Inject constructor(
             type = SubscriptionType.PLUS,
             launcherIcon = IR.mipmap.ic_launcher_halloween,
             aliasName = ".ui.MainActivity_13"
+        ),
+        PATRON_DARK(
+            id = "patron_dark",
+            labelId = LR.string.settings_app_icon_patron_dark,
+            settingsIcon = IR.drawable.appicon_patron_dark,
+            type = SubscriptionType.PATRON,
+            launcherIcon = IR.mipmap.ic_launcher_patron_dark,
+            aliasName = ".ui.MainActivity_14"
         );
 
         companion object {
