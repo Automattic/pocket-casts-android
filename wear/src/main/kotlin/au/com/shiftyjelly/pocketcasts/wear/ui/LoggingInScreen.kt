@@ -62,10 +62,7 @@ fun LoggingInScreen(
     val viewModel = hiltViewModel<LoggingInScreenViewModel>()
     val state = viewModel.state.collectAsState().value
 
-    val shouldNotDelayOnceComplete = state is LoggingInScreenViewModel.State.CompleteButDelaying && !withMinimumDelay
-    val completeWithDelay = state is LoggingInScreenViewModel.State.RefreshComplete
-    val shouldClose = shouldNotDelayOnceComplete || completeWithDelay
-    if (shouldClose) {
+    if (viewModel.shouldClose(withMinimumDelay)) {
         onClose()
     }
 

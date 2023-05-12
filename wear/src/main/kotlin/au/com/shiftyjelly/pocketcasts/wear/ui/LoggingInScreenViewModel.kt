@@ -10,7 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
@@ -48,22 +47,36 @@ class LoggingInScreenViewModel @Inject constructor(
         }
     }
 
+    fun shouldClose(withMinimumDelay: Boolean): Boolean {
+        val stateValue = state.value
+        val shouldNotDelayOnceComplete = !withMinimumDelay && stateValue is State.CompleteButDelaying
+        val completeWithDelay = stateValue is State.RefreshComplete
+        return shouldNotDelayOnceComplete || completeWithDelay
+    }
+
     private fun onRefreshStateChange(refreshState: RefreshState) {
         when (refreshState) {
-            RefreshState.Never,
+
             RefreshState.Refreshing -> {
-                val isRefreshingWithoutEmail = state.value.let { it is State.Refreshing && it.email == null }
-                if (isRefreshingWithoutEmail) {
-                    _state.value = State.Refreshing(syncManager.getEmail())
+                val stateValue = state.value
+                if (stateValue !is State.Refreshing) {
+                    val email = stateValue.email ?: syncManager.getEmail()
+                    _state.value = State.Refreshing(email)
                 }
             }
 
-            is RefreshState.Failed,
+            RefreshState.Never -> { /* Do nothing */ }
+
+            is RefreshState.Failed -> {
+                _state.value = State.RefreshComplete
+            }
+
             is RefreshState.Success -> {
                 viewModelScope.launch {
-                    _state.update {
-                        val email = it.email ?: syncManager.getEmail()
-                        State.CompleteButDelaying(email = email)
+                    val stateValue = state.value
+                    if (stateValue !is State.CompleteButDelaying) {
+                        val email = stateValue.email ?: syncManager.getEmail()
+                        _state.value = State.CompleteButDelaying(email = email)
                     }
 
                     delayUntilMinDuration()
