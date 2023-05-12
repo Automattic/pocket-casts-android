@@ -237,6 +237,10 @@ fun WearApp(
         composable(LoggingInScreen.route) {
             LoggingInScreen(
                 onClose = { navController.popBackStack() },
+                // Because this login is not triggered by the user, make sure that the
+                // logging in screen is shown for enough time for the user to understand
+                // what is happening.
+                withMinimumDelay = true,
             )
         }
     }

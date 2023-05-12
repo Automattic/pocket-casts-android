@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
 import au.com.shiftyjelly.pocketcasts.compose.images.ProfileImage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
+import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreenViewModel.State.RefreshComplete.email
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -54,92 +55,105 @@ object LoggingInScreen {
 fun LoggingInScreen(
     avatarUrl: String? = null,
     name: String? = null,
+    withMinimumDelay: Boolean = true,
     onClose: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<LoggingInScreenViewModel>()
     val state = viewModel.state.collectAsState().value
 
-    when (state) {
+    val shouldNotDelayOnceComplete = state is LoggingInScreenViewModel.State.CompleteButDelaying && !withMinimumDelay
+    val completeWithDelay = state is LoggingInScreenViewModel.State.RefreshComplete
+    val shouldClose = shouldNotDelayOnceComplete || completeWithDelay
+    if (shouldClose) {
+        onClose()
+    }
 
-        LoggingInScreenViewModel.State.RefreshComplete -> {
-            onClose()
+    Content(
+        email = state.email,
+        avatarUrl = avatarUrl,
+        name = name,
+        onClose = onClose,
+    )
+}
+
+@Composable
+private fun Content(
+    email: String?,
+    avatarUrl: String?,
+    name: String?,
+    onClose: () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable { onClose() }
+            .padding(16.dp)
+            .fillMaxSize()
+    ) {
+        val placeholder = @Composable {
+            SpinningIcon(Modifier.size(48.dp))
         }
 
-        is LoggingInScreenViewModel.State.Refreshing -> {
+        val profileModifier = Modifier
+            .clip(CircleShape)
+            .size(48.dp)
 
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+        if (avatarUrl != null) {
+            ProfileImage(
+                avatarUrl = avatarUrl,
+                contentDescription = null,
+                placeholder = placeholder,
+                modifier = profileModifier,
+            )
+        } else if (email != null) {
+            // If there's no avatar, but we have an email, try to use Gravatar
+            GravatarProfileImage(
+                email = email,
+                contentDescription = null,
+                placeholder = placeholder,
+                modifier = profileModifier,
+            )
+        } else {
+            placeholder()
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        if (name != null) {
+            Text(stringResource(LR.string.profile_hi, name))
+        } else {
+            Text(
+                text = stringResource(LR.string.profile_logging_in),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.title3
+            )
+        }
+
+        AnimatedVisibility(visible = email != null) {
+            BoxWithConstraints(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .clickable { onClose() }
-                    .padding(16.dp)
-                    .fillMaxSize()
+                    .fillMaxWidth()
             ) {
-                val placeholder = @Composable {
-                    SpinningIcon(Modifier.size(48.dp))
-                }
 
-                val profileModifier = Modifier
-                    .clip(CircleShape)
-                    .size(48.dp)
+                val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
+                val background = MaterialTheme.colors.background
 
-                if (avatarUrl != null) {
-                    ProfileImage(
-                        avatarUrl = avatarUrl,
-                        contentDescription = null,
-                        placeholder = placeholder,
-                        modifier = profileModifier,
-                    )
-                } else if (state.email != null) {
-                    // If there's no avatar, but we have an email, try to use Gravatar
-                    GravatarProfileImage(
-                        email = state.email,
-                        contentDescription = null,
-                        placeholder = placeholder,
-                        modifier = profileModifier,
-                    )
-                } else {
-                    placeholder()
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                if (name != null) {
-                    Text(stringResource(LR.string.profile_hi, name))
-                } else {
+                if (email != null) {
                     Text(
-                        text = stringResource(LR.string.profile_logging_in),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.title3
+                        text = email,
+                        style = MaterialTheme.typography.body2,
+                        // Turn off softWrap to make sure the text doesn't get truncated if it runs long.
+                        // Without this if "xxxx@gmail.com" ran just a bit long, it would get shortened
+                        // to "xxx@gmail".
+                        softWrap = false,
+                        modifier = Modifier.fadeOutOverflow(
+                            overFlowWidthPx = widthPx.toInt(),
+                            backgroundColor = background
+                        )
                     )
-                }
-
-                AnimatedVisibility(visible = state.email != null) {
-                    BoxWithConstraints(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-
-                        val widthPx = with(LocalDensity.current) { maxWidth.toPx() }
-                        val background = MaterialTheme.colors.background
-
-                        if (state.email != null) {
-                            Text(
-                                text = state.email,
-                                style = MaterialTheme.typography.body2,
-                                // Turn off softWrap to make sure the text doesn't get truncated if it runs long.
-                                // Without this if "xxxx@gmail.com" ran just a bit long, it would get shortened
-                                // to "xxx@gmail".
-                                softWrap = false,
-                                modifier = Modifier.fadeOutOverflow(
-                                    overFlowWidthPx = widthPx.toInt(),
-                                    backgroundColor = background
-                                )
-                            )
-                        }
-                    }
                 }
             }
         }

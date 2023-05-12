@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
@@ -27,9 +28,10 @@ class LoggingInScreenViewModel @Inject constructor(
     private val logInNotificationShownMs: Long = System.currentTimeMillis()
     private val logInNotificationMinDuration = 5.seconds
 
-    sealed class State {
-        class Refreshing(val email: String?) : State()
-        object RefreshComplete : State()
+    sealed class State(val email: String?) {
+        class Refreshing(email: String?) : State(email)
+        class CompleteButDelaying(email: String?) : State(email)
+        object RefreshComplete : State(null)
     }
 
     private val _state = MutableStateFlow<State>(State.Refreshing(syncManager.getEmail()))
@@ -59,6 +61,11 @@ class LoggingInScreenViewModel @Inject constructor(
             is RefreshState.Failed,
             is RefreshState.Success -> {
                 viewModelScope.launch {
+                    _state.update {
+                        val email = it.email ?: syncManager.getEmail()
+                        State.CompleteButDelaying(email = email)
+                    }
+
                     delayUntilMinDuration()
                     _state.value = State.RefreshComplete
                 }
