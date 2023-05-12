@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
-import au.com.shiftyjelly.pocketcasts.models.type.Username
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.NOTIFICATIONS_DISABLED_MESSAGE_SHOWN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_ENCRYPT_SECRET
@@ -1414,17 +1413,4 @@ class SettingsImpl @Inject constructor(
 
     override fun getFullySignedOut(): Boolean =
         getBoolean(PROCESSED_SIGNOUT_KEY, true)
-
-    override fun setUsername(username: Username?) {
-        setString(USERNAME_FIRST, username?.firstName)
-        setString(USERNAME_LAST, username?.lastName)
-        setString(USERNAME_DISPLAY, username?.displayName)
-    }
-
-    override fun getUsername(): Username =
-        Username(
-            firstName = getString(USERNAME_FIRST),
-            lastName = getString(USERNAME_LAST),
-            displayName = getString(USERNAME_DISPLAY),
-        )
 }

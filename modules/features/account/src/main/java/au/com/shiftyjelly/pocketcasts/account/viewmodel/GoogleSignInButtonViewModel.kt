@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.models.type.Username
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
@@ -111,7 +110,6 @@ class GoogleSignInButtonViewModel @Inject constructor(
                 } else {
                     signInWithGoogleToken(
                         idToken = idToken,
-                        username = Username.from(lastSignedInAccount),
                         onSuccess = {},
                         onError = onError
                     )
@@ -181,7 +179,6 @@ class GoogleSignInButtonViewModel @Inject constructor(
         val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
         val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
         signInWithGoogleToken(
-            username = Username.from(credential),
             idToken = idToken,
             onSuccess = onSuccess,
             onError = onError,
@@ -190,13 +187,11 @@ class GoogleSignInButtonViewModel @Inject constructor(
 
     private suspend fun signInWithGoogleToken(
         idToken: String,
-        username: Username,
         onSuccess: (GoogleSignInState) -> Unit,
         onError: suspend () -> Unit
     ) =
         when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
             is LoginResult.Success -> {
-                settings.setUsername(username)
                 podcastManager.refreshPodcastsAfterSignIn()
                 onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))
             }
