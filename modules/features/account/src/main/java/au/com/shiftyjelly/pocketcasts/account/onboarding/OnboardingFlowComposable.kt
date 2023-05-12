@@ -185,9 +185,9 @@ private fun Content(
                 },
                 navArgument(OnboardingNavRoute.PlusUpgrade.showPatronOnlyArgumentKey) {
                     type = NavType.BoolType
-                    when (flow) {
-                        is OnboardingFlow.PlusUpsell -> defaultValue = flow.showPatronOnly
-                        else -> Unit // Not a startDestination, default value should not be set.
+                    defaultValue = when (flow) {
+                        is OnboardingFlow.PlusUpsell -> flow.showPatronOnly
+                        else -> false
                     }
                 }
             )
@@ -267,8 +267,11 @@ private object OnboardingNavRoute {
         const val sourceArgumentKey = "source"
         const val showPatronOnlyArgumentKey = "show_patron_only"
         // The route variable should only be used to navigate to the PlusUpgrade screens
-        // when they are the startDestination. In all other cases, use the routeWithSource function.
-        const val route = "$routeBase/{$sourceArgumentKey}/{$showPatronOnlyArgumentKey}"
+        // when they are the startDestination and the args for these startDestinations are set using default values.
+        // They are parsed based on this deep-link-like route by the navigation component.
+        // For more details check here: https://developer.android.com/jetpack/compose/navigation#nav-with-args
+        // In all other cases, use the routeWithSource function.
+        const val route = "$routeBase/{$sourceArgumentKey}?{$showPatronOnlyArgumentKey}={$showPatronOnlyArgumentKey}"
         fun routeWithSource(source: OnboardingUpgradeSource) = "$routeBase/$source"
     }
 }
