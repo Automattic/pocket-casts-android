@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-25 12:54:20+0000
+Translation-Revision-Date: 2023-05-09 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="profile_patron_expires_in">Patron löper ut om %s</string>
+    <string name="profile_account">Konto</string>
+    <string name="log_in_watch_from_phone_instructions_2">Nästa gång du öppnar Pocket Casts på din klocka och har nätverksanslutning kommer du att loggas in.</string>
+    <string name="log_in_watch_from_phone_instructions_1">Logga in i Pocket Casts på en parkopplad Android-telefon.</string>
+    <string name="log_in_with_email">Logga in med e-post</string>
+    <string name="log_in_on_phone">Logga in på telefon</string>
+    <string name="log_in_with_google">Logga in med Google</string>
+    <string name="log_in_subtitle">Börja lyssna på dina favoritpodcasts</string>
+    <string name="onboarding_upgrade_no_subscriptions_found">Inga prenumerationer hittades.</string>
+    <string name="trial_then_per_year">Testa %1$s och därefter %2$s per år</string>
+    <string name="trial_then_per_month">Testa %1$s och därefter %2$s per månad</string>
+    <string name="trial_start">Starta min gratis provperiod</string>
+    <string name="subscribe_to">Prenumerera på %s</string>
+    <string name="settings_description_advanced">De här inställningarna är experimentella. Vi rekommenderar de flesta användare att inte ändra de från sina standardvärden.</string>
+    <string name="player_up_next_empty_desc_watch">Du kan placera avsnitt i kö för uppspelning via skärmen Avsnittsinformation.</string>
+    <string name="settings_advanced_sync_on_metered_summary">Tillåter automatisk bakrgrundssynkronisering på nätverk med datapriser. Det här är aktiverat som standard och får ingen effekt om bakgrundsuppdatering är inaktiverat.</string>
+    <string name="settings_advanced_sync_on_metered">Synkronisera på nätverk med datapriser</string>
+    <string name="settings_title_advanced">Avancerat</string>
+    <string name="profile_logging_in">Loggar in…</string>
     <string name="episode_downloading">Laddas ner</string>
     <string name="episode_in_up_next">I Nästa</string>
     <string name="onboarding_plus_feature_gratitude_title">Den eviga tacksamheten hos alla här på Pocket Casts</string>
-    <string name="onboarding_plus_features_description">Ta din podcastupplevelse till nästa nivå med exklusiv tillgång till funktioner och anpassningsalternativ.</string>
     <string name="onboarding_patron_feature_special_icons_title">Särskilda Pocket Casts-appikoner</string>
     <string name="onboarding_patron_feature_profile_badge_title">Supporterprofilmärke</string>
     <string name="onboarding_patron_feature_cloud_storage_title">50 GB molnlagring</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Allt i Plus</string>
-    <string name="onboarding_patron_features_description">Bli en Pocket Casts Patron och hjälp oss att fortsätta att leverera den bästa möjliga podcastupplevelsen.</string>
     <string name="onboarding_patron_features_title">Tror du på det vi gör och vill visa ditt stöd?</string>
-    <string name="slash_month">/månad</string>
-    <string name="slash_year">/år</string>
     <string name="server_user_delete_account_with_sub_failed">Ditt konto har en aktiv Pocket Casts Plus-prenumeration. Avbryt denna prenumeration innan du tar bort ditt konto.</string>
     <string name="server_user_change_email_success">Din e-postadress har ändrats.</string>
     <string name="server_user_email_verification_failed">E-postverifieringen misslyckades.</string>
@@ -697,6 +712,7 @@ Language: sv_SE
     <string name="settings_no_thanks">Nej tack</string>
     <string name="settings_manage_downloads_total">Totalsumma</string>
     <string name="settings_manage_downloads_include_starred">Inkludera stjärnmärkta</string>
+    <string name="settings_logs">Loggar</string>
     <string name="settings_lock_image">lås bild</string>
     <string name="settings_licenses">Licenser</string>
     <string name="settings_learn_more">Lär dig mer</string>
