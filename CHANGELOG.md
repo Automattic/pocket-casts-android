@@ -4,9 +4,10 @@
     *   Added the ability to see ratings for podcasts
         ([#951](https://github.com/Automattic/pocket-casts-android/pull/951)).
 *   Bug Fixes:
+    *   Fixed the discover categories sorting so that it is alphabetical in the device language
+        ([#942](https://github.com/Automattic/pocket-casts-android/pull/942)).
     *   Fixed Japanese translations for the 'Show played episodes' setting in Automotive.
         ([#890](https://github.com/Automattic/pocket-casts-android/issues/955)).
-
 *   Updates
     *   Link users to support forum from within the app
         ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
@@ -25,14 +26,14 @@
         ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
     *   Improved the validation of the Automotive skip forward and back time settings
         ([#890](https://github.com/Automattic/pocket-casts-android/pull/892)).
-    *   Fixed the show notes' timestamps not getting converted to a link if it contained another link 
+    *   Fixed the show notes' timestamps not getting converted to a link if it contained another link
         ([#814](https://github.com/Automattic/pocket-casts-android/issues/814)).
     *   Prevented crash when signing out of Android Automotive and clearing data while playback is in progress
         ([#919](https://github.com/Automattic/pocket-casts-android/pull/919)).
     *   Fixed keyboard not appearing when creating or editing folders.
         ([#946](https://github.com/Automattic/pocket-casts-android/pull/946)).
 
- 
+
 7.37.1
 -----
 * Bug Fixes:
@@ -70,11 +71,11 @@
 7.33
 -----
 *   New Features:
-    *    Added search history 
+    *    Added search history
          ([#784](https://github.com/Automattic/pocket-casts-android/pull/784)).
 *   Bug Fixes:
     *    App no longer crashes when the device browser has been disabled
-         ([#762](https://github.com/Automattic/pocket-casts-android/issues/762)).    
+         ([#762](https://github.com/Automattic/pocket-casts-android/issues/762)).
     *    Improve discovery of chromecast devices
          ([#780](https://github.com/Automattic/pocket-casts-android/issues/780)).
 
@@ -94,7 +95,7 @@
 *   Updates
     *   Update styling of upgrade prompt on account details screen
         ([#706](https://github.com/Automattic/pocket-casts-android/pull/706)).
-    *   Updated Android 13 media notification controls setting to hide custom actions 
+    *   Updated Android 13 media notification controls setting to hide custom actions
         ([#719](https://github.com/Automattic/pocket-casts-android/pull/719)).
 *   Health:
     *   Switched to using the new user login and register endpoints.
@@ -173,9 +174,9 @@
 
 *   New Features:
     * Add End of Year stats
-        ([#410](https://github.com/Automattic/pocket-casts-android/issues/410)).
+      ([#410](https://github.com/Automattic/pocket-casts-android/issues/410)).
     * Support Android 13 per-app language preferences
-        ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
+      ([#519](https://github.com/Automattic/pocket-casts-android/pull/519)).
 *   Bug Fixes:
     *   Fixed some layout issues in the EpisodeFragment
         ([#459](https://github.com/Automattic/pocket-casts-android/pull/459)).
