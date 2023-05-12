@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import au.com.shiftyjelly.pocketcasts.models.type.Username
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
@@ -21,6 +23,7 @@ import javax.inject.Inject
 class LoginWithGoogleScreenViewModel @Inject constructor(
     googleSignInClient: GoogleSignInClient,
     private val podcastManager: PodcastManager,
+    private val settings: Settings,
     private val syncManager: SyncManager,
 ) : ViewModel(), GoogleSignInEventListener {
 
@@ -47,6 +50,8 @@ class LoginWithGoogleScreenViewModel @Inject constructor(
             )
         }
 
+        val username = Username.from(account)
+
         account.idToken?.let { idToken ->
             val loginResult = syncManager.loginWithGoogle(idToken, SignInSource.WatchPhoneSync)
             when (loginResult) {
@@ -54,6 +59,7 @@ class LoginWithGoogleScreenViewModel @Inject constructor(
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")
                 }
                 is LoginResult.Success -> {
+                    settings.setUsername(username)
                     podcastManager.refreshPodcastsAfterSignIn()
                 }
             }

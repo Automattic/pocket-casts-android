@@ -1408,7 +1408,6 @@ class SettingsImpl @Inject constructor(
             SubscriptionFrequency.valueOf(it)
         }
 
-
     override fun setFullySignedOut(boolean: Boolean) {
         setBoolean(PROCESSED_SIGNOUT_KEY, boolean)
     }

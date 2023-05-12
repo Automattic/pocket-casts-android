@@ -111,6 +111,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
                 } else {
                     signInWithGoogleToken(
                         idToken = idToken,
+                        username = Username.from(lastSignedInAccount),
                         onSuccess = {},
                         onError = onError
                     )
@@ -178,14 +179,9 @@ class GoogleSignInButtonViewModel @Inject constructor(
         onError: suspend () -> Unit
     ) {
         val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
-        val username = Username(
-            firstName = credential.givenName,
-            lastName = credential.familyName,
-            displayName = credential.displayName,
-        )
         val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
         signInWithGoogleToken(
-            username = username,
+            username = Username.from(credential),
             idToken = idToken,
             onSuccess = onSuccess,
             onError = onError,
@@ -194,15 +190,13 @@ class GoogleSignInButtonViewModel @Inject constructor(
 
     private suspend fun signInWithGoogleToken(
         idToken: String,
-        username: Username? = null,
+        username: Username,
         onSuccess: (GoogleSignInState) -> Unit,
         onError: suspend () -> Unit
     ) =
         when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
             is LoginResult.Success -> {
-                if (username != null) {
-                    settings.setUsername(username)
-                }
+                settings.setUsername(username)
                 podcastManager.refreshPodcastsAfterSignIn()
                 onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount))
             }
