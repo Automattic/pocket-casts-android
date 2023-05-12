@@ -4,6 +4,10 @@
     *   Added the ability to see ratings for podcasts
         ([#951](https://github.com/Automattic/pocket-casts-android/pull/951)).
 
+*   Updates
+    *   Link users to support forum from within the app
+        ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
+
 7.38
 -----
 *   Updates:
