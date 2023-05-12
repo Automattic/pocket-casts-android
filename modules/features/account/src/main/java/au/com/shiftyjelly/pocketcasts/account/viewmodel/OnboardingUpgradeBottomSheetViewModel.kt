@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
 import android.app.Activity
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.Loaded
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.Loading
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetState.NoSubscriptions
@@ -10,10 +12,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.PurchaseEvent
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +36,11 @@ import javax.inject.Inject
 class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     private val subscriptionManager: SubscriptionManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
+    private val settings: Settings,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
+    private val source = savedStateHandle.get<OnboardingUpgradeSource>("source")
 
     private val _state = MutableStateFlow<OnboardingUpgradeBottomSheetState>(Loading)
     val state: StateFlow<OnboardingUpgradeBottomSheetState> = _state
@@ -132,12 +140,20 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
     }
 
     private fun stateFromList(subscriptions: List<Subscription>): OnboardingUpgradeBottomSheetState {
-        val defaultSelected = subscriptionManager.getDefaultSubscription(subscriptions)
+        val lastSelectedTier = settings.getLastSelectedSubscriptionTier().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
+        val lastSelectedFrequency = settings.getLastSelectedSubscriptionFrequency().takeIf { source in listOf(OnboardingUpgradeSource.LOGIN, OnboardingUpgradeSource.PROFILE) }
+
+        val fromProfile = source == OnboardingUpgradeSource.PROFILE
+        val defaultSelected = subscriptionManager.getDefaultSubscription(
+            subscriptions = subscriptions,
+            tier = lastSelectedTier,
+            frequency = lastSelectedFrequency
+        )
         return if (defaultSelected == null) {
             NoSubscriptions
         } else {
             Loaded(
-                subscriptions = subscriptions,
+                subscriptions = if (fromProfile) subscriptions.filter { it.tier == defaultSelected.tier } else subscriptions,
                 selectedSubscription = defaultSelected,
                 purchaseFailed = false,
             )
@@ -176,7 +192,7 @@ sealed class OnboardingUpgradeBottomSheetState {
         val purchaseFailed: Boolean = false
     ) : OnboardingUpgradeBottomSheetState() {
         val showTrialInfo = selectedSubscription.trialPricingPhase != null
-
+        val upgradeButton = selectedSubscription.toUpgradeButton()
         init {
             if (subscriptions.isEmpty()) {
                 LogBuffer.e(

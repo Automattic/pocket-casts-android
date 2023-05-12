@@ -80,7 +80,7 @@ project.ext {
     // Library versions
     versionAccessibilityTestFramework = '4.0.0'
     versionBillingClient = '5.0.0'
-    versionCompose = '1.4.1' // When updating this, also check if versionComposeAccompanist should be updated as well: https://github.com/google/accompanist#compose-versions
+    versionCompose = '1.4.2' // When updating this, also check if versionComposeAccompanist should be updated as well: https://github.com/google/accompanist#compose-versions
     versionComposeAccompanist = '0.30.1'
     versionComposeCompiler = '1.3.0'
     versionComposeWear = '1.2.0-alpha07'
@@ -203,8 +203,7 @@ project.ext {
             media3DatasourceOkhttp: "androidx.media3:media3-datasource-okhttp:$versionMedia3",
 
             // Fixes instrumentation tests, see: https://github.com/android/android-test/issues/861#issuecomment-1180219978
-            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework",
-            zxingCore: "com.google.zxing:core:3.5.1"
+            accessibilityTestFramework: "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:$versionAccessibilityTestFramework"
     ]
 
     libs = [

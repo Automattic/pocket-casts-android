@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="profile_picture_size_old">48dp</dimen>
-    <dimen name="profile_picture_size_new">104dp</dimen>
+    <dimen name="profile_picture_size">104dp</dimen>
+    <dimen name="account_details_picture_size">64dp</dimen>
 </resources>

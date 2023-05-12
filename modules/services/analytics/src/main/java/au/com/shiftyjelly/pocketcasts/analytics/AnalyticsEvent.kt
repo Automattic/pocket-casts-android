@@ -479,6 +479,8 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Settings - Help */
     SETTINGS_HELP_SHOWN("settings_help_shown"),
+    SETTINGS_LEAVE_FEEDBACK("settings_leave_feedback"),
+    SETTINGS_GET_SUPPORT("settings_get_support"),
 
     /* Settings - Import - Export */
     SETTINGS_IMPORT_SHOWN("settings_import_shown"),

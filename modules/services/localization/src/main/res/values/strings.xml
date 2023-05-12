@@ -82,6 +82,7 @@
     <string name="stream">Stream</string>
     <string name="subscribe">Subscribe</string>
     <string name="subscribe_to">Subscribe to %s</string>
+    <string name="upgrade_to">Upgrade to %s</string>
     <string name="unarchive_all">Unarchive all</string>
     <string name="unplayed">Unplayed</string>
     <string name="unsubscribe">Unsubscribe</string>
@@ -909,6 +910,7 @@
     <string name="profile_updates_ended">Updates ended: %s</string>
     <string name="profile_updates_ends">Updates end: %s</string>
     <string name="profile_upgrade_to_plus">Upgrade to Plus</string>
+    <string name="profile_upgrade_to_patron">Upgrade to Patron</string>
     <string name="profile_web_player">Web Player</string>
     <string name="profile_welcome_to_free">Welcome to Pocket Casts!</string>
     <string name="profile_welcome_to_plus">Welcome to Pocket Casts Plus!</string>
@@ -1293,6 +1295,9 @@
     <string name="settings_status_service_hosts_help">The most common cause is that you have an ad-blocker configured on your phone or network. You’ll need to unblock this domain to download podcasts. Please note Pocket Casts doesn’t host or choose where podcasts are hosted, that’s up to the author of the show and is out of our control.</string>
     <string name="settings_status_service_support">Support</string>
     <string name="settings_status_service_support_summary">Access to the support FAQ and contact us.</string>
+    <string name="settings_forums">Pocket Casts Forums</string>
+    <string name="settings_forums_description">Please go to Pocket Casts\' forums (%1$s) where our support team can help you.</string>
+    <string name="settings_take_me_there">Take me there</string>
     <string name="settings_about_share_with_friends">Share with friends</string>
     <string name="settings_about_share_with_friends_message">Hey! Here is a link to download the Pocket Casts app. I\'m really enjoying it and thought you might too. \nhttps://www.pocketcasts.com</string>
     <string name="settings_about_rate_us">Rate us</string>
@@ -1560,6 +1565,7 @@
     <string name="onboarding_patron_feature_profile_badge_title">Supporters profile badge</string>
     <string name="onboarding_patron_feature_special_icons_title">Special Pocket Casts app icons</string>
     <string name="onboarding_patron_feature_gratitude_title" translatable="false">@string/onboarding_plus_feature_gratitude_title</string>
+    <string name="onboarding_patron_subscribe">Subscribe to Pocket&#160;Casts Patron</string>
     <string name="onboarding_plus_features_title" translatable="false">@string/onboarding_upgrade_everything_you_love_about_pocket_casts_plus</string>
     <string name="onboarding_plus_feature_desktop_apps_title">Desktop Apps</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Listen in more places with our Windows, macOS, and Web apps.</string>
@@ -1575,6 +1581,7 @@
     <string name="onboarding_plus_privacy_policy">Privacy Policy</string>
     <string name="onboarding_plus_terms_and_conditions">Terms and Conditions</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">Start free trial &amp; subscribe</string>
+    <string name="onboarding_plus_subscribe">Subscribe to Pocket&#160;Casts Plus</string>
     <string name="onboarding_plus_recurring_after_free_trial">Recurring payments will begin after your %s</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Can be canceled at any time.</string>
     <string name="onboarding_welcome_get_you_listening">Welcome, now let\'s get you listening!</string>

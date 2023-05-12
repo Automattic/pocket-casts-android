@@ -32,36 +32,29 @@ import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -72,26 +65,27 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.IconRow
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusOutlinedRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.OutlinedRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PlusRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeButton
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.UpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationIconButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalPagerWrapper
 import au.com.shiftyjelly.pocketcasts.compose.components.StyledToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -150,7 +144,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                 onBackPressed = onBackPressed,
                 onNotNowPressed = onNotNowPressed,
                 onSubscriptionFrequencyChanged = { viewModel.onSubscriptionFrequencyChanged(it) },
-                onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCards[it]) },
+                onFeatureCardChanged = { viewModel.onFeatureCardChanged(loadedState.featureCardsState.featureCards[it]) },
                 onClickSubscribe = onClickSubscribe,
                 canUpgrade = canUpgrade,
             )
@@ -305,75 +299,26 @@ fun FeatureCards(
     state: OnboardingUpgradeFeaturesState.Loaded,
     onFeatureCardChanged: (Int) -> Unit,
 ) {
-    val pagerState =
-        rememberPagerState(initialPage = state.featureCards.indexOf(state.currentFeatureCard))
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.collect { index ->
-            onFeatureCardChanged(index)
-        }
-    }
-
-    var pagerHeight by remember { mutableStateOf(0) }
-    HorizontalPager(
-        pageCount = state.featureCards.size,
-        state = pagerState,
+    val featureCardsState = state.featureCardsState
+    HorizontalPagerWrapper(
+        pageCount = featureCardsState.featureCards.size,
+        initialPage = featureCardsState.featureCards.indexOf(state.currentFeatureCard),
+        onPageChanged = onFeatureCardChanged,
+        showPageIndicator = featureCardsState.showPageIndicator,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
-    ) { index ->
-        var pageHeight by remember { mutableStateOf(0) }
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .layout { measurable, constraints ->
-                    /* https://github.com/google/accompanist/issues/1050#issuecomment-1097483476 */
-                    val placeable = measurable.measure(constraints)
-                    pageHeight = placeable.height
-                    /* Restrict page height to the pager height */
-                    layout(constraints.maxWidth, pagerHeight) {
-                        placeable.placeRelative(0, 0)
-                    }
-                }
-                .onGloballyPositioned {
-                    /* Update pager height to the tallest page */
-                    if (pageHeight > pagerHeight) {
-                        pagerHeight = pageHeight
-                    }
-                }
-        ) {
-            FeatureCard(
-                card = state.featureCards[index],
-                modifier = if (pagerHeight > 0) {
-                    Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
-                } else Modifier
-            )
-        }
-    }
-
-    if (state.showPageIndicator) {
-        Row(
-            Modifier
-                .height(40.dp)
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            repeat(state.featureCards.size) { iteration ->
-                val color =
-                    if (pagerState.currentPage == iteration) Color.White else Color.White.copy(alpha = 0.5f)
-                Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                        .size(8.dp)
-                )
-            }
-        }
+    ) { index, pagerHeight ->
+        FeatureCard(
+            card = featureCardsState.featureCards[index],
+            modifier = if (pagerHeight > 0) {
+                Modifier.height(pagerHeight.pxToDp(LocalContext.current).dp)
+            } else Modifier
+        )
     }
 }
 
 @Composable
-fun FeatureCard(
+private fun FeatureCard(
     card: UpgradeFeatureCard,
     modifier: Modifier = Modifier,
 ) {
@@ -394,16 +339,17 @@ fun FeatureCard(
                     .padding(bottom = 12.dp),
                 contentAlignment = Alignment.TopStart
             ) {
-                SubscriptionTierPill(
+                SubscriptionBadge(
                     iconRes = card.iconRes,
                     shortNameRes = card.shortNameRes,
-                    modifier = Modifier.background(Color.Black)
+                    backgroundColor = Color.Black,
+                    textColor = Color.White,
                 )
             }
 
             Column {
                 card.featureItems.forEach {
-                    FeatureItem(it)
+                    UpgradeFeatureItem(it)
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 OnboardingUpgradeHelper.PrivacyPolicy(
@@ -413,34 +359,6 @@ fun FeatureCard(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun FeatureItem(
-    content: UpgradeFeatureItem,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .semantics(mergeDescendants = true) {}
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Icon(
-            painter = painterResource(content.image),
-            contentDescription = null,
-            tint = Color.Black,
-            modifier = modifier
-                .size(20.dp)
-                .padding(2.dp),
-        )
-        Spacer(Modifier.width(16.dp))
-        TextH50(
-            text = stringResource(content.title),
-            color = Color.Black,
-        )
     }
 }
 
@@ -468,8 +386,8 @@ private fun UpgradeButton(
             UpgradeRowButton(
                 primaryText = primaryText,
                 secondaryText = secondaryText,
-                backgroundColor = button.backgroundColor,
-                textColor = button.textColor,
+                backgroundColor = colorResource(button.backgroundColorRes),
+                textColor = colorResource(button.textColorRes),
                 onClick = onClickSubscribe,
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 24.dp)
@@ -552,10 +470,12 @@ private fun OldUpgradeLayout(
 
                 Spacer(Modifier.height(16.dp))
 
-                PlusOutlinedRowButton(
+                OutlinedRowButton(
                     text = stringResource(LR.string.not_now),
                     onClick = onNotNowPressed,
+                    brush = OnboardingUpgradeHelper.plusGradientBrush,
                     modifier = Modifier.padding(horizontal = 24.dp),
+                    subscriptionTier = SubscriptionTier.PLUS
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -720,7 +640,7 @@ fun NoSubscriptionsLayout(
         ) {
             NavigationIconButton(
                 onNavigationClick = onBackPressed,
-                iconColor = Color.White,
+                iconColor = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier
                     .height(48.dp)
                     .width(48.dp)
@@ -728,7 +648,7 @@ fun NoSubscriptionsLayout(
             if (showNotNow) {
                 TextH30(
                     text = stringResource(LR.string.not_now),
-                    color = Color.White,
+                    color = MaterialTheme.theme.colors.primaryText01,
                     modifier = Modifier
                         .padding(horizontal = 24.dp)
                         .clickable { onNotNowPressed() },

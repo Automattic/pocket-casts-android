@@ -6,13 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.widget.ConstraintLayout
 import au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
-import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionTierPill
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralDaysMonthsOrYears
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSecondsMinutesHoursDaysOrYears
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -21,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
 import au.com.shiftyjelly.pocketcasts.utils.days
@@ -49,7 +54,9 @@ open class UserView @JvmOverloads constructor(
     val lblSignInStatus: TextView?
     val imgProfilePicture: ProfileCircleView
     val btnAccount: Button?
-    private val subscriptionTierPill: ComposeView?
+    private val subscriptionBadge: ComposeView?
+    private val isDarkTheme: Boolean
+        get() = Theme.isDark(context)
 
     init {
         LayoutInflater.from(context).inflate(layoutResource, this, true)
@@ -57,21 +64,19 @@ open class UserView @JvmOverloads constructor(
         lblSignInStatus = findViewById(R.id.lblSignInStatus)
         imgProfilePicture = findViewById(R.id.imgProfilePicture)
         btnAccount = findViewById(R.id.btnAccount)
-        subscriptionTierPill = findViewById(R.id.subscriptionTierPill)
+        subscriptionBadge = findViewById(R.id.subscriptionBadge)
         setBackgroundResource(R.drawable.background_user_view)
     }
 
     open fun update(signInState: SignInState?) {
-        val isPatron = false // TODO: Patron - get Patron state from subscription status
-        updateProfileImageAndDaysRemaining(signInState, isPatron)
-        updateEmail(signInState, isPatron)
-        updateSubscriptionTierPill(signInState, isPatron)
+        updateProfileImageAndDaysRemaining(signInState)
+        updateEmail(signInState)
+        updateSubscriptionBadge(signInState)
         updateAccountButton(signInState)
     }
 
     private fun updateProfileImageAndDaysRemaining(
         signInState: SignInState?,
-        isPatron: Boolean,
     ) {
         when (signInState) {
             is SignInState.SignedIn -> {
@@ -84,7 +89,7 @@ open class UserView @JvmOverloads constructor(
                 imgProfilePicture.setup(
                     percent = percent,
                     plusOnly = signInState.isSignedInAsPlus,
-                    isPatron = isPatron,
+                    isPatron = signInState.isSignedInAsPatron,
                     gravatarUrl = gravatarUrl
                 )
             }
@@ -111,7 +116,7 @@ open class UserView @JvmOverloads constructor(
         return null
     }
 
-    private fun setDaysRemainingTextIfNeeded(signInState: SignInState.SignedIn, isPatron: Boolean) {
+    private fun setDaysRemainingTextIfNeeded(signInState: SignInState.SignedIn) {
         val status = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Plus) ?: return
         if (status.autoRenew) {
             return
@@ -124,20 +129,20 @@ open class UserView @JvmOverloads constructor(
 
         if (timeLeftMs <= maxSubscriptionExpiryMs) {
             val expiresIn = resources.getStringPluralSecondsMinutesHoursDaysOrYears(timeLeftMs)
-            val messagesRes = if (isPatron) LR.string.profile_patron_expires_in else LR.string.profile_plus_expires_in
+            val messagesRes = if (signInState.isSignedInAsPatron) LR.string.profile_patron_expires_in else LR.string.profile_plus_expires_in
             lblUserEmail.text = context.getString(messagesRes, expiresIn).uppercase()
             lblUserEmail.setTextColor(lblUserEmail.context.getThemeColor(UR.attr.support_05))
         }
     }
 
-    private fun updateEmail(signInState: SignInState?, isPatron: Boolean) {
+    private fun updateEmail(signInState: SignInState?) {
         when (signInState) {
             is SignInState.SignedIn -> {
                 lblUserEmail.text = signInState.email
                 lblUserEmail.visibility = View.VISIBLE
                 lblUserEmail.setTextColor(context.getThemeColor(UR.attr.primary_text_01))
 
-                if (this !is ExpandedUserView) setDaysRemainingTextIfNeeded(signInState, isPatron)
+                if (this !is ExpandedUserView) setDaysRemainingTextIfNeeded(signInState)
             }
             is SignInState.SignedOut -> {
                 lblUserEmail.text = context.getString(LR.string.profile_set_up_account)
@@ -147,17 +152,32 @@ open class UserView @JvmOverloads constructor(
         }
     }
 
-    private fun updateSubscriptionTierPill(signInState: SignInState?, isPatron: Boolean) {
-        subscriptionTierPill?.apply {
+    private fun updateSubscriptionBadge(signInState: SignInState?) {
+        subscriptionBadge?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                if (signInState is SignInState.SignedIn && isPatron) {
-                    SubscriptionTierPill(
-                        iconRes = IR.drawable.ic_patron,
-                        shortNameRes = LR.string.pocket_casts_patron_short,
-                        iconColor = Color.White,
-                        backgroundColor = colorResource(UR.color.patron_purple),
-                    )
+                AppTheme(if (isDarkTheme) Theme.ThemeType.DARK else Theme.ThemeType.LIGHT) {
+                    if (signInState is SignInState.SignedIn) {
+                        val isExpandedUserView = this@UserView is ExpandedUserView
+                        val modifier = Modifier.padding(top = 16.dp)
+                        if (signInState.isSignedInAsPatron) {
+                            SubscriptionBadge(
+                                iconRes = IR.drawable.ic_patron,
+                                shortNameRes = LR.string.pocket_casts_patron_short,
+                                iconColor = if (!isExpandedUserView) Color.White else Color.Unspecified,
+                                backgroundColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple) else null,
+                                textColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple_light) else null,
+                                modifier = if (isExpandedUserView) modifier else Modifier,
+                            )
+                        } else if (signInState.isSignedInAsPlus && isExpandedUserView) {
+                            SubscriptionBadge(
+                                iconRes = IR.drawable.ic_plus,
+                                shortNameRes = LR.string.pocket_casts_plus_short,
+                                iconColor = colorResource(UR.color.plus_gold),
+                                modifier = modifier,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -179,22 +199,16 @@ class ExpandedUserView @JvmOverloads constructor(
 ) : UserView(context, attrs, defStyleAttr) {
     override val layoutResource: Int
         get() = R.layout.view_expanded_user
-    val lblAccountType: TextView
-        get() = findViewById(R.id.lblAccountType)
     val lblPaymentStatus: TextView
         get() = findViewById(R.id.lblPaymentStatus)
 
     override fun update(signInState: SignInState?) {
         super.update(signInState)
 
-        val strPocketCasts = context.getString(LR.string.pocket_casts)
-        val strPocketCastsPlus = context.getString(LR.string.pocket_casts_plus)
-        lblAccountType.text = if (signInState?.isSignedInAsPlus == true) strPocketCastsPlus else strPocketCasts
-
         val status = (signInState as? SignInState.SignedIn)?.subscriptionStatus ?: return
         when (status) {
             is SubscriptionStatus.Free -> {
-                lblPaymentStatus.text = ""
+                lblPaymentStatus.text = context.getString(LR.string.profile_free_account)
                 lblSignInStatus?.text = ""
             }
             is SubscriptionStatus.Plus -> {

@@ -7,5 +7,6 @@ enum class OnboardingUpgradeSource(val analyticsValue: String) {
     LOGIN("login"),
     PLUS_DETAILS("plus_details"),
     PROFILE("profile"),
+    ACCOUNT_DETAILS("account_details"),
     RECOMMENDATIONS("recommendations"),
 }
