@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentSettingsAppearanceBinding
@@ -85,7 +86,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                     binding.themeRecyclerView.setHasFixedSize(true)
                     scrollToCurrentTheme()
 
-                    binding.appIconRecyclerView.adapter = AppearanceIconSettingsAdapter(mainWidth, isSignedInAsPlus, state.currentAppIcon, state.iconList) { beforeAppIconType, afterAppIconType, validIcon ->
+                    binding.appIconRecyclerView.adapter = AppearanceIconSettingsAdapter(mainWidth, viewModel.signInState.value, state.currentAppIcon, state.iconList) { beforeAppIconType, afterAppIconType, validIcon ->
                         if (validIcon) {
                             viewModel.updateGlobalIcon(afterAppIconType)
 
@@ -96,7 +97,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                                 .show()
                         } else {
                             viewModel.updateChangeAppIconType(Pair(beforeAppIconType, afterAppIconType))
-                            openOnboardingFlow()
+                            openOnboardingFlow(afterAppIconType.type)
                         }
                     }
                     binding.appIconRecyclerView.setHasFixedSize(true)
@@ -148,7 +149,7 @@ class AppearanceSettingsFragment : BaseFragment() {
             }
 
             (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updatePlusSignedIn(signInState.isSignedInAsPlus)
-            (binding.appIconRecyclerView.adapter as? AppearanceIconSettingsAdapter)?.updatePlusSignedIn(signInState.isSignedInAsPlus)
+            (binding.appIconRecyclerView.adapter as? AppearanceIconSettingsAdapter)?.updatePlusSignedIn(signInState)
             binding.upgradeGroup.isVisible = !signInState.isSignedInAsPlus && !settings.getUpgradeClosedAppearSettings()
         }
 
@@ -191,8 +192,11 @@ class AppearanceSettingsFragment : BaseFragment() {
         viewModel.onShown()
     }
 
-    private fun openOnboardingFlow() {
-        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.APPEARANCE))
+    private fun openOnboardingFlow(type: SubscriptionType? = null) {
+        val onboardingFlow = type?.takeIf { type == SubscriptionType.PATRON }?.let {
+            OnboardingFlow.PlusUpsell(source = OnboardingUpgradeSource.APPEARANCE, showPatronOnly = true)
+        } ?: OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.APPEARANCE)
+        OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)
     }
 
     private fun scrollToCurrentTheme() {
