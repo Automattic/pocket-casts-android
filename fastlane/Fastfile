@@ -122,7 +122,6 @@ platform :android do
   end
 
   lane :finalize_hotfix_release do |options|
-    push_to_git_remote()
 
     new_version = android_get_app_version()
     trigger_release_build(branch_to_build: "release/#{new_version}")
