@@ -65,6 +65,9 @@ class SettingsImpl @Inject constructor(
         private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
         private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
+        private const val USERNAME_FIRST = "UsernameFirst"
+        private const val USERNAME_LAST = "UsernameLast"
+        private const val USERNAME_DISPLAY = "UsernameDisplay"
     }
 
     private var languageCode: String? = null

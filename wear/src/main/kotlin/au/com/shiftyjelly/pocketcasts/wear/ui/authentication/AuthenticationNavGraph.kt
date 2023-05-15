@@ -28,7 +28,9 @@ fun NavGraphBuilder.authenticationNavGraph(navController: NavController) {
         scrollable(AuthenticationNavRoutes.loginScreen) {
             LoginScreen(
                 columnState = it.columnState,
-                onLoginWithGoogleClick = {},
+                onLoginWithGoogleClick = {
+                    navController.navigate(AuthenticationNavRoutes.loginWithGoogle)
+                },
                 onLoginWithPhoneClick = {
                     navController.navigate(AuthenticationNavRoutes.loginWithPhone)
                 },
@@ -73,6 +75,26 @@ fun NavGraphBuilder.authenticationNavGraph(navController: NavController) {
             LoginWithPhoneScreen(
                 columnState = it.columnState,
                 onDone = { navController.popBackStack() },
+            )
+        }
+
+        composable(AuthenticationNavRoutes.loginWithGoogle) {
+            LoginWithGoogleScreen(
+                onAuthSucceed = {
+                    val popped = navController.popBackStack(
+                        route = WatchListScreen.route,
+                        inclusive = false,
+                    )
+                    if (popped) {
+                        navController
+                            .currentBackStackEntry
+                            ?.savedStateHandle
+                            ?.set(WatchListScreen.scrollToTop, true)
+                    }
+                },
+                onAuthCanceled = {
+                    navController.popBackStack()
+                },
             )
         }
     }

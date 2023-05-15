@@ -189,6 +189,7 @@ project.ext {
 
             horologistAudioUi: "com.google.android.horologist:horologist-audio-ui:$versionHorologist",
             horologistAuthData: "com.google.android.horologist:horologist-auth-data:$versionHorologist",
+            horologistAuthComposables: "com.google.android.horologist:horologist-auth-composables:$versionHorologist",
             horologistAuthDataPhone: "com.google.android.horologist:horologist-auth-data-phone:$versionHorologist",
             horologistAuthUi: "com.google.android.horologist:horologist-auth-ui:$versionHorologist",
             horologistBaseUi: "com.google.android.horologist:horologist-base-ui:$versionHorologist",

@@ -103,6 +103,7 @@ class UserManagerImpl @Inject constructor(
                 settings.setMarketingOptIn(false)
                 settings.setMarketingOptInNeedsSync(false)
                 settings.setEndOfYearModalHasBeenShown(false)
+
                 analyticsTracker.track(
                     AnalyticsEvent.USER_SIGNED_OUT,
                     mapOf(KEY_USER_INITIATED to wasInitiatedByUser)
