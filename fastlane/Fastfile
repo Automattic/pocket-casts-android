@@ -90,7 +90,6 @@ platform :android do
 
   lane :complete_code_freeze do | options |
     android_completecodefreeze_prechecks(options)
-    push_to_git_remote()
 
     new_version = android_get_app_version()
     trigger_release_build(branch_to_build: "release/#{new_version}")
