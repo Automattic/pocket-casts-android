@@ -90,6 +90,7 @@ platform :android do
 
   lane :complete_code_freeze do | options |
     android_completecodefreeze_prechecks(options)
+    push_to_git_remote()
 
     new_version = android_get_app_version()
     trigger_release_build(branch_to_build: "release/#{new_version}")
@@ -98,6 +99,8 @@ platform :android do
   lane :new_beta_release do | options |
     android_betabuild_prechecks(options)
     android_bump_version_beta()
+    push_to_git_remote()
+
     new_version = android_get_app_version()
     trigger_release_build(branch_to_build: "release/#{new_version}")
   end
@@ -119,6 +122,8 @@ platform :android do
   end
 
   lane :finalize_hotfix_release do |options|
+    push_to_git_remote()
+
     new_version = android_get_app_version()
     trigger_release_build(branch_to_build: "release/#{new_version}")
   end
@@ -204,6 +209,7 @@ platform :android do
     create_new_milestone(repository:GH_REPOSITORY, need_appstore_submission: true)
     close_milestone(repository:GH_REPOSITORY, milestone: version["name"])
 
+    push_to_git_remote()
     trigger_release_build(branch_to_build: "release/#{version["name"]}")
   end
 
