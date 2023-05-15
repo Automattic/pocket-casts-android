@@ -17,6 +17,7 @@ object LogBuffer {
     const val TAG_PLAYBACK = "Playback"
     const val TAG_CRASH = "Crash"
     const val TAG_BACKGROUND_TASKS = "BgTask"
+    const val TAG_RX_JAVA_DEFAULT_ERROR_HANDLER = "RxJavaDefaultErrorHandler"
     const val TAG_SUBSCRIPTIONS = "Subscriptions"
     const val TAG_INVALID_STATE = "InvalidState"
 
