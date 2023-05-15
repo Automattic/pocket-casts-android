@@ -1,17 +1,16 @@
-*   Updates:
-    *   Added Advanced Settings section for experimental settings
-        ([#885](https://github.com/Automattic/pocket-casts-android/pull/885/)).
-    *   Added setting to disable sync on metered networks
-        ([#885](https://github.com/Automattic/pocket-casts-android/pull/885/)).
-    *   Added ability to view and share app logs from the "Help & feedback" screen
-        ([911](https://github.com/Automattic/pocket-casts-android/pull/911)).
+*   New Features:
+    *   Added the ability to see ratings for podcasts
+        ([#951](https://github.com/Automattic/pocket-casts-android/pull/951)).
 *   Bug Fixes:
-    *   Fixed accessibility content desctiption for episode list
-        ([#890](https://github.com/Automattic/pocket-casts-android/issues/890)).
-    *   Improved the validation of the Automotive skip forward and back time settings
-        ([#890](https://github.com/Automattic/pocket-casts-android/pull/892)).
-    *   Fixed the show notes' timestamps not getting converted to a link if it contained another link 
-        ([#814](https://github.com/Automattic/pocket-casts-android/issues/814)).
-    *   Prevented crash when signing out of Android Automotive and clearing data while playback is in progress
-        ([#919](https://github.com/Automattic/pocket-casts-android/pull/919)).    
+    *   Fixed the discover categories sorting so that it is alphabetical in the device language
+        ([#942](https://github.com/Automattic/pocket-casts-android/pull/942)).
+    *   Fixed Japanese translations for the 'Show played episodes' setting in Automotive.
+        ([#890](https://github.com/Automattic/pocket-casts-android/issues/955)).
+    *   Fixed the listening stats.
+        ([#960](https://github.com/Automattic/pocket-casts-android/pull/960)).
+    *   Fixed crash on grouping by season
+        ([#962](https://github.com/Automattic/pocket-casts-android/pull/962)).
+*   Updates
+    *   Link users to support forum from within the app
+        ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
 
