@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping.Season.getSeasonGroupId
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((PodcastEpisode) -> Int)?) {
@@ -36,7 +37,7 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
         }
     }
 
-    object Season : PodcastGrouping(LR.string.podcast_group_season, { it.season?.toInt() ?: 0 }) {
+    object Season : PodcastGrouping(LR.string.podcast_group_season, { getSeasonGroupId(it) }) {
         lateinit var groupTitlesList: List<String>
         override fun groupTitles(index: Int, context: Context): String {
             return groupTitlesList.getOrNull(index) ?: context.getString(LR.string.podcast_no_season)
@@ -48,7 +49,7 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
             list.forEach {
                 val firstEpisode = it.firstOrNull()
                 if (firstEpisode != null) {
-                    if (firstEpisode.season != null) {
+                    if (getSeasonGroupId(firstEpisode) > 0) {
                         titleList.add(resources.getString(LR.string.podcast_season_x, firstEpisode.season ?: 0))
                     } else {
                         titleList.add(resources.getString(LR.string.podcast_no_season))
@@ -61,6 +62,9 @@ sealed class PodcastGrouping(@StringRes val groupName: Int, val sortFunction: ((
             groupTitlesList = titleList.toList()
             return list
         }
+
+        private fun getSeasonGroupId(firstEpisode: PodcastEpisode) =
+            firstEpisode.season?.toInt()?.takeIf { season -> season > 0 } ?: 0
     }
 
     object Starred : PodcastGrouping(LR.string.profile_navigation_starred, { if (it.isStarred) 0 else 1 }) {

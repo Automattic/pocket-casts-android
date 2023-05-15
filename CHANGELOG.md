@@ -10,6 +10,8 @@
         ([#890](https://github.com/Automattic/pocket-casts-android/issues/955)).
     *   Fixed the listening stats.
         ([#960](https://github.com/Automattic/pocket-casts-android/pull/960)).
+    *   Fixed crash on grouping by season
+        ([#962](https://github.com/Automattic/pocket-casts-android/pull/962)).
 *   Updates
     *   Link users to support forum from within the app
         ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
