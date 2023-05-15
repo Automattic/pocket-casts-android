@@ -8,6 +8,8 @@
         ([#942](https://github.com/Automattic/pocket-casts-android/pull/942)).
     *   Fixed Japanese translations for the 'Show played episodes' setting in Automotive.
         ([#890](https://github.com/Automattic/pocket-casts-android/issues/955)).
+    *   Fixed the listening stats.
+        ([#960](https://github.com/Automattic/pocket-casts-android/pull/960)).
 *   Updates
     *   Link users to support forum from within the app
         ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
