@@ -647,6 +647,8 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    var lastSkipTimestamp: Long = 0L
+
     fun skipForward(playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN, jumpAmountSeconds: Int = settings.getSkipForwardInSecs()) {
         launch {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skip forward tapped")
@@ -661,6 +663,8 @@ open class PlaybackManager @Inject constructor(
             val durationMs = player?.durationMs() ?: Int.MAX_VALUE // If we don't have a duration, just let them skip
 
             statsManager.addTimeSavedSkipping((newPositionMs - currentTimeMs).toLong())
+            lastSkipTimestamp = System.currentTimeMillis()
+
             if (newPositionMs < durationMs) {
                 seekToTimeMsInternal(newPositionMs)
             } else {
@@ -682,6 +686,12 @@ open class PlaybackManager @Inject constructor(
             if (currentTimeMs < 0) return@launch
 
             val newPositionMs = Math.max(currentTimeMs - jumpAmountMs, 0)
+
+            if (System.currentTimeMillis() - lastSkipTimestamp < 2000) {
+                statsManager.addTimeSavedSkipping(-jumpAmountMs.toLong())
+                lastSkipTimestamp = System.currentTimeMillis()
+            }
+
             seekToTimeMsInternal(newPositionMs)
         }
         trackPlayback(AnalyticsEvent.PLAYBACK_SKIP_BACK, playbackSource)
