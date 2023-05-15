@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
+import android.os.Build
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -33,6 +34,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -111,13 +113,14 @@ open class SyncServerManager @Inject constructor(
         server.namedSettings(addBearer(token), request)
 
     fun syncUpdate(email: String, data: String, lastModified: String, token: AccessToken): Single<SyncUpdateResponse> {
-        val fields = mapOf(
+        val fields = mutableMapOf(
             "email" to email,
             "token" to token.value,
             "data" to data,
             "device_utc_time_ms" to System.currentTimeMillis().toString(),
             "last_modified" to lastModified
         )
+        addDeviceFields(fields)
         return server.syncUpdate(fields)
     }
 
@@ -257,5 +260,18 @@ open class SyncServerManager @Inject constructor(
 
     private fun addBearer(token: AccessToken): String {
         return "Bearer ${token.value}"
+    }
+
+    private fun addDeviceFields(fields: MutableMap<String, String>) {
+        with(fields) {
+            put("device", settings.getUniqueDeviceId())
+            put("v", Settings.PARSER_VERSION)
+            put("av", settings.getVersion())
+            put("ac", settings.getVersionCode().toString())
+            put("dt", "2")
+            put("c", Locale.getDefault().country)
+            put("l", Locale.getDefault().language)
+            put("m", Build.MODEL)
+        }
     }
 }

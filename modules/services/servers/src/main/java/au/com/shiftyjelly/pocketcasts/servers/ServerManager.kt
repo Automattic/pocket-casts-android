@@ -195,14 +195,6 @@ open class ServerManager @Inject constructor(
             .add("scope", "mobile")
     }
 
-    private fun postToSyncServer(servicePath: String, email: String?, password: String?, parameters: Parameters?, async: Boolean, postCallback: PostCallback): Call? {
-        val params = parameters ?: Parameters()
-        params.add("email", email)
-        password?.let { params.add("password", it) }
-        addDeviceParameters(params)
-        return post(Settings.SERVER_API_URL, servicePath, params, async, postCallback)
-    }
-
     private fun postToMainServer(servicePath: String, parameters: Parameters?, async: Boolean, postCallback: PostCallback): Call? {
         val parametersOrEmpty = parameters ?: Parameters()
         addDeviceParameters(parametersOrEmpty)
