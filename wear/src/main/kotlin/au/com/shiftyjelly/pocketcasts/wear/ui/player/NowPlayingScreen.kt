@@ -12,21 +12,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
+import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
 import au.com.shiftyjelly.pocketcasts.R
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.MarqueeTextMediaDisplay
 import com.google.android.horologist.audio.ui.VolumeUiState
 import com.google.android.horologist.audio.ui.components.actions.SetVolumeButton
 import com.google.android.horologist.compose.rotaryinput.onRotaryInputAccumulated
 import com.google.android.horologist.media.ui.components.PodcastControlButtons
+import com.google.android.horologist.media.ui.components.background.ColorBackground
 import com.google.android.horologist.media.ui.components.display.MessageMediaDisplay
 import com.google.android.horologist.media.ui.screens.player.PlayerScreen
+import androidx.appcompat.R as AR
 
 object NowPlayingScreen {
     const val route = "now_playing"
@@ -82,12 +89,18 @@ fun NowPlayingScreen(
                     }
 
                     is NowPlayingViewModel.State.Loaded -> {
-                        MarqueeTextMediaDisplay(
-                            title = state.title,
-                            artist = state.subtitle,
-                            modifier = modifier
-                                .clickable { navigateToEpisode(state.episodeUuid) },
-                        )
+                        MaterialTheme(
+                            colors = MaterialTheme.colors.copy(
+                                onBackground = Color.White,
+                            )
+                        ) {
+                            MarqueeTextMediaDisplay(
+                                title = state.title,
+                                artist = state.subtitle,
+                                modifier = modifier
+                                    .clickable { navigateToEpisode(state.episodeUuid) },
+                            )
+                        }
                     }
                 }
             },
@@ -122,7 +135,16 @@ fun NowPlayingScreen(
                     )
                 }
             },
-            background = {},
+            background = {
+
+                when (state) {
+                    NowPlayingViewModel.State.Loading -> Unit // Do Nothing
+
+                    is NowPlayingViewModel.State.Loaded -> {
+                        PodcastColorBackground(state)
+                    }
+                }
+            },
             modifier = Modifier
                 .onVolumeChangeByScroll(
                     focusRequester = rememberActiveFocusRequester(),
@@ -130,6 +152,17 @@ fun NowPlayingScreen(
                 )
         )
     }
+}
+
+@Composable
+private fun PodcastColorBackground(
+    state: NowPlayingViewModel.State.Loaded,
+) {
+    val context = LocalContext.current
+    val tintColor = state.tintColor ?: context.getThemeColor(AR.attr.colorAccent)
+    ColorBackground(
+        color = Color(ThemeColor.podcastIcon02(state.theme.activeTheme, tintColor))
+    )
 }
 
 @Composable
