@@ -177,14 +177,16 @@ fun TextH50(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     color: Color = MaterialTheme.theme.colors.primaryText01,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    fontSize: TextUnit = 14.sp,
+    lineHeight: TextUnit = 20.sp,
 ) {
     Text(
         text = text,
         color = color,
-        fontSize = 14.sp,
+        fontSize = fontSize,
         fontWeight = FontWeight.W500,
-        lineHeight = 20.sp,
+        lineHeight = lineHeight,
         textAlign = textAlign,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
@@ -374,6 +376,7 @@ private fun TextStylesPreview() {
         TextP30("P30")
         TextH40("H40")
         TextP40("P40")
+        TextH50("H50")
         TextP50("P50")
         TextP60("P60")
         TextH70("H70")
