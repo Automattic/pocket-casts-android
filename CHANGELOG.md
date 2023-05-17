@@ -1,6 +1,8 @@
 7.40
 -----
-
+*   Bug Fixes:
+    *   Improved the resolution of the Gravatar image
+        ([#973](https://github.com/Automattic/pocket-casts-android/pull/973)).
 
 7.39
 -----
