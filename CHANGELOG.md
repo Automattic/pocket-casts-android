@@ -12,6 +12,8 @@
         ([#960](https://github.com/Automattic/pocket-casts-android/pull/960)).
     *   Fixed crash on grouping by season
         ([#962](https://github.com/Automattic/pocket-casts-android/pull/962)).
+    *   Fixed crash that could occur when signing out of the app
+        ([#971](https://github.com/Automattic/pocket-casts-android/pull/971)).
 *   Updates
     *   Link users to support forum from within the app
         ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
