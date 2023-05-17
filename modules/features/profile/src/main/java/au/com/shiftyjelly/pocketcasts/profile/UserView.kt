@@ -172,6 +172,9 @@ open class UserView @JvmOverloads constructor(
                                 backgroundColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple) else null,
                                 textColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple_light) else null,
                                 modifier = if (isExpandedUserView) modifier else Modifier,
+                                iconSize = iconSize,
+                                fontSize = fontSize,
+                                padding = padding,
                             )
                         } else if (signInState.isSignedInAsPlus && isExpandedUserView) {
                             SubscriptionBadge(
