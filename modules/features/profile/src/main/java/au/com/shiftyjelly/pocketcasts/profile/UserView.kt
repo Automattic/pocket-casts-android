@@ -154,9 +154,9 @@ open class UserView @JvmOverloads constructor(
     }
 
     private fun updateSubscriptionBadge(signInState: SignInState?) {
-        val fontSize = if (Util.isAutomotive(context)) 24.sp else 14.sp
-        val iconSize = if (Util.isAutomotive(context)) 24.dp else 14.dp
-        val padding = if (Util.isAutomotive(context)) 8.dp else 4.dp
+        val fontSize = if (Util.isAutomotive(context)) 20.sp else 14.sp
+        val iconSize = if (Util.isAutomotive(context)) 20.dp else 14.dp
+        val padding = if (Util.isAutomotive(context)) 6.dp else 4.dp
         subscriptionBadge?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
