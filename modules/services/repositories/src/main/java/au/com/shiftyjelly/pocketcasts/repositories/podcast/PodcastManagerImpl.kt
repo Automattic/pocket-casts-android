@@ -500,7 +500,7 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.count()
     }
 
-    override fun countSubscribed(): Int {
+    override suspend fun countSubscribed(): Int {
         return podcastDao.countSubscribed()
     }
 
@@ -739,17 +739,6 @@ class PodcastManagerImpl @Inject constructor(
             sortPosition = sortPosition,
             addedDate = addedDate
         )
-    }
-
-    /**
-     * Will return true if all the podcasts are have auto download turned on.
-     */
-    private fun isAutoDownloadingAllPodcasts(): Boolean {
-        return if (countPodcasts() == 0) false else podcastDao.countDownloadStatus(Podcast.AUTO_DOWNLOAD_NEW_EPISODES) == podcastDao.countSubscribed()
-    }
-
-    private fun isNotificationsForAllPodcasts(): Boolean {
-        return if (countPodcasts() == 0) false else podcastDao.countNotificationsOn() == podcastDao.countSubscribed()
     }
 
     override suspend fun updatePodcastPositions(podcasts: List<Podcast>) {

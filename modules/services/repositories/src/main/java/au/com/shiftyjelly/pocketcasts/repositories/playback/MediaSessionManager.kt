@@ -285,7 +285,16 @@ class MediaSessionManager(
             .observeOn(Schedulers.io())
             .switchMap { state ->
                 val episodeSource =
-                    if (state.isEmpty) Observable.just(Optional.empty()) else episodeManager.observeEpisodeByUuidRx(state.episodeUuid).distinctUntilChanged(BaseEpisode.isMediaSessionEqual).map { Optional.of(it) }.toObservable()
+                    if (state.isEmpty) {
+                        Observable.just(Optional.empty())
+                    } else {
+                        episodeManager.observeEpisodeByUuidRx(state.episodeUuid)
+                            .distinctUntilChanged(BaseEpisode.isMediaSessionEqual)
+                            .map { Optional.of(it) }
+                            // if the episode is deleted from the database while playing catch the error and just return an empty state
+                            .onErrorReturn { Optional.empty() }
+                            .toObservable()
+                    }
                 Observables.combineLatest(Observable.just(state), episodeSource)
             }
             // ignore events until seeking has finished or the progress won't stay where the user requested
@@ -308,7 +317,6 @@ class MediaSessionManager(
                     .doOnError { LogBuffer.e(LogBuffer.TAG_PLAYBACK, "Error updating playback state in media session: ${it.message}") }.retry(3)
             }
             .ignoreElements()
-            .onErrorComplete()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = { throwable ->

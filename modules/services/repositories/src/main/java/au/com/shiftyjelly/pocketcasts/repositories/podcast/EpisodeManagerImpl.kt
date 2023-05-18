@@ -587,7 +587,7 @@ class EpisodeManagerImpl @Inject constructor(
         cleanUpDownloadFiles(episode)
     }
 
-    override fun countEpisodes(): Int {
+    override suspend fun countEpisodes(): Int {
         return episodeDao.count()
     }
 

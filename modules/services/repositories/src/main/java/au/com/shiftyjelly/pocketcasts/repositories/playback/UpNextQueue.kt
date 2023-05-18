@@ -68,6 +68,7 @@ interface UpNextQueue {
      * when certain metadata changes
      */
     fun getChangesObservableWithLiveCurrentEpisode(episodeManager: EpisodeManager, podcastManager: PodcastManager): Observable<State> {
+        // the debounce prevents too many events being generated and just returns the latest
         return changesObservable.debounce(100, TimeUnit.MILLISECONDS).switchMap { state ->
             if (state is State.Loaded) {
                 if (state.podcast != null) {
