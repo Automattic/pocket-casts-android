@@ -183,7 +183,7 @@ data class Podcast(
         return if (isDarkTheme) darkThemeColor else lightThemeColor
     }
 
-    fun getMiniPlayerTintColor(isDarkTheme: Boolean): Int {
+    fun getPlayerTintColor(isDarkTheme: Boolean): Int {
         return if (isDarkTheme) tintColorForDarkBg else tintColorForLightBg
     }
 
