@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
+import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import coil.Coil
 import coil.ImageLoader
 import com.google.firebase.FirebaseApp
@@ -100,6 +101,8 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         setupLogging()
         setupAnalytics()
         setupApp()
+
+        RxJavaUncaughtExceptionHandling.setUp()
     }
 
     private fun setupAnalytics() {

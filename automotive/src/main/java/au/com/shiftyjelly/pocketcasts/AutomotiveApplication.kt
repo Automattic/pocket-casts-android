@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -53,6 +54,8 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         setupAnalytics()
         setupAutomotiveDefaults()
         setupApp()
+
+        RxJavaUncaughtExceptionHandling.setUp()
     }
 
     override fun getWorkManagerConfiguration(): Configuration {
