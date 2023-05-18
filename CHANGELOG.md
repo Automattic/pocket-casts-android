@@ -3,6 +3,8 @@
 *   Bug Fixes:
     *   Improved the resolution of the Gravatar image
         ([#973](https://github.com/Automattic/pocket-casts-android/pull/973)).
+    *   Improved the Automotive user profile view
+        ([#975](https://github.com/Automattic/pocket-casts-android/pull/975)).
 
 7.39
 -----
