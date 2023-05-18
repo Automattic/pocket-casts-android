@@ -1,5 +1,8 @@
 7.40
 -----
+*   Updates:
+    *   Automotive now has the option to clear your data before logging in
+        ([#978](https://github.com/Automattic/pocket-casts-android/pull/978)).
 *   Bug Fixes:
     *   Improved the resolution of the Gravatar image
         ([#973](https://github.com/Automattic/pocket-casts-android/pull/973)).
