@@ -29,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
-import kotlinx.coroutines.delay
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -73,7 +72,6 @@ fun LoginWithEmailScreen(
 
         is SignInState.Success -> {
             LaunchedEffect(Unit) {
-                delay(1000)
                 onSignInSuccess()
             }
         }
