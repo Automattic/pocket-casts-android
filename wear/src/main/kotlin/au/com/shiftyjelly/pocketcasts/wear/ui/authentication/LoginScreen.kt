@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui
+package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height

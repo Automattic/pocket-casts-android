@@ -1,12 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -28,15 +22,12 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
@@ -44,18 +35,19 @@ import au.com.shiftyjelly.pocketcasts.compose.images.ProfileImage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreenViewModel.State.RefreshComplete.email
-import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object LoggingInScreen {
     const val route = "loggingInScreen"
+    const val routeWithDelay = "loggingInScreenWithDelay"
 }
 
 @Composable
 fun LoggingInScreen(
     avatarUrl: String? = null,
     name: String? = null,
-    withMinimumDelay: Boolean = true,
+    withMinimumDelay: Boolean = false,
     onClose: () -> Unit,
 ) {
 
@@ -90,7 +82,7 @@ private fun Content(
             .fillMaxSize()
     ) {
         val placeholder = @Composable {
-            SpinningIcon(Modifier.size(48.dp))
+            LoadingSpinner(Modifier.size(48.dp))
         }
 
         val profileModifier = Modifier
@@ -180,30 +172,6 @@ private fun Modifier.fadeOutOverflow(
             ),
         )
     }
-}
-
-@Composable
-private fun SpinningIcon(
-    modifier: Modifier = Modifier,
-) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
-
-    Icon(
-        painter = painterResource(IR.drawable.ic_retry),
-        contentDescription = null,
-        modifier = modifier
-            .graphicsLayer {
-                rotationZ = rotation
-            }
-    )
 }
 
 @Preview
