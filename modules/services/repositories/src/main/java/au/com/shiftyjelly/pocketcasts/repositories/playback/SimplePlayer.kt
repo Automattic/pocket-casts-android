@@ -42,7 +42,7 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
         private val REDUCED_BUFFER_MANUFACTURERS = listOf("mercedes-benz")
         private val USE_REDUCED_BUFFER = REDUCED_BUFFER_MANUFACTURERS.contains(Build.MANUFACTURER.lowercase())
 
-        private val BUFFER_TIME_MIN_MILLIS =  if (USE_REDUCED_BUFFER) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(15).toInt()
+        private val BUFFER_TIME_MIN_MILLIS = if (USE_REDUCED_BUFFER) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(15).toInt()
         private val BUFFER_TIME_MAX_MILLIS = BUFFER_TIME_MIN_MILLIS
 
         // Be careful increasing the size of the back buffer. It can easily lead to OOM errors.
