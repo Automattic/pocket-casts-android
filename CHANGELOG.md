@@ -16,6 +16,8 @@
         ([#960](https://github.com/Automattic/pocket-casts-android/pull/960)).
     *   Fixed crash on grouping by season
         ([#962](https://github.com/Automattic/pocket-casts-android/pull/962)).
+    *   Fixed the skip buttons not appearing in the remote player views
+        ([#976](https://github.com/Automattic/pocket-casts-android/pull/976)).
 *   Updates
     *   Link users to support forum from within the app
         ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
