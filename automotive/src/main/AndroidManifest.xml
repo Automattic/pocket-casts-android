@@ -31,7 +31,8 @@
         android:supportsRtl="true"
         android:theme="@style/Automotive.ThemeDark"
         android:appCategory="audio"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:largeHeap="true">
         <activity android:name=".AutomotiveSettingsActivity"
             android:exported="true">
             <intent-filter>
