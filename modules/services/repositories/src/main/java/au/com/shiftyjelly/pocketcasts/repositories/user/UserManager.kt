@@ -150,7 +150,7 @@ class UserManagerImpl @Inject constructor(
             userInitiated = false,
         )
 
-        // Block while clearing data so that users cannot interact with the until we're done clearing data
+        // Block while clearing data so that users cannot interact with the app until we're done clearing data
         runBlocking(Dispatchers.IO) {
 
             upNextQueue.removeAllIncludingChanges()
