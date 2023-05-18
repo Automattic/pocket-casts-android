@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:layout_height="wrap_content">
+
+    <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
+        android:id="@+id/imgProfilePicture"
+        android:layout_width="@dimen/profile_picture_size"
+        android:layout_height="@dimen/profile_picture_size"
+        android:layout_marginTop="16dp"
+        android:importantForAccessibility="no"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="W,1:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/subscriptionBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imgProfilePicture"
+        app:layout_constraintBottom_toBottomOf="@id/imgProfilePicture" />
+
+    <TextView
+        android:id="@+id/lblUserEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:focusable="true"
+        android:gravity="center"
+        android:textAppearance="@style/H70"
+        android:textAlignment="center"
+        android:textColor="?attr/primary_text_01"
+        android:textSize="24sp"
+        app:layout_constraintTop_toBottomOf="@id/subscriptionBadge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="xxx@gmail.com" />
+
+    <Button
+        android:id="@+id/btnAccount"
+        android:text="@string/profile_set_up_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/PCAccountOutlinedButton"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
+        android:textSize="24sp"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lblUserEmail"
+        tools:text="Set Up Account" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
