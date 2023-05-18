@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
@@ -40,8 +39,7 @@ fun NavGraphBuilder.authenticationNavGraph(navController: NavController) {
         composable(AuthenticationNavRoutes.loginWithEmail) {
             it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
             LoginWithEmailScreen(
-                viewModel = hiltViewModel(),
-                navigateOnSignInSuccess = { navController.navigate(LoggingInScreen.route) }
+                onSignInSuccess = { navController.navigate(LoggingInScreen.route) },
             )
         }
 

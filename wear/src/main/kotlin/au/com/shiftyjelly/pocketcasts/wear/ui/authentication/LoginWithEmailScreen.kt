@@ -27,6 +27,7 @@ import androidx.wear.input.RemoteInputIntentHelper
 import androidx.wear.input.wearableExtender
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -34,11 +35,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun LoginWithEmailScreen(
-    viewModel: SignInViewModel = hiltViewModel(),
-    navigateOnSignInSuccess: () -> Unit,
+    onSignInSuccess: () -> Unit,
 ) {
 
+    val viewModel = hiltViewModel<SignInViewModel>()
     val signInState by viewModel.signInState.observeAsState()
+    val email by viewModel.email.observeAsState()
 
     var loading by remember { mutableStateOf(false) }
 
@@ -46,6 +48,23 @@ fun LoginWithEmailScreen(
         null,
         SignInState.Empty -> {
             loading = false
+
+            if (email.isNullOrBlank()) {
+                val label = stringResource(LR.string.enter_email)
+                val launcher = getLauncher { viewModel.updateEmail(it) }
+                LaunchedEffect(Unit) {
+                    launchRemoteInput(label, launcher)
+                }
+            } else {
+                val label = stringResource(LR.string.enter_password)
+                val launcher = getLauncher {
+                    viewModel.updatePassword(it)
+                    viewModel.signIn()
+                }
+                LaunchedEffect(Unit) {
+                    launchRemoteInput(label, launcher)
+                }
+            }
         }
 
         SignInState.Loading -> {
@@ -55,36 +74,21 @@ fun LoginWithEmailScreen(
         is SignInState.Success -> {
             LaunchedEffect(Unit) {
                 delay(1000)
-                navigateOnSignInSuccess()
+                onSignInSuccess()
             }
         }
 
         is SignInState.Failure -> {
-            TODO("implement me")
+            loading = false
+            val message = (signInState as? SignInState.Failure)
+                ?.message
+                ?: stringResource(LR.string.error_login_failed)
+            ErrorScreen(message)
         }
     }
 
     if (loading) {
         Loading()
-    }
-
-    val email by viewModel.email.observeAsState()
-
-    if (email.isNullOrBlank()) {
-        val label = stringResource(LR.string.enter_email)
-        val launcher = getLauncher { viewModel.updateEmail(it) }
-        LaunchedEffect(Unit) {
-            launchRemoteInput(label, launcher)
-        }
-    } else {
-        val label = stringResource(LR.string.enter_password)
-        val launcher = getLauncher {
-            viewModel.updatePassword(it)
-            viewModel.signIn()
-        }
-        LaunchedEffect(Unit) {
-            launchRemoteInput(label, launcher)
-        }
     }
 }
 
@@ -114,7 +118,7 @@ private fun getLauncher(onResult: (String) -> Unit) =
 
 private fun launchRemoteInput(
     label: String,
-    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
 ) {
     val remoteInputs: List<RemoteInput> = listOf(
         RemoteInput.Builder(key)
