@@ -140,7 +140,7 @@ class UserManagerImpl @Inject constructor(
         wasInitiatedByUser: Boolean,
     ) {
         // Sign out first to make sure no data changes get synced
-        signOut(playbackManager, wasInitiatedByUser = true)
+        signOut(playbackManager = playbackManager, wasInitiatedByUser = wasInitiatedByUser)
 
         // Need to stop playback before we start clearing data
         playbackManager.removeEpisode(
@@ -162,7 +162,7 @@ class UserManagerImpl @Inject constructor(
             podcastManager.deleteAllPodcasts()
 
             userEpisodeManager.findUserEpisodes().forEach {
-                userEpisodeManager.delete(it, playbackManager)
+                userEpisodeManager.delete(episode = it, playbackManager = playbackManager)
             }
             episodeManager.deleteAll()
         }

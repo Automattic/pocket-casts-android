@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -89,7 +88,7 @@ class AutomotiveSettingsFragment : Fragment(), CoroutineScope {
         // ask the user if they want to clear their data before they sign in
         if (isAccountUsed()) {
             val context = context ?: return
-            val themedContext = if (Util.isAutomotive(context)) ContextThemeWrapper(context, CR.style.Theme_Car_NoActionBar) else context
+            val themedContext = ContextThemeWrapper(context, CR.style.Theme_Car_NoActionBar)
             val builder = AlertDialog.Builder(themedContext)
             builder.setTitle(getString(LR.string.profile_clear_data_question))
                 .setMessage(getString(LR.string.profile_clear_data_would_you_also_like_question))
@@ -102,7 +101,7 @@ class AutomotiveSettingsFragment : Fragment(), CoroutineScope {
                         folderManager = folderManager,
                         searchHistoryManager = searchHistoryManager,
                         episodeManager = episodeManager,
-                        wasInitiatedByUser = true
+                        wasInitiatedByUser = false
                     )
                     openSignInActivity()
                 }
