@@ -70,7 +70,7 @@ class MediaSessionManager(
         // ACTION_SKIP_TO_NEXT then the skip buttons on the lock screen are disabled. We work around this
         // by hiding our custom buttons on Samsung phones. It means the buttons in Android Auto aren't our
         // custom skip buttons, but it all still works.
-        private val MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS = listOf("samsung", "mercedes-benz", "google")
+        private val MANUFACTURERS_TO_HIDE_CUSTOM_SKIP_BUTTONS = listOf("samsung", "mercedes-benz")
 
         fun calculateSearchQueryOptions(query: String): List<String> {
             val options = mutableListOf<String>()

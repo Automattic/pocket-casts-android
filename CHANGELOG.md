@@ -18,6 +18,8 @@
         ([#962](https://github.com/Automattic/pocket-casts-android/pull/962)).
     *   Fixed bug that prevented full logs from being displayed within the app
         ([#974](https://github.com/Automattic/pocket-casts-android/pull/974)).
+    *   Fixed the skip buttons not appearing in the remote player views
+        ([#976](https://github.com/Automattic/pocket-casts-android/pull/976)).
 *   Updates
     *   Link users to support forum from within the app
         ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
