@@ -1,6 +1,8 @@
 7.40
 -----
 *   Bug Fixes:
+    *   Fixed the buffering and seeking issues with some Automotive manufacturers
+        ([#977](https://github.com/Automattic/pocket-casts-android/pull/977)).
     *   Improved the resolution of the Gravatar image
         ([#973](https://github.com/Automattic/pocket-casts-android/pull/973)).
 
