@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -33,22 +34,24 @@ class PodcastRatingsViewModel
     val stateFlow: StateFlow<RatingState> = _stateFlow
 
     fun loadRatings(podcastUuid: String) {
-        viewModelScope.launch {
-            try {
-                ratingsManager.podcastRatings(podcastUuid)
-                    .stateIn(viewModelScope)
-                    .collect { ratings ->
-                        _stateFlow.update {
-                            RatingState.Loaded(
-                                podcastUuid = ratings.podcastUuid,
-                                stars = getStars(ratings.average),
-                                total = ratings.total
-                            )
+        if (BuildConfig.SHOW_RATINGS) {
+            viewModelScope.launch {
+                try {
+                    ratingsManager.podcastRatings(podcastUuid)
+                        .stateIn(viewModelScope)
+                        .collect { ratings ->
+                            _stateFlow.update {
+                                RatingState.Loaded(
+                                    podcastUuid = ratings.podcastUuid,
+                                    stars = getStars(ratings.average),
+                                    total = ratings.total
+                                )
+                            }
                         }
-                    }
-            } catch (e: IOException) {
-                Timber.e(e, "Failed to load podcast ratings")
-                _stateFlow.update { RatingState.Error }
+                } catch (e: IOException) {
+                    Timber.e(e, "Failed to load podcast ratings")
+                    _stateFlow.update { RatingState.Error }
+                }
             }
         }
     }

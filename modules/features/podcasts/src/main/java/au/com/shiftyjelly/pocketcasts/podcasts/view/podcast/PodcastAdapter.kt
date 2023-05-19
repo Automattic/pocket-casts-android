@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
+import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
@@ -275,8 +276,10 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
-            ratingsViewModel.loadRatings(podcast.uuid)
-            ratingsViewModel.refreshPodcastRatings(podcast.uuid)
+            if (BuildConfig.SHOW_RATINGS) {
+                ratingsViewModel.loadRatings(podcast.uuid)
+                ratingsViewModel.refreshPodcastRatings(podcast.uuid)
+            }
             onHeaderSummaryToggled(headerExpanded, false)
         }
         this.podcast = podcast

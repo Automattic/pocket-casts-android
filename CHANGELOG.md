@@ -4,9 +4,6 @@
 
 7.39
 -----
-*   New Features:
-    *   Added the ability to see ratings for podcasts
-        ([#951](https://github.com/Automattic/pocket-casts-android/pull/951)).
 *   Bug Fixes:
     *   Fixed the discover categories sorting so that it is alphabetical in the device language
         ([#942](https://github.com/Automattic/pocket-casts-android/pull/942)).
