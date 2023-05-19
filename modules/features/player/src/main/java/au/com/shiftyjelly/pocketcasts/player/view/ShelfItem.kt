@@ -36,7 +36,7 @@ sealed class ShelfItem(
     object Effects : ShelfItem(
         id = "effects",
         title = { LR.string.podcast_playback_effects },
-        iconRes = { R.drawable.ic_effects_off },
+        iconRes = { IR.drawable.ic_effects_off },
         shownWhen = Shown.Always,
         analyticsValue = "playback_effects"
     )

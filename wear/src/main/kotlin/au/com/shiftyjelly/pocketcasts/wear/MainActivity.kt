@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.EffectsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.PCVolumeScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
@@ -249,6 +250,16 @@ fun WearApp(
                 // logging in screen is shown for enough time for the user to understand
                 // what is happening.
                 withMinimumDelay = true,
+            )
+        }
+
+        composable(PCVolumeScreen.route) {
+            PCVolumeScreen()
+        }
+
+        scrollable(EffectsScreen.route,) {
+            EffectsScreen(
+                columnState = it.columnState,
             )
         }
     }

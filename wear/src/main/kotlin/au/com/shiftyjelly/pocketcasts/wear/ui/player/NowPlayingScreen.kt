@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -14,6 +16,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +37,8 @@ import com.google.android.horologist.media.ui.components.background.ColorBackgro
 import com.google.android.horologist.media.ui.components.display.MessageMediaDisplay
 import com.google.android.horologist.media.ui.screens.player.PlayerScreen
 import androidx.appcompat.R as AR
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object NowPlayingScreen {
     const val route = "now_playing"
@@ -132,6 +137,7 @@ fun NowPlayingScreen(
                     NowPlayingSettingsButtons(
                         volumeUiState = volumeUiState,
                         onVolumeClick = { navController.navigate(PCVolumeScreen.route) },
+                        navController = navController,
                     )
                 }
             },
@@ -169,12 +175,24 @@ private fun PodcastColorBackground(
 fun NowPlayingSettingsButtons(
     volumeUiState: VolumeUiState,
     onVolumeClick: () -> Unit,
+    navController: NavController,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        IconButton(
+            onClick = {
+                navController.navigate(EffectsScreen.route)
+            }
+        ) {
+            Icon(
+                painter = painterResource(IR.drawable.ic_effects_off),
+                contentDescription = stringResource(LR.string.player_effects),
+                tint = Color.White
+            )
+        }
         SetVolumeButton(
             onVolumeClick = onVolumeClick,
             volumeUiState = volumeUiState
