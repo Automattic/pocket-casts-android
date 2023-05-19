@@ -216,7 +216,7 @@ abstract class PodcastDao {
     abstract fun countByUuid(uuid: String): Int
 
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1")
-    abstract fun countSubscribed(): Int
+    abstract suspend fun countSubscribed(): Int
 
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1 AND uuid = :uuid")
     abstract fun countSubscribedByUuid(uuid: String): Int

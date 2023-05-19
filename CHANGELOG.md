@@ -1,5 +1,8 @@
 7.40
 -----
+*   Updates:
+    *   Automotive now has the option to clear your data before logging in
+        ([#978](https://github.com/Automattic/pocket-casts-android/pull/978)).
 *   Bug Fixes:
     *   Fixed the buffering and seeking issues with some Automotive manufacturers
         ([#977](https://github.com/Automattic/pocket-casts-android/pull/977)).

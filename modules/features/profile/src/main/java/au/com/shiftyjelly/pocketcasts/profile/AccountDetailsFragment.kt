@@ -20,7 +20,6 @@ import au.com.shiftyjelly.pocketcasts.account.ChangeEmailFragment
 import au.com.shiftyjelly.pocketcasts.account.ChangePwdFragment
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -48,8 +47,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import java.util.Date
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
@@ -294,34 +291,15 @@ class AccountDetailsFragment : BaseFragment() {
     }
 
     private fun signOutAndClearData() {
-        // Sign out first to make sure no data changes get synced
-        userManager.signOut(playbackManager, wasInitiatedByUser = true)
-
-        // Need to stop playback before we start clearing data
-        playbackManager.removeEpisode(
-            episodeToRemove = playbackManager.getCurrentEpisode(),
-            // Unknown is fine here because we don't send analytics when the user did not initiate the action
-            source = AnalyticsSource.UNKNOWN,
-            userInitiated = false,
+        userManager.signOutAndClearData(
+            playbackManager = playbackManager,
+            upNextQueue = upNextQueue,
+            playlistManager = playlistManager,
+            folderManager = folderManager,
+            searchHistoryManager = searchHistoryManager,
+            episodeManager = episodeManager,
+            wasInitiatedByUser = true
         )
-
-        // Block while clearing data so that users cannot interact with the until we're done clearing data
-        runBlocking(Dispatchers.IO) {
-
-            upNextQueue.removeAllIncludingChanges()
-
-            playlistManager.resetDb()
-            folderManager.deleteAll()
-            searchHistoryManager.clearAll()
-
-            podcastManager.deleteAllPodcasts()
-
-            userEpisodeManager.findUserEpisodes().forEach {
-                userEpisodeManager.delete(it, playbackManager)
-            }
-            episodeManager.deleteAll()
-        }
-
         activity?.finish()
     }
 

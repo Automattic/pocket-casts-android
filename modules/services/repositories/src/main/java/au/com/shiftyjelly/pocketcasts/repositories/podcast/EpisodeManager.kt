@@ -120,7 +120,7 @@ interface EpisodeManager {
     fun deleteDownloadedEpisodeFiles()
 
     /** Utility methods  */
-    fun countEpisodes(): Int
+    suspend fun countEpisodes(): Int
     fun countEpisodesWhere(queryAfterWhere: String): Int
     fun downloadMissingEpisode(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean): Maybe<BaseEpisode>
 

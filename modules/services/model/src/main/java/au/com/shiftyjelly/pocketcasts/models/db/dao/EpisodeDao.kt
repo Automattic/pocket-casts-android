@@ -225,7 +225,7 @@ abstract class EpisodeDao {
     abstract fun markPlaybackHistorySynced()
 
     @Query("SELECT COUNT(*) FROM podcast_episodes")
-    abstract fun count(): Int
+    abstract suspend fun count(): Int
 
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE uuid = :uuid")
     abstract fun countByUuid(uuid: String): Int
