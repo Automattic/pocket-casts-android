@@ -29,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -108,7 +107,6 @@ private fun getLauncher(onResult: (String) -> Unit) =
         it.data?.let { data ->
             val results: Bundle = RemoteInput.getResultsFromIntent(data)
             results.getCharSequence(key)?.let { chars ->
-                Timber.i("TEST123, chars: $chars")
                 onResult(chars.toString())
             }
         }
