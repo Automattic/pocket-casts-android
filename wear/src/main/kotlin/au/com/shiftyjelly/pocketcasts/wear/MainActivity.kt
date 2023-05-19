@@ -254,6 +254,8 @@ fun WearApp(
         }
 
         composable(PCVolumeScreen.route) {
+            it.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+
             PCVolumeScreen()
         }
 
