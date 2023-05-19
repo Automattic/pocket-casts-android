@@ -39,16 +39,12 @@ class EffectsViewModel
 
     fun increasePlaybackSpeed() {
         val currentState = state.value as? State.Loaded ?: return
-        viewModelScope.launch {
-            changePlaybackSpeed(currentState.playbackEffects.playbackSpeed + 0.1)
-        }
+        changePlaybackSpeed(currentState.playbackEffects.playbackSpeed + 0.1)
     }
 
     fun decreasePlaybackSpeed() {
         val currentState = state.value as? State.Loaded ?: return
-        viewModelScope.launch {
-            changePlaybackSpeed(currentState.playbackEffects.playbackSpeed - 0.1)
-        }
+        changePlaybackSpeed(currentState.playbackEffects.playbackSpeed - 0.1)
     }
 
     private fun changePlaybackSpeed(speed: Double) {
