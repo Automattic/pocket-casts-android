@@ -242,6 +242,8 @@
     <string name="player_effects_speed">Speed</string>
     <string name="player_effects_speed_down">Speed Down</string>
     <string name="player_effects_speed_up">Speed Up</string>
+    <string name="player_effects_trim_level_up">Trim level up</string>
+    <string name="player_effects_trim_level_down">Trim level down</string>
     <string name="player_effects_trim_level">Trim level</string>
     <string name="player_effects_trim_mad_max">Mad Max</string>
     <string name="player_effects_trim_medium">Medium</string>

@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.player
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -60,6 +61,13 @@ class EffectsViewModel
         saveEffects(effects)
     }
 
+    fun updateTrimSilence(trimMode: TrimMode) {
+        val currentState = state.value as? State.Loaded ?: return
+        val effects = currentState.playbackEffects
+        effects.trimMode = trimMode
+        saveEffects(effects)
+    }
+
     fun updateBoostVolume(boostVolume: Boolean) {
         val currentState = state.value as? State.Loaded ?: return
         val effects = currentState.playbackEffects
@@ -78,6 +86,7 @@ class EffectsViewModel
         data class Loaded(
             val playbackEffects: PlaybackEffects,
         ) : State()
+
         object Loading : State()
     }
 }
