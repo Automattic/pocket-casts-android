@@ -60,6 +60,13 @@ class EffectsViewModel
         saveEffects(effects)
     }
 
+    fun updateBoostVolume(boostVolume: Boolean) {
+        val currentState = state.value as? State.Loaded ?: return
+        val effects = currentState.playbackEffects
+        effects.isVolumeBoosted = boostVolume
+        saveEffects(effects)
+    }
+
     private fun saveEffects(effects: PlaybackEffects) {
         viewModelScope.launch {
             playbackManager.updatePlayerEffects(effects)

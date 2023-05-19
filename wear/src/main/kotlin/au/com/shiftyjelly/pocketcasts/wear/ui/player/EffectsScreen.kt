@@ -23,8 +23,7 @@ import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.localization.R
-import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
+import au.com.shiftyjelly.pocketcasts.wear.ui.ToggleChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -55,6 +54,13 @@ fun EffectsScreen(
                         state = state,
                         onPlusClicked = { viewModel.increasePlaybackSpeed() },
                         onMinusClicked = { viewModel.decreasePlaybackSpeed() },
+                    )
+                }
+                item {
+                    ToggleChip(
+                        label = stringResource(LR.string.player_effects_volume_boost),
+                        checked = state.playbackEffects.isVolumeBoosted,
+                        onCheckedChanged = { viewModel.updateBoostVolume(it) },
                     )
                 }
             }
