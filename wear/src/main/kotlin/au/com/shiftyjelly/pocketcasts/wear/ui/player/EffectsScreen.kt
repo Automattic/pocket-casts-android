@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,14 +27,18 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.InlineSlider
 import androidx.wear.compose.material.InlineSliderDefaults
 import androidx.wear.compose.material.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.ToggleChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.layout.belowTimeTextPreview
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -46,6 +52,25 @@ fun EffectsScreen(
     viewModel: EffectsViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
+    Content(
+        columnState = columnState,
+        state = state,
+        increasePlaybackSpeed = { viewModel.increasePlaybackSpeed() },
+        decreasePlaybackSpeed = { viewModel.decreasePlaybackSpeed() },
+        updateTrimSilence = { viewModel.updateTrimSilence(it) },
+        updateBoostVolume = { viewModel.updateBoostVolume(it) },
+    )
+}
+
+@Composable
+fun Content(
+    columnState: ScalingLazyColumnState,
+    state: EffectsViewModel.State,
+    increasePlaybackSpeed: () -> Unit,
+    decreasePlaybackSpeed: () -> Unit,
+    updateTrimSilence: (TrimMode) -> Unit,
+    updateBoostVolume: (Boolean) -> Unit,
+) {
     ScalingLazyColumn(
         columnState = columnState,
         modifier = Modifier.fillMaxWidth()
@@ -59,8 +84,8 @@ fun EffectsScreen(
                 item {
                     SpeedChip(
                         state = state,
-                        onPlusClicked = { viewModel.increasePlaybackSpeed() },
-                        onMinusClicked = { viewModel.decreasePlaybackSpeed() },
+                        onPlusClicked = { increasePlaybackSpeed() },
+                        onMinusClicked = { decreasePlaybackSpeed() },
                     )
                 }
                 val trimSilence = state.playbackEffects.trimMode != TrimMode.OFF
@@ -70,7 +95,7 @@ fun EffectsScreen(
                         checked = trimSilence,
                         onCheckedChanged = { value ->
                             val newValue = if (value) TrimMode.LOW else TrimMode.OFF
-                            viewModel.updateTrimSilence(newValue)
+                            updateTrimSilence(newValue)
                         },
                     )
                 }
@@ -79,7 +104,7 @@ fun EffectsScreen(
                         TrimSilenceSlider(
                             trimMode = state.playbackEffects.trimMode,
                             onValueChanged = {
-                                viewModel.updateTrimSilence(TrimMode.values()[it])
+                                updateTrimSilence(TrimMode.values()[it])
                             },
                         )
                     }
@@ -88,7 +113,7 @@ fun EffectsScreen(
                     ToggleChip(
                         label = stringResource(LR.string.player_effects_volume_boost),
                         checked = state.playbackEffects.isVolumeBoosted,
-                        onCheckedChanged = { viewModel.updateBoostVolume(it) },
+                        onCheckedChanged = { updateBoostVolume(it) },
                     )
                 }
             }
@@ -203,6 +228,32 @@ fun TrimSilenceSlider(
             colors = InlineSliderDefaults.colors(
                 selectedBarColor = MaterialTheme.theme.colors.support05
             )
+        )
+    }
+}
+
+@Preview(
+    device = Devices.WEAR_OS_LARGE_ROUND,
+    showSystemUi = true,
+    backgroundColor = 0xff000000,
+    showBackground = true
+)
+@Composable
+fun EffectsScreenDarkPreview() {
+    AppTheme(themeType = Theme.ThemeType.DARK) {
+        Content(
+            columnState = belowTimeTextPreview(),
+            state = EffectsViewModel.State.Loaded(
+                playbackEffects = PlaybackEffects().apply {
+                    trimMode = TrimMode.MEDIUM
+                    playbackSpeed = 1.5
+                    isVolumeBoosted = true
+                }
+            ),
+            increasePlaybackSpeed = {},
+            decreasePlaybackSpeed = {},
+            updateTrimSilence = {},
+            updateBoostVolume = {},
         )
     }
 }
