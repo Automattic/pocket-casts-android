@@ -243,13 +243,19 @@ fun WearApp(
 
         authenticationNavGraph(navController)
 
-        composable(LoggingInScreen.route) {
+        composable(LoggingInScreen.routeWithDelay) {
             LoggingInScreen(
                 onClose = { navController.popBackStack() },
                 // Because this login is not triggered by the user, make sure that the
                 // logging in screen is shown for enough time for the user to understand
                 // what is happening.
                 withMinimumDelay = true,
+            )
+        }
+
+        composable(LoggingInScreen.route) {
+            LoggingInScreen(
+                onClose = { WatchListScreen.popToTop(navController) },
             )
         }
 
@@ -273,13 +279,13 @@ private fun handleSignInConfirmation(
     navController: NavController,
 ) {
 
-    val signInNotificationShowing = navController.currentDestination?.route == LoggingInScreen.route
+    val signInNotificationShowing = navController.currentDestination?.route == LoggingInScreen.routeWithDelay
 
     when (signInConfirmationAction) {
 
         is SignInConfirmationAction.Show -> {
             if (!signInNotificationShowing) {
-                navController.navigate(LoggingInScreen.route)
+                navController.navigate(LoggingInScreen.routeWithDelay)
             }
         }
 

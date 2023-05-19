@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -30,6 +31,19 @@ object WatchListScreen {
 
     // Key for boolean value in SavedStateHandle that is used to have this screen scroll to the top
     const val scrollToTop = "scroll_to_top"
+
+    fun popToTop(navController: NavController) {
+        val popped = navController.popBackStack(
+            route = WatchListScreen.route,
+            inclusive = false,
+        )
+        if (popped) {
+            navController
+                .currentBackStackEntry
+                ?.savedStateHandle
+                ?.set(WatchListScreen.scrollToTop, true)
+        }
+    }
 }
 
 @Composable

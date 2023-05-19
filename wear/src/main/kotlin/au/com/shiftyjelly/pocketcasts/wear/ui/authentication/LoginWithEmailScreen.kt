@@ -1,70 +1,133 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
-import androidx.compose.foundation.layout.Arrangement
+import android.app.RemoteInput
+import android.content.Intent
+import android.os.Bundle
+import android.view.inputmethod.EditorInfo
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
-import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.Icon
+import androidx.wear.input.RemoteInputIntentHelper
+import androidx.wear.input.wearableExtender
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
-import au.com.shiftyjelly.pocketcasts.compose.components.FormField
-import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun LoginWithEmailScreen(
-    viewModel: SignInViewModel = hiltViewModel(),
-    listState: ScalingLazyListState,
-    navigateToPasswordScreen: () -> Unit,
+    onSignInSuccess: () -> Unit,
 ) {
 
+    val viewModel = hiltViewModel<SignInViewModel>()
+    val signInState by viewModel.signInState.observeAsState()
     val email by viewModel.email.observeAsState()
 
-    ScalingLazyColumn(
-        state = listState,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
-    ) {
+    var loading by remember { mutableStateOf(false) }
 
-        item {
-            FormField(
-                value = email ?: "",
-                onValueChange = { viewModel.updateEmail(it) },
-                placeholder = "",
-                onImeAction = navigateToPasswordScreen,
-                singleLine = false,
-                modifier = Modifier
-                    .padding(all = 8.dp)
-                    .padding(top = 16.dp)
-            )
+    when (signInState) {
+        null,
+        SignInState.Empty -> {
+            loading = false
+
+            if (email.isNullOrBlank()) {
+                val label = stringResource(LR.string.enter_email)
+                val launcher = getLauncher { viewModel.updateEmail(it) }
+                LaunchedEffect(Unit) {
+                    launchRemoteInput(label, launcher)
+                }
+            } else {
+                val label = stringResource(LR.string.enter_password)
+                val launcher = getLauncher {
+                    viewModel.updatePassword(it)
+                    viewModel.signIn()
+                }
+                LaunchedEffect(Unit) {
+                    launchRemoteInput(label, launcher)
+                }
+            }
         }
 
-        item {
-            Button(
-                onClick = navigateToPasswordScreen,
-                enabled = email?.isNotBlank() == true
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = stringResource(R.string.profile_confirm),
-                    modifier = Modifier
-                        .size(24.dp)
-                        .wrapContentSize(align = Alignment.Center)
-                )
+        SignInState.Loading -> {
+            loading = true
+        }
+
+        is SignInState.Success -> {
+            LaunchedEffect(Unit) {
+                onSignInSuccess()
+            }
+        }
+
+        is SignInState.Failure -> {
+            loading = false
+            val message = (signInState as? SignInState.Failure)
+                ?.message
+                ?: stringResource(LR.string.error_login_failed)
+            ErrorScreen(message)
+        }
+    }
+
+    if (loading) {
+        Loading()
+    }
+}
+
+@Composable
+private fun Loading() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        LoadingSpinner(Modifier.size(48.dp))
+    }
+}
+
+private const val key = "key"
+
+@Composable
+private fun getLauncher(onResult: (String) -> Unit) =
+    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        it.data?.let { data ->
+            val results: Bundle = RemoteInput.getResultsFromIntent(data)
+            results.getCharSequence(key)?.let { chars ->
+                onResult(chars.toString())
             }
         }
     }
+
+private fun launchRemoteInput(
+    label: String,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+) {
+    val remoteInputs: List<RemoteInput> = listOf(
+        RemoteInput.Builder(key)
+            .setLabel(label)
+            .wearableExtender {
+                setEmojisAllowed(false)
+                setInputActionType(EditorInfo.IME_ACTION_DONE)
+            }
+            .build()
+    )
+
+    val intent: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
+    RemoteInputIntentHelper.putRemoteInputsExtra(intent, remoteInputs)
+
+    launcher.launch(intent)
 }
