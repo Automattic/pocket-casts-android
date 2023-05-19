@@ -166,7 +166,7 @@ private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animat
 }
 
 @Composable
-private fun ToggleChip(
+fun ToggleChip(
     label: String,
     checked: Boolean,
     onCheckedChanged: (Boolean) -> Unit,

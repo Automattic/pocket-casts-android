@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -155,7 +156,7 @@ class PodcastEffectsFragment : PreferenceFragmentCompat() {
     private fun updateTintColor(tintColor: Int) {
         // xml doesn't support tinting icons so we need to do it manually
         val context = preferenceManager.context
-        preferencePlaybackSpeed?.icon = context.getTintedDrawable(R.drawable.ic_speed, tintColor)
+        preferencePlaybackSpeed?.icon = context.getTintedDrawable(IR.drawable.ic_speed, tintColor)
         preferenceTrimSilence?.icon = context.getTintedDrawable(R.drawable.ic_silence, tintColor)
         preferenceBoostVolume?.icon = context.getTintedDrawable(R.drawable.ic_volumeboost, tintColor)
     }

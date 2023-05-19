@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.EffectsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.PCVolumeScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
@@ -255,6 +256,18 @@ fun WearApp(
         composable(LoggingInScreen.route) {
             LoggingInScreen(
                 onClose = { WatchListScreen.popToTop(navController) },
+            )
+        }
+
+        composable(PCVolumeScreen.route) {
+            it.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+
+            PCVolumeScreen()
+        }
+
+        scrollable(EffectsScreen.route,) {
+            EffectsScreen(
+                columnState = it.columnState,
             )
         }
     }

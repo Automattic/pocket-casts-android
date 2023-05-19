@@ -179,13 +179,14 @@ fun TextH50(
     color: Color = MaterialTheme.theme.colors.primaryText01,
     maxLines: Int = Int.MAX_VALUE,
     fontSize: TextUnit = 14.sp,
+    fontWeight: FontWeight = FontWeight.W500,
     lineHeight: TextUnit = 20.sp,
 ) {
     Text(
         text = text,
         color = color,
         fontSize = fontSize,
-        fontWeight = FontWeight.W500,
+        fontWeight = fontWeight,
         lineHeight = lineHeight,
         textAlign = textAlign,
         maxLines = maxLines,
