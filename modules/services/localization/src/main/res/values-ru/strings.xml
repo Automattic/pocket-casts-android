@@ -1224,7 +1224,7 @@ Language: ru
     <string name="podcast_archive_played">Это стоит делать только в том случае, если вы больше не хотите их видеть.</string>
     <string name="podcast_archive_all_played">Архивировать все прослушанные</string>
     <string name="podcast_archive_all">Архивировать все</string>
-    <string name="podcasts_unarchive">Из&amp;nbsp;архива</string>
+    <string name="podcasts_unarchive">Из архива</string>
     <string name="podcasts_time_to_add_some_podcasts_summary">Вы можете добавить подкасты с помощью поиска выше, а если вы ищете немного вдохновения, попробуйте вкладку «Поиск».</string>
     <string name="podcasts_time_to_add_some_podcasts">Пора добавить подкасты!</string>
     <string name="podcasts_sort_order">Порядок сортировки</string>
