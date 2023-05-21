@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
@@ -45,6 +46,8 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
         setupLogging()
         setupAnalytics()
         setupApp()
+
+        RxJavaUncaughtExceptionHandling.setUp()
     }
 
     private fun setupLogging() {

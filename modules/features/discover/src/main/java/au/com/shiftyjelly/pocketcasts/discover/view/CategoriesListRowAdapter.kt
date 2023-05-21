@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCategoryBinding
-import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import coil.load
@@ -33,7 +32,7 @@ class CategoriesListRowAdapter(val onPodcastListClick: (NetworkLoadableList) -> 
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val category = getItem(position)
-        holder.binding.lblTitle.text = category.name.tryToLocalise(holder.itemView.resources)
+        holder.binding.lblTitle.text = category.name
         holder.binding.imageView.load(category.icon)
         holder.itemView.setOnClickListener { onPodcastListClick(category) }
     }

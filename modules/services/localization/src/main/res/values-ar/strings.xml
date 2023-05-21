@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-05 02:10:06+0000
+Translation-Revision-Date: 2023-05-02 13:38:01+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
@@ -1046,7 +1046,6 @@ Language: ar
     <string name="player_action_next_chapter">الفصل التالي</string>
     <string name="time_left">متبقي %s</string>
     <string name="time_short_seconds">%d من الثواني</string>
-    <string name="time_short_minutes">%dمتر</string>
     <string name="time_short_hours_minutes">⁦%1$d⁩من الساعات ⁦%2$d⁩ من الدقائق</string>
     <string name="time_short_hours">%dس</string>
     <string name="search_hint">البحث حسب اسم البث الصوتي</string>
@@ -1074,6 +1073,7 @@ Language: ar
     <string name="unarchived_episodes_plural">تمت أرشفة ⁦%1$d⁩ من الحلقات</string>
     <string name="unarchived_episodes_singular">تمت إلغاء أرشفة حلقة واحدة</string>
     <string name="archived_episodes_plural">تمت إلغاء أرشفة ⁦%1$d⁩ من الحلقات</string>
+    <string name="time_short_minutes">%dدقيقة</string>
     <string name="archived_episodes_singular">تمت أرشفة حلقة واحدة</string>
     <string name="archive_summary">ينبغي أن تقوم بذلك فقط إذا كنت لا ترغب في رؤيتها بعد الآن.</string>
     <string name="archive_episodes_plural">أرشفة ⁦%1$d⁩ من الحلقات</string>

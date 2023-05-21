@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-25 20:54:03+0000
+Translation-Revision-Date: 2023-05-09 17:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="profile_patron_expires_in">Patron scade tra %s</string>
+    <string name="profile_account">Account</string>
+    <string name="log_in_watch_from_phone_instructions_2">La prossima volta che apri Pocket Casts sul tuo orologio e disponi di una connessione di rete, effettuerai la connessione.</string>
+    <string name="log_in_watch_from_phone_instructions_1">Accedi a Pocket Casts su un telefono Android associato.</string>
+    <string name="log_in_with_email">Accedi con l\'e-mail</string>
+    <string name="log_in_on_phone">Accedi al telefono</string>
+    <string name="log_in_with_google">Accedi con Google</string>
+    <string name="log_in_subtitle">Inizia ad ascoltare i tuoi podcast preferiti</string>
+    <string name="onboarding_upgrade_no_subscriptions_found">Nessun abbonamento trovato.</string>
+    <string name="trial_then_per_year">Prova %1$s, quindi %2$s all\'anno</string>
+    <string name="trial_then_per_month">Prova %1$s, quindi %2$s al mese</string>
+    <string name="trial_start">Inizio la mia prova gratuita</string>
+    <string name="subscribe_to">Abbonati a %s</string>
+    <string name="settings_description_advanced">Queste impostazioni sono sperimentali. Consigliamo alla maggior parte degli utenti di non modificarle rispetto ai valori predefiniti.</string>
+    <string name="player_up_next_empty_desc_watch">Puoi mettere in coda gli episodi da riprodurre successivamente nella schermata dei dettagli dell\'episodio.</string>
+    <string name="settings_advanced_sync_on_metered_summary">Consente la sincronizzazione automatica in background su reti a consumo. Questa opzione è attivata per impostazione predefinita e non ha effetto se l\'aggiornamento in background è disattivato.</string>
+    <string name="settings_advanced_sync_on_metered">Sincronizza le reti a consumo</string>
+    <string name="settings_title_advanced">Avanzato</string>
+    <string name="profile_logging_in">Accesso in corso…</string>
     <string name="episode_downloading">Download in corso</string>
     <string name="episode_in_up_next">Il prossimo</string>
     <string name="onboarding_plus_feature_gratitude_title">La gratitudine di tutti qui a Pocket Casts</string>
-    <string name="onboarding_plus_features_description">Porta la tua esperienza di podcasting a un livello superiore grazie all\'accesso esclusivo alle funzionalità e alle opzioni di personalizzazione.</string>
     <string name="onboarding_patron_feature_special_icons_title">Icone speciali dell\'app Pocket Casts</string>
     <string name="onboarding_patron_feature_profile_badge_title">Distintivo del profilo dei sostenitori</string>
     <string name="onboarding_patron_feature_cloud_storage_title">50 GB di archiviazione su cloud</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Tutto è Plus</string>
-    <string name="onboarding_patron_features_description">Diventa un Pocket Casts Patron e aiutaci a continuare a offrire la migliore esperienza di podcasting disponibile.</string>
     <string name="onboarding_patron_features_title">Credi in ciò che stiamo facendo e vuoi mostrare il tuo sostegno?</string>
-    <string name="slash_month">/al mese</string>
-    <string name="slash_year">/anno</string>
     <string name="server_user_delete_account_with_sub_failed">Il tuo account ha un abbonamento attivo a Pocket Casts Plus. Annullalo prima di eliminare il tuo account.</string>
     <string name="server_user_change_email_success">La tua e-mail è stata modificata correttamente.</string>
     <string name="server_user_email_verification_failed">Verifica e-mail non riuscita.</string>
@@ -697,6 +712,7 @@ Language: it
     <string name="settings_no_thanks">No, grazie</string>
     <string name="settings_manage_downloads_total">Totale</string>
     <string name="settings_manage_downloads_include_starred">Includi file aggiunti ai preferiti</string>
+    <string name="settings_logs">Log</string>
     <string name="settings_lock_image">immagine del blocco</string>
     <string name="settings_licenses">Licenze</string>
     <string name="settings_learn_more">Scopri di più</string>

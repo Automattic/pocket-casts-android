@@ -36,6 +36,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     @ApplicationContext private val context: Context,
     private val podcastManager: PodcastManager,
+    private val settings: Settings,
     private val syncManager: SyncManager,
 ) : ViewModel() {
 
@@ -177,7 +178,11 @@ class GoogleSignInButtonViewModel @Inject constructor(
     ) {
         val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
         val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
-        signInWithGoogleToken(idToken = idToken, onSuccess = onSuccess, onError = onError)
+        signInWithGoogleToken(
+            idToken = idToken,
+            onSuccess = onSuccess,
+            onError = onError,
+        )
     }
 
     private suspend fun signInWithGoogleToken(

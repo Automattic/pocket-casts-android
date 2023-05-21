@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -33,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.EffectsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.PCVolumeScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
@@ -98,6 +101,20 @@ fun WearApp(
                 swipeToDismissState = swipeToDismissState,
                 scrollableScaffoldContext = it,
             ) {
+
+                navController.currentBackStackEntry?.savedStateHandle
+                    ?.getStateFlow(WatchListScreen.scrollToTop, false)
+                    ?.collectAsStateWithLifecycle()?.value?.let { scrollToTop ->
+                        if (scrollToTop) {
+                            coroutineScope.launch {
+                                it.scrollableState.scrollToItem(0)
+                            }
+                            // Reset once consumed
+                            navController.currentBackStackEntry?.savedStateHandle
+                                ?.set(WatchListScreen.scrollToTop, false)
+                        }
+                    }
+
                 WatchListScreen(
                     scrollState = it.scrollableState,
                     navigateToRoute = navController::navigate,
@@ -108,6 +125,13 @@ fun WearApp(
                     },
                 )
             }
+        }
+
+        composable(
+            route = PCVolumeScreen.route,
+        ) {
+            it.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+            PCVolumeScreen()
         }
 
         composable(StreamingConfirmationScreen.route) {
@@ -219,9 +243,31 @@ fun WearApp(
 
         authenticationNavGraph(navController)
 
-        composable(LoggingInScreen.route) {
+        composable(LoggingInScreen.routeWithDelay) {
             LoggingInScreen(
                 onClose = { navController.popBackStack() },
+                // Because this login is not triggered by the user, make sure that the
+                // logging in screen is shown for enough time for the user to understand
+                // what is happening.
+                withMinimumDelay = true,
+            )
+        }
+
+        composable(LoggingInScreen.route) {
+            LoggingInScreen(
+                onClose = { WatchListScreen.popToTop(navController) },
+            )
+        }
+
+        composable(PCVolumeScreen.route) {
+            it.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
+
+            PCVolumeScreen()
+        }
+
+        scrollable(EffectsScreen.route,) {
+            EffectsScreen(
+                columnState = it.columnState,
             )
         }
     }
@@ -233,13 +279,13 @@ private fun handleSignInConfirmation(
     navController: NavController,
 ) {
 
-    val signInNotificationShowing = navController.currentDestination?.route == LoggingInScreen.route
+    val signInNotificationShowing = navController.currentDestination?.route == LoggingInScreen.routeWithDelay
 
     when (signInConfirmationAction) {
 
         is SignInConfirmationAction.Show -> {
             if (!signInNotificationShowing) {
-                navController.navigate(LoggingInScreen.route)
+                navController.navigate(LoggingInScreen.routeWithDelay)
             }
         }
 

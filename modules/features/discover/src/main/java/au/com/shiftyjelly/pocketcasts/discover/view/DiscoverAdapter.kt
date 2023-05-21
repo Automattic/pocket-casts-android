@@ -480,8 +480,12 @@ internal class DiscoverAdapter(
                     holder.recyclerView?.adapter = adapter
                     holder.loadSingle(
                         service.getCategoriesList(row.source),
-                        onSuccess = {
-                            adapter.submitList(it) { onRestoreInstanceState(holder) }
+                        onSuccess = { categories ->
+                            val sortedCategories = categories.map { it.copy(name = it.name.tryToLocalise(resources)) }.sortedBy { it.name }
+
+                            adapter.submitList(sortedCategories) {
+                                onRestoreInstanceState(holder)
+                            }
                         }
                     )
                 }

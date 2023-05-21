@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -64,11 +65,22 @@ class SettingsAppearanceViewModel @Inject constructor(
 
     fun loadThemesAndIcons() {
         createAccountState.postValue(SettingsAppearanceState.ThemesAndIconsLoading)
-
+        val appIcons = if (BuildConfig.ADD_PATRON_ENABLED) {
+            appIcon.allAppIconTypes.toList()
+        } else {
+            appIcon.allAppIconTypes.toList().filterNot {
+                it in listOf(
+                    AppIcon.AppIconType.PATRON_CHROME,
+                    AppIcon.AppIconType.PATRON_ROUND,
+                    AppIcon.AppIconType.PATRON_GLOW,
+                    AppIcon.AppIconType.PATRON_DARK,
+                )
+            }
+        }
         createAccountState.postValue(
             SettingsAppearanceState.ThemesAndIconsLoaded(
                 theme.activeTheme, theme.allThemes.toList(),
-                appIcon.activeAppIcon, appIcon.allAppIconTypes.toList()
+                appIcon.activeAppIcon, appIcons
             )
         )
     }
@@ -94,6 +106,10 @@ class SettingsAppearanceViewModel @Inject constructor(
                     AppIcon.AppIconType.ELECTRIC_PINK -> "electric_pink"
                     AppIcon.AppIconType.RADIOACTIVE -> "radioactive"
                     AppIcon.AppIconType.HALLOWEEN -> "halloween"
+                    AppIcon.AppIconType.PATRON_CHROME -> "patron_chrome"
+                    AppIcon.AppIconType.PATRON_ROUND -> "patron_round"
+                    AppIcon.AppIconType.PATRON_GLOW -> "patron_glow"
+                    AppIcon.AppIconType.PATRON_DARK -> "patron_dark"
                 }
             )
         )

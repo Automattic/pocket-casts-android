@@ -93,7 +93,7 @@ class AppearanceThemeSettingsAdapter(
             if (showOption && selected) {
                 tickDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_circle_tick)
             } else if (!showOption) {
-                tickDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_plus_bubble)
+                tickDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_locked_plus)
             }
             binding.imgTick.setImageDrawable(tickDrawable)
             binding.imgTick.contentDescription = binding.imgTick.resources.getString(if (selected) LR.string.on else LR.string.off)

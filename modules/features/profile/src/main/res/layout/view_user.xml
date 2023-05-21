@@ -9,8 +9,8 @@
 
     <au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
         android:id="@+id/imgProfilePicture"
-        android:layout_width="@dimen/profile_picture_size_new"
-        android:layout_height="@dimen/profile_picture_size_new"
+        android:layout_width="@dimen/profile_picture_size"
+        android:layout_height="@dimen/profile_picture_size"
         android:importantForAccessibility="no"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="W,1:1"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.compose.ui.platform.ComposeView
-        android:id="@+id/subscriptionTierPill"
+        android:id="@+id/subscriptionBadge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,10 +33,10 @@
         android:layout_marginTop="16dp"
         android:focusable="true"
         android:gravity="center"
-        android:textAppearance="@style/H70"
+        android:textAppearance="@style/H50"
         android:textAlignment="center"
         android:textColor="?attr/primary_text_01"
-        app:layout_constraintTop_toBottomOf="@id/subscriptionTierPill"
+        app:layout_constraintTop_toBottomOf="@id/subscriptionBadge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="xxx@gmail.com" />

@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-26 09:54:03+0000
+Translation-Revision-Date: 2023-05-09 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="profile_patron_expires_in">Patron 將於 %s後到期</string>
+    <string name="profile_account">帳號</string>
+    <string name="log_in_watch_from_phone_instructions_2">你下次在手錶上開啟 Pocket Casts 並連線網路時便會登入。</string>
+    <string name="log_in_watch_from_phone_instructions_1">在配對的 Android 手機上登入 Pocket Casts。</string>
+    <string name="log_in_with_email">透過電子郵件登入</string>
+    <string name="log_in_on_phone">在手機上登入</string>
+    <string name="log_in_with_google">透過 Google 登入</string>
+    <string name="log_in_subtitle">開始聆聽你最愛的 Podcast</string>
+    <string name="onboarding_upgrade_no_subscriptions_found">找不到訂閱。</string>
+    <string name="trial_then_per_year">試用只要 %1$s，接著每年 %2$s</string>
+    <string name="trial_then_per_month">試用只要 %1$s，接著每月 %2$s</string>
+    <string name="trial_start">開始我的免費試用</string>
+    <string name="subscribe_to">訂閱 %s</string>
+    <string name="settings_description_advanced">這些設定為實驗性功能。 我們建議大部分的使用者不要變更這些設定的預設值。</string>
+    <string name="player_up_next_empty_desc_watch">你可以在單集詳細資料畫面中，將單集加入接下來要播放的佇列。</string>
+    <string name="settings_advanced_sync_on_metered_summary">允許在計量付費網路自動背景同步處理。 此功能預設為啟用，如果關閉背景重新整理則無效。</string>
+    <string name="settings_advanced_sync_on_metered">在計量付費網路同步處理</string>
+    <string name="settings_title_advanced">進階</string>
+    <string name="profile_logging_in">正在登入…</string>
     <string name="episode_downloading">正在下載</string>
     <string name="episode_in_up_next">在「接下來播放」中</string>
     <string name="onboarding_plus_feature_gratitude_title">來自 Pocket Casts 所有使用者的誠摯謝意</string>
-    <string name="onboarding_plus_features_description">運用專屬功能和自訂選項，讓你的 Podcast 體驗更上一層樓。</string>
     <string name="onboarding_patron_feature_special_icons_title">特殊 Pocket Casts 應用程式圖示</string>
     <string name="onboarding_patron_feature_profile_badge_title">支持者個人檔案徽章</string>
     <string name="onboarding_patron_feature_cloud_storage_title">50 GB 雲端儲存空間</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">包含 Plus 所有功能</string>
-    <string name="onboarding_patron_features_description">成為 Pocket Casts 贊助者，協助我們繼續提供最優質的 Podcast 使用體驗。</string>
     <string name="onboarding_patron_features_title">肯定我們的服務，並想表達支持嗎？</string>
-    <string name="slash_month">/月</string>
-    <string name="slash_year">/年</string>
     <string name="server_user_delete_account_with_sub_failed">你的帳號已有啟用的 Pocket Casts Plus 訂購項目。 請先取消訂購再刪除帳號。</string>
     <string name="server_user_change_email_success">已成功變更你的電子郵件。</string>
     <string name="server_user_email_verification_failed">電子郵件驗證失敗。</string>
@@ -697,6 +712,7 @@ Language: zh_TW
     <string name="settings_no_thanks">不用！謝謝</string>
     <string name="settings_manage_downloads_total">總計</string>
     <string name="settings_manage_downloads_include_starred">包括加星號項目</string>
+    <string name="settings_logs">記錄</string>
     <string name="settings_lock_image">鎖定圖片</string>
     <string name="settings_licenses">授權</string>
     <string name="settings_learn_more">瞭解詳情</string>

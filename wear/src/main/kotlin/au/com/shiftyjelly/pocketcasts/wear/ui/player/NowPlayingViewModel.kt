@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.horologist.media.ui.components.controls.SeekButtonIncrement
 import com.google.android.horologist.media.ui.state.model.TrackPositionUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,14 +22,17 @@ import kotlin.time.toDuration
 class NowPlayingViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     settings: Settings,
+    private val theme: Theme,
 ) : ViewModel() {
 
     sealed class State {
         data class Loaded(
             val title: String,
             val subtitle: String?,
+            val tintColor: Int?,
             val playing: Boolean,
             val episodeUuid: String,
+            val theme: Theme,
             val seekBackwardIncrement: SeekButtonIncrement,
             val seekForwardIncrement: SeekButtonIncrement,
             val trackPositionUiModel: TrackPositionUiModel.Actual,
@@ -56,8 +60,10 @@ class NowPlayingViewModel @Inject constructor(
                     val podcast = playbackState.podcast
                     episode.displaySubtitle(podcast)
                 },
+                tintColor = playbackState.podcast?.getPlayerTintColor(theme.isDarkTheme),
                 episodeUuid = playbackState.episodeUuid,
                 playing = playbackState.isPlaying,
+                theme = theme,
                 seekBackwardIncrement = SeekButtonIncrement.Known(skipBackwardSecs),
                 seekForwardIncrement = SeekButtonIncrement.Known(skipForwardSecs),
                 trackPositionUiModel = trackPositionUiModel,

@@ -68,17 +68,20 @@ interface UpNextQueue {
      * when certain metadata changes
      */
     fun getChangesObservableWithLiveCurrentEpisode(episodeManager: EpisodeManager, podcastManager: PodcastManager): Observable<State> {
+        // the debounce prevents too many events being generated and just returns the latest
         return changesObservable.debounce(100, TimeUnit.MILLISECONDS).switchMap { state ->
             if (state is State.Loaded) {
                 if (state.podcast != null) {
                     // If we have a podcast we need to observe its effects state as well to ensure it updates when the global override changes
                     episodeManager.observeEpisodeByUuidRx(state.episode.uuid)
                         .combineLatest(podcastManager.observePodcastByUuid(state.podcast.uuid).distinctUntilChanged { t1, t2 -> t1.isUsingEffects == t2.isUsingEffects })
-                        .map { State.Loaded(it.first, it.second, state.queue) }
+                        .map<State> { State.Loaded(it.first, it.second, state.queue) }
+                        .onErrorReturn { State.Empty }
                         .toObservable()
                 } else {
                     episodeManager.observeEpisodeByUuidRx(state.episode.uuid)
-                        .map { State.Loaded(it, state.podcast, state.queue) }
+                        .map<State> { State.Loaded(it, state.podcast, state.queue) }
+                        .onErrorReturn { State.Empty }
                         .toObservable()
                 }
             } else {

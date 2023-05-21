@@ -1,23 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-04-25 12:54:19+0000
+Translation-Revision-Date: 2023-05-10 14:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="profile_patron_expires_in">Patron 만료: %s</string>
+    <string name="profile_account">계정</string>
+    <string name="log_in_watch_from_phone_instructions_2">다음에 시계에서 Pocket Casts를 열 때 네트워크에 연결되어 있으면 로그인됩니다.</string>
+    <string name="log_in_watch_from_phone_instructions_1">페어링된 Android 스마트폰에서 Pocket Casts에 로그인하세요.</string>
+    <string name="log_in_with_email">이메일로 로그인</string>
+    <string name="log_in_on_phone">스마트폰에서 로그인</string>
+    <string name="log_in_with_google">Google로 로그인</string>
+    <string name="log_in_subtitle">즐겨 찾는 팟캐스트 청취 시작</string>
+    <string name="onboarding_upgrade_no_subscriptions_found">구독을 찾을 수 없습니다.</string>
+    <string name="trial_then_per_year">%1$s 평가 후 %2$s/년</string>
+    <string name="trial_then_per_month">%1$s 평가 후 %2$s/월</string>
+    <string name="trial_start">내 무료 평가판 시작</string>
+    <string name="subscribe_to">%s 구독</string>
+    <string name="settings_description_advanced">이러한 설정은 실험용입니다. 대부분의 사용자는 기본값에서 이러한 설정을 변경하지 않는 것이 좋습니다.</string>
+    <string name="player_up_next_empty_desc_watch">다음에 재생할 에피소드를 에피소드 상세 정보 화면에서 대기열에 추가할 수 있습니다.</string>
+    <string name="settings_advanced_sync_on_metered_summary">데이터 요금제 네트워크에서 자동 백그라운드 동기화를 허용합니다. 기본적으로 활성화되어 있으며 백그라운드 새로 고침이 꺼져 있으면 아무 효과가 없습니다.</string>
+    <string name="settings_advanced_sync_on_metered">데이터 요금제 네트워크에서 동기화</string>
+    <string name="settings_title_advanced">고급</string>
+    <string name="profile_logging_in">로그인 중…</string>
     <string name="episode_downloading">다운로드하기</string>
     <string name="episode_in_up_next">다음 차례에</string>
     <string name="onboarding_plus_feature_gratitude_title">Pocket Casts에서 여러분께 드리는 감사 선물</string>
-    <string name="onboarding_plus_features_description">기능과 사용자 정의 옵션에 접근하는 독점 권한으로 팟캐스팅 환경의 수준을 높이세요.</string>
     <string name="onboarding_patron_feature_special_icons_title">특별한 Pocket Casts 앱 아이콘</string>
     <string name="onboarding_patron_feature_profile_badge_title">후원자 프로필 배지</string>
     <string name="onboarding_patron_feature_cloud_storage_title">클라우드 저장 공간 50GB</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Plus의 모든 것</string>
-    <string name="onboarding_patron_features_description">Pocket Casts 후원자가 되어 사용 가능한 최상의 팟캐스팅 환경을 계속 제공하도록 도와주세요.</string>
     <string name="onboarding_patron_features_title">마음을 다하여 믿고 후원해 주시겠어요?</string>
-    <string name="slash_month">/월</string>
-    <string name="slash_year">/년</string>
     <string name="server_user_delete_account_with_sub_failed">계정에 활성 Pocket Casts Plus 구독이 있습니다. 먼저 취소하고 계정을 삭제하세요.</string>
     <string name="server_user_change_email_success">이메일 주소가 변경되었습니다.</string>
     <string name="server_user_email_verification_failed">이메일 주소를 확인하지 못했습니다.</string>
@@ -27,13 +42,13 @@ Language: ko_KR
     <string name="server_login_password_change_failed">비밀번호를 변경할 수 없음</string>
     <string name="server_login_password_change_success">비밀번호 변경됨</string>
     <string name="add_to_up_next_question">다음 차례에 추가하시겠습니까?</string>
-    <string name="log_out">로그아웃</string>
-    <string name="removed">제거됨</string>
     <string name="wear_show_password">비밀번호 표시</string>
     <string name="wear_hide_password">비밀번호 숨기기</string>
     <string name="settings_metered_data_warning">사용 중인 데이터 경고</string>
     <string name="stream_warning_summary_short">스트리밍 시 데이터를 사용합니다. 계속하시겠습니까?</string>
+    <string name="removed">제거됨</string>
     <string name="mark_unplayed">재생 안 됨 표시</string>
+    <string name="log_out">로그아웃</string>
     <string name="account">계정</string>
     <string name="profile_just_sign_out">방금 로그아웃했습니다.</string>
     <string name="profile_clear_data_would_you_also_like_question">앱에 저장된 모든 데이터를 지우시겠나요?</string>
@@ -127,16 +142,18 @@ Language: ko_KR
     <string name="onboarding_import_from_castbox">Castbox에서 가져오기</string>
     <string name="onboarding_coming_from_another_app">다른 앱에서 나오나요? 팟캐스트를 가져와서 들어보세요. 나중에 언제든지 설정에서 이렇게 하실 수 있습니다.</string>
     <string name="onboarding_bring_your_podcasts">팟캐스트 가지고 다니기</string>
+    <string name="onboarding_import_podcasts_button">팟캐스트 가져오기</string>
     <string name="onboarding_import_podcasts_text">다른 앱에서 나오나요? 팟캐스트 가지고 다니기</string>
     <string name="onboarding_import_podcasts_title">팟캐스트 가져오기</string>
-    <string name="onboarding_import_podcasts_button">팟캐스트 가져오기</string>
     <string name="onboarding_continue_with_google_error">Google 로그인을 시작할 수 없습니다.</string>
     <string name="onboarding_find_podcasts">팟캐스트 찾기</string>
+    <string name="onboarding_welcome_recommendations_button">내 다음 팟캐스트 찾기</string>
     <string name="onboarding_welcome_recommendations_text">엄선한 발견 페이지에서 소문 없이 유행하는 팟캐스트를 찾아보세요.</string>
     <string name="onboarding_welcome_recommendations_title">새로운 내용 발견</string>
     <string name="onboarding_welcome_get_you_listening_plus">감사합니다. 이제 들려드리겠습니다!</string>
     <string name="onboarding_welcome_get_you_listening">환영합니다. 이제 들려드리겠습니다!</string>
     <string name="onboarding_plus_recurring_after_free_trial">%s 후 반복 결제 시작</string>
+    <string name="onboarding_plus_start_free_trial_and_subscribe">무료 평가판 시작 및 구독</string>
     <string name="onboarding_plus_terms_and_conditions">이용 약관</string>
     <string name="onboarding_plus_privacy_policy">개인정보 취급방침</string>
     <string name="onboarding_plus_continuing_agrees_to">계속하면 %1$s 및 %2$s에 동의하는 것입니다.</string>
@@ -145,8 +162,6 @@ Language: ko_KR
     <string name="onboarding_create_account">계정 생성</string>
     <string name="onboarding_log_in">로그인</string>
     <string name="plus_trial_duration_free_trial">%s 무료 평가판</string>
-    <string name="onboarding_welcome_recommendations_button">내 다음 팟캐스트 찾기</string>
-    <string name="onboarding_plus_start_free_trial_and_subscribe">무료 평가판 시작 및 구독</string>
     <string name="end_of_year_stories_failed">연말 스토리를 로드할 수 없습니다. 인터넷 연결을 확인하세요.</string>
     <string name="onboarding_plus_feature_themes_icons_text">트루 컬러를 이용하세요. Plus 클럽 전용 아이콘과 테마입니다.</string>
     <string name="onboarding_plus_feature_themes_icons_title">테마 및 아이콘</string>
@@ -156,13 +171,13 @@ Language: ko_KR
     <string name="onboarding_plus_feature_folders_title">폴더</string>
     <string name="onboarding_plus_feature_desktop_apps_text">Windows, macOS 및 웹 앱으로 더 많은 곳에서 청취하세요.</string>
     <string name="onboarding_plus_feature_desktop_apps_title">데스크톱 앱</string>
+    <string name="onboarding_upgrade_unlock_all_features">모든 기능 잠금 해제</string>
     <string name="onboarding_upgrade_exclusive_features_and_options">독점 기능 및 사용자 정의 옵션 접근 권한 받기</string>
+    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="onboarding_recommendations_import">가져오기</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">좋아하는 팟캐스트를 선택하거나 다른 팟캐스트 플레이어에서 가져와서 나만의 Pocket Casts를 만드세요. 나중에 언제든지 이렇게 하실 수 있습니다.</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">즐겨 찾는 팟캐스트 찾기</string>
-    <string name="onboarding_upgrade_unlock_all_features">모든 기능 잠금 해제</string>
     <string name="not_now">지금 안 함</string>
-    <string name="onboarding_upgrade_everything_you_love_about_pocket_casts_plus">Pocket Casts에 대해 좋아하는 모든 것 이상</string>
     <string name="settings_open_player_automatically_summary">설정하면 팟캐스트 에피소드 재생을 시작할 때 전체 화면 플레이어가 열립니다.</string>
     <string name="settings_open_player_automatically">자동으로 플레이어 열기</string>
     <string name="onboarding_email_invalid_message">유효한 이메일을 입력하세요.</string>
@@ -678,6 +693,7 @@ Language: ko_KR
     <string name="settings_podcast_artwork">팟캐스트 아트워크</string>
     <string name="settings_playback_resumption_summary">켜진 경우, 더 편안하게 따라가실 수 있도록 재개하는 에피소드의 조금 뒤로 Pocket Casts가 이동합니다.</string>
     <string name="settings_playback_resumption">지능형 재생 재개</string>
+    <string name="settings_notification_vibrate_never">안 함</string>
     <string name="settings_notification_vibrate_in_silent">무음 모드에서만</string>
     <string name="settings_notification_vibrate_new_episodes">새 에피소드</string>
     <string name="settings_notification_vibrate">진동 시점</string>
@@ -696,6 +712,7 @@ Language: ko_KR
     <string name="settings_no_thanks">괜찮습니다</string>
     <string name="settings_manage_downloads_total">합계</string>
     <string name="settings_manage_downloads_include_starred">별 표시 포함</string>
+    <string name="settings_logs">로그</string>
     <string name="settings_lock_image">잠금 이미지</string>
     <string name="settings_licenses">라이선스</string>
     <string name="settings_learn_more">더 알아보기</string>
@@ -798,7 +815,6 @@ Language: ko_KR
     <string name="plus_description_title">고급 청취자를 위한 향상된 기능</string>
     <string name="plus_description_body">한꺼번에 개인화하고 배포하세요. 개인 오디오 파일을 클라우드 서버에 업로드하고, 웹 플레이어를 통해 계정에 접근하고, 앱을 나만의 것으로 만드세요.</string>
     <string name="plus_create_marketing_features"> 모든 것</string>
-    <string name="settings_notification_vibrate_never">안 함</string>
     <string name="plus_cloud_storage_limit">클라우드 저장 공간 %dGB</string>
     <string name="plus_cloud_storage_body">강의 속도를 높이세요. 다른 콘텐츠를 압도하세요. 고유한 팟캐스트 DJ가 되세요.</string>
     <string name="plus_cloud_storage">클라우드 저장 공간</string>
@@ -806,6 +822,7 @@ Language: ko_KR
     <string name="profile_yearly">매년</string>
     <string name="profile_whats_included">무엇이 포함되나요?</string>
     <string name="profile_welcome_to_plus">Pocket Casts Plus에 오신 것을 환영합니다!</string>
+    <string name="profile_welcome_to_free">Pocket Casts에 오신 것을 환영합니다!</string>
     <string name="profile_web_player">웹 플레이어</string>
     <string name="profile_upgrade_to_plus">Plus로 업그레이드</string>
     <string name="profile_updates_ends">업데이트 종료: %s</string>
@@ -909,6 +926,7 @@ Language: ko_KR
     <string name="profile_navigation_listening_history">청취 기록</string>
     <string name="profile_navigation_files">파일</string>
     <string name="profile_monthly">매월</string>
+    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_last_refresh">마지막 새로 고침: %s 전</string>
     <string name="profile_joined">가입됨:</string>
     <string name="profile_get_plus">이 기능과 훨씬 더 많은 기능을 잠금 해제하려면 Pocket Casts Plus를 받으세요!</string>
@@ -919,7 +937,6 @@ Language: ko_KR
     <string name="profile_files_remove_image">이미지 교체</string>
     <string name="profile_files_empty_title">파일 없음</string>
     <string name="profile_files_empty_summary">자신의 파일을 청취하시겠나요?\n+ 버튼을 눌러 Pocket Casts에서 열면 여기에 표시됩니다.</string>
-    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_files_edit">편집</string>
     <string name="profile_files_addfile_save">저장</string>
     <string name="profile_files_add_filename">이름</string>
@@ -1074,7 +1091,6 @@ Language: ko_KR
     <string name="filters_choose_podcasts">팟캐스트 선택</string>
     <string name="filters_chip_media_type">미디어 유형</string>
     <string name="filters_chip_download_status">다운로드 상태</string>
-    <string name="profile_welcome_to_free">Pocket Casts에 오신 것을 환영합니다!</string>
     <string name="filters_chip_all_your_podcasts">모든 내 팟캐스트</string>
     <string name="filters_all_your_podcasts">모든 내 팟캐스트</string>
     <string name="episode_filters">에피소드 필터</string>
