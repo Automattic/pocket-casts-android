@@ -8,18 +8,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
-import androidx.wear.compose.material.Chip
-import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 
 object PodcastScreen {
     const val argument = "podcastUuid"
@@ -69,24 +67,9 @@ fun PodcastScreen(
                 episode = episode,
                 onClick = {
                     onEpisodeTap(episode)
-                }
+                },
+                showImage = false,
             )
         }
     }
-}
-
-@Composable
-private fun EpisodeChip(
-    episode: PodcastEpisode,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Chip(
-        onClick = { onClick() },
-        colors = ChipDefaults.secondaryChipColors(),
-        label = {
-            Text(episode.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        },
-        modifier = modifier.fillMaxWidth()
-    )
 }
