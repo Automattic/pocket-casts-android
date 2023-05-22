@@ -150,17 +150,24 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
         }
     }
 
-    fun canDuck(): Boolean {
-        return audioFocus == AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT && hasUserAllowedDucking()
+    enum class PlayOverNotificationSetting {
+        NEVER, DUCK, ALWAYS
     }
 
-    protected open fun hasUserAllowedDucking(): Boolean {
-        return settings.canDuckAudioWithNotifications()
+    private fun canDuck(): PlayOverNotificationSetting {
+        if (audioFocus != AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT) return PlayOverNotificationSetting.NEVER
+        return playOverNotification()
+    }
+
+    protected open fun playOverNotification() = when (settings.getPlayOverNotification()) {
+        0 -> PlayOverNotificationSetting.ALWAYS
+        1 -> PlayOverNotificationSetting.DUCK
+        else -> PlayOverNotificationSetting.NEVER
     }
 
     interface FocusChangeListener {
         fun onFocusGain(shouldResume: Boolean)
-        fun onFocusLoss(mayDuck: Boolean, transientLoss: Boolean)
+        fun onFocusLoss(playOverNotification: PlayOverNotificationSetting, transientLoss: Boolean)
         fun onFocusRequestFailed()
     }
 

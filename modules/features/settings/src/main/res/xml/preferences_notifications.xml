@@ -42,12 +42,11 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settings" >
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="overrideAudioInterruption"
-            android:persistent="true"
-            android:summary="@string/settings_notification_play_over_summary"
-            android:title="@string/settings_notification_play_over" />
+        <ListPreference
+            android:key="notificationAudio"
+            android:title="@string/settings_notification_play_over"
+            android:persistent="true"/>
+
         <SwitchPreference
             android:key="hideNotificationOnPause"
             android:persistent="true"

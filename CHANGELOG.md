@@ -64,6 +64,8 @@
         ([#973](https://github.com/Automattic/pocket-casts-android/pull/973)).
     *   Improved the Automotive user profile view
         ([#975](https://github.com/Automattic/pocket-casts-android/pull/975)).
+    *   Added audio ducking as an option when playing over external notifications
+        ([#1009](https://github.com/Automattic/pocket-casts-android/pull/1009)).
 
 7.39
 -----
