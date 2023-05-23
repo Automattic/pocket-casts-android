@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.podcast
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,6 +10,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
@@ -33,12 +33,14 @@ fun PodcastScreen(
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PodcastViewModel = hiltViewModel(),
+    listState: ScalingLazyListState,
 ) {
     when (val state = viewModel.uiState) {
         is UiState.Loaded -> Content(
             state = state,
             onEpisodeTap = onEpisodeTap,
             modifier = modifier,
+            listState = listState,
         )
 
         UiState.Empty -> Unit // Do Nothing
@@ -50,14 +52,15 @@ private fun Content(
     state: UiState.Loaded,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
+    listState: ScalingLazyListState,
 ) {
     val podcast = state.podcast ?: return
 
     ScalingLazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 26.dp),
+        modifier = modifier.fillMaxWidth(),
+        state = listState,
     ) {
+        item { Spacer(Modifier.height(4.dp)) }
         item {
             PodcastImage(
                 uuid = podcast.uuid,

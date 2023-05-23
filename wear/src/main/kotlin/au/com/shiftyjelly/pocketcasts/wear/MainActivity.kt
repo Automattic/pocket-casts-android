@@ -165,7 +165,7 @@ fun WearApp(
             }
         }
 
-        composable(
+        scrollable(
             route = PodcastScreen.route,
             arguments = listOf(
                 navArgument(PodcastScreen.argument) {
@@ -177,11 +177,13 @@ fun WearApp(
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
+                scrollableScaffoldContext = it
             ) {
                 PodcastScreen(
                     onEpisodeTap = { episode ->
                         navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
                     },
+                    listState = it.scrollableState,
                 )
             }
         }
