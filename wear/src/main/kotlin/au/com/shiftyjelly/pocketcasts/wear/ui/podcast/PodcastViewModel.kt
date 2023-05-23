@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,6 +21,7 @@ class PodcastViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
+    private val theme: Theme,
 ) : ViewModel() {
 
     private val podcastUuid: String = savedStateHandle[PodcastScreen.argument] ?: ""
@@ -29,6 +31,7 @@ class PodcastViewModel @Inject constructor(
         data class Loaded(
             val podcast: Podcast? = null,
             val episodes: List<PodcastEpisode> = emptyList(),
+            val theme: Theme,
         ) : UiState()
     }
 
@@ -44,6 +47,7 @@ class PodcastViewModel @Inject constructor(
             uiState = UiState.Loaded(
                 podcast = podcast,
                 episodes = episodes,
+                theme = theme,
             )
         }
     }
