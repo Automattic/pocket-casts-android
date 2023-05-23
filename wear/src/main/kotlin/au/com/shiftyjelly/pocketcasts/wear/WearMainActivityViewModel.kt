@@ -31,7 +31,7 @@ class WearMainActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class State(
-        val signInConfirmationAction: SignInConfirmationAction? = null,
+        val showLoggingInScreen: Boolean = false,
         val signInState: SignInState? = null,
         val subscriptionStatus: SubscriptionStatus? = null,
     )
@@ -76,7 +76,7 @@ class WearMainActivityViewModel @Inject constructor(
                     podcastManager.refreshPodcastsAfterSignIn()
                 }
                 _state.update {
-                    it.copy(signInConfirmationAction = SignInConfirmationAction.Show)
+                    it.copy(showLoggingInScreen = true)
                 }
             }
         }
@@ -86,15 +86,10 @@ class WearMainActivityViewModel @Inject constructor(
      * This should be invoked when the UI has handled showing or hiding the sign in confirmation.
      */
     fun onSignInConfirmationActionHandled() {
-        _state.update { it.copy(signInConfirmationAction = null) }
+        _state.update { it.copy(showLoggingInScreen = false) }
     }
 
     fun signOut() {
         userManager.signOut(playbackManager, wasInitiatedByUser = false)
     }
-}
-
-sealed class SignInConfirmationAction {
-    object Show : SignInConfirmationAction()
-    object Hide : SignInConfirmationAction()
 }

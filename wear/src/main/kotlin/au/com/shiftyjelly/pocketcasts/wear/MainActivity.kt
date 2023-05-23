@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -72,8 +71,8 @@ class MainActivity : ComponentActivity() {
                 WearApp(
                     signInState = state.signInState,
                     subscriptionStatus = state.subscriptionStatus,
-                    signInConfirmationAction = state.signInConfirmationAction,
-                    onSignInConfirmationActionHandled = viewModel::onSignInConfirmationActionHandled,
+                    showLoggingInScreen = state.showLoggingInScreen,
+                    onLoggingInScreenShown = viewModel::onSignInConfirmationActionHandled,
                     signOut = viewModel::signOut,
                 )
             }
@@ -85,8 +84,8 @@ class MainActivity : ComponentActivity() {
 fun WearApp(
     signInState: SignInState?,
     subscriptionStatus: SubscriptionStatus?,
-    signInConfirmationAction: SignInConfirmationAction?,
-    onSignInConfirmationActionHandled: () -> Unit,
+    showLoggingInScreen: Boolean,
+    onLoggingInScreenShown: () -> Unit,
     signOut: () -> Unit,
 ) {
 
@@ -95,11 +94,10 @@ fun WearApp(
     val navState = rememberSwipeDismissableNavHostState(swipeToDismissState)
     var loaded by remember { mutableStateOf(false) }
 
-    handleSignInConfirmation(
-        signInConfirmationAction = signInConfirmationAction,
-        onSignInConfirmationActionHandled = onSignInConfirmationActionHandled,
-        navController = navController
-    )
+    if (showLoggingInScreen) {
+        navController.navigate(LoggingInScreen.routeWithDelay)
+        onLoggingInScreenShown()
+    }
 
     val userCanAccessWatch = when (subscriptionStatus) {
         is SubscriptionStatus.Free,
@@ -383,42 +381,14 @@ private fun NavGraphBuilder.loggingInScreens(
     }
 }
 
-private fun handleSignInConfirmation(
-    signInConfirmationAction: SignInConfirmationAction?,
-    onSignInConfirmationActionHandled: () -> Unit,
-    navController: NavController,
-) {
-
-    val signInNotificationShowing = navController.currentDestination?.route == LoggingInScreen.routeWithDelay
-
-    when (signInConfirmationAction) {
-
-        is SignInConfirmationAction.Show -> {
-            if (!signInNotificationShowing) {
-                navController.navigate(LoggingInScreen.routeWithDelay)
-            }
-        }
-
-        SignInConfirmationAction.Hide -> {
-            if (signInNotificationShowing) {
-                navController.popBackStack()
-            }
-        }
-
-        null -> { /* do nothing */ }
-    }
-
-    onSignInConfirmationActionHandled()
-}
-
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
     WearApp(
         signInState = null,
         subscriptionStatus = null,
-        signInConfirmationAction = null,
-        onSignInConfirmationActionHandled = {},
+        showLoggingInScreen = false,
+        onLoggingInScreenShown = {},
         signOut = {},
     )
 }
