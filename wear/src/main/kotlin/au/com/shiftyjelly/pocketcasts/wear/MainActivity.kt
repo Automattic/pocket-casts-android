@@ -335,10 +335,10 @@ fun WearApp(
         }
     }
 
-    // We cannot just check the subscription status in the SignInState because the subscription status gets
-    // updated to the correct value only after the user signs in, so there is a delay in getting the updated,
+    // We cannot use the subscription status contained in the SignInState object because the subscription status
+    // gets updated to the correct value a bit after the user signs in—there is a delay in getting the updated and
     // correct subscription status. For example, immediately after a user signs in with a plus account, their
-    // sign in state reports it is a free subscription until the subscription call completes.
+    // sign in state does not report that it is a Plus subscription until after the subscription call completes.
     // This has to happen after the WearNavScaffold so that the new start destination has been processed,
     // otherwise the new start destination will replace any navigation we do here to the LoggingInScreen.
     var previousSubscriptionStatus by remember { mutableStateOf<SubscriptionStatus?>(null) }
