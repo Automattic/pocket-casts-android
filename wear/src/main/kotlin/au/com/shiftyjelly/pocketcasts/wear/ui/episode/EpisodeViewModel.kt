@@ -36,6 +36,7 @@ import coil.request.SuccessResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -103,6 +104,8 @@ class EpisodeViewModel @Inject constructor(
     )
 
     val stateFlow: StateFlow<State>
+    var showNowPlaying = MutableSharedFlow<Boolean>()
+        private set
 
     init {
         val episodeUuid = savedStateHandle.get<String>(EpisodeScreenFlow.episodeUuidArgument)
@@ -259,6 +262,7 @@ class EpisodeViewModel @Inject constructor(
                 episode = episode,
                 playbackSource = analyticsSource,
             )
+            showNowPlaying.emit(true)
         }
     }
 
