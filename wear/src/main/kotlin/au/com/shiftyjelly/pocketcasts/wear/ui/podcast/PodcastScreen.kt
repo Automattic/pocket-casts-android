@@ -2,15 +2,19 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.podcast
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -83,20 +87,33 @@ private fun Content(
                 Spacer(Modifier.height(4.dp))
             }
             item {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryText01,
-                    text = podcast.title
-                )
-            }
-            item {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    text = podcast.author
-                )
+                Column {
+                    Text(
+                        modifier = modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.theme.colors.primaryText01,
+                        text = podcast.title,
+                        style = MaterialTheme.typography.button
+                    )
+                    Text(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.theme.colors.primaryText02,
+                        text = podcast.author,
+                        style = MaterialTheme.typography.body2.merge(
+                            @Suppress("DEPRECATION")
+                            (
+                                TextStyle(
+                                    platformStyle = PlatformTextStyle(
+                                        includeFontPadding = false,
+                                    ),
+                                )
+                                )
+                        )
+                    )
+                }
             }
             items(state.episodes) { episode ->
                 EpisodeChip(
