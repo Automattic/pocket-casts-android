@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
-import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
@@ -18,7 +18,11 @@ private object AuthenticationNavRoutes {
     const val loginWithEmail = "login_with_email"
 }
 
-fun NavGraphBuilder.authenticationNavGraph(navController: NavController) {
+fun NavGraphBuilder.authenticationNavGraph(
+    navController: NavController,
+    onEmailSignInSuccess: () -> Unit,
+    googleSignInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,
+) {
     navigation(startDestination = AuthenticationNavRoutes.loginScreen, route = authenticationSubGraph) {
 
         scrollable(AuthenticationNavRoutes.loginScreen) {
@@ -39,7 +43,7 @@ fun NavGraphBuilder.authenticationNavGraph(navController: NavController) {
         composable(AuthenticationNavRoutes.loginWithEmail) {
             it.viewModel.timeTextMode = NavScaffoldViewModel.TimeTextMode.Off
             LoginWithEmailScreen(
-                onSignInSuccess = { navController.navigate(LoggingInScreen.route) },
+                onSignInSuccess = onEmailSignInSuccess
             )
         }
 
@@ -52,7 +56,7 @@ fun NavGraphBuilder.authenticationNavGraph(navController: NavController) {
 
         composable(AuthenticationNavRoutes.loginWithGoogle) {
             LoginWithGoogleScreen(
-                onAuthSucceed = { WatchListScreen.popToTop(navController) },
+                signInSuccessScreen = googleSignInSuccessScreen,
                 onAuthCanceled = { navController.popBackStack() },
             )
         }

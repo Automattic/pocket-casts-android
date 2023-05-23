@@ -11,6 +11,8 @@ private const val giftDaysCutOver = 10 * 365
 
 sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<Subscription>) {
 
+    object NotSignedIn : SubscriptionStatus(null, emptyList())
+
     @JsonClass(generateAdapter = true)
     data class Free(
         @field:Json(name = "expiry") val expiry: Date? = null,
