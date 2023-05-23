@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
+import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastViewModel.UiState
 
 object PodcastScreen {
     const val argument = "podcastUuid"
@@ -33,7 +34,24 @@ fun PodcastScreen(
     modifier: Modifier = Modifier,
     viewModel: PodcastViewModel = hiltViewModel(),
 ) {
-    val podcast = viewModel.uiState.podcast ?: return
+    when (val state = viewModel.uiState) {
+        is UiState.Loaded -> Content(
+            state = state,
+            onEpisodeTap = onEpisodeTap,
+            modifier = modifier,
+        )
+
+        UiState.Empty -> Unit // Do Nothing
+    }
+}
+
+@Composable
+private fun Content(
+    state: UiState.Loaded,
+    onEpisodeTap: (PodcastEpisode) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val podcast = state.podcast ?: return
 
     ScalingLazyColumn(
         modifier = modifier
@@ -63,7 +81,7 @@ fun PodcastScreen(
                 text = podcast.author
             )
         }
-        items(viewModel.uiState.episodes) { episode ->
+        items(state.episodes) { episode ->
             EpisodeChip(
                 episode = episode,
                 onClick = {
