@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 object PodcastScreen {
     const val argument = "podcastUuid"
     const val route = "podcast/{$argument}"
+    val podcastImageSize = 72.dp
 
     fun navigateRoute(podcastUuid: String) = "podcast/$podcastUuid"
 }
@@ -42,7 +43,7 @@ fun PodcastScreen(
         item {
             PodcastImage(
                 uuid = podcast.uuid,
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(PodcastScreen.podcastImageSize)
             )
             Spacer(Modifier.height(4.dp))
         }
