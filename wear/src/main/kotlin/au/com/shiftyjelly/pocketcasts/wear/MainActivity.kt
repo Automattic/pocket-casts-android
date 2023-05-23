@@ -94,7 +94,7 @@ fun WearApp(
         scrollable(
             route = WatchListScreen.route,
         ) {
-            val pagerState = rememberPagerState()
+            val pagerState = rememberPagerState { NowPlayingPager.pageCount }
             val coroutineScope = rememberCoroutineScope()
             NowPlayingPager(
                 navController = navController,

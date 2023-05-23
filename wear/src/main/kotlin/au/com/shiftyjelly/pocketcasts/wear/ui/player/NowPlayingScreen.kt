@@ -201,9 +201,10 @@ fun NowPlayingSettingsButtons(
     }
 }
 
+@Composable
 private fun Modifier.onVolumeChangeByScroll(
     focusRequester: FocusRequester,
-    onVolumeChangeByScroll: (scrollPixels: Float) -> Unit
+    onVolumeChangeByScroll: (scrollPixels: Float) -> Unit,
 ) =
     onRotaryInputAccumulated(onValueChange = onVolumeChangeByScroll)
         .focusRequester(focusRequester)
