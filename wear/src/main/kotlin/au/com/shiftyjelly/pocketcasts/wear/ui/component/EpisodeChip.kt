@@ -105,7 +105,7 @@ fun EpisodeChip(
             ) {
                 Text(
                     text = episode.title,
-                    lineHeight = 14.sp,
+                    lineHeight = 16.sp,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.button.merge(
                         @Suppress("DEPRECATION")
