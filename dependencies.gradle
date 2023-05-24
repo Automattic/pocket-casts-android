@@ -92,7 +92,7 @@ project.ext {
 
     // When updating this, check to see if versionComposeWear will be updated as well (and update that variable if appropriate)
     // https://github.com/google/horologist/blob/main/gradle/libs.versions.toml
-    versionHorologist = '0.4.2'
+    versionHorologist = '0.4.7'
 
     versionKotlinCoroutines = '1.6.4'
     versionLifecycle = '2.6.0'
@@ -200,7 +200,7 @@ project.ext {
             horologistMedia3Backend: "com.google.android.horologist:horologist-media3-backend:$versionHorologist",
             horologistMediaUi: "com.google.android.horologist:horologist-media-ui:$versionHorologist",
             horologistMediaData: "com.google.android.horologist:horologist-media-data:$versionHorologist",
-            horologistNetworkAwarness: "com.google.android.horologist:horologist-network-awareness:$versionHorologist",
+            horologistNetworkAwarnessOkHttp: "com.google.android.horologist:horologist-network-awareness-okhttp:$versionHorologist",
 
             media3DatasourceOkhttp: "androidx.media3:media3-datasource-okhttp:$versionMedia3",
 
