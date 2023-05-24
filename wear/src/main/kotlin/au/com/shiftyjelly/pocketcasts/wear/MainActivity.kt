@@ -92,7 +92,6 @@ fun WearApp(
     val navController = rememberSwipeDismissableNavController()
     val swipeToDismissState = rememberSwipeToDismissBoxState()
     val navState = rememberSwipeDismissableNavHostState(swipeToDismissState)
-    var loaded by remember { mutableStateOf(false) }
 
     if (showLoggingInScreen) {
         navController.navigate(LoggingInScreen.routeWithDelay)
@@ -119,7 +118,6 @@ fun WearApp(
     ) {
 
         scrollable(RequirePlusScreen.route) {
-            loaded = true
             RequirePlusScreen(
                 columnState = it.columnState,
                 onContinueToLogin = { navController.navigate(authenticationSubGraph) },
