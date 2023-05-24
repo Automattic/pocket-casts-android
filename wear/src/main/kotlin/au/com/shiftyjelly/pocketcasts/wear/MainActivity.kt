@@ -336,8 +336,8 @@ fun WearApp(
     // sign in state does not report that it is a Plus subscription until after the subscription call completes.
     // This has to happen after the WearNavScaffold so that the new start destination has been processed,
     // otherwise the new start destination will replace any navigation we do here to the LoggingInScreen.
-    var previousSubscriptionStatus by remember { mutableStateOf<SubscriptionStatus?>(null) }
-    if (previousSubscriptionStatus != subscriptionStatus &&
+    val previousSubscriptionStatus = remember { mutableStateOf<SubscriptionStatus?>(null) }
+    if (previousSubscriptionStatus.value != subscriptionStatus &&
         signInState is SignInState.SignedIn
     ) {
 
@@ -354,7 +354,7 @@ fun WearApp(
             }
         }
     }
-    previousSubscriptionStatus = subscriptionStatus
+    previousSubscriptionStatus.value = subscriptionStatus
 }
 
 private fun NavGraphBuilder.loggingInScreens(
