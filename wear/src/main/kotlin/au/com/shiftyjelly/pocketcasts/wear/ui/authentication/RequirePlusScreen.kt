@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Text
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
@@ -17,8 +16,6 @@ fun RequirePlusScreen(
     columnState: ScalingLazyColumnState,
     onContinueToLogin: () -> Unit,
 ) {
-
-    val viewModel = hiltViewModel<RequirePlusViewModel>()
 
     ScalingLazyColumn(
         columnState = columnState,
