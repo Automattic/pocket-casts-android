@@ -3,6 +3,7 @@
 package au.com.shiftyjelly.pocketcasts.wear
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -15,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +55,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -346,6 +349,9 @@ fun WearApp(
                 // This gets the user back to the start destination if they logged in as free
                 signOut()
                 navController.popBackStack(startDestination, inclusive = false)
+                if (subscriptionStatus is SubscriptionStatus.Free) {
+                    Toast.makeText(LocalContext.current, LR.string.log_in_with_plus, Toast.LENGTH_LONG).show()
+                }
             }
             is SubscriptionStatus.Plus -> {
                 if (waitingForSignIn) {
