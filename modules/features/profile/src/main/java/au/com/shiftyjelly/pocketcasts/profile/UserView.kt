@@ -217,7 +217,6 @@ class ExpandedUserView @JvmOverloads constructor(
 
         val status = (signInState as? SignInState.SignedIn)?.subscriptionStatus ?: return
         when (status) {
-            SubscriptionStatus.NotSignedIn,
             is SubscriptionStatus.Free -> {
                 lblPaymentStatus.text = context.getString(LR.string.profile_free_account)
                 lblSignInStatus?.text = ""

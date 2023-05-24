@@ -225,10 +225,7 @@ class HelpFragment : Fragment(), HasBackstack, Toolbar.OnMenuItemClickListener {
 
     private fun contactSupport() {
         when (subscriptionManager.getCachedStatus()) {
-            null,
-            is SubscriptionStatus.Free,
-            SubscriptionStatus.NotSignedIn -> useForumPopup()
-
+            null, is SubscriptionStatus.Free -> useForumPopup()
             is SubscriptionStatus.Plus -> sendSupportEmail()
         }
 

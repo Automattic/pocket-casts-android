@@ -35,8 +35,7 @@ class RequirePlusViewModel @Inject constructor(
 
                     val status = when (signInState) {
                         is SignInState.SignedIn -> when (signInState.subscriptionStatus) {
-                            is SubscriptionStatus.Free,
-                            SubscriptionStatus.NotSignedIn -> RequirePlusStatus.Free
+                            is SubscriptionStatus.Free -> RequirePlusStatus.Free
 
                             is SubscriptionStatus.Plus -> RequirePlusStatus.Plus
                         }

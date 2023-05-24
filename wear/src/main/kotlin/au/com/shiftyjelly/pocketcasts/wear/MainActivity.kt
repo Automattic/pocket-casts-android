@@ -101,7 +101,6 @@ fun WearApp(
 
     val userCanAccessWatch = when (subscriptionStatus) {
         is SubscriptionStatus.Free,
-        SubscriptionStatus.NotSignedIn,
         null -> false
         is SubscriptionStatus.Plus -> true
     }
@@ -345,9 +344,7 @@ fun WearApp(
     ) {
 
         when (subscriptionStatus) {
-            is SubscriptionStatus.Free,
-            SubscriptionStatus.NotSignedIn,
-            null -> {
+            null, is SubscriptionStatus.Free -> {
                 // This gets the user back to the start destination if they logged in as free
                 signOut()
                 navController.popBackStack(startDestination, inclusive = false)

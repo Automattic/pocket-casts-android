@@ -69,7 +69,7 @@ class SubscriptionManagerImpl @Inject constructor(
         if (cachedStatus != null) {
             accept(Optional.of(cachedStatus))
         } else {
-            accept(Optional.of(SubscriptionStatus.NotSignedIn))
+            accept(Optional.of(null))
         }
     }
 
