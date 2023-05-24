@@ -40,14 +40,14 @@ fun PodcastsScreen(
 
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),
-        state = listState,
+        state = listState
     ) {
         item {
             Text(
                 text = stringResource(LR.string.podcasts),
                 style = MaterialTheme.typography.title2,
                 color = MaterialTheme.theme.colors.primaryText01,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             )
         }
         items(items = uiState.items, key = { item -> item.uuid }) { item ->
