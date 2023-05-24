@@ -49,11 +49,15 @@ fun EpisodeScreen(
     navigateToConfirmDeleteDownload: () -> Unit,
     navigateToRemoveFromUpNextNotification: () -> Unit,
     navigateToStreamingConfirmation: () -> Unit,
+    navigateToNowPlaying: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<EpisodeViewModel>()
     val state = viewModel.stateFlow.collectAsState().value
     if (state !is EpisodeViewModel.State.Loaded) return
+
+    val showNowPlaying = viewModel.showNowPlaying.collectAsState(false).value
+    if (showNowPlaying) navigateToNowPlaying()
 
     val episode = state.episode
     val podcast = state.podcast

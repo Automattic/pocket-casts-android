@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object NowPlayingScreen {
     const val route = "now_playing"
+    const val pagerIndex = 1
 }
 
 @OptIn(ExperimentalWearFoundationApi::class)
