@@ -46,12 +46,9 @@ import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    @Inject lateinit var theme: Theme
 
     private val viewModel: WearMainActivityViewModel by viewModels()
 
@@ -59,7 +56,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val state by viewModel.state.collectAsState()
-            WearAppTheme(theme.activeTheme) {
+            WearAppTheme(Theme.ThemeType.EXTRA_DARK) {
                 WearApp(
                     signInConfirmationAction = state.signInConfirmationAction,
                     onSignInConfirmationActionHandled = viewModel::onSignInConfirmationActionHandled,
