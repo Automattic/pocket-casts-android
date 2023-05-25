@@ -18,7 +18,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -32,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.ScrollToTop
 import au.com.shiftyjelly.pocketcasts.wear.ui.SettingsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.RequirePlusScreen
@@ -120,6 +120,7 @@ fun WearApp(
     ) {
 
         scrollable(RequirePlusScreen.route) {
+            ScrollToTop.handle(navController, it.scrollableState)
             RequirePlusScreen(
                 columnState = it.columnState,
                 onContinueToLogin = { navController.navigate(authenticationSubGraph) },
@@ -138,18 +139,7 @@ fun WearApp(
                 scrollableScaffoldContext = it,
             ) {
 
-                navController.currentBackStackEntry?.savedStateHandle
-                    ?.getStateFlow(WatchListScreen.scrollToTop, false)
-                    ?.collectAsStateWithLifecycle()?.value?.let { scrollToTop ->
-                        if (scrollToTop) {
-                            coroutineScope.launch {
-                                it.scrollableState.scrollToItem(0)
-                            }
-                            // Reset once consumed
-                            navController.currentBackStackEntry?.savedStateHandle
-                                ?.set(WatchListScreen.scrollToTop, false)
-                        }
-                    }
+                ScrollToTop.handle(navController, it.scrollableState)
 
                 WatchListScreen(
                     scrollState = it.scrollableState,
@@ -285,10 +275,7 @@ fun WearApp(
                         inclusive = false,
                     )
                     if (popped) {
-                        navController
-                            .currentBackStackEntry
-                            ?.savedStateHandle
-                            ?.set(WatchListScreen.scrollToTop, true)
+                        ScrollToTop.initiate(navController)
                     }
                 }
 
@@ -345,7 +332,10 @@ fun WearApp(
             // This gets the user back to the start destination if they logged in as free. The
             // start destination should have been reset to the RequirePlusScreen already.
             signOut()
-            navController.popBackStack(startDestination, inclusive = false)
+            val popped = navController.popBackStack(startDestination, inclusive = false)
+            if (popped) {
+                ScrollToTop.initiate(navController)
+            }
             Toast.makeText(LocalContext.current, LR.string.log_in_with_plus, Toast.LENGTH_LONG).show()
         }
         is SubscriptionStatus.Plus -> {
