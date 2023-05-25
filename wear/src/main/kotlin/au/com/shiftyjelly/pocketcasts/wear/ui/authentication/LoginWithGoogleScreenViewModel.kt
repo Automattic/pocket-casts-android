@@ -53,4 +53,8 @@ class LoginWithGoogleScreenViewModel @Inject constructor(
             }
         }
     }
+
+    fun clearPreviousSignIn() {
+        googleSignInViewModel.googleSignInClient.signOut()
+    }
 }
