@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -107,9 +106,9 @@ fun WearApp(
         is SubscriptionStatus.Plus -> true
     }
 
-    var waitingForSignIn by remember { mutableStateOf(false) }
+    val waitingForSignIn = remember { mutableStateOf(false) }
     if (!userCanAccessWatch) {
-        waitingForSignIn = true
+        waitingForSignIn.value = true
     }
 
     val startDestination = if (userCanAccessWatch) WatchListScreen.route else RequirePlusScreen.route
@@ -340,26 +339,26 @@ fun WearApp(
     // This has to happen after the WearNavScaffold so that the new start destination has been processed,
     // otherwise the new start destination will replace any navigation we do here to the LoggingInScreen.
     val previousSubscriptionStatus = remember { mutableStateOf<SubscriptionStatus?>(null) }
-    if (previousSubscriptionStatus.value != subscriptionStatus &&
-        signInState is SignInState.SignedIn
-    ) {
-
-        when (subscriptionStatus) {
-            null, is SubscriptionStatus.Free -> {
-                // This gets the user back to the start destination if they logged in as free
-                signOut()
-                navController.popBackStack(startDestination, inclusive = false)
-                if (subscriptionStatus is SubscriptionStatus.Free) {
-                    Toast.makeText(LocalContext.current, LR.string.log_in_with_plus, Toast.LENGTH_LONG).show()
-                }
-            }
-            is SubscriptionStatus.Plus -> {
-                if (waitingForSignIn) {
-                    navController.navigate(LoggingInScreen.route)
-                }
+    when (subscriptionStatus) {
+        null -> { /* do nothing */ }
+        is SubscriptionStatus.Free -> {
+            // This gets the user back to the start destination if they logged in as free. The
+            // start destination should have been reset to the RequirePlusScreen already.
+            signOut()
+            navController.popBackStack(startDestination, inclusive = false)
+            Toast.makeText(LocalContext.current, LR.string.log_in_with_plus, Toast.LENGTH_LONG).show()
+        }
+        is SubscriptionStatus.Plus -> {
+            if (waitingForSignIn.value &&
+                signInState is SignInState.SignedIn &&
+                previousSubscriptionStatus.value != subscriptionStatus
+            ) {
+                navController.navigate(LoggingInScreen.route)
+                waitingForSignIn.value = false
             }
         }
     }
+
     previousSubscriptionStatus.value = subscriptionStatus
 }
 
