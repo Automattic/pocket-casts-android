@@ -39,7 +39,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
-import au.com.shiftyjelly.pocketcasts.wear.theme.theme
+import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -107,7 +107,7 @@ fun EpisodeChip(
                     text = episode.title,
                     lineHeight = 16.sp,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.theme.colors.primaryText01,
+                    color = MaterialTheme.colors.onPrimary,
                     style = MaterialTheme.typography.button.merge(
                         @Suppress("DEPRECATION")
                         (
@@ -141,7 +141,7 @@ fun EpisodeChip(
                     }
                     Text(
                         text = "$shortDate • $timeLeft",
-                        color = MaterialTheme.theme.colors.primaryText02,
+                        color = MaterialTheme.colors.onSecondary,
                         style = MaterialTheme.typography.caption2,
                     )
                 }
@@ -164,7 +164,7 @@ private fun IconsRow(
             Icon(
                 painter = painterResource(R.drawable.ic_upnext),
                 contentDescription = stringResource(LR.string.episode_in_up_next),
-                tint = MaterialTheme.theme.colors.support01,
+                tint = WearColors.upNextIcon,
                 modifier = Modifier.size(12.dp),
             )
         }
@@ -173,7 +173,7 @@ private fun IconsRow(
             Icon(
                 painter = painterResource(R.drawable.ic_downloaded),
                 contentDescription = stringResource(LR.string.downloaded),
-                tint = MaterialTheme.theme.colors.support02,
+                tint = WearColors.downloadedIcon,
                 modifier = Modifier.size(12.dp),
             )
         }

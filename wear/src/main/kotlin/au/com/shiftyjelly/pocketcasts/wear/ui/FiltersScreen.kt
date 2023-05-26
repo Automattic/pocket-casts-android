@@ -25,7 +25,8 @@ fun FiltersScreen() {
         Text(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.primary,
+            color = MaterialTheme.colors.onPrimary,
+            style = MaterialTheme.typography.body1,
             text = stringResource(LR.string.filters)
         )
         Text(

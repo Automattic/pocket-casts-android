@@ -22,8 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Icon
+import androidx.wear.compose.material.MaterialTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -40,6 +40,7 @@ fun ObtainConfirmationScreen(
         TextH30(
             text = text,
             textAlign = TextAlign.Center,
+            color = MaterialTheme.colors.onPrimary,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
@@ -57,7 +58,7 @@ fun ObtainConfirmationScreen(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .background(color = WearColors.FF202124)
+                        .background(color = MaterialTheme.colors.surface)
                         .clip(CircleShape)
                         .fillMaxSize()
                 ) {

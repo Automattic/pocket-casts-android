@@ -9,7 +9,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
@@ -27,9 +26,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.images.PodcastImageLoaderThemed
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
-import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import coil.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
@@ -109,8 +106,8 @@ private fun Content(
             } else {
                 SolidColor(MaterialTheme.colors.surface)
             },
-            contentColor = Color.White,
-            secondaryContentColor = WearColors.FFDADCE0,
+            contentColor = MaterialTheme.colors.onPrimary,
+            secondaryContentColor = MaterialTheme.colors.onSecondary,
         ),
         onClick = onClick,
         modifier = Modifier.fillMaxWidth() // This is needed for the backgroundImagePainter to work
@@ -148,7 +145,7 @@ private fun PlayIcon() {
 )
 @Composable
 private fun Preview() {
-    WearAppTheme(Theme.ThemeType.DARK) {
+    WearAppTheme {
         Content(
             podcast = Podcast(
                 uuid = "b643cb50-2c52-013b-ef7a-0acc26574db2",

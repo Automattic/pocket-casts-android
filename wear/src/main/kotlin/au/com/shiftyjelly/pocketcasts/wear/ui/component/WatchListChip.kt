@@ -14,7 +14,6 @@ import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import com.google.android.horologist.base.ui.components.StandardChip
 import com.google.android.horologist.base.ui.components.StandardChipType
 import com.google.android.horologist.base.ui.util.adjustChipHeightToFontScale
@@ -67,7 +66,7 @@ fun WatchListChip(
     icon: (@Composable BoxScope.() -> Unit)? = null,
     secondaryLabel: String? = null,
     colors: ChipColors = ChipDefaults.secondaryChipColors(
-        secondaryContentColor = MaterialTheme.theme.colors.primaryText02
+        secondaryContentColor = MaterialTheme.colors.onPrimary
     ),
 ) {
     Chip(
@@ -75,6 +74,7 @@ fun WatchListChip(
             Text(
                 text = title,
                 style = MaterialTheme.typography.button,
+                color = MaterialTheme.colors.onPrimary,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = if (secondaryLabel != null) 1 else 2,
             )
@@ -87,6 +87,7 @@ fun WatchListChip(
             if (secondaryLabel != null) {
                 Text(
                     text = secondaryLabel,
+                    color = MaterialTheme.colors.onSecondary,
                     overflow = TextOverflow.Ellipsis,
                 )
             }

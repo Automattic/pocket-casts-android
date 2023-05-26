@@ -26,9 +26,7 @@ import androidx.wear.compose.material.ToggleChipDefaults
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
-import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
@@ -173,13 +171,14 @@ fun ToggleChip(
     checked: Boolean,
     onCheckedChanged: (Boolean) -> Unit,
 ) {
-    val color = MaterialTheme.theme.colors.support05
+    val color = MaterialTheme.colors.error
     ToggleChip(
         checked = checked,
         onCheckedChange = { onCheckedChanged(it) },
         label = {
             Text(
                 text = label,
+                color = MaterialTheme.colors.onPrimary,
                 style = MaterialTheme.typography.button,
             )
         },
@@ -207,7 +206,7 @@ fun ToggleChip(
 )
 @Composable
 private fun SettingsScreenPreview_unchecked() {
-    WearAppTheme(Theme.ThemeType.DARK) {
+    WearAppTheme {
         Content(
             scrollState = ScalingLazyColumnState(),
             state = SettingsViewModel.State(
@@ -233,7 +232,7 @@ private fun SettingsScreenPreview_unchecked() {
 )
 @Composable
 private fun SettingsScreenPreview_checked() {
-    WearAppTheme(Theme.ThemeType.DARK) {
+    WearAppTheme {
         Content(
             scrollState = ScalingLazyColumnState(),
             state = SettingsViewModel.State(

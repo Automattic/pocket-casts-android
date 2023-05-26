@@ -1,18 +1,26 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.podcasts
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.items
+import androidx.wear.compose.material.Chip
+import androidx.wear.compose.material.ChipDefaults
+import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.extensions.darker
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
-import com.google.android.horologist.base.ui.components.StandardChip
-import com.google.android.horologist.base.ui.components.StandardChipType
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object PodcastsScreen {
     const val route = "podcasts_screen"
@@ -29,9 +37,17 @@ fun PodcastsScreen(
 
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),
-        state = listState,
+        state = listState
     ) {
-        items(uiState.items) { item ->
+        item {
+            Text(
+                text = stringResource(LR.string.podcasts),
+                style = MaterialTheme.typography.button,
+                color = MaterialTheme.colors.onSecondary,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+        items(items = uiState.items, key = { item -> item.uuid }) { item ->
             if (item is FolderItem.Podcast) {
                 PodcastChip(podcast = item, onClick = navigateToPodcast)
             }
@@ -45,12 +61,27 @@ private fun PodcastChip(
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    StandardChip(
-        label = podcast.title,
+    Chip(
         onClick = { onClick(podcast.uuid) },
-        chipType = StandardChipType.Secondary,
+        colors = ChipDefaults.gradientBackgroundChipColors(
+            startBackgroundColor = Color(podcast.podcast.tintColorForDarkBg).darker(0.5f),
+            endBackgroundColor = MaterialTheme.colors.surface
+        ),
+        label = {
+            Text(
+                text = podcast.title,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.button,
+                color = MaterialTheme.colors.onPrimary
+            )
+        },
         icon = {
-            PodcastImage(uuid = podcast.uuid, dropShadow = false, modifier = Modifier.size(30.dp))
+            PodcastImage(
+                uuid = podcast.uuid,
+                dropShadow = false,
+                modifier = Modifier.size(32.dp)
+            )
         },
         modifier = modifier.fillMaxWidth()
     )

@@ -28,7 +28,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastViewModel.UiState
 
@@ -91,7 +90,7 @@ private fun Content(
                     Text(
                         modifier = modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.theme.colors.primaryText01,
+                        color = MaterialTheme.colors.onPrimary,
                         text = podcast.title,
                         style = MaterialTheme.typography.button
                     )
@@ -100,7 +99,7 @@ private fun Content(
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.theme.colors.primaryText02,
+                        color = MaterialTheme.colors.onSecondary,
                         text = podcast.author,
                         style = MaterialTheme.typography.body2.merge(
                             @Suppress("DEPRECATION")
