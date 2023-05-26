@@ -24,7 +24,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault">
+        android:theme="@style/SplashTheme">
 
         <uses-library
             android:name="com.google.android.wearable"
@@ -40,8 +40,7 @@
 
         <activity
             android:name=".wear.MainActivity"
-            android:exported="true"
-            android:theme="@android:style/Theme.DeviceDefault">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
