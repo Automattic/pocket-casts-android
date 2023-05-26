@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
 import au.com.shiftyjelly.pocketcasts.compose.images.ProfileImage
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
-import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreenViewModel.State.RefreshComplete.email
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -43,6 +41,9 @@ object LoggingInScreen {
     const val routeWithDelay = "loggingInScreenWithDelay"
 }
 
+/**
+ * This screen assumes that a refresh has been triggered from somewhere else.
+ */
 @Composable
 fun LoggingInScreen(
     avatarUrl: String? = null,
