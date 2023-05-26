@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-10 14:54:03+0000
+Translation-Revision-Date: 2023-05-23 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="enter_password">비밀번호 입력</string>
+    <string name="enter_email">이메일 입력</string>
+    <string name="player_effects_trim_level_down">트리밍 레벨 낮추기</string>
+    <string name="player_effects_trim_level_up">트리밍 레벨 높이기</string>
+    <string name="effects">효과</string>
+    <string name="profile_hi"> %s님, 안녕하세요</string>
+    <string name="settings_take_me_there">안내</string>
+    <string name="settings_forums_description">지원팀에서 도와드릴 수 있는 Pocket Casts 포럼(%1$s)으로 이동하세요.</string>
+    <string name="settings_forums">Pocket Casts 포럼</string>
+    <string name="settings_app_icon_patron_dark">Patron Dark</string>
+    <string name="settings_app_icon_patron_glow">Patron Glow</string>
+    <string name="settings_app_icon_patron_round">Patron Round</string>
+    <string name="settings_app_icon_patron_chrome">Patron Chrome</string>
+    <string name="profile_upgrade_to_patron">Patron으로 업그레이드</string>
+    <string name="onboarding_plus_subscribe">Pocket Casts Plus 구독</string>
+    <string name="onboarding_patron_subscribe">Pocket Casts Patron 구독</string>
+    <string name="upgrade_to">%s(으)로 업그레이드</string>
     <string name="profile_patron_expires_in">Patron 만료: %s</string>
     <string name="profile_account">계정</string>
     <string name="log_in_watch_from_phone_instructions_2">다음에 시계에서 Pocket Casts를 열 때 네트워크에 연결되어 있으면 로그인됩니다.</string>

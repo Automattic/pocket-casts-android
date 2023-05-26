@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-09 17:54:03+0000
+Translation-Revision-Date: 2023-05-23 16:54:22+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="enter_password">Inserisci la password</string>
+    <string name="enter_email">Inserisci l\'e-mail</string>
+    <string name="player_effects_trim_level_down">Riduci livello</string>
+    <string name="player_effects_trim_level_up">Aumenta livello</string>
+    <string name="effects">Effetti</string>
+    <string name="profile_hi">Ciao, %s</string>
+    <string name="settings_take_me_there">Portami lì</string>
+    <string name="settings_forums_description">Vai sui forum di Pocket Casts (%1$s) dove il nostro team di supporto può esserti di aiuto.</string>
+    <string name="settings_forums">Forum di Pocket Casts</string>
+    <string name="settings_app_icon_patron_dark">Patron Dark</string>
+    <string name="settings_app_icon_patron_glow">Patron Glow</string>
+    <string name="settings_app_icon_patron_round">Patron Round</string>
+    <string name="settings_app_icon_patron_chrome">Patron Chrome</string>
+    <string name="profile_upgrade_to_patron">Aggiorna a Patron</string>
+    <string name="onboarding_plus_subscribe">Abbonati a Pocket Casts Plus</string>
+    <string name="onboarding_patron_subscribe">Abbonati a Pocket Casts Patron</string>
+    <string name="upgrade_to">Aggiorna a %s</string>
     <string name="profile_patron_expires_in">Patron scade tra %s</string>
     <string name="profile_account">Account</string>
     <string name="log_in_watch_from_phone_instructions_2">La prossima volta che apri Pocket Casts sul tuo orologio e disponi di una connessione di rete, effettuerai la connessione.</string>
