@@ -31,6 +31,8 @@
 *   Updates
     *   Link users to support forum from within the app
         ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
+    *   Added a new pride icon
+        ([#997](https://github.com/Automattic/pocket-casts-android/pull/997)).
 
 7.38
 -----

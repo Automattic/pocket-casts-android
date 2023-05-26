@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-09 09:54:03+0000
+Translation-Revision-Date: 2023-05-23 13:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="enter_password">輸入密碼</string>
+    <string name="enter_email">輸入電子郵件地址</string>
+    <string name="player_effects_trim_level_down">剪輯程度降低</string>
+    <string name="player_effects_trim_level_up">剪輯程度提高</string>
+    <string name="effects">效果</string>
+    <string name="profile_hi">%s，你好</string>
+    <string name="settings_take_me_there">帶我前往</string>
+    <string name="settings_forums_description">請前往 Pocket Casts 的論壇 (%1$s)，我們的支援團隊可為你提供協助。</string>
+    <string name="settings_forums">Pocket Casts 論壇</string>
+    <string name="settings_app_icon_patron_dark">Patron Dark</string>
+    <string name="settings_app_icon_patron_glow">Patron Glow</string>
+    <string name="settings_app_icon_patron_round">Patron Round</string>
+    <string name="settings_app_icon_patron_chrome">Patron Chrome</string>
+    <string name="profile_upgrade_to_patron">升級至 Patron</string>
+    <string name="onboarding_plus_subscribe">訂購 Pocket Casts Plus</string>
+    <string name="onboarding_patron_subscribe">訂購 Pocket Casts Patron</string>
+    <string name="upgrade_to">升級至 %s</string>
     <string name="profile_patron_expires_in">Patron 將於 %s後到期</string>
     <string name="profile_account">帳號</string>
     <string name="log_in_watch_from_phone_instructions_2">你下次在手錶上開啟 Pocket Casts 並連線網路時便會登入。</string>

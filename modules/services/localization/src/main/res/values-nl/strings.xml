@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-10 09:54:03+0000
+Translation-Revision-Date: 2023-05-24 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="enter_password">Voer wachtwoord in</string>
+    <string name="enter_email">E-mail invoeren</string>
+    <string name="player_effects_trim_level_down">Niveau van wegfilteren omlaag</string>
+    <string name="player_effects_trim_level_up">Niveau van wegfilteren omhoog</string>
+    <string name="effects">Effecten</string>
+    <string name="profile_hi">Hoi, %s</string>
+    <string name="settings_take_me_there">Neem me mee</string>
+    <string name="settings_forums_description">Ga naar de forums van Pocket Casts (%1$s), daar kan ons ondersteuningsteam je helpen.</string>
+    <string name="settings_forums">Forums Pocket Casts</string>
+    <string name="settings_app_icon_patron_dark">Patron donker</string>
+    <string name="settings_app_icon_patron_glow">Patron gloeiend</string>
+    <string name="settings_app_icon_patron_round">Patron rond</string>
+    <string name="settings_app_icon_patron_chrome">Patron chroom</string>
+    <string name="profile_upgrade_to_patron">Upgrade naar Patron</string>
+    <string name="onboarding_plus_subscribe">Abonneer je op Pocket Casts Plus</string>
+    <string name="onboarding_patron_subscribe">Abonneer je op Pocket Casts Patron</string>
+    <string name="upgrade_to">Upgrade naar %s</string>
     <string name="profile_patron_expires_in">Patron verloopt over %s</string>
     <string name="profile_account">Account</string>
     <string name="log_in_watch_from_phone_instructions_2">De volgende keer dat je Pocket Casts opent op je horloge en verbonden bent met een netwerk, word je ingelogd.</string>

@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-10 14:54:03+0000
+Translation-Revision-Date: 2023-05-22 11:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="enter_password">Введите пароль</string>
+    <string name="enter_email">Введите адрес электронной почты</string>
+    <string name="player_effects_trim_level_down">Уменьшить громкость в паузах</string>
+    <string name="player_effects_trim_level_up">Увеличить громкость в паузах</string>
+    <string name="effects">Эффекты</string>
+    <string name="profile_hi">Здравствуйте, %s</string>
+    <string name="settings_take_me_there">Перейти</string>
+    <string name="settings_forums_description">Посетите форумы Pocket Casts (%1$s), где можно обратиться в службу поддержки.</string>
+    <string name="settings_forums">Форумы Pocket Casts</string>
+    <string name="settings_app_icon_patron_dark">Patron Dark</string>
+    <string name="settings_app_icon_patron_glow">Patron Glow</string>
+    <string name="settings_app_icon_patron_round">Patron Round</string>
+    <string name="settings_app_icon_patron_chrome">Patron Chrome</string>
+    <string name="profile_upgrade_to_patron">Перейти на Patron</string>
+    <string name="onboarding_plus_subscribe">Подписаться на Pocket Casts Plus</string>
+    <string name="onboarding_patron_subscribe">Подписаться на Pocket Casts Patron</string>
+    <string name="upgrade_to">Перейти на %s</string>
     <string name="profile_patron_expires_in">Срок действия Patron истекает %s</string>
     <string name="profile_account">Учётная запись</string>
     <string name="log_in_watch_from_phone_instructions_2">В следующий раз, когда вы откроете Pocket Casts на своих подключенных к сети часах, будет выполнен вход в приложение.</string>
