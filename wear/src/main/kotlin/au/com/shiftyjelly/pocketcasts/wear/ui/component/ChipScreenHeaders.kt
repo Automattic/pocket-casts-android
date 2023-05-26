@@ -11,7 +11,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 
 @Composable
 fun ScreenHeaderChip(
@@ -46,7 +45,7 @@ private fun Header(
 ) {
     Text(
         text = stringResource(text),
-        color = textColor ?: WearColors.FFBDC1C6,
+        color = textColor ?: MaterialTheme.colors.onSecondary,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.button,
         modifier = modifier.fillMaxWidth()

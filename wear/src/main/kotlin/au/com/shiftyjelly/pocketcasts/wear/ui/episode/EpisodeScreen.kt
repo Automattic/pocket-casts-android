@@ -26,13 +26,13 @@ import androidx.core.text.parseAsHtml
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButtonState
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ExpandableText
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -71,12 +71,14 @@ fun EpisodeScreen(
 
         val headingLineHeight = 14.sp
         item {
-            TextP50(
+            Text(
                 text = episode.title,
                 maxLines = 2,
                 fontWeight = W700,
                 lineHeight = headingLineHeight,
                 textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.onPrimary,
+                style = MaterialTheme.typography.title3,
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
@@ -86,7 +88,8 @@ fun EpisodeScreen(
                 TextP50(
                     text = podcast.title,
                     maxLines = 1,
-                    color = WearColors.FFDADCE0,
+                    color = MaterialTheme.colors.onSecondary,
+                    style = MaterialTheme.typography.body1,
                     lineHeight = headingLineHeight,
                     textAlign = TextAlign.Center,
                     modifier = Modifier

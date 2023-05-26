@@ -16,7 +16,6 @@ import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Icon
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButtonState
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 
 @Composable
@@ -70,7 +69,7 @@ fun DownloadButton(
 @Preview
 @Composable
 private fun DownloadingPreview() {
-    WearAppTheme(Theme.ThemeType.DARK) {
+    WearAppTheme {
         Column {
             listOf(
                 DownloadButtonState.NotDownloaded("3 MB"),

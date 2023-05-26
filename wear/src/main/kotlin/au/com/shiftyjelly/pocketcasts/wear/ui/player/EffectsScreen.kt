@@ -33,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.ToggleChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -168,7 +167,10 @@ private fun SpeedChip(
                             contentDescription = stringResource(LR.string.player_effects_speed_up),
                         )
                     }
-                    TextH30(text = String.format("%.1fx", state.playbackEffects.playbackSpeed))
+                    TextH30(
+                        text = String.format("%.1fx", state.playbackEffects.playbackSpeed),
+                        color = MaterialTheme.colors.onPrimary,
+                    )
                     IconButton(onClick = onPlusClicked) {
                         Icon(
                             painter = painterResource(IR.drawable.plus_simple),
@@ -203,6 +205,7 @@ fun TrimSilenceSlider(
             TextH50(
                 text = stringResource(id = LR.string.player_effects_trim_silence),
                 fontWeight = FontWeight.W700,
+                color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
@@ -226,7 +229,7 @@ fun TrimSilenceSlider(
             steps = 2,
             segmented = true,
             colors = InlineSliderDefaults.colors(
-                selectedBarColor = MaterialTheme.theme.colors.support05
+                selectedBarColor = MaterialTheme.colors.onSurface
             )
         )
     }

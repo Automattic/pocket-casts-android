@@ -31,7 +31,6 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.images.GravatarProfileImage
 import au.com.shiftyjelly.pocketcasts.compose.images.ProfileImage
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -117,7 +116,8 @@ private fun Content(
             Text(
                 text = stringResource(LR.string.profile_logging_in),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.title3
+                color = MaterialTheme.colors.onPrimary,
+                style = MaterialTheme.typography.title2
             )
         }
 
@@ -134,7 +134,8 @@ private fun Content(
                 if (email != null) {
                     Text(
                         text = email,
-                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onPrimary,
+                        style = MaterialTheme.typography.body1,
                         // Turn off softWrap to make sure the text doesn't get truncated if it runs long.
                         // Without this if "xxxx@gmail.com" ran just a bit long, it would get shortened
                         // to "xxx@gmail".
@@ -178,7 +179,7 @@ private fun Modifier.fadeOutOverflow(
 @Preview
 @Composable
 private fun LoggingInScreenPreview() {
-    WearAppTheme(Theme.ThemeType.DARK) {
+    WearAppTheme {
         LoggingInScreen(
             onClose = {}
         )
