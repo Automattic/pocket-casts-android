@@ -1255,6 +1255,7 @@
     <string name="settings_app_icon_rose" translatable="false">@string/settings_theme_rose</string>
     <string name="settings_app_icon_pocket_cats" translatable="false">Pocket Cats</string>
     <string name="settings_app_icon_red_velvet">Red Velvet</string>
+    <string name="settings_app_icon_pride_2023">Pride 2023</string>
     <string name="settings_app_icon_plus">Plus</string>
     <string name="settings_app_icon_classic" translatable="false">@string/settings_theme_classic</string>
     <string name="settings_app_icon_electric_blue">Electric Blue</string>
