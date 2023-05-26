@@ -89,6 +89,14 @@ class AppIcon @Inject constructor(
             launcherIcon = IR.mipmap.ic_launcher_redvelvet,
             aliasName = ".ui.MainActivity_11"
         ),
+        PRIDE_2023(
+            id = "pride_2023",
+            labelId = LR.string.settings_app_icon_pride_2023,
+            settingsIcon = IR.drawable.appicon_pride_2023,
+            type = SubscriptionType.NONE,
+            launcherIcon = IR.mipmap.ic_launcher_pride_2023,
+            aliasName = ".ui.MainActivity_18"
+        ),
         PLUS(
             id = "plus",
             labelId = LR.string.settings_app_icon_plus,
