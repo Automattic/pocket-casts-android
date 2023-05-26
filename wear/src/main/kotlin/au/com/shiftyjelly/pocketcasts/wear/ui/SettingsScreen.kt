@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
+import com.google.android.horologist.base.ui.util.adjustChipHeightToFontScale
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -192,7 +194,9 @@ fun ToggleChip(
             checkedEndBackgroundColor = color.copy(alpha = 0.32f),
             checkedToggleControlColor = color,
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .adjustChipHeightToFontScale(LocalConfiguration.current.fontScale)
+            .fillMaxWidth()
     )
 }
 

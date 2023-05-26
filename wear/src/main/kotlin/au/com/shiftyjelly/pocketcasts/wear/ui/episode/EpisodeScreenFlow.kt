@@ -76,7 +76,7 @@ object EpisodeScreenFlow {
                         }
                     }
 
-                val pagerState = rememberPagerState()
+                val pagerState = rememberPagerState { NowPlayingPager.pageCount }
                 val coroutineScope = rememberCoroutineScope()
 
                 @OptIn(ExperimentalFoundationApi::class)

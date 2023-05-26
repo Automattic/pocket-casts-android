@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class LoggingInScreenViewModel @Inject constructor(
-    podcastManager: PodcastManager,
     settings: Settings,
     private val syncManager: SyncManager,
 ) : ViewModel() {
@@ -28,12 +27,21 @@ class LoggingInScreenViewModel @Inject constructor(
     private val logInNotificationMinDuration = 5.seconds
 
     sealed class State(val email: String?) {
+        object None : State(null)
         class Refreshing(email: String?) : State(email)
         class CompleteButDelaying(email: String?) : State(email)
         object RefreshComplete : State(null)
     }
 
-    private val _state = MutableStateFlow<State>(State.Refreshing(syncManager.getEmail()))
+    private val _state = MutableStateFlow(
+        when (settings.getRefreshState()) {
+            is RefreshState.Failed -> State.RefreshComplete
+            RefreshState.Never -> State.None
+            RefreshState.Refreshing -> State.Refreshing(syncManager.getEmail())
+            is RefreshState.Success -> State.RefreshComplete
+            null -> State.None
+        }
+    )
     val state = _state.asStateFlow()
 
     init {
@@ -42,27 +50,29 @@ class LoggingInScreenViewModel @Inject constructor(
                 .asFlow()
                 .collect(::onRefreshStateChange)
         }
-        viewModelScope.launch {
-            podcastManager.refreshPodcastsAfterSignIn()
-        }
     }
 
     fun shouldClose(withMinimumDelay: Boolean): Boolean {
         val stateValue = state.value
+
+        if (stateValue is State.None) {
+            LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Immediately closing LoggingInScreen because refresh is not in progress")
+            return true
+        }
+
         val shouldNotDelayOnceComplete = !withMinimumDelay && stateValue is State.CompleteButDelaying
-        val completeWithDelay = stateValue is State.RefreshComplete
-        return shouldNotDelayOnceComplete || completeWithDelay
+        val delayHasPassed = stateValue is State.RefreshComplete
+        return shouldNotDelayOnceComplete || delayHasPassed
     }
 
     private fun onRefreshStateChange(refreshState: RefreshState) {
         when (refreshState) {
 
             RefreshState.Refreshing -> {
-                val stateValue = state.value
-                if (stateValue !is State.Refreshing) {
-                    val email = stateValue.email ?: syncManager.getEmail()
-                    _state.value = State.Refreshing(email)
+                val email = state.value.email?.let {
+                    syncManager.getEmail()
                 }
+                _state.value = State.Refreshing(email)
             }
 
             RefreshState.Never -> { /* Do nothing */ }
@@ -73,11 +83,10 @@ class LoggingInScreenViewModel @Inject constructor(
 
             is RefreshState.Success -> {
                 viewModelScope.launch {
-                    val stateValue = state.value
-                    if (stateValue !is State.CompleteButDelaying) {
-                        val email = stateValue.email ?: syncManager.getEmail()
-                        _state.value = State.CompleteButDelaying(email = email)
+                    val email = state.value.email?.let {
+                        syncManager.getEmail()
                     }
+                    _state.value = State.CompleteButDelaying(email)
 
                     delayUntilMinDuration()
                     _state.value = State.RefreshComplete

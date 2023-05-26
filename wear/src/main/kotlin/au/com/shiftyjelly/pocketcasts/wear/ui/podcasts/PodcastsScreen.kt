@@ -59,7 +59,11 @@ fun PodcastsScreen(
 }
 
 @Composable
-private fun PodcastChip(podcast: FolderItem.Podcast, onClick: (String) -> Unit, modifier: Modifier = Modifier) {
+private fun PodcastChip(
+    podcast: FolderItem.Podcast,
+    onClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Chip(
         onClick = { onClick(podcast.uuid) },
         colors = ChipDefaults.gradientBackgroundChipColors(

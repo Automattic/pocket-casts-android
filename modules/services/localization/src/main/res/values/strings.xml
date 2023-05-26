@@ -33,6 +33,8 @@
     <string name="log_in">Log in</string>
     <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
     <string name="log_out">Log out</string>
+    <string name="log_in_watch_requires_plus">Sign in with a Plus account to use this app or upgrade visiting</string>
+    <string name="log_in_with_plus">Please sign in with a Plus account</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
