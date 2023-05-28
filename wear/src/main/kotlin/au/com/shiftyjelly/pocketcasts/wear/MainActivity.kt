@@ -178,7 +178,7 @@ fun WearApp(
         scrollable(
             route = PodcastsScreen.routeHomeFolder,
         ) {
-            PlayerAndPodcastsScreen(
+            PodcastsScreenContent(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
                 scrollableScaffoldContext = it,
@@ -193,7 +193,7 @@ fun WearApp(
                 }
             ),
         ) {
-            PlayerAndPodcastsScreen(
+            PodcastsScreenContent(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
                 scrollableScaffoldContext = it,
@@ -363,7 +363,7 @@ fun WearApp(
 }
 
 @Composable
-fun PlayerAndPodcastsScreen(
+fun PodcastsScreenContent(
     navController: NavHostController,
     swipeToDismissState: SwipeToDismissBoxState,
     scrollableScaffoldContext: ScrollableScaffoldContext,
