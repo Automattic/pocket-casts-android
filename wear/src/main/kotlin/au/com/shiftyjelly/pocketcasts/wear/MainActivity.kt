@@ -19,8 +19,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.wear.compose.material.SwipeToDismissBoxState
 import androidx.wear.compose.material.rememberSwipeToDismissBoxState
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavHostState
@@ -47,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
+import com.google.android.horologist.compose.navscaffold.ScrollableScaffoldContext
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
 import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
@@ -173,20 +176,28 @@ fun WearApp(
         }
 
         scrollable(
-            route = PodcastsScreen.route,
+            route = PodcastsScreen.routeHomeFolder,
         ) {
-            NowPlayingPager(
+            PlayerAndPodcastsScreen(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
                 scrollableScaffoldContext = it,
-            ) {
-                PodcastsScreen(
-                    listState = it.scrollableState,
-                    navigateToPodcast = { podcastUuid ->
-                        navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
-                    }
-                )
-            }
+            )
+        }
+
+        scrollable(
+            route = PodcastsScreen.routeFolder,
+            arguments = listOf(
+                navArgument(PodcastsScreen.argumentFolderUuid) {
+                    type = NavType.StringType
+                }
+            ),
+        ) {
+            PlayerAndPodcastsScreen(
+                navController = navController,
+                swipeToDismissState = swipeToDismissState,
+                scrollableScaffoldContext = it,
+            )
         }
 
         scrollable(
@@ -230,7 +241,6 @@ fun WearApp(
         }
 
         scrollable(DownloadsScreen.route) {
-
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
@@ -350,6 +360,29 @@ fun WearApp(
     }
 
     previousSubscriptionStatus.value = subscriptionStatus
+}
+
+@Composable
+fun PlayerAndPodcastsScreen(
+    navController: NavHostController,
+    swipeToDismissState: SwipeToDismissBoxState,
+    scrollableScaffoldContext: ScrollableScaffoldContext,
+) {
+    NowPlayingPager(
+        navController = navController,
+        swipeToDismissState = swipeToDismissState,
+        scrollableScaffoldContext = scrollableScaffoldContext,
+    ) {
+        PodcastsScreen(
+            listState = scrollableScaffoldContext.scrollableState,
+            navigateToPodcast = { podcastUuid ->
+                navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
+            },
+            navigateToFolder = { folderUuid ->
+                navController.navigate(PodcastsScreen.navigateRoute(folderUuid))
+            },
+        )
+    }
 }
 
 private fun NavGraphBuilder.loggingInScreens(
