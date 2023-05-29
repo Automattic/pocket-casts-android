@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.filters.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR

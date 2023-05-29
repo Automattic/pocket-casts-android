@@ -128,7 +128,16 @@ data class ThemeColors(
         FolderColor(id = 11, color = filter12)
     )
 
+    private val filterColors = listOf(
+        filter01,
+        filter05,
+        filter04,
+        filter06,
+        filter03
+    )
+
     private val folderIdToColor = folderColors.associateBy({ it.id }, { it.color })
 
     fun getFolderColor(id: Int): Color = folderIdToColor[id] ?: folderColors.first().color
+    fun getFilterColor(colorIndex: Int): Color = filterColors.getOrElse(colorIndex) { filterColors.first() }
 }
