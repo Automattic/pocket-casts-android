@@ -38,6 +38,8 @@ def getVersionName = {
     def versionName = versionProperties.getProperty("versionName", null)
     if (isAutomotiveBuild) {
         return "${versionName}a"
+    } else if (isWearBuild) {
+        return "${versionName}w"
     }
     return versionName
 }
