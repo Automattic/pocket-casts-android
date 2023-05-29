@@ -30,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.ScrollToTop
 import au.com.shiftyjelly.pocketcasts.wear.ui.SettingsScreen
@@ -42,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.filter.FilterScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.filters.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.EffectsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.PCVolumeScreen
@@ -231,12 +232,40 @@ fun WearApp(
             swipeToDismissState = swipeToDismissState,
         )
 
-        composable(FiltersScreen.route) {
+        scrollable(FiltersScreen.route) {
             NowPlayingPager(
                 navController = navController,
                 swipeToDismissState = swipeToDismissState,
+                scrollableScaffoldContext = it,
             ) {
-                FiltersScreen()
+                FiltersScreen(
+                    onFilterTap = { filterUuid ->
+                        navController.navigate(FilterScreen.navigateRoute(filterUuid))
+                    },
+                    listState = it.scrollableState,
+                )
+            }
+        }
+
+        scrollable(
+            route = FilterScreen.route,
+            arguments = listOf(
+                navArgument(FilterScreen.argumentFilterUuid) {
+                    type = NavType.StringType
+                }
+            ),
+        ) {
+            NowPlayingPager(
+                navController = navController,
+                swipeToDismissState = swipeToDismissState,
+                scrollableScaffoldContext = it,
+            ) {
+                FilterScreen(
+                    onEpisodeTap = { episode ->
+                        navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
+                    },
+                    listState = it.scrollableState,
+                )
             }
         }
 

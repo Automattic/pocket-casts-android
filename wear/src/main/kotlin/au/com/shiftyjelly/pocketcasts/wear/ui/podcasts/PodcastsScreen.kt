@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.darker
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -49,12 +50,7 @@ fun PodcastsScreen(
         state = listState
     ) {
         item {
-            Text(
-                text = if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.title,
-                style = MaterialTheme.typography.button,
-                color = MaterialTheme.colors.onSecondary,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            ScreenHeaderChip(if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.name)
         }
         items(items = uiState.items, key = { item -> item.uuid }) { item ->
             when (item) {

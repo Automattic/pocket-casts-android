@@ -15,8 +15,21 @@ import androidx.wear.compose.material.Text
 @Composable
 fun ScreenHeaderChip(
     @StringRes text: Int,
-    textColor: Color? = null,
     modifier: Modifier = Modifier,
+    textColor: Color? = null,
+) {
+    ScreenHeaderChip(
+        text = stringResource(text),
+        textColor = textColor,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun ScreenHeaderChip(
+    text: String,
+    modifier: Modifier = Modifier,
+    textColor: Color? = null,
 ) {
     Header(
         text = text,
@@ -30,21 +43,24 @@ fun ScreenHeaderChip(
 }
 
 @Composable
-fun SectionHeaderChip(@StringRes text: Int, modifier: Modifier = Modifier) {
+fun SectionHeaderChip(
+    @StringRes text: Int,
+    modifier: Modifier = Modifier
+) {
     Header(
-        text = text,
+        text = stringResource(text),
         modifier = modifier.padding(vertical = verticalPadding, horizontal = horizontalPadding)
     )
 }
 
 @Composable
 private fun Header(
-    @StringRes text: Int,
-    textColor: Color? = null,
+    text: String,
     modifier: Modifier = Modifier,
+    textColor: Color? = null,
 ) {
     Text(
-        text = stringResource(text),
+        text = text,
         color = textColor ?: MaterialTheme.colors.onSecondary,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.button,
