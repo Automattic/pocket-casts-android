@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
-import au.com.shiftyjelly.pocketcasts.models.to.FolderItem.Folder
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +24,7 @@ class PodcastsViewModel @Inject constructor(
 
     data class UiState(
         val folder: Folder? = null,
-        val items: List<FolderItem> = emptyList(),
-        val isSignedInAsPlus: Boolean = false
+        val items: List<FolderItem> = emptyList()
     )
 
     var uiState by mutableStateOf(UiState())
@@ -33,7 +32,7 @@ class PodcastsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val folder: FolderItem.Folder?
+            val folder: Folder?
             val items: List<FolderItem>
             if (folderUuid.isEmpty()) {
                 items = folderManager.getHomeFolder()
@@ -41,9 +40,9 @@ class PodcastsViewModel @Inject constructor(
             } else {
                 val podcasts = folderManager.findFolderPodcastsSorted(folderUuid)
                 items = podcasts.map { FolderItem.Podcast(it) }
-                folder = folderManager.findByUuid(folderUuid)?.let { FolderItem.Folder(folder = it, podcasts = podcasts) }
+                folder = folderManager.findByUuid(folderUuid)
             }
-            uiState = UiState(folder = folder, items = items, isSignedInAsPlus = false)
+            uiState = UiState(folder = folder, items = items)
         }
     }
 }

@@ -50,7 +50,7 @@ fun PodcastsScreen(
         state = listState
     ) {
         item {
-            ScreenHeaderChip(if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.title)
+            ScreenHeaderChip(if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.name)
         }
         items(items = uiState.items, key = { item -> item.uuid }) { item ->
             when (item) {
