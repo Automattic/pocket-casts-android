@@ -61,7 +61,7 @@ fun WatchListScreen(
             WatchListChip(
                 title = stringResource(LR.string.podcasts),
                 iconRes = IR.drawable.ic_podcasts,
-                onClick = { navigateToRoute(PodcastsScreen.route) }
+                onClick = { navigateToRoute(PodcastsScreen.routeHomeFolder) }
             )
         }
 
