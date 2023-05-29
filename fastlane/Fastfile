@@ -18,6 +18,8 @@ RELEASE_NOTES_SOURCE_PATH = File.join(PROJECT_ROOT_FOLDER, 'CHANGELOG.md')
 EXTRACTED_RELEASE_NOTES_PATH = File.join(ORIGINALS_METADATA_DIR_PATH, 'release_notes.txt')
 PLAY_STORE_TRACK_AUTOMOTIVE_BETA = "automotive:beta"
 PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION = "automotive:production"
+PLAY_STORE_TRACK_WEAR_BETA = "wear:beta"
+PLAY_STORE_TRACK_WEAR_PRODUCTION = "wear:production"
 PLAY_STORE_TRACK_BETA = "beta"
 PLAY_STORE_TRACK_PRODUCTION = "production"
 GLOTPRESS_APP_STRINGS_PROJECT_URL = 'https://translate.wordpress.com/projects/pocket-casts/android/'
@@ -52,7 +54,8 @@ ENV['FL_RELEASE_TOOLKIT_DEFAULT_BRANCH'] = 'main'
 GH_REPOSITORY = "automattic/pocket-casts-android"
 APPS_APP = "app"
 APPS_AUTOMOTIVE = "automotive"
-APPS = [APPS_APP, APPS_AUTOMOTIVE]
+APPS_WEAR = "wear"
+APPS = [APPS_APP, APPS_AUTOMOTIVE, APPS_WEAR]
 
 UPLOAD_TO_PLAY_STORE_JSON_KEY = File.join(PROJECT_ROOT_FOLDER, 'google-upload-credentials.json')
 
@@ -164,6 +167,8 @@ platform :android do
 
         track = if (app == APPS_AUTOMOTIVE)
             is_beta ? PLAY_STORE_TRACK_AUTOMOTIVE_BETA : PLAY_STORE_TRACK_AUTOMOTIVE_PRODUCTION
+        elsif (app == APPS_WEAR)
+            is_beta ? PLAY_STORE_TRACK_WEAR_BETA : PLAY_STORE_TRACK_WEAR_PRODUCTION
         else
             is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
         end
@@ -214,7 +219,7 @@ platform :android do
   end
 
   # @param [Hash<String>] version The version to create. Expects keys "name" and "code"
-  # @param [String] app The Android app to build (i.e 'app' or 'automotive')
+  # @param [String] app The Android app to build (i.e 'app', 'automotive', or 'wear')
   desc "Builds and bundles the given app"
   lane :build_bundle do | options |
     version = options[:version]
@@ -230,7 +235,8 @@ platform :android do
         task: ":#{app}:bundle",
         build_type: "Release",
         properties: {
-            "IS_AUTOMOTIVE_BUILD" => app == APPS_AUTOMOTIVE
+            "IS_AUTOMOTIVE_BUILD" => app == APPS_AUTOMOTIVE,
+            "IS_WEAR_BUILD" => app == APPS_WEAR
         }
     )
 

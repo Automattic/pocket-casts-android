@@ -1,4 +1,5 @@
 final VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_AUTOMOTIVE = 50000
+final VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_WEAR = 50000 + VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_AUTOMOTIVE
 
 def secretProperties = loadPropertiesFromFile(file("$rootDir/secret.properties") )
 def versionProperties = loadPropertiesFromFile(file("${rootDir}/version.properties"))
@@ -23,10 +24,13 @@ static def loadPropertiesFromFile(inputFile) {
 // The long term solution is to move the version information out of the `base.gradle` and into the specific
 // app & automotive modules and pass this information to the modules that require it.
 def isAutomotiveBuild = (project.findProperty("IS_AUTOMOTIVE_BUILD") ?: false).toBoolean()
+def isWearBuild = (project.findProperty("IS_WEAR_BUILD") ?: false).toBoolean()
 def getVersionCode = {
     def appVersionCode = versionProperties.getProperty("versionCode", null).toInteger()
     if (isAutomotiveBuild) {
         return appVersionCode + VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_AUTOMOTIVE
+    } else if (isWearBuild) {
+       return appVersionCode + VERSION_CODE_DIFFERENCE_BETWEEN_APP_AND_WEAR
     }
     return appVersionCode
 }
