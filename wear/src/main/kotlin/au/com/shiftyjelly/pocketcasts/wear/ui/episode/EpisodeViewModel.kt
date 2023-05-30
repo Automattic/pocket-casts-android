@@ -29,13 +29,17 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
+import au.com.shiftyjelly.pocketcasts.wear.di.ForApplicationScope
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.AudioOutputSelectorHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -67,8 +71,10 @@ class EpisodeViewModel @Inject constructor(
     private val showNotesManager: ServerShowNotesManager,
     theme: Theme,
     @ApplicationContext appContext: Context,
+    @ForApplicationScope private val coroutineScope: CoroutineScope,
+    private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
 ) : AndroidViewModel(appContext as Application) {
-
+    private var playAttempt: Job? = null
     private val analyticsSource = AnalyticsSource.WATCH_EPISODE_DETAILS
 
     sealed class State {
@@ -246,14 +252,18 @@ class EpisodeViewModel @Inject constructor(
         if (playbackManager.shouldWarnAboutPlayback()) {
             showStreamingConfirmation()
         } else {
-            play()
+            playAttempt?.cancel()
+
+            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
 
     fun onStreamingConfirmationResult(result: StreamingConfirmationScreen.Result) {
         val confirmedStreaming = result == StreamingConfirmationScreen.Result.CONFIRMED
         if (confirmedStreaming && !playbackManager.isPlaying()) {
-            play()
+            playAttempt?.cancel()
+
+            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
 
@@ -274,6 +284,8 @@ class EpisodeViewModel @Inject constructor(
             Timber.e("Attempted to pause when not playing")
             return
         }
+        playAttempt?.cancel()
+
         viewModelScope.launch {
             playbackManager.pause(playbackSource = analyticsSource)
         }

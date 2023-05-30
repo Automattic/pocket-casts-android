@@ -6,13 +6,17 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.wear.di.ForApplicationScope
 import com.google.android.horologist.media.ui.components.controls.SeekButtonIncrement
 import com.google.android.horologist.media.ui.state.model.TrackPositionUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 import javax.inject.Inject
 import kotlin.time.DurationUnit
@@ -23,7 +27,10 @@ class NowPlayingViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     settings: Settings,
     private val theme: Theme,
+    @ForApplicationScope private val coroutineScope: CoroutineScope,
+    private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
 ) : ViewModel() {
+    private var playAttempt: Job? = null
 
     sealed class State {
         data class Loaded(
@@ -78,11 +85,15 @@ class NowPlayingViewModel @Inject constructor(
         if (playbackManager.shouldWarnAboutPlayback()) {
             showStreamingConfirmation()
         } else {
-            play()
+            playAttempt?.cancel()
+
+            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
 
     fun onPauseButtonClick() {
+        playAttempt?.cancel()
+
         playbackManager.pause(playbackSource = AnalyticsSource.WATCH_PLAYER)
     }
 
@@ -97,7 +108,9 @@ class NowPlayingViewModel @Inject constructor(
     fun onStreamingConfirmationResult(result: StreamingConfirmationScreen.Result) {
         val confirmedStreaming = result == StreamingConfirmationScreen.Result.CONFIRMED
         if (confirmedStreaming && !playbackManager.isPlaying()) {
-            play()
+            playAttempt?.cancel()
+
+            playAttempt = coroutineScope.launch { audioOutputSelectorHelper.attemptPlay(::play) }
         }
     }
 
