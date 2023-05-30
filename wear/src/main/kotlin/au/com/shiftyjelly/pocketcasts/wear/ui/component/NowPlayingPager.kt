@@ -23,6 +23,9 @@ import com.google.android.horologist.compose.navscaffold.ScrollableScaffoldConte
 import com.google.android.horologist.compose.pager.PagerScreen
 import kotlinx.coroutines.launch
 
+object NowPlayingPager {
+    const val pageCount = 3
+}
 /**
  * Pager with three pages:
  *
@@ -33,7 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NowPlayingPager(
     navController: NavController,
-    pagerState: PagerState = rememberPagerState(),
+    pagerState: PagerState = rememberPagerState { NowPlayingPager.pageCount },
     swipeToDismissState: SwipeToDismissBoxState,
     scrollableScaffoldContext: ScrollableScaffoldContext? = null,
     firstPageContent: @Composable () -> Unit,
@@ -62,7 +65,6 @@ fun NowPlayingPager(
     }
 
     PagerScreen(
-        count = 3,
         state = pagerState,
         modifier = modifier
     ) { page ->

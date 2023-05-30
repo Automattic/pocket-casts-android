@@ -1,16 +1,11 @@
-*   New Features:
-    *   Added the ability to see ratings for podcasts
-        ([#951](https://github.com/Automattic/pocket-casts-android/pull/951)).
+*   Updates:
+    *   Automotive now has the option to clear your data before logging in
+        ([#978](https://github.com/Automattic/pocket-casts-android/pull/978)).
 *   Bug Fixes:
-    *   Fixed the discover categories sorting so that it is alphabetical in the device language
-        ([#942](https://github.com/Automattic/pocket-casts-android/pull/942)).
-    *   Fixed Japanese translations for the 'Show played episodes' setting in Automotive.
-        ([#890](https://github.com/Automattic/pocket-casts-android/issues/955)).
-    *   Fixed the listening stats.
-        ([#960](https://github.com/Automattic/pocket-casts-android/pull/960)).
-    *   Fixed crash on grouping by season
-        ([#962](https://github.com/Automattic/pocket-casts-android/pull/962)).
-*   Updates
-    *   Link users to support forum from within the app
-        ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
+    *   Fixed the buffering and seeking issues with some Automotive manufacturers
+        ([#977](https://github.com/Automattic/pocket-casts-android/pull/977)).
+    *   Improved the resolution of the Gravatar image
+        ([#973](https://github.com/Automattic/pocket-casts-android/pull/973)).
+    *   Improved the Automotive user profile view
+        ([#975](https://github.com/Automattic/pocket-casts-android/pull/975)).
 

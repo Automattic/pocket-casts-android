@@ -1,11 +1,10 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui
+package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -30,18 +29,18 @@ fun LoginScreen(
         item {
             Text(
                 text = stringResource(LR.string.log_in),
-                style = MaterialTheme.typography.title3,
                 textAlign = TextAlign.Center,
-                color = Color.White,
+                color = MaterialTheme.colors.onPrimary,
+                style = MaterialTheme.typography.title2,
             )
         }
 
         item {
             Text(
                 text = stringResource(LR.string.log_in_subtitle),
-                style = MaterialTheme.typography.body2,
                 textAlign = TextAlign.Center,
-                color = Color.White,
+                color = MaterialTheme.colors.onPrimary,
+                style = MaterialTheme.typography.body1,
             )
         }
 

@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,12 +26,11 @@ import androidx.wear.compose.material.ToggleChipDefaults
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
-import au.com.shiftyjelly.pocketcasts.wear.theme.theme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
+import com.google.android.horologist.base.ui.util.adjustChipHeightToFontScale
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -166,18 +166,19 @@ private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animat
 }
 
 @Composable
-private fun ToggleChip(
+fun ToggleChip(
     label: String,
     checked: Boolean,
     onCheckedChanged: (Boolean) -> Unit,
 ) {
-    val color = MaterialTheme.theme.colors.support05
+    val color = MaterialTheme.colors.error
     ToggleChip(
         checked = checked,
         onCheckedChange = { onCheckedChanged(it) },
         label = {
             Text(
                 text = label,
+                color = MaterialTheme.colors.onPrimary,
                 style = MaterialTheme.typography.button,
             )
         },
@@ -192,7 +193,9 @@ private fun ToggleChip(
             checkedEndBackgroundColor = color.copy(alpha = 0.32f),
             checkedToggleControlColor = color,
         ),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .adjustChipHeightToFontScale(LocalConfiguration.current.fontScale)
+            .fillMaxWidth()
     )
 }
 
@@ -203,7 +206,7 @@ private fun ToggleChip(
 )
 @Composable
 private fun SettingsScreenPreview_unchecked() {
-    WearAppTheme(Theme.ThemeType.DARK) {
+    WearAppTheme {
         Content(
             scrollState = ScalingLazyColumnState(),
             state = SettingsViewModel.State(
@@ -229,7 +232,7 @@ private fun SettingsScreenPreview_unchecked() {
 )
 @Composable
 private fun SettingsScreenPreview_checked() {
-    WearAppTheme(Theme.ThemeType.DARK) {
+    WearAppTheme {
         Content(
             scrollState = ScalingLazyColumnState(),
             state = SettingsViewModel.State(

@@ -66,6 +66,8 @@ android {
 }
 
 dependencies {
+    implementation androidLibs.wearInput
+
     // General Compose dependencies
     implementation androidLibs.composeActivity
     implementation androidLibs.composeUi
@@ -89,7 +91,7 @@ dependencies {
     implementation androidLibs.horologistMedia3Backend
     implementation androidLibs.horologistMediaData
     implementation androidLibs.horologistMediaUi
-    implementation androidLibs.horologistNetworkAwarness
+    implementation androidLibs.horologistNetworkAwarnessOkHttp
 
     implementation androidLibs.media3DatasourceOkhttp
 

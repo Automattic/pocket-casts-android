@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.wear.compose.material.Chip
@@ -13,7 +14,9 @@ import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import au.com.shiftyjelly.pocketcasts.wear.theme.theme
+import com.google.android.horologist.base.ui.components.StandardChip
+import com.google.android.horologist.base.ui.components.StandardChipType
+import com.google.android.horologist.base.ui.util.adjustChipHeightToFontScale
 
 @Composable
 fun WatchListChip(
@@ -21,17 +24,11 @@ fun WatchListChip(
     @DrawableRes iconRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    colors: ChipColors = ChipDefaults.secondaryChipColors(
-        secondaryContentColor = MaterialTheme.theme.colors.primaryText02
-    ),
-    overflow: TextOverflow? = null,
     secondaryLabel: String? = null,
 ) {
     WatchListChip(
         title = title,
         onClick = onClick,
-        colors = colors,
-        overflow = overflow,
         secondaryLabel = secondaryLabel,
         icon = {
             Icon(
@@ -49,31 +46,52 @@ fun WatchListChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: (@Composable BoxScope.() -> Unit)? = null,
-    colors: ChipColors = ChipDefaults.secondaryChipColors(
-        secondaryContentColor = MaterialTheme.theme.colors.primaryText02
-    ),
-    overflow: TextOverflow? = null,
     secondaryLabel: String? = null,
 ) {
-    Chip(
+    StandardChip(
+        label = title,
         onClick = onClick,
-        colors = colors,
+        modifier = modifier.fillMaxWidth(),
+        secondaryLabel = secondaryLabel,
+        icon = icon,
+        chipType = StandardChipType.Secondary,
+    )
+}
+
+@Composable
+fun WatchListChip(
+    title: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: (@Composable BoxScope.() -> Unit)? = null,
+    secondaryLabel: String? = null,
+    colors: ChipColors = ChipDefaults.secondaryChipColors(
+        secondaryContentColor = MaterialTheme.colors.onPrimary
+    ),
+) {
+    Chip(
         label = {
             Text(
                 text = title,
-                maxLines = if (secondaryLabel == null) 2 else 1,
+                style = MaterialTheme.typography.button,
+                color = MaterialTheme.colors.onPrimary,
                 overflow = TextOverflow.Ellipsis,
+                maxLines = if (secondaryLabel != null) 1 else 2,
             )
         },
+        onClick = onClick,
+        modifier = modifier
+            .adjustChipHeightToFontScale(LocalConfiguration.current.fontScale),
+        icon = icon,
         secondaryLabel = {
             if (secondaryLabel != null) {
                 Text(
                     text = secondaryLabel,
-                    overflow = overflow ?: TextOverflow.Ellipsis,
+                    color = MaterialTheme.colors.onSecondary,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         },
-        icon = icon,
-        modifier = modifier.fillMaxWidth()
+        colors = colors,
     )
 }

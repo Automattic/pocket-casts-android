@@ -2,8 +2,10 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -18,11 +20,13 @@ import androidx.wear.compose.material.SwipeToDismissBoxState
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NotificationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.composable
 import com.google.android.horologist.compose.navscaffold.scrollable
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object EpisodeScreenFlow {
@@ -37,6 +41,7 @@ object EpisodeScreenFlow {
     private const val deleteDownloadNotificationScreen = "deleteDownloadNotificationScreen"
     private const val removeFromUpNextNotificationScreen = "removeFromUpNextNotificationScreen"
 
+    @OptIn(ExperimentalFoundationApi::class)
     fun NavGraphBuilder.episodeGraph(
         navigateToPodcast: (podcastUuid: String) -> Unit,
         navController: NavController,
@@ -71,9 +76,13 @@ object EpisodeScreenFlow {
                         }
                     }
 
+                val pagerState = rememberPagerState { NowPlayingPager.pageCount }
+                val coroutineScope = rememberCoroutineScope()
+
                 @OptIn(ExperimentalFoundationApi::class)
                 NowPlayingPager(
                     navController = navController,
+                    pagerState = pagerState,
                     swipeToDismissState = swipeToDismissState,
                     scrollableScaffoldContext = it,
                 ) {
@@ -89,6 +98,11 @@ object EpisodeScreenFlow {
                         },
                         navigateToStreamingConfirmation = {
                             navController.navigate(StreamingConfirmationScreen.route)
+                        },
+                        navigateToNowPlaying = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(NowPlayingScreen.pagerIndex)
+                            }
                         },
                     )
                 }

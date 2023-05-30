@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.widget.ConstraintLayout
 import au.com.shiftyjelly.pocketcasts.account.ProfileCircleView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.SubscriptionBadge
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 import au.com.shiftyjelly.pocketcasts.utils.TimeConstants
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
 import java.util.Date
@@ -65,7 +67,6 @@ open class UserView @JvmOverloads constructor(
         imgProfilePicture = findViewById(R.id.imgProfilePicture)
         btnAccount = findViewById(R.id.btnAccount)
         subscriptionBadge = findViewById(R.id.subscriptionBadge)
-        setBackgroundResource(R.drawable.background_user_view)
     }
 
     open fun update(signInState: SignInState?) {
@@ -153,6 +154,9 @@ open class UserView @JvmOverloads constructor(
     }
 
     private fun updateSubscriptionBadge(signInState: SignInState?) {
+        val fontSize = if (Util.isAutomotive(context)) 20.sp else 14.sp
+        val iconSize = if (Util.isAutomotive(context)) 20.dp else 14.dp
+        val padding = if (Util.isAutomotive(context)) 6.dp else 4.dp
         subscriptionBadge?.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
@@ -168,12 +172,18 @@ open class UserView @JvmOverloads constructor(
                                 backgroundColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple) else null,
                                 textColor = if (!isExpandedUserView) colorResource(UR.color.patron_purple_light) else null,
                                 modifier = if (isExpandedUserView) modifier else Modifier,
+                                iconSize = iconSize,
+                                fontSize = fontSize,
+                                padding = padding,
                             )
                         } else if (signInState.isSignedInAsPlus && isExpandedUserView) {
                             SubscriptionBadge(
                                 iconRes = IR.drawable.ic_plus,
                                 shortNameRes = LR.string.pocket_casts_plus_short,
                                 iconColor = colorResource(UR.color.plus_gold),
+                                iconSize = iconSize,
+                                fontSize = fontSize,
+                                padding = padding,
                                 modifier = modifier,
                             )
                         }

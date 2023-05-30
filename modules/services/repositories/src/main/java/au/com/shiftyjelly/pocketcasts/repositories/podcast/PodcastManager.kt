@@ -116,7 +116,7 @@ interface PodcastManager {
 
     /** Utility methods  */
     fun countPodcasts(): Int
-    fun countSubscribed(): Int
+    suspend fun countSubscribed(): Int
     fun countSubscribedRx(): Single<Int>
     fun observeCountSubscribed(): Flowable<Int>
     fun countDownloadStatus(downloadStatus: Int): Int

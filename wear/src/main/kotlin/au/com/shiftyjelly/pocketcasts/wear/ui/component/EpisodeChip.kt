@@ -39,7 +39,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
-import au.com.shiftyjelly.pocketcasts.wear.theme.theme
+import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -47,6 +47,7 @@ fun EpisodeChip(
     episode: BaseEpisode,
     useUpNextIcon: Boolean = true,
     onClick: () -> Unit,
+    showImage: Boolean = true,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -56,7 +57,7 @@ fun EpisodeChip(
             .clickable { onClick() }
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
-            .height(72.dp)
+            .padding(vertical = 10.dp)
     ) {
 
         val viewModel = hiltViewModel<EpisodeChipViewModel>()
@@ -72,7 +73,7 @@ fun EpisodeChip(
             ?.queue
             ?: emptyList()
         val isInUpNextQueue = upNextQueue.any { it.uuid == episode.uuid }
-
+        val showUpNextIcon = useUpNextIcon && isInUpNextQueue
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.height(IntrinsicSize.Max)
@@ -82,37 +83,18 @@ fun EpisodeChip(
                 verticalArrangement = Arrangement.Center,
             ) {
 
-                EpisodeImage(
-                    episode = episode,
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clip(RoundedCornerShape(4.dp)),
-                )
-
-                val showUpNextIcon = useUpNextIcon && isInUpNextQueue
-                if (episode.isDownloaded || showUpNextIcon) {
-                    Row(
-                        horizontalArrangement = spacedBy(4.dp),
-                        modifier = Modifier.padding(top = 4.dp)
-                    ) {
-                        if (showUpNextIcon) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_upnext),
-                                contentDescription = stringResource(LR.string.episode_in_up_next),
-                                tint = MaterialTheme.theme.colors.support01,
-                                modifier = Modifier.size(12.dp),
-                            )
-                        }
-
-                        if (episode.isDownloaded) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_downloaded),
-                                contentDescription = stringResource(LR.string.downloaded),
-                                tint = MaterialTheme.theme.colors.support02,
-                                modifier = Modifier.size(12.dp),
-                            )
-                        }
-                    }
+                if (showImage) {
+                    EpisodeImage(
+                        episode = episode,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(RoundedCornerShape(4.dp)),
+                    )
+                    IconsRow(
+                        showUpNextIcon,
+                        episode,
+                        Modifier.padding(top = 4.dp)
+                    )
                 }
             }
 
@@ -123,8 +105,9 @@ fun EpisodeChip(
             ) {
                 Text(
                     text = episode.title,
-                    lineHeight = 14.sp,
+                    lineHeight = 16.sp,
                     overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colors.onPrimary,
                     style = MaterialTheme.typography.button.merge(
                         @Suppress("DEPRECATION")
                         (
@@ -145,12 +128,54 @@ fun EpisodeChip(
                     inProgress = episode.isInProgress,
                     context = LocalContext.current
                 ).text
-                Text(
-                    text = "$shortDate • $timeLeft",
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    style = MaterialTheme.typography.caption2
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    if (!showImage) {
+                        IconsRow(
+                            showUpNextIcon,
+                            episode,
+                            modifier = Modifier
+                                .padding(end = if (showUpNextIcon || episode.isDownloaded) 4.dp else 0.dp)
+                        )
+                    }
+                    Text(
+                        text = "$shortDate • $timeLeft",
+                        color = MaterialTheme.colors.onSecondary,
+                        style = MaterialTheme.typography.caption2,
+                    )
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun IconsRow(
+    showUpNextIcon: Boolean,
+    episode: BaseEpisode,
+    modifier: Modifier,
+) {
+    Row(
+        horizontalArrangement = spacedBy(4.dp),
+        modifier = modifier
+    ) {
+        if (showUpNextIcon) {
+            Icon(
+                painter = painterResource(R.drawable.ic_upnext),
+                contentDescription = stringResource(LR.string.episode_in_up_next),
+                tint = WearColors.upNextIcon,
+                modifier = Modifier.size(12.dp),
+            )
+        }
+
+        if (episode.isDownloaded) {
+            Icon(
+                painter = painterResource(R.drawable.ic_downloaded),
+                contentDescription = stringResource(LR.string.downloaded),
+                tint = WearColors.downloadedIcon,
+                modifier = Modifier.size(12.dp),
+            )
         }
     }
 }

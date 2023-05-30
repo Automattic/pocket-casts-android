@@ -122,7 +122,7 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
 
             val podcast = upNextState.podcast
             if (podcast != null) {
-                updateTintColor(podcast.getMiniPlayerTintColor(theme.isDarkTheme), theme)
+                updateTintColor(podcast.getPlayerTintColor(theme.isDarkTheme), theme)
             } else {
                 updateTintColor(context.getThemeColor(androidx.appcompat.R.attr.colorAccent), theme)
             }
