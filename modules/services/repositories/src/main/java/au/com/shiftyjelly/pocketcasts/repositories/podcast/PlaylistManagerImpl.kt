@@ -502,28 +502,6 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
-    override fun countEpisodesNotCompleted(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int {
-        return episodeManager.countEpisodesWhere("episodes.archived = 0 AND episodes.playing_status != " + EpisodePlayingStatus.COMPLETED.ordinal + " AND " + buildPlaylistWhere(playlist, null))
-    }
-
-    override fun countEpisodesDownloading(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int {
-        return episodeManager.countEpisodesWhere(
-            "episodes.archived = 0 AND (episodes.episode_status = " + EpisodeStatusEnum.DOWNLOADING.ordinal + " OR episodes.episode_status = " + EpisodeStatusEnum.QUEUED.ordinal + " OR episodes.episode_status = " + EpisodeStatusEnum.WAITING_FOR_WIFI.ordinal + " OR episodes.episode_status = " + EpisodeStatusEnum.WAITING_FOR_POWER.ordinal + ") AND " + buildPlaylistWhere(
-                playlist,
-                null
-            )
-        )
-    }
-
-    override fun countEpisodesNotDownloaded(playlist: Playlist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int {
-        return episodeManager.countEpisodesWhere(
-            "episodes.archived = 0 AND (episodes.episode_status = " + EpisodeStatusEnum.NOT_DOWNLOADED.ordinal + " OR episodes.episode_status = " + EpisodeStatusEnum.DOWNLOAD_FAILED.ordinal + ") AND " + buildPlaylistWhere(
-                playlist,
-                null
-            )
-        )
-    }
-
     private fun markAsNotSynced(playlist: Playlist) {
         playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
         playlistDao.updateSyncStatus(Playlist.SYNC_STATUS_NOT_SYNCED, playlist.uuid)
