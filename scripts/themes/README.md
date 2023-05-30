@@ -1,4 +1,4 @@
-Download the google_credentials.json file from 1Password 'Android Themes script'.
+Download the google_credentials.json file from our secret 'Pocket Casts - Android Themes Script'.
 ```
 ./run.sh
 ```
