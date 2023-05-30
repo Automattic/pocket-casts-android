@@ -15,9 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -29,10 +33,10 @@ import au.com.shiftyjelly.pocketcasts.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.MarqueeTextMediaDisplay
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.PodcastControlButtonsStyled
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.SetVolumeButtonStyled
 import com.google.android.horologist.audio.ui.VolumeUiState
-import com.google.android.horologist.audio.ui.components.actions.SetVolumeButton
 import com.google.android.horologist.compose.rotaryinput.onRotaryInputAccumulated
-import com.google.android.horologist.media.ui.components.PodcastControlButtons
 import com.google.android.horologist.media.ui.components.background.ColorBackground
 import com.google.android.horologist.media.ui.components.display.MessageMediaDisplay
 import com.google.android.horologist.media.ui.screens.player.PlayerScreen
@@ -95,24 +99,18 @@ fun NowPlayingScreen(
                     }
 
                     is NowPlayingViewModel.State.Loaded -> {
-                        MaterialTheme(
-                            colors = MaterialTheme.colors.copy(
-                                onBackground = Color.White,
-                            )
-                        ) {
-                            MarqueeTextMediaDisplay(
-                                title = state.title,
-                                artist = state.subtitle,
-                                modifier = modifier
-                                    .clickable { navigateToEpisode(state.episodeUuid) },
-                            )
-                        }
+                        MarqueeTextMediaDisplay(
+                            title = state.title,
+                            artist = state.subtitle,
+                            modifier = modifier
+                                .clickable { navigateToEpisode(state.episodeUuid) },
+                        )
                     }
                 }
             },
             controlButtons = {
                 if (state is NowPlayingViewModel.State.Loaded) {
-                    PodcastControlButtons(
+                    PodcastControlButtonsStyled(
                         onPlayButtonClick = {
                             playerViewModel.onPlayButtonClick(
                                 showStreamingConfirmation = {
@@ -128,8 +126,17 @@ fun NowPlayingScreen(
                         seekBackButtonEnabled = true,
                         onSeekForwardButtonClick = playerViewModel::onSeekForwardButtonClick,
                         seekForwardButtonEnabled = true,
-                        seekBackButtonIncrement = state.seekBackwardIncrement,
-                        seekForwardButtonIncrement = state.seekForwardIncrement,
+                        seekBackIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_back),
+                        seekForwardIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_foreward),
+                        playIcon = ImageVector.vectorResource(IR.drawable.wear_play),
+                        pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
+                        seekIconSize = 35.dp,
+                        seekIconAlign = Alignment.CenterHorizontally,
+                        seekTapTargetSize = DpSize(50.dp, 60.dp),
+                        progressColor = MaterialTheme.colors.onPrimary,
+                        trackColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.2f),
+                        backgroundColor = Color.Transparent,
+                        sidePadding = 12.dp,
                     )
                 }
             },
@@ -143,7 +150,6 @@ fun NowPlayingScreen(
                 }
             },
             background = {
-
                 when (state) {
                     NowPlayingViewModel.State.Loading -> Unit // Do Nothing
 
@@ -194,9 +200,12 @@ fun NowPlayingSettingsButtons(
                 tint = Color.White
             )
         }
-        SetVolumeButton(
+        SetVolumeButtonStyled(
             onVolumeClick = onVolumeClick,
-            volumeUiState = volumeUiState
+            volumeUiState = volumeUiState,
+            imageVolumeMute = ImageVector.vectorResource(IR.drawable.wear_volume_mute),
+            imageVolume = ImageVector.vectorResource(IR.drawable.wear_volume),
+            imageVolumeMax = ImageVector.vectorResource(IR.drawable.wear_volume_max),
         )
     }
 }
