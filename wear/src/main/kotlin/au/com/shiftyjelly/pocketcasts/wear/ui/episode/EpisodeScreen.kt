@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.text.parseAsHtml
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.items
+import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
@@ -167,6 +172,12 @@ fun EpisodeScreen(
             }
         }
 
+        state.errorData?.let {
+            item {
+                EpisodeErrorDetails(it)
+            }
+        }
+
         item {
             EpisodeDateTimeText(
                 episode = episode,
@@ -281,6 +292,46 @@ private fun EpisodeListChip(episodeScreenItem: EpisodeScreenItem) {
             .padding(bottom = 4.dp)
             .fillMaxWidth()
     )
+}
+
+@Composable
+private fun EpisodeErrorDetails(
+    errorData: EpisodeViewModel.State.Loaded.ErrorData,
+) {
+    val padding = 8.dp
+    Row(
+        modifier = Modifier
+            .padding(start = padding, end = padding, bottom = padding)
+            .background(
+                color = MaterialTheme.colors.secondary,
+                shape = RoundedCornerShape(10.dp)
+            ),
+    ) {
+        Box(modifier = Modifier.padding(start = padding, top = 10.dp)) {
+            Icon(
+                painter = painterResource(errorData.errorIconRes),
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+
+        Column {
+            Text(
+                text = stringResource(errorData.errorTitleRes),
+                color = MaterialTheme.colors.onSecondary,
+                style = MaterialTheme.typography.caption2,
+                modifier = Modifier.padding(padding)
+            )
+            errorData.errorDescription?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colors.onSecondary,
+                    style = MaterialTheme.typography.caption3,
+                    modifier = Modifier.padding(start = padding, end = padding, bottom = padding)
+                )
+            }
+        }
+    }
 }
 
 private data class EpisodeScreenItem(
