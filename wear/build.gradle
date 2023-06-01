@@ -34,7 +34,8 @@ android {
 
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher_radioactive",
-                    gitHash: gitHash + (gitDirty ? ("-" + gitDirty) : "")
+                    gitHash: gitHash + (gitDirty ? ("-" + gitDirty) : ""),
+                    sentryDsn: ""
             ]
         }
 
@@ -43,6 +44,11 @@ android {
         }
 
         release {
+            manifestPlaceholders = [
+                    gitHash: "",
+                    sentryDsn: project.pocketcastsSentryDsn
+            ]
+
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

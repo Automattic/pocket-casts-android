@@ -38,6 +38,10 @@
             android:name="pocketcasts_wear_os"
             android:value="true" />
 
+        <meta-data
+            android:name="au.com.shiftyjelly.pocketcasts.sentryDsn"
+            android:value="${sentryDsn}" />
+
         <activity
             android:name=".wear.MainActivity"
             android:exported="true">
