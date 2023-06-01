@@ -13,13 +13,14 @@ import com.google.android.horologist.networks.data.RequestType.MediaRequest.Comp
 import com.google.android.horologist.networks.rules.Allow
 import com.google.android.horologist.networks.rules.NetworkingRules
 import com.google.android.horologist.networks.rules.RequestCheck
+import timber.log.Timber
 
 object PocketCastsNetworkingRules : NetworkingRules {
     override fun isHighBandwidthRequest(requestType: RequestType): Boolean {
         if (BuildConfig.DEBUG) {
             // For testing purposes fail if we get unknown requests
-            check(requestType != RequestType.UnknownRequest) {
-                "Unknown request type. Failing on debug builds."
+            if (requestType == RequestType.UnknownRequest) {
+                Timber.e("Unknown request type. Requests should be one of: ${RequestType::class.java}")
             }
         }
 

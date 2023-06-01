@@ -2,16 +2,10 @@ package au.com.shiftyjelly.pocketcasts.wear.di
 
 import android.content.Context
 import android.net.ConnectivityManager
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadOkHttpClient
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
 import au.com.shiftyjelly.pocketcasts.wear.networking.PocketCastsNetworkingRules
-import com.google.android.horologist.networks.data.RequestType
 import com.google.android.horologist.networks.highbandwidth.HighBandwidthNetworkMediator
 import com.google.android.horologist.networks.highbandwidth.StandardHighBandwidthNetworkMediator
 import com.google.android.horologist.networks.logging.NetworkStatusLogger
-import com.google.android.horologist.networks.okhttp.NetworkSelectingCallFactory
-import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import com.google.android.horologist.networks.request.NetworkRequesterImpl
 import com.google.android.horologist.networks.rules.NetworkingRules
 import com.google.android.horologist.networks.rules.NetworkingRulesEngine
@@ -23,9 +17,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
-import okhttp3.Call
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 
@@ -74,34 +65,4 @@ object WearNetworkModule {
 
     @Provides
     fun provideNetworkLogger(): NetworkStatusLogger = NetworkStatusLogger.Logging
-
-    @Provides
-    @Singleton
-    @DownloadCallFactory
-    fun provideDownloadWearCallFactory(
-        highBandwidthNetworkMediator: HighBandwidthNetworkMediator,
-        networkRepository: NetworkRepository,
-        networkingRulesEngine: NetworkingRulesEngine,
-        @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
-        @ForApplicationScope coroutineScope: CoroutineScope,
-        logger: NetworkStatusLogger
-    ): Call.Factory {
-
-        return NetworkSelectingCallFactory(
-            networkingRulesEngine = networkingRulesEngine,
-            highBandwidthNetworkMediator = highBandwidthNetworkMediator,
-            networkRepository = networkRepository,
-            dataRequestRepository = null,
-            rootClient = phoneCallFactory,
-            coroutineScope = coroutineScope,
-            timeout = 5.seconds,
-            logger = logger,
-        )
-    }
-
-    @Provides
-    @DownloadRequestBuilder
-    fun downloadRequestBuilder(): Request.Builder =
-        Request.Builder()
-            .requestType(RequestType.MediaRequest.DownloadRequest)
 }

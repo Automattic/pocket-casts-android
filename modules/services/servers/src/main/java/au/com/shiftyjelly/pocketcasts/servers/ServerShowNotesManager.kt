@@ -3,13 +3,15 @@ package au.com.shiftyjelly.pocketcasts.servers
 import android.os.Handler
 import android.os.Looper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.di.ShowNotesCache
+import au.com.shiftyjelly.pocketcasts.servers.di.ShowNotesCacheCallFactory
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
+import com.google.android.horologist.networks.data.RequestType
+import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import io.reactivex.Completable
 import okhttp3.CacheControl
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
@@ -21,19 +23,21 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @Singleton
-class ServerShowNotesManager @Inject constructor(@ShowNotesCache private val httpShowNotesCache: OkHttpClient) {
+class ServerShowNotesManager @Inject constructor(
+    @ShowNotesCacheCallFactory private val showNotesCacheCallFactory: Call.Factory,
+) {
 
     fun cacheShowNotes(episodeUuid: String): Completable {
         return Completable.fromAction {
             val url = buildUrl(episodeUuid)
             val requestCache = buildCachedShowNotesRequest(url)
-            httpShowNotesCache.newCall(requestCache).execute().use { cachedResponse ->
+            showNotesCacheCallFactory.newCall(requestCache).execute().use { cachedResponse ->
                 val cachedNotes = getShowNotesFromResponse(cachedResponse)
                 // only download if not cached already
                 if (cachedNotes.isNullOrEmpty()) {
                     // download to cache
                     val request = buildNetworkShowNotesRequest(url)
-                    httpShowNotesCache.newCall(request).execute().use { response ->
+                    showNotesCacheCallFactory.newCall(request).execute().use { response ->
                         Timber.i("Show notes cached %s %s", episodeUuid, if (response.isSuccessful) "Successful" else "Failed")
                     }
                 }
@@ -92,7 +96,7 @@ class ServerShowNotesManager @Inject constructor(@ShowNotesCache private val htt
     private fun loadCachedShowNotes(url: String, listener: ShowNotesListener) {
         val requestCache = buildCachedShowNotesRequest(url)
 
-        httpShowNotesCache.newCall(requestCache).enqueue(object : Callback {
+        showNotesCacheCallFactory.newCall(requestCache).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Timber.e(e)
                 listener.complete(null)
@@ -112,7 +116,7 @@ class ServerShowNotesManager @Inject constructor(@ShowNotesCache private val htt
 
     private fun loadNetworkShowNotes(url: String, cachedNotes: String?, uiHandler: Handler?, callback: CachedServerCallback<String>?) {
         val request = buildNetworkShowNotesRequest(url)
-        httpShowNotesCache.newCall(request).enqueue(object : Callback {
+        showNotesCacheCallFactory.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Timber.e(e)
                 if (cachedNotes.isNullOrBlank()) {
@@ -137,15 +141,19 @@ class ServerShowNotesManager @Inject constructor(@ShowNotesCache private val htt
     }
 
     private fun buildNetworkShowNotesRequest(url: String): Request {
+        @OptIn(ExperimentalHorologistApi::class)
         return Request.Builder()
             .cacheControl(CacheControl.FORCE_NETWORK)
+            .requestType(RequestType.ApiRequest)
             .url(url)
             .build()
     }
 
     private fun buildCachedShowNotesRequest(url: String): Request {
+        @OptIn(ExperimentalHorologistApi::class)
         return Request.Builder()
             .cacheControl(CacheControl.Builder().onlyIfCached().build())
+            .requestType(RequestType.ApiRequest)
             .url(url)
             .build()
     }

@@ -10,16 +10,18 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.Share
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokenedOkHttpClient
+import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokenedCallFactory
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
+import com.google.android.horologist.networks.data.RequestType
+import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.FormBody
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import timber.log.Timber
@@ -32,7 +34,7 @@ import kotlin.coroutines.resumeWithException
 
 @Singleton
 open class ServerManager @Inject constructor(
-    @NoCacheTokenedOkHttpClient private val httpClientNoCache: OkHttpClient,
+    @NoCacheTokenedCallFactory private val callFactory: Call.Factory,
     private val settings: Settings
 ) {
     companion object {
@@ -209,9 +211,12 @@ open class ServerManager @Inject constructor(
         val url = serverUrl + servicePath
 
         val formBody = parameters.toFormBody()
+
+        @OptIn(ExperimentalHorologistApi::class)
         val request = Request.Builder()
             .url(url)
             .header("User-Agent", Settings.USER_AGENT_POCKETCASTS_SERVER)
+            .requestType(RequestType.ApiRequest)
             .post(formBody)
             .build()
 
@@ -316,7 +321,7 @@ open class ServerManager @Inject constructor(
             }
         }
 
-        val call = httpClientNoCache.newCall(request)
+        val call = callFactory.newCall(request)
         if (async) {
             call.enqueue(requestCallback)
             return call

@@ -19,6 +19,12 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
+import com.google.android.horologist.networks.highbandwidth.HighBandwidthNetworkMediator
+import com.google.android.horologist.networks.logging.NetworkStatusLogger
+import com.google.android.horologist.networks.okhttp.NetworkSelectingCallFactory
+import com.google.android.horologist.networks.rules.NetworkingRulesEngine
+import com.google.android.horologist.networks.status.NetworkRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Module
@@ -26,8 +32,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
+import okhttp3.Call
 import okhttp3.Dispatcher
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -42,6 +50,7 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -149,10 +158,14 @@ class ServersModule {
     }
 
     @Provides
-    @CachedOkHttpClient
+    @CachedCallFactory
     @Singleton
-    internal fun provideOkHttpClientCache(okHttpClientBuilder: OkHttpClient.Builder): OkHttpClient {
-        return okHttpClientBuilder.build()
+    internal fun provideOkHttpClientCache(
+        okHttpClientBuilder: OkHttpClient.Builder,
+        networkAwarenessWrapper: HorologistNetworkAwarenessWrapper,
+    ): Call.Factory {
+        val okHttpClient = okHttpClientBuilder.build()
+        return networkAwarenessWrapper.wrap(okHttpClient)
     }
 
     private fun buildRequestWithToken(original: Request, token: AccessToken?): Request {
@@ -191,17 +204,26 @@ class ServersModule {
     }
 
     @Provides
-    @CachedTokenedOkHttpClient
+    @CachedTokenedCallFactory
     @Singleton
-    internal fun provideOkHttpClientTokenedCache(okHttpClientBuilder: OkHttpClient.Builder, @TokenInterceptor tokenInterceptor: Interceptor): OkHttpClient {
-        return okHttpClientBuilder.addInterceptor(tokenInterceptor).build()
+    internal fun provideOkHttpClientTokenedCache(
+        okHttpClientBuilder: OkHttpClient.Builder,
+        @TokenInterceptor tokenInterceptor: Interceptor,
+        networkAwarenessWrapper: HorologistNetworkAwarenessWrapper,
+    ): Call.Factory {
+        val okHttpClient = okHttpClientBuilder.addInterceptor(tokenInterceptor).build()
+        return networkAwarenessWrapper.wrap(okHttpClient)
     }
 
     @Provides
-    @ShowNotesCache
+    @ShowNotesCacheCallFactory
     @Singleton
-    internal fun provideOkHttpShowNotesCache(@ApplicationContext context: Context): OkHttpClient {
-        return getShowNotesClient(context)
+    internal fun provideShowNotesCacheCallFactory(
+        @ApplicationContext context: Context,
+        networkAwarenessWrapper: HorologistNetworkAwarenessWrapper,
+    ): Call.Factory {
+        val showNotesClient = getShowNotesClient(context)
+        return networkAwarenessWrapper.wrap(showNotesClient)
     }
 
     @Provides
@@ -227,35 +249,47 @@ class ServersModule {
     }
 
     @Provides
-    @NoCacheOkHttpClient
+    @NoCacheCallFactory
     @Singleton
-    internal fun provideOkHttpClientNoCache(@NoCacheOkHttpClientBuilder builder: OkHttpClient.Builder): OkHttpClient {
-        return builder.build()
+    internal fun provideOkHttpClientNoCache(
+        @NoCacheOkHttpClientBuilder builder: OkHttpClient.Builder,
+        networkAwarenessWrapper: HorologistNetworkAwarenessWrapper,
+    ): Call.Factory {
+        val okHttpClient = builder.build()
+        return networkAwarenessWrapper.wrap(okHttpClient)
     }
 
     @Provides
-    @NoCacheTokenedOkHttpClient
+    @NoCacheTokenedCallFactory
     @Singleton
-    internal fun provideOkHttpClientNoCacheTokened(@NoCacheOkHttpClientBuilder builder: OkHttpClient.Builder, @TokenInterceptor tokenInterceptor: Interceptor): OkHttpClient {
-        return builder.addInterceptor(tokenInterceptor).build()
+    internal fun provideOkHttpClientNoCacheTokened(
+        @NoCacheOkHttpClientBuilder builder: OkHttpClient.Builder,
+        @TokenInterceptor tokenInterceptor: Interceptor,
+        networkAwarenessWrapper: HorologistNetworkAwarenessWrapper,
+    ): Call.Factory {
+        val okHttpClient = builder.addInterceptor(tokenInterceptor).build()
+        return networkAwarenessWrapper.wrap(okHttpClient)
     }
 
     @Provides
     @SyncServerRetrofit
     @Singleton
-    internal fun provideApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    internal fun provideApiRetrofit(
+        @CachedCallFactory callFactory: Call.Factory,
+        moshi: Moshi,
+    ): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(Settings.SERVER_API_URL)
-            .client(okHttpClient)
+            .callFactory(callFactory)
             .build()
     }
 
     @Provides
     @WpComServerRetrofit
     @Singleton
-    internal fun provideWpComApiRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient): Retrofit {
+    internal fun provideWpComApiRetrofit(@CachedCallFactory callFactory: Call.Factory): Retrofit {
         val moshi = Moshi.Builder()
             .add(AnonymousBumpStat.Adapter)
             .build()
@@ -263,72 +297,84 @@ class ServersModule {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .baseUrl(Settings.WP_COM_API_URL)
-            .client(okHttpClient)
+            .callFactory(callFactory)
             .build()
     }
 
     @Provides
     @RefreshServerRetrofit
     @Singleton
-    internal fun provideRefreshRetrofit(@NoCacheTokenedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    internal fun provideRefreshRetrofit(
+        @NoCacheTokenedCallFactory callFactory: Call.Factory,
+        moshi: Moshi,
+    ): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(Settings.SERVER_MAIN_URL)
-            .client(okHttpClient)
+            .callFactory(callFactory)
             .build()
     }
 
     @Provides
     @PodcastCacheServerRetrofit
     @Singleton
-    internal fun providePodcastRetrofit(@CachedTokenedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    internal fun providePodcastRetrofit(
+        @CachedTokenedCallFactory callFactory: Call.Factory,
+        moshi: Moshi,
+    ): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(Settings.SERVER_CACHE_URL)
-            .client(okHttpClient)
+            .callFactory(callFactory)
             .build()
     }
 
     @Provides
     @StaticServerRetrofit
     @Singleton
-    internal fun provideStaticRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl(Settings.SERVER_STATIC_URL)
-            .client(okHttpClient)
-            .build()
-    }
+    internal fun provideStaticRetrofit(
+        @CachedCallFactory callFactory: Call.Factory,
+        moshi: Moshi,
+    ): Retrofit = Retrofit.Builder()
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .baseUrl(Settings.SERVER_STATIC_URL)
+        .callFactory(callFactory)
+        .build()
 
     @Provides
     @ListDownloadServerRetrofit
     @Singleton
-    internal fun provideListDownloadRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl(Settings.SERVER_LIST_URL)
-            .client(okHttpClient)
-            .build()
-    }
+    internal fun provideListDownloadRetrofit(
+        @NoCacheCallFactory callFactory: Call.Factory,
+        moshi: Moshi,
+    ): Retrofit = Retrofit.Builder()
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .baseUrl(Settings.SERVER_LIST_URL)
+        .callFactory(callFactory)
+        .build()
 
     @Provides
     @ListUploadServerRetrofit
     @Singleton
-    internal fun provideListUploadRetrofit(@NoCacheOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .baseUrl(Settings.SERVER_SHARING_URL)
-            .client(okHttpClient)
-            .build()
-    }
+    internal fun provideListUploadRetrofit(
+        @NoCacheCallFactory callFactory: Call.Factory,
+        moshi: Moshi,
+    ): Retrofit = Retrofit.Builder()
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .baseUrl(Settings.SERVER_SHARING_URL)
+        .callFactory(callFactory)
+        .build()
 
     @Provides
     @DiscoverServerRetrofit
     @Singleton
-    internal fun provideRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshiBuilder: Moshi.Builder): Retrofit {
+    internal fun provideRetrofit(
+        @CachedCallFactory callFactory: Call.Factory,
+        moshiBuilder: Moshi.Builder,
+    ): Retrofit {
         moshiBuilder.add(ListTypeMoshiAdapter())
         moshiBuilder.add(DisplayStyleMoshiAdapter())
         moshiBuilder.add(ExpandedStyleMoshiAdapter())
@@ -336,7 +382,7 @@ class ServersModule {
             .addConverterFactory(MoshiConverterFactory.create(moshiBuilder.build()))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(Settings.SERVER_STATIC_URL)
-            .client(okHttpClient)
+            .callFactory(callFactory)
             .build()
     }
 
@@ -355,7 +401,43 @@ class ServersModule {
             platform
         )
     }
+
+    @OptIn(ExperimentalHorologistApi::class)
+    @Provides
+    @Singleton
+    fun provideCallFactoryWrapper(
+        @ApplicationContext context: Context,
+        @ForApplicationScope coroutineScope: CoroutineScope,
+        highBandwidthNetworkMediator: HighBandwidthNetworkMediator,
+        logger: NetworkStatusLogger,
+        networkRepository: NetworkRepository,
+        networkingRulesEngine: NetworkingRulesEngine,
+    ): HorologistNetworkAwarenessWrapper = object : HorologistNetworkAwarenessWrapper {
+        override fun wrap(okHttpClient: OkHttpClient) =
+            if (Util.isWearOs(context)) {
+                NetworkSelectingCallFactory(
+                    networkingRulesEngine = networkingRulesEngine,
+                    highBandwidthNetworkMediator = highBandwidthNetworkMediator,
+                    networkRepository = networkRepository,
+                    dataRequestRepository = null,
+                    rootClient = okHttpClient,
+                    coroutineScope = coroutineScope,
+                    timeout = 5.seconds,
+                    logger = logger,
+                )
+            } else {
+                okHttpClient
+            }
+    }
 }
+
+interface HorologistNetworkAwarenessWrapper {
+    fun wrap(okHttpClient: OkHttpClient): Call.Factory
+}
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ForApplicationScope
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -363,23 +445,23 @@ annotation class SyncServerCache
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class ShowNotesCache
+annotation class ShowNotesCacheCallFactory
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class CachedOkHttpClient
+annotation class CachedCallFactory
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class NoCacheOkHttpClient
+annotation class NoCacheCallFactory
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class NoCacheTokenedOkHttpClient
+annotation class NoCacheTokenedCallFactory
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class CachedTokenedOkHttpClient
+annotation class CachedTokenedCallFactory
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

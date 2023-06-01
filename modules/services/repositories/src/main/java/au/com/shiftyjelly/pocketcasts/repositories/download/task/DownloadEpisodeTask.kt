@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadCallFactory
-import au.com.shiftyjelly.pocketcasts.repositories.di.DownloadRequestBuilder
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.download.ResponseValidationResult
@@ -27,6 +26,9 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
+import com.google.android.horologist.networks.data.RequestType
+import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.Observable
@@ -53,7 +55,6 @@ import java.io.RandomAccessFile
 import java.net.SocketException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import javax.inject.Provider
 import javax.net.ssl.SSLHandshakeException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -70,7 +71,6 @@ class DownloadEpisodeTask @AssistedInject constructor(
     var episodeManager: EpisodeManager,
     var userEpisodeManager: UserEpisodeManager,
     @DownloadCallFactory private val callFactory: Call.Factory,
-    @DownloadRequestBuilder private val requestBuilderProvider: Provider<Request.Builder>
 ) : Worker(context, params) {
 
     companion object {
@@ -263,7 +263,9 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 throw UnderscoreInHostName()
             }
 
-            val requestBuilder = requestBuilderProvider.get()
+            @OptIn(ExperimentalHorologistApi::class)
+            val requestBuilder = Request.Builder()
+                .requestType(RequestType.MediaRequest.DownloadRequest)
                 .url(downloadUrl)
                 .header("User-Agent", "Pocket Casts")
 
