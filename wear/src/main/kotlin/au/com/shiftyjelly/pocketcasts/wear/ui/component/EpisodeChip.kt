@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -144,6 +145,26 @@ fun EpisodeChip(
                         color = MaterialTheme.colors.onSecondary,
                         style = MaterialTheme.typography.caption2,
                     )
+                }
+                episode.playErrorDetails?.let {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(IR.drawable.ic_alert_small),
+                            contentDescription = stringResource(LR.string.podcast_episode_playback_error),
+                            modifier = Modifier.size(14.dp),
+                            tint = MaterialTheme.colors.onSecondary,
+                        )
+                        Text(
+                            text = it,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            color = MaterialTheme.colors.onSecondary,
+                            style = MaterialTheme.typography.caption3,
+                            modifier = Modifier.padding(start = 5.dp)
+                        )
+                    }
                 }
             }
         }

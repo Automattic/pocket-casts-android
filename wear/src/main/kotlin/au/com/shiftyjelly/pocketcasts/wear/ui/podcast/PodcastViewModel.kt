@@ -13,7 +13,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,14 +44,26 @@ class PodcastViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.Default) {
             val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
-            val episodes = podcast?.let {
-                episodeManager.findEpisodesByPodcastOrdered(it)
-            } ?: emptyList()
-            uiState = UiState.Loaded(
-                podcast = podcast,
-                episodes = episodes,
-                theme = theme,
-            )
+            podcast?.let {
+                episodeManager.observeEpisodesByPodcastOrderedRx(it)
+                    .asFlow()
+                    .map { podcastEpisodes ->
+                        val sortFunction = podcast.podcastGrouping.sortFunction
+                        if (sortFunction != null) {
+                            podcastEpisodes.sortedByDescending(sortFunction)
+                        } else {
+                            podcastEpisodes
+                        }
+                    }
+                    .stateIn(viewModelScope)
+                    .collect { episodes ->
+                        uiState = UiState.Loaded(
+                            podcast = podcast,
+                            episodes = episodes,
+                            theme = theme,
+                        )
+                    }
+            }
         }
     }
 }
