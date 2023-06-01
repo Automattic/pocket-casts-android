@@ -315,21 +315,20 @@ private fun EpisodeErrorDetails(
             )
         }
 
-        Column {
+        if (errorData.errorDescription == null) {
             Text(
                 text = stringResource(errorData.errorTitleRes),
                 color = MaterialTheme.colors.onSecondary,
                 style = MaterialTheme.typography.caption2,
                 modifier = Modifier.padding(padding)
             )
-            errorData.errorDescription?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colors.onSecondary,
-                    style = MaterialTheme.typography.caption3,
-                    modifier = Modifier.padding(start = padding, end = padding, bottom = padding)
-                )
-            }
+        } else {
+            Text(
+                text = errorData.errorDescription,
+                color = MaterialTheme.colors.onSecondary,
+                style = MaterialTheme.typography.caption3,
+                modifier = Modifier.padding(padding)
+            )
         }
     }
 }
