@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.wear.networking
 
 import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.BuildConfig
-import com.google.android.horologist.networks.ExperimentalHorologistNetworksApi
 import com.google.android.horologist.networks.data.NetworkInfo
 import com.google.android.horologist.networks.data.NetworkStatus
 import com.google.android.horologist.networks.data.NetworkType
@@ -20,7 +19,7 @@ object PocketCastsNetworkingRules : NetworkingRules {
         if (BuildConfig.DEBUG) {
             // For testing purposes fail if we get unknown requests
             if (requestType == RequestType.UnknownRequest) {
-                Timber.e("Unknown request type. Requests should be one of: ${RequestType::class.java}")
+                Timber.e("Unknown request type")
             }
         }
 
@@ -85,7 +84,6 @@ object PocketCastsNetworkingRules : NetworkingRules {
  * @return The most preferred network type that is available. If none of the preferred types are
  * available, the first available network is returned. See test cases for examples.
  */
-@OptIn(ExperimentalHorologistNetworksApi::class)
 @VisibleForTesting
 internal fun List<NetworkStatus>.prefer(vararg types: NetworkType): NetworkStatus? =
     types.firstNotNullOfOrNull { type ->

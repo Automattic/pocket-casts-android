@@ -9,9 +9,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
-import com.google.android.horologist.networks.data.RequestType
-import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -53,9 +50,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
 
                 val client = OkHttpClient()
 
-                @OptIn(ExperimentalHorologistApi::class)
                 val request = Request.Builder()
-                    .requestType(RequestType.ApiRequest)
                     .url(downloadUrl)
                     .addHeader("User-Agent", "Pocket Casts")
                     .head()

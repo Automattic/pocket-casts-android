@@ -206,8 +206,6 @@ dependencies {
     implementation androidLibs.composeViewModel
     implementation androidLibs.composeUiUtil
     implementation androidLibs.wearPlayServices
-    implementation androidLibs.horologistAnnotations
-    implementation androidLibs.horologistNetworkAwarnessOkHttp
 
     implementation libs.kotlinCoroutines
     implementation libs.kotlinCoroutinesAndroid

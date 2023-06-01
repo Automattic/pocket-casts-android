@@ -26,9 +26,6 @@ import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.anyMessageContains
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
-import com.google.android.horologist.networks.data.RequestType
-import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.Observable
@@ -263,9 +260,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 throw UnderscoreInHostName()
             }
 
-            @OptIn(ExperimentalHorologistApi::class)
             val requestBuilder = Request.Builder()
-                .requestType(RequestType.MediaRequest.DownloadRequest)
                 .url(downloadUrl)
                 .header("User-Agent", "Pocket Casts")
 

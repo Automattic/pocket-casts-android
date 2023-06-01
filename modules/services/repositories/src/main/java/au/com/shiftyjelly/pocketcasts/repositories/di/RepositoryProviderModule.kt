@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.di
 
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncAccountManager
 import au.com.shiftyjelly.pocketcasts.servers.di.HorologistNetworkAwarenessWrapper
+import au.com.shiftyjelly.pocketcasts.servers.di.PCRequestType
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import dagger.Module
 import dagger.Provides
@@ -38,7 +39,7 @@ class RepositoryProviderModule {
             .readTimeout(30, TimeUnit.SECONDS)
             .build()
 
-        return networkAwarenessWrapper.wrap(client)
+        return networkAwarenessWrapper.wrap(client, PCRequestType.Download)
     }
 }
 

@@ -95,6 +95,7 @@ dependencies {
     implementation androidLibs.horologistMedia3Backend
     implementation androidLibs.horologistMediaData
     implementation androidLibs.horologistMediaUi
+    implementation androidLibs.horologistNetworkAwarnessOkHttp
 
     implementation androidLibs.media3DatasourceOkhttp
 

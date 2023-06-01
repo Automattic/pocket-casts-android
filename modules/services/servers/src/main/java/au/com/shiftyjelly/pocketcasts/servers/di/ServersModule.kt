@@ -19,12 +19,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
-import com.google.android.horologist.networks.highbandwidth.HighBandwidthNetworkMediator
-import com.google.android.horologist.networks.logging.NetworkStatusLogger
-import com.google.android.horologist.networks.okhttp.NetworkSelectingCallFactory
-import com.google.android.horologist.networks.rules.NetworkingRulesEngine
-import com.google.android.horologist.networks.status.NetworkRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Module
@@ -32,7 +26,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.Call
@@ -50,7 +43,6 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -401,38 +393,21 @@ class ServersModule {
             platform
         )
     }
-
-    @OptIn(ExperimentalHorologistApi::class)
-    @Provides
-    @Singleton
-    fun provideCallFactoryWrapper(
-        @ApplicationContext context: Context,
-        @ForApplicationScope coroutineScope: CoroutineScope,
-        highBandwidthNetworkMediator: HighBandwidthNetworkMediator,
-        logger: NetworkStatusLogger,
-        networkRepository: NetworkRepository,
-        networkingRulesEngine: NetworkingRulesEngine,
-    ): HorologistNetworkAwarenessWrapper = object : HorologistNetworkAwarenessWrapper {
-        override fun wrap(okHttpClient: OkHttpClient) =
-            if (Util.isWearOs(context)) {
-                NetworkSelectingCallFactory(
-                    networkingRulesEngine = networkingRulesEngine,
-                    highBandwidthNetworkMediator = highBandwidthNetworkMediator,
-                    networkRepository = networkRepository,
-                    dataRequestRepository = null,
-                    rootClient = okHttpClient,
-                    coroutineScope = coroutineScope,
-                    timeout = 5.seconds,
-                    logger = logger,
-                )
-            } else {
-                okHttpClient
-            }
-    }
 }
 
 interface HorologistNetworkAwarenessWrapper {
-    fun wrap(okHttpClient: OkHttpClient): Call.Factory
+    fun wrap(
+        okHttpClient: OkHttpClient,
+        requestType: PCRequestType = PCRequestType.Api,
+    ): Call.Factory
+    companion object {
+        val noopImpl = object : HorologistNetworkAwarenessWrapper {
+            override fun wrap(
+                okHttpClient: OkHttpClient,
+                requestType: PCRequestType,
+            ) = okHttpClient
+        }
+    }
 }
 
 @Qualifier

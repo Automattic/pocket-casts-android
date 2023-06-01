@@ -5,9 +5,6 @@ import android.os.Looper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.ShowNotesCacheCallFactory
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
-import com.google.android.horologist.networks.data.RequestType
-import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import io.reactivex.Completable
 import okhttp3.CacheControl
 import okhttp3.Call
@@ -141,19 +138,15 @@ class ServerShowNotesManager @Inject constructor(
     }
 
     private fun buildNetworkShowNotesRequest(url: String): Request {
-        @OptIn(ExperimentalHorologistApi::class)
         return Request.Builder()
             .cacheControl(CacheControl.FORCE_NETWORK)
-            .requestType(RequestType.ApiRequest)
             .url(url)
             .build()
     }
 
     private fun buildCachedShowNotesRequest(url: String): Request {
-        @OptIn(ExperimentalHorologistApi::class)
         return Request.Builder()
             .cacheControl(CacheControl.Builder().onlyIfCached().build())
-            .requestType(RequestType.ApiRequest)
             .url(url)
             .build()
     }

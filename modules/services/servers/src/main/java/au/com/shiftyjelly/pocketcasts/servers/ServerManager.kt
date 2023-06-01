@@ -13,9 +13,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCacheTokenedCallFactory
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
-import com.google.android.horologist.networks.data.RequestType
-import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -212,11 +209,9 @@ open class ServerManager @Inject constructor(
 
         val formBody = parameters.toFormBody()
 
-        @OptIn(ExperimentalHorologistApi::class)
         val request = Request.Builder()
             .url(url)
             .header("User-Agent", Settings.USER_AGENT_POCKETCASTS_SERVER)
-            .requestType(RequestType.ApiRequest)
             .post(formBody)
             .build()
 

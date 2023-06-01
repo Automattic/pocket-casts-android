@@ -4,9 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import au.com.shiftyjelly.pocketcasts.utils.extensions.await
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
-import com.google.android.horologist.networks.data.RequestType
-import com.google.android.horologist.networks.okhttp.impl.RequestTypeHolder.Companion.requestType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -51,9 +48,7 @@ class ServiceStatusChecker @Inject constructor(@ApplicationContext val context: 
             .build()
 
         try {
-            @OptIn(ExperimentalHorologistApi::class)
             val request = Request.Builder()
-                .requestType(RequestType.ApiRequest)
                 .url(url)
                 .build()
             val response = okHttpClient.newCall(request).await()
