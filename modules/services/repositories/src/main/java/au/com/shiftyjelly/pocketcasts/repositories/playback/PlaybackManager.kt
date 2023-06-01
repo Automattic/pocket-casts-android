@@ -63,6 +63,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -892,11 +893,13 @@ open class PlaybackManager @Inject constructor(
                 } else {
                     event.message
                 }
-                val isAutomotive = Util.isAutomotive(application)
-                SentryHelper.recordException(
-                    message = "Illegal playback state encountered for episode uuid ${episode?.uuid}, isAutomotive $isAutomotive}: ",
-                    throwable = event.error ?: IllegalStateException(event.message)
-                )
+                Sentry.withScope { scope ->
+                    episode?.uuid?.let { scope.setTag("episodeUuid", it) }
+                    SentryHelper.recordException(
+                        message = "Illegal playback state encountered",
+                        throwable = event.error ?: IllegalStateException(event.message)
+                    )
+                }
                 playbackStateRelay.accept(playbackState.copy(state = PlaybackState.State.ERROR, lastErrorMessage = errorMessage, lastChangeFrom = "onPlayerError"))
             }
         }

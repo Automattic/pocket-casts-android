@@ -15,11 +15,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
+import io.sentry.android.core.SentryAndroid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -43,11 +46,19 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
+        setupSentry()
         setupLogging()
         setupAnalytics()
         setupApp()
 
         RxJavaUncaughtExceptionHandling.setUp()
+    }
+
+    private fun setupSentry() {
+        SentryAndroid.init(this) { options ->
+            options.dsn = settings.getSentryDsn()
+            options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.WEAR.value)
+        }
     }
 
     private fun setupLogging() {
