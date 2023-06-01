@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -52,6 +53,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
@@ -86,7 +88,14 @@ class EpisodeViewModel @Inject constructor(
             val tintColor: Color?,
             val downloadProgress: Float? = null,
             val showNotes: String? = null,
-        ) : State()
+            val errorData: ErrorData?,
+        ) : State() {
+            data class ErrorData(
+                @StringRes val errorTitleRes: Int,
+                @DrawableRes val errorIconRes: Int,
+                val errorDescription: String?,
+            )
+        }
 
         object Empty : State()
     }
@@ -156,6 +165,7 @@ class EpisodeViewModel @Inject constructor(
             downloadProgressFlow.onStart<Float?> { emit(null) },
             showNotesFlow.onStart { emit(null) }
         ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotes ->
+
             State.Loaded(
                 episode = episode,
                 podcast = podcast,
@@ -164,8 +174,45 @@ class EpisodeViewModel @Inject constructor(
                 inUpNext = isInUpNext(upNext, episode),
                 tintColor = getTintColor(episode, podcast, theme),
                 showNotes = showNotes,
+                errorData = getErrorData(episode),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), State.Empty)
+    }
+
+    private fun getErrorData(episode: BaseEpisode): State.Loaded.ErrorData? {
+        val errorTitleRes: Int?
+        val errorIconRes: Int?
+        var errorDescription: String? = null
+
+        val episodeStatus = episode.episodeStatus
+        if (episode.playErrorDetails == null) {
+            errorTitleRes = when (episodeStatus) {
+                EpisodeStatusEnum.DOWNLOAD_FAILED -> LR.string.podcasts_download_failed
+                EpisodeStatusEnum.WAITING_FOR_WIFI -> LR.string.podcasts_download_wifi
+                EpisodeStatusEnum.WAITING_FOR_POWER -> LR.string.podcasts_download_power
+                else -> null
+            }
+            if (episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+                errorDescription = episode.downloadErrorDetails
+            }
+            errorIconRes = when (episodeStatus) {
+                EpisodeStatusEnum.DOWNLOAD_FAILED -> IR.drawable.ic_failedwarning
+                EpisodeStatusEnum.WAITING_FOR_WIFI -> IR.drawable.ic_waitingforwifi
+                EpisodeStatusEnum.WAITING_FOR_POWER -> IR.drawable.ic_waitingforpower
+                else -> null
+            }
+        } else {
+            errorIconRes = IR.drawable.ic_play_all
+            errorTitleRes = LR.string.podcast_episode_playback_error
+            errorDescription = episode.playErrorDetails
+        }
+        return errorTitleRes?.let {
+            State.Loaded.ErrorData(
+                errorTitleRes = it,
+                errorIconRes = errorIconRes ?: IR.drawable.ic_failedwarning,
+                errorDescription = errorDescription
+            )
+        }
     }
 
     private fun isInUpNext(
@@ -198,9 +245,9 @@ class EpisodeViewModel @Inject constructor(
 
     fun downloadEpisode() {
         val episode = (stateFlow.value as? State.Loaded)?.episode ?: return
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val fromString = "wear episode screen"
-
+            clearErrors(episode)
             if (episode.downloadTaskId != null) {
                 when (episode) {
                     is PodcastEpisode -> {
@@ -226,6 +273,14 @@ class EpisodeViewModel @Inject constructor(
                     source = analyticsSource,
                     uuid = episode.uuid
                 )
+            }
+        }
+    }
+
+    private suspend fun clearErrors(episode: BaseEpisode) {
+        withContext(Dispatchers.IO) {
+            if (episode is PodcastEpisode) {
+                episodeManager.clearDownloadError(episode)
             }
             episodeManager.clearPlaybackError(episode)
         }
@@ -271,6 +326,9 @@ class EpisodeViewModel @Inject constructor(
         val episode = (stateFlow.value as? State.Loaded)?.episode
             ?: return
         viewModelScope.launch {
+            if (episode.playErrorDetails != null || episode.downloadErrorDetails != null) {
+                clearErrors(episode)
+            }
             playbackManager.playNowSync(
                 episode = episode,
                 playbackSource = analyticsSource,
