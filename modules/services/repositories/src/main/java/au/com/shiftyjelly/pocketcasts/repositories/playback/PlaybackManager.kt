@@ -893,10 +893,8 @@ open class PlaybackManager @Inject constructor(
                 } else {
                     event.message
                 }
-                val isAutomotive = Util.isAutomotive(application)
                 Sentry.withScope { scope ->
                     episode?.uuid?.let { scope.setTag("episodeUuid", it) }
-                    scope.setTag("isAutomotive", isAutomotive.toString())
                     SentryHelper.recordException(
                         message = "Illegal playback state encountered",
                         throwable = event.error ?: IllegalStateException(event.message)
