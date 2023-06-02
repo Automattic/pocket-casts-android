@@ -5,8 +5,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -93,26 +91,24 @@ private fun Content(
             )
         }
 
+        val backgroundRefreshStringRes =
+            if (state.refreshInBackground) LR.string.settings_storage_background_refresh_on else LR.string.settings_storage_background_refresh_off
         item {
-            Column {
-                val stringRes =
-                    if (state.refreshInBackground) LR.string.settings_storage_background_refresh_on else LR.string.settings_storage_background_refresh_off
-                ToggleChip(
-                    label = stringResource(LR.string.settings_storage_background_refresh),
-                    checked = state.refreshInBackground,
-                    onCheckedChanged = onRefreshInBackgroundChanged,
-                )
-                Box(
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(stringRes),
-                        style = MaterialTheme.typography.caption3,
-                        color = MaterialTheme.colors.onSecondary,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
+            ToggleChip(
+                label = stringResource(LR.string.settings_storage_background_refresh),
+                checked = state.refreshInBackground,
+                onCheckedChanged = onRefreshInBackgroundChanged,
+            )
+        }
+
+        item {
+            Text(
+                text = stringResource(backgroundRefreshStringRes),
+                style = MaterialTheme.typography.caption3,
+                color = MaterialTheme.colors.onSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(8.dp)
+            )
         }
 
         item {
