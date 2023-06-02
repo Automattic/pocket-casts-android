@@ -45,7 +45,6 @@ import io.sentry.protocol.User
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -76,8 +75,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
     @Inject lateinit var syncManager: SyncManager
-
-    private val applicationScope = MainScope()
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
