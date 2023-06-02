@@ -5,7 +5,10 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -16,7 +19,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
@@ -53,6 +58,7 @@ fun SettingsScreen(
         scrollState = scrollState,
         state = state,
         onWarnOnMeteredChanged = { viewModel.setWarnOnMeteredNetwork(it) },
+        onRefreshInBackgroundChanged = { viewModel.setRefreshPodcastsInBackground(it) },
         signInClick = signInClick,
         onSignOutClicked = viewModel::signOut,
         onRefreshClicked = viewModel::refresh,
@@ -64,6 +70,7 @@ private fun Content(
     scrollState: ScalingLazyColumnState,
     state: SettingsViewModel.State,
     onWarnOnMeteredChanged: (Boolean) -> Unit,
+    onRefreshInBackgroundChanged: (Boolean) -> Unit,
     signInClick: () -> Unit,
     onSignOutClicked: () -> Unit,
     onRefreshClicked: () -> Unit,
@@ -80,6 +87,28 @@ private fun Content(
                 checked = state.showDataWarning,
                 onCheckedChanged = onWarnOnMeteredChanged,
             )
+        }
+
+        item {
+            Column {
+                val stringRes =
+                    if (state.refreshInBackground) LR.string.settings_storage_background_refresh_on else LR.string.settings_storage_background_refresh_off
+                ToggleChip(
+                    label = stringResource(LR.string.settings_storage_background_refresh),
+                    checked = state.refreshInBackground,
+                    onCheckedChanged = onRefreshInBackgroundChanged,
+                )
+                Box(
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(stringRes),
+                        style = MaterialTheme.typography.caption3,
+                        color = MaterialTheme.colors.onSecondary,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
         }
 
         item {
@@ -215,10 +244,12 @@ private fun SettingsScreenPreview_unchecked() {
                     subscriptionStatus = SubscriptionStatus.Free(),
                 ),
                 showDataWarning = false,
+                refreshInBackground = false,
                 refreshState = null,
             ),
             signInClick = {},
             onWarnOnMeteredChanged = {},
+            onRefreshInBackgroundChanged = {},
             onSignOutClicked = {},
             onRefreshClicked = {},
         )
@@ -241,10 +272,12 @@ private fun SettingsScreenPreview_checked() {
                     subscriptionStatus = SubscriptionStatus.Free(),
                 ),
                 showDataWarning = true,
+                refreshInBackground = true,
                 refreshState = null,
             ),
             signInClick = {},
             onWarnOnMeteredChanged = {},
+            onRefreshInBackgroundChanged = {},
             onSignOutClicked = {},
             onRefreshClicked = {},
         )
