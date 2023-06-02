@@ -13,11 +13,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -91,5 +94,20 @@ class WearMainActivityViewModel @Inject constructor(
 
     fun signOut() {
         userManager.signOut(playbackManager, wasInitiatedByUser = false)
+    }
+
+    fun refreshPodcasts() {
+        viewModelScope.launch(Dispatchers.IO) {
+            delay(REFRESH_START_DELAY) // delay the refresh to allow the UI to load
+            try {
+                podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
+    }
+
+    companion object {
+        private const val REFRESH_START_DELAY = 1000L
     }
 }
