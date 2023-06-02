@@ -8,6 +8,7 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "../base.gradle"
 
 android {
+    namespace 'au.com.shiftyjelly.pocketcasts.wear'
 
     defaultConfig {
         minSdk project.minSdkVersionWear
@@ -70,36 +71,36 @@ android {
 }
 
 dependencies {
-    implementation androidLibs.wearInput
+    implementation libs.wear.input
 
     // General Compose dependencies
-    implementation androidLibs.composeActivity
-    implementation androidLibs.composeUi
-    implementation androidLibs.composeMaterialIconsExtended
-    implementation androidLibs.composeUiToolingPreview
-    implementation libs.hiltNavigationCompose
+    implementation libs.activity.compose
+    implementation libs.compose.ui
+    implementation libs.material.icons.extended
+    implementation libs.compose.ui.tooling.preview
+    implementation libs.hilt.navigation.compose
 
     // Compose for Wear OS Dependencies
-    implementation androidLibs.wearComposeMaterial
-    implementation androidLibs.wearComposeFoundation
-    implementation androidLibs.wearComposeNavigation
+    implementation libs.wear.compose.material
+    implementation libs.wear.compose.foundation
+    implementation libs.wear.compose.navigation
 
     // Horologist Dependencies
-    implementation androidLibs.horologistAudioUi
-    implementation androidLibs.horologistAuthData
-    implementation androidLibs.horologistAuthComposables
-    implementation androidLibs.horologistAuthUi
-    implementation androidLibs.horologistBaseUi
-    implementation androidLibs.horologistDatalayer
-    implementation androidLibs.horologistMedia
-    implementation androidLibs.horologistMedia3Backend
-    implementation androidLibs.horologistMediaData
-    implementation androidLibs.horologistMediaUi
-    implementation androidLibs.horologistNetworkAwarnessOkHttp
+    implementation libs.horologist.audio.ui
+    implementation libs.horologist.auth.data
+    implementation libs.horologist.auth.composables
+    implementation libs.horologist.auth.ui
+    implementation libs.horologist.base.ui
+    implementation libs.horologist.datalayer
+    implementation libs.horologist.media
+    implementation libs.horologist.media3.backend
+    implementation libs.horologist.media.data
+    implementation libs.horologist.media.ui
+    implementation libs.horologist.network.awareness.okhttp
 
-    implementation androidLibs.media3DatasourceOkhttp
+    implementation libs.media3.datasource.okhttp
 
-    implementation androidLibs.horologistComposeLayout
+    implementation libs.horologist.compose.layout
 
     implementation project(':modules:services:analytics')
     implementation project(':modules:services:compose')

@@ -19,16 +19,10 @@ buildscript {
 
     // Gradle Plugins
     dependencies {
-        // Android - https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:7.3.0'
         // Google Services - https://developers.google.com/android/guides/google-services-plugin
-        classpath "com.google.gms:google-services:4.3.14"
-        // Kotlin
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath libs.google.services
         // Open source licenses plugin
-        classpath 'com.google.android.gms:oss-licenses-plugin:0.10.5'
-        // Hilt dependency injection
-        classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
+        classpath libs.oss.licenses
     }
 
     // Force proguard to the new version to fix "proguard.ParseException: Use of generics not allowed for java type at '<1>_<2>_<3>JsonAdapter' in line 31 of file '/Users/philip/.gradle/caches/transforms-2/files-2.1/d5ca2d039e1d32e9ba6bfd6a67df5151/META-INF/proguard/moshi.pro'"
@@ -40,10 +34,13 @@ buildscript {
 }
 
 plugins {
-    id 'com.mikepenz.aboutlibraries.plugin' version '10.4.0' apply false
-    id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'com.diffplug.spotless' version '6.2.2'
-    id 'io.sentry.android.gradle' version '3.1.5' apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.dagger.hilt.android) apply false
+    alias(libs.plugins.mikepenz.aboutlibraries) apply false
+    alias(libs.plugins.ben.manes.versions) apply false
+    alias(libs.plugins.diffplug.spotless) apply false
+    alias(libs.plugins.sentry.android) apply false
 }
 
 apply plugin: 'base'
@@ -57,19 +54,6 @@ spotless {
         targetExclude("$buildDir/**/*.kt")
         targetExclude('bin/**/*.kt')
         ktlint('0.45.1')
-    }
-}
-
-dependencyUpdates.resolutionStrategy {
-    componentSelection { rules ->
-        rules.all { ComponentSelection selection ->
-            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
-                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-            }
-            if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
     }
 }
 
