@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
@@ -35,6 +36,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 class PocketCastsWearApplication : Application(), Configuration.Provider {
 
+    @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
     @Inject lateinit var downloadManager: DownloadManager
     @Inject lateinit var episodeManager: EpisodeManager
     @Inject lateinit var notificationHelper: NotificationHelper
@@ -80,6 +82,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
             )
 
             notificationHelper.setupNotificationChannels()
+            appLifecycleObserver.setup()
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
