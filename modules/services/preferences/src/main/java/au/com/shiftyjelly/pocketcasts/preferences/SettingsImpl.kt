@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_EN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isScreenReaderOn
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
@@ -287,7 +288,8 @@ class SettingsImpl @Inject constructor(
         syncOnMeteredNetwork() || isUnmetered
 
     override fun refreshPodcastsAutomatically(): Boolean {
-        return getBoolean("backgroundRefresh", true)
+        val isWear = Util.isWearOs(context)
+        return getBoolean("backgroundRefresh", !isWear)
     }
 
     override fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean) {
