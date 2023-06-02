@@ -100,7 +100,7 @@ class WearMainActivityViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             delay(REFRESH_START_DELAY) // delay the refresh to allow the UI to load
             try {
-                podcastManager.refreshPodcastsIfRequired(fromLog = "open app")
+                podcastManager.refreshPodcastsIfRequired(fromLog = "watch - open app")
             } catch (e: Exception) {
                 Timber.e(e)
             }

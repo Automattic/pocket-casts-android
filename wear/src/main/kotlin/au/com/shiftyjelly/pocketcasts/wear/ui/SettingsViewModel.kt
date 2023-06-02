@@ -72,6 +72,6 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun refresh() {
-        podcastManager.refreshPodcasts("watch")
+        podcastManager.refreshPodcasts("watch - settings")
     }
 }
