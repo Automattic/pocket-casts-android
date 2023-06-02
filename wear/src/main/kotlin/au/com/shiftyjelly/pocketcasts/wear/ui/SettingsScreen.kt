@@ -53,6 +53,7 @@ fun SettingsScreen(
         scrollState = scrollState,
         state = state,
         onWarnOnMeteredChanged = { viewModel.setWarnOnMeteredNetwork(it) },
+        onRefreshInBackgroundChanged = { viewModel.setRefreshPodcastsInBackground(it) },
         signInClick = signInClick,
         onSignOutClicked = viewModel::signOut,
         onRefreshClicked = viewModel::refresh,
@@ -64,6 +65,7 @@ private fun Content(
     scrollState: ScalingLazyColumnState,
     state: SettingsViewModel.State,
     onWarnOnMeteredChanged: (Boolean) -> Unit,
+    onRefreshInBackgroundChanged: (Boolean) -> Unit,
     signInClick: () -> Unit,
     onSignOutClicked: () -> Unit,
     onRefreshClicked: () -> Unit,
@@ -79,6 +81,14 @@ private fun Content(
                 label = stringResource(LR.string.settings_metered_data_warning),
                 checked = state.showDataWarning,
                 onCheckedChanged = onWarnOnMeteredChanged,
+            )
+        }
+
+        item {
+            ToggleChip(
+                label = stringResource(LR.string.settings_storage_background_refresh),
+                checked = state.refreshInBackground,
+                onCheckedChanged = onRefreshInBackgroundChanged,
             )
         }
 
@@ -215,10 +225,12 @@ private fun SettingsScreenPreview_unchecked() {
                     subscriptionStatus = SubscriptionStatus.Free(),
                 ),
                 showDataWarning = false,
+                refreshInBackground = false,
                 refreshState = null,
             ),
             signInClick = {},
             onWarnOnMeteredChanged = {},
+            onRefreshInBackgroundChanged = {},
             onSignOutClicked = {},
             onRefreshClicked = {},
         )
@@ -241,10 +253,12 @@ private fun SettingsScreenPreview_checked() {
                     subscriptionStatus = SubscriptionStatus.Free(),
                 ),
                 showDataWarning = true,
+                refreshInBackground = true,
                 refreshState = null,
             ),
             signInClick = {},
             onWarnOnMeteredChanged = {},
+            onRefreshInBackgroundChanged = {},
             onSignOutClicked = {},
             onRefreshClicked = {},
         )
