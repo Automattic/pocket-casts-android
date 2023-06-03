@@ -61,7 +61,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     private fun setupSentry() {
         SentryAndroid.init(this) { options ->
-            options.dsn = settings.getSentryDsn()
+            options.dsn = if (settings.getSendCrashReports()) settings.getSentryDsn() else ""
             options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.WEAR.value)
         }
     }
