@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
@@ -41,6 +42,10 @@ fun WatchListScreen(
     val state by viewModel.state.collectAsState()
     val upNextState = state.upNextQueue
 
+    CallOnce {
+        viewModel.onShown()
+    }
+
     ScalingLazyColumn(
         state = scrollState,
         flingBehavior = ScrollableDefaults.flingBehavior(),
@@ -54,7 +59,10 @@ fun WatchListScreen(
 
         if (upNextState is UpNextQueue.State.Loaded) {
             item {
-                NowPlayingChip(onClick = toNowPlaying)
+                NowPlayingChip(onClick = {
+                    viewModel.onNowPlayingClicked()
+                    toNowPlaying()
+                })
             }
         }
 
@@ -62,7 +70,10 @@ fun WatchListScreen(
             WatchListChip(
                 title = stringResource(LR.string.podcasts),
                 iconRes = IR.drawable.ic_podcasts,
-                onClick = { navigateToRoute(PodcastsScreen.routeHomeFolder) }
+                onClick = {
+                    viewModel.onPodcastsClicked()
+                    navigateToRoute(PodcastsScreen.routeHomeFolder)
+                }
             )
         }
 
@@ -70,7 +81,10 @@ fun WatchListScreen(
             WatchListChip(
                 title = stringResource(LR.string.downloads),
                 iconRes = IR.drawable.ic_download,
-                onClick = { navigateToRoute(DownloadsScreen.route) }
+                onClick = {
+                    viewModel.onDownloadsClicked()
+                    navigateToRoute(DownloadsScreen.route)
+                }
             )
         }
 
@@ -78,7 +92,10 @@ fun WatchListScreen(
             WatchListChip(
                 title = stringResource(LR.string.filters),
                 iconRes = IR.drawable.ic_filters,
-                onClick = { navigateToRoute(FiltersScreen.route) }
+                onClick = {
+                    viewModel.onFiltersClicked()
+                    navigateToRoute(FiltersScreen.route)
+                }
             )
         }
 
@@ -86,7 +103,10 @@ fun WatchListScreen(
             WatchListChip(
                 title = stringResource(LR.string.profile_navigation_files),
                 iconRes = PR.drawable.ic_file,
-                onClick = { navigateToRoute(FilesScreen.route) }
+                onClick = {
+                    viewModel.onFilesClicked()
+                    navigateToRoute(FilesScreen.route)
+                }
             )
         }
 
@@ -94,7 +114,10 @@ fun WatchListScreen(
             WatchListChip(
                 title = stringResource(LR.string.settings),
                 iconRes = IR.drawable.ic_profile_settings,
-                onClick = { navigateToRoute(SettingsScreen.route) }
+                onClick = {
+                    viewModel.onSettingsClicked()
+                    navigateToRoute(SettingsScreen.route)
+                }
             )
         }
     }

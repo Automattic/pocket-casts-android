@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.wear.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -18,6 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WatchListScreenViewModel @Inject constructor(
+    private val analyticsTracker: AnalyticsTrackerWrapper,
     episodeManager: EpisodeManager,
     playbackManager: PlaybackManager,
     podcastManager: PodcastManager,
@@ -43,5 +46,33 @@ class WatchListScreenViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    fun onShown() {
+        analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_SHOWN)
+    }
+
+    fun onNowPlayingClicked() {
+        analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_NOW_PLAYING_TAPPED)
+    }
+
+    fun onPodcastsClicked() {
+        analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_PODCASTS_TAPPED)
+    }
+
+    fun onDownloadsClicked() {
+        analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_DOWNLOADS_TAPPED)
+    }
+
+    fun onFiltersClicked() {
+        analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_FILTERS_TAPPED)
+    }
+
+    fun onFilesClicked() {
+        analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_FILES_TAPPED)
+    }
+
+    fun onSettingsClicked() {
+        analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_SETTINGS_TAPPED)
     }
 }
