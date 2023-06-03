@@ -5,7 +5,9 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
@@ -42,6 +44,9 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject lateinit var tracksTracker: TracksAnalyticsTracker
+    @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
 
     override fun onCreate() {
         super.onCreate()
@@ -99,6 +104,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     }
 
     private fun setupAnalytics() {
+        AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
         FirebaseApp.initializeApp(this)
     }

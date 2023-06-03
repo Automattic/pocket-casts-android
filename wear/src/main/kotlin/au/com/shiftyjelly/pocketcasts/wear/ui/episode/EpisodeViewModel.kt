@@ -77,7 +77,7 @@ class EpisodeViewModel @Inject constructor(
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
-    private val analyticsSource = AnalyticsSource.WATCH_EPISODE_DETAILS
+    private val analyticsSource = AnalyticsSource.EPISODE_DETAILS
 
     sealed class State {
         data class Loaded(
@@ -364,7 +364,7 @@ class EpisodeViewModel @Inject constructor(
         val state = stateFlow.value as? State.Loaded ?: return
         playbackManager.removeEpisode(
             episodeToRemove = state.episode,
-            source = AnalyticsSource.WATCH_EPISODE_DETAILS
+            source = AnalyticsSource.EPISODE_DETAILS
         )
     }
 
