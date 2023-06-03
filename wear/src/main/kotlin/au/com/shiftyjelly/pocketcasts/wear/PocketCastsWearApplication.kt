@@ -76,6 +76,9 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
                 Sentry.setUser(user)
             }
         }
+
+        // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
+        FirebaseApp.initializeApp(this)
     }
 
     private fun setupLogging() {
@@ -118,7 +121,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     private fun setupAnalytics() {
         AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
-        FirebaseApp.initializeApp(this)
+        AnalyticsTracker.refreshMetadata()
     }
 
     override fun getWorkManagerConfiguration(): Configuration {
