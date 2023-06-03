@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
@@ -24,7 +25,9 @@ import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
+import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
+import io.sentry.protocol.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -47,6 +50,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
+    @Inject lateinit var syncManager: SyncManager
 
     override fun onCreate() {
         super.onCreate()
@@ -63,6 +67,14 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
         SentryAndroid.init(this) { options ->
             options.dsn = if (settings.getSendCrashReports()) settings.getSentryDsn() else ""
             options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.WEAR.value)
+        }
+
+        // Link email to Sentry crash reports only if the user has opted in
+        if (settings.getLinkCrashReportsToUser()) {
+            syncManager.getEmail()?.let { syncEmail ->
+                val user = User().apply { email = syncEmail }
+                Sentry.setUser(user)
+            }
         }
     }
 
