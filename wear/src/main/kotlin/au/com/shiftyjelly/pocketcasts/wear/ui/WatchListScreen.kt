@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.filters.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.settings.SettingsScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR

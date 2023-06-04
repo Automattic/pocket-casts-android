@@ -25,6 +25,7 @@ android {
             applicationIdSuffix '.debug'
 
             manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher_radioactive",
                     sentryDsn: ""
             ]
         }
@@ -36,6 +37,7 @@ android {
 
         release {
             manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher",
                     gitHash: "",
                     sentryDsn: project.pocketcastsSentryDsn
             ]

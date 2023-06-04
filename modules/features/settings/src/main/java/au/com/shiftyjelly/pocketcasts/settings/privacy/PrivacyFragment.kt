@@ -62,7 +62,7 @@ class PrivacyFragment : BaseFragment() {
                             viewModel.updateAnalyticsSetting(it)
                         },
                         onCrashReportsClick = {
-                            viewModel.updateCrashReportsSetting(context, it)
+                            viewModel.updateCrashReportsSetting(it)
                         },
                         onLinkAccountClick = {
                             viewModel.updateLinkAccountSetting(it)

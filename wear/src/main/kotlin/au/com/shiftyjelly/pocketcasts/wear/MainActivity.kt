@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.FilesScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.LoggingInScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.ScrollToTop
-import au.com.shiftyjelly.pocketcasts.wear.ui.SettingsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.WatchListScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.RequirePlusScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationNavGraph
@@ -49,6 +48,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.player.PCVolumeScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.settings.PrivacySettingsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.settings.SettingsScreen
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.ScrollableScaffoldContext
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
@@ -308,7 +309,12 @@ fun WearApp(
             SettingsScreen(
                 scrollState = it.columnState,
                 signInClick = { navController.navigate(authenticationSubGraph) },
+                navigateToPrivacySettings = { navController.navigate(PrivacySettingsScreen.route) },
             )
+        }
+
+        scrollable(PrivacySettingsScreen.route) {
+            PrivacySettingsScreen(scrollState = it.columnState)
         }
 
         val popToStartDestination: () -> Unit = {
