@@ -6,14 +6,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.items
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.filter.FilterViewModel.UiState
+import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 
 object FilterScreen {
     const val argumentFilterUuid = "filterUuid"
@@ -27,7 +27,7 @@ fun FilterScreen(
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FilterViewModel = hiltViewModel(),
-    listState: ScalingLazyListState,
+    columnState: ScalingLazyColumnState,
 ) {
     val uiState by viewModel.uiState.collectAsState(UiState.Loading)
     when (val state = uiState) {
@@ -35,7 +35,7 @@ fun FilterScreen(
             state = state,
             onEpisodeTap = onEpisodeTap,
             modifier = modifier,
-            listState = listState,
+            listState = columnState,
         )
         is UiState.Loading -> LoadingScreen()
         is UiState.Empty -> Unit
@@ -47,11 +47,11 @@ private fun Content(
     state: UiState.Loaded,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    listState: ScalingLazyListState,
+    listState: ScalingLazyColumnState,
 ) {
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),
-        state = listState
+        columnState = listState
     ) {
         item {
             ScreenHeaderChip(state.filter.title)
