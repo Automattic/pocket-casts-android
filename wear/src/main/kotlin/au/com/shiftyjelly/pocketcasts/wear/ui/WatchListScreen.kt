@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.filters.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.settings.SettingsScreen
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.profile.R as PR

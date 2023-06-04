@@ -1334,6 +1334,7 @@
     <string name="settings_privacy_crash">Crash reports</string>
     <string name="settings_privacy_crash_summary">Allow us to collect crash reports.</string>
     <string name="settings_privacy_crash_link">Link your account to crashes</string>
+    <string name="settings_privacy_crash_link_short">Link your account</string>
     <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
