@@ -248,7 +248,7 @@ fun WearApp(
                     onFilterTap = { filterUuid ->
                         navController.navigate(FilterScreen.navigateRoute(filterUuid))
                     },
-                    listState = it.scrollableState,
+                    columnState = it.columnState,
                 )
             }
         }
