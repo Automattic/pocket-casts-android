@@ -414,7 +414,7 @@ fun PodcastsScreenContent(
         scrollableScaffoldContext = scrollableScaffoldContext,
     ) {
         PodcastsScreen(
-            listState = scrollableScaffoldContext.scrollableState,
+            columnState = scrollableScaffoldContext.columnState,
             navigateToPodcast = { podcastUuid ->
                 navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
             },
