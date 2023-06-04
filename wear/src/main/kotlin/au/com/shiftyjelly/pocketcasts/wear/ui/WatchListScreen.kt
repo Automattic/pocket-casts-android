@@ -30,7 +30,7 @@ object WatchListScreen {
 
 @Composable
 fun WatchListScreen(
-    scrollState: ScalingLazyColumnState,
+    columnState: ScalingLazyColumnState,
     navigateToRoute: (String) -> Unit,
     toNowPlaying: () -> Unit,
 ) {
@@ -44,7 +44,7 @@ fun WatchListScreen(
     }
 
     ScalingLazyColumn(
-        columnState = scrollState,
+        columnState = columnState,
         modifier = Modifier.fillMaxWidth(),
     ) {
 
@@ -126,7 +126,7 @@ private fun WatchListPreview() {
         WatchListScreen(
             toNowPlaying = {},
             navigateToRoute = {},
-            scrollState = ScalingLazyColumnState()
+            columnState = ScalingLazyColumnState()
         )
     }
 }

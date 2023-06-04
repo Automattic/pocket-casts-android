@@ -150,7 +150,7 @@ fun WearApp(
                 ScrollToTop.handle(navController, it.scrollableState)
 
                 WatchListScreen(
-                    scrollState = it.columnState,
+                    columnState = it.columnState,
                     navigateToRoute = navController::navigate,
                     toNowPlaying = {
                         coroutineScope.launch {
