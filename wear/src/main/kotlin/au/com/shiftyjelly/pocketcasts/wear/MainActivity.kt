@@ -225,7 +225,7 @@ fun WearApp(
                     onEpisodeTap = { episode ->
                         navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
                     },
-                    listState = it.scrollableState,
+                    columnState = it.columnState,
                 )
             }
         }
