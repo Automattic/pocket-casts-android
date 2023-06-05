@@ -12,8 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
@@ -24,6 +22,8 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.darker
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
+import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -39,7 +39,7 @@ object PodcastsScreen {
 fun PodcastsScreen(
     modifier: Modifier = Modifier,
     viewModel: PodcastsViewModel = hiltViewModel(),
-    listState: ScalingLazyListState,
+    columnState: ScalingLazyColumnState,
     navigateToPodcast: (String) -> Unit,
     navigateToFolder: (String) -> Unit,
 ) {
@@ -47,7 +47,7 @@ fun PodcastsScreen(
 
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),
-        state = listState
+        columnState = columnState
     ) {
         item {
             ScreenHeaderChip(if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.name)

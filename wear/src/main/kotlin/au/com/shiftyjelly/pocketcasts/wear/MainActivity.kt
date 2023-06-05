@@ -150,7 +150,7 @@ fun WearApp(
                 ScrollToTop.handle(navController, it.scrollableState)
 
                 WatchListScreen(
-                    scrollState = it.scrollableState,
+                    columnState = it.columnState,
                     navigateToRoute = navController::navigate,
                     toNowPlaying = {
                         coroutineScope.launch {
@@ -225,7 +225,7 @@ fun WearApp(
                     onEpisodeTap = { episode ->
                         navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
                     },
-                    listState = it.scrollableState,
+                    columnState = it.columnState,
                 )
             }
         }
@@ -248,7 +248,7 @@ fun WearApp(
                     onFilterTap = { filterUuid ->
                         navController.navigate(FilterScreen.navigateRoute(filterUuid))
                     },
-                    listState = it.scrollableState,
+                    columnState = it.columnState,
                 )
             }
         }
@@ -270,7 +270,7 @@ fun WearApp(
                     onEpisodeTap = { episode ->
                         navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
                     },
-                    listState = it.scrollableState,
+                    columnState = it.columnState,
                 )
             }
         }
@@ -414,7 +414,7 @@ fun PodcastsScreenContent(
         scrollableScaffoldContext = scrollableScaffoldContext,
     ) {
         PodcastsScreen(
-            listState = scrollableScaffoldContext.scrollableState,
+            columnState = scrollableScaffoldContext.columnState,
             navigateToPodcast = { podcastUuid ->
                 navController.navigate(PodcastScreen.navigateRoute(podcastUuid))
             },
