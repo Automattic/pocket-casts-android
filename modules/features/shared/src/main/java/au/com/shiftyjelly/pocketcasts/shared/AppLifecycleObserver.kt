@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts
+package au.com.shiftyjelly.pocketcasts.shared
 
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner

@@ -117,6 +117,7 @@ dependencies {
     implementation project(':modules:features:podcasts')
     implementation project(':modules:features:profile')
     implementation project(':modules:features:settings')
+    implementation project(':modules:features:shared')
 }
 
 task useGoogleServicesDebugFile {
