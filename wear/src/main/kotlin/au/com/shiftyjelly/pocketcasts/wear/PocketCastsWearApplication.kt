@@ -11,11 +11,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
+import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
@@ -43,6 +45,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var playlistManager: PlaylistManager
     @Inject lateinit var podcastManager: PodcastManager
+    @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var settings: Settings
     @Inject lateinit var userManager: UserManager
     @Inject lateinit var workerFactory: HiltWorkerFactory
@@ -100,6 +103,13 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
                     }
                 }
             }
+
+            VersionMigrationsJob.run(
+                podcastManager = podcastManager,
+                settings = settings,
+                syncManager = syncManager,
+                context = this@PocketCastsWearApplication
+            )
         }
 
         userManager.beginMonitoringAccountManager(playbackManager)
