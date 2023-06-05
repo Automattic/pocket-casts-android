@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toIsoString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -91,7 +92,14 @@ class PodcastSyncProcess(
             .andThen(syncSettings())
             .andThen(syncCloudFiles())
             .andThen(firstSyncChanges())
-            .andThen(syncPlayHistory())
+            .andThen(
+                if (Util.isWearOs(context)) {
+                    // We don't use the play history on wear os, so we can skip this potentially large call
+                    Completable.complete()
+                } else {
+                    syncPlayHistory()
+                }
+            )
         return syncUpNextObservable
             .doOnError { throwable ->
                 SentryHelper.recordException("Sync failed", throwable)
