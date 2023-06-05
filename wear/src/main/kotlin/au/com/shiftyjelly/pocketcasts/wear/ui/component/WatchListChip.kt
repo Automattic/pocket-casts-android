@@ -3,11 +3,13 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.component
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipColors
 import androidx.wear.compose.material.ChipDefaults
@@ -34,6 +36,7 @@ fun WatchListChip(
             Icon(
                 painter = painterResource(iconRes),
                 contentDescription = title,
+                modifier = Modifier.size(24.dp)
             )
         },
         modifier = modifier,

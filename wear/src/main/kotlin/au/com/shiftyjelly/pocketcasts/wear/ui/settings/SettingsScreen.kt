@@ -1,12 +1,10 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui
+package au.com.shiftyjelly.pocketcasts.wear.ui.settings
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -40,6 +38,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.settings.R as SR
 
 object SettingsScreen {
     const val route = "settings_screen"
@@ -49,6 +48,7 @@ object SettingsScreen {
 fun SettingsScreen(
     scrollState: ScalingLazyColumnState,
     signInClick: () -> Unit,
+    navigateToPrivacySettings: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<SettingsViewModel>()
@@ -62,6 +62,7 @@ fun SettingsScreen(
         signInClick = signInClick,
         onSignOutClicked = viewModel::signOut,
         onRefreshClicked = viewModel::refresh,
+        onPrivacyClicked = navigateToPrivacySettings,
     )
 }
 
@@ -74,6 +75,7 @@ private fun Content(
     signInClick: () -> Unit,
     onSignOutClicked: () -> Unit,
     onRefreshClicked: () -> Unit,
+    onPrivacyClicked: () -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
 
@@ -89,26 +91,24 @@ private fun Content(
             )
         }
 
+        val backgroundRefreshStringRes =
+            if (state.refreshInBackground) LR.string.settings_storage_background_refresh_on else LR.string.settings_storage_background_refresh_off
         item {
-            Column {
-                val stringRes =
-                    if (state.refreshInBackground) LR.string.settings_storage_background_refresh_on else LR.string.settings_storage_background_refresh_off
-                ToggleChip(
-                    label = stringResource(LR.string.settings_storage_background_refresh),
-                    checked = state.refreshInBackground,
-                    onCheckedChanged = onRefreshInBackgroundChanged,
-                )
-                Box(
-                    modifier = Modifier.padding(8.dp)
-                ) {
-                    Text(
-                        text = stringResource(stringRes),
-                        style = MaterialTheme.typography.caption3,
-                        color = MaterialTheme.colors.onSecondary,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
+            ToggleChip(
+                label = stringResource(LR.string.settings_storage_background_refresh),
+                checked = state.refreshInBackground,
+                onCheckedChanged = onRefreshInBackgroundChanged,
+            )
+        }
+
+        item {
+            Text(
+                text = stringResource(backgroundRefreshStringRes),
+                style = MaterialTheme.typography.caption3,
+                color = MaterialTheme.colors.onSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(8.dp)
+            )
         }
 
         item {
@@ -133,6 +133,14 @@ private fun Content(
                     )
                 },
                 onClick = onRefreshClicked,
+            )
+        }
+
+        item {
+            WatchListChip(
+                title = stringResource(LR.string.settings_privacy_analytics),
+                iconRes = SR.drawable.whatsnew_privacy,
+                onClick = onPrivacyClicked,
             )
         }
 
@@ -252,6 +260,7 @@ private fun SettingsScreenPreview_unchecked() {
             onRefreshInBackgroundChanged = {},
             onSignOutClicked = {},
             onRefreshClicked = {},
+            onPrivacyClicked = {},
         )
     }
 }
@@ -280,6 +289,7 @@ private fun SettingsScreenPreview_checked() {
             onRefreshInBackgroundChanged = {},
             onSignOutClicked = {},
             onRefreshClicked = {},
+            onPrivacyClicked = {},
         )
     }
 }

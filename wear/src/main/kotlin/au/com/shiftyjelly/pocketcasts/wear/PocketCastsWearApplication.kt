@@ -27,7 +27,9 @@ import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
+import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
+import io.sentry.protocol.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -52,6 +54,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
+    @Inject lateinit var syncManager: SyncManager
 
     override fun onCreate() {
         super.onCreate()
@@ -66,9 +69,20 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     private fun setupSentry() {
         SentryAndroid.init(this) { options ->
-            options.dsn = settings.getSentryDsn()
+            options.dsn = if (settings.getSendCrashReports()) settings.getSentryDsn() else ""
             options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.WEAR.value)
         }
+
+        // Link email to Sentry crash reports only if the user has opted in
+        if (settings.getLinkCrashReportsToUser()) {
+            syncManager.getEmail()?.let { syncEmail ->
+                val user = User().apply { email = syncEmail }
+                Sentry.setUser(user)
+            }
+        }
+
+        // Setup the Firebase, the documentation says this isn't needed but in production we sometimes get the following error "FirebaseApp is not initialized in this process au.com.shiftyjelly.pocketcasts. Make sure to call FirebaseApp.initializeApp(Context) first."
+        FirebaseApp.initializeApp(this)
     }
 
     private fun setupLogging() {
@@ -119,7 +133,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     private fun setupAnalytics() {
         AnalyticsTracker.register(tracksTracker, bumpStatsTracker)
         AnalyticsTracker.init(settings)
-        FirebaseApp.initializeApp(this)
+        AnalyticsTracker.refreshMetadata()
     }
 
     override fun getWorkManagerConfiguration(): Configuration {
