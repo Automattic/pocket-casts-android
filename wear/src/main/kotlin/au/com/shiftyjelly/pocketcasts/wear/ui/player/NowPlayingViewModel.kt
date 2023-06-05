@@ -94,15 +94,15 @@ class NowPlayingViewModel @Inject constructor(
     fun onPauseButtonClick() {
         playAttempt?.cancel()
 
-        playbackManager.pause(playbackSource = AnalyticsSource.WATCH_PLAYER)
+        playbackManager.pause(playbackSource = AnalyticsSource.PLAYER)
     }
 
     fun onSeekBackButtonClick() {
-        playbackManager.skipBackward(AnalyticsSource.WATCH_PLAYER)
+        playbackManager.skipBackward(AnalyticsSource.PLAYER)
     }
 
     fun onSeekForwardButtonClick() {
-        playbackManager.skipForward(AnalyticsSource.WATCH_PLAYER)
+        playbackManager.skipForward(AnalyticsSource.PLAYER)
     }
 
     fun onStreamingConfirmationResult(result: StreamingConfirmationScreen.Result) {
@@ -115,6 +115,6 @@ class NowPlayingViewModel @Inject constructor(
     }
 
     private fun play() {
-        playbackManager.playQueue(AnalyticsSource.WATCH_PLAYER)
+        playbackManager.playQueue(AnalyticsSource.PLAYER)
     }
 }

@@ -42,7 +42,7 @@ class LoginWithGoogleScreenViewModel @Inject constructor(
         }
 
         account.idToken?.let { idToken ->
-            val loginResult = syncManager.loginWithGoogle(idToken, SignInSource.WatchPhoneSync)
+            val loginResult = syncManager.loginWithGoogle(idToken, SignInSource.UserInitiated.Watch)
             when (loginResult) {
                 is LoginResult.Failed -> {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")

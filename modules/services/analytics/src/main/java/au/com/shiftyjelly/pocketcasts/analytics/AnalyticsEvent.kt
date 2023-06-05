@@ -545,4 +545,13 @@ enum class AnalyticsEvent(val key: String) {
 
     /* Ratings */
     RATING_STARS_TAPPED("rating_stars_tapped"),
+
+    /* Wear Main List Screen */
+    WEAR_MAIN_LIST_SHOWN("wear_main_list_shown"),
+    WEAR_MAIN_LIST_NOW_PLAYING_TAPPED("wear_main_list_now_playing_tapped"),
+    WEAR_MAIN_LIST_PODCASTS_TAPPED("wear_main_list_podcasts_tapped"),
+    WEAR_MAIN_LIST_DOWNLOADS_TAPPED("wear_main_list_downloads_tapped"),
+    WEAR_MAIN_LIST_FILTERS_TAPPED("wear_main_list_filters_tapped"),
+    WEAR_MAIN_LIST_FILES_TAPPED("wear_main_list_files_tapped"),
+    WEAR_MAIN_LIST_SETTINGS_TAPPED("wear_main_list_settings_tapped"),
 }

@@ -46,6 +46,7 @@ android {
 
         release {
             manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher",
                     gitHash: "",
                     sentryDsn: project.pocketcastsSentryDsn
             ]
@@ -116,6 +117,7 @@ dependencies {
     implementation project(':modules:features:account')
     implementation project(':modules:features:podcasts')
     implementation project(':modules:features:profile')
+    implementation project(':modules:features:settings')
 }
 
 task useGoogleServicesDebugFile {

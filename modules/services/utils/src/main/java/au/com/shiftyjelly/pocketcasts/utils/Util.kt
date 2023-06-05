@@ -14,6 +14,7 @@ import java.util.Locale
 
 object Util {
     private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 570
+    private var appPlatform: AppPlatform? = null
 
     fun isCarUiMode(context: Context): Boolean {
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
@@ -25,6 +26,18 @@ object Util {
 
     fun isWearOs(context: Context): Boolean =
         appInfoHasBoolean("pocketcasts_wear_os", context)
+
+    // Caching this value since it will always be the same for a given app
+    fun getAppPlatform(context: Context): AppPlatform =
+        appPlatform ?: run {
+            val value = when {
+                isAutomotive(context) -> AppPlatform.Automotive
+                isWearOs(context) -> AppPlatform.WearOs
+                else -> AppPlatform.Phone
+            }
+            appPlatform = value
+            value
+        }
 
     private fun appInfoHasBoolean(key: String, context: Context, default: Boolean = false): Boolean {
         val appInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

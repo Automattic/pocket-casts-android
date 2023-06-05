@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.DisplayUtil
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject
@@ -45,6 +47,11 @@ class TracksAnalyticsTracker @Inject constructor(
                 PredefinedEventProperty.PLUS_SUBSCRIPTION_TYPE to subscriptionType,
                 PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM to subscriptionPlatform,
                 PredefinedEventProperty.PLUS_SUBSCRIPTION_FREQUENCY to subscriptionFrequency,
+                PredefinedEventProperty.PLATFORM to when (Util.getAppPlatform(appContext)) {
+                    AppPlatform.Automotive -> "automotive"
+                    AppPlatform.Phone -> "phone"
+                    AppPlatform.WearOs -> "watch"
+                },
             ).mapKeys { it.key.analyticsKey }
         }
 
@@ -112,6 +119,7 @@ class TracksAnalyticsTracker @Inject constructor(
         PLUS_SUBSCRIPTION_TYPE("plus_subscription_type"),
         PLUS_SUBSCRIPTION_PLATFORM("plus_subscription_platform"),
         PLUS_SUBSCRIPTION_FREQUENCY("plus_subscription_frequency"),
+        PLATFORM("platform"),
     }
 
     companion object {

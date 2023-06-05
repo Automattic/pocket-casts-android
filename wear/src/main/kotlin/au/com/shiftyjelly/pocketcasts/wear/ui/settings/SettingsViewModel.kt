@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui
+package au.com.shiftyjelly.pocketcasts.wear.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,6 +30,7 @@ class SettingsViewModel @Inject constructor(
         val refreshState: RefreshState?,
         val signInState: SignInState,
         val showDataWarning: Boolean,
+        val refreshInBackground: Boolean,
     )
 
     private val _state = MutableStateFlow(
@@ -37,6 +38,7 @@ class SettingsViewModel @Inject constructor(
             refreshState = null,
             signInState = userManager.getSignInState().blockingFirst(),
             showDataWarning = settings.warnOnMeteredNetwork(),
+            refreshInBackground = settings.refreshPodcastsAutomatically(),
         )
     )
     val state = _state.asStateFlow()
@@ -62,6 +64,11 @@ class SettingsViewModel @Inject constructor(
     fun setWarnOnMeteredNetwork(warnOnMeteredNetwork: Boolean) {
         settings.setWarnOnMeteredNetwork(warnOnMeteredNetwork)
         _state.update { it.copy(showDataWarning = warnOnMeteredNetwork) }
+    }
+
+    fun setRefreshPodcastsInBackground(isChecked: Boolean) {
+        settings.setRefreshPodcastsAutomatically(isChecked)
+        _state.update { it.copy(refreshInBackground = isChecked) }
     }
 
     fun signOut() {
