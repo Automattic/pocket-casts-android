@@ -54,7 +54,6 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
-    @Inject lateinit var syncManager: SyncManager
 
     override fun onCreate() {
         super.onCreate()
