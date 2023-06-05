@@ -554,4 +554,10 @@ enum class AnalyticsEvent(val key: String) {
     WEAR_MAIN_LIST_FILTERS_TAPPED("wear_main_list_filters_tapped"),
     WEAR_MAIN_LIST_FILES_TAPPED("wear_main_list_files_tapped"),
     WEAR_MAIN_LIST_SETTINGS_TAPPED("wear_main_list_settings_tapped"),
+
+    /* Wear Sign In */
+    WEAR_SIGNIN_SHOWN("wear_signin_shown"),
+    WEAR_SIGNIN_GOOGLE_TAPPED("wear_signin_google_tapped"),
+    WEAR_SIGNIN_PHONE_TAPPED("wear_signin_phone_tapped"),
+    WEAR_SIGNIN_EMAIL_TAPPED("wear_signin_email_tapped"),
 }
