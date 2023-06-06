@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,6 +28,7 @@ import androidx.wear.input.RemoteInputIntentHelper
 import androidx.wear.input.wearableExtender
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -39,6 +41,7 @@ fun LoginWithEmailScreen(
     val viewModel = hiltViewModel<SignInViewModel>()
     val signInState by viewModel.signInState.observeAsState()
     val email by viewModel.email.observeAsState()
+    val context = LocalContext.current
 
     var loading by remember { mutableStateOf(false) }
 
@@ -77,9 +80,13 @@ fun LoginWithEmailScreen(
 
         is SignInState.Failure -> {
             loading = false
-            val message = (signInState as? SignInState.Failure)
-                ?.message
-                ?: stringResource(LR.string.error_login_failed)
+            val message = if (!Network.isConnected(context)) {
+                stringResource(LR.string.log_in_no_network)
+            } else {
+                (signInState as? SignInState.Failure)
+                    ?.message
+                    ?: stringResource(LR.string.error_login_failed)
+            }
             ErrorScreen(message)
         }
     }
