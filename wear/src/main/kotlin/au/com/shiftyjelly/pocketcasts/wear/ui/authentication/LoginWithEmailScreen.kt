@@ -39,6 +39,7 @@ fun LoginWithEmailScreen(
     val viewModel = hiltViewModel<SignInViewModel>()
     val signInState by viewModel.signInState.observeAsState()
     val email by viewModel.email.observeAsState()
+    val password by viewModel.password.observeAsState()
 
     var loading by remember { mutableStateOf(false) }
 
@@ -53,15 +54,16 @@ fun LoginWithEmailScreen(
                 LaunchedEffect(Unit) {
                     launchRemoteInput(label, launcher)
                 }
-            } else {
+            } else if(password.isNullOrEmpty()) {
                 val label = stringResource(LR.string.enter_password)
                 val launcher = getLauncher {
                     viewModel.updatePassword(it)
-                    viewModel.signIn()
                 }
                 LaunchedEffect(Unit) {
                     launchRemoteInput(label, launcher)
                 }
+            }else{
+                viewModel.signIn()
             }
         }
 

@@ -33,7 +33,7 @@ class SignInViewModel
         if (errors.isEmpty()) {
             signInState.postValue(SignInState.Empty)
         } else {
-            signInState.value = SignInState.Failure(errors = errors, message = null)
+            signInState.value = SignInState.Failure(errors = errors, message = errors.last().message)
         }
     }
 
@@ -89,10 +89,10 @@ class SignInViewModel
     }
 }
 
-enum class SignInError {
-    INVALID_EMAIL,
-    INVALID_PASSWORD,
-    SERVER
+enum class SignInError(val message: String) {
+    INVALID_EMAIL("Please enter a valid email address."),
+    INVALID_PASSWORD("Password must be at least 6 characters long."),
+    SERVER("Internal server error occurred. Please try again later.")
 }
 
 sealed class SignInState {
