@@ -41,11 +41,15 @@ class OnboardingLogInViewModel @Inject constructor(
         _state.update { it.copy(password = password) }
     }
 
+    fun updateServerErrorMessage(message: String?) {
+        _state.update { it.copy(serverErrorMessage = message) }
+    }
+
     fun logIn(onSuccessfulLogin: () -> Unit) {
         _state.update { it.copy(hasAttemptedLogIn = true) }
 
         val state = state.value
-        if (!state.isEmailValid || !state.isPasswordValid) {
+        if (!state.isEmailValid || !state.isPasswordValid || state.serverErrorMessage != null) {
             return
         }
 
