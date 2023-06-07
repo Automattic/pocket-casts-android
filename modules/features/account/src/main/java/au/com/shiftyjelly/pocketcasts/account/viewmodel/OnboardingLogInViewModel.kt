@@ -55,7 +55,7 @@ class OnboardingLogInViewModel @Inject constructor(
         _state.update { it.copy(hasAttemptedLogIn = true, isNetworkAvailable = Network.isConnected(getApplication())) }
 
         val state = state.value
-        if (!state.isEmailValid || !state.isPasswordValid) {
+        if (!state.isEmailValid || !state.isPasswordValid || !state.isNetworkAvailable) {
             return
         }
 
@@ -108,7 +108,7 @@ data class LogInState(
     private val serverErrorMessage: String? = null,
     private val isCallInProgress: Boolean = false,
     private val hasAttemptedLogIn: Boolean = false,
-    private val isNetworkAvailable: Boolean = true,
+    val isNetworkAvailable: Boolean = true,
 ) {
     val isEmailValid = AccountViewModel.isEmailValid(email)
     val isPasswordValid = AccountViewModel.isPasswordValid(password)

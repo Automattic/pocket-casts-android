@@ -61,7 +61,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
         _stateFlow.update { it.copy(hasAttemptedLogIn = true, isNetworkAvailable = Network.isConnected(getApplication())) }
 
         val state = stateFlow.value
-        if (!state.isEmailValid || !state.isPasswordValid) {
+        if (!state.isEmailValid || !state.isPasswordValid || !state.isNetworkAvailable) {
             return
         }
 
@@ -106,7 +106,7 @@ data class OnboardingCreateAccountState(
     private val noNetworkErrorMessage: String,
     private val hasAttemptedLogIn: Boolean = false,
     private val isCallInProgress: Boolean = false,
-    private val isNetworkAvailable: Boolean = true,
+    val isNetworkAvailable: Boolean = true,
 ) {
     val isEmailValid = AccountViewModel.isEmailValid(email)
     val isPasswordValid = AccountViewModel.isPasswordValid(password)
