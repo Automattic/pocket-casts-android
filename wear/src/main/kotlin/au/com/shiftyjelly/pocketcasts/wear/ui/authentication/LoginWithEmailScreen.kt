@@ -20,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,7 +27,6 @@ import androidx.wear.input.RemoteInputIntentHelper
 import androidx.wear.input.wearableExtender
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SignInViewModel
-import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -41,7 +39,7 @@ fun LoginWithEmailScreen(
     val viewModel = hiltViewModel<SignInViewModel>()
     val signInState by viewModel.signInState.observeAsState()
     val email by viewModel.email.observeAsState()
-    val context = LocalContext.current
+    val password by viewModel.password.observeAsState()
 
     var loading by remember { mutableStateOf(false) }
 
@@ -56,15 +54,16 @@ fun LoginWithEmailScreen(
                 LaunchedEffect(Unit) {
                     launchRemoteInput(label, launcher)
                 }
-            } else {
+            } else if (password.isNullOrEmpty()) {
                 val label = stringResource(LR.string.enter_password)
                 val launcher = getLauncher {
                     viewModel.updatePassword(it)
-                    viewModel.signIn()
                 }
                 LaunchedEffect(Unit) {
                     launchRemoteInput(label, launcher)
                 }
+            } else {
+                viewModel.signIn()
             }
         }
 
@@ -80,13 +79,12 @@ fun LoginWithEmailScreen(
 
         is SignInState.Failure -> {
             loading = false
-            val message = if (!Network.isConnected(context)) {
-                stringResource(LR.string.log_in_no_network)
-            } else {
-                (signInState as? SignInState.Failure)
-                    ?.message
-                    ?: stringResource(LR.string.error_login_failed)
-            }
+            val currentState = signInState as? SignInState.Failure
+            val message = currentState?.message
+                ?: stringResource(
+                    currentState?.errors?.last()?.message
+                        ?: LR.string.error_login_failed
+                )
             ErrorScreen(message)
         }
     }
