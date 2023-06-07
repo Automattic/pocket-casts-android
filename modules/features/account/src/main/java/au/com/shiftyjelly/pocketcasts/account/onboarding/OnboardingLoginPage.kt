@@ -113,13 +113,13 @@ internal fun OnboardingLoginPage(
                 modifier = Modifier.padding(16.dp),
             )
 
-            if(state.showNetworkError){
+            if (state.showNetworkError) {
                 TextP40(
                     text = stringResource(id = LR.string.log_in_no_network),
                     color = MaterialTheme.theme.colors.support05,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
-            }else if(state.serverErrorMessage != null){
+            } else if (state.serverErrorMessage != null) {
                 TextP40(
                     text = state.serverErrorMessage!!,
                     color = MaterialTheme.theme.colors.support05,
