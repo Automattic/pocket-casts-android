@@ -122,9 +122,17 @@ internal fun OnboardingCreateAccountPage(
                     .padding(bottom = 16.dp)
             )
 
-            state.serverErrorMessage?.let {
+            if (state.showNetworkError) {
                 TextP40(
-                    text = it,
+                    text = stringResource(LR.string.log_in_no_network),
+                    color = MaterialTheme.theme.colors.support05,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp)
+                )
+            } else if (state.serverErrorMessage != null) {
+                TextP40(
+                    text = state.serverErrorMessage!!,
                     color = MaterialTheme.theme.colors.support05,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
