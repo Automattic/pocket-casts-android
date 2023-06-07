@@ -1555,6 +1555,7 @@
     <string name="onboarding_sign_up">Sign up</string>
     <string name="onboarding_continue_with_google">Continue with Google</string>
     <string name="onboarding_continue_with_google_error">Unable to launch Google sign in.</string>
+    <string name="log_in_no_network">No network connection detected. Please try again later.</string>
     <string name="log_in_with_google">Log in with Google</string>
     <string name="log_in_on_phone">Log in on phone</string>
     <string name="log_in_with_email">Log in with email</string>

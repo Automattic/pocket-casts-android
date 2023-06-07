@@ -113,9 +113,9 @@ internal fun OnboardingLoginPage(
                 modifier = Modifier.padding(16.dp),
             )
 
-            state.serverErrorMessage?.let {
+            state.errorMessage?.let { errorMessage ->
                 TextP40(
-                    text = it,
+                    text = errorMessage,
                     color = MaterialTheme.theme.colors.support05,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
