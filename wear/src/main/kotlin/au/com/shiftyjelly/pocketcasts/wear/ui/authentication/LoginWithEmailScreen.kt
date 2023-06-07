@@ -54,7 +54,7 @@ fun LoginWithEmailScreen(
                 LaunchedEffect(Unit) {
                     launchRemoteInput(label, launcher)
                 }
-            } else if(password.isNullOrEmpty()) {
+            } else if (password.isNullOrEmpty()) {
                 val label = stringResource(LR.string.enter_password)
                 val launcher = getLauncher {
                     viewModel.updatePassword(it)
@@ -62,7 +62,7 @@ fun LoginWithEmailScreen(
                 LaunchedEffect(Unit) {
                     launchRemoteInput(label, launcher)
                 }
-            }else{
+            } else {
                 viewModel.signIn()
             }
         }
@@ -80,7 +80,11 @@ fun LoginWithEmailScreen(
         is SignInState.Failure -> {
             loading = false
             val currentState = signInState as? SignInState.Failure
-            val message = (currentState?.message ?: currentState?.errors?.last()?.message?.let { stringResource(id = it) }) ?: stringResource(id = LR.string.error_login_failed)
+            val message = currentState?.message
+                ?: stringResource(
+                    currentState?.errors?.last()?.message
+                        ?: LR.string.error_login_failed
+                )
             ErrorScreen(message)
         }
     }
