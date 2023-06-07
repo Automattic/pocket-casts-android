@@ -1363,6 +1363,9 @@
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_invalid_email_address">Please enter a valid email address.</string>
+    <string name="error_invalid_password_length">Please enter a password that is at least 6 characters long.</string>
+    <string name="error_server_failed">Internal server error occurred. Please try again later.</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_login_failed">Unable to login to your sync account, sorry. Please try again later.</string>
     <string name="error_search_failed">Search Failed</string>
