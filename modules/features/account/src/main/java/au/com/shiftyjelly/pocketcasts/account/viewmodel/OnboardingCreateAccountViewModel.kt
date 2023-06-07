@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class OnboardingCreateAccountViewModel @Inject constructor(
@@ -34,7 +35,9 @@ class OnboardingCreateAccountViewModel @Inject constructor(
         get() = Dispatchers.Default
 
     private val _stateFlow = MutableStateFlow(
-        OnboardingCreateAccountState()
+        OnboardingCreateAccountState(
+            noNetworkErrorMessage = getApplication<Application>().getString(LR.string.log_in_no_network)
+        )
     )
     val stateFlow: StateFlow<OnboardingCreateAccountState> = _stateFlow
 
@@ -100,16 +103,24 @@ data class OnboardingCreateAccountState(
     val email: String = "",
     val password: String = "",
     val serverErrorMessage: String? = null,
+    private val noNetworkErrorMessage: String,
     private val hasAttemptedLogIn: Boolean = false,
     private val isCallInProgress: Boolean = false,
-    private val isNetworkAvailable: Boolean = true
+    private val isNetworkAvailable: Boolean = true,
 ) {
     val isEmailValid = AccountViewModel.isEmailValid(email)
     val isPasswordValid = AccountViewModel.isPasswordValid(password)
 
     val showEmailError = hasAttemptedLogIn && !isEmailValid
     val showPasswordError = hasAttemptedLogIn && !isPasswordValid
-    val showNetworkError = hasAttemptedLogIn && !isNetworkAvailable
+
+    val errorMessage: String? = if (!hasAttemptedLogIn) {
+        null
+    } else if (!isNetworkAvailable) {
+        noNetworkErrorMessage
+    } else {
+        serverErrorMessage
+    }
 
     val enableSubmissionFields = !isCallInProgress
 }
