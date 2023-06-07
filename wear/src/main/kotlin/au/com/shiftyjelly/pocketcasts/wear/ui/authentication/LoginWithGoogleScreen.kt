@@ -10,10 +10,10 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ErrorScreen
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.horologist.auth.composables.screens.AuthErrorScreen
 import com.google.android.horologist.auth.ui.googlesignin.signin.GoogleSignInScreen
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import com.google.android.horologist.auth.composables.R as HR
 
 @Composable
 fun LoginWithGoogleScreen(
@@ -36,11 +36,12 @@ fun LoginWithGoogleScreen(
             onAuthCanceled()
         },
         failedContent = {
-            if(!Network.isConnected(context)){
-                ErrorScreen(stringResource(LR.string.log_in_no_network))
-            }else {
-                AuthErrorScreen()
+            val message = if (Network.isConnected(context)) {
+                HR.string.horologist_auth_error_message
+            } else {
+                LR.string.log_in_no_network
             }
+            ErrorScreen(stringResource(message))
         },
         content = {
             signInSuccessScreen(state.googleSignInAccount)

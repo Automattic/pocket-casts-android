@@ -23,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -58,9 +56,6 @@ internal fun OnboardingLoginPage(
 
     val viewModel = hiltViewModel<OnboardingLogInViewModel>()
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
-
-    val networkErrorMessage = stringResource(id = LR.string.log_in_no_network)
 
     CallOnce {
         viewModel.onShown()
@@ -111,21 +106,22 @@ internal fun OnboardingLoginPage(
                 showEmailError = state.showEmailError,
                 showPasswordError = state.showPasswordError,
                 enabled = state.enableSubmissionFields,
-                onDone = {
-                    viewModel.updateServerErrorMessage(
-                        if (Network.isConnected(context)) null else networkErrorMessage
-                    )
-                    viewModel.logIn(onLoginComplete)
-                },
+                onDone = { viewModel.logIn(onLoginComplete) },
                 onUpdateEmail = viewModel::updateEmail,
                 onUpdatePassword = viewModel::updatePassword,
                 isCreatingAccount = false,
                 modifier = Modifier.padding(16.dp),
             )
 
-            state.serverErrorMessage?.let {
+            if(state.showNetworkError){
                 TextP40(
-                    text = it,
+                    text = stringResource(id = LR.string.log_in_no_network),
+                    color = MaterialTheme.theme.colors.support05,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }else if(state.serverErrorMessage != null){
+                TextP40(
+                    text = state.serverErrorMessage!!,
                     color = MaterialTheme.theme.colors.support05,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -150,12 +146,7 @@ internal fun OnboardingLoginPage(
             RowButton(
                 text = stringResource(LR.string.onboarding_log_in),
                 enabled = state.enableSubmissionFields,
-                onClick = {
-                    viewModel.updateServerErrorMessage(
-                        if (Network.isConnected(context)) null else networkErrorMessage
-                    )
-                    viewModel.logIn(onLoginComplete)
-                },
+                onClick = { viewModel.logIn(onLoginComplete) },
             )
         }
     }

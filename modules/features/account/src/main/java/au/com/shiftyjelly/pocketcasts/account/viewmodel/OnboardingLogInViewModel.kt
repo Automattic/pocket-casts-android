@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
@@ -9,7 +11,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +29,8 @@ class OnboardingLogInViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val subscriptionManager: SubscriptionManager,
     private val syncManager: SyncManager,
-) : ViewModel(), CoroutineScope {
+    @ApplicationContext context: Context
+) : AndroidViewModel(context as Application), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -41,12 +46,8 @@ class OnboardingLogInViewModel @Inject constructor(
         _state.update { it.copy(password = password) }
     }
 
-    fun updateServerErrorMessage(message: String?) {
-        _state.update { it.copy(serverErrorMessage = message) }
-    }
-
     fun logIn(onSuccessfulLogin: () -> Unit) {
-        _state.update { it.copy(hasAttemptedLogIn = true) }
+        _state.update { it.copy(hasAttemptedLogIn = true, isNetworkAvailable = Network.isConnected(getApplication())) }
 
         val state = state.value
         if (!state.isEmailValid || !state.isPasswordValid || state.serverErrorMessage != null) {
@@ -101,12 +102,14 @@ data class LogInState(
     val serverErrorMessage: String? = null,
     private val isCallInProgress: Boolean = false,
     private val hasAttemptedLogIn: Boolean = false,
+    private val isNetworkAvailable: Boolean = true
 ) {
     val isEmailValid = AccountViewModel.isEmailValid(email)
     val isPasswordValid = AccountViewModel.isPasswordValid(password)
 
     val showEmailError = hasAttemptedLogIn && !isEmailValid
     val showPasswordError = hasAttemptedLogIn && !isPasswordValid
+    val showNetworkError = hasAttemptedLogIn && !isNetworkAvailable
 
     val enableSubmissionFields = !isCallInProgress
 }
