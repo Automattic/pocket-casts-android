@@ -84,7 +84,11 @@ open class PodcastImageLoader(
 
     fun loadCoil(podcastUuid: String?, size: Int? = null, placeholder: Boolean = true, onComplete: () -> Unit = {}): ImageRequest.Builder {
         if (podcastUuid == null) return loadNoPodcastCoil()
-        val url = if (size != null) PodcastImage.getArtworkUrl(size = size, uuid = podcastUuid) else PodcastImage.getLargeArtworkUrl(uuid = podcastUuid)
+        val url = if (size != null) {
+            PodcastImage.getArtworkUrl(size = size, uuid = podcastUuid)
+        } else {
+            PodcastImage.getLargeArtworkUrl(uuid = podcastUuid, context = context)
+        }
 
         val placeholderDrawable = if (placeholder) placeholderResId() else 0
         var builder = ImageRequest.Builder(context)
@@ -184,7 +188,7 @@ open class PodcastImageLoader(
 
     private fun cacheSubscribedArtworkRequest(podcast: Podcast): ImageRequest {
         return ImageRequest.Builder(context)
-            .data(PodcastImage.getLargeArtworkUrl(podcast.uuid))
+            .data(PodcastImage.getLargeArtworkUrl(uuid = podcast.uuid, context = context))
             .memoryCachePolicy(CachePolicy.DISABLED)
             .build()
     }
