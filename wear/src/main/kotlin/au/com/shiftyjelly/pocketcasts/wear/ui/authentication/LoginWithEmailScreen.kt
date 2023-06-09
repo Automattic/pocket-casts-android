@@ -100,7 +100,7 @@ private fun Loading() {
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize(),
     ) {
-        LoadingSpinner(Modifier.size(48.dp))
+        LoadingSpinner(Modifier.size(36.dp))
     }
 }
 
