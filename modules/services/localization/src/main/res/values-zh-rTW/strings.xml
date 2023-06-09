@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-23 13:54:03+0000
+Translation-Revision-Date: 2023-06-06 09:54:26+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">連結你的帳號</string>
+    <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">請使用 Plus 帳號登入</string>
+    <string name="log_in_watch_requires_plus">使用 Plus 帳號登入即可使用此 App，或升級以造訪</string>
     <string name="enter_password">輸入密碼</string>
     <string name="enter_email">輸入電子郵件地址</string>
     <string name="player_effects_trim_level_down">剪輯程度降低</string>

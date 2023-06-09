@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-24 09:54:03+0000
+Translation-Revision-Date: 2023-06-07 09:54:20+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">关联您的账户</string>
+    <string name="settings_app_icon_pride_2023">2023 年骄傲月</string>
+    <string name="log_in_with_plus">请使用 Plus 账户登录</string>
+    <string name="log_in_watch_requires_plus">使用 Plus 账户登录以使用此应用或升级访问</string>
     <string name="enter_password">输入密码</string>
     <string name="enter_email">输入电子邮件地址</string>
     <string name="player_effects_trim_level_down">降低功能级别</string>

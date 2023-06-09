@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-22 14:54:24+0000
+Translation-Revision-Date: 2023-06-05 19:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">Vincular sua conta</string>
+    <string name="settings_app_icon_pride_2023">Orgulho LGBT+ 2023</string>
+    <string name="log_in_with_plus">Faça login com uma conta do Plus</string>
+    <string name="log_in_watch_requires_plus">Faça login com uma conta do Plus para usar este aplicativo ou atualize acessando</string>
     <string name="enter_password">Inserir senha</string>
     <string name="enter_email">Inserir e-mail</string>
     <string name="player_effects_trim_level_down">Reduzir nível de corte</string>

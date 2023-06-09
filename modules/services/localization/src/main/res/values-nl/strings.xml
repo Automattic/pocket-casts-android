@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-24 09:54:03+0000
+Translation-Revision-Date: 2023-06-06 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">Je account koppelen</string>
+    <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">Log in met een Plus-account</string>
+    <string name="log_in_watch_requires_plus">Log in met een Plus-account om deze app te kunnen gebruiken of upgrade je bezoekersaccount</string>
     <string name="enter_password">Voer wachtwoord in</string>
     <string name="enter_email">E-mail invoeren</string>
     <string name="player_effects_trim_level_down">Niveau van wegfilteren omlaag</string>
