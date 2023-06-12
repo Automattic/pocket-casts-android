@@ -1027,6 +1027,7 @@
     <string name="settings_auto_download_up_next">Episodes added to Up Next</string>
     <string name="settings_auto_play">Auto play</string>
     <string name="settings_auto_play_summary">When there\'s nothing left to play, automatically pick an episode for me</string>
+    <string name="settings_beta_features">Beta Features</string>
     <string name="settings_battery">Battery</string>
     <string name="settings_battery_settings">Battery settings</string>
     <string name="settings_battery_learn_more">Learn more</string>
