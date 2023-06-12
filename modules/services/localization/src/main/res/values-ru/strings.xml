@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-22 11:54:03+0000
+Translation-Revision-Date: 2023-06-07 09:54:20+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">Привязать учетную запись</string>
+    <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">Войдите с учётной записью Plus</string>
+    <string name="log_in_watch_requires_plus">Войдите с учётной записью Plus, чтобы использовать это приложение или расширить возможности посещения</string>
     <string name="enter_password">Введите пароль</string>
     <string name="enter_email">Введите адрес электронной почты</string>
     <string name="player_effects_trim_level_down">Уменьшить громкость в паузах</string>
