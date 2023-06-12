@@ -49,6 +49,7 @@ fun SettingsScreen(
     scrollState: ScalingLazyColumnState,
     signInClick: () -> Unit,
     navigateToPrivacySettings: () -> Unit,
+    navigateToAbout: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<SettingsViewModel>()
@@ -63,6 +64,7 @@ fun SettingsScreen(
         onSignOutClicked = viewModel::signOut,
         onRefreshClicked = viewModel::refresh,
         onPrivacyClicked = navigateToPrivacySettings,
+        onAboutClicked = navigateToAbout,
     )
 }
 
@@ -76,6 +78,7 @@ private fun Content(
     onSignOutClicked: () -> Unit,
     onRefreshClicked: () -> Unit,
     onPrivacyClicked: () -> Unit,
+    onAboutClicked: () -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
 
@@ -163,6 +166,14 @@ private fun Content(
                     )
                 }
             }
+        }
+
+        item {
+            WatchListChip(
+                title = stringResource(LR.string.settings_title_about),
+                iconRes = SR.drawable.settings_about,
+                onClick = onAboutClicked
+            )
         }
     }
 }
@@ -261,6 +272,7 @@ private fun SettingsScreenPreview_unchecked() {
             onSignOutClicked = {},
             onRefreshClicked = {},
             onPrivacyClicked = {},
+            onAboutClicked = {},
         )
     }
 }
@@ -290,6 +302,7 @@ private fun SettingsScreenPreview_checked() {
             onSignOutClicked = {},
             onRefreshClicked = {},
             onPrivacyClicked = {},
+            onAboutClicked = {},
         )
     }
 }
