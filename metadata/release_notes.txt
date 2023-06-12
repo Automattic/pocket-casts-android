@@ -1,11 +1,5 @@
-*   Updates:
-    *   Automotive now has the option to clear your data before logging in
-        ([#978](https://github.com/Automattic/pocket-casts-android/pull/978)).
-*   Bug Fixes:
-    *   Fixed the buffering and seeking issues with some Automotive manufacturers
-        ([#977](https://github.com/Automattic/pocket-casts-android/pull/977)).
-    *   Improved the resolution of the Gravatar image
-        ([#973](https://github.com/Automattic/pocket-casts-android/pull/973)).
-    *   Improved the Automotive user profile view
-        ([#975](https://github.com/Automattic/pocket-casts-android/pull/975)).
+
+*   New Features:
+    *   Wear OS app
+        ([#1068](https://github.com/Automattic/pocket-casts-android/pull/1068)).
 
