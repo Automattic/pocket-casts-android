@@ -147,10 +147,8 @@ android {
             if (canSignRelease) {
                 signingConfig signingConfigs.release
             }
-
         }
     }
-
 }
 
 dependencies {

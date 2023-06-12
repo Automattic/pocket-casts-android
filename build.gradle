@@ -43,7 +43,7 @@ plugins {
     id 'com.mikepenz.aboutlibraries.plugin' version '10.4.0' apply false
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'com.diffplug.spotless' version '6.2.2'
-    id 'io.sentry.android.gradle' version '3.1.5' apply false
+    id 'io.sentry.android.gradle' version '3.10.0' apply false
 }
 
 apply plugin: 'base'
@@ -86,4 +86,3 @@ allprojects {
         }
     }
 }
-
