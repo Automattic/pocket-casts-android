@@ -17,17 +17,6 @@ android {
         applicationId project.applicationId
     }
 
-    if (canSignRelease) {
-        signingConfigs {
-            release {
-                storeFile = project.storeFile
-                storePassword = project.storePassword
-                keyAlias = project.keyAlias
-                keyPassword = project.keyPassword
-            }
-        }
-    }
-
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
@@ -53,11 +42,15 @@ android {
                     sentryDsn: project.pocketcastsSentryDsn
             ]
 
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            if (canSignRelease) {
-                signingConfig signingConfigs.release
+            if (!project.pocketcastsSentryDsn) {
+                println "WARNING: Sentry DSN gradle property 'pocketcastsSentryDsn' not found. Crash reporting won't work without this."
             }
+
+            if (!file("${project.rootDir}/sentry.properties").exists()) {
+                println "WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded."
+            }
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
