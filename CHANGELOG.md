@@ -1,6 +1,9 @@
 7.41
 -----
 
+*   New Features:
+    *   Wear OS app
+        ([#1068](https://github.com/Automattic/pocket-casts-android/pull/1068)).
 
 7.40
 -----
