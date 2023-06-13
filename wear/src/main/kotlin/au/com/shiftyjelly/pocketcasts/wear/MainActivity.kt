@@ -50,6 +50,9 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.settings.PrivacySettingsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.settings.SettingsScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.settings.UrlScreenRoutes
+import au.com.shiftyjelly.pocketcasts.wear.ui.settings.WearAboutScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.settings.settingsUrlScreens
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.ScrollableScaffoldContext
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
@@ -310,12 +313,23 @@ fun WearApp(
                 scrollState = it.columnState,
                 signInClick = { navController.navigate(authenticationSubGraph) },
                 navigateToPrivacySettings = { navController.navigate(PrivacySettingsScreen.route) },
+                navigateToAbout = { navController.navigate(WearAboutScreen.route) }
             )
         }
 
         scrollable(PrivacySettingsScreen.route) {
             PrivacySettingsScreen(scrollState = it.columnState)
         }
+
+        scrollable(WearAboutScreen.route) {
+            WearAboutScreen(
+                columnState = it.columnState,
+                onTermsOfServiceClick = { navController.navigate(UrlScreenRoutes.termsOfService) },
+                onPrivacyClick = { navController.navigate(UrlScreenRoutes.privacy) }
+            )
+        }
+
+        settingsUrlScreens()
 
         val popToStartDestination: () -> Unit = {
             when (startDestination) {

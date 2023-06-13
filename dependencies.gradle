@@ -193,6 +193,7 @@ project.ext {
             wearComposeNavigation: "androidx.wear.compose:compose-navigation:$versionComposeWear",
             wearPlayServices: "com.google.android.gms:play-services-wearable:18.0.0",
             wearInput: 'androidx.wear:wear-input:1.2.0-alpha02',
+            wearRemoteInteractions: 'androidx.wear:wear-remote-interactions:1.0.0',
 
             horologistAudioUi: "com.google.android.horologist:horologist-audio-ui:$versionHorologist",
             horologistAuthData: "com.google.android.horologist:horologist-auth-data:$versionHorologist",
