@@ -8,6 +8,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.BuildConfig
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -18,7 +19,12 @@ object WearAboutScreen {
 }
 
 @Composable
-fun WearAboutScreen(columnState: ScalingLazyColumnState) {
+fun WearAboutScreen(
+    columnState: ScalingLazyColumnState,
+    onTermsOfServiceClick: () -> Unit,
+    onPrivacyClick: () -> Unit,
+) {
+
     ScalingLazyColumn(
         columnState = columnState,
     ) {
@@ -38,30 +44,18 @@ fun WearAboutScreen(columnState: ScalingLazyColumnState) {
             )
         }
 
-        // share
-        // website
-        // instagram
-        // twitter
+        item {
+            WatchListChip(
+                title = stringResource(LR.string.settings_about_terms_of_serivce),
+                onClick = onTermsOfServiceClick
+            )
+        }
 
-//        item {
-//            WatchListChip(
-//                title = stringResource(LR.string.settings_about_terms_of_serivce),
-//                onClick = { TODO() }
-//            )
-//        }
-//
-//        item {
-//            WatchListChip(
-//                title = stringResource(LR.string.settings_about_privacy_policy),
-//                onClick = { TODO() }
-//            )
-//        }
-//
-//        item {
-//            WatchListChip(
-//                title = stringResource(LR.string.settings_about_acknowledgements),
-//                onClick = { TODO() }
-//            )
-//        }
+        item {
+            WatchListChip(
+                title = stringResource(LR.string.settings_about_privacy_policy),
+                onClick = onPrivacyClick
+            )
+        }
     }
 }

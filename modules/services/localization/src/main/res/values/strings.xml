@@ -1328,6 +1328,8 @@
     <string name="settings_about_privacy_policy">Privacy policy</string>
     <string name="settings_about_acknowledgements">Acknowledgements</string>
     <string name="settings_about_website">Website</string>
+    <string name="settings_about_terms_of_service_available_at">Our Terms of service are available at %s</string>
+    <string name="settings_about_privacy_policy_available_at">Our Privacy policy is available at %s</string>
     <string name="settings_privacy_summary">Allowing us to collect analytics and crash reports helps us build a better app. We understand if you would prefer not to share this information.</string>
     <string name="settings_privacy_analytics">Analytics</string>
     <string name="settings_privacy_analytics_summary">Allow us to collect analytics.</string>
@@ -1336,6 +1338,8 @@
     <string name="settings_privacy_crash_link">Link your account to crashes</string>
     <string name="settings_privacy_crash_link_short">Link your account</string>
     <string name="settings_privacy_crash_link_summary">Allow us to link your Pocket Casts account to crash reports.</string>
+    <string name="settings_open_on_phone">Open on phone</string>
+    <string name="settings_could_not_open_on_phone">Unable to open on phone</string>
 
     <string name="settings_advanced_sync_on_metered">Sync on Metered Networks</string>
     <string name="settings_advanced_sync_on_metered_summary">Permits automatic background sync on metered networks. This is enabled by default and has no effect if background refresh is turned off.</string>

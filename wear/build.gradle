@@ -75,6 +75,7 @@ sentry {
 
 dependencies {
     implementation androidLibs.wearInput
+    implementation androidLibs.wearRemoteInteractions
 
     // General Compose dependencies
     implementation androidLibs.composeActivity
