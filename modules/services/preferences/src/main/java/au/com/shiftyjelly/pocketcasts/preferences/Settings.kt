@@ -50,7 +50,6 @@ interface Settings {
         const val WHATS_NEW_VERSION_CODE = 7566
 
         const val DEFAULT_MAX_AUTO_ADD_LIMIT = 100
-        const val LIMIT_MAX_PODCAST_EPISODES = 1500
         const val MAX_DOWNLOAD = 100
 
         const val PARSER_VERSION = "1.7"

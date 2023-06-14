@@ -9,8 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.CachedServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
+import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.views.helper.ShowNotesFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +21,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.rx2.rxCompletable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -60,34 +61,20 @@ class NotesViewModel
                 showNotesFormatter.linkColor = ColorUtils.colorIntToHexString(linkColor)
             }
             // load the show notes
-            .flatMapCompletable { loadShowNotes(episode.uuid) }
+            .flatMapCompletable { loadShowNotes(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { Timber.e(it) })
             .addTo(disposables)
     }
 
-    private fun loadShowNotes(episodeUuid: String): Completable {
+    private fun loadShowNotes(podcastUuid: String, episodeUuid: String): Completable {
         // Clear previous show notes while loading new notes
         updateShowNotes("", inProgress = true)
-
-        return Completable.fromAction {
-            serverShowNotesManager.loadShowNotes(
-                episodeUuid,
-                object : CachedServerCallback<String> {
-                    override fun cachedDataFound(data: String) {
-                        updateShowNotes(data, inProgress = false)
-                    }
-
-                    override fun networkDataFound(data: String) {
-                        updateShowNotes(data, inProgress = false)
-                    }
-
-                    override fun notFound() {
-                        updateShowNotes("", inProgress = false)
-                    }
-                }
-            )
+        return rxCompletable {
+            val state = serverShowNotesManager.loadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
+            val showNotes = if (state is ShowNotesState.Loaded) state.showNotes else ""
+            updateShowNotes(showNotes, inProgress = false)
         }
     }
 

@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.episode
 import android.content.Context
 import androidx.annotation.ColorInt
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -20,9 +20,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.CachedServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
+import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
@@ -32,12 +32,13 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Function3
+import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
+import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -60,7 +61,7 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     private val source = AnalyticsSource.EPISODE_DETAILS
     lateinit var state: LiveData<EpisodeFragmentState>
-    val showNotes: MutableLiveData<String> = MutableLiveData()
+    lateinit var showNotesState: LiveData<ShowNotesState>
     lateinit var inUpNext: LiveData<Boolean>
     val isPlaying: LiveData<Boolean> = playbackManager.playbackStateLive.map {
         it.episodeUuid == episode?.uuid && it.isPlaying
@@ -71,23 +72,23 @@ class EpisodeFragmentViewModel @Inject constructor(
     var episode: PodcastEpisode? = null
     var isFragmentChangingConfigurations: Boolean = false
 
-    fun setup(episodeUUID: String, podcastUUID: String?, forceDark: Boolean) {
+    fun setup(episodeUuid: String, podcastUuid: String?, forceDark: Boolean) {
         val isDarkTheme = forceDark || theme.isDarkTheme
         val progressUpdatesObservable = downloadManager.progressUpdateRelay
-            .filter { it.episodeUuid == episodeUUID }
+            .filter { it.episodeUuid == episodeUuid }
             .map { it.downloadProgress }
             .startWith(0f)
             .toFlowable(BackpressureStrategy.LATEST)
 
         // If we can't find it in the database and we know the podcast uuid we can try load it
         // from the server
-        val onEmptyHandler = if (podcastUUID != null) {
-            podcastManager.findOrDownloadPodcastRx(podcastUUID).flatMapMaybe {
-                val episode = it.episodes.find { episode -> episode.uuid == episodeUUID }
+        val onEmptyHandler = if (podcastUuid != null) {
+            podcastManager.findOrDownloadPodcastRx(podcastUuid).flatMapMaybe {
+                val episode = it.episodes.find { episode -> episode.uuid == episodeUuid }
                 if (episode != null) {
                     Maybe.just(episode)
                 } else {
-                    episodeManager.downloadMissingEpisode(episodeUUID, podcastUUID, PodcastEpisode(uuid = episodeUUID, publishedDate = Date()), podcastManager, downloadMetaData = true).flatMap { missingEpisode ->
+                    episodeManager.downloadMissingEpisode(episodeUuid, podcastUuid, PodcastEpisode(uuid = episodeUuid, publishedDate = Date()), podcastManager, downloadMetaData = true).flatMap { missingEpisode ->
                         if (missingEpisode is PodcastEpisode) {
                             Maybe.just(missingEpisode)
                         } else {
@@ -100,22 +101,23 @@ class EpisodeFragmentViewModel @Inject constructor(
             Maybe.empty()
         }
 
-        val stateObservable: Flowable<EpisodeFragmentState> = episodeManager.findByUuidRx(episodeUUID)
+        val stateObservable: Flowable<EpisodeFragmentState> = episodeManager.findByUuidRx(episodeUuid)
             .switchIfEmpty(onEmptyHandler)
             .flatMapPublisher { episode ->
-                val zipper: Function3<PodcastEpisode, Podcast, Float, EpisodeFragmentState> = Function3 { episodeLoaded: PodcastEpisode, podcast: Podcast, downloadProgress: Float ->
+                val zipper: Function4<PodcastEpisode, Podcast, ShowNotesState, Float, EpisodeFragmentState> = Function4 { episodeLoaded: PodcastEpisode, podcast: Podcast, showNotesState: ShowNotesState, downloadProgress: Float ->
                     val tintColor = podcast.getTintColor(isDarkTheme)
                     val podcastColor = podcast.getTintColor(isDarkTheme)
-                    EpisodeFragmentState.Loaded(episodeLoaded, podcast, tintColor, podcastColor, downloadProgress)
+                    EpisodeFragmentState.Loaded(episodeLoaded, podcast, showNotesState, tintColor, podcastColor, downloadProgress)
                 }
-                loadShowNotes(episode)
                 return@flatMapPublisher Flowable.combineLatest(
-                    episodeManager.observeByUuid(episodeUUID).asFlowable(),
+                    episodeManager.observeByUuid(episodeUuid).asFlowable(),
                     podcastManager.findPodcastByUuidRx(episode.podcastUuid).toFlowable(),
+                    serverShowNotesManager.loadShowNotesFlow(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid).asFlowable(),
                     progressUpdatesObservable,
                     zipper
                 )
             }
+            .doOnNext { Timber.i("PHILIP Episode state $it") }
             .doOnNext { if (it is EpisodeFragmentState.Loaded) { episode = it.episode } }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
             .observeOn(AndroidSchedulers.mainThread())
@@ -123,33 +125,23 @@ class EpisodeFragmentViewModel @Inject constructor(
 
         state = stateObservable.toLiveData()
 
+        showNotesState = state
+            .map { episodeState ->
+                when (episodeState) {
+                    is EpisodeFragmentState.Loaded -> episodeState.showNotesState
+                    is EpisodeFragmentState.Error -> ShowNotesState.NotFound
+                }
+            }
+            .distinctUntilChanged()
+
         val inUpNextObservable = playbackManager.upNextQueue.changesObservable.toFlowable(BackpressureStrategy.LATEST)
-            .map { upNext -> (upNext is UpNextQueue.State.Loaded) && (upNext.episode == episode || upNext.queue.map { it.uuid }.contains(episodeUUID)) }
+            .map { upNext -> (upNext is UpNextQueue.State.Loaded) && (upNext.episode == episode || upNext.queue.map { it.uuid }.contains(episodeUuid)) }
         inUpNext = inUpNextObservable.toLiveData()
     }
 
     override fun onCleared() {
         super.onCleared()
         disposables.clear()
-    }
-
-    fun loadShowNotes(episode: PodcastEpisode) {
-        serverShowNotesManager.loadShowNotes(
-            episode.uuid,
-            object : CachedServerCallback<String> {
-                override fun cachedDataFound(data: String) {
-                    showNotes.value = data
-                }
-
-                override fun networkDataFound(data: String) {
-                    showNotes.value = data
-                }
-
-                override fun notFound() {
-                    showNotes.value = ""
-                }
-            }
-        )
     }
 
     fun deleteDownloadedEpisode() {
@@ -297,6 +289,6 @@ class EpisodeFragmentViewModel @Inject constructor(
 }
 
 sealed class EpisodeFragmentState {
-    data class Loaded(val episode: PodcastEpisode, val podcast: Podcast, @ColorInt val tintColor: Int, @ColorInt val podcastColor: Int, val downloadProgress: Float) : EpisodeFragmentState()
+    data class Loaded(val episode: PodcastEpisode, val podcast: Podcast, val showNotesState: ShowNotesState, @ColorInt val tintColor: Int, @ColorInt val podcastColor: Int, val downloadProgress: Float) : EpisodeFragmentState()
     data class Error(val error: Throwable) : EpisodeFragmentState()
 }

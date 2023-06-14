@@ -12,12 +12,12 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
 
     val server = retrofit.create(PodcastCacheServer::class.java)
 
-    override fun getPodcastResponse(podcastUuid: String, pageNumber: Int, sortOption: Int, episodeLimit: Int): Single<Response<PodcastResponse>> {
-        return server.getPodcastAndEpisodesRaw(podcastUuid, pageNumber, sortOption, episodeLimit)
+    override fun getPodcastResponse(podcastUuid: String): Single<Response<PodcastResponse>> {
+        return server.getPodcastAndEpisodesRaw(podcastUuid)
     }
 
-    override fun getPodcast(podcastUuid: String, pageNumber: Int, sortOption: Int, episodeLimit: Int): Single<Podcast> {
-        return server.getPodcastAndEpisodes(podcastUuid, pageNumber, sortOption, episodeLimit)
+    override fun getPodcast(podcastUuid: String): Single<Podcast> {
+        return server.getPodcastAndEpisodes(podcastUuid)
             .map(PodcastResponse::toPodcast)
     }
 

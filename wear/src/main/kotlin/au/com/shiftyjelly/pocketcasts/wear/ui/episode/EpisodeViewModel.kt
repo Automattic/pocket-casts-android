@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
+import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine6
@@ -40,6 +41,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,6 +50,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -62,6 +65,7 @@ import kotlin.coroutines.suspendCoroutine
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class EpisodeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -87,7 +91,7 @@ class EpisodeViewModel @Inject constructor(
             val inUpNext: Boolean,
             val tintColor: Color?,
             val downloadProgress: Float? = null,
-            val showNotes: String? = null,
+            val showNotesState: ShowNotesState,
             val errorData: ErrorData?,
         ) : State() {
             data class ErrorData(
@@ -154,7 +158,7 @@ class EpisodeViewModel @Inject constructor(
 
         val showNotesFlow = episodeFlow
             .filterIsInstance<PodcastEpisode>() // user episodes don't have show notes
-            .map { showNotesManager.loadShowNotes(it.uuid) }
+            .flatMapLatest { showNotesManager.loadShowNotesFlow(podcastUuid = it.podcastUuid, episodeUuid = it.uuid) }
 
         stateFlow = combine6(
             episodeFlow,
@@ -163,8 +167,8 @@ class EpisodeViewModel @Inject constructor(
             isPlayingEpisodeFlow.onStart { emit(false) },
             inUpNextFlow,
             downloadProgressFlow.onStart<Float?> { emit(null) },
-            showNotesFlow.onStart { emit(null) }
-        ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotes ->
+            showNotesFlow
+        ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotesState ->
 
             State.Loaded(
                 episode = episode,
@@ -173,7 +177,7 @@ class EpisodeViewModel @Inject constructor(
                 downloadProgress = downloadProgress,
                 inUpNext = isInUpNext(upNext, episode),
                 tintColor = getTintColor(episode, podcast, theme),
-                showNotes = showNotes,
+                showNotesState = showNotesState,
                 errorData = getErrorData(episode),
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), State.Empty)

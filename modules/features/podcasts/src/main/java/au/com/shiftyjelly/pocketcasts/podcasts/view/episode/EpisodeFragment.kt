@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.images.into
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
+import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarColor
@@ -407,10 +408,12 @@ class EpisodeFragment : BaseDialogFragment() {
             }
         )
 
-        // Ideally this would all be contained in the viewmodel state observable but webview flickers when updating
-        viewModel.showNotes.observe(viewLifecycleOwner) { showNotes ->
-            formattedNotes = showNotesFormatter.format(showNotes) ?: showNotes
-            loadShowNotes(formattedNotes ?: "")
+        viewModel.showNotesState.observe(viewLifecycleOwner) { showNotesState ->
+            if (showNotesState is ShowNotesState.Loaded) {
+                val showNotes = showNotesState.showNotes
+                formattedNotes = showNotesFormatter.format(showNotes) ?: showNotes
+                loadShowNotes(formattedNotes ?: "")
+            }
         }
 
         binding?.btnArchive?.let { button ->

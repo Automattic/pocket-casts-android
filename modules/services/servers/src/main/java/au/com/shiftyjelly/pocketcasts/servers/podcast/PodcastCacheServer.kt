@@ -61,11 +61,11 @@ data class PodcastRatingsResponse(
 }
 
 interface PodcastCacheServer {
-    @GET("/mobile/podcast/full/{podcastUuid}/{pageNumber}/{sortOption}/{episodeLimit}")
-    fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String, @Path("pageNumber") pageNumber: Int = 0, @Path("sortOption") sortOption: Int = 3, @Path("episodeLimit") episodeLimit: Int = 0): Single<Response<PodcastResponse>>
+    @GET("/mobile/podcast/full/{podcastUuid}")
+    fun getPodcastAndEpisodesRaw(@Path("podcastUuid") podcastUuid: String): Single<Response<PodcastResponse>>
 
-    @GET("/mobile/podcast/full/{podcastUuid}/{pageNumber}/{sortOption}/{episodeLimit}")
-    fun getPodcastAndEpisodes(@Path("podcastUuid") podcastUuid: String, @Path("pageNumber") pageNumber: Int = 0, @Path("sortOption") sortOption: Int = 3, @Path("episodeLimit") episodeLimit: Int = 0): Single<PodcastResponse>
+    @GET("/mobile/podcast/full/{podcastUuid}")
+    fun getPodcastAndEpisodes(@Path("podcastUuid") podcastUuid: String): Single<PodcastResponse>
 
     @GET("/mobile/podcast/findbyepisode/{podcastUuid}/{episodeUuid}")
     fun getPodcastAndEpisode(@Path("podcastUuid") podcastUuid: String, @Path("episodeUuid") episodeUuid: String): Single<PodcastResponse>
