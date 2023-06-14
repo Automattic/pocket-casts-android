@@ -48,7 +48,7 @@ android {
 
         release {
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_pride_2023",
+                    appIcon: "@mipmap/ic_launcher",
                     gitHash: "",
                     sentryDsn: project.pocketcastsSentryDsn
             ]
