@@ -1,6 +1,9 @@
 7.42
 -----
 
+*   Updates:
+    *   Use sha256 to encode email for gravatar
+        ([#1080](https://github.com/Automattic/pocket-casts-android/pull/1080)).
 
 7.41
 -----
