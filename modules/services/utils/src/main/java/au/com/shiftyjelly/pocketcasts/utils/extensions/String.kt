@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import timber.log.Timber
-import java.nio.charset.Charset
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -66,17 +65,17 @@ fun String.removeNewLines(): String {
     return this.replace("[\n\r]".toRegex(), "")
 }
 
-fun String.sha1(): String? = hashString(algorithm = "SHA-1", charset = Charsets.ISO_8859_1)
-fun String.sha256(): String? = hashString(algorithm = "SHA-256")
+fun String.sha1(): String? = hashString("SHA-1")
+fun String.sha256(): String? = hashString("SHA-256")
 
 /**
  * For information on permitted algorithms, see
  * https://developer.android.com/reference/kotlin/java/security/MessageDigest
  */
-private fun String.hashString(algorithm: String, charset: Charset = Charsets.UTF_8) =
+private fun String.hashString(algorithm: String) =
     try {
         MessageDigest.getInstance(algorithm)
-            .digest(toByteArray(charset))
+            .digest(toByteArray())
             .joinToString("") { "%02x".format(it) }
     } catch (e: Exception) {
         LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Error applying $algorithm to $this: ${e.message}")
