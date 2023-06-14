@@ -22,12 +22,15 @@ class PodcastsViewModel @Inject constructor(
 
     private val folderUuid: String = savedStateHandle[PodcastsScreen.argumentFolderUuid] ?: ""
 
-    data class UiState(
-        val folder: Folder? = null,
-        val items: List<FolderItem> = emptyList()
-    )
+    sealed class UiState {
+        object Empty : UiState()
+        data class Loaded(
+            val folder: Folder? = null,
+            val items: List<FolderItem> = emptyList()
+        ) : UiState()
+    }
 
-    var uiState by mutableStateOf(UiState())
+    var uiState by mutableStateOf<UiState>(UiState.Empty)
         private set
 
     init {
@@ -42,7 +45,9 @@ class PodcastsViewModel @Inject constructor(
                 items = podcasts.map { FolderItem.Podcast(it) }
                 folder = folderManager.findByUuid(folderUuid)
             }
-            uiState = UiState(folder = folder, items = items)
+            if (items.isNotEmpty()) {
+                uiState = UiState.Loaded(folder = folder, items = items)
+            }
         }
     }
 }
