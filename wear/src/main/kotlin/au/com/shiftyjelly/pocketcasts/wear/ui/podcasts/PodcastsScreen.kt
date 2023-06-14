@@ -70,10 +70,19 @@ fun PodcastsScreen(
             }
         } else {
             item {
-                TextH30(text = "No subscribed podcasts", textAlign = TextAlign.Center, color = Color.White)
+                TextH30(
+                    text = stringResource(id = LR.string.podcasts_no_subscriptions),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.onPrimary
+                )
             }
             item {
-                TextP40(text = "Subscribe to podcasts on your phone and they'll appear here.", textAlign = TextAlign.Center, color = Color.White, fontWeight = FontWeight.W400)
+                TextP40(
+                    text = stringResource(id = LR.string.podcasts_subscribe_on_phone),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.onPrimary,
+                    fontWeight = FontWeight.W400
+                )
             }
         }
     }
