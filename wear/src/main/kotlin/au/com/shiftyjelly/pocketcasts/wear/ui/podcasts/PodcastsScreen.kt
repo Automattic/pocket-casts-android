@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,6 +20,8 @@ import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.darker
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
@@ -52,14 +56,24 @@ fun PodcastsScreen(
         item {
             ScreenHeaderChip(if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.name)
         }
-        items(items = uiState.items, key = { item -> item.uuid }) { item ->
-            when (item) {
-                is FolderItem.Podcast -> {
-                    PodcastChip(podcast = item, onClick = navigateToPodcast)
+        if (uiState.items.isNotEmpty()) {
+            items(items = uiState.items, key = { item -> item.uuid }) { item ->
+                when (item) {
+                    is FolderItem.Podcast -> {
+                        PodcastChip(podcast = item, onClick = navigateToPodcast)
+                    }
+
+                    is FolderItem.Folder -> {
+                        FolderChip(folderItem = item, onClick = navigateToFolder)
+                    }
                 }
-                is FolderItem.Folder -> {
-                    FolderChip(folderItem = item, onClick = navigateToFolder)
-                }
+            }
+        } else {
+            item {
+                TextH30(text = "No subscribed podcasts", textAlign = TextAlign.Center, color = Color.White)
+            }
+            item {
+                TextP40(text = "Subscribe to podcasts on your phone and they'll appear here.", textAlign = TextAlign.Center, color = Color.White, fontWeight = FontWeight.W400)
             }
         }
     }
