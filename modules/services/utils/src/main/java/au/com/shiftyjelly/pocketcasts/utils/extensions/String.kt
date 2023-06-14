@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import timber.log.Timber
-import java.io.UnsupportedEncodingException
+import java.nio.charset.Charset
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,34 +66,19 @@ fun String.removeNewLines(): String {
     return this.replace("[\n\r]".toRegex(), "")
 }
 
-fun String.sha1(): String? {
-    return try {
-        val digest = MessageDigest.getInstance("SHA-1")
-        digest.update(this.toByteArray(charset("iso-8859-1")), 0, this.length)
-        val hash = digest.digest()
-        hash.joinToString("") { "%02x".format(it) }
+fun String.sha1(): String? = hashString(algorithm = "SHA-1", charset = Charsets.ISO_8859_1)
+fun String.sha256(): String? = hashString(algorithm = "SHA-256")
+
+/**
+ * For information on permitted algorithms, see
+ * https://developer.android.com/reference/kotlin/java/security/MessageDigest
+ */
+private fun String.hashString(algorithm: String, charset: Charset = Charsets.UTF_8) =
+    try {
+        MessageDigest.getInstance(algorithm)
+            .digest(toByteArray(charset))
+            .joinToString("") { "%02x".format(it) }
     } catch (e: Exception) {
+        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Error applying $algorithm to $this: ${e.message}")
         null
     }
-}
-
-/* https://en.gravatar.com/site/implement/images/java/ */
-fun String.md5Hex(): String? {
-    try {
-        val md = MessageDigest.getInstance("MD5")
-        return hex(md.digest(this.toByteArray(charset("CP1252"))))
-    } catch (e: NoSuchAlgorithmException) {
-        Timber.e(e.message)
-    } catch (e: UnsupportedEncodingException) {
-        Timber.e(e.message)
-    }
-    return null
-}
-
-private fun hex(array: ByteArray): String {
-    val sb = StringBuffer()
-    for (i in array.indices) {
-        sb.append(Integer.toHexString((array[i].toInt() and 0xFF) or 0x100).substring(1, 3))
-    }
-    return sb.toString()
-}
