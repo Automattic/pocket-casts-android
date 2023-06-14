@@ -279,12 +279,18 @@ class MediaSessionManager(
     }
 
     private fun observePlaybackState() {
-        val ignoreStates = listOf(
-            // ignore the current position update because the media session progress the time without it and it causes the position to jump when seeking
-            "updateCurrentPosition",
+        val ignoreStates = mutableListOf(
             // ignore buffer position because it isn't displayed in the media session
             "updateBufferPosition"
         )
+
+        val isAutomotive = Util.isAutomotive(context)
+        // listen to the playback progress every second on Automotive as it can get out of sync
+        if (!isAutomotive) {
+            // ignore the playback progress updates as the media session can calculate this without being sent it every second
+            ignoreStates.add("updateCurrentPosition")
+        }
+
         var previousEpisode: BaseEpisode? = null
 
         playbackManager.playbackStateRelay
