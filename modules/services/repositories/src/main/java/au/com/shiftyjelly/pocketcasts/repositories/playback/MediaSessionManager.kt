@@ -305,7 +305,8 @@ class MediaSessionManager(
             }
             // ignore events until seeking has finished or the progress won't stay where the user requested
             .doOnNext {
-                if (it.first.lastChangeFrom == "onSeekComplete" || it.first.isPaused) {
+                val changeFrom = it.first.lastChangeFrom
+                if (changeFrom == "onSeekComplete" || changeFrom == "updateCurrentPosition" || it.first.isPaused) {
                     seeking = false
                 }
             }
