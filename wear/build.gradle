@@ -11,6 +11,7 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "../base.gradle"
 
 android {
+    namespace 'au.com.shiftyjelly.pocketcasts'
 
     defaultConfig {
         minSdk project.minSdkVersionWear

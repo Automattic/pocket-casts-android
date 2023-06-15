@@ -20,7 +20,7 @@ buildscript {
     // Gradle Plugins
     dependencies {
         // Android - https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         // Google Services - https://developers.google.com/android/guides/google-services-plugin
         classpath "com.google.gms:google-services:4.3.14"
         // Kotlin
