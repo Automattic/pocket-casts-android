@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ fun HelpScreen(columnState: ScalingLazyColumnState) {
 
     val viewModel = hiltViewModel<HelpScreenViewModel>()
     val state = viewModel.state.collectAsState().value
+    val context = LocalContext.current
 
     ScalingLazyColumn(columnState = columnState) {
         item {
@@ -36,7 +38,7 @@ fun HelpScreen(columnState: ScalingLazyColumnState) {
             return@ScalingLazyColumn
         } else if (state.isPhoneAvailable) {
             phoneAvailableContent(
-                onEmailLogsToSupport = viewModel::emailLogsToSupport
+                onEmailLogsToSupport = { viewModel.emailLogsToSupport(context) }
             )
         } else {
             noPhoneAvailableContent()

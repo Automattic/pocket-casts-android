@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.shared
 
 import android.content.Context
+import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.shared.WatchPhoneCommunication.Companion.Paths.emailLogsToSupport
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -89,8 +90,11 @@ class WatchPhoneCommunication {
     }
 
     class Phone @Inject constructor(
-        @ApplicationContext appContext: Context,
+        @ApplicationContext private val appContext: Context,
+        private val support: Support,
     ) {
+
+        private val coroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
         fun handleMessage(messageEvent: MessageEvent) {
             when (messageEvent.path) {
@@ -105,8 +109,12 @@ class WatchPhoneCommunication {
         }
 
         private fun handleEmailLogsToSupportMessage(messageEvent: MessageEvent) {
-            val logs = String(messageEvent.data)
-            TODO("send email to support")
+            coroutineScope.launch {
+                val intent = support.emailWearLogsToSupportIntent(messageEvent.data, appContext).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                appContext.startActivity(intent)
+            }
         }
     }
 }
