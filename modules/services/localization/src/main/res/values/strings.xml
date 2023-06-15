@@ -436,6 +436,7 @@
     <string name="podcast_group_unplayed" translatable="false">@string/unplayed</string>
     <string name="podcast_hide_archived">Hide archived</string>
     <string name="podcast_load_error">There was an error loading the podcast.</string>
+    <string name="podcast_loading">Loading your podcasts</string>
     <string name="podcast_next_episode_any_day_now">Next episode any day now</string>
     <string name="podcast_next_episode_today">Next episode today</string>
     <string name="podcast_next_episode_tomorrow">Next episode tomorrow</string>

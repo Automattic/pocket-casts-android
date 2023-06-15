@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.podcasts
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +8,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,14 +23,15 @@ class PodcastsViewModel @Inject constructor(
 
     sealed class UiState {
         object Empty : UiState()
+        object Loading : UiState()
         data class Loaded(
             val folder: Folder? = null,
             val items: List<FolderItem> = emptyList()
         ) : UiState()
     }
 
-    var uiState by mutableStateOf<UiState>(UiState.Empty)
-        private set
+    private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
+    val uiState: StateFlow<UiState> = _uiState
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -45,8 +45,10 @@ class PodcastsViewModel @Inject constructor(
                 items = podcasts.map { FolderItem.Podcast(it) }
                 folder = folderManager.findByUuid(folderUuid)
             }
-            if (items.isNotEmpty()) {
-                uiState = UiState.Loaded(folder = folder, items = items)
+            _uiState.value = if (items.isNotEmpty()) {
+                UiState.Loaded(folder = folder, items = items)
+            } else {
+                UiState.Empty
             }
         }
     }

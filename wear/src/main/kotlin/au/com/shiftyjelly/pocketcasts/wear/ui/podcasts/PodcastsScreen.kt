@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.darker
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
@@ -50,8 +52,7 @@ fun PodcastsScreen(
     navigateToPodcast: (String) -> Unit,
     navigateToFolder: (String) -> Unit,
 ) {
-
-    when (val uiState = viewModel.uiState) {
+    when (val uiState = viewModel.uiState.collectAsState().value) {
         is PodcastsViewModel.UiState.Empty -> {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -93,6 +94,23 @@ fun PodcastsScreen(
                         }
                     }
                 }
+            }
+        }
+
+        is PodcastsViewModel.UiState.Loading -> {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LoadingSpinner()
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(LR.string.podcast_loading),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.onPrimary,
+                    style = MaterialTheme.typography.body1,
+                )
             }
         }
     }
