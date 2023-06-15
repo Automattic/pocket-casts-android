@@ -35,4 +35,6 @@ object FeatureFlagManager {
             ?: false
 
     private fun addProvider(provider: FeatureFlagProvider) = providers.add(provider)
+
+    fun clearFeatureFlagProviders() = providers.clear()
 }
