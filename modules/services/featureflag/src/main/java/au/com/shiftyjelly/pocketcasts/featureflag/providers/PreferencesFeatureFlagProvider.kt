@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.featureflag.providers
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.MIN_PRIORITY
 import au.com.shiftyjelly.pocketcasts.featureflag.ModifiableFeatureFlagProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -16,6 +17,10 @@ class PreferencesFeatureFlagProvider @Inject constructor(
     @ApplicationContext context: Context,
 ) : ModifiableFeatureFlagProvider {
     private val preferences = context.featureFlagsSharedPrefs()
+
+    override val priority = MIN_PRIORITY
+
+    override fun hasFeature(feature: Feature): Boolean = true
 
     override fun isFeatureEnabled(feature: Feature) =
         preferences.getBoolean(feature.key, feature.defaultValue)

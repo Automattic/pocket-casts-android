@@ -14,6 +14,7 @@ import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 private const val FEATURE_FLAG_KEY = "feature_flag_key"
@@ -34,6 +35,9 @@ class FeatureFlagManagerTest {
 
     @Mock
     private lateinit var storeFeatureFlagProvider: FeatureFlagProvider
+
+    @Mock
+    private lateinit var remoteFeatureFlagProvider: RemoteFeatureFlagProvider
 
     private lateinit var preferencesFeatureFlagProvider: ModifiableFeatureFlagProvider
 
@@ -87,6 +91,15 @@ class FeatureFlagManagerTest {
         val result = FeatureFlagManager.setFeatureEnabled(featureFlag, true)
 
         assertFalse(result)
+    }
+
+    @Test
+    fun `given remote provider added, when feature flags refresh invoked, then feature flags are refreshed`() {
+        FeatureFlagManager.initialize(listOf(remoteFeatureFlagProvider))
+
+        FeatureFlagManager.refreshFeatureFlags()
+
+        verify(remoteFeatureFlagProvider).refreshFeatureFlags()
     }
 
     private fun initPreferenceFeatureFlagProvider(
