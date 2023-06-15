@@ -47,6 +47,7 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
         return try {
             server.getShowNotesCache(podcastUuid)
         } catch (e: Exception) {
+            // ignore the error when the cache is empty
             Timber.e(e)
             null
         }
