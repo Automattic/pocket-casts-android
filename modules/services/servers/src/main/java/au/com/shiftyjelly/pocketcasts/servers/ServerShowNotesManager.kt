@@ -26,6 +26,9 @@ class ServerShowNotesManager @Inject constructor(
         const val URL = "${Settings.SERVER_CACHE_URL}/mobile/show_notes/full/%s"
     }
 
+    /**
+     * Check the cache for show notes then download them if not found or update the cache.
+     */
     fun loadShowNotesFlow(podcastUuid: String, episodeUuid: String): Flow<ShowNotesState> {
         return flow {
             emit(ShowNotesState.Loading)
@@ -56,6 +59,9 @@ class ServerShowNotesManager @Inject constructor(
         }
     }
 
+    /**
+     * Download the show notes, if that fails try the cache.
+     */
     suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState {
         val showNotesDownloaded = downloadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
         var downloadException: Exception? = null
