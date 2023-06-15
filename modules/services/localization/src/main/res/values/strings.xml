@@ -1056,6 +1056,7 @@
     <string name="settings_help_contact_support">Contact Support</string>
     <string name="settings_help_contact_support_email_sent_to_phone">If your phone is nearby, it will show a pop-up to email support with your logs attached</string>
     <string name="settings_help_contact_support_no_phone_connection">Please pair your watch with a phone that has Pocket Casts installed to view your logs or contact support</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">Please pair your watch with a phone that has Pocket Casts installed before proceeding.</string>
     <string name="settings_help_send_logs_to_phone">Send Logs To Phone</string>
     <string name="settings_help_logs_sent_to_phone_check_phone">If your phone is nearby, it will show a pop-up with your logs</string>
     <string name="settings_help_phone_unavailable_message">Please try again when your phone is connected to your watch.</string>

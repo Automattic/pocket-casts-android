@@ -11,6 +11,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyListScope
+import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
@@ -51,6 +52,19 @@ private fun ScalingLazyListScope.phoneAvailableContent(
     onEmailLogsToSupport: () -> Unit,
     onSendLogsToPhone: () -> Unit,
 ) {
+    item {
+        Text(
+            text = stringResource(id = LR.string.settings_help_contact_support_wear_requires_nearby_phone),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.caption3,
+            color = MaterialTheme.colors.onSecondary,
+        )
+    }
+
+    item {
+        Spacer(Modifier.height(8.dp))
+    }
+
     item {
         WatchListChip(
             title = stringResource(LR.string.settings_help_contact_support),
