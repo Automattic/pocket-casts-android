@@ -4,14 +4,20 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureFlagProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.StoreFeatureFlagProvider
 import javax.inject.Inject
 
 class AppLifecycleObserver @Inject constructor(
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
+    private val preferencesFeatureFlagProvider: PreferencesFeatureFlagProvider,
+    private val storeFeatureFlagProvider: StoreFeatureFlagProvider,
 ) : DefaultLifecycleObserver {
     fun setup() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         appLifecycleAnalytics.onApplicationInstalledOrUpgraded()
+        setupFeatureFlags()
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -22,5 +28,14 @@ class AppLifecycleObserver @Inject constructor(
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
         appLifecycleAnalytics.onApplicationEnterBackground()
+    }
+
+    private fun setupFeatureFlags() {
+        val providers = if (BuildConfig.DEBUG) {
+            preferencesFeatureFlagProvider
+        } else {
+            storeFeatureFlagProvider
+        }
+        FeatureFlagManager.initialize(listOf(providers))
     }
 }

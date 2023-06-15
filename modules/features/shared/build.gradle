@@ -11,4 +11,5 @@ android {
 
 dependencies {
     implementation project(':modules:services:analytics')
+    implementation project(':modules:services:featureflag')
 }
