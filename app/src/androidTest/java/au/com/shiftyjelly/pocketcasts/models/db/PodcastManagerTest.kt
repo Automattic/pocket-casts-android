@@ -52,7 +52,7 @@ class PodcastManagerTest {
 
         val application = context
         val podcastCacheServer = mock<PodcastCacheServerManager> {
-            on { getPodcast(uuid, 0, 3, 1500) } doReturn Single.just(Podcast(uuid))
+            on { getPodcast(uuid) } doReturn Single.just(Podcast(uuid))
         }
         val staticServerManager = mock<StaticServerManager> {
             on { getColorsSingle(uuid) } doReturn Single.just(Optional.empty())
