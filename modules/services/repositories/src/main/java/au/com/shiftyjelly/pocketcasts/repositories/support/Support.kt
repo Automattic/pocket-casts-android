@@ -38,6 +38,7 @@ import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.BufferedWriter
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
@@ -135,6 +136,16 @@ class Support @Inject constructor(
 
         return intent
     }
+
+    suspend fun getLogs(): String =
+        withContext(Dispatchers.IO) {
+            buildString {
+                append(getUserDebug(false))
+                val outputStream = ByteArrayOutputStream()
+                LogBuffer.output(outputStream)
+                append(outputStream.toString())
+            }
+        }
 
     @Suppress("DEPRECATION")
     suspend fun getUserDebug(html: Boolean): String {
