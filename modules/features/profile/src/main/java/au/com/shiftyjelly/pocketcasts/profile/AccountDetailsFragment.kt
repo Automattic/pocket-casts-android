@@ -23,6 +23,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -117,14 +119,16 @@ class AccountDetailsFragment : BaseFragment() {
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPlusPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPlusPaid
             // TODO: Patron - hide if upgraded to patron
-            binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus && BuildConfig.ADD_PATRON_ENABLED
+            binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
+                FeatureFlagManager.isFeatureEnabled(FeatureFlag.ADD_PATRON_ENABLED)
 
             binding.userUpgradeComposeView?.apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
                     AppTheme(theme.activeTheme) {
                         val showUpgradeBanner = subscription != null && (signInState.isSignedInAsFree || giftExpiring)
-                        binding.dividerView15?.isVisible = showUpgradeBanner && BuildConfig.ADD_PATRON_ENABLED
+                        binding.dividerView15?.isVisible = showUpgradeBanner &&
+                            FeatureFlagManager.isFeatureEnabled(FeatureFlag.ADD_PATRON_ENABLED)
                         if (showUpgradeBanner) {
                             ProfileUpgradeBanner(
                                 onClick = {
