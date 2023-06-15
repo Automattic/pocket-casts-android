@@ -38,7 +38,8 @@ fun HelpScreen(columnState: ScalingLazyColumnState) {
             return@ScalingLazyColumn
         } else if (state.isPhoneAvailable) {
             phoneAvailableContent(
-                onEmailLogsToSupport = { viewModel.emailLogsToSupport(context) }
+                onEmailLogsToSupport = { viewModel.emailLogsToSupport(context) },
+                onSendLogsToPhone = { viewModel.sendLogsToPhone(context) },
             )
         } else {
             noPhoneAvailableContent()
@@ -48,11 +49,19 @@ fun HelpScreen(columnState: ScalingLazyColumnState) {
 
 private fun ScalingLazyListScope.phoneAvailableContent(
     onEmailLogsToSupport: () -> Unit,
+    onSendLogsToPhone: () -> Unit,
 ) {
     item {
         WatchListChip(
             title = stringResource(LR.string.settings_help_contact_support),
             onClick = onEmailLogsToSupport,
+        )
+    }
+
+    item {
+        WatchListChip(
+            title = stringResource(LR.string.settings_help_send_logs_to_phone),
+            onClick = onSendLogsToPhone,
         )
     }
 }

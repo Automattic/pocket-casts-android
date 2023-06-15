@@ -37,4 +37,13 @@ class HelpScreenViewModel @Inject constructor(
                 .show()
         }
     }
+
+    fun sendLogsToPhone(context: Context) {
+        viewModelScope.launch {
+            watchPhoneCommunication.sendLogsToPhoneMessage()
+            delay(1.seconds)
+            Toast.makeText(context, LR.string.settings_help_logs_sent_to_phone_check_phone, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
 }
