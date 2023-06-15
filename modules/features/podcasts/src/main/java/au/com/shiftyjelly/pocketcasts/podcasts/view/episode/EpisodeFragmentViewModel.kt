@@ -38,7 +38,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -117,7 +116,6 @@ class EpisodeFragmentViewModel @Inject constructor(
                     zipper
                 )
             }
-            .doOnNext { Timber.i("PHILIP Episode state $it") }
             .doOnNext { if (it is EpisodeFragmentState.Loaded) { episode = it.episode } }
             .onErrorReturn { EpisodeFragmentState.Error(it) }
             .observeOn(AndroidSchedulers.mainThread())
