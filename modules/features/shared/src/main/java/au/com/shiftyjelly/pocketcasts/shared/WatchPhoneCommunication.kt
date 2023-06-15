@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -75,39 +76,53 @@ class WatchPhoneCommunication {
                 }, capabilityName)
         }
 
-        suspend fun emailLogsToSupportMessage() {
-            withContext(Dispatchers.IO) {
+        suspend fun emailLogsToSupportMessage(): WatchMessageSendState {
+            return withContext(Dispatchers.IO) {
                 withAvailableNode { node ->
                     val path = emailLogsToSupport
                     val data = support.getLogs().toByteArray()
-                    Wearable
-                        .getMessageClient(appContext)
-                        .sendMessage(node.id, path, data)
-                }
+                    try {
+                        Wearable
+                            .getMessageClient(appContext)
+                            .sendMessage(node.id, path, data)
+                            .await()
+                        WatchMessageSendState.QUEUED
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        WatchMessageSendState.FAILED_TO_QUEUE
+                    }
+                } ?: WatchMessageSendState.FAILED_TO_QUEUE
             }
         }
 
-        suspend fun sendLogsToPhoneMessage() {
+        suspend fun sendLogsToPhoneMessage(): WatchMessageSendState =
             withContext(Dispatchers.IO) {
                 withAvailableNode { node ->
                     val path = sendLogsToPhone
                     val data = support.getLogs().toByteArray()
-                    Wearable
-                        .getMessageClient(appContext)
-                        .sendMessage(node.id, path, data)
-                }
+                    try {
+                        Wearable
+                            .getMessageClient(appContext)
+                            .sendMessage(node.id, path, data)
+                            .await()
+                        WatchMessageSendState.QUEUED
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        WatchMessageSendState.FAILED_TO_QUEUE
+                    }
+                } ?: WatchMessageSendState.FAILED_TO_QUEUE
             }
-        }
 
-        private suspend fun withAvailableNode(continuation: suspend (node: Node) -> Unit) {
+        private suspend fun <T> withAvailableNode(continuation: suspend (node: Node) -> T): T? {
             val node = availableNodeFlow.value
-            if (node == null) {
+            return if (node == null) {
                 // This should not happen because we should be preventing the user from selecting
                 // an option requiring a node when no nodes are available
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "cannot communicate with phone because no nodes are available")
-                return
+                null
+            } else {
+                continuation(node)
             }
-            continuation(node)
         }
     }
 
@@ -153,6 +168,13 @@ class WatchPhoneCommunication {
             }
         }
     }
+}
+
+enum class WatchMessageSendState {
+    // a message being queued for delivery does not guarantee delivery
+    QUEUED,
+    // this occurs when attempting to queue a message for a node that is not available
+    FAILED_TO_QUEUE,
 }
 
 enum class WatchPhoneCommunicationState {

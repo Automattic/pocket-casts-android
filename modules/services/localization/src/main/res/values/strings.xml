@@ -1054,10 +1054,11 @@
     <string name="settings_get_plus_and_more">Get Pocket Casts Plus to unlock this feature and more!</string>
     <string name="settings_help_cant_load">Could not load Help &amp; Feedback.\nPlease check your internet connection and try again.</string>
     <string name="settings_help_contact_support">Contact Support</string>
-    <string name="settings_help_contact_support_email_sent_to_phone">Check your phone for a pop-up to email support with your logs attached</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">If your phone is nearby, it will show a pop-up to email support with your logs attached</string>
     <string name="settings_help_contact_support_no_phone_connection">Please pair your watch with a phone that has Pocket Casts installed to view your logs or contact support</string>
     <string name="settings_help_send_logs_to_phone">Send Logs To Phone</string>
-    <string name="settings_help_logs_sent_to_phone_check_phone">Check your phone for a pop-up with your logs</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">If your phone is nearby, it will show a pop-up with your logs</string>
+    <string name="settings_help_phone_unavailable_message">Please try again when your phone is connected to your watch.</string>
     <string name="settings_import_choose_file">Choose an OPML file.</string>
     <string name="settings_import_file">Select file</string>
     <string name="settings_import_file_summary">If you have podcast subscriptions in another app or service, Pocket Casts can import them from an OPML file.</string>
