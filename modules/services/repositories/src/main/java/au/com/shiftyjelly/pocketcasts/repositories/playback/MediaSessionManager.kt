@@ -89,7 +89,6 @@ class MediaSessionManager(
 
     val mediaSession = MediaSessionCompat(context, "PocketCastsMediaSession")
     val disposables = CompositeDisposable()
-    var seeking = false
     private val source = AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION
 
     override val coroutineContext: CoroutineContext
@@ -279,17 +278,14 @@ class MediaSessionManager(
     }
 
     private fun observePlaybackState() {
-        val ignoreStates = mutableListOf(
+        val ignoreStates = listOf(
             // ignore buffer position because it isn't displayed in the media session
-            "updateBufferPosition"
-        )
-
-        val isAutomotive = Util.isAutomotive(context)
-        // listen to the playback progress every second on Automotive as it can get out of sync
-        if (!isAutomotive) {
+            "updateBufferPosition",
             // ignore the playback progress updates as the media session can calculate this without being sent it every second
-            ignoreStates.add("updateCurrentPosition")
-        }
+            "updateCurrentPosition",
+            // ignore the user seeking as the event onBufferingStateChanged will update the buffering state
+            "onUserSeeking"
+        )
 
         var previousEpisode: BaseEpisode? = null
 
@@ -309,20 +305,11 @@ class MediaSessionManager(
                     }
                 Observables.combineLatest(Observable.just(state), episodeSource)
             }
-            // ignore events until seeking has finished or the progress won't stay where the user requested
-            .doOnNext {
-                val changeFrom = it.first.lastChangeFrom
-                if (changeFrom == "onSeekComplete" || changeFrom == "updateCurrentPosition" || it.first.isPaused) {
-                    seeking = false
-                }
-            }
             .filter {
-                // allow the playback state and episode through when true
-                (!ignoreStates.contains(it.first.lastChangeFrom) && !seeking) || !BaseEpisode.isMediaSessionEqual(it.second.get(), previousEpisode)
+                !ignoreStates.contains(it.first.lastChangeFrom) || !BaseEpisode.isMediaSessionEqual(it.second.get(), previousEpisode)
             }
             .doOnNext {
                 previousEpisode = it.second.get()
-                Timber.d("Media session update from %s with state %s", it.first.lastChangeFrom, it.first.state.name)
             }
             .switchMap { (state, episode) -> getPlaybackStateRx(state, episode).toObservable().onErrorResumeNext(Observable.empty()) }
             .switchMap {
@@ -620,7 +607,6 @@ class MediaSessionManager(
 
         override fun onSeekTo(pos: Long) {
             logEvent("seek to $pos")
-            seeking = true
             launch {
                 playbackManager.seekToTimeMs(pos.toInt())
                 playbackManager.trackPlaybackSeek(pos.toInt(), AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION)
