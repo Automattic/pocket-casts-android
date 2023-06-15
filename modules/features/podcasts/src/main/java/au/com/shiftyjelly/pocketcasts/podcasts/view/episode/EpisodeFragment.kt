@@ -414,6 +414,7 @@ class EpisodeFragment : BaseDialogFragment() {
                 formattedNotes = showNotesFormatter.format(showNotes) ?: showNotes
                 loadShowNotes(formattedNotes ?: "")
             } else if (showNotesState is ShowNotesState.Error || showNotesState is ShowNotesState.NotFound) {
+                formattedNotes = ""
                 loadShowNotes("")
             }
         }
