@@ -29,7 +29,6 @@ android {
         buildConfigField "String", "GOOGLE_SIGN_IN_SERVER_CLIENT_ID", "\"${project.googleSignInServerClientId}\""
 
         // Feature Flags
-        buildConfigField "boolean", "SHOW_RATINGS", "false"
         buildConfigField "boolean", "ADD_PATRON_ENABLED", "false"
 
         testInstrumentationRunner project.testInstrumentationRunner

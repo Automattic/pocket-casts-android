@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +35,7 @@ class PodcastRatingsViewModel
     val stateFlow: StateFlow<RatingState> = _stateFlow
 
     fun loadRatings(podcastUuid: String) {
-        if (BuildConfig.SHOW_RATINGS) {
+        if (FeatureFlagManager.isFeatureEnabled(FeatureFlag.SHOW_RATINGS_ENABLED)) {
             viewModelScope.launch {
                 try {
                     ratingsManager.podcastRatings(podcastUuid)

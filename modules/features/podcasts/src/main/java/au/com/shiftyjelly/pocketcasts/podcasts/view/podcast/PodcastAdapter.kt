@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
-import au.com.shiftyjelly.pocketcasts.podcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeHeaderBinding
@@ -41,6 +40,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.StarRatingView
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.preferences.featureflag.FeatureFlagManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -276,7 +277,7 @@ class PodcastAdapter(
         // expand the podcast description and details if the user hasn't subscribed
         if (this.podcast.uuid != podcast.uuid) {
             headerExpanded = !podcast.isSubscribed
-            if (BuildConfig.SHOW_RATINGS) {
+            if (FeatureFlagManager.isFeatureEnabled(FeatureFlag.SHOW_RATINGS_ENABLED)) {
                 ratingsViewModel.loadRatings(podcast.uuid)
                 ratingsViewModel.refreshPodcastRatings(podcast.uuid)
             }
