@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import timber.log.Timber
 
 @HiltWorker
 class UpdateShowNotesTask @AssistedInject constructor(
@@ -19,7 +20,7 @@ class UpdateShowNotesTask @AssistedInject constructor(
         const val INPUT_EPISODE_UUID = "episode_uuid"
     }
 
-    private val podcastUuid = inputData.getString(INPUT_EPISODE_UUID)!!
+    private val podcastUuid = inputData.getString(INPUT_PODCAST_UUID)!!
     private val episodeUuid = inputData.getString(INPUT_EPISODE_UUID)!!
 
     override suspend fun doWork(): Result {
@@ -27,6 +28,7 @@ class UpdateShowNotesTask @AssistedInject constructor(
             showNotesManager.downloadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
             Result.success()
         } catch (e: Exception) {
+            Timber.e(e)
             Result.failure()
         }
     }
