@@ -6,11 +6,12 @@ import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
 import retrofit2.Response
 import retrofit2.Retrofit
+import timber.log.Timber
 import javax.inject.Inject
 
 class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetrofit private val retrofit: Retrofit) : PodcastCacheServerManager {
 
-    val server = retrofit.create(PodcastCacheServer::class.java)
+    private val server = retrofit.create(PodcastCacheServer::class.java)
 
     override fun getPodcastResponse(podcastUuid: String): Single<Response<PodcastResponse>> {
         return server.getPodcastAndEpisodesRaw(podcastUuid)
@@ -37,4 +38,17 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
 
     override suspend fun getPodcastRatings(podcastUuid: String) =
         server.getPodcastRatings(podcastUuid).toPodcastRatings(podcastUuid)
+
+    override suspend fun getShowNotes(podcastUuid: String): ShowNotesResponse {
+        return server.getShowNotes(podcastUuid)
+    }
+
+    override suspend fun getShowNotesCache(podcastUuid: String): ShowNotesResponse? {
+        return try {
+            server.getShowNotesCache(podcastUuid)
+        } catch (e: Exception) {
+            Timber.e(e)
+            null
+        }
+    }
 }
