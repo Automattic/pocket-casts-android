@@ -30,8 +30,9 @@ class ServerShowNotesManager @Inject constructor(
                 // download or update cache
                 val showNotesDownloaded = downloadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
                 if (showNotesDownloaded != null) {
-                    if (showNotesDownloaded != showNotesCached) {
+                    if (showNotesDownloaded != showNotesCached || !loaded) {
                         emit(ShowNotesState.Loaded(showNotesDownloaded))
+                        loaded = true
                     }
                 } else {
                     emit(ShowNotesState.NotFound)

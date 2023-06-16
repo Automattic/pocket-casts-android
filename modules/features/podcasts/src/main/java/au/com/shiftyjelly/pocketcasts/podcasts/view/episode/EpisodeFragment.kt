@@ -409,13 +409,19 @@ class EpisodeFragment : BaseDialogFragment() {
         )
 
         viewModel.showNotesState.observe(viewLifecycleOwner) { showNotesState ->
-            if (showNotesState is ShowNotesState.Loaded) {
-                val showNotes = showNotesState.showNotes
-                formattedNotes = showNotesFormatter.format(showNotes) ?: showNotes
-                loadShowNotes(formattedNotes ?: "")
-            } else if (showNotesState is ShowNotesState.Error || showNotesState is ShowNotesState.NotFound) {
-                formattedNotes = ""
-                loadShowNotes("")
+            when (showNotesState) {
+                is ShowNotesState.Loaded -> {
+                    val showNotes = showNotesState.showNotes
+                    formattedNotes = showNotesFormatter.format(showNotes) ?: showNotes
+                    loadShowNotes(formattedNotes ?: "")
+                }
+                is ShowNotesState.Error, is ShowNotesState.NotFound -> {
+                    formattedNotes = ""
+                    loadShowNotes("")
+                }
+                is ShowNotesState.Loading -> {
+                    // Do nothing as the starting state is loading
+                }
             }
         }
 
