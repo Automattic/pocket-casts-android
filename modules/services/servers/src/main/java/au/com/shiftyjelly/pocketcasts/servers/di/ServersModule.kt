@@ -282,7 +282,7 @@ class ServersModule {
     @Provides
     @PodcastCacheServerRetrofit
     @Singleton
-    internal fun providePodcastRetrofit(@CachedTokenedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    internal fun providePodcastRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
