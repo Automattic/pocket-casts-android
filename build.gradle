@@ -4,23 +4,11 @@ buildscript {
         kotlin_version = '1.7.10'
         hilt_version = '2.43.2'
     }
-    repositories {
-        google()
-        mavenLocal()
-
-        maven {
-            url 'https://a8c-libs.s3.amazonaws.com/android' 
-            content {
-                includeGroup "com.automattic.android"
-                includeGroup "com.automattic.android.publish-to-s3"
-            }
-        }
-    }
 
     // Gradle Plugins
     dependencies {
         // Android - https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.0.2'
         // Google Services - https://developers.google.com/android/guides/google-services-plugin
         classpath "com.google.gms:google-services:4.3.14"
         // Kotlin
