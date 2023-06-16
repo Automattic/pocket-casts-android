@@ -46,21 +46,4 @@ class HelpScreenViewModel @Inject constructor(
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
     }
-
-    fun sendLogsToPhone(context: Context) {
-        viewModelScope.launch {
-            val result = watchPhoneCommunication.sendLogsToPhoneMessage()
-            val message = when (result) {
-                WatchMessageSendState.QUEUED -> LR.string.settings_help_logs_sent_to_phone_check_phone
-                WatchMessageSendState.FAILED_TO_QUEUE -> LR.string.settings_help_phone_unavailable_message
-            }
-
-            if (result == WatchMessageSendState.QUEUED) {
-                // There is a bit of delay between an item being queued and it being received on the phone,
-                // so add a short delay before directing the user to their phone.
-                delay(2.seconds)
-            }
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-        }
-    }
 }

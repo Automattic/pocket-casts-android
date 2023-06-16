@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.shared.WatchPhoneCommunication.Companion.Paths.emailLogsToSupport
-import au.com.shiftyjelly.pocketcasts.shared.WatchPhoneCommunication.Companion.Paths.sendLogsToPhone
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.CapabilityInfo
@@ -24,7 +23,6 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class WatchPhoneCommunication {
 
@@ -32,7 +30,6 @@ class WatchPhoneCommunication {
         private object Paths {
             private const val prefix = "/pocket_casts_wear_communication"
             const val emailLogsToSupport = "$prefix/email_support"
-            const val sendLogsToPhone = "$prefix/send_logs_to_phone"
         }
 
         private const val capabilityName = "pocket_casts_wear_listener"
@@ -95,24 +92,6 @@ class WatchPhoneCommunication {
             }
         }
 
-        suspend fun sendLogsToPhoneMessage(): WatchMessageSendState =
-            withContext(Dispatchers.IO) {
-                withAvailableNode { node ->
-                    val path = sendLogsToPhone
-                    val data = support.getLogs().toByteArray()
-                    try {
-                        Wearable
-                            .getMessageClient(appContext)
-                            .sendMessage(node.id, path, data)
-                            .await()
-                        WatchMessageSendState.QUEUED
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                        WatchMessageSendState.FAILED_TO_QUEUE
-                    }
-                } ?: WatchMessageSendState.FAILED_TO_QUEUE
-            }
-
         private suspend fun <T> withAvailableNode(continuation: suspend (node: Node) -> T): T? {
             val node = availableNodeFlow.value
             return if (node == null) {
@@ -137,7 +116,6 @@ class WatchPhoneCommunication {
             when (messageEvent.path) {
 
                 emailLogsToSupport -> handleEmailLogsToSupportMessage(messageEvent)
-                sendLogsToPhone -> handleSendLogsToPhoneMessage(messageEvent)
 
                 else -> {
                     val message = "${this::class.java.simpleName} received message with unexpected path: ${messageEvent.path}"
@@ -149,19 +127,6 @@ class WatchPhoneCommunication {
         private fun handleEmailLogsToSupportMessage(messageEvent: MessageEvent) {
             coroutineScope.launch {
                 val intent = support.emailWearLogsToSupportIntent(messageEvent.data, appContext).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                appContext.startActivity(intent)
-            }
-        }
-
-        private fun handleSendLogsToPhoneMessage(messageEvent: MessageEvent) {
-            coroutineScope.launch(Dispatchers.IO) {
-                val intent = support.shareWearLogs(
-                    logBytes = messageEvent.data,
-                    subject = appContext.getString(LR.string.settings_watch_logs),
-                    context = appContext
-                ).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 appContext.startActivity(intent)
