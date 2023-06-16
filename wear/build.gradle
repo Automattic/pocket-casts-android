@@ -95,7 +95,7 @@ dependencies {
     implementation androidLibs.horologistAuthData
     implementation androidLibs.horologistAuthComposables
     implementation androidLibs.horologistAuthUi
-    implementation androidLibs.horologistBaseUi
+    implementation androidLibs.horologistComposeMaterial
     implementation androidLibs.horologistDatalayer
     implementation androidLibs.horologistMedia
     implementation androidLibs.horologistMedia3Backend
