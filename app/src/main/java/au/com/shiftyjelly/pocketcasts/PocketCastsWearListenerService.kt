@@ -11,8 +11,8 @@ class PocketCastsWearListenerService : WearableListenerService() {
 
     @Inject lateinit var watchPhoneCommunication: WatchPhoneCommunication.Phone
 
-    override fun onMessageReceived(p0: MessageEvent) {
-        watchPhoneCommunication.handleMessage(p0)
-        super.onMessageReceived(p0)
+    override fun onMessageReceived(event: MessageEvent) {
+        watchPhoneCommunication.handleMessage(event)
+        super.onMessageReceived(event)
     }
 }
