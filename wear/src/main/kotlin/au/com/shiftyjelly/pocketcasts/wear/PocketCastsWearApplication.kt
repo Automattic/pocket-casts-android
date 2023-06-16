@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -34,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
@@ -85,6 +87,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
     }
 
     private fun setupLogging() {
+        LogBuffer.setup(File(filesDir, "logs").absolutePath)
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
         }
