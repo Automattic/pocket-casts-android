@@ -106,38 +106,66 @@ fun NowPlayingScreen(
                                 .clickable { navigateToEpisode(state.episodeUuid) },
                         )
                     }
+
+                    is NowPlayingViewModel.State.Empty -> {
+                        MessageMediaDisplay(
+                            message = stringResource(LR.string.empty_play_state),
+                            modifier = modifier
+                        )
+                    }
                 }
             },
             controlButtons = {
-                if (state is NowPlayingViewModel.State.Loaded) {
-                    PodcastControlButtonsStyled(
-                        onPlayButtonClick = {
-                            playerViewModel.onPlayButtonClick(
-                                showStreamingConfirmation = {
-                                    navController.navigate(StreamingConfirmationScreen.route)
-                                }
-                            )
-                        },
-                        onPauseButtonClick = playerViewModel::onPauseButtonClick,
-                        playPauseButtonEnabled = true,
-                        playing = state.playing,
-                        trackPositionUiModel = state.trackPositionUiModel,
-                        onSeekBackButtonClick = playerViewModel::onSeekBackButtonClick,
-                        seekBackButtonEnabled = true,
-                        onSeekForwardButtonClick = playerViewModel::onSeekForwardButtonClick,
-                        seekForwardButtonEnabled = true,
-                        seekBackIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_back),
-                        seekForwardIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_foreward),
-                        playIcon = ImageVector.vectorResource(IR.drawable.wear_play),
-                        pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
-                        seekIconSize = 35.dp,
-                        seekIconAlign = Alignment.CenterHorizontally,
-                        seekTapTargetSize = DpSize(50.dp, 60.dp),
-                        progressColor = MaterialTheme.colors.onPrimary,
-                        trackColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.2f),
-                        backgroundColor = Color.Transparent,
-                        sidePadding = 12.dp,
-                    )
+                when(state){
+                    is NowPlayingViewModel.State.Loaded -> {
+                        PodcastControlButtonsStyled(
+                            onPlayButtonClick = {
+                                playerViewModel.onPlayButtonClick(
+                                    showStreamingConfirmation = {
+                                        navController.navigate(StreamingConfirmationScreen.route)
+                                    }
+                                )
+                            },
+                            onPauseButtonClick = playerViewModel::onPauseButtonClick,
+                            playPauseButtonEnabled = true,
+                            playing = state.playing,
+                            trackPositionUiModel = state.trackPositionUiModel,
+                            onSeekBackButtonClick = playerViewModel::onSeekBackButtonClick,
+                            seekBackButtonEnabled = true,
+                            onSeekForwardButtonClick = playerViewModel::onSeekForwardButtonClick,
+                            seekForwardButtonEnabled = true,
+                            seekBackIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_back),
+                            seekForwardIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_foreward),
+                            playIcon = ImageVector.vectorResource(IR.drawable.wear_play),
+                            pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
+                            seekIconSize = 35.dp,
+                            seekIconAlign = Alignment.CenterHorizontally,
+                            seekTapTargetSize = DpSize(50.dp, 60.dp),
+                            progressColor = MaterialTheme.colors.onPrimary,
+                            trackColor = MaterialTheme.colors.onPrimary.copy(alpha = 0.2f),
+                            backgroundColor = Color.Transparent,
+                            sidePadding = 12.dp,
+                        )
+                    }
+                    is NowPlayingViewModel.State.Empty -> {
+                        PodcastControlButtonsStyled(
+                            onPlayButtonClick = {},
+                            onPauseButtonClick = {},
+                            playPauseButtonEnabled = false,
+                            playing = false,
+                            onSeekBackButtonClick = {},
+                            seekBackButtonEnabled = false,
+                            onSeekForwardButtonClick = {},
+                            seekForwardButtonEnabled = false,
+                            seekBackIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_back),
+                            seekForwardIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_foreward),
+                            playIcon = ImageVector.vectorResource(IR.drawable.wear_play),
+                            pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
+                            sidePadding = 12.dp,
+                            seekIconAlign = Alignment.CenterHorizontally,
+                        )
+                    }
+                    is NowPlayingViewModel.State.Loading -> {}
                 }
             },
             buttons = {
@@ -152,6 +180,7 @@ fun NowPlayingScreen(
             background = {
                 when (state) {
                     NowPlayingViewModel.State.Loading -> Unit // Do Nothing
+                    NowPlayingViewModel.State.Empty -> Unit
 
                     is NowPlayingViewModel.State.Loaded -> {
                         PodcastColorBackground(state)
