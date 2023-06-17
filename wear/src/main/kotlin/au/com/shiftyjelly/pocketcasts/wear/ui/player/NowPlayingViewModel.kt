@@ -45,7 +45,7 @@ class NowPlayingViewModel @Inject constructor(
             val trackPositionUiModel: TrackPositionUiModel.Actual,
         ) : State()
         object Loading : State()
-        object Empty: State()
+        object Empty : State()
     }
 
     val state: StateFlow<State> =
@@ -55,9 +55,9 @@ class NowPlayingViewModel @Inject constructor(
             settings.skipForwardInSecsObservable.asFlow(),
         ) { playbackState, skipBackwardSecs, skipForwardSecs ->
 
-            if(playbackState.isEmpty){
+            if (playbackState.isEmpty) {
                 State.Empty
-            }else {
+            } else {
 
                 val trackPositionUiModel = TrackPositionUiModel.Actual(
                     percent = with(playbackState) { positionMs.toFloat() / durationMs },

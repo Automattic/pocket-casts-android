@@ -116,7 +116,7 @@ fun NowPlayingScreen(
                 }
             },
             controlButtons = {
-                when(state){
+                when (state) {
                     is NowPlayingViewModel.State.Loaded -> {
                         PodcastControlButtonsStyled(
                             onPlayButtonClick = {
