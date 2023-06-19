@@ -397,7 +397,7 @@ interface Settings {
 
     fun setPopularPodcastCountryCode(code: String)
 
-    fun getPlayOverNotification(): Int
+    fun getPlayOverNotification(): PlayOverNotificationSetting
 
     fun hasBlockAlreadyRun(label: String): Boolean
     fun setBlockAlreadyRun(label: String, hasRun: Boolean)

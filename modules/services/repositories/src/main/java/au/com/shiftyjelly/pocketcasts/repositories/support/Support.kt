@@ -406,7 +406,7 @@ class Support @Inject constructor(
                 output.append(eol)
 
                 output.append("Notifications").append(eol)
-                output.append("Play over notifications? ").append(playOverNotificationString(settings.getPlayOverNotification())).append(eol)
+                output.append("Play over notifications? ").append(settings.getPlayOverNotification().analyticsString).append(eol)
                 output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause()) "yes" else "no").append(eol)
                 output.append(eol)
 
@@ -473,13 +473,6 @@ class Support @Inject constructor(
 
     private fun yesNoString(value: Boolean): String {
         return if (value) "yes" else "no"
-    }
-
-    private fun playOverNotificationString(value: Int) = when (value) {
-        0 -> "always"
-        1 -> "duck"
-        2 -> "never"
-        else -> "unknown"
     }
 
     private fun getDeviceName(): String {

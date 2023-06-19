@@ -504,12 +504,12 @@ class SettingsImpl @Inject constructor(
         return getBoolean(Settings.PREFERENCE_AUTO_SHOW_PLAYED, false)
     }
 
-    override fun getPlayOverNotification(): Int {
+    override fun getPlayOverNotification(): PlayOverNotificationSetting {
         val value = sharedPreferences.getString(
             Settings.PREFERENCE_NOTIFICATION_AUDIO,
             Settings.PREFERENCE_NOTIFICATION_AUDIO_DEFAULT
         ) ?: Settings.PREFERENCE_NOTIFICATION_AUDIO_DEFAULT
-        return Integer.parseInt(value)
+        return PlayOverNotificationSetting.fromPreferenceString(value)
     }
 
     override fun hasBlockAlreadyRun(label: String): Boolean {

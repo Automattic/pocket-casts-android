@@ -7,6 +7,7 @@ import android.media.AudioManager
 import androidx.media.AudioAttributesCompat
 import androidx.media.AudioFocusRequestCompat
 import androidx.media.AudioManagerCompat
+import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import timber.log.Timber
@@ -150,21 +151,10 @@ open class FocusManager(private val settings: Settings, context: Context?) : Aud
         }
     }
 
-    enum class PlayOverNotificationSetting {
-        NEVER, DUCK, ALWAYS
-    }
-
     private fun canDuck(): PlayOverNotificationSetting {
         if (audioFocus != AUDIO_NO_FOCUS_CAN_DUCK_TRANSIENT) return PlayOverNotificationSetting.NEVER
-        return playOverNotification()
+        return settings.getPlayOverNotification()
     }
-
-    protected open fun playOverNotification() = when (settings.getPlayOverNotification()) {
-        0 -> PlayOverNotificationSetting.ALWAYS
-        1 -> PlayOverNotificationSetting.DUCK
-        else -> PlayOverNotificationSetting.NEVER
-    }
-
     interface FocusChangeListener {
         fun onFocusGain(shouldResume: Boolean)
         fun onFocusLoss(playOverNotification: PlayOverNotificationSetting, transientLoss: Boolean)

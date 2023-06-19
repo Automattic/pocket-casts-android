@@ -16,6 +16,7 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.SwitchPreference
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.preferences.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -136,10 +137,18 @@ class NotificationsSettingsFragment :
             true
         }
         playOverNotificationPreference?.setOnPreferenceChangeListener { _, newValue ->
+            val playOverNotificationSetting = (newValue as? String)
+                ?.let { PlayOverNotificationSetting.fromPreferenceString(it) }
+                ?: throw IllegalStateException("Invalid value for play over notification preference: $newValue")
+
             analyticsTracker.track(
                 AnalyticsEvent.SETTINGS_NOTIFICATIONS_PLAY_OVER_NOTIFICATIONS_TOGGLED,
-                mapOf("enabled" to (newValue != "2"))
+                mapOf(
+                    "enabled" to (playOverNotificationSetting != PlayOverNotificationSetting.NEVER),
+                    "value" to playOverNotificationSetting.analyticsString,
+                ),
             )
+
             true
         }
     }
@@ -458,25 +467,21 @@ class NotificationsSettingsFragment :
     }
 
     private fun setupPlayOverNotifications() {
-        playOverNotificationPreference?.let {
-            it.entries = arrayOf(
-                getString(LR.string.settings_notification_play_over_never),
-                getString(LR.string.settings_notification_play_over_duck),
-                getString(LR.string.settings_notification_play_over_always)
+        playOverNotificationPreference?.apply {
+            val options = listOf(
+                PlayOverNotificationSetting.NEVER,
+                PlayOverNotificationSetting.DUCK,
+                PlayOverNotificationSetting.ALWAYS,
             )
-            it.entryValues = arrayOf("2", "1", "0")
-            it.value = settings.getPlayOverNotification().toString()
+            entries = options.map { getString(it.titleRes) }.toTypedArray()
+            entryValues = options.map { it.preferenceInt.toString() }.toTypedArray()
+            value = settings.getPlayOverNotification().preferenceInt.toString()
         }
         changePlayOverNotificationSummary()
     }
 
     private fun changePlayOverNotificationSummary() {
-        playOverNotificationPreference?.summary = when (settings.getPlayOverNotification()) {
-            2 -> getString(LR.string.settings_notification_play_over_never)
-            1 -> getString(LR.string.settings_notification_play_over_duck)
-            0 -> getString(LR.string.settings_notification_play_over_always)
-            else -> ""
-        }
+        playOverNotificationPreference?.summary = getString(settings.getPlayOverNotification().titleRes)
     }
 
     override fun getBackstackCount(): Int {
