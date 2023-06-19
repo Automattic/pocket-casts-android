@@ -17,22 +17,24 @@ object FeatureFlag {
         providers.forEach { addProvider(it) }
     }
 
-    fun isEnabled(feature: Feature): Boolean {
-        // TODO: Add support for (Firebase) Remote Feature Flags Provider
-        if (providers.size > 1) {
-            throw IllegalStateException("Multiple providers not yet supported for feature flags")
-        }
-        return providers.firstOrNull()
+    fun isEnabled(feature: Feature) =
+        providers.filter { it.hasFeature(feature) }
+            .sortedBy(FeatureProvider::priority)
+            .firstOrNull()
             ?.isEnabled(feature)
             ?: feature.defaultValue
-    }
 
     fun setEnabled(feature: Feature, enabled: Boolean) =
-        providers.filterIsInstance(ModifiableFeatureProvider::class.java)
+        providers.filterIsInstance<ModifiableFeatureProvider>()
             .firstOrNull()
             ?.setEnabled(feature, enabled)
             ?.let { true }
             ?: false
+
+    fun refresh() {
+        providers.filterIsInstance<RemoteFeatureProvider>()
+            .forEach { it.refresh() }
+    }
 
     private fun addProvider(provider: FeatureProvider) = providers.add(provider)
 

@@ -6,7 +6,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatureProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.FirebaseRemoteFeatureFlagProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ class AppLifecycleObserver @Inject constructor(
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
     private val preferencesFeatureProvider: PreferencesFeatureProvider,
     private val defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
-    private val firebaseRemoteFeatureProvider: FirebaseRemoteFeatureFlagProvider
+    private val firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider
 ) : DefaultLifecycleObserver {
     fun setup() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -39,9 +39,9 @@ class AppLifecycleObserver @Inject constructor(
         } else {
             listOf(
                 firebaseRemoteFeatureProvider,
-                storeFeatureProvider
+                defaultReleaseFeatureProvider
             )
         }
-        FeatureFlag.initialize(listOf(providers))
+        FeatureFlag.initialize(providers)
     }
 }

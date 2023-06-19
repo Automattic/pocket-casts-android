@@ -37,7 +37,7 @@ class FeatureFlagTest {
     private lateinit var defaultReleaseFeatureProvider: FeatureProvider
 
     @Mock
-    private lateinit var remoteFeatureProvider: RemoteFeatureFlagProvider
+    private lateinit var remoteFeatureProvider: RemoteFeatureProvider
 
     private lateinit var preferencesFeatureProvider: ModifiableFeatureProvider
 

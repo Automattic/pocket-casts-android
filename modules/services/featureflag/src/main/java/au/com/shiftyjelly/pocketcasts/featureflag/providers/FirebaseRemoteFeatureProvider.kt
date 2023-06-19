@@ -2,24 +2,24 @@ package au.com.shiftyjelly.pocketcasts.featureflag.providers
 
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.MAX_PRIORITY
-import au.com.shiftyjelly.pocketcasts.featureflag.RemoteFeatureFlagProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.RemoteFeatureProvider
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import timber.log.Timber
 import javax.inject.Inject
 
-class FirebaseRemoteFeatureFlagProvider @Inject constructor(
+class FirebaseRemoteFeatureProvider @Inject constructor(
     private val firebaseRemoteConfig: FirebaseRemoteConfig
-) : RemoteFeatureFlagProvider {
+) : RemoteFeatureProvider {
     override val priority: Int = MAX_PRIORITY
 
-    override fun isFeatureEnabled(feature: Feature): Boolean =
+    override fun isEnabled(feature: Feature): Boolean =
         firebaseRemoteConfig.getBoolean(feature.key)
 
     override fun hasFeature(feature: Feature): Boolean {
         return false
     }
 
-    override fun refreshFeatureFlags() {
+    override fun refresh() {
         firebaseRemoteConfig.fetch().addOnCompleteListener {
             Timber.e("Firebase feature flag refreshed")
         }
