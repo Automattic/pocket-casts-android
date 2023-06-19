@@ -20,6 +20,7 @@ include ':modules:features:taskerplugin'
 // services
 include ':modules:services:analytics'
 include ':modules:services:compose'
+include ':modules:services:featureflag'
 include ':modules:services:images'
 include ':modules:services:localization'
 include ':modules:services:model'
