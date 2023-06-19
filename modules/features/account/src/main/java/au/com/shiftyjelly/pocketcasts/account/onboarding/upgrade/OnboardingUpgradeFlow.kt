@@ -23,7 +23,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomS
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomSheetViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -54,7 +54,7 @@ fun OnboardingUpgradeFlow(
     val userSignedInOrSignedUpInUpsellFlow = flow is OnboardingFlow.PlusUpsell &&
         (source == OnboardingUpgradeSource.RECOMMENDATIONS || source == OnboardingUpgradeSource.LOGIN)
 
-    if (FeatureFlagManager.isFeatureEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) {
+    if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) {
         activity?.let {
             LaunchedEffect(Unit) {
                 mainSheetViewModel.onClickSubscribe(
@@ -71,7 +71,7 @@ fun OnboardingUpgradeFlow(
         hasSubscriptions && (
             // The hidden state is shown as the first screen in the PlusUpsell flow, so when we return
             // to this screen after login/signup we want to immediately expand the purchase bottom sheet.
-            (!FeatureFlagManager.isFeatureEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) ||
+            (!FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && userSignedInOrSignedUpInUpsellFlow) ||
                 // User already indicated they want to upgrade, so go straight to purchase modal
                 flow is OnboardingFlow.PlusAccountUpgradeNeedsLogin ||
                 flow is OnboardingFlow.PlusAccountUpgrade

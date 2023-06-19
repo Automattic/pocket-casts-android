@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.featureflag
 
 import android.content.Context
 import android.content.SharedPreferences
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureFlagProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
 import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -19,7 +19,7 @@ import org.mockito.kotlin.whenever
 private const val FEATURE_FLAG_KEY = "feature_flag_key"
 
 @RunWith(MockitoJUnitRunner::class)
-class FeatureFlagManagerTest {
+class FeatureFlagTest {
     @Mock
     private lateinit var feature: Feature
 
@@ -33,9 +33,9 @@ class FeatureFlagManagerTest {
     private lateinit var sharedPreferencesEditor: SharedPreferences.Editor
 
     @Mock
-    private lateinit var defaultReleaseFeatureFlagProvider: FeatureFlagProvider
+    private lateinit var defaultReleaseFeatureProvider: FeatureProvider
 
-    private lateinit var preferencesFeatureFlagProvider: ModifiableFeatureFlagProvider
+    private lateinit var preferencesFeatureProvider: ModifiableFeatureProvider
 
     @Before
     fun setup() {
@@ -44,16 +44,16 @@ class FeatureFlagManagerTest {
 
     @Test
     fun `given feature flag not set in preferences, then return default value`() {
-        FeatureFlagManager.initialize(listOf(preferencesFeatureFlagProvider))
+        FeatureFlag.initialize(listOf(preferencesFeatureProvider))
 
-        assertTrue(FeatureFlagManager.isFeatureEnabled(feature) == feature.defaultValue)
+        assertTrue(FeatureFlag.isEnabled(feature) == feature.defaultValue)
     }
 
     @Test
     fun `given modifiable provider added, when feature flag value changed, then value is saved in preferences`() {
-        FeatureFlagManager.initialize(listOf(preferencesFeatureFlagProvider))
+        FeatureFlag.initialize(listOf(preferencesFeatureProvider))
 
-        val result = FeatureFlagManager.setFeatureEnabled(feature, true)
+        val result = FeatureFlag.setEnabled(feature, true)
 
         assertTrue(result)
     }
@@ -62,29 +62,29 @@ class FeatureFlagManagerTest {
     fun `given modifiable provider added, when feature flag set to true, then return true for feature flag`() {
         initPreferenceFeatureFlagProvider(defaultFeatureFlagValue = false)
         whenever(sharedPreferences.getBoolean(anyString(), anyBoolean())).thenReturn(true)
-        FeatureFlagManager.initialize(listOf(preferencesFeatureFlagProvider))
+        FeatureFlag.initialize(listOf(preferencesFeatureProvider))
 
-        FeatureFlagManager.setFeatureEnabled(feature, true)
+        FeatureFlag.setEnabled(feature, true)
 
-        assertTrue(FeatureFlagManager.isFeatureEnabled(feature))
+        assertTrue(FeatureFlag.isEnabled(feature))
     }
 
     @Test
     fun `given modifiable provider added, when feature flag set to false, then return false for feature flag`() {
         initPreferenceFeatureFlagProvider(defaultFeatureFlagValue = true)
         whenever(sharedPreferences.getBoolean(anyString(), anyBoolean())).thenReturn(false)
-        FeatureFlagManager.initialize(listOf(preferencesFeatureFlagProvider))
+        FeatureFlag.initialize(listOf(preferencesFeatureProvider))
 
-        FeatureFlagManager.setFeatureEnabled(feature, false)
+        FeatureFlag.setEnabled(feature, false)
 
-        assertTrue(!FeatureFlagManager.isFeatureEnabled(feature))
+        assertTrue(!FeatureFlag.isEnabled(feature))
     }
 
     @Test
     fun `given non modifiable provider added, when feature flag value changed, then value is not saved in preferences`() {
-        FeatureFlagManager.initialize(listOf(defaultReleaseFeatureFlagProvider))
+        FeatureFlag.initialize(listOf(defaultReleaseFeatureProvider))
 
-        val result = FeatureFlagManager.setFeatureEnabled(feature, true)
+        val result = FeatureFlag.setEnabled(feature, true)
 
         assertFalse(result)
     }
@@ -99,11 +99,11 @@ class FeatureFlagManagerTest {
         whenever(sharedPreferencesEditor.putBoolean(anyString(), anyBoolean()))
             .thenReturn(sharedPreferencesEditor)
 
-        preferencesFeatureFlagProvider = PreferencesFeatureFlagProvider(context)
+        preferencesFeatureProvider = PreferencesFeatureProvider(context)
     }
 
     @After
     fun tearDown() {
-        FeatureFlagManager.clearFeatureFlagProviders()
+        FeatureFlag.clearProviders()
     }
 }

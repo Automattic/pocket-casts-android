@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.UpgradeFeatureC
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatureCard
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
@@ -63,7 +63,7 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
                             )
                         } ?: emptyList()
                     val defaultSubscription = subscriptionManager.getDefaultSubscription(subscriptions)
-                    if (FeatureFlagManager.isFeatureEnabled(Feature.ADD_PATRON_ENABLED)) {
+                    if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
                         defaultSubscription?.let {
                             val upgradeButtons = subscriptions.map { it.tier }
                                 .mapNotNull { tier ->

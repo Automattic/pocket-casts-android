@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.featureflag.providers
 
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,7 +11,7 @@ import javax.inject.Singleton
  * provided through this provider.
  */
 @Singleton
-class DefaultReleaseFeatureFlagProvider @Inject constructor() : FeatureFlagProvider {
+class DefaultReleaseFeatureProvider @Inject constructor() : FeatureProvider {
     override fun isEnabled(feature: Feature) =
         when (feature) {
             Feature.END_OF_YEAR_ENABLED,

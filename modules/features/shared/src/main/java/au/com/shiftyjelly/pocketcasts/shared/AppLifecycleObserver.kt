@@ -4,15 +4,15 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatureFlagProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureFlagProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatureProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
 import javax.inject.Inject
 
 class AppLifecycleObserver @Inject constructor(
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
-    private val preferencesFeatureFlagProvider: PreferencesFeatureFlagProvider,
-    private val defaultReleaseFeatureFlagProvider: DefaultReleaseFeatureFlagProvider,
+    private val preferencesFeatureFlagProvider: PreferencesFeatureProvider,
+    private val defaultReleaseFeatureFlagProvider: DefaultReleaseFeatureProvider,
 ) : DefaultLifecycleObserver {
     fun setup() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -36,6 +36,6 @@ class AppLifecycleObserver @Inject constructor(
         } else {
             defaultReleaseFeatureFlagProvider
         }
-        FeatureFlagManager.initialize(listOf(providers))
+        FeatureFlag.initialize(listOf(providers))
     }
 }

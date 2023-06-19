@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.toUpgradeFeatur
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.type.RecurringSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
@@ -54,7 +54,7 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
     private val showPatronOnly = savedStateHandle.get<Boolean>("show_patron_only")
 
     init {
-        if (FeatureFlagManager.isFeatureEnabled(Feature.ADD_PATRON_ENABLED)) {
+        if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
             viewModelScope.launch {
                 subscriptionManager
                     .observeProductDetails()

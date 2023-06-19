@@ -1,9 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.featureflag
 
-interface FeatureFlagProvider {
+interface FeatureProvider {
     fun isEnabled(feature: Feature): Boolean
 }
 
-interface ModifiableFeatureFlagProvider : FeatureFlagProvider {
+interface ModifiableFeatureProvider : FeatureProvider {
     fun setEnabled(feature: Feature, enabled: Boolean)
 }
