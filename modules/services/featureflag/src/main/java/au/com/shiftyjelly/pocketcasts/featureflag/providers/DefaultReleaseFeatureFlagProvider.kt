@@ -12,7 +12,7 @@ import javax.inject.Singleton
  * provided through this provider.
  */
 @Singleton
-class StoreFeatureFlagProvider @Inject constructor() : FeatureFlagProvider {
+class DefaultReleaseFeatureFlagProvider @Inject constructor() : FeatureFlagProvider {
     override fun isFeatureEnabled(feature: Feature) =
         if (feature is FeatureFlag) {
             when (feature) {

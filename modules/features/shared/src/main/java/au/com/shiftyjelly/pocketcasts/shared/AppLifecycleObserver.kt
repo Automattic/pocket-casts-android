@@ -5,14 +5,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatureFlagProvider
 import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureFlagProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.StoreFeatureFlagProvider
 import javax.inject.Inject
 
 class AppLifecycleObserver @Inject constructor(
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
     private val preferencesFeatureFlagProvider: PreferencesFeatureFlagProvider,
-    private val storeFeatureFlagProvider: StoreFeatureFlagProvider,
+    private val defaultReleaseFeatureFlagProvider: DefaultReleaseFeatureFlagProvider,
 ) : DefaultLifecycleObserver {
     fun setup() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -34,7 +34,7 @@ class AppLifecycleObserver @Inject constructor(
         val providers = if (BuildConfig.DEBUG) {
             preferencesFeatureFlagProvider
         } else {
-            storeFeatureFlagProvider
+            defaultReleaseFeatureFlagProvider
         }
         FeatureFlagManager.initialize(listOf(providers))
     }

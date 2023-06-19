@@ -33,7 +33,7 @@ class FeatureFlagManagerTest {
     private lateinit var sharedPreferencesEditor: SharedPreferences.Editor
 
     @Mock
-    private lateinit var storeFeatureFlagProvider: FeatureFlagProvider
+    private lateinit var defaultReleaseFeatureFlagProvider: FeatureFlagProvider
 
     private lateinit var preferencesFeatureFlagProvider: ModifiableFeatureFlagProvider
 
@@ -82,7 +82,7 @@ class FeatureFlagManagerTest {
 
     @Test
     fun `given non modifiable provider added, when feature flag value changed, then value is not saved in preferences`() {
-        FeatureFlagManager.initialize(listOf(storeFeatureFlagProvider))
+        FeatureFlagManager.initialize(listOf(defaultReleaseFeatureFlagProvider))
 
         val result = FeatureFlagManager.setFeatureEnabled(featureFlag, true)
 
