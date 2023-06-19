@@ -48,11 +48,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.player.PCVolumeScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.settings.PrivacySettingsScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.settings.SettingsScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.settings.UrlScreenRoutes
-import au.com.shiftyjelly.pocketcasts.wear.ui.settings.WearAboutScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.settings.settingsUrlScreens
+import au.com.shiftyjelly.pocketcasts.wear.ui.settings.settingsRoutes
 import com.google.android.horologist.compose.navscaffold.NavScaffoldViewModel
 import com.google.android.horologist.compose.navscaffold.ScrollableScaffoldContext
 import com.google.android.horologist.compose.navscaffold.WearNavScaffold
@@ -308,29 +304,6 @@ fun WearApp(
             }
         }
 
-        scrollable(SettingsScreen.route) {
-            SettingsScreen(
-                scrollState = it.columnState,
-                signInClick = { navController.navigate(authenticationSubGraph) },
-                navigateToPrivacySettings = { navController.navigate(PrivacySettingsScreen.route) },
-                navigateToAbout = { navController.navigate(WearAboutScreen.route) }
-            )
-        }
-
-        scrollable(PrivacySettingsScreen.route) {
-            PrivacySettingsScreen(scrollState = it.columnState)
-        }
-
-        scrollable(WearAboutScreen.route) {
-            WearAboutScreen(
-                columnState = it.columnState,
-                onTermsOfServiceClick = { navController.navigate(UrlScreenRoutes.termsOfService) },
-                onPrivacyClick = { navController.navigate(UrlScreenRoutes.privacy) }
-            )
-        }
-
-        settingsUrlScreens()
-
         val popToStartDestination: () -> Unit = {
             when (startDestination) {
                 WatchListScreen.route -> {
@@ -353,6 +326,8 @@ fun WearApp(
                 else -> throw IllegalStateException("Unexpected start destination $startDestination")
             }
         }
+
+        settingsRoutes(navController)
 
         authenticationNavGraph(
             navController = navController,

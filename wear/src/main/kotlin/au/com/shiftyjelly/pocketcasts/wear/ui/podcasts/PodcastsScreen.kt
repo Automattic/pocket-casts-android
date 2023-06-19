@@ -1,14 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.podcasts
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.darker
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
+import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingSpinner
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
@@ -43,23 +52,65 @@ fun PodcastsScreen(
     navigateToPodcast: (String) -> Unit,
     navigateToFolder: (String) -> Unit,
 ) {
-    val uiState = viewModel.uiState
-
-    ScalingLazyColumn(
-        modifier = modifier.fillMaxWidth(),
-        columnState = columnState
-    ) {
-        item {
-            ScreenHeaderChip(if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.name)
+    when (val uiState = viewModel.uiState.collectAsState().value) {
+        is PodcastsViewModel.UiState.Empty -> {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text(
+                    text = stringResource(LR.string.podcasts_no_subscriptions),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.onPrimary,
+                    style = MaterialTheme.typography.title2,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(LR.string.podcasts_subscribe_on_phone),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.onPrimary,
+                    style = MaterialTheme.typography.body1,
+                )
+            }
         }
-        items(items = uiState.items, key = { item -> item.uuid }) { item ->
-            when (item) {
-                is FolderItem.Podcast -> {
-                    PodcastChip(podcast = item, onClick = navigateToPodcast)
+
+        is PodcastsViewModel.UiState.Loaded -> {
+            ScalingLazyColumn(
+                modifier = modifier.fillMaxWidth(),
+                columnState = columnState
+            ) {
+                item {
+                    ScreenHeaderChip(if (uiState.folder == null) stringResource(LR.string.podcasts) else uiState.folder.name)
                 }
-                is FolderItem.Folder -> {
-                    FolderChip(folderItem = item, onClick = navigateToFolder)
+                items(items = uiState.items, key = { item -> item.uuid }) { item ->
+                    when (item) {
+                        is FolderItem.Podcast -> {
+                            PodcastChip(podcast = item, onClick = navigateToPodcast)
+                        }
+
+                        is FolderItem.Folder -> {
+                            FolderChip(folderItem = item, onClick = navigateToFolder)
+                        }
+                    }
                 }
+            }
+        }
+
+        is PodcastsViewModel.UiState.Loading -> {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LoadingSpinner()
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(LR.string.podcast_loading),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.onPrimary,
+                    style = MaterialTheme.typography.body1,
+                )
             }
         }
     }

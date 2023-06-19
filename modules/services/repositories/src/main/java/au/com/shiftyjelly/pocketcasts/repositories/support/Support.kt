@@ -38,6 +38,7 @@ import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.BufferedWriter
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
@@ -136,11 +137,95 @@ class Support @Inject constructor(
         return intent
     }
 
+    suspend fun shareWearLogs(logBytes: ByteArray, subject: String, context: Context): Intent =
+        withContext(Dispatchers.IO) {
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/html"
+
+            val isPlus = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
+            intent.putExtra(
+                Intent.EXTRA_SUBJECT,
+                "$subject v${settings.getVersion()} ${if (isPlus) " - Plus Account" else ""}"
+            )
+
+            try {
+                val emailFolder = File(context.filesDir, "email")
+                emailFolder.mkdirs()
+                val debugFile = File(emailFolder, "debug_wear.txt")
+
+                debugFile.writeBytes(logBytes)
+                val fileUri =
+                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                intent.putExtra(Intent.EXTRA_STREAM, fileUri)
+            } catch (e: Exception) {
+                Timber.e(e)
+                intent.putExtra(Intent.EXTRA_TEXT, String(logBytes))
+            }
+            intent
+        }
+
+    suspend fun emailWearLogsToSupportIntent(logBytes: ByteArray, context: Context): Intent {
+        val subject = "Android wear support"
+        val intro = "Hi there, just needed help with something..."
+        val intent = Intent(Intent.ACTION_SEND)
+
+        withContext(Dispatchers.IO) {
+            intent.type = "text/html"
+            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
+            val isPlus = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
+            intent.putExtra(
+                Intent.EXTRA_SUBJECT,
+                "$subject v${settings.getVersion()} ${if (isPlus) " - Plus Account" else ""}"
+            )
+
+            try {
+                val emailFolder = File(context.filesDir, "email")
+                emailFolder.mkdirs()
+                val debugFile = File(emailFolder, "debug_wear.txt")
+
+                debugFile.writeBytes(logBytes)
+                val fileUri =
+                    FileUtil.createUriWithReadPermissions(debugFile, intent, context)
+                intent.putExtra(Intent.EXTRA_STREAM, fileUri)
+                intent.putExtra(
+                    Intent.EXTRA_TEXT,
+                    HtmlCompat.fromHtml(
+                        "$intro<br/><br/>",
+                        HtmlCompat.FROM_HTML_MODE_COMPACT
+                    )
+                )
+            } catch (e: Exception) {
+                Timber.e(e)
+
+                val debugStr = buildString {
+                    append(intro)
+                    append("<br/><br/><br/><br/><br/><br/><br/>")
+                    append(String(logBytes))
+                }
+
+                intent.putExtra(Intent.EXTRA_TEXT, debugStr)
+            }
+        }
+
+        return intent
+    }
+
+    suspend fun getLogs(): String =
+        withContext(Dispatchers.IO) {
+            buildString {
+                append(getUserDebug(false))
+                val outputStream = ByteArrayOutputStream()
+                LogBuffer.output(outputStream)
+                append(outputStream.toString())
+            }
+        }
+
     @Suppress("DEPRECATION")
     suspend fun getUserDebug(html: Boolean): String {
         val output = StringBuilder()
         try {
             val eol = if (html) "<br/>" else "\n"
+            output.append("Platform : ").append(Util.getAppPlatform(context)).append(eol)
             output.append("App version : ").append(settings.getVersion()).append(" (").append(settings.getVersionCode()).append(")").append(eol)
             output.append("Sync account: ").append(if (syncManager.isLoggedIn()) syncManager.getEmail() else "Not logged in").append(eol)
             if (syncManager.isLoggedIn()) {
