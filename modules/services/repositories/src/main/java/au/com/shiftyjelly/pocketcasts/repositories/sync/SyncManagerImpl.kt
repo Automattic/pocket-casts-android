@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.exception.UserNotLoggedInException
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
@@ -121,15 +122,15 @@ class SyncManagerImpl @Inject constructor(
     override fun getEmail(): String? =
         syncAccountManager.getEmail()
 
-    override suspend fun getAccessToken(account: Account): AccessToken? =
+    override suspend fun getAccessToken(account: Account): AccessToken =
         syncAccountManager.peekAccessToken(account)
             ?: fetchAccessToken(account)
 
     override fun getRefreshToken(): RefreshToken? =
         syncAccountManager.getRefreshToken()
 
-    private suspend fun fetchAccessToken(account: Account): AccessToken? {
-        val refreshToken = syncAccountManager.getRefreshToken(account) ?: return null
+    private suspend fun fetchAccessToken(account: Account): AccessToken {
+        val refreshToken = syncAccountManager.getRefreshToken(account) ?: throw UserNotLoggedInException()
         return try {
             val signInType = syncAccountManager.getSignInType(account)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Fetching the access token, SignInType: $signInType")
@@ -146,7 +147,11 @@ class SyncManagerImpl @Inject constructor(
             tokenResponse.accessToken
         } catch (ex: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to fetch access token.")
-            null
+            if (isHttpClientError(ex)) {
+                throw UserNotLoggedInException()
+            } else {
+                throw ex
+            }
         }
     }
 
@@ -562,6 +567,10 @@ class SyncManagerImpl @Inject constructor(
 
     private fun isHttpUnauthorized(throwable: Throwable?): Boolean {
         return throwable is HttpException && throwable.code() == 401
+    }
+
+    private fun isHttpClientError(throwable: Throwable?): Boolean {
+        return throwable is HttpException && throwable.code() in 400..499
     }
 
     private fun handleTokenResponse(loginIdentity: LoginIdentity, response: LoginTokenResponse): AuthResultModel {

@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
+import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
@@ -61,8 +61,8 @@ open class SyncServerManager @Inject constructor(
     }
 
     suspend fun login(email: String, password: String): LoginTokenResponse {
-        val request = LoginRequest(email = email, password = password, scope = SCOPE_MOBILE)
-        return server.login(request)
+        val request = LoginPocketCastsRequest(email = email, password = password, scope = SCOPE_MOBILE)
+        return server.loginPocketCasts(request)
     }
 
     suspend fun loginGoogle(idToken: String): LoginTokenResponse {
@@ -70,8 +70,12 @@ open class SyncServerManager @Inject constructor(
         return server.loginGoogle(request)
     }
 
+    /**
+     * Update the access token using the refresh token.
+     * If any 4xx is returned the user should be logged out and asked to login.
+     */
     suspend fun loginToken(refreshToken: RefreshToken): LoginTokenResponse {
-        val request = LoginTokenRequest(refreshToken = refreshToken)
+        val request = LoginTokenRequest(refreshToken = refreshToken, scope = SCOPE_MOBILE)
         return server.loginToken(request)
     }
 

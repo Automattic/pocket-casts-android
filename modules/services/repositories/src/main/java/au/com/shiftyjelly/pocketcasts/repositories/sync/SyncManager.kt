@@ -48,7 +48,7 @@ interface SyncManager : NamedSettingsCaller, AccountStatusInfo {
     suspend fun loginWithToken(token: RefreshToken, loginIdentity: LoginIdentity, signInSource: SignInSource): LoginResult
     suspend fun createUserWithEmailAndPassword(email: String, password: String): LoginResult
     suspend fun forgotPassword(email: String, onSuccess: () -> Unit, onError: (String) -> Unit)
-    suspend fun getAccessToken(account: Account): AccessToken?
+    suspend fun getAccessToken(account: Account): AccessToken
     fun getRefreshToken(): RefreshToken?
     fun emailChange(newEmail: String, password: String): Single<UserChangeResponse>
     fun deleteAccount(): Single<UserChangeResponse>

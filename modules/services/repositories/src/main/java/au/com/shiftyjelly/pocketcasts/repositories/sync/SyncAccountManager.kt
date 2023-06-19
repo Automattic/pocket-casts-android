@@ -3,17 +3,16 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.accounts.AccountManagerFuture
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
+import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenException
+import au.com.shiftyjelly.pocketcasts.servers.sync.exception.UserNotLoggedInException
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getIntent
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -22,12 +21,10 @@ import javax.inject.Inject
  * The only class that should use this class is the
  * [SyncManager] class. Consider using that instead of this class.
  */
-class SyncAccountManager @Inject constructor(
-    @ApplicationContext private val context: Context,
+open class SyncAccountManager @Inject constructor(
     private val tokenErrorNotification: TokenErrorNotification,
+    private val accountManager: AccountManager
 ) : TokenHandler {
-
-    private val accountManager = AccountManager.get(context)
 
     private fun getAccount(): Account? {
         return accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE).firstOrNull()
@@ -77,14 +74,13 @@ class SyncAccountManager @Inject constructor(
                 val token = bundle.getString(AccountManager.KEY_AUTHTOKEN)
                 // Token failed to refresh
                 if (token == null) {
-                    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        bundle.getParcelable(AccountManager.KEY_INTENT, Intent::class.java)
+                    val intent = bundle.getIntent(AccountManager.KEY_INTENT)
+                    if (intent == null) {
+                        throw RefreshTokenException()
                     } else {
-                        @Suppress("DEPRECATION")
-                        bundle.getParcelable(AccountManager.KEY_INTENT) as? Intent
+                        tokenErrorNotification.show(intent)
+                        throw UserNotLoggedInException()
                     }
-                    intent?.let { tokenErrorNotification.show(it) }
-                    throw SecurityException("Token could not be refreshed")
                 } else {
                     AccessToken(token)
                 }
@@ -143,7 +139,7 @@ class SyncAccountManager @Inject constructor(
     fun getRefreshToken(account: Account? = null): RefreshToken? =
         (account ?: getAccount())?.let {
             val refreshToken = accountManager.getPassword(it)
-            if (refreshToken.isNotEmpty()) {
+            if (refreshToken != null && refreshToken.isNotEmpty()) {
                 RefreshToken(refreshToken)
             } else {
                 null
