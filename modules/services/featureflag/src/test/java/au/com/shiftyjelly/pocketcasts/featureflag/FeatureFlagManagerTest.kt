@@ -21,7 +21,7 @@ private const val FEATURE_FLAG_KEY = "feature_flag_key"
 @RunWith(MockitoJUnitRunner::class)
 class FeatureFlagManagerTest {
     @Mock
-    private lateinit var featureFlag: FeatureFlag
+    private lateinit var feature: Feature
 
     @Mock
     private lateinit var context: Context
@@ -46,14 +46,14 @@ class FeatureFlagManagerTest {
     fun `given feature flag not set in preferences, then return default value`() {
         FeatureFlagManager.initialize(listOf(preferencesFeatureFlagProvider))
 
-        assertTrue(FeatureFlagManager.isFeatureEnabled(featureFlag) == featureFlag.defaultValue)
+        assertTrue(FeatureFlagManager.isFeatureEnabled(feature) == feature.defaultValue)
     }
 
     @Test
     fun `given modifiable provider added, when feature flag value changed, then value is saved in preferences`() {
         FeatureFlagManager.initialize(listOf(preferencesFeatureFlagProvider))
 
-        val result = FeatureFlagManager.setFeatureEnabled(featureFlag, true)
+        val result = FeatureFlagManager.setFeatureEnabled(feature, true)
 
         assertTrue(result)
     }
@@ -64,9 +64,9 @@ class FeatureFlagManagerTest {
         whenever(sharedPreferences.getBoolean(anyString(), anyBoolean())).thenReturn(true)
         FeatureFlagManager.initialize(listOf(preferencesFeatureFlagProvider))
 
-        FeatureFlagManager.setFeatureEnabled(featureFlag, true)
+        FeatureFlagManager.setFeatureEnabled(feature, true)
 
-        assertTrue(FeatureFlagManager.isFeatureEnabled(featureFlag))
+        assertTrue(FeatureFlagManager.isFeatureEnabled(feature))
     }
 
     @Test
@@ -75,16 +75,16 @@ class FeatureFlagManagerTest {
         whenever(sharedPreferences.getBoolean(anyString(), anyBoolean())).thenReturn(false)
         FeatureFlagManager.initialize(listOf(preferencesFeatureFlagProvider))
 
-        FeatureFlagManager.setFeatureEnabled(featureFlag, false)
+        FeatureFlagManager.setFeatureEnabled(feature, false)
 
-        assertTrue(!FeatureFlagManager.isFeatureEnabled(featureFlag))
+        assertTrue(!FeatureFlagManager.isFeatureEnabled(feature))
     }
 
     @Test
     fun `given non modifiable provider added, when feature flag value changed, then value is not saved in preferences`() {
         FeatureFlagManager.initialize(listOf(defaultReleaseFeatureFlagProvider))
 
-        val result = FeatureFlagManager.setFeatureEnabled(featureFlag, true)
+        val result = FeatureFlagManager.setFeatureEnabled(feature, true)
 
         assertFalse(result)
     }
@@ -92,8 +92,8 @@ class FeatureFlagManagerTest {
     private fun initPreferenceFeatureFlagProvider(
         defaultFeatureFlagValue: Boolean = false,
     ) {
-        whenever(featureFlag.key).thenReturn(FEATURE_FLAG_KEY)
-        whenever(featureFlag.defaultValue).thenReturn(defaultFeatureFlagValue)
+        whenever(feature.key).thenReturn(FEATURE_FLAG_KEY)
+        whenever(feature.defaultValue).thenReturn(defaultFeatureFlagValue)
         whenever(context.getSharedPreferences(anyString(), anyInt())).thenReturn(sharedPreferences)
         whenever(sharedPreferences.edit()).thenReturn(sharedPreferencesEditor)
         whenever(sharedPreferencesEditor.putBoolean(anyString(), anyBoolean()))

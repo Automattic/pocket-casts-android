@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.featureflag
 
-enum class FeatureFlag(
+enum class Feature(
     val key: String,
     val title: String,
     val defaultValue: Boolean,

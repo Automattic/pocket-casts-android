@@ -17,20 +17,20 @@ object FeatureFlagManager {
         providers.forEach { addProvider(it) }
     }
 
-    fun isFeatureEnabled(featureFlag: FeatureFlag): Boolean {
+    fun isFeatureEnabled(feature: Feature): Boolean {
         // TODO: Add support for (Firebase) Remote Feature Flags Provider
         if (providers.size > 1) {
             throw IllegalStateException("Multiple providers not yet supported for feature flags")
         }
         return providers.firstOrNull()
-            ?.isEnabled(featureFlag)
-            ?: featureFlag.defaultValue
+            ?.isEnabled(feature)
+            ?: feature.defaultValue
     }
 
-    fun setFeatureEnabled(featureFlag: FeatureFlag, enabled: Boolean) =
+    fun setFeatureEnabled(feature: Feature, enabled: Boolean) =
         providers.filterIsInstance(ModifiableFeatureFlagProvider::class.java)
             .firstOrNull()
-            ?.setEnabled(featureFlag, enabled)
+            ?.setEnabled(feature, enabled)
             ?.let { true }
             ?: false
 

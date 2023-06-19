@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,14 +21,14 @@ class BetaFeaturesViewModel @Inject constructor() : ViewModel() {
     val state: StateFlow<State> = _state
 
     private val featureFlags: List<FeatureFlagWrapper>
-        get() = FeatureFlag.values().map {
+        get() = Feature.values().map {
             FeatureFlagWrapper(
                 featureFlag = it,
                 isEnabled = FeatureFlagManager.isFeatureEnabled(it)
             )
         }
 
-    fun setFeatureEnabled(feature: FeatureFlag, enabled: Boolean) {
+    fun setFeatureEnabled(feature: Feature, enabled: Boolean) {
         FeatureFlagManager.setFeatureEnabled(feature, enabled)
         _state.value = _state.value.copy(
             featureFlags = featureFlags
@@ -36,7 +36,7 @@ class BetaFeaturesViewModel @Inject constructor() : ViewModel() {
     }
 
     data class FeatureFlagWrapper(
-        val featureFlag: FeatureFlag,
+        val featureFlag: Feature,
         val isEnabled: Boolean,
     )
 }

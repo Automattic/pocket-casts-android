@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -66,7 +66,7 @@ class SettingsAppearanceViewModel @Inject constructor(
 
     fun loadThemesAndIcons() {
         createAccountState.postValue(SettingsAppearanceState.ThemesAndIconsLoading)
-        val appIcons = if (FeatureFlagManager.isFeatureEnabled(FeatureFlag.ADD_PATRON_ENABLED)) {
+        val appIcons = if (FeatureFlagManager.isFeatureEnabled(Feature.ADD_PATRON_ENABLED)) {
             appIcon.allAppIconTypes.toList()
         } else {
             appIcon.allAppIconTypes.toList().filterNot {
