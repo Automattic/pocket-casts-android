@@ -1032,10 +1032,6 @@ class SettingsImpl @Inject constructor(
         return getRemoteConfigLong(FirebaseConfig.EPISODE_SEARCH_DEBOUNCE_MS)
     }
 
-    override fun isFeatureFlagSearchImprovementsEnabled(): Boolean {
-        return firebaseRemoteConfig.getBoolean(FirebaseConfig.FEATURE_FLAG_SEARCH_IMPROVEMENTS)
-    }
-
     private fun getRemoteConfigLong(key: String): Long {
         val value = firebaseRemoteConfig.getLong(key)
         return if (value == 0L) (FirebaseConfig.defaults[key] as? Long ?: 0L) else value

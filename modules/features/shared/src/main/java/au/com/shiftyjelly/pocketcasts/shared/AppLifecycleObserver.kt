@@ -4,17 +4,17 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatureProvider
 import au.com.shiftyjelly.pocketcasts.featureflag.providers.FirebaseRemoteFeatureFlagProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureFlagProvider
-import au.com.shiftyjelly.pocketcasts.featureflag.providers.StoreFeatureFlagProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
 import javax.inject.Inject
 
 class AppLifecycleObserver @Inject constructor(
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
-    private val preferencesFeatureFlagProvider: PreferencesFeatureFlagProvider,
-    private val storeFeatureFlagProvider: StoreFeatureFlagProvider,
-    private val firebaseRemoteFeatureFlagProvider: FirebaseRemoteFeatureFlagProvider
+    private val preferencesFeatureProvider: PreferencesFeatureProvider,
+    private val defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
+    private val firebaseRemoteFeatureProvider: FirebaseRemoteFeatureFlagProvider
 ) : DefaultLifecycleObserver {
     fun setup() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -25,7 +25,7 @@ class AppLifecycleObserver @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appLifecycleAnalytics.onApplicationEnterForeground()
-        FeatureFlagManager.refreshFeatureFlags()
+        FeatureFlag.refresh()
     }
 
     override fun onPause(owner: LifecycleOwner) {
@@ -35,13 +35,13 @@ class AppLifecycleObserver @Inject constructor(
 
     private fun setupFeatureFlags() {
         val providers = if (BuildConfig.DEBUG) {
-            listOf(preferencesFeatureFlagProvider)
+            listOf(preferencesFeatureProvider)
         } else {
             listOf(
-                firebaseRemoteFeatureFlagProvider,
-                storeFeatureFlagProvider
+                firebaseRemoteFeatureProvider,
+                storeFeatureProvider
             )
         }
-        FeatureFlagManager.initialize(providers)
+        FeatureFlag.initialize(listOf(providers))
     }
 }

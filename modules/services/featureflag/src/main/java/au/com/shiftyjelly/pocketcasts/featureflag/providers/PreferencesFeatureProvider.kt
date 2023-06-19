@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.featureflag.providers
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.MIN_PRIORITY
-import au.com.shiftyjelly.pocketcasts.featureflag.ModifiableFeatureFlagProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.ModifiableFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,19 +13,19 @@ import javax.inject.Singleton
  * See StoreFeatureFlagProvider to set feature flag values for release builds.
  */
 @Singleton
-class PreferencesFeatureFlagProvider @Inject constructor(
+class PreferencesFeatureProvider @Inject constructor(
     @ApplicationContext context: Context,
-) : ModifiableFeatureFlagProvider {
+) : ModifiableFeatureProvider {
     private val preferences = context.featureFlagsSharedPrefs()
 
     override val priority = MIN_PRIORITY
 
     override fun hasFeature(feature: Feature): Boolean = true
 
-    override fun isFeatureEnabled(feature: Feature) =
+    override fun isEnabled(feature: Feature) =
         preferences.getBoolean(feature.key, feature.defaultValue)
 
-    override fun setFeatureEnabled(feature: Feature, enabled: Boolean) =
+    override fun setEnabled(feature: Feature, enabled: Boolean) =
         preferences.edit().putBoolean(feature.key, enabled).apply()
 
     private fun Context.featureFlagsSharedPrefs() =

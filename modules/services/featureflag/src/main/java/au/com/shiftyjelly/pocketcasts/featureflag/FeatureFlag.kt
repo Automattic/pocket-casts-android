@@ -1,29 +1,40 @@
 package au.com.shiftyjelly.pocketcasts.featureflag
 
-interface Feature {
-    val key: String
-    val title: String
-    val defaultValue: Boolean
-}
+import java.util.concurrent.CopyOnWriteArrayList
 
-enum class FeatureFlag(
-    override val key: String,
-    override val title: String,
-    override val defaultValue: Boolean,
-) : Feature {
-    END_OF_YEAR_ENABLED(
-        key = "end_of_year_enabled",
-        title = "End of Year",
-        defaultValue = false
-    ),
-    SHOW_RATINGS_ENABLED(
-        key = "show_ratings_enabled",
-        title = "Show Ratings",
-        defaultValue = false
-    ),
-    ADD_PATRON_ENABLED(
-        key = "add_patron_enabled",
-        title = "Patron",
-        defaultValue = false
-    ),
+/**
+ * Manages feature flags in the application with a list of different feature providers.
+ * It allows you to initialize, query, and modify feature visibility. Each feature provider may have
+ * a specific implementation based on the source (e.g. shared preferences, remote server) and
+ * added based on build type (debug or release).
+ *
+ * Inspired from blog post: https://rb.gy/ea4eo
+ */
+object FeatureFlag {
+    private val providers = CopyOnWriteArrayList<FeatureProvider>()
+
+    fun initialize(providers: List<FeatureProvider>) {
+        providers.forEach { addProvider(it) }
+    }
+
+    fun isEnabled(feature: Feature): Boolean {
+        // TODO: Add support for (Firebase) Remote Feature Flags Provider
+        if (providers.size > 1) {
+            throw IllegalStateException("Multiple providers not yet supported for feature flags")
+        }
+        return providers.firstOrNull()
+            ?.isEnabled(feature)
+            ?: feature.defaultValue
+    }
+
+    fun setEnabled(feature: Feature, enabled: Boolean) =
+        providers.filterIsInstance(ModifiableFeatureProvider::class.java)
+            .firstOrNull()
+            ?.setEnabled(feature, enabled)
+            ?.let { true }
+            ?: false
+
+    private fun addProvider(provider: FeatureProvider) = providers.add(provider)
+
+    fun clearProviders() = providers.clear()
 }

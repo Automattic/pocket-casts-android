@@ -33,9 +33,9 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
-import com.google.android.horologist.base.ui.util.adjustChipHeightToFontScale
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.material.util.adjustChipHeightToFontScale
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
@@ -50,6 +50,7 @@ fun SettingsScreen(
     signInClick: () -> Unit,
     navigateToPrivacySettings: () -> Unit,
     navigateToAbout: () -> Unit,
+    navigateToHelp: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<SettingsViewModel>()
@@ -65,6 +66,7 @@ fun SettingsScreen(
         onRefreshClicked = viewModel::refresh,
         onPrivacyClicked = navigateToPrivacySettings,
         onAboutClicked = navigateToAbout,
+        onHelpClicked = navigateToHelp,
     )
 }
 
@@ -79,6 +81,7 @@ private fun Content(
     onRefreshClicked: () -> Unit,
     onPrivacyClicked: () -> Unit,
     onAboutClicked: () -> Unit,
+    onHelpClicked: () -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
 
@@ -166,6 +169,14 @@ private fun Content(
                     )
                 }
             }
+        }
+
+        item {
+            WatchListChip(
+                title = stringResource(LR.string.settings_title_help),
+                iconRes = SR.drawable.settings_help,
+                onClick = onHelpClicked
+            )
         }
 
         item {
@@ -273,6 +284,7 @@ private fun SettingsScreenPreview_unchecked() {
             onRefreshClicked = {},
             onPrivacyClicked = {},
             onAboutClicked = {},
+            onHelpClicked = {},
         )
     }
 }
@@ -303,6 +315,7 @@ private fun SettingsScreenPreview_checked() {
             onRefreshClicked = {},
             onPrivacyClicked = {},
             onAboutClicked = {},
+            onHelpClicked = {},
         )
     }
 }

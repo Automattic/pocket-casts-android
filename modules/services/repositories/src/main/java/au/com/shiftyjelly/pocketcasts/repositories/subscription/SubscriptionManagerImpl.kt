@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.subscription
 import android.app.Activity
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
-import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlagManager
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_MONTHLY_PRODUCT_ID
@@ -163,7 +163,7 @@ class SubscriptionManagerImpl @Inject constructor(
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build(),
             ).apply {
-                if (FeatureFlagManager.isFeatureEnabled(FeatureFlag.ADD_PATRON_ENABLED)) {
+                if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
                     add(
                         QueryProductDetailsParams.Product.newBuilder()
                             .setProductId(PATRON_MONTHLY_PRODUCT_ID)
