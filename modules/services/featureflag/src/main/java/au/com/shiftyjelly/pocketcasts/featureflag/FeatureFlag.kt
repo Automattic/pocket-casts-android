@@ -25,7 +25,8 @@ object FeatureFlag {
             ?: feature.defaultValue
 
     fun setEnabled(feature: Feature, enabled: Boolean) =
-        providers.filterIsInstance<ModifiableFeatureProvider>()
+        providers.filter { it.hasFeature(feature) }
+            .filterIsInstance<ModifiableFeatureProvider>()
             .firstOrNull()
             ?.setEnabled(feature, enabled)
             ?.let { true }
