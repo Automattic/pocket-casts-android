@@ -6,4 +6,5 @@ android {
 }
 
 dependencies {
+    implementation project(':modules:services:utils')
 }

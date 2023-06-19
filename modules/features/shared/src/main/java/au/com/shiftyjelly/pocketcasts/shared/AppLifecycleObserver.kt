@@ -6,13 +6,15 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.featureflag.providers.DefaultReleaseFeatureProvider
+import au.com.shiftyjelly.pocketcasts.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.featureflag.providers.PreferencesFeatureProvider
 import javax.inject.Inject
 
 class AppLifecycleObserver @Inject constructor(
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
-    private val preferencesFeatureFlagProvider: PreferencesFeatureProvider,
-    private val defaultReleaseFeatureFlagProvider: DefaultReleaseFeatureProvider,
+    private val preferencesFeatureProvider: PreferencesFeatureProvider,
+    private val defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
+    private val firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider
 ) : DefaultLifecycleObserver {
     fun setup() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -23,6 +25,7 @@ class AppLifecycleObserver @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appLifecycleAnalytics.onApplicationEnterForeground()
+        FeatureFlag.refresh()
     }
 
     override fun onPause(owner: LifecycleOwner) {
@@ -32,10 +35,13 @@ class AppLifecycleObserver @Inject constructor(
 
     private fun setupFeatureFlags() {
         val providers = if (BuildConfig.DEBUG) {
-            preferencesFeatureFlagProvider
+            listOf(preferencesFeatureProvider)
         } else {
-            defaultReleaseFeatureFlagProvider
+            listOf(
+                firebaseRemoteFeatureProvider,
+                defaultReleaseFeatureProvider
+            )
         }
-        FeatureFlag.initialize(listOf(providers))
+        FeatureFlag.initialize(providers)
     }
 }
