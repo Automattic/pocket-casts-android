@@ -21,7 +21,12 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
 
     override fun refresh() {
         firebaseRemoteConfig.fetch().addOnCompleteListener {
-            Timber.e("Firebase feature flag refreshed")
+            if (it.isSuccessful) {
+                firebaseRemoteConfig.activate()
+                Timber.e("Firebase feature flag refreshed")
+            } else {
+                Timber.e("Could not fetch remote config: ${it.exception?.message ?: "Unknown error"}")
+            }
         }
     }
 }
