@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.android.gms.common.ConnectionResult
@@ -109,6 +111,7 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     private fun setupSentry() {
         SentryAndroid.init(this) { options ->
             options.dsn = settings.getSentryDsn()
+            options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.AUTOMOTIVE.value)
         }
     }
 

@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-09 15:54:03+0000
+Translation-Revision-Date: 2023-06-07 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">Länka ditt konto</string>
+    <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">Logga in med ett Plus-konto</string>
+    <string name="log_in_watch_requires_plus">Logga in med ett Plus-konto för att använda den här appen eller uppgradera genom att besöka</string>
+    <string name="enter_password">Ditt lösenord</string>
+    <string name="enter_email">Ange e-post</string>
+    <string name="player_effects_trim_level_down">Trimningsnivå upp</string>
+    <string name="player_effects_trim_level_up">Trimningsnivå ner</string>
+    <string name="effects">Effekter</string>
+    <string name="profile_hi">Hej, %s</string>
+    <string name="settings_take_me_there">Ta mig dit</string>
+    <string name="settings_forums_description">Gå till Pocket Casts-forumen (%1$s), där vårt supportteam kan hjälpa dig.</string>
+    <string name="settings_forums">Pocket Casts-forumen</string>
+    <string name="settings_app_icon_patron_dark">Patron Dark</string>
+    <string name="settings_app_icon_patron_glow">Patron Glow</string>
+    <string name="settings_app_icon_patron_round">Patron Round</string>
+    <string name="settings_app_icon_patron_chrome">Patron Chrome</string>
+    <string name="profile_upgrade_to_patron">Uppgradera till Patron</string>
+    <string name="onboarding_plus_subscribe">Prenumerera på Pocket Casts Plus</string>
+    <string name="onboarding_patron_subscribe">Prenumerera på Pocket Casts Patron</string>
+    <string name="upgrade_to">Uppgradera till %s</string>
     <string name="profile_patron_expires_in">Patron löper ut om %s</string>
     <string name="profile_account">Konto</string>
     <string name="log_in_watch_from_phone_instructions_2">Nästa gång du öppnar Pocket Casts på din klocka och har nätverksanslutning kommer du att loggas in.</string>

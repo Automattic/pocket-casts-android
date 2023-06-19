@@ -73,6 +73,9 @@ object WearNetworkModule {
         )
 
     @Provides
+    fun provideNetworkLogger(): NetworkStatusLogger = NetworkStatusLogger.Logging
+
+    @Provides
     @Singleton
     @DownloadCallFactory
     fun provideDownloadWearCallFactory(
@@ -81,6 +84,7 @@ object WearNetworkModule {
         networkingRulesEngine: NetworkingRulesEngine,
         @DownloadOkHttpClient phoneCallFactory: OkHttpClient,
         @ForApplicationScope coroutineScope: CoroutineScope,
+        logger: NetworkStatusLogger
     ): Call.Factory {
 
         return NetworkSelectingCallFactory(
@@ -91,6 +95,7 @@ object WearNetworkModule {
             rootClient = phoneCallFactory,
             coroutineScope = coroutineScope,
             timeout = 5.seconds,
+            logger = logger,
         )
     }
 

@@ -5,6 +5,8 @@ import android.os.Build
 import android.os.Vibrator
 import au.com.shiftyjelly.pocketcasts.wear.ui.AppConfig
 import com.google.android.horologist.audio.SystemAudioRepository
+import com.google.android.horologist.media3.audio.AudioOutputSelector
+import com.google.android.horologist.media3.audio.BluetoothSettingsOutputSelector
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,6 +25,13 @@ object ConfigModule {
     @Singleton
     @Provides
     fun appConfig(): AppConfig = AppConfig()
+
+    @Singleton
+    @Provides
+    fun audioOutputSelector(
+        systemAudioRepository: SystemAudioRepository
+    ): AudioOutputSelector =
+        BluetoothSettingsOutputSelector(systemAudioRepository)
 
     @Singleton
     @Provides

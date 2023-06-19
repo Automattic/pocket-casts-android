@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-10 12:54:03+0000
+Translation-Revision-Date: 2023-06-07 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">Associer votre compte</string>
+    <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">Connectez-vous avec un compte Plus</string>
+    <string name="log_in_watch_requires_plus">Connectez-vous avec un compte Plus pour utiliser cette application ou mettre à niveau les visites</string>
+    <string name="enter_password">Saisissez un mot de passe</string>
+    <string name="enter_email">Entrer l’adresse e-mail</string>
+    <string name="player_effects_trim_level_down">Diminuer la sensibilité de coupe</string>
+    <string name="player_effects_trim_level_up">Augmenter la sensibilité de coupe</string>
+    <string name="effects">Effets</string>
+    <string name="profile_hi">Bonjour, %s</string>
+    <string name="settings_take_me_there">Y accéder</string>
+    <string name="settings_forums_description">Rendez-vous sur les forums de Pocket Casts (%1$s) pour obtenir de l’aide de notre équipe d’assistance.</string>
+    <string name="settings_forums">Forums Pocket Casts</string>
+    <string name="settings_app_icon_patron_dark">Patron Dark</string>
+    <string name="settings_app_icon_patron_glow">Patron Glow</string>
+    <string name="settings_app_icon_patron_round">Patron Round</string>
+    <string name="settings_app_icon_patron_chrome">Patron Chrome</string>
+    <string name="profile_upgrade_to_patron">Passer à Patron</string>
+    <string name="onboarding_plus_subscribe">S’abonner à Pocket Casts Plus</string>
+    <string name="onboarding_patron_subscribe">S’abonner à Pocket Casts Patron</string>
+    <string name="upgrade_to">Passer à %s</string>
     <string name="profile_patron_expires_in">Le parrainage expire dans %s</string>
     <string name="profile_account">Compte</string>
     <string name="log_in_watch_from_phone_instructions_2">La prochaine fois que vous ouvrirez Pocket Casts sur votre montre et que vous disposerez d’une connexion réseau, vous serez connecté.</string>

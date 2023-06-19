@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-11 22:06:42+0000
+Translation-Revision-Date: 2023-06-06 13:54:23+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">アカウントをリンクする</string>
+    <string name="settings_app_icon_pride_2023">プライド2023</string>
+    <string name="log_in_with_plus">Plus アカウントにサインインしてください</string>
+    <string name="log_in_watch_requires_plus">Plus アカウントでサインインしてこのアプリを使用するかアクセスをアップグレードする</string>
+    <string name="enter_password">パスワードを入力</string>
+    <string name="enter_email">メールアドレスを入力</string>
+    <string name="player_effects_trim_level_down">カットレベルを下げる</string>
+    <string name="player_effects_trim_level_up">カットレベルを上げる</string>
+    <string name="effects">エフェクト</string>
+    <string name="profile_hi">%s さん、こんにちは</string>
+    <string name="settings_take_me_there">フォーラムに移動</string>
+    <string name="settings_forums_description">Pocket Casts のフォーラム (%1$s) にアクセスしてください。サポートチームがサポートします。</string>
+    <string name="settings_forums">Pocket Casts フォーラム</string>
+    <string name="settings_app_icon_patron_dark">Patron ダーク</string>
+    <string name="settings_app_icon_patron_glow">Patron グロー</string>
+    <string name="settings_app_icon_patron_round">Patron ラウンド</string>
+    <string name="settings_app_icon_patron_chrome">Patron クロム</string>
+    <string name="profile_upgrade_to_patron">Patron へのアップグレード</string>
+    <string name="onboarding_plus_subscribe">Pocket Casts Plus を購読</string>
+    <string name="onboarding_patron_subscribe">Pocket Casts Patron を購読</string>
+    <string name="upgrade_to">%s へのアップグレード </string>
     <string name="profile_patron_expires_in">Patron は%sで期限が切れます</string>
     <string name="profile_account">アカウント</string>
     <string name="log_in_watch_from_phone_instructions_2">次回以降は Watch で Pocket Casts を開いてネットワークに接続されるとログイン状態になります。</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="au.com.shiftyjelly.pocketcasts">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.BLUETOOTH"/>
@@ -16,15 +15,17 @@
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="com.android.vending.CHECK_LICENSE"/>
 
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
         android:name=".wear.PocketCastsWearApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="${appIcon}"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault">
+        android:theme="@style/SplashTheme">
 
         <uses-library
             android:name="com.google.android.wearable"
@@ -38,10 +39,13 @@
             android:name="pocketcasts_wear_os"
             android:value="true" />
 
+        <meta-data
+            android:name="au.com.shiftyjelly.pocketcasts.sentryDsn"
+            android:value="${sentryDsn}" />
+
         <activity
             android:name=".wear.MainActivity"
-            android:exported="true"
-            android:theme="@android:style/Theme.DeviceDefault">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -82,6 +86,20 @@
         <service android:name="au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncJob"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true"/>
+        <service android:name="au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsJob"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
+
+        <!-- File sharing / Opml export -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
 
         <!-- Work Manager -->
         <provider

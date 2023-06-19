@@ -20,7 +20,7 @@ buildscript {
     // Gradle Plugins
     dependencies {
         // Android - https://developer.android.com/studio/releases/gradle-plugin
-        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         // Google Services - https://developers.google.com/android/guides/google-services-plugin
         classpath "com.google.gms:google-services:4.3.14"
         // Kotlin
@@ -43,7 +43,7 @@ plugins {
     id 'com.mikepenz.aboutlibraries.plugin' version '10.4.0' apply false
     id 'com.github.ben-manes.versions' version '0.42.0'
     id 'com.diffplug.spotless' version '6.2.2'
-    id 'io.sentry.android.gradle' version '3.1.5' apply false
+    id 'io.sentry.android.gradle' version '3.10.0' apply false
 }
 
 apply plugin: 'base'
@@ -86,4 +86,3 @@ allprojects {
         }
     }
 }
-

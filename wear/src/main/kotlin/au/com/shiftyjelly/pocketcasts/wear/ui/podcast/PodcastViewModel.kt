@@ -8,42 +8,62 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class PodcastViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val episodeManager: EpisodeManager,
-    private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
+    private val theme: Theme,
 ) : ViewModel() {
 
     private val podcastUuid: String = savedStateHandle[PodcastScreen.argument] ?: ""
 
-    data class UiState(
-        val podcast: Podcast? = null,
-        val episodes: List<PodcastEpisode> = emptyList(),
-    )
+    sealed class UiState {
+        object Empty : UiState()
+        data class Loaded(
+            val podcast: Podcast? = null,
+            val episodes: List<PodcastEpisode> = emptyList(),
+            val theme: Theme,
+        ) : UiState()
+    }
 
-    var uiState by mutableStateOf(UiState())
+    var uiState: UiState by mutableStateOf(UiState.Empty)
         private set
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
             val podcast = podcastManager.findPodcastByUuidSuspend(podcastUuid)
-            val episodes = podcast?.let {
-                episodeManager.findEpisodesByPodcastOrdered(it)
-            } ?: emptyList()
-            uiState = UiState(
-                podcast = podcast,
-                episodes = episodes
-            )
+            podcast?.let {
+                episodeManager.observeEpisodesByPodcastOrderedRx(it)
+                    .asFlow()
+                    .map { podcastEpisodes ->
+                        val sortFunction = podcast.podcastGrouping.sortFunction
+                        if (sortFunction != null) {
+                            podcastEpisodes.sortedByDescending(sortFunction)
+                        } else {
+                            podcastEpisodes
+                        }
+                    }
+                    .stateIn(viewModelScope)
+                    .collect { episodes ->
+                        uiState = UiState.Loaded(
+                            podcast = podcast,
+                            episodes = episodes,
+                            theme = theme,
+                        )
+                    }
+            }
         }
     }
 }

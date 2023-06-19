@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.images
 
+import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.utils.Util
 
 object PodcastImage {
 
@@ -31,7 +33,9 @@ object PodcastImage {
         return String.format(STATIC_ARTWORK_JPG_URL, Settings.SERVER_STATIC_URL, size, uuid)
     }
 
-    fun getLargeArtworkUrl(uuid: String): String {
-        return getArtworkUrl(960, uuid)
+    fun getLargeArtworkUrl(uuid: String, context: Context): String {
+        // The watch's smaller screen does not need such large images
+        val size = if (Util.isWearOs(context)) 480 else 960
+        return getArtworkUrl(size, uuid)
     }
 }

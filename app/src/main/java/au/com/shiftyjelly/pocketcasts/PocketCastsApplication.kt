@@ -25,7 +25,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
+import au.com.shiftyjelly.pocketcasts.utils.SentryHelper.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
@@ -43,7 +46,6 @@ import io.sentry.protocol.User
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -74,8 +76,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
     @Inject lateinit var tracksTracker: TracksAnalyticsTracker
     @Inject lateinit var bumpStatsTracker: AnonymousBumpStatsTracker
     @Inject lateinit var syncManager: SyncManager
-
-    private val applicationScope = MainScope()
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -118,6 +118,7 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
         SentryAndroid.init(this) { options ->
             options.dsn = if (settings.getSendCrashReports()) settings.getSentryDsn() else ""
+            options.setTag(SentryHelper.GLOBAL_TAG_APP_PLATFORM, AppPlatform.MOBILE.value)
         }
 
         // Link email to Sentry crash reports only if the user has opted in

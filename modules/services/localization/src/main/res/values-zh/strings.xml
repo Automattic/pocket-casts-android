@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-09 09:54:03+0000
+Translation-Revision-Date: 2023-06-07 09:54:20+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">关联您的账户</string>
+    <string name="settings_app_icon_pride_2023">2023 年骄傲月</string>
+    <string name="log_in_with_plus">请使用 Plus 账户登录</string>
+    <string name="log_in_watch_requires_plus">使用 Plus 账户登录以使用此应用或升级访问</string>
+    <string name="enter_password">输入密码</string>
+    <string name="enter_email">输入电子邮件地址</string>
+    <string name="player_effects_trim_level_down">降低功能级别</string>
+    <string name="player_effects_trim_level_up">升级功能级别</string>
+    <string name="effects">效果</string>
+    <string name="profile_hi">%s，您好。</string>
+    <string name="settings_take_me_there">前往</string>
+    <string name="settings_forums_description">请前往 Pocket Casts 论坛 (%1$s)，在那里我们的支持团队可以帮助您。</string>
+    <string name="settings_forums">Pocket Casts 论坛</string>
+    <string name="settings_app_icon_patron_dark">Patron 深色</string>
+    <string name="settings_app_icon_patron_glow">Patron 亮色</string>
+    <string name="settings_app_icon_patron_round">Patron 圆形</string>
+    <string name="settings_app_icon_patron_chrome">Patron 铬黄色</string>
+    <string name="profile_upgrade_to_patron">升级至 Patron</string>
+    <string name="onboarding_plus_subscribe">订阅 Pocket Casts Plus</string>
+    <string name="onboarding_patron_subscribe">订阅 Pocket Casts Patron</string>
+    <string name="upgrade_to">升级至 %s</string>
     <string name="profile_patron_expires_in">Patron 到期时间 %s</string>
     <string name="profile_account">账户</string>
     <string name="log_in_watch_from_phone_instructions_2">下次您在手表上打开 Pocket Casts 并连接到网络时，您会自动登录。</string>

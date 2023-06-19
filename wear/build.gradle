@@ -1,6 +1,9 @@
+import io.sentry.android.gradle.extensions.InstrumentationFeature
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'io.sentry.android.gradle'
 }
 
 apply plugin: 'com.google.gms.google-services'
@@ -8,21 +11,11 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "../base.gradle"
 
 android {
+    namespace 'au.com.shiftyjelly.pocketcasts'
 
     defaultConfig {
         minSdk project.minSdkVersionWear
         applicationId project.applicationId
-    }
-
-    if (canSignRelease) {
-        signingConfigs {
-            release {
-                storeFile = project.storeFile
-                storePassword = project.storePassword
-                keyAlias = project.keyAlias
-                keyPassword = project.keyPassword
-            }
-        }
     }
 
     buildTypes {
@@ -34,7 +27,8 @@ android {
 
             manifestPlaceholders = [
                     appIcon: "@mipmap/ic_launcher_radioactive",
-                    gitHash: gitHash + (gitDirty ? ("-" + gitDirty) : "")
+                    gitHash: gitHash + (gitDirty ? ("-" + gitDirty) : ""),
+                    sentryDsn: ""
             ]
         }
 
@@ -43,13 +37,21 @@ android {
         }
 
         release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher",
+                    gitHash: "",
+                    sentryDsn: project.pocketcastsSentryDsn
+            ]
 
-            if (canSignRelease) {
-                signingConfig signingConfigs.release
+            if (!project.pocketcastsSentryDsn) {
+                println "WARNING: Sentry DSN gradle property 'pocketcastsSentryDsn' not found. Crash reporting won't work without this."
             }
+
+            if (!file("${project.rootDir}/sentry.properties").exists()) {
+                println "WARNING: Sentry configuration file 'sentry.properties' not found. The ProGuard mapping files won't be uploaded."
+            }
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -65,8 +67,16 @@ android {
     }
 }
 
+sentry {
+    includeProguardMapping = file("$rootDir/sentry.properties").exists()
+    tracingInstrumentation {
+        features = EnumSet.allOf(InstrumentationFeature) - InstrumentationFeature.FILE_IO
+    }
+}
+
 dependencies {
     implementation androidLibs.wearInput
+    implementation androidLibs.wearRemoteInteractions
 
     // General Compose dependencies
     implementation androidLibs.composeActivity
@@ -85,13 +95,13 @@ dependencies {
     implementation androidLibs.horologistAuthData
     implementation androidLibs.horologistAuthComposables
     implementation androidLibs.horologistAuthUi
-    implementation androidLibs.horologistBaseUi
+    implementation androidLibs.horologistComposeMaterial
     implementation androidLibs.horologistDatalayer
     implementation androidLibs.horologistMedia
     implementation androidLibs.horologistMedia3Backend
     implementation androidLibs.horologistMediaData
     implementation androidLibs.horologistMediaUi
-    implementation androidLibs.horologistNetworkAwarness
+    implementation androidLibs.horologistNetworkAwarnessOkHttp
 
     implementation androidLibs.media3DatasourceOkhttp
 
@@ -111,6 +121,8 @@ dependencies {
     implementation project(':modules:features:account')
     implementation project(':modules:features:podcasts')
     implementation project(':modules:features:profile')
+    implementation project(':modules:features:settings')
+    implementation project(':modules:features:shared')
 }
 
 task useGoogleServicesDebugFile {

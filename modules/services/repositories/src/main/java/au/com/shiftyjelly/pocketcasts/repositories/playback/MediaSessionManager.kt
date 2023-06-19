@@ -199,7 +199,13 @@ class MediaSessionManager(
             .setActions(getSupportedActions(playbackState))
             .setExtras(bundleOf(EXTRA_TRANSIENT to playbackState.transientLoss))
 
-        addCustomActions(stateBuilder, currentEpisode, playbackState)
+        // Do not add custom actions on Wear OS because there is a bug in Wear 3.5 that causes
+        // this to make the Wear OS media notification stop working. This bug was fixed
+        // internally by the Wear OS team in June 2023. Once that fix is released we should be
+        // able to remove this guard.
+        if (!Util.isWearOs(context)) {
+            addCustomActions(stateBuilder, currentEpisode, playbackState)
+        }
 
         return stateBuilder.build()
     }

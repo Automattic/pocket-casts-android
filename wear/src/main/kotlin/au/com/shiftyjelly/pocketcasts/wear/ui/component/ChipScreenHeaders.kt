@@ -11,13 +11,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
 
 @Composable
 fun ScreenHeaderChip(
     @StringRes text: Int,
-    textColor: Color? = null,
     modifier: Modifier = Modifier,
+    textColor: Color? = null,
+) {
+    ScreenHeaderChip(
+        text = stringResource(text),
+        textColor = textColor,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun ScreenHeaderChip(
+    text: String,
+    modifier: Modifier = Modifier,
+    textColor: Color? = null,
 ) {
     Header(
         text = text,
@@ -31,22 +43,25 @@ fun ScreenHeaderChip(
 }
 
 @Composable
-fun SectionHeaderChip(@StringRes text: Int, modifier: Modifier = Modifier) {
+fun SectionHeaderChip(
+    @StringRes text: Int,
+    modifier: Modifier = Modifier
+) {
     Header(
-        text = text,
+        text = stringResource(text),
         modifier = modifier.padding(vertical = verticalPadding, horizontal = horizontalPadding)
     )
 }
 
 @Composable
 private fun Header(
-    @StringRes text: Int,
-    textColor: Color? = null,
+    text: String,
     modifier: Modifier = Modifier,
+    textColor: Color? = null,
 ) {
     Text(
-        text = stringResource(text),
-        color = textColor ?: WearColors.FFBDC1C6,
+        text = text,
+        color = textColor ?: MaterialTheme.colors.onSecondary,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.button,
         modifier = modifier.fillMaxWidth()

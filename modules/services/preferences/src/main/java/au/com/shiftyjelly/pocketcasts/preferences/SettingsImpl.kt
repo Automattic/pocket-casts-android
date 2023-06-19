@@ -25,9 +25,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_EN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isScreenReaderOn
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -49,6 +50,7 @@ class SettingsImpl @Inject constructor(
     @PublicSharedPreferences private val sharedPreferences: SharedPreferences,
     @PrivateSharedPreferences private val privatePreferences: SharedPreferences,
     @ApplicationContext private val context: Context,
+    private val firebaseRemoteConfig: FirebaseRemoteConfig,
     private val moshi: Moshi
 ) : Settings {
 
@@ -71,8 +73,6 @@ class SettingsImpl @Inject constructor(
     }
 
     private var languageCode: String? = null
-
-    private val firebaseRemoteConfig: FirebaseRemoteConfig by lazy { setupFirebaseConfig() }
 
     override val podcastLayoutObservable = BehaviorRelay.create<Int>().apply { accept(getPodcastsLayout()) }
     override val skipForwardInSecsObservable = BehaviorRelay.create<Int>().apply { accept(getSkipForwardInSecs()) }
@@ -143,21 +143,6 @@ class SettingsImpl @Inject constructor(
             applicationInfo.metaData.getString("au.com.shiftyjelly.pocketcasts.sentryDsn", "")
         } catch (e: NameNotFoundException) {
             ""
-        }
-    }
-
-    private fun setupFirebaseConfig(): FirebaseRemoteConfig {
-        return FirebaseRemoteConfig.getInstance().apply {
-            val config = FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(2L * 60L * 60L)
-                .build()
-            setConfigSettingsAsync(config)
-            setDefaultsAsync(FirebaseConfig.defaults)
-            fetchAndActivate().addOnCompleteListener {
-                if (!it.isSuccessful) {
-                    Timber.e("Could not fetch remote config: ${it.exception?.message ?: "Unknown error"}")
-                }
-            }
         }
     }
 
@@ -287,7 +272,8 @@ class SettingsImpl @Inject constructor(
         syncOnMeteredNetwork() || isUnmetered
 
     override fun refreshPodcastsAutomatically(): Boolean {
-        return getBoolean("backgroundRefresh", true)
+        val isWear = Util.isWearOs(context)
+        return getBoolean("backgroundRefresh", !isWear)
     }
 
     override fun setRefreshPodcastsAutomatically(shouldRefresh: Boolean) {
@@ -1044,10 +1030,6 @@ class SettingsImpl @Inject constructor(
 
     override fun getEpisodeSearchDebounceMs(): Long {
         return getRemoteConfigLong(FirebaseConfig.EPISODE_SEARCH_DEBOUNCE_MS)
-    }
-
-    override fun isFeatureFlagSearchImprovementsEnabled(): Boolean {
-        return firebaseRemoteConfig.getBoolean(FirebaseConfig.FEATURE_FLAG_SEARCH_IMPROVEMENTS)
     }
 
     private fun getRemoteConfigLong(key: String): Long {

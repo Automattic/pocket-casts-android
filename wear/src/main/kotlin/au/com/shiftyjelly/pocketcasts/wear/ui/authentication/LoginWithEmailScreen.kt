@@ -39,6 +39,7 @@ fun LoginWithEmailScreen(
     val viewModel = hiltViewModel<SignInViewModel>()
     val signInState by viewModel.signInState.observeAsState()
     val email by viewModel.email.observeAsState()
+    val password by viewModel.password.observeAsState()
 
     var loading by remember { mutableStateOf(false) }
 
@@ -53,15 +54,16 @@ fun LoginWithEmailScreen(
                 LaunchedEffect(Unit) {
                     launchRemoteInput(label, launcher)
                 }
-            } else {
+            } else if (password.isNullOrEmpty()) {
                 val label = stringResource(LR.string.enter_password)
                 val launcher = getLauncher {
                     viewModel.updatePassword(it)
-                    viewModel.signIn()
                 }
                 LaunchedEffect(Unit) {
                     launchRemoteInput(label, launcher)
                 }
+            } else {
+                viewModel.signIn()
             }
         }
 
@@ -77,9 +79,12 @@ fun LoginWithEmailScreen(
 
         is SignInState.Failure -> {
             loading = false
-            val message = (signInState as? SignInState.Failure)
-                ?.message
-                ?: stringResource(LR.string.error_login_failed)
+            val currentState = signInState as? SignInState.Failure
+            val message = currentState?.message
+                ?: stringResource(
+                    currentState?.errors?.last()?.message
+                        ?: LR.string.error_login_failed
+                )
             ErrorScreen(message)
         }
     }
@@ -95,7 +100,7 @@ private fun Loading() {
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize(),
     ) {
-        LoadingSpinner(Modifier.size(48.dp))
+        LoadingSpinner(Modifier.size(36.dp))
     }
 }
 

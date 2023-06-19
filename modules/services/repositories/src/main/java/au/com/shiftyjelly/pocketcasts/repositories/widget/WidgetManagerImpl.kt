@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,27 +34,29 @@ class WidgetManagerImpl @Inject constructor(
 ) : WidgetManager {
 
     override fun updateWidget(podcast: Podcast?, playing: Boolean, playingEpisode: BaseEpisode?) {
-        if (Util.isAutomotive(context)) {
-            return
-        }
+        when (Util.getAppPlatform(context)) {
+            AppPlatform.Automotive,
+            AppPlatform.WearOs -> { /* do nothing */ }
+            AppPlatform.Phone -> {
+                try {
+                    val appWidgetManager = AppWidgetManager.getInstance(context)
 
-        try {
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-
-            val views = RemoteViews(context.packageName, R.layout.widget)
-            val widgetName = ComponentName(context, PodcastWidget::class.java)
-            if (playingEpisode == null) {
-                showPlayingControls(false, views)
-            } else {
-                showPlayingControls(true, views)
-                updateArtWork(podcast, playingEpisode, views, widgetName, context)
-                showPlayButton(playing, views)
-                updateSkipAmounts(views, settings)
+                    val views = RemoteViews(context.packageName, R.layout.widget)
+                    val widgetName = ComponentName(context, PodcastWidget::class.java)
+                    if (playingEpisode == null) {
+                        showPlayingControls(false, views)
+                    } else {
+                        showPlayingControls(true, views)
+                        updateArtWork(podcast, playingEpisode, views, widgetName, context)
+                        showPlayButton(playing, views)
+                        updateSkipAmounts(views, settings)
+                    }
+                    updateOnClicks(views, context)
+                    appWidgetManager.updateAppWidget(widgetName, views)
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
             }
-            updateOnClicks(views, context)
-            appWidgetManager.updateAppWidget(widgetName, views)
-        } catch (e: Exception) {
-            Timber.e(e)
         }
     }
 

@@ -160,6 +160,7 @@ sealed class SignInSource {
     sealed class UserInitiated(val analyticsValue: String) : SignInSource() {
         object SignInViewModel : UserInitiated("sign_in_view_model")
         object Onboarding : UserInitiated("onboarding")
+        object Watch : UserInitiated("watch")
     }
     object WatchPhoneSync : SignInSource()
 }

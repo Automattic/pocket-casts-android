@@ -1,3 +1,17 @@
+7.42
+-----
+
+
+7.41
+-----
+
+*   New Features:
+    *   Wear OS app
+        ([#1068](https://github.com/Automattic/pocket-casts-android/pull/1068)).
+    * Updates
+        Use regular Pocket Casts app icon by default, and allow pride icon to still be selected.
+        ([#1079](https://github.com/Automattic/pocket-casts-android/pull/1079)).
+
 7.40
 -----
 *   Updates:
@@ -13,9 +27,6 @@
 
 7.39
 -----
-*   New Features:
-    *   Added the ability to see ratings for podcasts
-        ([#951](https://github.com/Automattic/pocket-casts-android/pull/951)).
 *   Bug Fixes:
     *   Fixed the discover categories sorting so that it is alphabetical in the device language
         ([#942](https://github.com/Automattic/pocket-casts-android/pull/942)).
@@ -34,6 +45,8 @@
 *   Updates
     *   Link users to support forum from within the app
         ([#950](https://github.com/Automattic/pocket-casts-android/pull/950)).
+    *   Added a new pride icon
+        ([#997](https://github.com/Automattic/pocket-casts-android/pull/997)).
 
 7.38
 -----

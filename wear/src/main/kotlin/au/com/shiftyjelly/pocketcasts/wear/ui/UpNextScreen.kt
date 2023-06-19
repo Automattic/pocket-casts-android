@@ -15,14 +15,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
+import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object UpNextScreen {
@@ -34,7 +34,7 @@ fun UpNextScreen(
     navigateToEpisode: (episodeUuid: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: UpNextViewModel = hiltViewModel(),
-    listState: ScalingLazyListState,
+    columnState: ScalingLazyColumnState,
 ) {
     val queueState by viewModel.upNextQueue.subscribeAsState(initial = null)
 
@@ -50,7 +50,7 @@ fun UpNextScreen(
                 EmptyQueueState()
             } else {
                 ScalingLazyColumn(
-                    state = listState,
+                    columnState = columnState,
                     modifier = modifier.fillMaxWidth(),
                 ) {
 
@@ -81,13 +81,15 @@ private fun EmptyQueueState() {
         Text(
             text = stringResource(LR.string.player_up_next_empty),
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.title3,
+            color = MaterialTheme.colors.onPrimary,
+            style = MaterialTheme.typography.title2,
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text = stringResource(LR.string.player_up_next_empty_desc_watch),
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.body2,
+            color = MaterialTheme.colors.onPrimary,
+            style = MaterialTheme.typography.body1,
         )
     }
 }

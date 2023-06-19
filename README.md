@@ -79,6 +79,7 @@ If you happen to find a security vulnerability, please let us know at https://ha
 
 - [Coding Style](docs/coding-style.md) - guidelines and validation and auto-formatting tools
 - [Pull Request Guidelines](docs/pull-request-guidelines.md) - branch naming and how to write good pull requests
+- [Translations](docs/translations.md) - how the app gets translated and how to contribute translations
 
 ## Signing a Release
 
