@@ -1,16 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.featureflag
 
-interface Feature {
-    val key: String
-    val title: String
-    val defaultValue: Boolean
-}
-
 enum class FeatureFlag(
-    override val key: String,
-    override val title: String,
-    override val defaultValue: Boolean,
-) : Feature {
+    val key: String,
+    val title: String,
+    val defaultValue: Boolean,
+) {
     END_OF_YEAR_ENABLED(
         key = "end_of_year_enabled",
         title = "End of Year",

@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.featureflag.providers
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.featureflag.ModifiableFeatureFlagProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -17,11 +17,11 @@ class PreferencesFeatureFlagProvider @Inject constructor(
 ) : ModifiableFeatureFlagProvider {
     private val preferences = context.featureFlagsSharedPrefs()
 
-    override fun isFeatureEnabled(feature: Feature) =
-        preferences.getBoolean(feature.key, feature.defaultValue)
+    override fun isEnabled(featureFlag: FeatureFlag) =
+        preferences.getBoolean(featureFlag.key, featureFlag.defaultValue)
 
-    override fun setFeatureEnabled(feature: Feature, enabled: Boolean) =
-        preferences.edit().putBoolean(feature.key, enabled).apply()
+    override fun setEnabled(featureFlag: FeatureFlag, enabled: Boolean) =
+        preferences.edit().putBoolean(featureFlag.key, enabled).apply()
 
     private fun Context.featureFlagsSharedPrefs() =
         this.getSharedPreferences("POCKETCASTS_FEATURE_FLAGS", Context.MODE_PRIVATE)
