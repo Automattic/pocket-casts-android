@@ -47,7 +47,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.rx2.rxSingle
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
@@ -520,9 +520,8 @@ class SyncManagerImpl @Inject constructor(
 
     private fun <T : Any> getCacheTokenOrLoginRxSingle(serverCall: (token: AccessToken) -> Single<T>): Single<T> {
         if (isLoggedIn()) {
-            return Single.fromCallable {
-                runBlocking { syncAccountManager.getAccessToken() }
-                    ?: throw RuntimeException("Failed to get token")
+            return rxSingle {
+                syncAccountManager.getAccessToken() ?: throw RuntimeException("Failed to get token")
             }
                 .flatMap { token -> serverCall(token) }
                 // refresh invalid
@@ -548,10 +547,8 @@ class SyncManagerImpl @Inject constructor(
 
     private fun refreshToken(): Single<AccessToken> {
         syncAccountManager.invalidateAccessToken()
-        return Single.fromCallable {
-            runBlocking {
-                syncAccountManager.getAccessToken()
-            } ?: throw RuntimeException("Failed to get token")
+        return rxSingle {
+            syncAccountManager.getAccessToken() ?: throw RuntimeException("Failed to get token")
         }.doOnError {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Refresh token threw an error.")
         }
