@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YE
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -409,12 +410,14 @@ private fun SubscriptionStatusResponse.toStatus(): SubscriptionStatus {
     } else {
         val freq = SubscriptionFrequency.values().getOrNull(frequency) ?: SubscriptionFrequency.NONE
         val enumType = SubscriptionType.values().getOrNull(type) ?: SubscriptionType.NONE
-        SubscriptionStatus.Plus(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumType, index)
+        val enumTier = SubscriptionTier.fromString(tier)
+        SubscriptionStatus.Plus(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumType, enumTier, index)
     }
 }
 
 private fun SubscriptionResponse.toSubscription(): SubscriptionStatus.Subscription {
     val enumType = SubscriptionType.values().getOrNull(type) ?: SubscriptionType.NONE
+    val enumTier = SubscriptionTier.fromString(tier)
     val freq = SubscriptionFrequency.values().getOrNull(frequency) ?: SubscriptionFrequency.NONE
-    return SubscriptionStatus.Subscription(enumType, freq, expiryDate, autoRenewing, updateUrl)
+    return SubscriptionStatus.Subscription(enumType, enumTier, freq, expiryDate, autoRenewing, updateUrl)
 }
