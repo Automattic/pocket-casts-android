@@ -5,6 +5,7 @@ import android.accounts.AccountManager
 import android.accounts.NetworkErrorException
 import android.content.Context
 import android.content.Intent
+import androidx.core.os.BundleCompat
 import androidx.test.platform.app.InstrumentationRegistry
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
@@ -154,7 +155,7 @@ class PocketCastsAccountAuthenticatorTest {
         assertNotNull(bundle)
 
         // if the refresh token has expired and they need to sign in again an intent is returned to the login page
-        val intent = bundle.getParcelable(AccountManager.KEY_INTENT, Intent::class.java)
+        val intent = BundleCompat.getParcelable(bundle, AccountManager.KEY_INTENT, Intent::class.java)
         assertNotNull(intent)
         assertEquals(AccountActivity::class.java.name, intent?.component?.className)
 
