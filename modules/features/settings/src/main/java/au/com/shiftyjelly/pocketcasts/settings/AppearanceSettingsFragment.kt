@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.settings.databinding.FragmentSettingsAppearanceBinding
@@ -97,7 +97,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                                 .show()
                         } else {
                             viewModel.updateChangeAppIconType(Pair(beforeAppIconType, afterAppIconType))
-                            openOnboardingFlow(afterAppIconType.type)
+                            openOnboardingFlow(afterAppIconType.tier)
                         }
                     }
                     binding.appIconRecyclerView.setHasFixedSize(true)
@@ -192,8 +192,8 @@ class AppearanceSettingsFragment : BaseFragment() {
         viewModel.onShown()
     }
 
-    private fun openOnboardingFlow(type: SubscriptionType? = null) {
-        val onboardingFlow = type?.takeIf { type == SubscriptionType.PATRON }?.let {
+    private fun openOnboardingFlow(tier: SubscriptionTier? = null) {
+        val onboardingFlow = tier?.takeIf { tier == SubscriptionTier.PATRON }?.let {
             OnboardingFlow.PlusUpsell(source = OnboardingUpgradeSource.APPEARANCE, showPatronOnly = true)
         } ?: OnboardingFlow.PlusUpsell(OnboardingUpgradeSource.APPEARANCE)
         OnboardingLauncher.openOnboardingFlow(activity, onboardingFlow)

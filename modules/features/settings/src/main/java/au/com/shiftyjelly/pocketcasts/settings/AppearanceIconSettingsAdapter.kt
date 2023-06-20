@@ -9,7 +9,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.databinding.AdapterAppearanceAppiconItemBinding
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
@@ -93,10 +93,10 @@ class AppearanceIconSettingsAdapter(
             if (isValidIcon && selected) {
                 tickDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_circle_tick)
             } else if (!isValidIcon) {
-                val iconDrawable = when (appIcon.type) {
-                    SubscriptionType.PLUS -> R.drawable.ic_locked_plus
-                    SubscriptionType.PATRON -> R.drawable.ic_locked_patron
-                    SubscriptionType.NONE -> throw IllegalStateException("Unknown type found for AppIcon")
+                val iconDrawable = when (appIcon.tier) {
+                    SubscriptionTier.PLUS -> R.drawable.ic_locked_plus
+                    SubscriptionTier.PATRON -> R.drawable.ic_locked_patron
+                    SubscriptionTier.NONE -> throw IllegalStateException("Unknown type found for AppIcon")
                 }
                 tickDrawable = AppCompatResources.getDrawable(itemView.context, iconDrawable)
             }
@@ -122,8 +122,8 @@ class AppearanceIconSettingsAdapter(
         }
 
         private fun isValidIcon(appIcon: AppIcon.AppIconType) =
-            (appIcon.type == SubscriptionType.NONE) ||
-                (appIcon.type == SubscriptionType.PLUS && signInState?.isSignedInAsPlus == true) ||
-                (appIcon.type == SubscriptionType.PATRON && signInState?.isSignedInAsPatron == true)
+            (appIcon.tier == SubscriptionTier.NONE) ||
+                (appIcon.tier == SubscriptionTier.PLUS && signInState?.isSignedInAsPlus == true) ||
+                (appIcon.tier == SubscriptionTier.PATRON && signInState?.isSignedInAsPatron == true)
     }
 }

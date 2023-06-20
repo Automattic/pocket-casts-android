@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.models.type
 
 enum class SubscriptionType(val label: String) {
     NONE("none"),
-    PLUS("plus"),
-    PATRON("patron");
+    PLUS("plus");
     override fun toString() = label
 }
