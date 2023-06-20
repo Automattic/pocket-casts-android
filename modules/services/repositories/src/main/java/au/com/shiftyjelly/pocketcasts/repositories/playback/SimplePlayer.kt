@@ -216,11 +216,13 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_ENDED) {
-                    onCompletion()
-                } else if (playbackState == Player.STATE_READY) {
-                    onBufferingStateChanged()
-                    onDurationAvailable()
+                when (playbackState) {
+                    Player.STATE_READY -> {
+                        onBufferingStateChanged()
+                        onDurationAvailable()
+                    }
+                    Player.STATE_BUFFERING -> onBufferingStateChanged()
+                    Player.STATE_ENDED -> onCompletion()
                 }
             }
 
