@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.preferences
+package au.com.shiftyjelly.pocketcasts.utils.config
 
 object FirebaseConfig {
     const val PERIODIC_SAVE_TIME_MS = "periodic_playback_save_ms"

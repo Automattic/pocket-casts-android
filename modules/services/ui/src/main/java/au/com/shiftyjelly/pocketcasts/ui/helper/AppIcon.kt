@@ -179,7 +179,7 @@ class AppIcon @Inject constructor(
         );
 
         companion object {
-            fun fromString(value: String, default: AppIconType = PRIDE_2023): AppIconType {
+            fun fromString(value: String, default: AppIconType = DEFAULT): AppIconType {
                 return AppIconType.values().find { it.id == value } ?: default
             }
         }
@@ -194,8 +194,8 @@ class AppIcon @Inject constructor(
     val allAppIconTypes = AppIconType.values()
 
     private fun getAppIconFromPreferences(): AppIconType {
-        val appIconId: String = sharedPreferences.getString(PREFERENCE_APPICON, AppIconType.PRIDE_2023.id) ?: AppIconType.PRIDE_2023.id
-        return AppIconType.fromString(appIconId, AppIconType.PRIDE_2023)
+        val appIconId: String = sharedPreferences.getString(PREFERENCE_APPICON, AppIconType.DEFAULT.id) ?: AppIconType.PRIDE_2023.id
+        return AppIconType.fromString(appIconId, AppIconType.DEFAULT)
     }
 
     private fun setAppIconToPreferences(appIconType: AppIconType) {
@@ -210,7 +210,7 @@ class AppIcon @Inject constructor(
         AppIconType.values().forEach { iconType ->
             val componentName = ComponentName(componentPackage, "$classPath${iconType.aliasName}")
             // If we are using the default icon we just switch every alias off
-            val enabledFlag = if (selectedIconType == iconType && selectedIconType != AppIconType.PRIDE_2023) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            val enabledFlag = if (selectedIconType == iconType && selectedIconType != AppIconType.DEFAULT) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
             context.packageManager.setComponentEnabledSetting(componentName, enabledFlag, PackageManager.DONT_KILL_APP)
         }
     }

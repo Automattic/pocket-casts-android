@@ -8,11 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.MaterialTheme
-import com.google.android.horologist.base.ui.components.StandardChip
-import com.google.android.horologist.base.ui.components.StandardChipType
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.material.Chip
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -23,6 +25,13 @@ fun LoginScreen(
     onLoginWithPhoneClick: () -> Unit,
     onLoginWithEmailClick: () -> Unit,
 ) {
+
+    val viewModel = hiltViewModel<LoginViewModel>()
+
+    CallOnce {
+        viewModel.onShown()
+    }
+
     ScalingLazyColumn(
         columnState = columnState,
     ) {
@@ -49,29 +58,38 @@ fun LoginScreen(
         }
 
         item {
-            StandardChip(
+            Chip(
                 labelId = LR.string.log_in_with_google,
-                chipType = StandardChipType.Secondary,
+                colors = ChipDefaults.secondaryChipColors(),
                 icon = IR.drawable.google_g_white,
-                onClick = onLoginWithGoogleClick,
+                onClick = {
+                    viewModel.onGoogleLoginClicked()
+                    onLoginWithGoogleClick()
+                },
             )
         }
 
         item {
-            StandardChip(
+            Chip(
                 labelId = LR.string.log_in_on_phone,
-                chipType = StandardChipType.Secondary,
+                colors = ChipDefaults.secondaryChipColors(),
                 icon = IR.drawable.baseline_phone_android_24,
-                onClick = onLoginWithPhoneClick,
+                onClick = {
+                    viewModel.onPhoneLoginClicked()
+                    onLoginWithPhoneClick()
+                },
             )
         }
 
         item {
-            StandardChip(
+            Chip(
                 labelId = LR.string.log_in_with_email,
-                chipType = StandardChipType.Secondary,
+                colors = ChipDefaults.secondaryChipColors(),
                 icon = IR.drawable.ic_email_white_24dp,
-                onClick = onLoginWithEmailClick,
+                onClick = {
+                    viewModel.onEmailLoginClicked()
+                    onLoginWithEmailClick()
+                },
             )
         }
     }

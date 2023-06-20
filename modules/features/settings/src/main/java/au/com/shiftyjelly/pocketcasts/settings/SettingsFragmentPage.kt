@@ -55,6 +55,10 @@ fun SettingsFragmentPage(
                 DeveloperRow(onClick = { openFragment(DeveloperFragment()) })
             }
 
+            if (isDebug) {
+                BetaFeatures(onClick = { openFragment(BetaFeaturesFragment()) })
+            }
+
             if (!isUnrestrictedBattery && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 BatteryOptimizationRow(onClick = { openFragment(BatteryRestrictionsSettingsFragment.newInstance(closeButton = false)) })
             }
@@ -88,6 +92,21 @@ private fun DeveloperRow(onClick: () -> Unit) {
         primaryText = stringResource(LR.string.settings_developer),
         icon = GradientIconData(
             res = SR.drawable.ic_developer_mode,
+            colors = listOf(
+                MaterialTheme.theme.colors.gradient03A,
+                MaterialTheme.theme.colors.gradient03E,
+            )
+        ),
+        modifier = rowModifier(onClick)
+    )
+}
+
+@Composable
+private fun BetaFeatures(onClick: () -> Unit) {
+    SettingRow(
+        primaryText = stringResource(LR.string.settings_beta_features),
+        icon = GradientIconData(
+            res = IR.drawable.ic_science,
             colors = listOf(
                 MaterialTheme.theme.colors.gradient03A,
                 MaterialTheme.theme.colors.gradient03E,

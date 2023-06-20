@@ -25,6 +25,7 @@ android {
             applicationIdSuffix '.debug'
 
             manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher_radioactive",
                     sentryDsn: ""
             ]
         }
@@ -36,6 +37,7 @@ android {
 
         release {
             manifestPlaceholders = [
+                    appIcon: "@mipmap/ic_launcher",
                     gitHash: "",
                     sentryDsn: project.pocketcastsSentryDsn
             ]
@@ -75,6 +77,7 @@ dependencies {
     implementation project(':modules:features:settings')
     implementation project(':modules:features:discover')
     implementation project(':modules:features:account')
+    implementation project(':modules:features:shared')
 }
 
 apply plugin: 'com.google.gms.google-services'

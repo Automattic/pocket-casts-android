@@ -21,4 +21,5 @@ dependencies {
     implementation project(':modules:services:repositories')
     implementation project(':modules:services:model')
     implementation project(':modules:services:analytics')
+    implementation project(':modules:services:featureflag')
 }

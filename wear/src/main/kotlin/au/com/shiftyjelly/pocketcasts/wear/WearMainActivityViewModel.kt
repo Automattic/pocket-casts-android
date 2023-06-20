@@ -1,23 +1,30 @@
 package au.com.shiftyjelly.pocketcasts.wear
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSyncAuthData
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,7 +34,9 @@ class WearMainActivityViewModel @Inject constructor(
     tokenBundleRepository: TokenBundleRepository<WatchSyncAuthData?>,
     subscriptionManager: SubscriptionManager,
     private val userManager: UserManager,
+    private val settings: Settings,
     watchSync: WatchSync,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     data class State(
@@ -91,5 +100,22 @@ class WearMainActivityViewModel @Inject constructor(
 
     fun signOut() {
         userManager.signOut(playbackManager, wasInitiatedByUser = false)
+    }
+
+    fun refreshPodcasts() {
+        viewModelScope.launch(Dispatchers.IO) {
+            delay(REFRESH_START_DELAY) // delay the refresh to allow the UI to load
+            try {
+                podcastManager.refreshPodcastsIfRequired(fromLog = "watch - open app")
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
+        // Schedule next refresh in the background
+        RefreshPodcastsTask.scheduleOrCancel(context, settings)
+    }
+
+    companion object {
+        private const val REFRESH_START_DELAY = 1000L
     }
 }

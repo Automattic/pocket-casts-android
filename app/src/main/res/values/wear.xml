@@ -14,12 +14,14 @@
      limitations under the License.
 -->
 
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@array/android_wear_capabilities">
     <string-array
         name="android_wear_capabilities"
         translatable="false"
         tools:ignore="UnusedResources">
-        <!-- declaring the provided capabilities -->
         <item>horologist_phone</item>
+        <item>pocket_casts_wear_listener</item>
     </string-array>
 </resources>

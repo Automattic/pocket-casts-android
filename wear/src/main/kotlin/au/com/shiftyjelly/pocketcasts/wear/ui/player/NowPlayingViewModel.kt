@@ -45,6 +45,7 @@ class NowPlayingViewModel @Inject constructor(
             val trackPositionUiModel: TrackPositionUiModel.Actual,
         ) : State()
         object Loading : State()
+        object Empty : State()
     }
 
     val state: StateFlow<State> =
@@ -54,27 +55,32 @@ class NowPlayingViewModel @Inject constructor(
             settings.skipForwardInSecsObservable.asFlow(),
         ) { playbackState, skipBackwardSecs, skipForwardSecs ->
 
-            val trackPositionUiModel = TrackPositionUiModel.Actual(
-                percent = with(playbackState) { positionMs.toFloat() / durationMs },
-                duration = playbackState.durationMs.toDuration(DurationUnit.MILLISECONDS),
-                position = playbackState.positionMs.toDuration(DurationUnit.MILLISECONDS),
-                shouldAnimate = true
-            )
+            if (playbackState.isEmpty) {
+                State.Empty
+            } else {
 
-            State.Loaded(
-                title = playbackState.title,
-                subtitle = playbackManager.getCurrentEpisode()?.let { episode ->
-                    val podcast = playbackState.podcast
-                    episode.displaySubtitle(podcast)
-                },
-                tintColor = playbackState.podcast?.getPlayerTintColor(theme.isDarkTheme),
-                episodeUuid = playbackState.episodeUuid,
-                playing = playbackState.isPlaying,
-                theme = theme,
-                seekBackwardIncrement = SeekButtonIncrement.Known(skipBackwardSecs),
-                seekForwardIncrement = SeekButtonIncrement.Known(skipForwardSecs),
-                trackPositionUiModel = trackPositionUiModel,
-            )
+                val trackPositionUiModel = TrackPositionUiModel.Actual(
+                    percent = with(playbackState) { positionMs.toFloat() / durationMs },
+                    duration = playbackState.durationMs.toDuration(DurationUnit.MILLISECONDS),
+                    position = playbackState.positionMs.toDuration(DurationUnit.MILLISECONDS),
+                    shouldAnimate = true
+                )
+
+                State.Loaded(
+                    title = playbackState.title,
+                    subtitle = playbackManager.getCurrentEpisode()?.let { episode ->
+                        val podcast = playbackState.podcast
+                        episode.displaySubtitle(podcast)
+                    },
+                    tintColor = playbackState.podcast?.getPlayerTintColor(theme.isDarkTheme),
+                    episodeUuid = playbackState.episodeUuid,
+                    playing = playbackState.isPlaying,
+                    theme = theme,
+                    seekBackwardIncrement = SeekButtonIncrement.Known(skipBackwardSecs),
+                    seekForwardIncrement = SeekButtonIncrement.Known(skipForwardSecs),
+                    trackPositionUiModel = trackPositionUiModel,
+                )
+            }
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
@@ -94,15 +100,15 @@ class NowPlayingViewModel @Inject constructor(
     fun onPauseButtonClick() {
         playAttempt?.cancel()
 
-        playbackManager.pause(playbackSource = AnalyticsSource.WATCH_PLAYER)
+        playbackManager.pause(playbackSource = AnalyticsSource.PLAYER)
     }
 
     fun onSeekBackButtonClick() {
-        playbackManager.skipBackward(AnalyticsSource.WATCH_PLAYER)
+        playbackManager.skipBackward(AnalyticsSource.PLAYER)
     }
 
     fun onSeekForwardButtonClick() {
-        playbackManager.skipForward(AnalyticsSource.WATCH_PLAYER)
+        playbackManager.skipForward(AnalyticsSource.PLAYER)
     }
 
     fun onStreamingConfirmationResult(result: StreamingConfirmationScreen.Result) {
@@ -115,6 +121,6 @@ class NowPlayingViewModel @Inject constructor(
     }
 
     private fun play() {
-        playbackManager.playQueue(AnalyticsSource.WATCH_PLAYER)
+        playbackManager.playQueue(AnalyticsSource.PLAYER)
     }
 }

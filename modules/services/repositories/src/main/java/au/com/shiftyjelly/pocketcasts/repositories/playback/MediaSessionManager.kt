@@ -89,7 +89,6 @@ class MediaSessionManager(
 
     val mediaSession = MediaSessionCompat(context, "PocketCastsMediaSession")
     val disposables = CompositeDisposable()
-    var seeking = false
     private val source = AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION
 
     override val coroutineContext: CoroutineContext
@@ -199,7 +198,13 @@ class MediaSessionManager(
             .setActions(getSupportedActions(playbackState))
             .setExtras(bundleOf(EXTRA_TRANSIENT to playbackState.transientLoss))
 
-        addCustomActions(stateBuilder, currentEpisode, playbackState)
+        // Do not add custom actions on Wear OS because there is a bug in Wear 3.5 that causes
+        // this to make the Wear OS media notification stop working. This bug was fixed
+        // internally by the Wear OS team in June 2023. Once that fix is released we should be
+        // able to remove this guard.
+        if (!Util.isWearOs(context)) {
+            addCustomActions(stateBuilder, currentEpisode, playbackState)
+        }
 
         return stateBuilder.build()
     }
@@ -274,11 +279,14 @@ class MediaSessionManager(
 
     private fun observePlaybackState() {
         val ignoreStates = listOf(
-            // ignore the current position update because the media session progress the time without it and it causes the position to jump when seeking
-            "updateCurrentPosition",
             // ignore buffer position because it isn't displayed in the media session
-            "updateBufferPosition"
+            "updateBufferPosition",
+            // ignore the playback progress updates as the media session can calculate this without being sent it every second
+            "updateCurrentPosition",
+            // ignore the user seeking as the event onBufferingStateChanged will update the buffering state
+            "onUserSeeking"
         )
+
         var previousEpisode: BaseEpisode? = null
 
         playbackManager.playbackStateRelay
@@ -297,19 +305,11 @@ class MediaSessionManager(
                     }
                 Observables.combineLatest(Observable.just(state), episodeSource)
             }
-            // ignore events until seeking has finished or the progress won't stay where the user requested
-            .doOnNext {
-                if (it.first.lastChangeFrom == "onSeekComplete" || it.first.isPaused) {
-                    seeking = false
-                }
-            }
             .filter {
-                // allow the playback state and episode through when true
-                (!ignoreStates.contains(it.first.lastChangeFrom) && !seeking) || !BaseEpisode.isMediaSessionEqual(it.second.get(), previousEpisode)
+                !ignoreStates.contains(it.first.lastChangeFrom) || !BaseEpisode.isMediaSessionEqual(it.second.get(), previousEpisode)
             }
             .doOnNext {
                 previousEpisode = it.second.get()
-                Timber.d("Media session update from %s with state %s", it.first.lastChangeFrom, it.first.state.name)
             }
             .switchMap { (state, episode) -> getPlaybackStateRx(state, episode).toObservable().onErrorResumeNext(Observable.empty()) }
             .switchMap {
@@ -607,7 +607,6 @@ class MediaSessionManager(
 
         override fun onSeekTo(pos: Long) {
             logEvent("seek to $pos")
-            seeking = true
             launch {
                 playbackManager.seekToTimeMs(pos.toInt())
                 playbackManager.trackPlaybackSeek(pos.toInt(), AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION)

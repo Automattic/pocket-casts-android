@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui
+package au.com.shiftyjelly.pocketcasts.wear.ui.settings
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
@@ -6,6 +6,7 @@ import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -16,7 +17,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
@@ -30,11 +33,12 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
-import com.google.android.horologist.base.ui.util.adjustChipHeightToFontScale
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.material.util.adjustChipHeightToFontScale
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.settings.R as SR
 
 object SettingsScreen {
     const val route = "settings_screen"
@@ -44,6 +48,9 @@ object SettingsScreen {
 fun SettingsScreen(
     scrollState: ScalingLazyColumnState,
     signInClick: () -> Unit,
+    navigateToPrivacySettings: () -> Unit,
+    navigateToAbout: () -> Unit,
+    navigateToHelp: () -> Unit,
 ) {
 
     val viewModel = hiltViewModel<SettingsViewModel>()
@@ -53,9 +60,13 @@ fun SettingsScreen(
         scrollState = scrollState,
         state = state,
         onWarnOnMeteredChanged = { viewModel.setWarnOnMeteredNetwork(it) },
+        onRefreshInBackgroundChanged = { viewModel.setRefreshPodcastsInBackground(it) },
         signInClick = signInClick,
         onSignOutClicked = viewModel::signOut,
         onRefreshClicked = viewModel::refresh,
+        onPrivacyClicked = navigateToPrivacySettings,
+        onAboutClicked = navigateToAbout,
+        onHelpClicked = navigateToHelp,
     )
 }
 
@@ -64,9 +75,13 @@ private fun Content(
     scrollState: ScalingLazyColumnState,
     state: SettingsViewModel.State,
     onWarnOnMeteredChanged: (Boolean) -> Unit,
+    onRefreshInBackgroundChanged: (Boolean) -> Unit,
     signInClick: () -> Unit,
     onSignOutClicked: () -> Unit,
     onRefreshClicked: () -> Unit,
+    onPrivacyClicked: () -> Unit,
+    onAboutClicked: () -> Unit,
+    onHelpClicked: () -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
 
@@ -79,6 +94,26 @@ private fun Content(
                 label = stringResource(LR.string.settings_metered_data_warning),
                 checked = state.showDataWarning,
                 onCheckedChanged = onWarnOnMeteredChanged,
+            )
+        }
+
+        val backgroundRefreshStringRes =
+            if (state.refreshInBackground) LR.string.settings_storage_background_refresh_on else LR.string.settings_storage_background_refresh_off
+        item {
+            ToggleChip(
+                label = stringResource(LR.string.settings_storage_background_refresh),
+                checked = state.refreshInBackground,
+                onCheckedChanged = onRefreshInBackgroundChanged,
+            )
+        }
+
+        item {
+            Text(
+                text = stringResource(backgroundRefreshStringRes),
+                style = MaterialTheme.typography.caption3,
+                color = MaterialTheme.colors.onSecondary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(8.dp)
             )
         }
 
@@ -108,6 +143,14 @@ private fun Content(
         }
 
         item {
+            WatchListChip(
+                title = stringResource(LR.string.settings_privacy_analytics),
+                iconRes = SR.drawable.whatsnew_privacy,
+                onClick = onPrivacyClicked,
+            )
+        }
+
+        item {
             val signInState = state.signInState
             when (signInState) {
                 is SignInState.SignedIn -> {
@@ -126,6 +169,22 @@ private fun Content(
                     )
                 }
             }
+        }
+
+        item {
+            WatchListChip(
+                title = stringResource(LR.string.settings_title_help),
+                iconRes = SR.drawable.settings_help,
+                onClick = onHelpClicked
+            )
+        }
+
+        item {
+            WatchListChip(
+                title = stringResource(LR.string.settings_title_about),
+                iconRes = SR.drawable.settings_about,
+                onClick = onAboutClicked
+            )
         }
     }
 }
@@ -215,12 +274,17 @@ private fun SettingsScreenPreview_unchecked() {
                     subscriptionStatus = SubscriptionStatus.Free(),
                 ),
                 showDataWarning = false,
+                refreshInBackground = false,
                 refreshState = null,
             ),
             signInClick = {},
             onWarnOnMeteredChanged = {},
+            onRefreshInBackgroundChanged = {},
             onSignOutClicked = {},
             onRefreshClicked = {},
+            onPrivacyClicked = {},
+            onAboutClicked = {},
+            onHelpClicked = {},
         )
     }
 }
@@ -241,12 +305,17 @@ private fun SettingsScreenPreview_checked() {
                     subscriptionStatus = SubscriptionStatus.Free(),
                 ),
                 showDataWarning = true,
+                refreshInBackground = true,
                 refreshState = null,
             ),
             signInClick = {},
             onWarnOnMeteredChanged = {},
+            onRefreshInBackgroundChanged = {},
             onSignOutClicked = {},
             onRefreshClicked = {},
+            onPrivacyClicked = {},
+            onAboutClicked = {},
+            onHelpClicked = {},
         )
     }
 }

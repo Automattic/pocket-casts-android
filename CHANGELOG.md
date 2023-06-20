@@ -1,6 +1,19 @@
+7.42
+-----
+
+*   Updates:
+    *   Use sha256 to encode email for gravatar
+        ([#1080](https://github.com/Automattic/pocket-casts-android/pull/1080)).
+
 7.41
 -----
 
+*   New Features:
+    *   Wear OS app
+        ([#1068](https://github.com/Automattic/pocket-casts-android/pull/1068)).
+    * Updates
+        Use regular Pocket Casts app icon by default, and allow pride icon to still be selected.
+        ([#1079](https://github.com/Automattic/pocket-casts-android/pull/1079)).
 
 7.40
 -----

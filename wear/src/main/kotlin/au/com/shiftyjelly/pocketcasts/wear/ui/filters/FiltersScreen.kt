@@ -11,8 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.items
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
@@ -21,6 +19,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.filters.FiltersViewModel.UiState
+import com.google.android.horologist.compose.layout.ScalingLazyColumn
+import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object FiltersScreen {
@@ -32,7 +32,7 @@ fun FiltersScreen(
     onFilterTap: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FiltersViewModel = hiltViewModel(),
-    listState: ScalingLazyListState,
+    columnState: ScalingLazyColumnState,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     when (val state = uiState) { // the state needs to be immutable or the following error will happen 'Smart cast is impossible'
@@ -40,7 +40,7 @@ fun FiltersScreen(
             filters = state.filters,
             onFilterTap = onFilterTap,
             modifier = modifier,
-            listState = listState,
+            columnState = columnState,
         )
         is UiState.Loading -> LoadingScreen()
     }
@@ -51,11 +51,11 @@ private fun Content(
     filters: List<Playlist>,
     onFilterTap: (String) -> Unit,
     modifier: Modifier = Modifier,
-    listState: ScalingLazyListState,
+    columnState: ScalingLazyColumnState,
 ) {
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),
-        state = listState
+        columnState = columnState
     ) {
         item {
             ScreenHeaderChip(LR.string.filters)

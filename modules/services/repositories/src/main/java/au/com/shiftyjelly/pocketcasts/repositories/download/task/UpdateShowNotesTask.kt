@@ -1,26 +1,34 @@
 package au.com.shiftyjelly.pocketcasts.repositories.download.task
 
 import android.content.Context
-import androidx.work.Worker
+import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.servers.ServerShowNotesManager
-import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
-import okhttp3.OkHttpClient
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import timber.log.Timber
 
-class UpdateShowNotesTask(val context: Context, val params: WorkerParameters) : Worker(context, params) {
+@HiltWorker
+class UpdateShowNotesTask @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val showNotesManager: ServerShowNotesManager
+) : CoroutineWorker(context, params) {
     companion object {
+        const val INPUT_PODCAST_UUID = "podcast_uuid"
         const val INPUT_EPISODE_UUID = "episode_uuid"
     }
 
-    private val httpClient: OkHttpClient = ServersModule.getShowNotesClient(context)
-    private val episodeUUID = inputData.getString(INPUT_EPISODE_UUID)!!
+    private val podcastUuid = inputData.getString(INPUT_PODCAST_UUID)!!
+    private val episodeUuid = inputData.getString(INPUT_EPISODE_UUID)!!
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         return try {
-            val serverShowNotes = ServerShowNotesManager(httpClient)
-            serverShowNotes.cacheShowNotes(episodeUUID).onErrorComplete().blockingAwait()
+            showNotesManager.downloadShowNotes(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
             Result.success()
         } catch (e: Exception) {
+            Timber.e(e)
             Result.failure()
         }
     }

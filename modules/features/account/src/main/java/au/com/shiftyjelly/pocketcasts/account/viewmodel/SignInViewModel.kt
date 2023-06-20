@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -10,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class SignInViewModel
@@ -89,10 +91,10 @@ class SignInViewModel
     }
 }
 
-enum class SignInError {
-    INVALID_EMAIL,
-    INVALID_PASSWORD,
-    SERVER
+enum class SignInError(@StringRes val message: Int) {
+    INVALID_EMAIL(LR.string.error_invalid_email_address),
+    INVALID_PASSWORD(LR.string.error_invalid_password_length),
+    SERVER(LR.string.error_server_failed)
 }
 
 sealed class SignInState {

@@ -14,11 +14,13 @@ include ':modules:features:podcasts'
 include ':modules:features:profile'
 include ':modules:features:search'
 include ':modules:features:settings'
+include ':modules:features:shared'
 include ':modules:features:taskerplugin'
 
 // services
 include ':modules:services:analytics'
 include ':modules:services:compose'
+include ':modules:services:featureflag'
 include ':modules:services:images'
 include ':modules:services:localization'
 include ':modules:services:model'

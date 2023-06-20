@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-05-24 14:54:03+0000
+Translation-Revision-Date: 2023-06-06 13:54:23+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="settings_privacy_crash_link_short">Dein Konto verbinden</string>
+    <string name="settings_app_icon_pride_2023">Pride 2023</string>
+    <string name="log_in_with_plus">Bitte melde dich mit einem Plus-Konto an</string>
+    <string name="log_in_watch_requires_plus">Melde dich mit einem Plus-Konto an, um diese App zu verwenden, oder führe ein Upgrade durch unter</string>
     <string name="enter_password">Passwort eingeben</string>
     <string name="enter_email">E-Mail-Adresse eingeben</string>
     <string name="player_effects_trim_level_down">Kürzungsgrad runter</string>

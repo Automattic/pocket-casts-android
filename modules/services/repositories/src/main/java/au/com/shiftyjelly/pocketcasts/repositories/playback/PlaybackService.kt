@@ -153,7 +153,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     fun isForegroundService(): Boolean {
         val manager = baseContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-            if (PlaybackService::class.java.name == service.service.className) {
+            if (this::class.java.name == service.service.className) {
                 return service.foreground
             }
         }

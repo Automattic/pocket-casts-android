@@ -48,7 +48,7 @@ android {
 
         release {
             manifestPlaceholders = [
-                    appIcon: "@mipmap/ic_launcher_pride_2023",
+                    appIcon: "@mipmap/ic_launcher",
                     gitHash: "",
                     sentryDsn: project.pocketcastsSentryDsn
             ]
@@ -94,6 +94,7 @@ dependencies {
     implementation project(':modules:features:filters')
     implementation project(':modules:features:navigation')
     implementation project(':modules:features:account')
+    implementation project(':modules:features:shared')
     implementation project(':modules:features:taskerplugin')
     implementation project(':modules:features:endofyear')
 }

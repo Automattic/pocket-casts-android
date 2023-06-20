@@ -82,7 +82,7 @@ private fun Content(
             .fillMaxSize()
     ) {
         val placeholder = @Composable {
-            LoadingSpinner(Modifier.size(48.dp))
+            LoadingSpinner(Modifier.size(36.dp))
         }
 
         val profileModifier = Modifier
