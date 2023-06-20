@@ -133,6 +133,7 @@
 
     <string name="episodes_singular">1 episode</string>
     <string name="episodes_plural">%d episodes</string>
+    <string name="empty_play_state">Pick an episode to begin</string>
 
     <string name="seconds_label">Seconds</string>
     <string name="seconds_singular">1 second</string>
