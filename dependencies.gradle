@@ -89,7 +89,7 @@ project.ext {
     versionCompose = '1.4.2' // When updating this, also check if versionComposeAccompanist should be updated as well: https://github.com/google/accompanist#compose-versions
     versionComposeAccompanist = '0.30.1'
     versionComposeCompiler = '1.3.0'
-    versionComposeWear = '1.2.0-alpha10'
+    versionComposeWear = '1.2.0-beta02'
     versionDagger = '2.41'
     versionEspresso = '3.4.0'
     versionMedia3 = '1.0.0'
