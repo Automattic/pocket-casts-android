@@ -4,10 +4,10 @@ import android.accounts.AccountAuthenticatorResponse
 import android.accounts.AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
@@ -55,12 +55,7 @@ class AccountActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
 
-            val accountAuthenticatorResponse = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                intent.getParcelableExtra(KEY_ACCOUNT_AUTHENTICATOR_RESPONSE)
-            }
+            val accountAuthenticatorResponse = IntentCompat.getParcelableExtra(intent, KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
             if (accountAuthenticatorResponse != null) {
                 graph.setStartDestination(R.id.signInFragment)
             } else if (isNewUpgradeInstance(intent)) {

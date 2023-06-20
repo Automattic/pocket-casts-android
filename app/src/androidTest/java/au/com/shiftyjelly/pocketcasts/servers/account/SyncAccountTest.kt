@@ -55,7 +55,7 @@ internal class SyncAccountTest {
 
         okhttpCache = Cache(File(context.cacheDir.absolutePath, "HttpCache"), (10 * 1024 * 1024).toLong())
 
-        val accountManager = mock<AccountManager>()
+        val accountManager = AccountManager.get(context)
         val syncServerManager = SyncServerManager(retrofit, mock(), okhttpCache)
         val syncAccountManager = SyncAccountManager(mock(), accountManager)
 

@@ -12,7 +12,7 @@ import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.account.AccountActivity
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.servers.sync.exception.UserNotLoggedInException
+import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import kotlinx.coroutines.runBlocking
 
 class PocketCastsAccountAuthenticator(
@@ -46,7 +46,7 @@ class PocketCastsAccountAuthenticator(
             )
         } catch (e: Exception) {
             // the refresh token is invalid or expired so the user needs to sign in again
-            if (e is UserNotLoggedInException) {
+            if (e is RefreshTokenExpiredException) {
                 return buildSignInIntent(response)
             } else {
                 throw NetworkErrorException(e)

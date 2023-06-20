@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServerManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.exception.UserNotLoggedInException
+import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
@@ -130,7 +130,7 @@ class SyncManagerImpl @Inject constructor(
         syncAccountManager.getRefreshToken()
 
     private suspend fun fetchAccessToken(account: Account): AccessToken {
-        val refreshToken = syncAccountManager.getRefreshToken(account) ?: throw UserNotLoggedInException()
+        val refreshToken = syncAccountManager.getRefreshToken(account) ?: throw RefreshTokenExpiredException()
         return try {
             val signInType = syncAccountManager.getSignInType(account)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Fetching the access token, SignInType: $signInType")
@@ -148,7 +148,7 @@ class SyncManagerImpl @Inject constructor(
         } catch (ex: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Unable to fetch access token.")
             if (isHttpClientError(ex)) {
-                throw UserNotLoggedInException()
+                throw RefreshTokenExpiredException()
             } else {
                 throw ex
             }
@@ -193,9 +193,6 @@ class SyncManagerImpl @Inject constructor(
         val loginResult = try {
             val response = loginFunction()
             val result = handleTokenResponse(loginIdentity = loginIdentity, response = response)
-
-            settings.setFullySignedOut(false)
-
             LoginResult.Success(result)
         } catch (ex: Exception) {
             Timber.e(ex, "Failed to sign in with Pocket Casts")
@@ -586,6 +583,7 @@ class SyncManagerImpl @Inject constructor(
         )
         isLoggedInObservable.accept(true)
 
+        settings.setFullySignedOut(false)
         settings.setLastModified(null)
 
         return AuthResultModel(

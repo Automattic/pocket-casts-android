@@ -3,15 +3,16 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.accounts.AccountManagerFuture
+import android.accounts.NetworkErrorException
+import android.content.Intent
 import android.os.Bundle
+import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
 import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
-import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenException
-import au.com.shiftyjelly.pocketcasts.servers.sync.exception.UserNotLoggedInException
-import au.com.shiftyjelly.pocketcasts.utils.extensions.getIntent
+import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -74,12 +75,12 @@ open class SyncAccountManager @Inject constructor(
                 val token = bundle.getString(AccountManager.KEY_AUTHTOKEN)
                 // Token failed to refresh
                 if (token == null) {
-                    val intent = bundle.getIntent(AccountManager.KEY_INTENT)
+                    val intent = BundleCompat.getParcelable(bundle, AccountManager.KEY_INTENT, Intent::class.java)
                     if (intent == null) {
-                        throw RefreshTokenException()
+                        throw NetworkErrorException()
                     } else {
                         tokenErrorNotification.show(intent)
-                        throw UserNotLoggedInException()
+                        throw RefreshTokenExpiredException()
                     }
                 } else {
                     AccessToken(token)
