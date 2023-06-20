@@ -307,6 +307,7 @@
     <string name="player_skipped_last">Skipped the last %d seconds</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_open_full_size_player">Activate to open full size player</string>
+    <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
 
     <!-- Podcasts -->
 
