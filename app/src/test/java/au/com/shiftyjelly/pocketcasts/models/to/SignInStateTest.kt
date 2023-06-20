@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.models.to
 
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import org.junit.Test
 import java.util.Date
@@ -19,6 +20,7 @@ class SignInStateTest {
             platform = SubscriptionPlatform.ANDROID,
             subscriptionList = emptyList(),
             type = SubscriptionType.PLUS,
+            tier = SubscriptionTier.PLUS,
             index = 0
         )
         // test an Android paying Plus subscriber
