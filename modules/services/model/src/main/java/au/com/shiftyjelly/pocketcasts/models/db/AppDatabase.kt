@@ -809,7 +809,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private fun getColumnNames(database: SupportSQLiteDatabase, tableName: String): List<String> {
             val names = mutableListOf<String>()
-            database.query("select * from $tableName limit 1", null).use { cursor ->
+            database.query("select * from $tableName limit 1").use { cursor ->
                 names.addAll(Arrays.asList(*cursor.columnNames))
             }
             return names
