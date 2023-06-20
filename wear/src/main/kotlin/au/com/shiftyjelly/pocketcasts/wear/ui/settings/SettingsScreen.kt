@@ -5,7 +5,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -24,7 +22,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.ToggleChipDefaults
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -35,7 +32,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.SectionHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
-import com.google.android.horologist.compose.material.util.adjustChipHeightToFontScale
+import com.google.android.horologist.compose.material.ToggleChip
+import com.google.android.horologist.compose.material.ToggleChipToggleControl
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
@@ -161,6 +159,7 @@ private fun Content(
                         onClick = onSignOutClicked,
                     )
                 }
+
                 is SignInState.SignedOut -> {
                     WatchListChip(
                         title = stringResource(LR.string.log_in),
@@ -233,28 +232,13 @@ fun ToggleChip(
     val color = MaterialTheme.colors.error
     ToggleChip(
         checked = checked,
-        onCheckedChange = { onCheckedChanged(it) },
-        label = {
-            Text(
-                text = label,
-                color = MaterialTheme.colors.onPrimary,
-                style = MaterialTheme.typography.button,
-            )
-        },
-        toggleControl = {
-            Icon(
-                imageVector = ToggleChipDefaults.switchIcon(checked),
-                contentDescription = stringResource(if (checked) LR.string.on else LR.string.off),
-                modifier = Modifier
-            )
-        },
+        onCheckedChanged = { onCheckedChanged(it) },
+        label = label,
+        toggleControl = ToggleChipToggleControl.Switch,
         colors = ToggleChipDefaults.toggleChipColors(
             checkedEndBackgroundColor = color.copy(alpha = 0.32f),
             checkedToggleControlColor = color,
         ),
-        modifier = Modifier
-            .adjustChipHeightToFontScale(LocalConfiguration.current.fontScale)
-            .fillMaxWidth()
     )
 }
 

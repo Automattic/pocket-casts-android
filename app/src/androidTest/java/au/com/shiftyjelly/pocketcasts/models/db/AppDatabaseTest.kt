@@ -150,7 +150,7 @@ class AppDatabaseTest {
     }
 
     private fun countRows(db: SupportSQLiteDatabase?, tableName: String): Int {
-        return db?.query("select count(*) from $tableName", null).use { cursor ->
+        return db?.query("select count(*) from $tableName").use { cursor ->
             cursor?.let {
                 it.moveToFirst()
                 return@use it.getInt(0)
