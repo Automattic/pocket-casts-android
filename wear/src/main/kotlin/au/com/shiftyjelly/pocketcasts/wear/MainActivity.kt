@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavGraphBuilder
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
                 val state by viewModel.state.collectAsState()
 
                 WearApp(
+                    email = state.email,
                     signInState = state.signInState,
                     subscriptionStatus = state.subscriptionStatus,
                     showLoggingInScreen = state.showLoggingInScreen,
@@ -91,6 +93,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WearApp(
+    email: String?,
     signInState: SignInState?,
     subscriptionStatus: SubscriptionStatus?,
     showLoggingInScreen: Boolean,
@@ -375,7 +378,12 @@ fun WearApp(
             if (popped) {
                 ScrollToTop.initiate(navController)
             }
-            Toast.makeText(LocalContext.current, LR.string.log_in_with_plus, Toast.LENGTH_LONG).show()
+            val message = if (email != null) {
+                stringResource(LR.string.log_in_free_acccount, email)
+            } else {
+                stringResource(LR.string.log_in_with_plus)
+            }
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
         }
         is SubscriptionStatus.Plus -> {
             if (waitingForSignIn.value &&
@@ -437,6 +445,7 @@ private fun NavGraphBuilder.loggingInScreens(
 @Composable
 fun DefaultPreview() {
     WearApp(
+        email = "",
         signInState = null,
         subscriptionStatus = null,
         showLoggingInScreen = false,
