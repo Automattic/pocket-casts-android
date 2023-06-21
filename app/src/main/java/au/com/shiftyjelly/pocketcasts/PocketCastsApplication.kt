@@ -38,8 +38,6 @@ import coil.ImageLoader
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.HiltAndroidApp
-import io.reactivex.exceptions.UndeliverableException
-import io.reactivex.plugins.RxJavaPlugins
 import io.sentry.Sentry
 import io.sentry.android.core.SentryAndroid
 import io.sentry.protocol.User
@@ -97,12 +95,11 @@ class PocketCastsApplication : Application(), Configuration.Provider {
 
         super.onCreate()
 
+        RxJavaUncaughtExceptionHandling.setUp()
         setupSentry()
         setupLogging()
         setupAnalytics()
         setupApp()
-
-        RxJavaUncaughtExceptionHandling.setUp()
     }
 
     private fun setupAnalytics() {
@@ -249,19 +246,6 @@ class PocketCastsApplication : Application(), Configuration.Provider {
         LogBuffer.setup(File(filesDir, "logs").absolutePath)
         if (BuildConfig.DEBUG) {
             Timber.plant(TimberDebugTree())
-        }
-
-        // Fix for error with Rx flows that have an exception and have been disposed. "UndeliverableException: The exception could not be delivered to the consumer because it has already canceled/disposed the flow or the exception has nowhere to go to begin with."
-        RxJavaPlugins.setErrorHandler { e ->
-            if (e is UndeliverableException) {
-                // Merely log undeliverable exceptions
-                Timber.e(e)
-            } else {
-                // Forward all others to current thread's uncaught exception handler
-                Thread.currentThread().also { thread ->
-                    thread.uncaughtExceptionHandler?.uncaughtException(thread, e)
-                }
-            }
         }
     }
 }
