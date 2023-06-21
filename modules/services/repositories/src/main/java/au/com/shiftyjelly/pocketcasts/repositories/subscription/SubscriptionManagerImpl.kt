@@ -10,9 +10,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_MONTHLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PATRON_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_MONTHLY_PRODUCT_ID
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_PRODUCT_BASE
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription.Companion.PLUS_YEARLY_PRODUCT_ID
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper.mapProductIdToTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
@@ -79,7 +79,7 @@ class SubscriptionManagerImpl @Inject constructor(
     private val productDetails = BehaviorRelay.create<ProductDetailsState>()
     private val purchaseEvents = PublishRelay.create<PurchaseEvent>()
     private val subscriptionChangedEvents = PublishRelay.create<SubscriptionChangedEvent>()
-    private var freeTrialEligible: Boolean = true
+    private var freeTrialEligible = HashMap<Subscription.SubscriptionTier, Boolean>()
 
     override fun signOut() {
         clearCachedStatus()
@@ -267,7 +267,12 @@ class SubscriptionManagerImpl @Inject constructor(
                             .build()
                         billingClient.acknowledgePurchase(acknowledgePurchaseParams, this@SubscriptionManagerImpl)
                     }
-                    updateFreeTrialEligible(false)
+                    purchase.products.map {
+                        mapProductIdToTier(it.toString())
+                    }.distinct().forEach {
+                        updateFreeTrialEligible(it, false)
+                    }
+
                     FirebaseAnalyticsTracker.plusPurchased()
                 } catch (e: Exception) {
                     LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, e, "Could not send purchase info")
@@ -312,9 +317,12 @@ class SubscriptionManagerImpl @Inject constructor(
             .build()
 
         billingClient.queryPurchaseHistoryAsync(queryPurchaseHistoryParams) { _, purchases ->
-            // TODO: Patron - Update free trial eligibility for Patron
-            if (purchases?.any { it.products.toString().contains(PLUS_PRODUCT_BASE) } == true) {
-                updateFreeTrialEligible(false)
+            purchases?.forEach {
+                it.products.map { productId ->
+                    mapProductIdToTier(productId)
+                }.distinct().forEach { tier ->
+                    updateFreeTrialEligible(tier, false)
+                }
             }
         }
     }
@@ -351,10 +359,10 @@ class SubscriptionManagerImpl @Inject constructor(
         subscriptionStatus.accept(Optional.empty())
     }
 
-    override fun isFreeTrialEligible() = freeTrialEligible
+    override fun isFreeTrialEligible(tier: Subscription.SubscriptionTier) = freeTrialEligible[tier] ?: false
 
-    override fun updateFreeTrialEligible(eligible: Boolean) {
-        freeTrialEligible = eligible
+    override fun updateFreeTrialEligible(tier: Subscription.SubscriptionTier, eligible: Boolean) {
+        freeTrialEligible[tier] = eligible
     }
 
     override fun getDefaultSubscription(

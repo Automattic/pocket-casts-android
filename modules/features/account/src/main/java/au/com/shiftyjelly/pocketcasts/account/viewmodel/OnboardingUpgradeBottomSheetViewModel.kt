@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeBottomS
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionMapper
 import au.com.shiftyjelly.pocketcasts.models.type.TrialSubscriptionPricingPhase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ProductDetailsState
@@ -63,7 +64,9 @@ class OnboardingUpgradeBottomSheetViewModel @Inject constructor(
                         is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                             Subscription.fromProductDetails(
                                 productDetails = productDetailsState,
-                                isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                                isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
+                                    SubscriptionMapper.mapProductIdToTier(productDetailsState.productId)
+                                )
                             )
                         }
                     } ?: emptyList()

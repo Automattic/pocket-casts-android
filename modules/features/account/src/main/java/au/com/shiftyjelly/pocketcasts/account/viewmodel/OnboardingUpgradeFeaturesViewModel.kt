@@ -66,7 +66,9 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                             is ProductDetailsState.Loaded -> productDetails.productDetails.mapNotNull { productDetailsState ->
                                 Subscription.fromProductDetails(
                                     productDetails = productDetailsState,
-                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible()
+                                    isFreeTrialEligible = subscriptionManager.isFreeTrialEligible(
+                                        SubscriptionMapper.mapProductIdToTier(productDetailsState.productId)
+                                    )
                                 )
                             }
                         } ?: emptyList()
