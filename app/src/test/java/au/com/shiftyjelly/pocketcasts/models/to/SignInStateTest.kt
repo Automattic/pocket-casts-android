@@ -23,26 +23,26 @@ class SignInStateTest {
             tier = SubscriptionTier.PLUS,
             index = 0
         )
-        // test an Android paying Plus subscriber
+        // test an Android paying subscriber
         val stateAndroid = SignInState.SignedIn(email = email, subscriptionStatus = statusAndroidPlusPaid)
-        assert(stateAndroid.isSignedInAsPlusPaid)
-        // test an iOS paying Plus subscriber
+        assert(stateAndroid.isSignedInAsPaid)
+        // test an iOS paying subscriber
         val stateiOS = SignInState.SignedIn(email = email, subscriptionStatus = statusAndroidPlusPaid.copy(platform = SubscriptionPlatform.IOS))
-        assert(stateiOS.isSignedInAsPlusPaid)
-        // test a Web Player paying Plus subscriber
+        assert(stateiOS.isSignedInAsPaid)
+        // test a Web Player paying subscriber
         val stateWebPlayer = SignInState.SignedIn(email = email, subscriptionStatus = statusAndroidPlusPaid.copy(platform = SubscriptionPlatform.WEB))
-        assert(stateWebPlayer.isSignedInAsPlusPaid)
-        // test a gift Plus user
+        assert(stateWebPlayer.isSignedInAsPaid)
+        // test a gift user
         val statePayingGift = SignInState.SignedIn(email = email, subscriptionStatus = statusAndroidPlusPaid.copy(platform = SubscriptionPlatform.GIFT))
-        assert(!statePayingGift.isSignedInAsPlusPaid)
-        // test a paying Plus subscriber
+        assert(!statePayingGift.isSignedInAsPaid)
+        // test a paying subscriber
         val statePaying = SignInState.SignedIn(email = email, subscriptionStatus = statusAndroidPlusPaid)
-        assert(statePaying.isSignedInAsPlusPaid)
-        // a cancelled Plus subscriber should still have access to the paid Plus features, we don't need to check the expiry as loading the state will covert it to a free account
+        assert(statePaying.isSignedInAsPaid)
+        // a cancelled subscriber should still have access to the paid features, we don't need to check the expiry as loading the state will covert it to a free account
         val stateCancelled = SignInState.SignedIn(email = email, subscriptionStatus = statusAndroidPlusPaid.copy(autoRenew = false))
-        assert(stateCancelled.isSignedInAsPlusPaid)
-        // free users should not have access to paid Plus features
+        assert(stateCancelled.isSignedInAsPaid)
+        // free users should not have access to paid features
         val stateFree = SignInState.SignedIn(email = email, subscriptionStatus = SubscriptionStatus.Free())
-        assert(!stateFree.isSignedInAsPlusPaid)
+        assert(!stateFree.isSignedInAsPaid)
     }
 }

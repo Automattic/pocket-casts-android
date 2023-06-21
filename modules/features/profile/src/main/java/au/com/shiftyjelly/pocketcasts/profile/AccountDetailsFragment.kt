@@ -116,8 +116,8 @@ class AccountDetailsFragment : BaseFragment() {
                 giftExpiring = (daysLessThan30 && !status.autoRenew)
             }
 
-            binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPlusPaid
-            binding.btnCancelSub?.isVisible = signInState.isSignedInAsPlusPaid
+            binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
+            binding.btnCancelSub?.isVisible = signInState.isSignedInAsPaid
             binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
                 FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
 

@@ -37,7 +37,7 @@ sealed class SignInState {
             this.subscriptionStatus is SubscriptionStatus.Plus &&
             this.subscriptionStatus.tier == SubscriptionTier.PATRON
 
-    val isSignedInAsPlusPaid: Boolean
+    val isSignedInAsPaid: Boolean
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && paidSubscriptionPlatforms.contains(this.subscriptionStatus.platform)
 
     val isLifetimePlus: Boolean
