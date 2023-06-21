@@ -3,12 +3,12 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.core.content.IntentCompat
 import androidx.core.view.WindowCompat
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -36,12 +36,7 @@ class OnboardingActivity : AppCompatActivity() {
             if (currentSignInState != null) {
 
                 val onboardingFlow = remember(savedInstanceState) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        intent?.getParcelableExtra(ANALYTICS_FLOW_KEY, OnboardingFlow::class.java)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        intent?.getParcelableExtra(ANALYTICS_FLOW_KEY) as OnboardingFlow?
-                    }
+                    IntentCompat.getParcelableExtra(intent, ANALYTICS_FLOW_KEY, OnboardingFlow::class.java)
                 } ?: throw IllegalStateException("Analytics flow not set")
 
                 if (shouldSetupTheme(onboardingFlow)) {

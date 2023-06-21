@@ -1,10 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,12 +49,7 @@ class RegionSelectFragment : BaseFragment() {
     }
 
     val regionList: ArrayList<DiscoverRegion>
-        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getParcelableArrayList(ARG_REGION_LIST, DiscoverRegion::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            arguments?.getParcelableArrayList(ARG_REGION_LIST)
-        } ?: ArrayList()
+        get() = arguments?.let { BundleCompat.getParcelableArrayList(it, ARG_REGION_LIST, DiscoverRegion::class.java) } ?: ArrayList()
 
     var listener: Listener? = null
 

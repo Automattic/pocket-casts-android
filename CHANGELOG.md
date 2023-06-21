@@ -9,6 +9,8 @@
         ([#1101](https://github.com/Automattic/pocket-casts-android/pull/1101)).
     *   Fixed Extra Dark theme not applying proper background on some settings screens
         ([#987](https://github.com/Automattic/pocket-casts-android/pull/987)).
+    *   Fixed Automotive seek bar and playback state issues.
+        ([#1077](https://github.com/Automattic/pocket-casts-android/pull/1077)).
 
 7.41
 -----
