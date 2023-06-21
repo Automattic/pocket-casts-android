@@ -118,7 +118,6 @@ class AccountDetailsFragment : BaseFragment() {
 
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPlusPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPlusPaid
-            // TODO: Patron - hide if upgraded to patron
             binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
                 FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
 
