@@ -21,10 +21,21 @@ sealed class SignInState {
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Free
 
     val isSignedInAsPlus: Boolean
-        get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && this.subscriptionStatus.type == SubscriptionType.PLUS
+        get() = if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
+            this is SignedIn &&
+                this.subscriptionStatus is SubscriptionStatus.Plus &&
+                this.subscriptionStatus.tier == SubscriptionTier.PLUS
+        } else {
+            this is SignedIn &&
+                this.subscriptionStatus is SubscriptionStatus.Plus &&
+                this.subscriptionStatus.type == SubscriptionType.PLUS
+        }
 
     val isSignedInAsPatron: Boolean
-        get() = FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) && this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && this.subscriptionStatus.tier == SubscriptionTier.PATRON
+        get() = FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED) &&
+            this is SignedIn &&
+            this.subscriptionStatus is SubscriptionStatus.Plus &&
+            this.subscriptionStatus.tier == SubscriptionTier.PATRON
 
     val isSignedInAsPlusPaid: Boolean
         get() = this is SignedIn && this.subscriptionStatus is SubscriptionStatus.Plus && paidSubscriptionPlatforms.contains(this.subscriptionStatus.platform)
