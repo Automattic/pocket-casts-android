@@ -410,14 +410,14 @@ private fun SubscriptionStatusResponse.toStatus(): SubscriptionStatus {
     } else {
         val freq = SubscriptionFrequency.values().getOrNull(frequency) ?: SubscriptionFrequency.NONE
         val enumType = SubscriptionType.values().getOrNull(type) ?: SubscriptionType.NONE
-        val enumTier = SubscriptionTier.fromString(tier)
+        val enumTier = SubscriptionTier.fromString(tier, enumType)
         SubscriptionStatus.Plus(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumType, enumTier, index)
     }
 }
 
 private fun SubscriptionResponse.toSubscription(): SubscriptionStatus.Subscription {
     val enumType = SubscriptionType.values().getOrNull(type) ?: SubscriptionType.NONE
-    val enumTier = SubscriptionTier.fromString(tier)
+    val enumTier = SubscriptionTier.fromString(tier, enumType)
     val freq = SubscriptionFrequency.values().getOrNull(frequency) ?: SubscriptionFrequency.NONE
     return SubscriptionStatus.Subscription(enumType, enumTier, freq, expiryDate, autoRenewing, updateUrl)
 }
