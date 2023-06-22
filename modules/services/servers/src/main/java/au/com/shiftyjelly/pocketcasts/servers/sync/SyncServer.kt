@@ -9,8 +9,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearSyncReques
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginGoogleRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsRequest
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginPocketCastsResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
@@ -33,10 +31,7 @@ import retrofit2.http.Url
 
 interface SyncServer {
     @POST("/user/login_pocket_casts")
-    suspend fun login(@Body request: LoginRequest): LoginTokenResponse
-
-    @POST("/user/login_pocket_casts")
-    suspend fun loginPocketCasts(@Body request: LoginPocketCastsRequest): LoginPocketCastsResponse
+    suspend fun loginPocketCasts(@Body request: LoginPocketCastsRequest): LoginTokenResponse
 
     @POST("/user/login_google")
     suspend fun loginGoogle(@Body request: LoginGoogleRequest): LoginTokenResponse
@@ -143,7 +138,4 @@ interface SyncServer {
 
     @POST("/subscription/promo/validate")
     fun validatePromoCode(@Body request: PromoCodeRequest): Single<PromoCodeResponse>
-
-    @POST("/subscription/cancel/web")
-    fun cancelSubscription(@Header("Authorization") authorization: String, @Body request: SupporterCancelRequest): Single<Response<Void>>
 }

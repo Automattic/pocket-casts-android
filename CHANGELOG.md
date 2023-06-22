@@ -5,6 +5,8 @@
     *   Use sha256 to encode email for gravatar
         ([#1080](https://github.com/Automattic/pocket-casts-android/pull/1080)).
 *   Bug Fixes:
+    *   Fixed the sign in notification appearing when there was a network or server issue.
+        ([#1101](https://github.com/Automattic/pocket-casts-android/pull/1101)).
     *   Fixed Extra Dark theme not applying proper background on some settings screens
         ([#987](https://github.com/Automattic/pocket-casts-android/pull/987)).
 
