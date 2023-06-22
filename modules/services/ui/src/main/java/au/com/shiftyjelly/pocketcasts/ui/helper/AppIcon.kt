@@ -194,7 +194,7 @@ class AppIcon @Inject constructor(
     val allAppIconTypes = AppIconType.values()
 
     private fun getAppIconFromPreferences(): AppIconType {
-        val appIconId: String = sharedPreferences.getString(PREFERENCE_APPICON, AppIconType.DEFAULT.id) ?: AppIconType.PRIDE_2023.id
+        val appIconId: String = sharedPreferences.getString(PREFERENCE_APPICON, AppIconType.DEFAULT.id) ?: AppIconType.DEFAULT.id
         return AppIconType.fromString(appIconId, AppIconType.DEFAULT)
     }
 
