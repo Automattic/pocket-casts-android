@@ -714,7 +714,7 @@ class MainActivity :
                 }
             }
 
-            if (signinState.isSignedInAsPlus) {
+            if (signinState.isSignedInAsPlusOrPatron) {
                 status?.let {
                     if (viewModel.shouldShowCancelled(it)) {
                         val cancelledFragment = SubCancelledFragment.newInstance()

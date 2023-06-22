@@ -6,7 +6,7 @@
         <variable name="expanded" type="boolean" />
         <variable name="tintColor" type="int"/>
         <variable name="headerColor" type="int"/>
-        <variable name="isPlusUser" type="boolean"/>
+        <variable name="isPlusOrPatronUser" type="boolean"/>
     </data>
 
     <LinearLayout android:id="@+id/podcast_header"
@@ -21,7 +21,7 @@
             app:tintColor="@{tintColor}"
             app:headerColor="@{headerColor}"
             app:expanded="@{expanded}"
-            app:isPlusUser="@{isPlusUser}"/>
+            app:isPlusOrPatronUser="@{isPlusOrPatronUser}"/>
 
         <include
             android:id="@+id/bottom"

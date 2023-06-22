@@ -123,7 +123,7 @@ class AppearanceIconSettingsAdapter(
 
         private fun isValidIcon(appIcon: AppIcon.AppIconType) =
             (appIcon.tier == SubscriptionTier.NONE) ||
-                (appIcon.tier == SubscriptionTier.PLUS && signInState?.isSignedInAsPlus == true) ||
+                (appIcon.tier == SubscriptionTier.PLUS && signInState?.isSignedInAsPlusOrPatron == true) ||
                 (appIcon.tier == SubscriptionTier.PATRON && signInState?.isSignedInAsPatron == true)
     }
 }

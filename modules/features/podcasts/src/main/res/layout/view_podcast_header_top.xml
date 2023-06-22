@@ -7,7 +7,7 @@
         <variable name="tintColor" type="int"/>
         <variable name="headerColor" type="int"/>
         <variable name="expanded" type="boolean" />
-        <variable name="isPlusUser" type="boolean" />
+        <variable name="isPlusOrPatronUser" type="boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -87,7 +87,7 @@
             app:tint="?attr/primary_icon_02"
             app:layout_constraintEnd_toStartOf="@+id/notifications"
             app:layout_constraintTop_toBottomOf="@+id/header"
-            app:show="@{podcast.isSubscribed &amp;&amp; isPlusUser}" />
+            app:show="@{podcast.isSubscribed &amp;&amp; isPlusOrPatronUser}" />
 
         <ImageView
             android:id="@+id/notifications"

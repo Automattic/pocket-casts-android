@@ -70,8 +70,8 @@ class AppearanceSettingsFragment : BaseFragment() {
                 is SettingsAppearanceState.ThemesAndIconsLoading -> {}
                 is SettingsAppearanceState.ThemesAndIconsLoaded -> {
                     val mainWidth = activity?.resources?.displayMetrics?.widthPixels // Display metrics gives the app size not the display, it's badly named. Works in chromebooks and split screen
-                    val isSignedInAsPlus = viewModel.signInState.value?.isSignedInAsPlus ?: false
-                    binding.themeRecyclerView.adapter = AppearanceThemeSettingsAdapter(mainWidth, isSignedInAsPlus, state.currentThemeType, state.themeList) { beforeThemeType, afterThemeType, validTheme ->
+                    val isSignedInAsPlusOrPatron = viewModel.signInState.value?.isSignedInAsPlusOrPatron ?: false
+                    binding.themeRecyclerView.adapter = AppearanceThemeSettingsAdapter(mainWidth, isSignedInAsPlusOrPatron, state.currentThemeType, state.themeList) { beforeThemeType, afterThemeType, validTheme ->
                         if (validTheme) {
                             (activity as? AppCompatActivity)?.let {
                                 theme.updateTheme(it, afterThemeType)
@@ -114,7 +114,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                 val afterThemeType = changeThemeType.second
 
                 if (beforeThemeType != null && afterThemeType != null) {
-                    if (signInState.isSignedInAsPlus) {
+                    if (signInState.isSignedInAsPlusOrPatron) {
                         (activity as? AppCompatActivity)?.let {
                             theme.updateTheme(it, afterThemeType)
                             binding.swtSystemTheme.isChecked = theme.getUseSystemTheme() // Update switch if changing the theme updated the setting
@@ -132,7 +132,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                 val afterAppIconType = changeAppIconType.second
 
                 if (beforeAppIconType != null && afterAppIconType != null) {
-                    if (signInState.isSignedInAsPlus) {
+                    if (signInState.isSignedInAsPlusOrPatron) {
                         viewModel.updateGlobalIcon(afterAppIconType)
                         viewModel.updateChangeAppIconType(Pair(null, null))
 
@@ -148,9 +148,9 @@ class AppearanceSettingsFragment : BaseFragment() {
                 }
             }
 
-            (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updatePlusSignedIn(signInState.isSignedInAsPlus)
+            (binding.themeRecyclerView.adapter as? AppearanceThemeSettingsAdapter)?.updatePlusSignedIn(signInState.isSignedInAsPlusOrPatron)
             (binding.appIconRecyclerView.adapter as? AppearanceIconSettingsAdapter)?.updatePlusSignedIn(signInState)
-            binding.upgradeGroup.isVisible = !signInState.isSignedInAsPlus && !settings.getUpgradeClosedAppearSettings()
+            binding.upgradeGroup.isVisible = !signInState.isSignedInAsPlusOrPatron && !settings.getUpgradeClosedAppearSettings()
         }
 
         viewModel.loadThemesAndIcons()

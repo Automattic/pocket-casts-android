@@ -25,7 +25,7 @@ class SearchHistoryViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) : ViewModel() {
     private val signInState = userManager.getSignInState().asFlow()
-    private var isSignedAsPlus = false
+    private var isSignedInAsPlusOrPatron = false
     private var onlySearchRemote: Boolean = false
     private var source: AnalyticsSource = AnalyticsSource.UNKNOWN
 
@@ -49,7 +49,7 @@ class SearchHistoryViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch(ioDispatcher) {
             signInState.collect { signInState ->
-                isSignedAsPlus = signInState.isSignedInAsPlus
+                isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron
                 loadSearchHistory()
             }
         }
@@ -57,7 +57,7 @@ class SearchHistoryViewModel @Inject constructor(
 
     private suspend fun loadSearchHistory() {
         val entries = searchHistoryManager.findAll(
-            showFolders = isSignedAsPlus && !onlySearchRemote
+            showFolders = isSignedInAsPlusOrPatron && !onlySearchRemote
         )
         mutableState.value = mutableState.value.copy(entries = entries)
     }

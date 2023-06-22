@@ -118,8 +118,7 @@ class AccountDetailsFragment : BaseFragment() {
 
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPaid
-            binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
-                FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
+            binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus
 
             binding.userUpgradeComposeView?.apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)

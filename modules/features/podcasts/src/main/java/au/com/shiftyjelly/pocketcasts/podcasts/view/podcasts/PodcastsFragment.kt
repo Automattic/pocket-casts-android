@@ -113,7 +113,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
             val folder = folderState.folder
             val rootFolder = folder == null
-            val isSignedInAsPlus = folderState.isSignedInAsPlus
+            val isSignedInAsPlus = folderState.isSignedInAsPlusOrPatron
             val toolbar = binding.toolbar
 
             val toolbarColors: ToolbarColors

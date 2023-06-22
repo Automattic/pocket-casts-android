@@ -87,7 +87,7 @@ private fun Content(
             onBackPressed = exitOnboarding,
             onComplete = {
                 navController.navigate(
-                    if (signInState.isSignedInAsPlus) {
+                    if (signInState.isSignedInAsPlusOrPatron) {
                         OnboardingNavRoute.welcome
                     } else {
                         OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
@@ -236,13 +236,13 @@ private fun Content(
             OnboardingWelcomePage(
                 activeTheme = theme,
                 flow = flow,
-                isSignedInAsPlus = signInState.isSignedInAsPlus,
+                isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
                 onDone = exitOnboarding,
                 onContinueToDiscover = completeOnboardingToDiscover,
                 onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
                 onBackPressed = {
                     // Don't allow navigation back to the upgrade screen after the user upgrades
-                    if (signInState.isSignedInAsPlus) {
+                    if (signInState.isSignedInAsPlusOrPatron) {
                         exitOnboarding()
                     } else {
                         navController.popBackStack()

@@ -140,7 +140,7 @@ class PlusSettingsFragment : BaseFragment() {
             .observe(viewLifecycleOwner) { signInState ->
                 // If the user has gone through the upgraded to Plus, we no longer want
                 // to present this screen since it is asking them to sign up for Plus
-                if (signInState.isSignedInAsPlus && isAdded) {
+                if (signInState.isSignedInAsPlusOrPatron && isAdded) {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 }

@@ -69,19 +69,19 @@ class CloudSettingsFragment : BaseFragment() {
         val lblDeleteCloudFileAfterPlaying = binding.lblDeleteCloudFileAfterPlaying
         val swtDeleteCloudFileAfterPlaying = binding.swtDeleteCloudFileAfterPlaying
         viewModel.signInState.observe(viewLifecycleOwner) { signInState ->
-            lblDeleteCloudFileAfterPlaying.isVisible = signInState.isSignedInAsPlus
-            swtDeleteCloudFileAfterPlaying.isVisible = signInState.isSignedInAsPlus
+            lblDeleteCloudFileAfterPlaying.isVisible = signInState.isSignedInAsPlusOrPatron
+            swtDeleteCloudFileAfterPlaying.isVisible = signInState.isSignedInAsPlusOrPatron
 
-            binding.plusLayout.isEnabled = signInState.isSignedInAsPlus
-            binding.plusLayout.alpha = if (signInState.isSignedInAsPlus) 1.0f else 0.5f
-            binding.imgLock.isVisible = !signInState.isSignedInAsPlus
-            binding.btnLock.isVisible = !signInState.isSignedInAsPlus
+            binding.plusLayout.isEnabled = signInState.isSignedInAsPlusOrPatron
+            binding.plusLayout.alpha = if (signInState.isSignedInAsPlusOrPatron) 1.0f else 0.5f
+            binding.imgLock.isVisible = !signInState.isSignedInAsPlusOrPatron
+            binding.btnLock.isVisible = !signInState.isSignedInAsPlusOrPatron
 
-            binding.swtAutoUploadToCloud.isEnabled = signInState.isSignedInAsPlus
-            binding.swtAutoDownloadFromCloud.isEnabled = signInState.isSignedInAsPlus
-            binding.swtCloudOnlyOnWiFi.isEnabled = signInState.isSignedInAsPlus
+            binding.swtAutoUploadToCloud.isEnabled = signInState.isSignedInAsPlusOrPatron
+            binding.swtAutoDownloadFromCloud.isEnabled = signInState.isSignedInAsPlusOrPatron
+            binding.swtCloudOnlyOnWiFi.isEnabled = signInState.isSignedInAsPlusOrPatron
 
-            binding.upgradeLayout.isVisible = !signInState.isSignedInAsPlus && !settings.getUpgradeClosedCloudSettings()
+            binding.upgradeLayout.isVisible = !signInState.isSignedInAsPlusOrPatron && !settings.getUpgradeClosedCloudSettings()
         }
 
         with(binding.swtAutoAddToUpNext) {
