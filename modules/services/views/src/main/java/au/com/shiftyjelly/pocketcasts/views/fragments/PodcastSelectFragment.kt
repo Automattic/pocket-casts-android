@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.views.fragments
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -10,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -61,12 +61,7 @@ class PodcastSelectFragment : BaseFragment() {
             }
 
         private fun extractArgs(bundle: Bundle?): PodcastSelectFragmentArgs? =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                bundle?.getParcelable(NEW_INSTANCE_ARG, PodcastSelectFragmentArgs::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                bundle?.getParcelable(NEW_INSTANCE_ARG) as PodcastSelectFragmentArgs?
-            }
+            bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, PodcastSelectFragmentArgs::class.java) }
     }
 
     interface Listener {

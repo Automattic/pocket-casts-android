@@ -1,12 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.account
 
 import android.app.PendingIntent
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -123,13 +123,9 @@ class SignInFragment : BaseFragment() {
                     } else {
                         activity?.finish()
 
-                        if (arguments?.containsKey(EXTRA_SUCCESS_INTENT) == true) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                arguments?.getParcelable(EXTRA_SUCCESS_INTENT, PendingIntent::class.java)
-                            } else {
-                                @Suppress("DEPRECATION")
-                                arguments?.getParcelable(EXTRA_SUCCESS_INTENT)
-                            }?.send()
+                        val arguments = arguments
+                        if (arguments != null && arguments.containsKey(EXTRA_SUCCESS_INTENT)) {
+                            BundleCompat.getParcelable(arguments, EXTRA_SUCCESS_INTENT, PendingIntent::class.java)?.send()
                         }
                     }
                 }
