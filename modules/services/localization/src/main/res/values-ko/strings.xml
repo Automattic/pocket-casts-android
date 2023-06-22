@@ -856,7 +856,6 @@ Language: ko_KR
     <string name="profile_supporter_support_producer">이 컬렉션에 대한 액세스 권한을 신청하여 이 프로듀서 후원 돕기</string>
     <string name="profile_supporter_subscribe_all">모두 구독</string>
     <string name="profile_supporter_no_podcasts">후원자 팟캐스트를 찾을 수 없음</string>
-    <string name="profile_supporter_description">프리미엄 팟캐스트를 보려면 Pocket Casts 계정이 필요합니다. 걱정하지 마세요. 무료이며 만들기 쉽습니다!</string>
     <string name="profile_supporter_become_a_supporter">후원자 되기</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d개 구독됨</string>
     <string name="profile_sub_web_goto">구독을 취소하려면 Pocketcasts.com을 통해 취소해야 합니다.</string>

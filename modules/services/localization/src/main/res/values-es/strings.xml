@@ -856,7 +856,6 @@ Language: es
     <string name="profile_supporter_support_producer">Regístrate para ayudar a este productor y acceder a su colección</string>
     <string name="profile_supporter_subscribe_all">SUSCRIBIRSE A TODO</string>
     <string name="profile_supporter_no_podcasts">No se han encontrado podcasts de seguidores</string>
-    <string name="profile_supporter_description">Se necesita una cuenta de Pocket Casts para ver los podcasts premium. No te preocupes, es gratis y muy fácil de crear.</string>
     <string name="profile_supporter_become_a_supporter">Conviértete en seguidor</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d suscriptores</string>
     <string name="profile_sub_web_goto">Para cancelar la suscripción, deberás hacerlo a través de Pocketcasts.com.</string>

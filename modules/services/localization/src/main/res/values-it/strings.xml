@@ -856,7 +856,6 @@ Language: it
     <string name="profile_supporter_support_producer">Aiutaci a supportare questo produttore iscrivendoti per accedere a questa raccolta</string>
     <string name="profile_supporter_subscribe_all">ABBONATI A TUTTO</string>
     <string name="profile_supporter_no_podcasts">Nessun podcast del promotore trovato</string>
-    <string name="profile_supporter_description">Per visualizzare i podcast premium è necessario un account Pocket Casts. Non preoccuparti, crearne uno è facile e gratuito.</string>
     <string name="profile_supporter_become_a_supporter">Diventa un promotore</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d CON ABBONAMENTO</string>
     <string name="profile_sub_web_goto">Per annullare l\'abbonamento, dovrai annullare tramite Pocketcasts.com.</string>

@@ -856,7 +856,6 @@ Language: zh_CN
     <string name="profile_supporter_support_producer">通过注册访问此库以为制片人提供支持</string>
     <string name="profile_supporter_subscribe_all">全部订阅</string>
     <string name="profile_supporter_no_podcasts">未找到支持者播客</string>
-    <string name="profile_supporter_description">需要 Pocket Casts 账户才能查看优质播客。 不用担心，可轻松免费创建一个！</string>
     <string name="profile_supporter_become_a_supporter">成为支持者</string>
     <string name="profile_subscribed_current_total">已订阅 %1$d/%2$d</string>
     <string name="profile_sub_web_goto">要取消订阅，您将需要通过 Pocketcasts.com 取消。</string>

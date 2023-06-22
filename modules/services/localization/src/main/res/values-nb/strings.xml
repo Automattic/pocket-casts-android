@@ -540,7 +540,6 @@ Language: nb_NO
     <string name="profile_supporter_support_producer">Bidra til å støtte denne produsenten ved å registrere deg for tilgang til denne samlingen</string>
     <string name="profile_supporter_subscribe_all">ABONNER PÅ ALLE</string>
     <string name="profile_supporter_no_podcasts">Fant ingen podcaster for støttemedlemmer</string>
-    <string name="profile_supporter_description">En Pocket Casts-konto er påkrevd for å vise premium-podcaster. Slapp av, det er gratis og enkelt å opprette en konto!</string>
     <string name="profile_supporter_become_a_supporter">Bli støttemedlem</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d ABONNERT PÅ</string>
     <string name="profile_sub_web_goto">Hvis du vil annullere abonnementet, må du annullere via Pocketcasts.com.</string>

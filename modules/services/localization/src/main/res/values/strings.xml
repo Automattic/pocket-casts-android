@@ -907,7 +907,6 @@
     <string name="profile_sub_web_goto">To cancel your subscription, you&#x2019;ll need to cancel via Pocketcasts.com.</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d SUBSCRIBED</string>
     <string name="profile_supporter_become_a_supporter">Become a supporter</string>
-    <string name="profile_supporter_description">A Pocket Casts account is required to view premium podcasts. Don\'t worry, it\'s free and easy to create one!</string>
     <string name="profile_supporter_error" translatable="false">@string/error</string>
     <string name="profile_supporter_loading" translatable="false">@string/loading</string>
     <string name="profile_supporter_no_podcasts">No supporter podcasts found</string>

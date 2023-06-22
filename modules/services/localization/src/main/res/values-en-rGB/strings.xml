@@ -538,7 +538,6 @@ Language: en_GB
     <string name="profile_supporter_support_producer">Help support this producer by signing up for access to this collection</string>
     <string name="profile_supporter_subscribe_all">SUBSCRIBE ALL</string>
     <string name="profile_supporter_no_podcasts">No supporter podcasts found</string>
-    <string name="profile_supporter_description">A Pocket Casts account is required to view premium podcasts. Don\'t worry, it\'s free and easy to create one!</string>
     <string name="profile_supporter_become_a_supporter">Become a supporter</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d SUBSCRIBED</string>
     <string name="profile_sub_web_goto">To cancel your subscription, you’ll need to cancel via Pocketcasts.com.</string>

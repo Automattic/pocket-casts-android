@@ -4,6 +4,7 @@ import android.accounts.AccountAuthenticatorResponse
 import android.accounts.AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -55,8 +56,11 @@ class AccountActivity : AppCompatActivity() {
             val graph = navInflater.inflate(R.navigation.account_nav_graph)
             val arguments = Bundle()
 
+            // Temporary workaround that that can be removed after the upgrade to Android 11 in August 2023.
+            val navigateToSignIn = Build.MANUFACTURER.lowercase() == "mercedes-benz" && Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+
             val accountAuthenticatorResponse = IntentCompat.getParcelableExtra(intent, KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, AccountAuthenticatorResponse::class.java)
-            if (accountAuthenticatorResponse != null) {
+            if (accountAuthenticatorResponse != null || navigateToSignIn) {
                 graph.setStartDestination(R.id.signInFragment)
             } else if (isNewUpgradeInstance(intent)) {
                 viewModel.clearReadyForUpgrade()
@@ -71,8 +75,6 @@ class AccountActivity : AppCompatActivity() {
                 viewModel.clearValues()
                 graph.setStartDestination(R.id.accountFragment)
             }
-
-            viewModel.supporterInstance = intent.getBooleanExtra(SUPPORTER_INTENT, false)
 
             navController.setGraph(graph, arguments)
 
@@ -202,7 +204,6 @@ class AccountActivity : AppCompatActivity() {
         private const val IS_PROMO_CODE = "account_activity.is_promo_code"
         const val PROMO_CODE_VALUE = "account_activity.promo_code"
         const val PROMO_CODE_RETURN_DESCRIPTION = "account_activity.promo_code_return_description"
-        const val SUPPORTER_INTENT = "account_activity.supporter"
 
         fun promoCodeInstance(context: Context?, code: String): Intent {
             val intent = Intent(context, AccountActivity::class.java)

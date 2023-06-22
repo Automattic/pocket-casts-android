@@ -544,7 +544,6 @@ Language: ar
     <string name="profile_supporter_support_producer">ساعد على دعم هذا المنتج بالتسجيل للوصول إلى هذه التشكيلة</string>
     <string name="profile_supporter_subscribe_all">الاشتراك للجميع</string>
     <string name="profile_supporter_no_podcasts">لم يتم العثور على أي بث صوتي مؤيد</string>
-    <string name="profile_supporter_description">يلزم حساب على Pocket Casts لعرض البث الصوتي المميز. لا تقلق، إنه مجاني ومن السهل إنشاء حساب واحد!</string>
     <string name="profile_supporter_become_a_supporter">كن مؤيدًا</string>
     <string name="profile_subscribed_current_total">%1$d/⁦%2$d⁩ تم الاشتراك</string>
     <string name="profile_sub_web_goto">لإلغاء اشتراكك، سيتعيَّن عليك الإلغاء من خلال Pocketcasts.com.</string>

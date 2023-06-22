@@ -856,7 +856,6 @@ Language: sv_SE
     <string name="profile_supporter_support_producer">Stöd den här producenten genom att registrera dig för åtkomst till den här samlingen</string>
     <string name="profile_supporter_subscribe_all">PRENUMERERA PÅ ALLA</string>
     <string name="profile_supporter_no_podcasts">Inga supporterpodcasts hittades</string>
-    <string name="profile_supporter_description">Ett Pocket Casts-konto krävs för att se premiumpodcaster. Oroa dig inte, det är gratis och enkelt att skapa ett!</string>
     <string name="profile_supporter_become_a_supporter">Bli supporter</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d PRENUMERATIONER HAR SKAPATS</string>
     <string name="profile_sub_web_goto">Om du vill avsluta din prenumeration måste du göra detta via Pocketcasts.com.</string>
