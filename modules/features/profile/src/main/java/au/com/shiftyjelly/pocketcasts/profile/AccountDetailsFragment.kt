@@ -111,8 +111,8 @@ class AccountDetailsFragment : BaseFragment() {
         viewModel.viewState.observe(viewLifecycleOwner) { (signInState, subscription, deleteAccountState) ->
             var giftExpiring = false
             (signInState as? SignInState.SignedIn)?.subscriptionStatus?.let { status ->
-                val plusStatus = status as? SubscriptionStatus.Plus ?: return@let
-                val daysLessThan30 = plusStatus.expiry.before(Date(Date().time + 30.days()))
+                val subscriptionStatus = status as? SubscriptionStatus.Paid ?: return@let
+                val daysLessThan30 = subscriptionStatus.expiry.before(Date(Date().time + 30.days()))
                 giftExpiring = (daysLessThan30 && !status.autoRenew)
             }
 

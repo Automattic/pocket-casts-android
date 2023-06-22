@@ -36,7 +36,7 @@ class SearchHistoryViewModelTest {
     @Mock
     private lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
-    private val subscriptionStatusPlus = SubscriptionStatus.Plus(
+    private val subscriptionStatusPaid = SubscriptionStatus.Paid(
         expiry = Date(),
         autoRenew = true,
         giftDays = 0,
@@ -51,7 +51,7 @@ class SearchHistoryViewModelTest {
     private val subscriptionStatusFree = SubscriptionStatus.Free()
 
     @Test
-    fun `given plus user and local + remote search, when search history shown, then folders included`() =
+    fun `given paid subscription status and local + remote search, when search history shown, then folders included`() =
         runTest {
             val viewModel = initViewModel(isPlusUser = true, isOnlySearchRemote = false)
 
@@ -61,7 +61,7 @@ class SearchHistoryViewModelTest {
         }
 
     @Test
-    fun `given free user and local + remote only search, when search history shown, then folders not included`() =
+    fun `given free subscription status and local + remote only search, when search history shown, then folders not included`() =
         runTest {
             val viewModel = initViewModel(isPlusUser = false, isOnlySearchRemote = true)
 
@@ -71,7 +71,7 @@ class SearchHistoryViewModelTest {
         }
 
     @Test
-    fun `given plus user and remote only search, when search history shown, then folders not included`() =
+    fun `given paid subscription status and remote only search, when search history shown, then folders not included`() =
         runTest {
             val viewModel = initViewModel(isPlusUser = true, isOnlySearchRemote = true)
 
@@ -81,7 +81,7 @@ class SearchHistoryViewModelTest {
         }
 
     @Test
-    fun `given free user and remote only search, when search history shown, then folders not included`() =
+    fun `given free subscription status and remote only search, when search history shown, then folders not included`() =
         runTest {
             val viewModel = initViewModel(isPlusUser = false, isOnlySearchRemote = true)
 
@@ -99,7 +99,7 @@ class SearchHistoryViewModelTest {
                 Flowable.just(
                     SignInState.SignedIn(
                         email = "",
-                        subscriptionStatus = if (isPlusUser) subscriptionStatusPlus else subscriptionStatusFree
+                        subscriptionStatus = if (isPlusUser) subscriptionStatusPaid else subscriptionStatusFree
                     )
                 )
             )

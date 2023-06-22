@@ -117,15 +117,15 @@ class SubscriptionManagerImpl @Inject constructor(
                 subscriptionStatus.accept(Optional.of(it))
                 val oldStatus = cachedSubscriptionStatus
                 if (oldStatus != it) {
-                    if (it is SubscriptionStatus.Plus && oldStatus is SubscriptionStatus.Free) {
+                    if (it is SubscriptionStatus.Paid && oldStatus is SubscriptionStatus.Free) {
                         subscriptionChangedEvents.accept(SubscriptionChangedEvent.AccountUpgradedToPlus)
-                    } else if (it is SubscriptionStatus.Free && oldStatus is SubscriptionStatus.Plus) {
+                    } else if (it is SubscriptionStatus.Free && oldStatus is SubscriptionStatus.Paid) {
                         subscriptionChangedEvents.accept(SubscriptionChangedEvent.AccountDowngradedToFree)
                     }
                 }
                 cachedSubscriptionStatus = it
 
-                if (!it.isLifetimePlus && it is SubscriptionStatus.Plus && it.platform == SubscriptionPlatform.GIFT) { // This account is a trial account
+                if (!it.isLifetimePlus && it is SubscriptionStatus.Paid && it.platform == SubscriptionPlatform.GIFT) { // This account is a trial account
                     settings.setTrialFinishedSeen(false) // Make sure on expiry we show the trial finished dialog
                 }
             }
@@ -419,7 +419,7 @@ private fun SubscriptionStatusResponse.toStatus(): SubscriptionStatus {
         val freq = SubscriptionFrequency.values().getOrNull(frequency) ?: SubscriptionFrequency.NONE
         val enumType = SubscriptionType.values().getOrNull(type) ?: SubscriptionType.NONE
         val enumTier = SubscriptionTier.fromString(tier, enumType)
-        SubscriptionStatus.Plus(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumType, enumTier, index)
+        SubscriptionStatus.Paid(expiryDate ?: Date(), autoRenewing, giftDays, freq, originalPlatform, subs, enumType, enumTier, index)
     }
 }
 

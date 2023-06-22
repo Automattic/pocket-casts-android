@@ -175,7 +175,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         }
         viewModel.signInState.observe(viewLifecycleOwner) {
             binding?.swipeRefreshLayout?.isEnabled =
-                it is SignInState.SignedIn && it.subscriptionStatus is SubscriptionStatus.Plus
+                it is SignInState.SignedIn && it.subscriptionStatus is SubscriptionStatus.Paid
         }
 
         binding?.fab?.setOnClickListener {

@@ -478,7 +478,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     suspend fun loadPodcastsChildren(): List<MediaBrowserCompat.MediaItem> {
-        return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
+        return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
             folderManager.getHomeFolder().mapNotNull { item ->
                 when (item) {
                     is FolderItem.Folder -> convertFolderToMediaItem(this, item.folder)
@@ -493,7 +493,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     suspend fun loadFolderPodcastsChildren(folderUuid: String): List<MediaBrowserCompat.MediaItem> {
-        return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
+        return if (subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
             folderManager.findFolderPodcastsSorted(folderUuid).mapNotNull { podcast ->
                 convertPodcastToMediaItem(podcast = podcast, context = this)
             }

@@ -49,11 +49,11 @@ class MainActivityViewModel
         get() = signInState.value?.isSignedIn ?: false
 
     fun shouldShowCancelled(subscriptionStatus: SubscriptionStatus): Boolean {
-        val plusStatus = (subscriptionStatus as? SubscriptionStatus.Plus) ?: return false
+        val paidStatus = (subscriptionStatus as? SubscriptionStatus.Paid) ?: return false
         val renewing = subscriptionStatus.autoRenew
         val cancelAcknowledged = settings.getCancelledAcknowledged()
-        val giftDays = plusStatus.giftDays
-        val expired = plusStatus.expiry.before(Date())
+        val giftDays = paidStatus.giftDays
+        val expired = paidStatus.expiry.before(Date())
 
         return !renewing && !cancelAcknowledged && giftDays == 0 && expired
     }

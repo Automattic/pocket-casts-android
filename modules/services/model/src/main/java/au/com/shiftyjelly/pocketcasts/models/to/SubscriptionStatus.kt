@@ -21,7 +21,7 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
     ) : SubscriptionStatus(expiry, subscriptionList)
 
     @JsonClass(generateAdapter = true)
-    data class Plus(
+    data class Paid(
         @field:Json(name = "expiry") val expiry: Date,
         @field:Json(name = "autoRenew") val autoRenew: Boolean,
         @field:Json(name = "giftDays") val giftDays: Int = 0,
@@ -48,5 +48,5 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
     }
 
     val isLifetimePlus: Boolean
-        get() = this is Plus && this.platform == SubscriptionPlatform.GIFT && this.giftDays > giftDaysCutOver
+        get() = this is Paid && this.platform == SubscriptionPlatform.GIFT && this.giftDays > giftDaysCutOver
 }
