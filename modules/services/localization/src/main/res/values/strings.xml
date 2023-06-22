@@ -33,8 +33,9 @@
     <string name="log_in">Log in</string>
     <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
     <string name="log_out">Log out</string>
-    <string name="log_in_watch_requires_plus">Sign in with a Plus account to use this app or upgrade visiting</string>
-    <string name="log_in_with_plus">Please sign in with a Plus account</string>
+    <string name="log_in_watch_requires_plus">Log in with a Plus account to use this app or upgrade visiting</string>
+    <string name="log_in_with_plus">Please log in with a Plus account</string>
+    <string name="log_in_free_acccount">%s is using a free account</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
@@ -1579,6 +1580,7 @@
     <string name="enter_email">Enter email</string>
     <string name="log_in_watch_from_phone_instructions_1">Log into Pocket Casts on a paired Android phone.</string>
     <string name="log_in_watch_from_phone_instructions_2">The next time you open Pocket Casts on your watch and have a network connection, you will be logged in.</string>
+    <string name="log_in_watch_from_phone_instructions_3">If you are having trouble, make sure your phone is running the same version of Pocket Casts as your watch (%s)</string>
     <string name="enter_password">Enter password</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>

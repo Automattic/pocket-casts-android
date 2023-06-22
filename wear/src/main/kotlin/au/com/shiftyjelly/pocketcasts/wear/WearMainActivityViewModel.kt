@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import com.google.android.horologist.auth.data.tokenshare.TokenBundleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,17 +36,19 @@ class WearMainActivityViewModel @Inject constructor(
     subscriptionManager: SubscriptionManager,
     private val userManager: UserManager,
     private val settings: Settings,
+    private val syncManager: SyncManager,
     watchSync: WatchSync,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     data class State(
+        val email: String?,
         val showLoggingInScreen: Boolean = false,
         val signInState: SignInState? = null,
         val subscriptionStatus: SubscriptionStatus? = null,
     )
 
-    private val _state = MutableStateFlow(State())
+    private val _state = MutableStateFlow(State(email = syncManager.getEmail()))
     val state = _state.asStateFlow()
 
     init {
@@ -72,7 +75,12 @@ class WearMainActivityViewModel @Inject constructor(
                 .observeSubscriptionStatus()
                 .asFlow()
                 .collect { subscriptionStatus ->
-                    _state.update { it.copy(subscriptionStatus = subscriptionStatus.get()) }
+                    _state.update {
+                        it.copy(
+                            email = syncManager.getEmail(),
+                            subscriptionStatus = subscriptionStatus.get(),
+                        )
+                    }
                 }
         }
     }
@@ -85,7 +93,10 @@ class WearMainActivityViewModel @Inject constructor(
                     podcastManager.refreshPodcastsAfterSignIn()
                 }
                 _state.update {
-                    it.copy(showLoggingInScreen = true)
+                    it.copy(
+                        email = syncManager.getEmail(),
+                        showLoggingInScreen = true,
+                    )
                 }
             }
         }
@@ -95,7 +106,12 @@ class WearMainActivityViewModel @Inject constructor(
      * This should be invoked when the UI has handled showing or hiding the sign in confirmation.
      */
     fun onSignInConfirmationActionHandled() {
-        _state.update { it.copy(showLoggingInScreen = false) }
+        _state.update {
+            it.copy(
+                email = syncManager.getEmail(),
+                showLoggingInScreen = false,
+            )
+        }
     }
 
     fun signOut() {
