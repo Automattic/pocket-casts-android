@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -37,17 +38,13 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val context: Context, override val onPlayerEvent: (au.com.shiftyjelly.pocketcasts.repositories.playback.Player, PlayerEvent) -> Unit) : LocalPlayer(onPlayerEvent) {
+    private val reducedBufferManufacturers = listOf("mercedes-benz")
+    private val useReducedBuffer = reducedBufferManufacturers.contains(Build.MANUFACTURER.lowercase()) || Util.isWearOs(context)
+    private val bufferTimeMinMillis = if (useReducedBuffer) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(5).toInt()
+    private val bufferTimeMaxMillis = bufferTimeMinMillis
 
-    companion object {
-        private val REDUCED_BUFFER_MANUFACTURERS = listOf("mercedes-benz")
-        private val USE_REDUCED_BUFFER = REDUCED_BUFFER_MANUFACTURERS.contains(Build.MANUFACTURER.lowercase())
-
-        private val BUFFER_TIME_MIN_MILLIS = if (USE_REDUCED_BUFFER) TimeUnit.MINUTES.toMillis(2).toInt() else TimeUnit.MINUTES.toMillis(5).toInt()
-        private val BUFFER_TIME_MAX_MILLIS = BUFFER_TIME_MIN_MILLIS
-
-        // Be careful increasing the size of the back buffer. It can easily lead to OOM errors.
-        private val BACK_BUFFER_TIME_MILLIS = if (USE_REDUCED_BUFFER) TimeUnit.SECONDS.toMillis(30).toInt() else TimeUnit.MINUTES.toMillis(1).toInt()
-    }
+    // Be careful increasing the size of the back buffer. It can easily lead to OOM errors.
+    private val backBufferTimeMillis = if (useReducedBuffer) TimeUnit.SECONDS.toMillis(30).toInt() else TimeUnit.MINUTES.toMillis(1).toInt()
 
     private var player: ExoPlayer? = null
 
@@ -176,9 +173,9 @@ class SimplePlayer(val settings: Settings, val statsManager: StatsManager, val c
     private fun prepare() {
         val trackSelector = DefaultTrackSelector(context)
 
-        val minBufferMillis = if (isStreaming) BUFFER_TIME_MIN_MILLIS else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
-        val maxBufferMillis = if (isStreaming) BUFFER_TIME_MAX_MILLIS else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
-        val backBufferMillis = if (isStreaming) BACK_BUFFER_TIME_MILLIS else DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS
+        val minBufferMillis = if (isStreaming) bufferTimeMinMillis else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
+        val maxBufferMillis = if (isStreaming) bufferTimeMaxMillis else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
+        val backBufferMillis = if (isStreaming) backBufferTimeMillis else DefaultLoadControl.DEFAULT_BACK_BUFFER_DURATION_MS
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
                 minBufferMillis,
