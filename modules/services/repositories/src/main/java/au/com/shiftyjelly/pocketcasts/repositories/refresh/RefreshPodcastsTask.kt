@@ -72,7 +72,7 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 .setInitialDelay(REFRESH_EVERY_HOURS, TimeUnit.HOURS)
                 .build()
 
-            workManager.enqueueUniquePeriodicWork(TAG_REFRESH_TASK, ExistingPeriodicWorkPolicy.REPLACE, request)
+            workManager.enqueueUniquePeriodicWork(TAG_REFRESH_TASK, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, request)
 
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Set up periodic refresh")
         }

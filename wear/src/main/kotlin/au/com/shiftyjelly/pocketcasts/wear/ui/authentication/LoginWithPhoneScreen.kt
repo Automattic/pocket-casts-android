@@ -11,6 +11,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import au.com.shiftyjelly.pocketcasts.BuildConfig
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -51,6 +52,15 @@ fun LoginWithPhoneScreen(
         item {
             Text(
                 text = "2. ${stringResource(LR.string.log_in_watch_from_phone_instructions_2)}",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+        }
+
+        item {
+            Text(
+                text = stringResource(LR.string.log_in_watch_from_phone_instructions_3, BuildConfig.VERSION_NAME),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.body2,
                 modifier = Modifier.padding(bottom = 24.dp)

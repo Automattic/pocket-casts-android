@@ -1,10 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.repositories.endofyear
 
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedCategory
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ListenedNumbers
 import au.com.shiftyjelly.pocketcasts.models.db.helper.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.db.helper.TopPodcast
-import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryEpilogue
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.StoryIntro
@@ -50,7 +51,7 @@ class EndOfYearManagerImpl @Inject constructor(
 
     override suspend fun isEligibleForStories(): Boolean =
         hasEpisodesPlayedUpto(YEAR, TimeUnit.MINUTES.toSeconds(EPISODE_MINIMUM_PLAYED_TIME_IN_MIN)) &&
-            BuildConfig.END_OF_YEAR_ENABLED
+            FeatureFlag.isEnabled(Feature.END_OF_YEAR_ENABLED)
 
     /**
      * Download the year's listening history.

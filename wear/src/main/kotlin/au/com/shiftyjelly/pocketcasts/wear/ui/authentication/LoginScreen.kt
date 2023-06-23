@@ -1,20 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.ChipDefaults
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
-import com.google.android.horologist.base.ui.components.StandardChip
-import com.google.android.horologist.base.ui.components.StandardChipType
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import com.google.android.horologist.compose.material.Chip
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -36,31 +28,9 @@ fun LoginScreen(
         columnState = columnState,
     ) {
         item {
-            Text(
-                text = stringResource(LR.string.log_in),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onPrimary,
-                style = MaterialTheme.typography.title2,
-            )
-        }
-
-        item {
-            Text(
-                text = stringResource(LR.string.log_in_subtitle),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onPrimary,
-                style = MaterialTheme.typography.body1,
-            )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
-        item {
-            StandardChip(
+            Chip(
                 labelId = LR.string.log_in_with_google,
-                chipType = StandardChipType.Secondary,
+                colors = ChipDefaults.secondaryChipColors(),
                 icon = IR.drawable.google_g_white,
                 onClick = {
                     viewModel.onGoogleLoginClicked()
@@ -70,9 +40,9 @@ fun LoginScreen(
         }
 
         item {
-            StandardChip(
+            Chip(
                 labelId = LR.string.log_in_on_phone,
-                chipType = StandardChipType.Secondary,
+                colors = ChipDefaults.secondaryChipColors(),
                 icon = IR.drawable.baseline_phone_android_24,
                 onClick = {
                     viewModel.onPhoneLoginClicked()
@@ -82,9 +52,9 @@ fun LoginScreen(
         }
 
         item {
-            StandardChip(
+            Chip(
                 labelId = LR.string.log_in_with_email,
-                chipType = StandardChipType.Secondary,
+                colors = ChipDefaults.secondaryChipColors(),
                 icon = IR.drawable.ic_email_white_24dp,
                 onClick = {
                     viewModel.onEmailLoginClicked()

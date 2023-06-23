@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -106,6 +107,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             )
             Column(
                 modifier = Modifier
+                    .background(MaterialTheme.theme.colors.primaryUi02)
                     .verticalScroll(rememberScrollState())
             ) {
                 SettingSection(heading = stringResource(LR.string.settings_general_defaults)) {

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="?attr/primary_ui_01"
     android:orientation="vertical"
-    tools:context=".account.AccountFragment">
+    tools:context=".AccountFragment">
 
     <ScrollView
         android:layout_width="match_parent"

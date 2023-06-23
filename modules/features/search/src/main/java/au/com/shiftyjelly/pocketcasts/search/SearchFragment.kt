@@ -243,7 +243,6 @@ class SearchFragment : BaseFragment() {
                         onShowAllCLick = ::onShowAllClick,
                         onScroll = { UiUtil.hideKeyboard(searchView) },
                         onlySearchRemote = onlySearchRemote,
-                        settings = settings
                     )
                 }
             }

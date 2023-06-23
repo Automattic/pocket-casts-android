@@ -170,6 +170,7 @@ private fun AboutPage(onBackPressed: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
+            .background(MaterialTheme.theme.colors.primaryUi02)
             .verticalScroll(scrollState)
     ) {
         ThemedTopAppBar(

@@ -16,9 +16,8 @@ import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import com.google.android.horologist.base.ui.components.StandardChip
-import com.google.android.horologist.base.ui.components.StandardChipType
-import com.google.android.horologist.base.ui.util.adjustChipHeightToFontScale
+import com.google.android.horologist.compose.material.util.adjustChipHeightToFontScale
+import com.google.android.horologist.compose.material.Chip as StandardChip
 
 @Composable
 fun WatchListChip(
@@ -57,7 +56,7 @@ fun WatchListChip(
         modifier = modifier.fillMaxWidth(),
         secondaryLabel = secondaryLabel,
         icon = icon,
-        chipType = StandardChipType.Secondary,
+        colors = ChipDefaults.secondaryChipColors(),
     )
 }
 

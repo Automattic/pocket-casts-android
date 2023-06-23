@@ -156,7 +156,7 @@ class SubscribeManager @Inject constructor(
 
     private fun downloadPodcast(podcastUuid: String): Single<Podcast> {
         // download the podcast
-        val serverPodcastObservable = podcastCacheServerManager.getPodcast(podcastUuid, episodeLimit = Settings.LIMIT_MAX_PODCAST_EPISODES)
+        val serverPodcastObservable = podcastCacheServerManager.getPodcast(podcastUuid)
             .subscribeOn(Schedulers.io())
             .doOnSuccess { Timber.i("Downloaded episodes success podcast $podcastUuid") }
         // download the colors

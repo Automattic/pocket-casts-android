@@ -59,13 +59,11 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-
+        RxJavaUncaughtExceptionHandling.setUp()
         setupSentry()
         setupLogging()
         setupAnalytics()
         setupApp()
-
-        RxJavaUncaughtExceptionHandling.setUp()
     }
 
     private fun setupSentry() {

@@ -23,8 +23,6 @@ import retrofit2.HttpException
 import retrofit2.Response
 import java.util.Date
 
-class UserNotLoggedInException : Exception()
-
 class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
 
     @ToJson

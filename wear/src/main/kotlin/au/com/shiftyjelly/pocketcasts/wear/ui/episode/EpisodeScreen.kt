@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.DownloadButtonState
+import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ExpandableText
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
@@ -188,11 +189,11 @@ fun EpisodeScreen(
         }
 
         item {
-            if (state.showNotes != null) {
+            if (state.showNotesState is ShowNotesState.Loaded) {
                 val coroutineScope = rememberCoroutineScope()
                 Column {
                     ExpandableText(
-                        text = state.showNotes.parseAsHtml().toString(),
+                        text = state.showNotesState.showNotes.parseAsHtml().toString(),
                         style = MaterialTheme.typography.caption2,
                         textAlign = TextAlign.Center,
                         onClick = { isExpanded ->

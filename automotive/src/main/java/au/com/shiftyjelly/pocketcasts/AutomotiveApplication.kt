@@ -51,13 +51,12 @@ class AutomotiveApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
+        RxJavaUncaughtExceptionHandling.setUp()
         setupSentry()
         setupLogging()
         setupAnalytics()
         setupAutomotiveDefaults()
         setupApp()
-
-        RxJavaUncaughtExceptionHandling.setUp()
     }
 
     override fun getWorkManagerConfiguration(): Configuration {

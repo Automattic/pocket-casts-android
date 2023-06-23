@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.di
 
+import android.accounts.AccountManager
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
@@ -282,7 +283,7 @@ class ServersModule {
     @Provides
     @PodcastCacheServerRetrofit
     @Singleton
-    internal fun providePodcastRetrofit(@CachedTokenedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    internal fun providePodcastRetrofit(@CachedOkHttpClient okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -354,6 +355,12 @@ class ServersModule {
             listWebService,
             platform
         )
+    }
+
+    @Provides
+    @Singleton
+    internal fun provideAccountManager(@ApplicationContext context: Context): AccountManager {
+        return AccountManager.get(context)
     }
 }
 

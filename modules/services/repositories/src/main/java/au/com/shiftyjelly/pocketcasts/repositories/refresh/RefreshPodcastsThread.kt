@@ -42,7 +42,7 @@ import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
 import au.com.shiftyjelly.pocketcasts.servers.ServerCallback
 import au.com.shiftyjelly.pocketcasts.servers.ServerManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServerManagerImpl
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.UserNotLoggedInException
+import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.EntryPoint
@@ -131,13 +131,8 @@ class RefreshPodcastsThread(
             Timber.e(e)
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Refresh failed")
 
-            if (e is SecurityException || e is UserNotLoggedInException) {
-                val exceptionType = when (e) {
-                    is SecurityException -> "SecurityException"
-                    is UserNotLoggedInException -> "UserNotLoggedInException"
-                    else -> "unexpected exception"
-                }
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because there was a $exceptionType")
+            if (e is RefreshTokenExpiredException) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signed out user because the refresh token has expired.")
 
                 val userManager = entryPoint.userManager()
                 val playbackManager = entryPoint.playbackManager()
@@ -261,7 +256,7 @@ class RefreshPodcastsThread(
         if (throwable != null) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
 
-            if (throwable is UserNotLoggedInException) {
+            if (throwable is RefreshTokenExpiredException) {
                 LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because server post failed to log in")
                 userManager.signOut(playbackManager, wasInitiatedByUser = false)
             } else {

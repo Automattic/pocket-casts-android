@@ -889,7 +889,7 @@ open class PlaybackManager @Inject constructor(
         withContext(Dispatchers.Main) {
             playbackStateRelay.blockingFirst().let { playbackState ->
                 val errorMessage = if (event.error?.cause is HttpDataSource.HttpDataSourceException) {
-                    "Could not load podcast. Please check your internet connection and try again."
+                    application.getString(LR.string.player_play_failed_check_internet)
                 } else {
                     event.message
                 }

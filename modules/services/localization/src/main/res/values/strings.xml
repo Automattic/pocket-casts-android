@@ -33,8 +33,9 @@
     <string name="log_in">Log in</string>
     <string name="log_in_subtitle">Start listening to your favourite podcasts</string>
     <string name="log_out">Log out</string>
-    <string name="log_in_watch_requires_plus">Sign in with a Plus account to use this app or upgrade visiting</string>
-    <string name="log_in_with_plus">Please sign in with a Plus account</string>
+    <string name="log_in_watch_requires_plus">Log in with a Plus account to use this app or upgrade visiting</string>
+    <string name="log_in_with_plus">Please log in with a Plus account</string>
+    <string name="log_in_free_acccount">%s is using a free account</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
@@ -133,6 +134,7 @@
 
     <string name="episodes_singular">1 episode</string>
     <string name="episodes_plural">%d episodes</string>
+    <string name="empty_play_state">Pick an episode to begin</string>
 
     <string name="seconds_label">Seconds</string>
     <string name="seconds_singular">1 second</string>
@@ -215,7 +217,7 @@
     <string name="search_history_clear_all_confirm_button_title">Clear Search History</string>
     <string name="search_history_clear_all_confirmation_message">Are you sure you want to clear all your search history?</string>
     <string name="search_history_recent_searches">Recent searches</string>
-    <string name="search_history_row_type_episode_subtitle">Episode \u2022 %s \u2022 %s</string>
+    <string name="search_history_row_type_episode_subtitle">Episode \u2022 %1$s \u2022 %2$s</string>
     <string name="search_history_row_type_folder_subtitle">Folder \u2022 %s</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
     <string name="search_results_all_episodes">All episodes</string>
@@ -307,6 +309,7 @@
     <string name="player_skipped_last">Skipped the last %d seconds</string>
     <string name="player_started_from">Starting podcast from %d seconds</string>
     <string name="player_open_full_size_player">Activate to open full size player</string>
+    <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
 
     <!-- Podcasts -->
 
@@ -339,6 +342,7 @@
     <string name="podcasts_menu_search_podcasts">Search podcasts</string>
     <string name="podcasts_menu_share_podcasts">Share podcasts</string>
     <string name="podcasts_menu_sort_by">Sort by</string>
+    <string name="podcasts_no_subscriptions">No subscribed podcasts</string>
     <string name="podcasts_plural">%d Podcasts</string>
     <string name="podcasts_share">Share podcasts</string>
     <string name="podcasts_share_0_selected">0 selected</string>
@@ -370,6 +374,7 @@
     <string name="podcasts_sort_by_release_date">Episode release date</string>
     <string name="podcasts_sort_by_title">"Title (A - Z)"</string>
     <string name="podcasts_sort_order">Sort order</string>
+    <string name="podcasts_subscribe_on_phone">Subscribe to podcasts on your phone and they\'ll appear here.</string>
     <string name="podcasts_time_to_add_some_podcasts">Time to add some Podcasts!</string>
     <string name="podcasts_time_to_add_some_podcasts_summary">You can add podcasts by searching above or if you are looking for some inspiration try the Discover tab.</string>
     <string name="podcasts_empty_folder">Your folder is empty</string>
@@ -434,6 +439,7 @@
     <string name="podcast_group_unplayed" translatable="false">@string/unplayed</string>
     <string name="podcast_hide_archived">Hide archived</string>
     <string name="podcast_load_error">There was an error loading the podcast.</string>
+    <string name="podcast_loading">Loading your podcasts</string>
     <string name="podcast_next_episode_any_day_now">Next episode any day now</string>
     <string name="podcast_next_episode_today">Next episode today</string>
     <string name="podcast_next_episode_tomorrow">Next episode tomorrow</string>
@@ -901,7 +907,6 @@
     <string name="profile_sub_web_goto">To cancel your subscription, you&#x2019;ll need to cancel via Pocketcasts.com.</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d SUBSCRIBED</string>
     <string name="profile_supporter_become_a_supporter">Become a supporter</string>
-    <string name="profile_supporter_description">A Pocket Casts account is required to view premium podcasts. Don\'t worry, it\'s free and easy to create one!</string>
     <string name="profile_supporter_error" translatable="false">@string/error</string>
     <string name="profile_supporter_loading" translatable="false">@string/loading</string>
     <string name="profile_supporter_no_podcasts">No supporter podcasts found</string>
@@ -1027,6 +1032,7 @@
     <string name="settings_auto_download_up_next">Episodes added to Up Next</string>
     <string name="settings_auto_play">Auto play</string>
     <string name="settings_auto_play_summary">When there\'s nothing left to play, automatically pick an episode for me</string>
+    <string name="settings_beta_features">Beta Features</string>
     <string name="settings_battery">Battery</string>
     <string name="settings_battery_settings">Battery settings</string>
     <string name="settings_battery_learn_more">Learn more</string>
@@ -1573,6 +1579,7 @@
     <string name="enter_email">Enter email</string>
     <string name="log_in_watch_from_phone_instructions_1">Log into Pocket Casts on a paired Android phone.</string>
     <string name="log_in_watch_from_phone_instructions_2">The next time you open Pocket Casts on your watch and have a network connection, you will be logged in.</string>
+    <string name="log_in_watch_from_phone_instructions_3">If you are having trouble, make sure your phone is running the same version of Pocket Casts as your watch (%s)</string>
     <string name="enter_password">Enter password</string>
     <string name="onboarding_discover_your_next_favorite_podcast">Discover your next favorite podcast</string>
     <string name="onboarding_create_an_account_to">Create an account to sync your listening experience across all your devices.</string>

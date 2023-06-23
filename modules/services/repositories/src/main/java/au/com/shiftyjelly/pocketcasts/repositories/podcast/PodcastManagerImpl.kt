@@ -201,7 +201,7 @@ class PodcastManagerImpl @Inject constructor(
     override fun refreshPodcastInBackground(existingPodcast: Podcast, playbackManager: PlaybackManager) {
         launch {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid}")
-            val updatedPodcast = cacheServerManager.getPodcastResponse(existingPodcast.uuid, episodeLimit = Settings.LIMIT_MAX_PODCAST_EPISODES)
+            val updatedPodcast = cacheServerManager.getPodcastResponse(existingPodcast.uuid)
                 .map {
                     val responsePodcast = it.body()?.toPodcast()
                     if (it.wasCached()) {

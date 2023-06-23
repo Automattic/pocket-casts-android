@@ -11,6 +11,7 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "../base.gradle"
 
 android {
+    namespace 'au.com.shiftyjelly.pocketcasts'
 
     defaultConfig {
         minSdk project.minSdkVersionWear
@@ -94,7 +95,7 @@ dependencies {
     implementation androidLibs.horologistAuthData
     implementation androidLibs.horologistAuthComposables
     implementation androidLibs.horologistAuthUi
-    implementation androidLibs.horologistBaseUi
+    implementation androidLibs.horologistComposeMaterial
     implementation androidLibs.horologistDatalayer
     implementation androidLibs.horologistMedia
     implementation androidLibs.horologistMedia3Backend

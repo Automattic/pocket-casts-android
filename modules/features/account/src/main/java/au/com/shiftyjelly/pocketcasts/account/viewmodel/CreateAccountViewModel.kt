@@ -39,7 +39,6 @@ class CreateAccountViewModel
     val createAccountState = MutableLiveData<CreateAccountState>().apply { value = CreateAccountState.CurrentlyValid }
     private val disposables = CompositeDisposable()
     var defaultSubscriptionType = SubscriptionType.FREE
-    var supporterInstance = false
 
     @Inject lateinit var subscriptionManager: SubscriptionManager
 
