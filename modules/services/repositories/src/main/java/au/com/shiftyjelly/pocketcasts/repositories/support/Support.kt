@@ -88,22 +88,9 @@ class Support @Inject constructor(
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
             }
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
-            val accountType = if (isPaid) {
-                if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
-                    when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
-                        SubscriptionTier.PATRON -> "Patron Account"
-                        SubscriptionTier.PLUS -> "Plus Account"
-                        SubscriptionTier.NONE -> ""
-                    }
-                } else {
-                    "Plus Account"
-                }
-            } else {
-                ""
-            }
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} $accountType"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
             )
 
             // try to attach the debug information
@@ -161,7 +148,7 @@ class Support @Inject constructor(
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${if (isPaid) " - Plus Account" else ""}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
             )
 
             try {
@@ -191,7 +178,7 @@ class Support @Inject constructor(
             val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${if (isPaid) " - Plus Account" else ""}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
             )
 
             try {
@@ -224,6 +211,20 @@ class Support @Inject constructor(
         }
 
         return intent
+    }
+
+    private fun getAccountType(isPaid: Boolean) = if (isPaid) {
+        if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
+            when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
+                SubscriptionTier.PATRON -> "Patron Account"
+                SubscriptionTier.PLUS -> "Plus Account"
+                SubscriptionTier.NONE -> ""
+            }
+        } else {
+            "Plus Account"
+        }
+    } else {
+        ""
     }
 
     suspend fun getLogs(): String =
