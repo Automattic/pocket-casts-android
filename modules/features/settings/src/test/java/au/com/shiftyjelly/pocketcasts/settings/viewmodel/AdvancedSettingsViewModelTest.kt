@@ -3,22 +3,23 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.utils.MainCoroutineRule
 import dagger.hilt.android.qualifiers.ApplicationContext
 import junit.framework.TestCase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.times
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class AdvancedSettingsViewModelTest {
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
 
     @Mock
     private lateinit var settings: Settings
@@ -31,10 +32,8 @@ class AdvancedSettingsViewModelTest {
     private lateinit var context: Context
     private lateinit var viewModel: AdvancedSettingsViewModel
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         whenever(settings.syncOnMeteredNetwork()).thenReturn(false)
         viewModel = AdvancedSettingsViewModel(
             settings,

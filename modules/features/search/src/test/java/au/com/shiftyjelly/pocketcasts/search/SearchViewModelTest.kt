@@ -4,12 +4,11 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
-import kotlinx.coroutines.Dispatchers
+import au.com.shiftyjelly.pocketcasts.search.utils.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -23,6 +22,9 @@ import java.util.UUID
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class SearchViewModelTest {
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
+
     @Mock
     private lateinit var searchHandler: SearchHandler
 
@@ -39,7 +41,6 @@ class SearchViewModelTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         whenever(searchHandler.searchResults).thenReturn(mock())
         whenever(searchHandler.loading).thenReturn(mock())
         viewModel =
