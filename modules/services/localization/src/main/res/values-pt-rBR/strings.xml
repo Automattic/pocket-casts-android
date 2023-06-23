@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-05 19:54:03+0000
+Translation-Revision-Date: 2023-06-19 19:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="settings_watch_logs">Registros do smartwatch</string>
+    <string name="settings_help_phone_unavailable_message">Tente novamente quando o telefone estiver conectado ao smartwatch.</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">Se o seu telefone estiver pareado, aparecerá um pop-up com seus registros</string>
+    <string name="settings_help_send_logs_to_phone">Enviar registros para o telefone</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">Antes de continuar, pareie seu smartwatch com um telefone que tenha o Pocket Casts instalado.</string>
+    <string name="settings_help_contact_support_no_phone_connection">Pareie seu smartwatch com um telefone que tenha Pocket Casts instalado para visualizar seus registros ou entre em contato com o suporte</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">Se o seu telefone estiver pareado, aparecerá um pop-up para enviar um e-mail ao suporte com seus registros anexados</string>
+    <string name="podcast_loading">Carregando os seus podcasts</string>
+    <string name="podcasts_subscribe_on_phone">Siga podcasts no seu telefone e eles vão aparecer aqui.</string>
+    <string name="podcasts_no_subscriptions">Nenhum podcast seguido</string>
+    <string name="settings_could_not_open_on_phone">Não foi possível abrir no telefone</string>
+    <string name="settings_open_on_phone">Abrir no telefone</string>
+    <string name="settings_about_privacy_policy_available_at">Nossa Política de privacidade está disponível em %s</string>
+    <string name="settings_about_terms_of_service_available_at">Nossos Termos de serviço estão disponíveis em %s</string>
+    <string name="log_in_no_network">Nenhuma conexão de rede detectada. Tente novamente mais tarde.</string>
+    <string name="error_server_failed">Ocorreu um erro interno no servidor. Tente novamente mais tarde.</string>
+    <string name="error_invalid_password_length">Informe uma senha com pelo menos seis caracteres.</string>
+    <string name="error_invalid_email_address">Digite um endereço de e-mail válido.</string>
     <string name="settings_privacy_crash_link_short">Vincular sua conta</string>
     <string name="settings_app_icon_pride_2023">Orgulho LGBT+ 2023</string>
-    <string name="log_in_with_plus">Faça login com uma conta do Plus</string>
-    <string name="log_in_watch_requires_plus">Faça login com uma conta do Plus para usar este aplicativo ou atualize acessando</string>
     <string name="enter_password">Inserir senha</string>
     <string name="enter_email">Inserir e-mail</string>
     <string name="player_effects_trim_level_down">Reduzir nível de corte</string>
@@ -79,7 +95,6 @@ Language: pt_BR
     <string name="podcasts_all">Todos os podcasts</string>
     <string name="search_results_all_podcasts">Todos os podcasts</string>
     <string name="search_results_all_episodes">Todos os episódios</string>
-    <string name="search_history_row_type_episode_subtitle">Episódio \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Mostrar tudo</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>

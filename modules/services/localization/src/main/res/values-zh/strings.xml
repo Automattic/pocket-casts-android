@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-07 09:54:20+0000
+Translation-Revision-Date: 2023-06-20 18:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="settings_watch_logs">Watch 日志</string>
+    <string name="settings_help_phone_unavailable_message">请在手机连接手表后重试。</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">如果您的手机当前已配对，它将显示一个包含日志的弹出窗口</string>
+    <string name="settings_help_send_logs_to_phone">将日志发送到手机</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">请先将您的手表与已安装 Pocket Casts 的手机配对，然后再继续。</string>
+    <string name="settings_help_contact_support_no_phone_connection">请将您的手表与已安装 Pocket Casts 的手机配对，以查看您的日志或联系支持人员</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">如果您的手机当前已配对，它将显示一个包含日志的电子邮件支持弹出窗口</string>
+    <string name="podcast_loading">正在加载您的播客</string>
+    <string name="podcasts_subscribe_on_phone">在手机上订阅播客，这些博客就会显示在此处。</string>
+    <string name="podcasts_no_subscriptions">无订阅博客</string>
+    <string name="settings_could_not_open_on_phone">无法在手机上打开</string>
+    <string name="settings_open_on_phone">在手机上打开</string>
+    <string name="settings_about_privacy_policy_available_at">请访问 %s 查看我们的隐私政策</string>
+    <string name="settings_about_terms_of_service_available_at">请访问 %s 查看我们的服务条款</string>
+    <string name="log_in_no_network">未检测到网络连接。 请稍后重试。</string>
+    <string name="error_server_failed">发生内部服务器错误。 请稍后重试。</string>
+    <string name="error_invalid_password_length">请输入密码，至少包含 6 个字符。</string>
+    <string name="error_invalid_email_address">请输入有效的电子邮箱地址。</string>
     <string name="settings_privacy_crash_link_short">关联您的账户</string>
     <string name="settings_app_icon_pride_2023">2023 年骄傲月</string>
-    <string name="log_in_with_plus">请使用 Plus 账户登录</string>
-    <string name="log_in_watch_requires_plus">使用 Plus 账户登录以使用此应用或升级访问</string>
     <string name="enter_password">输入密码</string>
     <string name="enter_email">输入电子邮件地址</string>
     <string name="player_effects_trim_level_down">降低功能级别</string>
@@ -79,7 +95,6 @@ Language: zh_CN
     <string name="podcasts_all">所有播客</string>
     <string name="search_results_all_podcasts">所有播客</string>
     <string name="search_results_all_episodes">所有剧集</string>
-    <string name="search_history_row_type_episode_subtitle">剧集 \u2022 %s \u2022 %s</string>
     <string name="search_show_all">显示所有</string>
     <string name="podcast">播客</string>
     <string name="search_history_row_type_podcast_subtitle">播客 \u2022 %s</string>

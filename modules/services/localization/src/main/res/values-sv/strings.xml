@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-07 11:54:04+0000
+Translation-Revision-Date: 2023-06-23 09:56:55+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_watch_logs">Watch-loggar</string>
+    <string name="settings_help_phone_unavailable_message">Försök igen när din telefon är ansluten till din klocka.</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">Om din telefon är parkopplad kommer ett popup-meddelande med dina loggar att visas</string>
+    <string name="settings_help_send_logs_to_phone">Skicka loggar till telefon</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">Parkoppla din klocka med en telefon som har Pocket Casts installerat innan du fortsätter.</string>
+    <string name="settings_help_contact_support_no_phone_connection">Parkoppla din klocka med en telefon som har Pocket Casts installerat för att visa dina logga eller kontakta supporten</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">Om din telefon är parkopplad kommer ett popup-meddelande med en uppmaning om att e-posta supporten med dina loggar bifogade att visas</string>
+    <string name="podcast_loading">Laddar dina podcasts</string>
+    <string name="podcasts_subscribe_on_phone">Prenumerera på podcasts på din telefon så visas de här.</string>
+    <string name="podcasts_no_subscriptions">Inga podcastprenumerationer</string>
+    <string name="settings_could_not_open_on_phone">Kunde inte öppnas på telefonen</string>
+    <string name="settings_open_on_phone">Öppna på telefon</string>
+    <string name="settings_about_privacy_policy_available_at">Vår integritetspolicy är tillgänglig på %s</string>
+    <string name="settings_about_terms_of_service_available_at">Våra användarvillkor är tillgängliga på %s</string>
+    <string name="log_in_no_network">Ingen nätverksanslutning upptäckt. Försök igen senare.</string>
+    <string name="error_server_failed">Ett internt serverfel inträffade. Försök igen senare.</string>
+    <string name="error_invalid_password_length">Ange ett lösenord som är minst 6 tecken långt.</string>
+    <string name="error_invalid_email_address">Ange en giltig e-postadress.</string>
     <string name="settings_privacy_crash_link_short">Länka ditt konto</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
     <string name="log_in_with_plus">Logga in med ett Plus-konto</string>
-    <string name="log_in_watch_requires_plus">Logga in med ett Plus-konto för att använda den här appen eller uppgradera genom att besöka</string>
     <string name="enter_password">Ditt lösenord</string>
     <string name="enter_email">Ange e-post</string>
     <string name="player_effects_trim_level_down">Trimningsnivå upp</string>
@@ -79,7 +96,6 @@ Language: sv_SE
     <string name="podcasts_all">Alla podcasts</string>
     <string name="search_results_all_podcasts">Alla podcasts</string>
     <string name="search_results_all_episodes">Alla avsnitt</string>
-    <string name="search_history_row_type_episode_subtitle">Avsnitt \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Visa alla</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>

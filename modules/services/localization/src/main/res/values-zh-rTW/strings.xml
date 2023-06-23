@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-06 09:54:26+0000
+Translation-Revision-Date: 2023-06-20 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="settings_watch_logs">手錶記錄</string>
+    <string name="settings_help_phone_unavailable_message">請將手機連結至手錶後再試一次。</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">如果你的手機目前已完成配對，手機畫面就會顯示包含記錄的快顯視窗</string>
+    <string name="settings_help_send_logs_to_phone">將記錄傳送至手機</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">請將你的手錶與已安裝 Pocket Casts 的手機配對，再繼續操作。</string>
+    <string name="settings_help_contact_support_no_phone_connection">請將你的手錶與已安裝 Pocket Casts 的手機配對，以觀看記錄或聯絡支援團隊</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">如果你的手機目前已完成配對，手機畫面就會顯示快顯視窗，以便你將記錄附加至電子郵件並傳送給支援團隊</string>
+    <string name="podcast_loading">正在載入你的 Podcast</string>
+    <string name="podcasts_subscribe_on_phone">在手機上訂閱 Podcast，訂閱內容就會顯示在此處。</string>
+    <string name="podcasts_no_subscriptions">未訂閱任何 Podcast</string>
+    <string name="settings_could_not_open_on_phone">無法在手機上開啟</string>
+    <string name="settings_open_on_phone">在手機上開啟</string>
+    <string name="settings_about_privacy_policy_available_at">可在 %s 查看我們的隱私權政策</string>
+    <string name="settings_about_terms_of_service_available_at">可在 %s 查看我們的使用條款</string>
+    <string name="log_in_no_network">未偵測到網路連線。 請稍後再試一次。</string>
+    <string name="error_server_failed">發生內部伺服器錯誤。 請稍後再試一次。</string>
+    <string name="error_invalid_password_length">請輸入長度至少為 6 個字元的密碼。</string>
+    <string name="error_invalid_email_address">請輸入有效的電子郵件地址。</string>
     <string name="settings_privacy_crash_link_short">連結你的帳號</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
-    <string name="log_in_with_plus">請使用 Plus 帳號登入</string>
-    <string name="log_in_watch_requires_plus">使用 Plus 帳號登入即可使用此 App，或升級以造訪</string>
     <string name="enter_password">輸入密碼</string>
     <string name="enter_email">輸入電子郵件地址</string>
     <string name="player_effects_trim_level_down">剪輯程度降低</string>
@@ -79,7 +95,6 @@ Language: zh_TW
     <string name="podcasts_all">所有 Podcast</string>
     <string name="search_results_all_podcasts">所有 Podcast</string>
     <string name="search_results_all_episodes">所有單集</string>
-    <string name="search_history_row_type_episode_subtitle">單集 \u2022 %s \u2022 %s</string>
     <string name="search_show_all">顯示全部</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>

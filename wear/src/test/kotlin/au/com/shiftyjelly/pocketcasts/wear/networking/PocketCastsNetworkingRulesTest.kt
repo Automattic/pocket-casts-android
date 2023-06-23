@@ -6,6 +6,8 @@ import com.google.android.horologist.networks.data.NetworkType
 import com.google.android.horologist.networks.data.NetworkType.BT
 import com.google.android.horologist.networks.data.NetworkType.Cell
 import com.google.android.horologist.networks.data.NetworkType.Wifi
+import com.google.android.horologist.networks.data.Networks
+import com.google.android.horologist.networks.data.RequestType
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -75,6 +77,87 @@ class PocketCastsNetworkingRulesTest {
             expectedOutput = Cell
         )
     }
+
+    @Test
+    fun `downloads prefer wifi`() {
+        assertPreferredNetworkForRequestType(
+            requestType = RequestType.MediaRequest.DownloadRequest,
+            availableNetworkTypes = listOf(BT, Cell, Wifi),
+            expectedNetworkType = Wifi,
+        )
+    }
+
+    @Test
+    fun `downloads prefer cell if no wifi`() {
+        assertPreferredNetworkForRequestType(
+            requestType = RequestType.MediaRequest.DownloadRequest,
+            availableNetworkTypes = listOf(BT, Cell),
+            expectedNetworkType = Cell,
+        )
+    }
+
+    @Test
+    fun `downloads will use bluetooth if only option`() {
+        assertPreferredNetworkForRequestType(
+            requestType = RequestType.MediaRequest.DownloadRequest,
+            availableNetworkTypes = listOf(BT),
+            expectedNetworkType = BT,
+        )
+    }
+
+    @Test
+    fun `streaming will use bluetooth if available`() {
+        assertPreferredNetworkForRequestType(
+            requestType = RequestType.MediaRequest.StreamRequest,
+            availableNetworkTypes = listOf(Wifi, Cell, BT),
+            expectedNetworkType = BT,
+        )
+    }
+
+    @Test
+    fun `streaming will prefer wifi over cell`() {
+        assertPreferredNetworkForRequestType(
+            requestType = RequestType.MediaRequest.StreamRequest,
+            availableNetworkTypes = listOf(Cell, Wifi),
+            expectedNetworkType = Wifi,
+        )
+    }
+
+    @Test
+    fun `streaming will use cell if only option`() {
+        assertPreferredNetworkForRequestType(
+            requestType = RequestType.MediaRequest.StreamRequest,
+            availableNetworkTypes = listOf(Cell),
+            expectedNetworkType = Cell,
+        )
+    }
+
+    private fun assertPreferredNetworkForRequestType(
+        requestType: RequestType,
+        availableNetworkTypes: List<NetworkType>,
+        expectedNetworkType: NetworkType,
+    ) {
+        val networks = mockNetworksWithTypes(availableNetworkTypes)
+        val resultNetworkStatus = PocketCastsNetworkingRules.getPreferredNetwork(networks, requestType)
+        assertEquals(expectedNetworkType, resultNetworkStatus!!.networkInfo.type)
+    }
+
+    private fun mockNetworksWithTypes(networkTypes: List<NetworkType>): Networks =
+        mock<Networks>().apply {
+            val networkStatuses = networkTypes.map { mockNetworkStatus(it) }
+            whenever(this.networks).thenReturn(networkStatuses)
+        }
+
+    private fun mockNetworkStatus(networkType: NetworkType): NetworkStatus =
+        mock<NetworkStatus>().apply {
+            val networkInfo = mockNetworkInfo(networkType)
+            whenever(this.networkInfo).thenReturn(networkInfo)
+        }
+
+    private fun mockNetworkInfo(networkType: NetworkType): NetworkInfo =
+        mock<NetworkInfo>().apply {
+            whenever(this.type).thenReturn(networkType)
+        }
 
     private fun assertPrefers(
         input: List<NetworkType>,
