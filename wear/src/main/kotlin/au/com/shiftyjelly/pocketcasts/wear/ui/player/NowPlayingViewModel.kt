@@ -60,7 +60,11 @@ class NowPlayingViewModel @Inject constructor(
             } else {
 
                 val trackPositionUiModel = TrackPositionUiModel.Actual(
-                    percent = with(playbackState) { positionMs.toFloat() / durationMs },
+                    percent = with(playbackState) {
+                        if (durationMs != 0) {
+                            positionMs.toFloat() / durationMs
+                        } else 0f
+                    },
                     duration = playbackState.durationMs.toDuration(DurationUnit.MILLISECONDS),
                     position = playbackState.positionMs.toDuration(DurationUnit.MILLISECONDS),
                     shouldAnimate = true
