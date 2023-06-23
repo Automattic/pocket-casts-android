@@ -540,7 +540,6 @@ Language: nb_NO
     <string name="profile_supporter_support_producer">Bidra til å støtte denne produsenten ved å registrere deg for tilgang til denne samlingen</string>
     <string name="profile_supporter_subscribe_all">ABONNER PÅ ALLE</string>
     <string name="profile_supporter_no_podcasts">Fant ingen podcaster for støttemedlemmer</string>
-    <string name="profile_supporter_description">En Pocket Casts-konto er påkrevd for å vise premium-podcaster. Slapp av, det er gratis og enkelt å opprette en konto!</string>
     <string name="profile_supporter_become_a_supporter">Bli støttemedlem</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d ABONNERT PÅ</string>
     <string name="profile_sub_web_goto">Hvis du vil annullere abonnementet, må du annullere via Pocketcasts.com.</string>
@@ -637,10 +636,10 @@ Language: nb_NO
     <string name="profile_free">Gratis</string>
     <string name="profile_forgot_your_password">Jeg har glemt passordet mitt</string>
     <string name="profile_find_out_more">Finn ut mer om Pocket Casts Plus</string>
-    <string name="profile_license_agreement">Pocket Casts respekterer personvernet ditt. Disse retningslinjene for personvern forklarer hvilke opplysninger vi samler inn om deg og hvorfor, hva vi gjør med disse opplysningene, og hvordan vi behandler dem. De gjelder for Pocket Casts-apper for iOS og Android og Pocket Casts-webtjenesten med tilknyttede macOS- og Windows-apper (kalt for \"tjenesten\", både samlet sett og i flertall). Ved å bruke tjenesten godtar du disse retningslinjene for personvern. Hvis du slår på push-varslinger i appen, lagrer vi push-tokenet som Apple leverer til oss, for å levere disse push-varslingene til enheten din. Hvis du kjøper webappen, lagrer vi en transaksjons-ID for kjøpet. Hvis du velger ikke å opprette en konto, og hvis du ikke bruker push-varslinger, blir ingen data om deg lagret på serverne våre. Pocket Casts-webtjenesten bruker også informasjonskapsler og lignende teknologi til å holde deg innlogget. Hvis du velger å generere en støtteforespørsel fra selve tjenesten, kan vi generere et vedlegg som inneholder flere data for hjelp til håndtering av støtteforespørselen, som du kan se på før den blir sendt inn.</string>
     <string name="profile_files_remove_image">Erstatt bilde</string>
     <string name="profile_files_empty_title">Ingen filer</string>
     <string name="profile_files_empty_summary">Vil du lytte til dine egne filer?\nTrykk på +-knappen for å åpne dem i Pocket Casts, så vises de her.</string>
+    <string name="profile_license_agreement">Pocket Casts respekterer personvernet ditt. Disse retningslinjene for personvern forklarer hvilke opplysninger vi samler inn om deg og hvorfor, hva vi gjør med disse opplysningene, og hvordan vi behandler dem. De gjelder for Pocket Casts-apper for iOS og Android og Pocket Casts-webtjenesten med tilknyttede macOS- og Windows-apper (kalt for \"tjenesten\", både samlet sett og i flertall). Ved å bruke tjenesten godtar du disse retningslinjene for personvern. Hvis du slår på push-varslinger i appen, lagrer vi push-tokenet som Apple leverer til oss, for å levere disse push-varslingene til enheten din. Hvis du kjøper webappen, lagrer vi en transaksjons-ID for kjøpet. Hvis du velger ikke å opprette en konto, og hvis du ikke bruker push-varslinger, blir ingen data om deg lagret på serverne våre. Pocket Casts-webtjenesten bruker også informasjonskapsler og lignende teknologi til å holde deg innlogget. Hvis du velger å generere en støtteforespørsel fra selve tjenesten, kan vi generere et vedlegg som inneholder flere data for hjelp til håndtering av støtteforespørselen, som du kan se på før den blir sendt inn.</string>
     <string name="profile_files_edit">Rediger</string>
     <string name="profile_files_addfile_save">Lagre</string>
     <string name="profile_files_add_filename">Navn</string>

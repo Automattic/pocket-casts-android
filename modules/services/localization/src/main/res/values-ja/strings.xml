@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-06 13:54:23+0000
+Translation-Revision-Date: 2023-06-22 10:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_watch_logs">Watch ログ</string>
+    <string name="settings_help_phone_unavailable_message">スマートフォンがウォッチに接続されているときにもう一度お試しください。</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">スマートフォンが現在ペアリングされている場合は、ログのポップアップが表示されます</string>
+    <string name="settings_help_send_logs_to_phone">スマートフォンにログを送信</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">続行する前に Pocket Casts がインストールされているスマートフォンをウォッチとペアリングしてください。</string>
+    <string name="settings_help_contact_support_no_phone_connection">ログを表示したりサポートに連絡したりするには Pocket Casts がインストールされているスマートフォンとウォッチをペアリングしてください</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">スマートフォンが現在ペアリングされている場合は、ポップアップが表示され、サポートにログが添付されたメールが送信されます</string>
+    <string name="podcast_loading">ポッドキャストを読み込み中</string>
+    <string name="podcasts_subscribe_on_phone">スマートフォンでポッドキャストを購読すると、こちらに表示されます。</string>
+    <string name="podcasts_no_subscriptions">購読されたポッドキャストはありません</string>
+    <string name="settings_could_not_open_on_phone">スマートフォンを開けません</string>
+    <string name="settings_open_on_phone">スマートフォンを開く</string>
+    <string name="settings_about_privacy_policy_available_at">プライバシーポリシーは %s でご覧いただけます</string>
+    <string name="settings_about_terms_of_service_available_at">利用規約は %s でご覧いただけます</string>
+    <string name="log_in_no_network">ネットワーク接続が検出されませんでした。 後でもう一度お試しください。</string>
+    <string name="error_server_failed">内部サーバーエラーが発生しました。 後でもう一度お試しください。</string>
+    <string name="error_invalid_password_length">パスワードは少なくとも6文字以上にしてください。</string>
+    <string name="error_invalid_email_address">有効なメールアドレスを入力してください。</string>
     <string name="settings_privacy_crash_link_short">アカウントをリンクする</string>
     <string name="settings_app_icon_pride_2023">プライド2023</string>
-    <string name="log_in_with_plus">Plus アカウントにサインインしてください</string>
-    <string name="log_in_watch_requires_plus">Plus アカウントでサインインしてこのアプリを使用するかアクセスをアップグレードする</string>
     <string name="enter_password">パスワードを入力</string>
     <string name="enter_email">メールアドレスを入力</string>
     <string name="player_effects_trim_level_down">カットレベルを下げる</string>
@@ -79,7 +95,6 @@ Language: ja_JP
     <string name="podcasts_all">すべてのポッドキャスト</string>
     <string name="search_results_all_podcasts">すべてのポッドキャスト</string>
     <string name="search_results_all_episodes">すべてのエピソード</string>
-    <string name="search_history_row_type_episode_subtitle">エピソード \u2022%s \u2022%s</string>
     <string name="search_show_all">すべて表示</string>
     <string name="podcast">ポッドキャスト</string>
     <string name="search_history_row_type_podcast_subtitle">ポッドキャスト \u2022 %s</string>
@@ -856,7 +871,6 @@ Language: ja_JP
     <string name="profile_supporter_support_producer">このコレクションにアクセスするには、登録してこのプロデューサーのサポートにご参加ください</string>
     <string name="profile_supporter_subscribe_all">すべてに登録</string>
     <string name="profile_supporter_no_podcasts">サポーターポッドキャストが見つかりません</string>
-    <string name="profile_supporter_description">プレミアムポッドキャストを表示するには Pocket Casts アカウントが必要です。 アカウントは無料で簡単に作成できます。</string>
     <string name="profile_supporter_become_a_supporter">サポーターになる</string>
     <string name="profile_subscribed_current_total">%2$d件中%1$d件に登録済み</string>
     <string name="profile_sub_web_goto">サブスクリプションは Pocketcasts.com からキャンセルする必要があります。</string>

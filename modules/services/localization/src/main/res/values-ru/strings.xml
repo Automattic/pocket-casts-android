@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-07 09:54:20+0000
+Translation-Revision-Date: 2023-06-21 09:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="settings_watch_logs">Журналы часов</string>
+    <string name="settings_help_phone_unavailable_message">Повторите попытку, когда телефон будет подключён к часам.</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">Если сопряжение с телефоном установлено, он покажет всплывающее окно с журналами.</string>
+    <string name="settings_help_send_logs_to_phone">Отправить журналы на телефон</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">Перед тем как продолжить, установите сопряжение часов с телефоном, на котором установлено приложение Pocket Casts.</string>
+    <string name="settings_help_contact_support_no_phone_connection">Чтобы просмотреть журналы или связаться со службой поддержки, установите сопряжение часов с телефоном, на котором установлено приложение Pocket Casts.</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">Если сопряжение с телефоном установлено, он покажет всплывающее окно для отправки в службу поддержки эл. письма с приложенными журналами.</string>
+    <string name="podcast_loading">Загрузка подкастов</string>
+    <string name="podcasts_subscribe_on_phone">Подпишитесь на подкасты на телефоне, и они появятся здесь.</string>
+    <string name="podcasts_no_subscriptions">Нет подписок на подкасты</string>
+    <string name="settings_could_not_open_on_phone">Не удалось открыть на телефоне</string>
+    <string name="settings_open_on_phone">Открыть на телефоне</string>
+    <string name="settings_about_privacy_policy_available_at">Нашу Политику конфиденциальности можно найти по адресу %s</string>
+    <string name="settings_about_terms_of_service_available_at">Наши Условия предоставления услуг можно найти по адресу %s</string>
+    <string name="log_in_no_network">Сетевое подключение не обнаружено. Повторите попытку позже.</string>
+    <string name="error_server_failed">Произошла внутренняя ошибка сервера. Повторите попытку позже.</string>
+    <string name="error_invalid_password_length">Введите пароль длиной не менее 6 символов.</string>
+    <string name="error_invalid_email_address">Укажите действительный адрес эл. почты.</string>
     <string name="settings_privacy_crash_link_short">Привязать учетную запись</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
-    <string name="log_in_with_plus">Войдите с учётной записью Plus</string>
-    <string name="log_in_watch_requires_plus">Войдите с учётной записью Plus, чтобы использовать это приложение или расширить возможности посещения</string>
     <string name="enter_password">Введите пароль</string>
     <string name="enter_email">Введите адрес электронной почты</string>
     <string name="player_effects_trim_level_down">Уменьшить громкость в паузах</string>
@@ -79,7 +95,6 @@ Language: ru
     <string name="podcasts_all">Все подкасты</string>
     <string name="search_results_all_podcasts">Все подкасты</string>
     <string name="search_results_all_episodes">Все выпуски</string>
-    <string name="search_history_row_type_episode_subtitle">Выпуск \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Показать всё</string>
     <string name="podcast">Подкаст</string>
     <string name="search_history_row_type_podcast_subtitle">Подкаст \u2022 %s</string>
@@ -856,7 +871,6 @@ Language: ru
     <string name="profile_supporter_support_producer">Поддержите этого производителя, подписавшись на эту коллекцию</string>
     <string name="profile_supporter_subscribe_all">ПОДПИСАТЬСЯ НА ВСЁ</string>
     <string name="profile_supporter_no_podcasts">Спонсорские подкасты не найдены</string>
-    <string name="profile_supporter_description">Для просмотра премиум-подкастов требуется учётная запись Pocket Casts. Не переживайте, она бесплатная, и её легко создать!</string>
     <string name="profile_supporter_become_a_supporter">Стать спонсором</string>
     <string name="profile_subscribed_current_total">ПОДПИСАНО %1$d/%2$d</string>
     <string name="profile_sub_web_goto">Чтобы аннулировать подписку, вам нужно отменить ее на сайте Pocketcasts.com.</string>

@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-07 11:54:03+0000
+Translation-Revision-Date: 2023-06-22 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_watch_logs">Journaux de la montre</string>
+    <string name="settings_help_phone_unavailable_message">Veuillez réessayer lorsque votre téléphone sera connecté à votre montre.</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">Si votre téléphone est actuellement jumelé avec votre montre, une fenêtre contextuelle avec vos journaux s’affichera.</string>
+    <string name="settings_help_send_logs_to_phone">Envoyer les journaux au téléphone</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">Veuillez jumeler votre montre avec un téléphone sur lequel Pocket Casts est installé avant de continuer.</string>
+    <string name="settings_help_contact_support_no_phone_connection">Veuillez jumeler votre montre avec un téléphone sur lequel Pocket Casts est installé pour afficher vos journaux ou contactez l’assistance</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">Si votre téléphone est actuellement jumelé avec votre montre, une fenêtre contextuelle s’affichera pour envoyer un e-mail à l’assistance avec vos journaux en pièces jointes.</string>
+    <string name="podcast_loading">Chargement de vos podcasts</string>
+    <string name="podcasts_subscribe_on_phone">Les podcasts auxquels vous vous abonnez sur votre téléphone apparaîtront ici.</string>
+    <string name="podcasts_no_subscriptions">Pas d’abonnement aux podcasts</string>
+    <string name="settings_could_not_open_on_phone">Ouverture impossible sur le téléphone</string>
+    <string name="settings_open_on_phone">Ouvrir sur le téléphone</string>
+    <string name="settings_about_privacy_policy_available_at">Notre politique de confidentialité est disponible à l’adresse %s</string>
+    <string name="settings_about_terms_of_service_available_at">Nos conditions d’utilisation sont disponibles à l’adresse  %s</string>
+    <string name="log_in_no_network">Aucune connexion réseau n’a été détectée. Veuillez réessayer plus tard.</string>
+    <string name="error_server_failed">Une erreur interne du serveur s’est produite Veuillez réessayer plus tard.</string>
+    <string name="error_invalid_password_length">Veuillez saisir un mot de passe d’au moins 6 caractères.</string>
+    <string name="error_invalid_email_address">Veuillez saisir une adresse e-mail valide.</string>
     <string name="settings_privacy_crash_link_short">Associer votre compte</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
-    <string name="log_in_with_plus">Connectez-vous avec un compte Plus</string>
-    <string name="log_in_watch_requires_plus">Connectez-vous avec un compte Plus pour utiliser cette application ou mettre à niveau les visites</string>
     <string name="enter_password">Saisissez un mot de passe</string>
     <string name="enter_email">Entrer l’adresse e-mail</string>
     <string name="player_effects_trim_level_down">Diminuer la sensibilité de coupe</string>
@@ -79,7 +95,6 @@ Language: fr
     <string name="podcasts_all">Tous les podcasts</string>
     <string name="search_results_all_podcasts">Tous les podcasts</string>
     <string name="search_results_all_episodes">Tous les épisodes</string>
-    <string name="search_history_row_type_episode_subtitle">Épisode \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Montrer tous</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
@@ -856,7 +871,6 @@ Language: fr
     <string name="profile_supporter_support_producer">Soutenez ce producteur en vous inscrivant pour accéder à cette collection</string>
     <string name="profile_supporter_subscribe_all">S’ABONNER À TOUS</string>
     <string name="profile_supporter_no_podcasts">Aucun podcast d’abonné trouvé</string>
-    <string name="profile_supporter_description">Un compte Pocket Casts est obligatoire pour afficher les podcasts premium. Ne vous inquiétez, c’est gratuit et facile d’en créer un !</string>
     <string name="profile_supporter_become_a_supporter">Devenir abonné</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d ABONNÉ</string>
     <string name="profile_sub_web_goto">Pour annuler votre abonnement, connectez-vous sur le site Pocketcasts.com.</string>

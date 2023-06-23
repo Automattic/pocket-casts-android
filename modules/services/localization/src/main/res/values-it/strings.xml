@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2023-06-06 18:54:25+0000
+Translation-Revision-Date: 2023-06-21 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="settings_watch_logs">Log di Watch</string>
+    <string name="settings_help_phone_unavailable_message">Riprova quando il telefono è connesso all\'orologio.</string>
+    <string name="settings_help_logs_sent_to_phone_check_phone">Se il telefono è attualmente associato, verrà visualizzato un popup con i tuoi log</string>
+    <string name="settings_help_send_logs_to_phone">Invia log al telefono</string>
+    <string name="settings_help_contact_support_wear_requires_nearby_phone">Prima di procedere, associa l\'orologio a un telefono su cui è installato Pocket Casts.</string>
+    <string name="settings_help_contact_support_no_phone_connection">Per visualizzare i log o contattare il supporto, associa l\'orologio a un telefono su cui è installato Pocket Casts</string>
+    <string name="settings_help_contact_support_email_sent_to_phone">Se il telefono è attualmente associato, verrà visualizzato un popup per il supporto via e-mail con i log allegati</string>
+    <string name="podcast_loading">Caricamento dei podcast</string>
+    <string name="podcasts_subscribe_on_phone">Iscriviti ai podcast sul tuo telefono e verranno visualizzati qui.</string>
+    <string name="podcasts_no_subscriptions">Nessuna iscrizione ai podcast</string>
+    <string name="settings_could_not_open_on_phone">Impossibile aprire sul telefono</string>
+    <string name="settings_open_on_phone">Apri sul telefono</string>
+    <string name="settings_about_privacy_policy_available_at">La nostra Politica sulla privacy è disponibile all\'indirizzo %s</string>
+    <string name="settings_about_terms_of_service_available_at">I nostri Termini di servizio sono disponibili all\'indirizzo %s</string>
+    <string name="log_in_no_network">Nessuna connessione di rete rilevata. Riprova più tardi.</string>
+    <string name="error_server_failed">Si è verificato un errore del server interno. Riprova più tardi.</string>
+    <string name="error_invalid_password_length">Inserisci una password che sia lunga almeno 6 caratteri.</string>
+    <string name="error_invalid_email_address">Inserisci un indirizzo e-mail valido.</string>
     <string name="settings_privacy_crash_link_short">Collega il tuo account</string>
     <string name="settings_app_icon_pride_2023">Pride 2023</string>
-    <string name="log_in_with_plus">Accedi con un account Plus</string>
-    <string name="log_in_watch_requires_plus">Accedi con un account Plus per usare questa app o effettuare l\'aggiornamento visitando</string>
     <string name="enter_password">Inserisci la password</string>
     <string name="enter_email">Inserisci l\'e-mail</string>
     <string name="player_effects_trim_level_down">Riduci livello</string>
@@ -79,7 +95,6 @@ Language: it
     <string name="podcasts_all">Tutti i podcast</string>
     <string name="search_results_all_podcasts">Tutti i podcast</string>
     <string name="search_results_all_episodes">Tutti gli episodi</string>
-    <string name="search_history_row_type_episode_subtitle">Episodio \u2022 %s \u2022 %s</string>
     <string name="search_show_all">Mostra tutti</string>
     <string name="podcast">Podcast</string>
     <string name="search_history_row_type_podcast_subtitle">Podcast \u2022 %s</string>
@@ -856,7 +871,6 @@ Language: it
     <string name="profile_supporter_support_producer">Aiutaci a supportare questo produttore iscrivendoti per accedere a questa raccolta</string>
     <string name="profile_supporter_subscribe_all">ABBONATI A TUTTO</string>
     <string name="profile_supporter_no_podcasts">Nessun podcast del promotore trovato</string>
-    <string name="profile_supporter_description">Per visualizzare i podcast premium è necessario un account Pocket Casts. Non preoccuparti, crearne uno è facile e gratuito.</string>
     <string name="profile_supporter_become_a_supporter">Diventa un promotore</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d CON ABBONAMENTO</string>
     <string name="profile_sub_web_goto">Per annullare l\'abbonamento, dovrai annullare tramite Pocketcasts.com.</string>
