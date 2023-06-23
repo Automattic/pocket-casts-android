@@ -9,14 +9,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.sp
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentAccountBinding
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.AccountFragmentViewModel
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
@@ -44,7 +42,6 @@ class AccountFragment : BaseFragment() {
     }
 
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
-    private val accountViewModel: CreateAccountViewModel by activityViewModels()
 
     private var realBinding: FragmentAccountBinding? = null
     private val binding: FragmentAccountBinding get() = realBinding ?: throw IllegalStateException("Trying to access the binding outside of the view lifecycle.")
@@ -72,9 +69,6 @@ class AccountFragment : BaseFragment() {
                     binding.imgCreateAccount.setup(view.context.getThemeTintedDrawable(IR.drawable.ic_alert_small, UR.attr.support_05))
                     binding.btnCreate.text = getString(LR.string.done)
                     binding.btnCreate.setOnClickListener { activity?.finish() }
-                } else {
-                    val res = if (accountViewModel.supporterInstance) LR.string.profile_supporter_description else LR.string.profile_save_your_podcasts
-                    binding.lblSaveYourPodcasts.setText(res)
                 }
             }
         )
@@ -112,7 +106,7 @@ class AccountFragment : BaseFragment() {
             )
             FirebaseAnalyticsTracker.createAccountClicked()
             if (view.findNavController().currentDestination?.id == R.id.accountFragment) {
-                if (Util.isCarUiMode(view.context) || accountViewModel.supporterInstance) { // We can't sign up to plus on cars so skip that step
+                if (Util.isCarUiMode(view.context)) { // We can't sign up to plus on cars so skip that step
                     view.findNavController().navigate(R.id.action_accountFragment_to_createEmailFragment)
                 } else {
                     view.findNavController().navigate(R.id.action_accountFragment_to_createAccountFragment)

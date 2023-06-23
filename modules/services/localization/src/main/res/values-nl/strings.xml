@@ -856,7 +856,6 @@ Language: nl
     <string name="profile_supporter_support_producer">Ondersteun deze producer door je aan te melden voor toegang tot deze collectie</string>
     <string name="profile_supporter_subscribe_all">OP ALLES ABONNEREN</string>
     <string name="profile_supporter_no_podcasts">Geen ondersteunerpodcasts gevonden</string>
-    <string name="profile_supporter_description">Je hebt een Pocket Casts-account vereist om premium-podcasts te bekijken. Gen zorgen, het is gratis en eenvoudig aan te maken.</string>
     <string name="profile_supporter_become_a_supporter">Word een ondersteuner</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d GEABONNEERD</string>
     <string name="profile_sub_web_goto">Om je abonnement te annuleren, moet je het annuleren via Pocketcasts.com.</string>

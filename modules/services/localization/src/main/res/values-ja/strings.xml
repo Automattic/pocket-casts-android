@@ -856,7 +856,6 @@ Language: ja_JP
     <string name="profile_supporter_support_producer">このコレクションにアクセスするには、登録してこのプロデューサーのサポートにご参加ください</string>
     <string name="profile_supporter_subscribe_all">すべてに登録</string>
     <string name="profile_supporter_no_podcasts">サポーターポッドキャストが見つかりません</string>
-    <string name="profile_supporter_description">プレミアムポッドキャストを表示するには Pocket Casts アカウントが必要です。 アカウントは無料で簡単に作成できます。</string>
     <string name="profile_supporter_become_a_supporter">サポーターになる</string>
     <string name="profile_subscribed_current_total">%2$d件中%1$d件に登録済み</string>
     <string name="profile_sub_web_goto">サブスクリプションは Pocketcasts.com からキャンセルする必要があります。</string>

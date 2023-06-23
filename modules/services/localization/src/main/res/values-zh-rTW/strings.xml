@@ -856,7 +856,6 @@ Language: zh_TW
     <string name="profile_supporter_support_producer">註冊收聽本系列，幫助支持此節目製作人</string>
     <string name="profile_supporter_subscribe_all">全部訂閱</string>
     <string name="profile_supporter_no_podcasts">找不到支持的 Podcast</string>
-    <string name="profile_supporter_description">需要 Pocket Casts 帳號才能查看進階版 Podcast。 別擔心，建立帳號免費又簡單！</string>
     <string name="profile_supporter_become_a_supporter">成為支持者</string>
     <string name="profile_subscribed_current_total">已訂閱 %1$d 個，共 %2$d 個</string>
     <string name="profile_sub_web_goto">若要取消訂閱，請前往 Pocketcasts.com 取消。</string>

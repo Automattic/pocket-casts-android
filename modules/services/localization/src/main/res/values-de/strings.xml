@@ -856,7 +856,6 @@ Language: de
     <string name="profile_supporter_support_producer">Unterstütze diesen Produzenten, indem du dich für den Zugriff auf diese Sammlung registrierst</string>
     <string name="profile_supporter_subscribe_all">ALLE ABONNIEREN</string>
     <string name="profile_supporter_no_podcasts">Keine Unterstützer-Podcasts gefunden</string>
-    <string name="profile_supporter_description">Zur Anzeige von Premium-Podcasts benötigst du ein Pocket Casts-Konto. Keine Sorge, es ist leicht und kostet nichts, eines zu erstellen!</string>
     <string name="profile_supporter_become_a_supporter">Werde Unterstützer</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d ABONNIERT</string>
     <string name="profile_sub_web_goto">Besuche Pocketcasts.com, um dein Abonnement zu kündigen.</string>

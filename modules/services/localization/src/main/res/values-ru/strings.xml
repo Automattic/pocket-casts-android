@@ -856,7 +856,6 @@ Language: ru
     <string name="profile_supporter_support_producer">Поддержите этого производителя, подписавшись на эту коллекцию</string>
     <string name="profile_supporter_subscribe_all">ПОДПИСАТЬСЯ НА ВСЁ</string>
     <string name="profile_supporter_no_podcasts">Спонсорские подкасты не найдены</string>
-    <string name="profile_supporter_description">Для просмотра премиум-подкастов требуется учётная запись Pocket Casts. Не переживайте, она бесплатная, и её легко создать!</string>
     <string name="profile_supporter_become_a_supporter">Стать спонсором</string>
     <string name="profile_subscribed_current_total">ПОДПИСАНО %1$d/%2$d</string>
     <string name="profile_sub_web_goto">Чтобы аннулировать подписку, вам нужно отменить ее на сайте Pocketcasts.com.</string>

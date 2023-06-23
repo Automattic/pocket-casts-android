@@ -856,7 +856,6 @@ Language: pt_BR
     <string name="profile_supporter_support_producer">Assine para ter acesso a esta coleção e apoiar este produtor</string>
     <string name="profile_supporter_subscribe_all">ASSINAR TUDO</string>
     <string name="profile_supporter_no_podcasts">Nenhum podcast de apoiador encontrado</string>
-    <string name="profile_supporter_description">Para ver os podcasts premium é necessário ter uma conta no Pocket Casts. Não se preocupe! A conta é grátis e fácil de criar.</string>
     <string name="profile_supporter_become_a_supporter">Torne-se um apoiador</string>
     <string name="profile_subscribed_current_total">%1$d/%2$d ASSINADO(S)</string>
     <string name="profile_sub_web_goto">Para cancelar sua assinatura, visite Pocketcasts.com.</string>
