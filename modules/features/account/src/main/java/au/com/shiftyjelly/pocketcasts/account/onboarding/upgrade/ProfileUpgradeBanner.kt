@@ -141,7 +141,16 @@ private fun FeatureCard(
         Spacer(modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.height(8.dp))
 
-        val primaryText = stringResource(LR.string.upgrade_to, stringResource(button.shortNameRes))
+        val primaryText = when (button.planType) {
+            UpgradeButton.PlanType.RENEW -> stringResource(LR.string.renew_your_subscription)
+            UpgradeButton.PlanType.SUBSCRIBE -> {
+                when (button.subscription) {
+                    is Subscription.Simple -> stringResource(LR.string.subscribe_to, stringResource(button.shortNameRes))
+                    is Subscription.WithTrial -> stringResource(LR.string.trial_start)
+                }
+            }
+            UpgradeButton.PlanType.UPGRADE -> stringResource(LR.string.upgrade_to, stringResource(button.shortNameRes))
+        }
         OnboardingUpgradeHelper.UpgradeRowButton(
             primaryText = primaryText,
             backgroundColor = colorResource(button.backgroundColorRes),
