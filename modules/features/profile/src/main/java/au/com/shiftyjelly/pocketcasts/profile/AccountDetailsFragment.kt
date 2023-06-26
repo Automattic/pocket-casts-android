@@ -116,6 +116,7 @@ class AccountDetailsFragment : BaseFragment() {
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
             binding.btnCancelSub?.isVisible = signInState.isSignedInAsPaid
             binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
+                !giftExpiring &&
                 FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
 
             binding.userUpgradeComposeView?.apply {
