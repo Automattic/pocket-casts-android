@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.utils.days
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.Date
@@ -31,7 +32,10 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
         @field:Json(name = "type") val type: SubscriptionType,
         @field:Json(name = "tier") val tier: SubscriptionTier,
         @field:Json(name = "index") val index: Int
-    ) : SubscriptionStatus(expiry, subscriptionList)
+    ) : SubscriptionStatus(expiry, subscriptionList) {
+        val isExpiring: Boolean
+            get() = expiry.before(Date(Date().time + 30.days())) && !autoRenew
+    }
 
     @JsonClass(generateAdapter = true)
     data class Subscription(

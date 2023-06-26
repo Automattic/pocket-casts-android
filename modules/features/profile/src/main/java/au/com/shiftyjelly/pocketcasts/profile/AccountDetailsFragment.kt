@@ -44,12 +44,10 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.days
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Date
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -112,8 +110,7 @@ class AccountDetailsFragment : BaseFragment() {
             var giftExpiring = false
             (signInState as? SignInState.SignedIn)?.subscriptionStatus?.let { status ->
                 val subscriptionStatus = status as? SubscriptionStatus.Paid ?: return@let
-                val daysLessThan30 = subscriptionStatus.expiry.before(Date(Date().time + 30.days()))
-                giftExpiring = (daysLessThan30 && !status.autoRenew)
+                giftExpiring = subscriptionStatus.isExpiring
             }
 
             binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
