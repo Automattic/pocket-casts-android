@@ -29,7 +29,7 @@ interface SubscriptionManager {
     suspend fun sendPurchaseToServer(purchase: Purchase)
     fun refreshPurchases()
     suspend fun getPurchases(): PurchasesResult?
-    fun launchBillingFlow(activity: Activity, productDetails: ProductDetails, offerToken: String): BillingResult?
+    fun launchBillingFlow(activity: Activity, productDetails: ProductDetails, offerToken: String)
     fun getCachedStatus(): SubscriptionStatus?
     fun clearCachedStatus()
     fun isFreeTrialEligible(tier: Subscription.SubscriptionTier): Boolean
