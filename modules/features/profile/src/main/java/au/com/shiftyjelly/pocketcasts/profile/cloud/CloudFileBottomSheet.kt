@@ -289,7 +289,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 val layoutLockedCloud = binding.layoutLockedCloud
                 when (signInState) {
                     is SignInState.SignedIn -> {
-                        if (signInState.subscriptionStatus is SubscriptionStatus.Plus) {
+                        if (signInState.subscriptionStatus is SubscriptionStatus.Paid) {
                             layoutCloud.isVisible = true
                             layoutLockedCloud.isVisible = false
                         } else {

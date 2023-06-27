@@ -111,14 +111,13 @@ class AccountDetailsFragment : BaseFragment() {
         viewModel.viewState.observe(viewLifecycleOwner) { (signInState, subscription, deleteAccountState) ->
             var giftExpiring = false
             (signInState as? SignInState.SignedIn)?.subscriptionStatus?.let { status ->
-                val plusStatus = status as? SubscriptionStatus.Plus ?: return@let
-                val daysLessThan30 = plusStatus.expiry.before(Date(Date().time + 30.days()))
+                val subscriptionStatus = status as? SubscriptionStatus.Paid ?: return@let
+                val daysLessThan30 = subscriptionStatus.expiry.before(Date(Date().time + 30.days()))
                 giftExpiring = (daysLessThan30 && !status.autoRenew)
             }
 
-            binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPlusPaid
-            binding.btnCancelSub?.isVisible = signInState.isSignedInAsPlusPaid
-            // TODO: Patron - hide if upgraded to patron
+            binding.cancelViewGroup?.isVisible = signInState.isSignedInAsPaid
+            binding.btnCancelSub?.isVisible = signInState.isSignedInAsPaid
             binding.upgradeAccountGroup?.isVisible = signInState.isSignedInAsPlus &&
                 FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
 

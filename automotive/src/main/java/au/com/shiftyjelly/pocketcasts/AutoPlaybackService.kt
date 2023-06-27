@@ -127,9 +127,9 @@ class AutoPlaybackService : PlaybackService() {
 
     private fun loadProfileRoot(): List<MediaBrowserCompat.MediaItem> {
         return buildList {
-            // Add the user uploaded Files if they are a Plus subscriber
-            val isPlusUser = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
-            if (isPlusUser) {
+            // Add the user uploaded Files if they are a paying subscriber
+            val isPaidUser = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
+            if (isPaidUser) {
                 add(buildListMediaItem(id = PROFILE_FILES, title = LR.string.profile_navigation_files, drawable = IR.drawable.automotive_files))
             }
             add(buildListMediaItem(id = PROFILE_STARRED, title = LR.string.profile_navigation_starred, drawable = IR.drawable.automotive_filter_star))

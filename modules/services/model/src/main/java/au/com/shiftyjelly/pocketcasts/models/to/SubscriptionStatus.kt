@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.models.to
 
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionFrequency
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionType
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -20,7 +21,7 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
     ) : SubscriptionStatus(expiry, subscriptionList)
 
     @JsonClass(generateAdapter = true)
-    data class Plus(
+    data class Paid(
         @field:Json(name = "expiry") val expiry: Date,
         @field:Json(name = "autoRenew") val autoRenew: Boolean,
         @field:Json(name = "giftDays") val giftDays: Int = 0,
@@ -28,12 +29,14 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
         @field:Json(name = "platform") val platform: SubscriptionPlatform,
         @field:Json(name = "subscriptions") val subscriptionList: List<Subscription> = emptyList(),
         @field:Json(name = "type") val type: SubscriptionType,
+        @field:Json(name = "tier") val tier: SubscriptionTier,
         @field:Json(name = "index") val index: Int
     ) : SubscriptionStatus(expiry, subscriptionList)
 
     @JsonClass(generateAdapter = true)
     data class Subscription(
         @field:Json(name = "type") val type: SubscriptionType,
+        @field:Json(name = "tier") val tier: SubscriptionTier,
         @field:Json(name = "frequency") val frequency: SubscriptionFrequency,
         @field:Json(name = "expiryDate") val expiryDate: Date?,
         @field:Json(name = "autoRenewing") val autoRenewing: Boolean,
@@ -45,5 +48,5 @@ sealed class SubscriptionStatus(val expiryDate: Date?, val subscriptions: List<S
     }
 
     val isLifetimePlus: Boolean
-        get() = this is Plus && this.platform == SubscriptionPlatform.GIFT && this.giftDays > giftDaysCutOver
+        get() = this is Paid && this.platform == SubscriptionPlatform.GIFT && this.giftDays > giftDaysCutOver
 }

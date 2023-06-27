@@ -23,20 +23,20 @@ class TracksAnalyticsTracker @Inject constructor(
 ) : IdentifyingTracker(preferences) {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
     override val anonIdPrefKey: String = TRACKS_ANON_ID
-    private val plusSubscription: SubscriptionStatus.Plus?
-        get() = settings.getCachedSubscription() as? SubscriptionStatus.Plus
+    private val paidSubscription: SubscriptionStatus.Paid?
+        get() = settings.getCachedSubscription() as? SubscriptionStatus.Paid
 
     private val predefinedEventProperties: Map<String, Any>
         get() {
             val isLoggedIn = accountStatusInfo.isLoggedIn()
-            val hasSubscription = plusSubscription != null
-            val hasLifetime = plusSubscription?.isLifetimePlus
+            val hasSubscription = paidSubscription != null
+            val hasLifetime = paidSubscription?.isLifetimePlus
                 ?: false
-            val subscriptionType = plusSubscription?.type?.toString()
+            val subscriptionType = paidSubscription?.type?.toString()
                 ?: INVALID_OR_NULL_VALUE
-            val subscriptionPlatform = plusSubscription?.platform?.toString()
+            val subscriptionPlatform = paidSubscription?.platform?.toString()
                 ?: INVALID_OR_NULL_VALUE
-            val subscriptionFrequency = plusSubscription?.frequency?.toString()
+            val subscriptionFrequency = paidSubscription?.frequency?.toString()
                 ?: INVALID_OR_NULL_VALUE
 
             return mapOf(

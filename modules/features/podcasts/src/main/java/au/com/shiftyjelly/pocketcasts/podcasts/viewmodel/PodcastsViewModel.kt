@@ -51,7 +51,7 @@ class PodcastsViewModel
     data class FolderState(
         val folder: Folder?,
         val items: List<FolderItem>,
-        val isSignedInAsPlus: Boolean
+        val isSignedInAsPlusOrPatron: Boolean
     )
 
     val signInState: LiveData<SignInState> = userManager.getSignInState().toLiveData()
@@ -89,17 +89,17 @@ class PodcastsViewModel
         userManager.getSignInState()
     ) { podcasts, folders, folderUuidOptional, podcastSortOrder, signInState ->
         val folderUuid = folderUuidOptional.orElse(null)
-        if (!signInState.isSignedInAsPlus) {
+        if (!signInState.isSignedInAsPlusOrPatron) {
             FolderState(
                 items = buildPodcastItems(podcasts, podcastSortOrder),
                 folder = null,
-                isSignedInAsPlus = false
+                isSignedInAsPlusOrPatron = false
             )
         } else if (folderUuid == null) {
             FolderState(
                 items = buildHomeFolderItems(podcasts, folders, podcastSortOrder),
                 folder = null,
-                isSignedInAsPlus = true
+                isSignedInAsPlusOrPatron = true
             )
         } else {
             val openFolder = folders.firstOrNull { it.uuid == folderUuid }
@@ -107,13 +107,13 @@ class PodcastsViewModel
                 FolderState(
                     items = emptyList(),
                     folder = null,
-                    isSignedInAsPlus = true
+                    isSignedInAsPlusOrPatron = true
                 )
             } else {
                 FolderState(
                     items = openFolder.podcasts.map { FolderItem.Podcast(it) },
                     folder = openFolder.folder,
-                    isSignedInAsPlus = true
+                    isSignedInAsPlusOrPatron = true
                 )
             }
         }

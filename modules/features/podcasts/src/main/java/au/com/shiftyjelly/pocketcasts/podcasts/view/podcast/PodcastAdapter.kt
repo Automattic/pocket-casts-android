@@ -131,7 +131,7 @@ class PodcastAdapter(
 
     private var headerExpanded: Boolean = false
     private var tintColor: Int = 0x000000
-    private var signedInAsPlus: Boolean = false
+    private var signedInAsPlusOrPatron: Boolean = false
     var castConnected: Boolean = false
         set(value) {
             field = value
@@ -175,7 +175,7 @@ class PodcastAdapter(
         holder.binding.expanded = headerExpanded
         holder.binding.tintColor = ThemeColor.podcastText02(theme.activeTheme, tintColor)
         holder.binding.headerColor = ThemeColor.podcastUi03(theme.activeTheme, podcast.backgroundColor)
-        holder.binding.isPlusUser = signedInAsPlus
+        holder.binding.isPlusOrPatronUser = signedInAsPlusOrPatron
 
         holder.binding.bottom.ratings.setContent {
             AppTheme(theme.activeTheme) {
@@ -291,8 +291,8 @@ class PodcastAdapter(
         this.tintColor = tintColor
     }
 
-    fun setSignedInAsPlus(signedInAsPlus: Boolean) {
-        this.signedInAsPlus = signedInAsPlus
+    fun setSignedInAsPlusOrPatron(signedInAsPlusOrPatron: Boolean) {
+        this.signedInAsPlusOrPatron = signedInAsPlusOrPatron
         notifyItemChanged(0)
     }
 

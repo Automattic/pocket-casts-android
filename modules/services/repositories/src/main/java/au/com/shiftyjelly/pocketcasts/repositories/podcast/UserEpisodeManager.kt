@@ -385,7 +385,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 val newEpisode = it.toUserEpisode()
                 add(newEpisode, playbackManager)
 
-                if (settings.getCloudAutoDownload() && subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
+                if (settings.getCloudAutoDownload() && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
                     userEpisodeDao.updateAutoDownloadStatus(PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED, newEpisode.uuid)
                     newEpisode.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_AUTO_DOWNLOADED
                     downloadManager.addEpisodeToQueue(newEpisode, "cloud files sync", false)
@@ -569,7 +569,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override fun autoUploadToCloudIfReq(episode: UserEpisode) {
-        if (settings.getCloudAutoUpload() && subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus) {
+        if (settings.getCloudAutoUpload() && subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid) {
             uploadToServer(episode, settings.getCloudOnlyWifi())
         }
     }

@@ -45,7 +45,7 @@ class SubCancelledFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.viewState.observe(viewLifecycleOwner) { (signInState, _) ->
-            val expiryDate = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Plus)?.expiry ?: Date()
+            val expiryDate = ((signInState as? SignInState.SignedIn)?.subscriptionStatus as? SubscriptionStatus.Paid)?.expiry ?: Date()
             val endDate = dateFormatter.format(expiryDate)
             binding?.txtHint0?.text = getString(LR.string.profile_sub_cancel_hint0) + " " + endDate
         }

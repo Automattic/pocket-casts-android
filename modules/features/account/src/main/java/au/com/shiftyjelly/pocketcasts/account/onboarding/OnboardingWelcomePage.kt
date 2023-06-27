@@ -71,7 +71,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun OnboardingWelcomePage(
     activeTheme: Theme.ThemeType,
     flow: OnboardingFlow,
-    isSignedInAsPlus: Boolean,
+    isSignedInAsPlusOrPatron: Boolean,
     onDone: () -> Unit,
     onContinueToDiscover: () -> Unit,
     onImportTapped: () -> Unit,
@@ -104,7 +104,7 @@ fun OnboardingWelcomePage(
     val showDiscover = (flow as? OnboardingFlow.PlusFlow)?.source != OnboardingUpgradeSource.FILES
 
     Content(
-        isSignedInAsPlus = isSignedInAsPlus,
+        isSignedInAsPlusOrPatron = isSignedInAsPlusOrPatron,
         showDiscover = showDiscover,
         onContinueToDiscover = {
             viewModel.onContinueToDiscover(flow)
@@ -131,7 +131,7 @@ fun OnboardingWelcomePage(
 
 @Composable
 private fun Content(
-    isSignedInAsPlus: Boolean,
+    isSignedInAsPlusOrPatron: Boolean,
     showDiscover: Boolean,
     onContinueToDiscover: () -> Unit,
     onImportTapped: () -> Unit,
@@ -148,7 +148,7 @@ private fun Content(
         Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
         Spacer(Modifier.weight(1f))
 
-        if (isSignedInAsPlus) {
+        if (isSignedInAsPlusOrPatron) {
             PlusPersonCheckmark()
         } else {
             PersonCheckmark()
@@ -157,7 +157,7 @@ private fun Content(
         Spacer(Modifier.height(8.dp))
         TextH10(
             text = stringResource(
-                if (isSignedInAsPlus) {
+                if (isSignedInAsPlusOrPatron) {
                     LR.string.onboarding_welcome_get_you_listening_plus
                 } else {
                     LR.string.onboarding_welcome_get_you_listening
@@ -360,7 +360,7 @@ private fun PersonCheckmark(
 private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         Content(
-            isSignedInAsPlus = false,
+            isSignedInAsPlusOrPatron = false,
             showDiscover = true,
             onContinueToDiscover = {},
             onImportTapped = {},
@@ -376,7 +376,7 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
 private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         Content(
-            isSignedInAsPlus = true,
+            isSignedInAsPlusOrPatron = true,
             showDiscover = true,
             onContinueToDiscover = {},
             onImportTapped = {},

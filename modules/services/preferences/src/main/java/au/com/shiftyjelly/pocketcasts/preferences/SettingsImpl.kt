@@ -1192,8 +1192,8 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun setCachedSubscription(subscriptionStatus: SubscriptionStatus?) {
-        if (subscriptionStatus is SubscriptionStatus.Plus) {
-            val adapter = moshi.adapter(SubscriptionStatus.Plus::class.java)
+        if (subscriptionStatus is SubscriptionStatus.Paid) {
+            val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
             val str = adapter.toJson(subscriptionStatus)
             privatePreferences.edit().putString("accountstatus", encrypt(str)).apply()
         } else {
@@ -1204,7 +1204,7 @@ class SettingsImpl @Inject constructor(
     override fun getCachedSubscription(): SubscriptionStatus? {
         val str = decrypt(privatePreferences.getString("accountstatus", null)) ?: return null
         try {
-            val adapter = moshi.adapter(SubscriptionStatus.Plus::class.java)
+            val adapter = moshi.adapter(SubscriptionStatus.Paid::class.java)
             return adapter.fromJson(str)
         } catch (e: Exception) {
             return null

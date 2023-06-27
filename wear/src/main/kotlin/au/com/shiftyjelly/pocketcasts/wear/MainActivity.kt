@@ -113,7 +113,7 @@ fun WearApp(
     val userCanAccessWatch = when (subscriptionStatus) {
         is SubscriptionStatus.Free,
         null -> false
-        is SubscriptionStatus.Plus -> true
+        is SubscriptionStatus.Paid -> true
     }
 
     val waitingForSignIn = remember { mutableStateOf(false) }
@@ -385,7 +385,7 @@ fun WearApp(
             }
             Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
         }
-        is SubscriptionStatus.Plus -> {
+        is SubscriptionStatus.Paid -> {
             if (waitingForSignIn.value &&
                 signInState is SignInState.SignedIn &&
                 previousSubscriptionStatus.value != subscriptionStatus

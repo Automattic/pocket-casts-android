@@ -264,7 +264,7 @@ class PodcastSyncProcess(
     private fun syncCloudFiles(): Completable {
         return subscriptionManager.getSubscriptionStatus(allowCache = false)
             .flatMapCompletable {
-                if (it is SubscriptionStatus.Plus) {
+                if (it is SubscriptionStatus.Paid) {
                     rxCompletable { userEpisodeManager.syncFiles(playbackManager) }
                 } else {
                     Completable.complete()

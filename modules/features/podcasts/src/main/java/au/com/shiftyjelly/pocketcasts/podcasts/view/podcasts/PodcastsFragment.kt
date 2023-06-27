@@ -113,7 +113,7 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             }
             val folder = folderState.folder
             val rootFolder = folder == null
-            val isSignedInAsPlus = folderState.isSignedInAsPlus
+            val isSignedInAsPlusOrPatron = folderState.isSignedInAsPlusOrPatron
             val toolbar = binding.toolbar
 
             val toolbarColors: ToolbarColors
@@ -133,11 +133,11 @@ class PodcastsFragment : BaseFragment(), FolderAdapter.ClickListener, PodcastTou
             )
 
             toolbar.menu.findItem(R.id.folders_locked)?.run {
-                isVisible = !isSignedInAsPlus
+                isVisible = !isSignedInAsPlusOrPatron
                 setIcon(theme.folderLockedImageName)
             }
 
-            toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlus
+            toolbar.menu.findItem(R.id.create_folder)?.isVisible = rootFolder && isSignedInAsPlusOrPatron
             toolbar.menu.findItem(R.id.search_podcasts)?.isVisible = rootFolder
 
             adapter?.setFolderItems(folderState.items)

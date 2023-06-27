@@ -70,7 +70,7 @@ fun SettingsFragmentPage(
             GeneralRow(onClick = { openFragment(PlaybackSettingsFragment()) })
             NotificationRow(onClick = { openFragment(NotificationsSettingsFragment()) })
             AppearanceRow(
-                isSignedInAsPlus = signInState.isSignedInAsPlus,
+                isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
                 onClick = { openFragment(AppearanceSettingsFragment.newInstance()) }
             )
             StorageAndDataUseRow(onClick = { openFragment(StorageSettingsFragment()) })
@@ -165,11 +165,11 @@ private fun NotificationRow(onClick: () -> Unit) {
 }
 
 @Composable
-private fun AppearanceRow(isSignedInAsPlus: Boolean, onClick: () -> Unit) {
+private fun AppearanceRow(isSignedInAsPlusOrPatron: Boolean, onClick: () -> Unit) {
     SettingRow(
         primaryText = stringResource(LR.string.settings_title_appearance),
         icon = GradientIconData(SR.drawable.settings_appearance),
-        primaryTextEndDrawable = if (isSignedInAsPlus) null else IR.drawable.ic_plus,
+        primaryTextEndDrawable = if (isSignedInAsPlusOrPatron) null else IR.drawable.ic_plus,
         modifier = rowModifier(onClick)
     )
 }

@@ -11,10 +11,13 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.toPublisher
 import androidx.work.WorkManager
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
+import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -84,10 +87,10 @@ class Support @Inject constructor(
             if (emailSupport) {
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
             }
-            val isPlus = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
+            val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${if (isPlus) " - Plus Account" else ""}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
             )
 
             // try to attach the debug information
@@ -142,10 +145,10 @@ class Support @Inject constructor(
             val intent = Intent(Intent.ACTION_SEND)
             intent.type = "text/html"
 
-            val isPlus = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
+            val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${if (isPlus) " - Plus Account" else ""}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
             )
 
             try {
@@ -172,10 +175,10 @@ class Support @Inject constructor(
         withContext(Dispatchers.IO) {
             intent.type = "text/html"
             intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("support@pocketcasts.com"))
-            val isPlus = subscriptionManager.getCachedStatus() is SubscriptionStatus.Plus
+            val isPaid = subscriptionManager.getCachedStatus() is SubscriptionStatus.Paid
             intent.putExtra(
                 Intent.EXTRA_SUBJECT,
-                "$subject v${settings.getVersion()} ${if (isPlus) " - Plus Account" else ""}"
+                "$subject v${settings.getVersion()} ${getAccountType(isPaid)}"
             )
 
             try {
@@ -208,6 +211,20 @@ class Support @Inject constructor(
         }
 
         return intent
+    }
+
+    private fun getAccountType(isPaid: Boolean) = if (isPaid) {
+        if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
+            when ((subscriptionManager.getCachedStatus() as SubscriptionStatus.Paid).tier) {
+                SubscriptionTier.PATRON -> "Patron Account"
+                SubscriptionTier.PLUS -> "Plus Account"
+                SubscriptionTier.NONE -> ""
+            }
+        } else {
+            "Plus Account"
+        }
+    } else {
+        ""
     }
 
     suspend fun getLogs(): String =
