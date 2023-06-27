@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.featureflag
 
 /**
- * Every provider has an explicit priority so they can override each other (e.g. "Firebase Remote" > Store).
+ * Every provider has an explicit priority so they can override each other (e.g. "Firebase Remote" > "Default Release").
  *
  * Not every provider has to provide a flag value for every feature.
  * E.g. Unless you want the feature flag to be remote, feature should not be provided by the remote feature flag provider and hasFeature should return false for that feature
