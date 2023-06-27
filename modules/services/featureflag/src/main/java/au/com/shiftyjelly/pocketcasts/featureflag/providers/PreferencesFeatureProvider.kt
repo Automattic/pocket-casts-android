@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 /**
  * Used to override values for feature flags at runtime in debug builds.
- * See StoreFeatureFlagProvider to set feature flag values for release builds.
+ * See DefaultReleaseFeatureProvider to set feature flag values for release builds.
  */
 @Singleton
 class PreferencesFeatureProvider @Inject constructor(
