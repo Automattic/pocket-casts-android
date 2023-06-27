@@ -20,7 +20,8 @@ class DefaultReleaseFeatureProvider @Inject constructor() : FeatureProvider {
     override fun isEnabled(feature: Feature) =
         when (feature) {
             Feature.END_OF_YEAR_ENABLED,
-            Feature.SHOW_RATINGS_ENABLED -> false
-            Feature.ADD_PATRON_ENABLED -> true
+            Feature.SHOW_RATINGS_ENABLED,
+            Feature.ADD_PATRON_ENABLED,
+            -> false
         }
 }
