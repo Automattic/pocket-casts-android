@@ -140,23 +140,28 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
         cachedSubscriptionStatus: SubscriptionStatus?,
     ) = subscriptionManager.getDefaultSubscription(
         subscriptions = filteredSubscriptions,
-        tier = if (cachedTier == SubscriptionTier.PATRON) {
-            Subscription.SubscriptionTier.PATRON
-        } else {
-            Subscription.SubscriptionTier.PLUS
+        tier = when (cachedTier) {
+            SubscriptionTier.PATRON -> Subscription.SubscriptionTier.PATRON
+
+            null,
+            SubscriptionTier.NONE,
+            SubscriptionTier.PLUS -> Subscription.SubscriptionTier.PLUS
         },
         frequency = getSubscriptionFrequency(cachedSubscriptionStatus)
     )
 
     private fun getSubscriptionFrequency(cachedSubscriptionStatus: SubscriptionStatus?) =
-        if (cachedSubscriptionStatus is SubscriptionStatus.Paid) {
-            when (cachedSubscriptionStatus.frequency) {
-                SubscriptionFrequency.NONE -> SubscriptionFrequency.YEARLY
-                SubscriptionFrequency.MONTHLY -> SubscriptionFrequency.MONTHLY
-                SubscriptionFrequency.YEARLY -> SubscriptionFrequency.YEARLY
+        when (cachedSubscriptionStatus) {
+            is SubscriptionStatus.Paid -> {
+                when (cachedSubscriptionStatus.frequency) {
+                    SubscriptionFrequency.NONE -> SubscriptionFrequency.YEARLY
+                    SubscriptionFrequency.MONTHLY -> SubscriptionFrequency.MONTHLY
+                    SubscriptionFrequency.YEARLY -> SubscriptionFrequency.YEARLY
+                }
             }
-        } else {
-            SubscriptionFrequency.YEARLY
+
+            null,
+            is SubscriptionStatus.Free -> SubscriptionFrequency.YEARLY
         }
 
     private fun getPlanType(
@@ -166,11 +171,8 @@ class ProfileUpgradeBannerViewModel @Inject constructor(
     ): PlanType {
         val productTierMatchesUserSubscriptionTier =
             productTier.name.lowercase() == cachedTier?.label?.lowercase()
-        val isExpiring = if (productTierMatchesUserSubscriptionTier) {
-            (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.isExpiring ?: false
-        } else {
-            false
-        }
+        val isExpiring = productTierMatchesUserSubscriptionTier &&
+            (cachedSubscriptionStatus as? SubscriptionStatus.Paid)?.isExpiring == true
         return when {
             isExpiring -> PlanType.RENEW
             cachedSubscriptionStatus is SubscriptionStatus.Paid &&
