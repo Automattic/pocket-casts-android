@@ -20,4 +20,9 @@ enum class Feature(
         title = "Patron",
         defaultValue = false
     ),
+    AUTO_PLAY_UP_NEXT_SETTING(
+        key = "auto_play_when_up_next_empty",
+        title = "Auto Play When Up Next Empty Setting",
+        defaultValue = BuildConfig.DEBUG,
+    ),
 }

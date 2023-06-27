@@ -306,6 +306,7 @@ interface Settings {
     val openPlayerAutomaticallyFlow: StateFlow<Boolean>
     val tapOnUpNextShouldPlayFlow: StateFlow<Boolean>
     val customMediaActionsVisibilityFlow: StateFlow<Boolean>
+    val autoPlayNextEpisodeOnEmptyFlow: StateFlow<Boolean>
 
     fun getVersion(): String
     fun getVersionCode(): Int
@@ -554,6 +555,7 @@ interface Settings {
     fun getAutoSubscribeToPlayed(): Boolean
     fun getAutoShowPlayed(): Boolean
     fun getAutoPlayNextEpisodeOnEmpty(): Boolean
+    fun setAutoPlayNextEpisodeOnEmpty(enabled: Boolean)
     fun defaultShowArchived(): Boolean
     fun setDefaultShowArchived(value: Boolean)
     fun getMediaNotificationControlItems(): List<MediaNotificationControls>

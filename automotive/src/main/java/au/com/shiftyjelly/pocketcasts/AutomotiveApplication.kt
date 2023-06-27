@@ -102,9 +102,6 @@ class AutomotiveApplication : Application(), Configuration.Provider {
         if (!settings.contains(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY)) {
             settings.setBooleanForKey(Settings.PREFERENCE_AUTO_SUBSCRIBE_ON_PLAY, true)
         }
-        if (!settings.contains(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY)) {
-            settings.setBooleanForKey(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, true)
-        }
     }
 
     private fun setupSentry() {

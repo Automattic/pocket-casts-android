@@ -47,6 +47,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSection
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -271,6 +273,19 @@ class PlaybackSettingsFragment : BaseFragment() {
                             settings.setTapOnUpNextShouldPlay(it)
                         }
                     )
+
+                    if (FeatureFlag.isEnabled(Feature.AUTO_PLAY_UP_NEXT_SETTING)) {
+                        AutoPlayNextOnEmpty(
+                            saved = settings.autoPlayNextEpisodeOnEmptyFlow.collectAsState().value,
+                            onSave = {
+                                analyticsTracker.track(
+                                    AnalyticsEvent.SETTINGS_GENERAL_CONTINUOUS_PLAYBACK_TOGGLED,
+                                    mapOf("enabled" to it)
+                                )
+                                settings.setAutoPlayNextEpisodeOnEmpty(it)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -501,6 +516,15 @@ class PlaybackSettingsFragment : BaseFragment() {
         SettingRow(
             primaryText = stringResource(LR.string.settings_up_next_tap),
             secondaryText = stringResource(LR.string.settings_up_next_tap_summary),
+            toggle = SettingRowToggle.Switch(checked = saved),
+            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
+        )
+
+    @Composable
+    private fun AutoPlayNextOnEmpty(saved: Boolean, onSave: (Boolean) -> Unit) =
+        SettingRow(
+            primaryText = stringResource(LR.string.settings_continuous_playback),
+            secondaryText = stringResource(LR.string.settings_continuous_playback_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
         )
