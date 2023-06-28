@@ -476,6 +476,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN("settings_general_media_notification_controls_shown"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
+    SETTINGS_GENERAL_CONTINUOUS_PLAYBACK_TOGGLED("settings_general_continuous_playback_toggled"),
 
     /* Settings - Help */
     SETTINGS_HELP_SHOWN("settings_help_shown"),

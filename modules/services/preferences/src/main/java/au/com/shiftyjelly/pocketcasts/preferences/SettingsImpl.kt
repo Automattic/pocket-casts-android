@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.SETTINGS_EN
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.config.FirebaseConfig
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isScreenReaderOn
@@ -98,6 +99,7 @@ class SettingsImpl @Inject constructor(
     override val intelligentPlaybackResumptionFlow = MutableStateFlow(getIntelligentPlaybackResumption())
     override val tapOnUpNextShouldPlayFlow = MutableStateFlow(getTapOnUpNextShouldPlay())
     override val customMediaActionsVisibilityFlow = MutableStateFlow(areCustomMediaActionsVisible())
+    override val autoPlayNextEpisodeOnEmptyFlow = MutableStateFlow(getAutoPlayNextEpisodeOnEmpty())
 
     override val refreshStateObservable = BehaviorRelay.create<RefreshState>().apply {
         val lastError = getLastRefreshError()
@@ -999,7 +1001,17 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getAutoPlayNextEpisodeOnEmpty(): Boolean {
-        return getBoolean(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, false)
+        val defaultValue = when (Util.getAppPlatform(context)) {
+            AppPlatform.Automotive -> true
+            AppPlatform.Phone -> true
+            AppPlatform.WearOs -> false
+        }
+        return getBoolean(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, defaultValue)
+    }
+
+    override fun setAutoPlayNextEpisodeOnEmpty(enabled: Boolean) {
+        setBoolean(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, enabled)
+        autoPlayNextEpisodeOnEmptyFlow.update { enabled }
     }
 
     override fun getAutoArchiveIncludeStarred(): Boolean {
