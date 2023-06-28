@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.servers.di.PodcastCacheServerRetrofit
 import au.com.shiftyjelly.pocketcasts.servers.discover.EpisodeSearch
 import io.reactivex.Single
+import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import timber.log.Timber
@@ -47,8 +48,11 @@ class PodcastCacheServerManagerImpl @Inject constructor(@PodcastCacheServerRetro
         return try {
             server.getShowNotesCache(podcastUuid)
         } catch (e: Exception) {
+            // if the cache can't be found a HTTP 504 Unsatisfiable Request will be thrown
+            if (e !is HttpException) {
+                Timber.e(e)
+            }
             // ignore the error when the cache is empty
-            Timber.e(e)
             null
         }
     }
