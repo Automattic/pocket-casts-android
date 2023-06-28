@@ -12,7 +12,7 @@ sealed class OnboardingFlow(val analyticsValue: String) : Parcelable {
     @Parcelize class PlusUpsell(
         override val source: OnboardingUpgradeSource,
         val showPatronOnly: Boolean = false,
-    ) : PlusFlow, OnboardingFlow(if (showPatronOnly) "patron_upsell" else "plus_upsell")
+    ) : PlusFlow, OnboardingFlow("plus_upsell")
     @Parcelize class PatronAccountUpgrade(override val source: OnboardingUpgradeSource) : PlusFlow, OnboardingFlow("patron_account_upgrade")
 
     sealed interface PlusFlow {
