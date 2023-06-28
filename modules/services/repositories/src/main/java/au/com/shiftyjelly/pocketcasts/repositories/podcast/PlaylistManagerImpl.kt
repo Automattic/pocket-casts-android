@@ -496,7 +496,8 @@ class PlaylistManagerImpl @Inject constructor(
         where.append("archived = 0")
 
         val playingEpisode = playbackManager?.getCurrentEpisode()?.uuid
-        if (playingEpisode != null && playbackManager.lastLoadedFromPodcastOrPlaylistUuid == playlist.uuid) {
+        val lastLoadedFromPodcastOrFilterUuid = settings.getlastLoadedFromPodcastOrFilterUuid()
+        if (playingEpisode != null && lastLoadedFromPodcastOrFilterUuid == playlist.uuid) {
             where.insert(0, "(podcast_episodes.uuid = '$playingEpisode' OR (")
             where.append("))")
         }

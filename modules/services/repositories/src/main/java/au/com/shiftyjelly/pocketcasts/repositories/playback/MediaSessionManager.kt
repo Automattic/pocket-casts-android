@@ -571,8 +571,7 @@ class MediaSessionManager(
                 val episodeId = autoMediaId.episodeId
                 episodeManager.findEpisodeByUuid(episodeId)?.let { episode ->
                     playbackManager.playNow(episode, playbackSource = source)
-
-                    playbackManager.lastLoadedFromPodcastOrPlaylistUuid = autoMediaId.sourceId
+                    settings.setlastLoadedFromPodcastOrFilterUuid(autoMediaId.sourceId)
                 }
             }
         }

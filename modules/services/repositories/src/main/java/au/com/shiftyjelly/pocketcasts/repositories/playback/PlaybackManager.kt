@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.toLiveData
 import androidx.media3.datasource.HttpDataSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -32,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper.removeEpisodeFromQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
@@ -46,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.widget.WidgetManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.EpisodeSyncResponse
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.SentryHelper
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -67,7 +70,9 @@ import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
@@ -105,6 +110,7 @@ open class PlaybackManager @Inject constructor(
     private val analyticsTracker: AnalyticsTrackerWrapper,
     private val episodeAnalytics: EpisodeAnalytics,
     private val syncManager: SyncManager,
+    private val cloudFilesManager: CloudFilesManager,
 ) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
 
     companion object {
@@ -153,7 +159,6 @@ open class PlaybackManager @Inject constructor(
     private var syncTimerDisposable: Disposable? = null
     private var lastWarnedPlayedEpisodeUuid: String? = null
     private var lastPlayedEpisodeUuid: String? = null
-    var lastLoadedFromPodcastOrPlaylistUuid: String? = null
 
     private val resumptionHelper = ResumptionHelper(settings)
 
@@ -383,11 +388,15 @@ open class PlaybackManager @Inject constructor(
         if (switchEpisode || isPlayerSwitchRequired()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Player switch required. Different episode: $switchEpisode")
             pause(transientLoss = true)
-            upNextQueue.playNow(episode) {
-                launch {
-                    loadCurrentEpisode(play = true, forceStream = forceStream, playbackSource = playbackSource)
+            upNextQueue.playNow(
+                episode = episode,
+                automaticUpNextSource = automaticUpNextSource(playbackSource, episode),
+                onAdd = {
+                    launch {
+                        loadCurrentEpisode(play = true, forceStream = forceStream, playbackSource = playbackSource)
+                    }
                 }
-            }
+            )
 
             if (episode is PodcastEpisode) {
                 // We only want to track playing of episodes, not files
@@ -398,6 +407,47 @@ open class PlaybackManager @Inject constructor(
             playQueue(playbackSource)
         }
     }
+
+    private fun automaticUpNextSource(analyticsSource: AnalyticsSource, episode: BaseEpisode): AutomaticUpNextSource? =
+        when (analyticsSource) {
+            AnalyticsSource.AUTO_PAUSE,
+            AnalyticsSource.AUTO_PLAY,
+            AnalyticsSource.CHROMECAST,
+            AnalyticsSource.DISCOVER,
+            AnalyticsSource.DISCOVER_PLAIN_LIST,
+            AnalyticsSource.DISCOVER_PODCAST_LIST,
+            AnalyticsSource.DISCOVER_RANKED_LIST,
+            AnalyticsSource.FULL_SCREEN_VIDEO,
+            AnalyticsSource.LISTENING_HISTORY,
+            AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION,
+            AnalyticsSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
+            AnalyticsSource.MINIPLAYER,
+            AnalyticsSource.ONBOARDING_RECOMMENDATIONS,
+            AnalyticsSource.ONBOARDING_RECOMMENDATIONS_SEARCH,
+            AnalyticsSource.PODCAST_LIST,
+            AnalyticsSource.PODCAST_SETTINGS,
+            AnalyticsSource.PLAYER,
+            AnalyticsSource.PLAYER_BROADCAST_ACTION,
+            AnalyticsSource.PLAYER_PLAYBACK_EFFECTS,
+            AnalyticsSource.TASKER,
+            AnalyticsSource.UNKNOWN,
+            AnalyticsSource.UP_NEXT,
+            -> null
+
+            AnalyticsSource.NOTIFICATION,
+            -> (episode as? PodcastEpisode)?.let { AutomaticUpNextSource.create(it) }
+
+            // These following screens should be setting an appropriate [AutomaticUpNextSource.mostRecentList] when
+            // the user views them, otherwise [AutomaticUpNextSource.create] will not return the proper
+            // value.
+            AnalyticsSource.DOWNLOADS,
+            AnalyticsSource.EPISODE_DETAILS,
+            AnalyticsSource.FILES,
+            AnalyticsSource.FILTERS,
+            AnalyticsSource.PODCAST_SCREEN,
+            AnalyticsSource.STARRED,
+            -> AutomaticUpNextSource.create()
+        }
 
     suspend fun play(
         upNextPosition: UpNextPosition,
@@ -1083,38 +1133,52 @@ open class PlaybackManager @Inject constructor(
     }
 
     private suspend fun autoSelectNextEpisode(): BaseEpisode? {
-        val lastPodcastOrPlaylistUuid = lastLoadedFromPodcastOrPlaylistUuid
+        val lastPodcastOrFilterUuid = settings.getlastLoadedFromPodcastOrFilterUuid()
         val lastEpisodeUuid = lastPlayedEpisodeUuid
-        if (lastEpisodeUuid == null || lastPodcastOrPlaylistUuid == null) {
+        if (lastEpisodeUuid == null || lastPodcastOrFilterUuid == null) {
             return null
         }
 
-        var episodeUuids = emptyList<String>()
+        val allEpisodes: List<BaseEpisode> = when (lastPodcastOrFilterUuid) {
 
-        val podcast = podcastManager.findPodcastByUuid(lastPodcastOrPlaylistUuid)
-        if (podcast != null) {
-            episodeUuids = episodeManager.findEpisodesByPodcastOrdered(podcast).map { it.uuid }
-        } else {
-            val playlist = playlistManager.findByUuid(lastPodcastOrPlaylistUuid)
-            if (playlist != null) {
-                episodeUuids = playlistManager.findEpisodes(playlist, episodeManager, this).map { it.uuid }
+            AutomaticUpNextSource.Companion.Predefined.downloads ->
+                episodeManager.observeDownloadEpisodes().asFlow().firstOrNull()
+
+            AutomaticUpNextSource.Companion.Predefined.files ->
+                cloudFilesManager.cloudFilesList.asFlow().firstOrNull()
+
+            AutomaticUpNextSource.Companion.Predefined.starred ->
+                episodeManager.observeStarredEpisodes().asFlow().firstOrNull()
+
+            // First check if it is a podcast uuid, then check if it is from a filter
+            else -> podcastManager.findPodcastByUuid(lastPodcastOrFilterUuid)?.let { podcast ->
+                episodeManager.findEpisodesByPodcastOrdered(podcast)
+            } ?: playlistManager.findByUuid(lastPodcastOrFilterUuid)?.let { playlist ->
+                playlistManager.findEpisodes(playlist, episodeManager, this)
             }
-        }
+        } ?: emptyList()
 
-        val lastEpisodeIndex = episodeUuids.indexOfFirst { it == lastEpisodeUuid }
+        val allEpisodeUuids = allEpisodes.map { it.uuid }
+        val lastEpisodeIndex = allEpisodeUuids.indexOfFirst { it == lastEpisodeUuid }
+
         // go down the episode list until the end, and then go up the episode list
-        episodeUuids = episodeUuids.slice(lastEpisodeIndex + 1 until episodeUuids.size) + episodeUuids.slice(0 until lastEpisodeIndex).asReversed()
+        val episodeUuidsSlice = allEpisodeUuids.slice(lastEpisodeIndex + 1 until allEpisodeUuids.size) + allEpisodeUuids.slice(0 until lastEpisodeIndex).asReversed()
 
-        for (episodeUuid in episodeUuids) {
+        // Return the first episode that is not archived or finished
+        for (episodeUuid in episodeUuidsSlice) {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: continue
-            if (episode.isFinished || episode.isArchived) {
-                continue
+            if (!episode.isArchived && !episode.isFinished) {
+                return episode
             }
-            return episode
         }
 
-        // find the latest episode from the podcast in your collection
-        return episodeManager.findLatestEpisodeToPlay()
+        // If no matches found, play the latest episode on Android Automotive to avoid the player stopping
+        return when (Util.getAppPlatform(application)) {
+            AppPlatform.Automotive -> episodeManager.findLatestEpisodeToPlay()
+
+            AppPlatform.Phone,
+            AppPlatform.WearOs -> null
+        }
     }
 
     private suspend fun sleep(episode: BaseEpisode?) {

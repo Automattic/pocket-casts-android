@@ -11,6 +11,8 @@ import android.os.Build
 import android.util.Base64
 import androidx.core.content.edit
 import androidx.work.NetworkType
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -68,9 +70,7 @@ class SettingsImpl @Inject constructor(
         private const val LAST_SELECTED_SUBSCRIPTION_TIER_KEY = "LastSelectedSubscriptionTierKey"
         private const val LAST_SELECTED_SUBSCRIPTION_FREQUENCY_KEY = "LastSelectedSubscriptionFrequencyKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
-        private const val USERNAME_FIRST = "UsernameFirst"
-        private const val USERNAME_LAST = "UsernameLast"
-        private const val USERNAME_DISPLAY = "UsernameDisplay"
+        private const val LAST_SELECTED_PODCAST_OR_FILTER_UUID = "LastSelectedPodcastOrFilterUuid"
     }
 
     private var languageCode: String? = null
@@ -1001,6 +1001,9 @@ class SettingsImpl @Inject constructor(
     }
 
     override fun getAutoPlayNextEpisodeOnEmpty(): Boolean {
+        if (!FeatureFlag.isEnabled(Feature.AUTO_PLAY_UP_NEXT_SETTING)) {
+            return false
+        }
         val defaultValue = when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive -> true
             AppPlatform.Phone -> true
@@ -1407,4 +1410,11 @@ class SettingsImpl @Inject constructor(
 
     override fun getFullySignedOut(): Boolean =
         getBoolean(PROCESSED_SIGNOUT_KEY, true)
+
+    override fun setlastLoadedFromPodcastOrFilterUuid(uuid: String?) {
+        setString(LAST_SELECTED_PODCAST_OR_FILTER_UUID, uuid)
+    }
+
+    override fun getlastLoadedFromPodcastOrFilterUuid(): String? =
+        getString(LAST_SELECTED_PODCAST_OR_FILTER_UUID)
 }
