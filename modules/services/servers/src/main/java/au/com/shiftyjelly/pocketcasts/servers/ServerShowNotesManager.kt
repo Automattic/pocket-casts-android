@@ -80,6 +80,9 @@ class ServerShowNotesManager @Inject constructor(
     }
 
     suspend fun downloadShowNotes(podcastUuid: String, episodeUuid: String): String? {
+        if (podcastUuid.isBlank() || episodeUuid.isBlank()) {
+            return null
+        }
         val response = podcastCacheServerManager.getShowNotes(podcastUuid = podcastUuid)
         return response.findEpisode(episodeUuid)?.showNotes
     }
