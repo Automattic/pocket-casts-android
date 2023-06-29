@@ -8,10 +8,10 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -58,7 +58,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private val source = AnalyticsSource.EPISODE_DETAILS
+    private val source = SourceView.EPISODE_DETAILS
     lateinit var state: LiveData<EpisodeFragmentState>
     lateinit var showNotesState: LiveData<ShowNotesState>
     lateinit var inUpNext: LiveData<Boolean>
@@ -256,14 +256,14 @@ class EpisodeFragmentViewModel @Inject constructor(
     ): Boolean {
         episode?.let { episode ->
             if (isPlaying.value == true) {
-                playbackManager.pause(playbackSource = source)
+                playbackManager.pause(sourceView = source)
                 return false
             } else {
                 fromListUuid?.let {
                     FirebaseAnalyticsTracker.podcastEpisodePlayedFromList(it, episode.podcastUuid)
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_EPISODE_PLAY, mapOf(LIST_ID_KEY to it, PODCAST_ID_KEY to episode.podcastUuid))
                 }
-                playbackManager.playNow(episode, forceStream = force, playbackSource = source)
+                playbackManager.playNow(episode, forceStream = force, sourceView = source)
                 warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                 return true
             }

@@ -4,8 +4,8 @@ import android.accounts.AccountManager
 import android.accounts.OnAccountsUpdateListener
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.models.to.SubscriptionStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -146,7 +146,7 @@ class UserManagerImpl @Inject constructor(
         playbackManager.removeEpisode(
             episodeToRemove = playbackManager.getCurrentEpisode(),
             // Unknown is fine here because we don't send analytics when the user did not initiate the action
-            source = AnalyticsSource.UNKNOWN,
+            source = SourceView.UNKNOWN,
             userInitiated = false,
         )
 

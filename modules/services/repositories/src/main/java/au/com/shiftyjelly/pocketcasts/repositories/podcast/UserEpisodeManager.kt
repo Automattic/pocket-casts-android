@@ -8,8 +8,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -174,7 +174,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         userEpisodeDao.insert(episode)
 
         if (settings.getCloudAddToUpNext()) {
-            playbackManager.playLast(episode = episode, source = AnalyticsSource.FILES)
+            playbackManager.playLast(episode = episode, source = SourceView.FILES)
         }
     }
 
@@ -188,7 +188,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager) {
         deleteFilesForEpisode(episode)
-        playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILES, userInitiated = false)
+        playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES, userInitiated = false)
         cancelUpload(episode)
         userEpisodeDao.delete(episode)
     }
@@ -202,7 +202,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager) {
         episodes.forEach {
-            playbackManager.removeEpisode(episodeToRemove = it, source = AnalyticsSource.FILES, userInitiated = false)
+            playbackManager.removeEpisode(episodeToRemove = it, source = SourceView.FILES, userInitiated = false)
         }
         userEpisodeDao.deleteAll(episodes)
     }
@@ -399,7 +399,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             if (episode != null) {
                 if (!episode.isDownloaded) {
                     // File deleted from server
-                    playbackManager.removeEpisode(episode, source = AnalyticsSource.UNKNOWN, userInitiated = false)
+                    playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
                     userEpisodeDao.delete(episode)
                 } else {
                     if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
@@ -594,7 +594,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun markAllAsPlayed(episodes: List<UserEpisode>, playbackManager: PlaybackManager) {
         episodes.map { it.uuid }.chunked(500).forEach { userEpisodeDao.updateAllPlayingStatus(it, System.currentTimeMillis(), EpisodePlayingStatus.COMPLETED) }
-        episodes.forEach { playbackManager.removeEpisode(it, source = AnalyticsSource.UNKNOWN, userInitiated = false) }
+        episodes.forEach { playbackManager.removeEpisode(it, source = SourceView.UNKNOWN, userInitiated = false) }
     }
 
     override suspend fun markAllAsUnplayed(episodes: List<UserEpisode>) {

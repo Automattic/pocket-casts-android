@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -104,15 +104,15 @@ class NowPlayingViewModel @Inject constructor(
     fun onPauseButtonClick() {
         playAttempt?.cancel()
 
-        playbackManager.pause(playbackSource = AnalyticsSource.PLAYER)
+        playbackManager.pause(sourceView = SourceView.PLAYER)
     }
 
     fun onSeekBackButtonClick() {
-        playbackManager.skipBackward(AnalyticsSource.PLAYER)
+        playbackManager.skipBackward(SourceView.PLAYER)
     }
 
     fun onSeekForwardButtonClick() {
-        playbackManager.skipForward(AnalyticsSource.PLAYER)
+        playbackManager.skipForward(SourceView.PLAYER)
     }
 
     fun onStreamingConfirmationResult(result: StreamingConfirmationScreen.Result) {
@@ -125,6 +125,6 @@ class NowPlayingViewModel @Inject constructor(
     }
 
     private fun play() {
-        playbackManager.playQueue(AnalyticsSource.PLAYER)
+        playbackManager.playQueue(SourceView.PLAYER)
     }
 }

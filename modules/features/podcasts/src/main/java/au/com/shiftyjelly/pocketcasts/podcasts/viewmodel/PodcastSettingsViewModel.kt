@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -120,7 +120,7 @@ class PodcastSettingsViewModel @Inject constructor(
             podcastManager.unsubscribe(podcast.uuid, playbackManager)
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-                AnalyticsProp.podcastUnsubscribed(AnalyticsSource.PODCAST_SETTINGS, podcast.uuid)
+                AnalyticsProp.podcastUnsubscribed(SourceView.PODCAST_SETTINGS, podcast.uuid)
             )
         }
     }
@@ -160,7 +160,7 @@ class PodcastSettingsViewModel @Inject constructor(
     private object AnalyticsProp {
         private const val SOURCE_KEY = "source"
         private const val UUID_KEY = "uuid"
-        fun podcastUnsubscribed(source: AnalyticsSource, uuid: String) =
+        fun podcastUnsubscribed(source: SourceView, uuid: String) =
             mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
     }
 }

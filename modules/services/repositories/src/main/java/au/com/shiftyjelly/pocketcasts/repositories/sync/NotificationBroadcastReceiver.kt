@@ -5,8 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -30,7 +30,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     @Inject lateinit var playbackManager: PlaybackManager
     @Inject lateinit var episodeAnalytics: EpisodeAnalytics
 
-    private val source = AnalyticsSource.NOTIFICATION
+    private val source = SourceView.NOTIFICATION
 
     companion object {
 
@@ -95,7 +95,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
     private fun playNow(episodeUuid: String, forceStream: Boolean) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNow(episode, forceStream = forceStream, playbackSource = source)
+                playbackManager.playNow(episode, forceStream = forceStream, sourceView = source)
             }
         }
     }
@@ -139,7 +139,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
                 playbackManager.playLast(episode = episode, source = source)
                 if (playNext) {
-                    playbackManager.playNextInQueue(playbackSource = source)
+                    playbackManager.playNextInQueue(sourceView = source)
                 }
             }
         }

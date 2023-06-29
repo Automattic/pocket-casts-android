@@ -11,8 +11,8 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
@@ -120,7 +120,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
     private object AnalyticsProp {
         private const val source = "source"
 
-        fun sourceMap(eventSource: AnalyticsSource) =
+        fun sourceMap(eventSource: SourceView) =
             mapOf(source to eventSource.analyticsValue)
     }
 }

@@ -12,9 +12,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
@@ -128,11 +128,11 @@ open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickList
             FirebaseAnalyticsTracker.podcastSubscribedFromList(it, podcastUuid)
             analyticsTracker.track(AnalyticsEvent.DISCOVER_LIST_PODCAST_SUBSCRIBED, mapOf(LIST_ID_KEY to it, PODCAST_UUID_KEY to podcastUuid))
         }
-        var podcastSubscribedSource = AnalyticsSource.DISCOVER
+        var podcastSubscribedSource = SourceView.DISCOVER
         if (expandedStyle is ExpandedStyle.RankedList) {
-            podcastSubscribedSource = AnalyticsSource.DISCOVER_RANKED_LIST
+            podcastSubscribedSource = SourceView.DISCOVER_RANKED_LIST
         } else if (expandedStyle is ExpandedStyle.PlainList) {
-            podcastSubscribedSource = AnalyticsSource.DISCOVER_PLAIN_LIST
+            podcastSubscribedSource = SourceView.DISCOVER_PLAIN_LIST
         }
         analyticsTracker.track(AnalyticsEvent.PODCAST_SUBSCRIBED, mapOf(SOURCE_KEY to podcastSubscribedSource.analyticsValue, UUID_KEY to podcastUuid))
         podcastManager.subscribeToPodcast(podcastUuid, sync = true)

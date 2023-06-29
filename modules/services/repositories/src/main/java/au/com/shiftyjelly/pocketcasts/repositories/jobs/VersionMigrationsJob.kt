@@ -7,7 +7,7 @@ import android.app.job.JobScheduler
 import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -171,7 +171,7 @@ class VersionMigrationsJob : JobService() {
         episodes.forEach { episode ->
             playbackManager.removeEpisode(
                 episodeToRemove = episode,
-                source = AnalyticsSource.UNKNOWN,
+                source = SourceView.UNKNOWN,
                 userInitiated = false
             )
             appDatabase.episodeDao().delete(episode)

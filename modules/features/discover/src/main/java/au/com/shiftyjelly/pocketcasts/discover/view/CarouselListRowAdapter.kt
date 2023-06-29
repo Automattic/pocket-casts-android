@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.extensions.updateSubscribeButtonIcon
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
@@ -85,7 +85,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
                     FirebaseAnalyticsTracker.subscribedToFeaturedPodcast()
                     analyticsTracker.track(AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED, AnalyticsProp.featuredPodcastSubscribed(podcast.uuid))
                 }
-                analyticsTracker.track(AnalyticsEvent.PODCAST_SUBSCRIBED, AnalyticsProp.podcastSubscribed(AnalyticsSource.DISCOVER, podcast.uuid))
+                analyticsTracker.track(AnalyticsEvent.PODCAST_SUBSCRIBED, AnalyticsProp.podcastSubscribed(SourceView.DISCOVER, podcast.uuid))
             }
         } else {
             holder.podcast = null
@@ -103,7 +103,7 @@ internal class CarouselListRowAdapter(var pillText: String?, val theme: Theme, v
             fun sponsoredPodcastSubscribed(listId: String, uuid: String) = mapOf(LIST_ID_KEY to listId, PODCAST_UUID_KEY to uuid)
             fun featuredPodcastTapped(uuid: String) = mapOf(PODCAST_UUID_KEY to uuid)
             fun featuredPodcastSubscribed(uuid: String) = mapOf(PODCAST_UUID_KEY to uuid)
-            fun podcastSubscribed(source: AnalyticsSource, uuid: String) =
+            fun podcastSubscribed(source: SourceView, uuid: String) =
                 mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
         }
     }

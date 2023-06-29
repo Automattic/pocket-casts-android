@@ -7,9 +7,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -152,7 +152,7 @@ class PlayerViewModel @Inject constructor(
     ) {
         fun isSameChapter(chapter: Chapter) = currentChapter?.let { it.index == chapter.index } ?: false
     }
-    private val source = AnalyticsSource.PLAYER
+    private val source = SourceView.PLAYER
     private val _showPlayerFlow = MutableSharedFlow<Unit>()
     val showPlayerFlow: SharedFlow<Unit> = _showPlayerFlow
 
@@ -371,22 +371,22 @@ class PlayerViewModel @Inject constructor(
 
     fun play() {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play clicked in player")
-        playbackManager.playQueue(playbackSource = source)
+        playbackManager.playQueue(sourceView = source)
     }
 
-    fun playEpisode(uuid: String, playbackSource: AnalyticsSource = AnalyticsSource.UNKNOWN) {
+    fun playEpisode(uuid: String, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
             val episode = episodeManager.findEpisodeByUuid(uuid) ?: return@launch
-            playbackManager.playNow(episode = episode, playbackSource = playbackSource)
+            playbackManager.playNow(episode = episode, sourceView = sourceView)
         }
     }
 
     fun skipBackward() {
-        playbackManager.skipBackward(playbackSource = source)
+        playbackManager.skipBackward(sourceView = source)
     }
 
     fun skipForward() {
-        playbackManager.skipForward(playbackSource = source)
+        playbackManager.skipForward(sourceView = source)
     }
 
     fun onMarkAsPlayedClick() {
@@ -400,7 +400,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextEpisodeClick() {
-        playbackManager.playNextInQueue(playbackSource = source)
+        playbackManager.playNextInQueue(sourceView = source)
     }
 
     private fun markAsPlayedConfirmed(episode: BaseEpisode) {

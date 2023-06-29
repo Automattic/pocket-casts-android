@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-enum class AnalyticsSource(val analyticsValue: String) {
+enum class SourceView(val analyticsValue: String) {
     PODCAST_SCREEN("podcast_screen"),
     PODCAST_LIST("podcast_list"),
     FILTERS("filters"),
@@ -35,6 +35,6 @@ enum class AnalyticsSource(val analyticsValue: String) {
 
     companion object {
         fun fromString(source: String?) =
-            AnalyticsSource.values().find { it.analyticsValue == source } ?: UNKNOWN
+            SourceView.values().find { it.analyticsValue == source } ?: UNKNOWN
     }
 }

@@ -13,8 +13,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -61,7 +61,7 @@ class SearchFragment : BaseFragment() {
         fun newInstance(
             floating: Boolean = false,
             onlySearchRemote: Boolean = false,
-            source: AnalyticsSource
+            source: SourceView
         ): SearchFragment {
             val fragment = SearchFragment()
             val arguments = Bundle().apply {
@@ -83,8 +83,8 @@ class SearchFragment : BaseFragment() {
         get() = arguments?.getBoolean(ARG_FLOATING) ?: false
     val onlySearchRemote: Boolean
         get() = arguments?.getBoolean(ARG_ONLY_SEARCH_REMOTE) ?: false
-    val source: AnalyticsSource
-        get() = AnalyticsSource.fromString(arguments?.getString(ARG_SOURCE))
+    val source: SourceView
+        get() = SourceView.fromString(arguments?.getString(ARG_SOURCE))
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

@@ -5,8 +5,8 @@ import android.content.Context
 import android.view.View
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -45,11 +45,11 @@ class WarningsHelper @Inject constructor(
     fun streamingWarningDialog(
         episode: BaseEpisode,
         snackbarParentView: View? = null,
-        playbackSource: AnalyticsSource
+        sourceView: SourceView
     ): ConfirmationDialog {
         return streamingWarningDialog(onConfirm = {
             GlobalScope.launch {
-                playbackManager.playNow(episode = episode, forceStream = true, playbackSource = playbackSource)
+                playbackManager.playNow(episode = episode, forceStream = true, sourceView = sourceView)
                 showBatteryWarningSnackbarIfAppropriate(snackbarParentView)
             }
         })
@@ -79,7 +79,7 @@ class WarningsHelper @Inject constructor(
             .setOnSecondary { download(episodeUuid, waitForWifi = true, from = from) }
     }
 
-    fun uploadWarning(episodeUuid: String, source: AnalyticsSource): ConfirmationDialog {
+    fun uploadWarning(episodeUuid: String, source: SourceView): ConfirmationDialog {
         val titleRes =
             if (Network.isWifiConnection(activity)) LR.string.profile_cloud_upload_warning_title_metered_wifi else LR.string.profile_cloud_upload_warning_title_on_wifi
         return ConfirmationDialog()
@@ -93,7 +93,7 @@ class WarningsHelper @Inject constructor(
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun upload(episodeUuid: String, waitForWifi: Boolean, source: AnalyticsSource) {
+    private fun upload(episodeUuid: String, waitForWifi: Boolean, source: SourceView) {
         GlobalScope.launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let {
                 if (it !is UserEpisode) return@let

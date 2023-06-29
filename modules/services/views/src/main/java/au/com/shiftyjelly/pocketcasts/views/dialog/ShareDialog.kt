@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.views.dialog
 
 import android.content.Context
 import androidx.fragment.app.FragmentManager
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SharePodcastHelper
@@ -20,7 +20,7 @@ class ShareDialog(
     private val analyticsTracker: AnalyticsTrackerWrapper
 ) {
 
-    private val source = AnalyticsSource.EPISODE_DETAILS
+    private val source = SourceView.EPISODE_DETAILS
     fun show() {
         if (fragmentManager == null || context == null) {
             return

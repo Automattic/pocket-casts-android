@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -110,11 +110,11 @@ class FilterEpisodeListViewModel @Inject constructor(
             if (!episode.isArchived) {
                 episodeManager.archive(episode, playbackManager)
                 trackSwipeAction(SwipeAction.ARCHIVE)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, AnalyticsSource.FILTERS, episode.uuid)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, SourceView.FILTERS, episode.uuid)
             } else {
                 episodeManager.unarchive(episode)
                 trackSwipeAction(SwipeAction.UNARCHIVE)
-                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, AnalyticsSource.FILTERS, episode.uuid)
+                episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_UNARCHIVED, SourceView.FILTERS, episode.uuid)
             }
         }
     }
@@ -126,7 +126,7 @@ class FilterEpisodeListViewModel @Inject constructor(
             if (startIndex > -1) {
                 playbackManager.upNextQueue.removeAll()
                 val count = min(episodes.size - startIndex, settings.getMaxUpNextEpisodes())
-                playbackManager.playEpisodes(episodes = episodes.subList(startIndex, startIndex + count), playbackSource = AnalyticsSource.FILTERS)
+                playbackManager.playEpisodes(episodes = episodes.subList(startIndex, startIndex + count), sourceView = SourceView.FILTERS)
             }
         }
     }
@@ -162,10 +162,10 @@ class FilterEpisodeListViewModel @Inject constructor(
     fun episodeSwipeUpNext(episode: BaseEpisode) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILTERS)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILTERS)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playNext(episode = episode, source = AnalyticsSource.FILTERS)
+                playbackManager.playNext(episode = episode, source = SourceView.FILTERS)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
@@ -174,10 +174,10 @@ class FilterEpisodeListViewModel @Inject constructor(
     fun episodeSwipeUpLast(episode: BaseEpisode) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILTERS)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILTERS)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playLast(episode = episode, source = AnalyticsSource.FILTERS)
+                playbackManager.playLast(episode = episode, source = SourceView.FILTERS)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
