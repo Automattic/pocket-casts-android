@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -1147,6 +1148,12 @@ class MainActivity :
                     val uri = intent.data ?: return
                     OpmlImportTask.run(uri, this)
                 }
+            } else if (action == Intent.ACTION_SEND &&
+                intent.type in listOf("text/x-opml", "application/octet-stream")
+            ) {
+                // Import opml from share sheet
+                val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
+                OpmlImportTask.run(uri, this)
             } else if (action == MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH) {
                 val bundle = intent.extras ?: return
                 playbackManager.mediaSessionManager.playFromSearchExternal(bundle)
