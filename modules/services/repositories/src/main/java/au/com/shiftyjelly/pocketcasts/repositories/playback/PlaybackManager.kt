@@ -419,8 +419,6 @@ open class PlaybackManager @Inject constructor(
             AnalyticsSource.DISCOVER_RANKED_LIST,
             AnalyticsSource.FULL_SCREEN_VIDEO,
             AnalyticsSource.LISTENING_HISTORY,
-            AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION,
-            AnalyticsSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
             AnalyticsSource.MINIPLAYER,
             AnalyticsSource.ONBOARDING_RECOMMENDATIONS,
             AnalyticsSource.ONBOARDING_RECOMMENDATIONS_SEARCH,
@@ -434,6 +432,8 @@ open class PlaybackManager @Inject constructor(
             AnalyticsSource.UP_NEXT,
             -> null
 
+            AnalyticsSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
+            AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION,
             AnalyticsSource.NOTIFICATION,
             -> (episode as? PodcastEpisode)?.let { AutomaticUpNextSource.create(it) }
 
