@@ -18,18 +18,18 @@ class AppLifecycleAnalytics @Inject constructor(
     /* The date the app was last opened, used for calculating time in app */
     private var applicationOpenedDate: Date? = null
 
-    fun onApplicationInstalledOrUpgraded() {
-        // Track app upgrade and install
-        val versionCode = packageUtil.getVersionCode(appContext)
-        val oldVersionCode = settings.getMigratedVersionCode()
+    // Called when Pocket Casts is installed on a device that does not already have a previous version of
+    // the app installed
+    fun onNewApplicationInstall() {
+        analyticsTracker.track(AnalyticsEvent.APPLICATION_INSTALLED)
+    }
 
-        if (oldVersionCode == 0) {
-            // Track application installed if there isn't old version code
-            analyticsTracker.track(AnalyticsEvent.APPLICATION_INSTALLED)
-        } else if (oldVersionCode < versionCode) {
-            // app upgraded
-            analyticsTracker.track(AnalyticsEvent.APPLICATION_UPDATED, mapOf(KEY_PREVIOUS_VERSION_CODE to oldVersionCode))
-        }
+    // Called when Pocket Casts is upgraded on a device
+    fun onApplicationUpgrade(previousVersionCode: Int) {
+        analyticsTracker.track(
+            AnalyticsEvent.APPLICATION_UPDATED,
+            mapOf(KEY_PREVIOUS_VERSION_CODE to previousVersionCode)
+        )
     }
 
     fun onApplicationEnterForeground() {
