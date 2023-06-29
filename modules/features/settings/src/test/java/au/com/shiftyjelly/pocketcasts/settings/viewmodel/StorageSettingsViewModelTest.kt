@@ -7,19 +7,18 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.FolderLocation
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.utils.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Flowable
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +36,11 @@ private const val CUSTOM_FOLDER_NEW_PATH = "custom_folder_new_path"
 private const val CUSTOM_FOLDER_NEW_LABEL = "CustomFolderNew"
 
 @RunWith(MockitoJUnitRunner::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class StorageSettingsViewModelTest {
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
+
     @Mock
     private lateinit var podcastManager: PodcastManager
 
@@ -65,10 +68,8 @@ class StorageSettingsViewModelTest {
     @JvmField
     val temporaryFolder = TemporaryFolder()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         whenever(context.getString(any())).thenReturn("")
         whenever(context.getString(any(), any())).thenReturn("")
         whenever(settings.getStorageChoiceName()).thenReturn("")

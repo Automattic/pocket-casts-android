@@ -1,19 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import au.com.shiftyjelly.pocketcasts.endofyear.utils.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.stories.Story
 import au.com.shiftyjelly.pocketcasts.utils.FileUtilWrapper
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -28,16 +26,14 @@ private val story2 = mock<Story>()
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class StoriesViewModelTest {
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
+
     @Mock
     private lateinit var fileUtilWrapper: FileUtilWrapper
 
     @Mock
     private lateinit var endOfYearManager: EndOfYearManager
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
 
     @Test
     fun `when vm starts, then progress is zero`() = runTest {

@@ -4,14 +4,13 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.settings.viewmodel.utils.MainCoroutineRule
 import io.reactivex.Flowable
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -21,7 +20,10 @@ import org.mockito.kotlin.whenever
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ManualCleanupViewModelTest {
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
     private lateinit var episodeManager: EpisodeManager
     private lateinit var playbackManager: PlaybackManager
     private lateinit var analyticsTracker: AnalyticsTrackerWrapper
@@ -32,10 +34,8 @@ class ManualCleanupViewModelTest {
     private val diskSpaceView =
         ManualCleanupViewModel.State.DiskSpaceView(title = LR.string.unplayed, episodes = episodes)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         episodeManager = mock()
         playbackManager = mock()
         analyticsTracker = mock()
