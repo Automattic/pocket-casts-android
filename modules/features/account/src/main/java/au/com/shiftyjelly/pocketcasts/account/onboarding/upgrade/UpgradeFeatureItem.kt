@@ -28,9 +28,13 @@ enum class PlusUpgradeFeatureItem(
         image = IR.drawable.ic_cloud_storage,
         title = LR.string.onboarding_plus_feature_cloud_storage_title,
     ),
+    WatchPlayback(
+        image = IR.drawable.ic_watch_play,
+        title = LR.string.onboarding_plus_feature_watch_playback,
+    ),
     ThemesIcons(
         image = IR.drawable.ic_themes,
-        title = LR.string.onboarding_plus_feature_themes_icons_title,
+        title = LR.string.onboarding_plus_feature_extra_themes_icons_title,
     ),
     UndyingGratitude(
         image = IR.drawable.ic_heart,
@@ -46,6 +50,10 @@ enum class PatronUpgradeFeatureItem(
     EverythingInPlus(
         image = IR.drawable.ic_check,
         title = LR.string.onboarding_patron_feature_everything_in_plus_title,
+    ),
+    EarlyAccess(
+        image = IR.drawable.ic_new_features,
+        title = LR.string.onboarding_patron_feature_early_access_title,
     ),
     CloudStorage(
         image = IR.drawable.ic_cloud_storage,
