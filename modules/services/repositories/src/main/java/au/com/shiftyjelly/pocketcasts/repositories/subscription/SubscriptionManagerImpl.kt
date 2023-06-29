@@ -336,18 +336,50 @@ class SubscriptionManagerImpl @Inject constructor(
         return billingClient.queryPurchasesAsync(params = queryPurchasesParams)
     }
 
-    override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails, offerToken: String): BillingResult {
-        val productDetailsParams =
-            BillingFlowParams.ProductDetailsParams.newBuilder()
-                .setProductDetails(productDetails)
-                .setOfferToken(offerToken)
-                .build()
-        val productDetailsParamsList = listOf(productDetailsParams)
-        val billingFlowParams =
-            BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
-                .build()
-        return billingClient.launchBillingFlow(activity, billingFlowParams)
+    @OptIn(DelicateCoroutinesApi::class)
+    override fun launchBillingFlow(activity: Activity, productDetails: ProductDetails, offerToken: String) {
+        GlobalScope.launch {
+            val productDetailsParams =
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(productDetails)
+                    .setOfferToken(offerToken)
+                    .build()
+            val productDetailsParamsList = listOf(productDetailsParams)
+            var billingFlowParams =
+                BillingFlowParams.newBuilder()
+                    .setProductDetailsParamsList(productDetailsParamsList)
+
+            settings.getCachedSubscription()?.let { subscriptionStatus ->
+                if (
+                    shouldAllowUpgradePlan(
+                        subscribedPlanStatus = subscriptionStatus,
+                        newPlanDetails = productDetails,
+                    )
+                ) {
+                    val purchasesResult = getPurchases()
+                    if (purchasesResult == null) {
+                        LogBuffer.e(
+                            LogBuffer.TAG_SUBSCRIPTIONS,
+                            "unable to upgrade plan because billing result returned null purchases"
+                        )
+                        return@launch
+                    }
+
+                    if (purchasesResult.purchasesList.isNotEmpty()) {
+                        val existingPurchase = purchasesResult.purchasesList.first()
+                        billingFlowParams = billingFlowParams.setSubscriptionUpdateParams(
+                            BillingFlowParams.SubscriptionUpdateParams.newBuilder()
+                                .setOldPurchaseToken(existingPurchase.purchaseToken)
+                                /* User is changing subscription entitlement, proration rate applied at runtime (https://rb.gy/e876y)
+                                   Also, since upgrading to a more expensive tier, recommended proration rate is IMMEDIATE_AND_CHARGE_PRORATED_PRICE (https://rb.gy/acghw) */
+                                .setReplaceProrationMode(BillingFlowParams.ProrationMode.IMMEDIATE_AND_CHARGE_PRORATED_PRICE)
+                                .build()
+                        )
+                    }
+                }
+            }
+            billingClient.launchBillingFlow(activity, billingFlowParams.build())
+        }
     }
 
     override fun getCachedStatus(): SubscriptionStatus? {
@@ -388,6 +420,15 @@ class SubscriptionManagerImpl @Inject constructor(
         } ?: tierSubscriptions.firstOrNull() // If no matching subscription is found, select first available one
     }
 }
+
+private fun shouldAllowUpgradePlan(
+    subscribedPlanStatus: SubscriptionStatus,
+    newPlanDetails: ProductDetails
+) = subscribedPlanStatus is SubscriptionStatus.Paid &&
+    subscribedPlanStatus.tier == SubscriptionTier.PLUS &&
+    subscribedPlanStatus.platform == SubscriptionPlatform.ANDROID &&
+    newPlanDetails.productId in listOf(PATRON_MONTHLY_PRODUCT_ID, PATRON_YEARLY_PRODUCT_ID) &&
+    FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)
 
 sealed class ProductDetailsState {
     data class Loaded(val productDetails: List<ProductDetails>) : ProductDetailsState()
