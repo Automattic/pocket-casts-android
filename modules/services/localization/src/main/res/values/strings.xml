@@ -1600,6 +1600,7 @@
     <string name="onboarding_upgrade_unlock_all_features">Unlock all features</string>
     <string name="onboarding_patron_features_title">Believe in what we\’re doing and want to show your support?</string>
     <string name="onboarding_patron_feature_everything_in_plus_title">Everything in Plus</string>
+    <string name="onboarding_patron_feature_early_access_title">Early access to features</string>
     <string name="onboarding_patron_feature_cloud_storage_title">50GB Cloud Storage</string>
     <string name="onboarding_patron_feature_profile_badge_title">Supporters profile badge</string>
     <string name="onboarding_patron_feature_special_icons_title">Special Pocket Casts app icons</string>
@@ -1612,6 +1613,8 @@
     <string name="onboarding_plus_feature_folders_text">Organize your podcasts in folders and keep them in sync across all your devices.</string>
     <string name="onboarding_plus_feature_cloud_storage_title">10GB Cloud Storage</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Upload your files to cloud storage and have them available everywhere.</string>
+    <string name="onboarding_plus_feature_watch_playback">Watch Playback</string>
+    <string name="onboarding_plus_feature_extra_themes_icons_title">Extra Themes &amp; App Icons</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes &amp; Icons</string>
     <string name="onboarding_plus_feature_themes_icons_text">Fly your true colors. Exclusive icons and themes for the Plus club only.</string>
     <string name="onboarding_plus_feature_gratitude_title">The undying gratitude of everyone here at Pocket Casts</string>
