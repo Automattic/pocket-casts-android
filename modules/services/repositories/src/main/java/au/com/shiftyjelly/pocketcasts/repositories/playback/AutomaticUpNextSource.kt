@@ -2,7 +2,10 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 
-open class AutomaticUpNextSource(val uuid: String) {
+class AutomaticUpNextSource private constructor(val uuid: String?) {
+
+    constructor() : this(mostRecentList)
+    constructor(episode: PodcastEpisode) : this(episode.podcastUuid)
 
     companion object {
         var mostRecentList: String? = null
@@ -12,8 +15,5 @@ open class AutomaticUpNextSource(val uuid: String) {
             const val files = "files"
             const val starred = "starred"
         }
-
-        fun create(): AutomaticUpNextSource? = mostRecentList?.let { AutomaticUpNextSource(it) }
-        fun create(episode: PodcastEpisode): AutomaticUpNextSource = AutomaticUpNextSource(episode.podcastUuid)
     }
 }

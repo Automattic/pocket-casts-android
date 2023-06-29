@@ -144,7 +144,7 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
             Mode.Downloaded -> AutomaticUpNextSource.Companion.Predefined.downloads
             Mode.History -> null
             Mode.Starred -> AutomaticUpNextSource.Companion.Predefined.starred
-        }?.let { AutomaticUpNextSource.mostRecentList = it }
+        }.let { AutomaticUpNextSource.mostRecentList = it }
     }
 
     override fun onDestroyView() {

@@ -408,6 +408,9 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    // Returning null means a source should not affect the auto play behavior. Listening history is not
+    // returning null because it should actively disable auto play if a user plays an episode from the
+    // listening history screen.
     private fun automaticUpNextSource(analyticsSource: AnalyticsSource, episode: BaseEpisode): AutomaticUpNextSource? =
         when (analyticsSource) {
             AnalyticsSource.AUTO_PAUSE,
@@ -418,7 +421,6 @@ open class PlaybackManager @Inject constructor(
             AnalyticsSource.DISCOVER_PODCAST_LIST,
             AnalyticsSource.DISCOVER_RANKED_LIST,
             AnalyticsSource.FULL_SCREEN_VIDEO,
-            AnalyticsSource.LISTENING_HISTORY,
             AnalyticsSource.MINIPLAYER,
             AnalyticsSource.ONBOARDING_RECOMMENDATIONS,
             AnalyticsSource.ONBOARDING_RECOMMENDATIONS_SEARCH,
@@ -435,18 +437,19 @@ open class PlaybackManager @Inject constructor(
             AnalyticsSource.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
             AnalyticsSource.MEDIA_BUTTON_BROADCAST_ACTION,
             AnalyticsSource.NOTIFICATION,
-            -> (episode as? PodcastEpisode)?.let { AutomaticUpNextSource.create(it) }
+            -> (episode as? PodcastEpisode)?.let { AutomaticUpNextSource(it) }
 
-            // These following screens should be setting an appropriate [AutomaticUpNextSource.mostRecentList] when
-            // the user views them, otherwise [AutomaticUpNextSource.create] will not return the proper
+            // These screens should be setting an appropriate value for [AutomaticUpNextSource.mostRecentList]
+            // when the user views them, otherwise [AutomaticUpNextSource.create] will not return the proper
             // value.
+            AnalyticsSource.LISTENING_HISTORY,
             AnalyticsSource.DOWNLOADS,
             AnalyticsSource.EPISODE_DETAILS,
             AnalyticsSource.FILES,
             AnalyticsSource.FILTERS,
             AnalyticsSource.PODCAST_SCREEN,
             AnalyticsSource.STARRED,
-            -> AutomaticUpNextSource.create()
+            -> AutomaticUpNextSource()
         }
 
     suspend fun play(
