@@ -1006,7 +1006,7 @@ class SettingsImpl @Inject constructor(
         }
         val defaultValue = when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive -> true
-            AppPlatform.Phone -> true
+            AppPlatform.Phone -> false
             AppPlatform.WearOs -> false
         }
         return getBoolean(Settings.PREFERENCE_AUTO_PLAY_ON_EMPTY, defaultValue)
