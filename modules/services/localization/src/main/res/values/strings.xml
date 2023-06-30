@@ -268,7 +268,7 @@
     <string name="player_sleep_1_minute">1 minute</string>
     <string name="player_sleep_60_minutes">60 minutes</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutes</string>
-    <string name="player_sleep_add_1_minute">+ 1 minutes</string>
+    <string name="player_sleep_add_1_minute">+ 1 minute</string>
     <string name="player_sleep_cancel_timer">Cancel timer</string>
     <string name="player_sleep_custom_minus">Custom minus</string>
     <string name="player_sleep_custom_plus">Custom plus</string>
