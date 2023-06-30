@@ -201,7 +201,6 @@ class OnboardingUpgradeFeaturesViewModel @Inject constructor(
                 )
 
             currentSubscription?.let { subscription ->
-                // TODO: Patron - Fix tracking
                 analyticsTracker.track(
                     AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
                     mapOf(OnboardingUpgradeBottomSheetViewModel.flowKey to flow.analyticsValue, OnboardingUpgradeBottomSheetViewModel.selectedSubscriptionKey to subscription.productDetails.productId)
