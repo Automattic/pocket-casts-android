@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBind
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -85,6 +86,11 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        AutomaticUpNextSource.mostRecentList = AutomaticUpNextSource.Companion.Predefined.files
+    }
+
     override fun onPause() {
         super.onPause()
         multiSelectHelper.isMultiSelecting = false
@@ -97,8 +103,8 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
 
-        playButtonListener.source = AnalyticsSource.FILES
-        multiSelectHelper.source = AnalyticsSource.FILES
+        playButtonListener.source = SourceView.FILES
+        multiSelectHelper.source = SourceView.FILES
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -244,7 +250,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
-        multiSelectHelper.source = AnalyticsSource.FILES
+        multiSelectHelper.source = SourceView.FILES
         binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
     }
 

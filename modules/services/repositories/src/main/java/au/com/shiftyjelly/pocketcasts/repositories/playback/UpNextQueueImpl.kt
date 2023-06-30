@@ -154,9 +154,17 @@ class UpNextQueueImpl @Inject constructor(
         return queueEpisodes.any { it.uuid == uuid } || (currentEpisode?.let { it.uuid == uuid } ?: false)
     }
 
-    override suspend fun playNow(episode: BaseEpisode, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
+    override suspend fun playNow(
+        episode: BaseEpisode,
+        automaticUpNextSource: AutomaticUpNextSource?,
+        onAdd: (() -> Unit)?,
+    ) = withContext(coroutineContext) {
         // Don't build an Up Next if it is already empty
         if (queueEpisodes.isEmpty()) {
+            // when the upNextQueue is empty, save the source for auto playing the next episode
+            automaticUpNextSource?.let {
+                settings.setlastLoadedFromPodcastOrFilterUuid(it.uuid)
+            }
             saveChanges(UpNextAction.ClearAll)
         }
         saveChanges(UpNextAction.PlayNow(episode, onAdd))
@@ -294,6 +302,12 @@ class UpNextQueueImpl @Inject constructor(
         upNextDao.insertAt(upNextEpisode = episode.toUpNextEpisode(), position = position, replaceOneEpisode = false)
         if (episode.isArchived) {
             episodeManager.unarchive(episode)
+        }
+
+        // clear last loaded uuid if anything gets added to the up next queue
+        val hasQueuedItems = currentEpisode != null
+        if (hasQueuedItems) {
+            settings.setlastLoadedFromPodcastOrFilterUuid(null)
         }
     }
 

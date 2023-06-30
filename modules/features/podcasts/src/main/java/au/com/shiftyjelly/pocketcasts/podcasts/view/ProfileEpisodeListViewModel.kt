@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -111,9 +111,9 @@ class ProfileEpisodeListViewModel @Inject constructor(
     }
 
     private fun getAnalyticsSource() = when (mode) {
-        ProfileEpisodeListFragment.Mode.Downloaded -> AnalyticsSource.DOWNLOADS
-        ProfileEpisodeListFragment.Mode.History -> AnalyticsSource.LISTENING_HISTORY
-        ProfileEpisodeListFragment.Mode.Starred -> AnalyticsSource.STARRED
+        ProfileEpisodeListFragment.Mode.Downloaded -> SourceView.DOWNLOADS
+        ProfileEpisodeListFragment.Mode.History -> SourceView.LISTENING_HISTORY
+        ProfileEpisodeListFragment.Mode.Starred -> SourceView.STARRED
     }
 
     companion object {

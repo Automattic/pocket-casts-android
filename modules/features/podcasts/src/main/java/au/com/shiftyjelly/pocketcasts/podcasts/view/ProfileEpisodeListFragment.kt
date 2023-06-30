@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -139,6 +140,11 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     override fun onResume() {
         super.onResume()
         binding?.recyclerView?.adapter = adapter
+        when (mode) {
+            Mode.Downloaded -> AutomaticUpNextSource.Companion.Predefined.downloads
+            Mode.History -> null
+            Mode.Starred -> AutomaticUpNextSource.Companion.Predefined.starred
+        }.let { AutomaticUpNextSource.mostRecentList = it }
     }
 
     override fun onDestroyView() {
@@ -395,8 +401,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     private fun getAnalyticsEventSource() = when (mode) {
-        Mode.Downloaded -> AnalyticsSource.DOWNLOADS
-        Mode.Starred -> AnalyticsSource.STARRED
-        Mode.History -> AnalyticsSource.LISTENING_HISTORY
+        Mode.Downloaded -> SourceView.DOWNLOADS
+        Mode.Starred -> SourceView.STARRED
+        Mode.History -> SourceView.LISTENING_HISTORY
     }
 }

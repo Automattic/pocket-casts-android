@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.saveToGlobalSettings
@@ -46,13 +46,13 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
                 val jumpAmountSeconds = input.regular.skipSeconds?.toIntOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_TIME_TO_SKIP_PROVIDED, context.getString(R.string.time_to_skip_not_valid, input.regular.skipSeconds))
 
                 if (commandEnum == InputControlPlayback.PlaybackCommand.SkipBack) {
-                    playbackManager.skipBackward(jumpAmountSeconds = jumpAmountSeconds, playbackSource = AnalyticsSource.TASKER)
+                    playbackManager.skipBackward(jumpAmountSeconds = jumpAmountSeconds, sourceView = SourceView.TASKER)
                 } else {
-                    playbackManager.skipForward(jumpAmountSeconds = jumpAmountSeconds, playbackSource = AnalyticsSource.TASKER)
+                    playbackManager.skipForward(jumpAmountSeconds = jumpAmountSeconds, sourceView = SourceView.TASKER)
                 }
             }
             InputControlPlayback.PlaybackCommand.PlayNextInQueue -> playbackManager.playNextInQueue(
-                AnalyticsSource.TASKER
+                SourceView.TASKER
             )
             InputControlPlayback.PlaybackCommand.SetPlaybackSpeed -> {
                 val speed = input.regular.playbackSpeed?.toDoubleOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_PLAYBACK_SPEED_PROVIDED, context.getString(R.string.playback_speed_not_valid, input.regular.playbackSpeed))

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -111,6 +111,6 @@ class PodcastEffectsViewModel
     }
 
     fun trackPlaybackEffectsEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
-        playbackManager.trackPlaybackEffectsEvent(event, props, AnalyticsSource.PODCAST_SETTINGS)
+        playbackManager.trackPlaybackEffectsEvent(event, props, SourceView.PODCAST_SETTINGS)
     }
 }

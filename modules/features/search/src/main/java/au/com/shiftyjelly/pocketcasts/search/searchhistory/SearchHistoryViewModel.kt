@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.search.searchhistory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -27,7 +27,7 @@ class SearchHistoryViewModel @Inject constructor(
     private val signInState = userManager.getSignInState().asFlow()
     private var isSignedInAsPlusOrPatron = false
     private var onlySearchRemote: Boolean = false
-    private var source: AnalyticsSource = AnalyticsSource.UNKNOWN
+    private var source: SourceView = SourceView.UNKNOWN
 
     private val mutableState = MutableStateFlow(
         State(entries = emptyList())
@@ -42,7 +42,7 @@ class SearchHistoryViewModel @Inject constructor(
         onlySearchRemote = value
     }
 
-    fun setSource(source: AnalyticsSource) {
+    fun setSource(source: SourceView) {
         this.source = source
     }
 
@@ -118,9 +118,9 @@ class SearchHistoryViewModel @Inject constructor(
             const val SOURCE = "source"
             const val TYPE = "type"
             const val UUID = "uuid"
-            fun sourceMap(source: AnalyticsSource) = mapOf(SOURCE to source.analyticsValue)
+            fun sourceMap(source: SourceView) = mapOf(SOURCE to source.analyticsValue)
             fun searchHistoryEntryMap(
-                source: AnalyticsSource,
+                source: SourceView,
                 type: SearchHistoryType,
                 uuid: String? = null,
             ) = HashMap<String, String>().apply {

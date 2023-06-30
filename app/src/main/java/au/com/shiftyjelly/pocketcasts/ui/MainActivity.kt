@@ -44,10 +44,10 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContr
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.account.watchsync.WatchSync
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesFragment
@@ -927,31 +927,31 @@ class MainActivity :
                 playbackManager.getCurrentEpisode()?.let { episode ->
                     launch(Dispatchers.Main) {
                         if (episode.isDownloaded) {
-                            playbackManager.playQueue(AnalyticsSource.MINIPLAYER)
+                            playbackManager.playQueue(SourceView.MINIPLAYER)
                             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                         } else {
-                            warningsHelper.streamingWarningDialog(episode = episode, playbackSource = AnalyticsSource.MINIPLAYER)
+                            warningsHelper.streamingWarningDialog(episode = episode, sourceView = SourceView.MINIPLAYER)
                                 .show(supportFragmentManager, "streaming dialog")
                         }
                     }
                 }
             }
         } else {
-            playbackManager.playQueue(AnalyticsSource.MINIPLAYER)
+            playbackManager.playQueue(SourceView.MINIPLAYER)
             warningsHelper.showBatteryWarningSnackbarIfAppropriate()
         }
     }
 
     override fun onPauseClicked() {
-        playbackManager.pause(playbackSource = AnalyticsSource.MINIPLAYER)
+        playbackManager.pause(sourceView = SourceView.MINIPLAYER)
     }
 
     override fun onSkipBackwardClicked() {
-        playbackManager.skipBackward(playbackSource = AnalyticsSource.MINIPLAYER)
+        playbackManager.skipBackward(sourceView = SourceView.MINIPLAYER)
     }
 
     override fun onSkipForwardClicked() {
-        playbackManager.skipForward(playbackSource = AnalyticsSource.MINIPLAYER)
+        playbackManager.skipForward(sourceView = SourceView.MINIPLAYER)
     }
 
     override fun addFragment(fragment: Fragment, onTop: Boolean) {

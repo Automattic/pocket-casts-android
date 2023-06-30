@@ -9,8 +9,8 @@ import androidx.lifecycle.toLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentMultiselectBinding
@@ -29,7 +29,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
     @Inject lateinit var settings: Settings
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
     private val source: String
-        get() = arguments?.getString(ARG_SOURCE) ?: AnalyticsSource.UNKNOWN.analyticsValue
+        get() = arguments?.getString(ARG_SOURCE) ?: SourceView.UNKNOWN.analyticsValue
 
     private val adapter = MultiSelectAdapter(editable = true, listener = null, dragListener = this::onItemStartDrag)
     private lateinit var itemTouchHelper: ItemTouchHelper
@@ -183,7 +183,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
 
     companion object {
         private const val ARG_SOURCE = "source"
-        fun newInstance(source: AnalyticsSource) = MultiSelectFragment().apply {
+        fun newInstance(source: SourceView) = MultiSelectFragment().apply {
             arguments = bundleOf(
                 ARG_SOURCE to source.analyticsValue,
             )

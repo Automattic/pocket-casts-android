@@ -18,8 +18,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -79,7 +79,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private var binding: AdapterPlayerHeaderBinding? = null
     private var skippedFirstTouch: Boolean = false
     private var hasReceivedOnTouchDown = false
-    private val playbackSource = AnalyticsSource.PLAYER
+    private val sourceView = SourceView.PLAYER
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
@@ -121,7 +121,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         binding.seekBar.changeListener = object : PlayerSeekBar.OnUserSeekListener {
             override fun onSeekPositionChangeStop(progress: Int, seekComplete: () -> Unit) {
                 viewModel.seekToMs(progress, seekComplete)
-                playbackManager.trackPlaybackSeek(progress, AnalyticsSource.PLAYER)
+                playbackManager.trackPlaybackSeek(progress, SourceView.PLAYER)
             }
 
             override fun onSeekPositionChanging(progress: Int) {}
@@ -497,7 +497,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     override fun onPlayClicked() {
         if (playbackManager.isPlaying()) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Pause clicked in player")
-            playbackManager.pause(playbackSource = playbackSource)
+            playbackManager.pause(sourceView = sourceView)
         } else {
             if (playbackManager.shouldWarnAboutPlayback()) {
                 launch {
@@ -508,7 +508,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 viewModel.play()
                                 warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
                             } else {
-                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, playbackSource = playbackSource)
+                                warningsHelper.streamingWarningDialog(episode = episode, snackbarParentView = view, sourceView = sourceView)
                                     .show(parentFragmentManager, "streaming dialog")
                             }
                         }

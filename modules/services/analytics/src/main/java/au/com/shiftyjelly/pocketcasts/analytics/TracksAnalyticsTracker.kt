@@ -34,6 +34,8 @@ class TracksAnalyticsTracker @Inject constructor(
                 ?: false
             val subscriptionType = paidSubscription?.type?.toString()
                 ?: INVALID_OR_NULL_VALUE
+            val subscriptionTier = paidSubscription?.tier?.toString()
+                ?: INVALID_OR_NULL_VALUE
             val subscriptionPlatform = paidSubscription?.platform?.toString()
                 ?: INVALID_OR_NULL_VALUE
             val subscriptionFrequency = paidSubscription?.frequency?.toString()
@@ -45,6 +47,7 @@ class TracksAnalyticsTracker @Inject constructor(
                 PredefinedEventProperty.PLUS_HAS_SUBSCRIPTION to hasSubscription,
                 PredefinedEventProperty.PLUS_HAS_LIFETIME to hasLifetime,
                 PredefinedEventProperty.PLUS_SUBSCRIPTION_TYPE to subscriptionType,
+                PredefinedEventProperty.PLUS_SUBSCRIPTION_TIER to subscriptionTier,
                 PredefinedEventProperty.PLUS_SUBSCRIPTION_PLATFORM to subscriptionPlatform,
                 PredefinedEventProperty.PLUS_SUBSCRIPTION_FREQUENCY to subscriptionFrequency,
                 PredefinedEventProperty.PLATFORM to when (Util.getAppPlatform(appContext)) {
@@ -117,6 +120,7 @@ class TracksAnalyticsTracker @Inject constructor(
         PLUS_HAS_SUBSCRIPTION("plus_has_subscription"),
         PLUS_HAS_LIFETIME("plus_has_lifetime"),
         PLUS_SUBSCRIPTION_TYPE("plus_subscription_type"),
+        PLUS_SUBSCRIPTION_TIER("plus_subscription_tier"),
         PLUS_SUBSCRIPTION_PLATFORM("plus_subscription_platform"),
         PLUS_SUBSCRIPTION_FREQUENCY("plus_subscription_frequency"),
         PLATFORM("platform"),
