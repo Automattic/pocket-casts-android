@@ -1,19 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import android.content.Context
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
 import au.com.shiftyjelly.pocketcasts.utils.timeIntervalSinceNow
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class AppLifecycleAnalytics @Inject constructor(
-    @ApplicationContext private val appContext: Context,
-    private val settings: Settings,
-    private val packageUtil: PackageUtil,
-    private val analyticsTracker: AnalyticsTrackerWrapper
+    private val analyticsTracker: AnalyticsTrackerWrapper,
 ) {
     /* The date the app was last opened, used for calculating time in app */
     private var applicationOpenedDate: Date? = null

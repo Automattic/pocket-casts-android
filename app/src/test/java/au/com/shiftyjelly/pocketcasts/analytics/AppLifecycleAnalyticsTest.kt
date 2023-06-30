@@ -1,11 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics.Companion.KEY_PREVIOUS_VERSION_CODE
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics.Companion.KEY_TIME_IN_APP
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.utils.PackageUtil
-import dagger.hilt.android.qualifiers.ApplicationContext
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,27 +12,12 @@ import org.mockito.kotlin.verify
 @RunWith(MockitoJUnitRunner::class)
 class AppLifecycleAnalyticsTest {
     @Mock
-    @ApplicationContext
-    private lateinit var context: Context
-
-    @Mock
-    private lateinit var settings: Settings
-
-    @Mock
-    private lateinit var packageUtil: PackageUtil
-
-    @Mock
     private lateinit var analyticsTracker: AnalyticsTrackerWrapper
     lateinit var appLifecycleAnalytics: AppLifecycleAnalytics
 
     @Before
     fun setUp() {
-        appLifecycleAnalytics = AppLifecycleAnalytics(
-            context,
-            settings,
-            packageUtil,
-            analyticsTracker
-        )
+        appLifecycleAnalytics = AppLifecycleAnalytics(analyticsTracker)
     }
 
     /* APPLICATION INSTALLED */
