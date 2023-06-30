@@ -279,7 +279,7 @@ class PlaybackSettingsFragment : BaseFragment() {
                             saved = settings.autoPlayNextEpisodeOnEmptyFlow.collectAsState().value,
                             onSave = {
                                 analyticsTracker.track(
-                                    AnalyticsEvent.SETTINGS_GENERAL_CONTINUOUS_PLAYBACK_TOGGLED,
+                                    AnalyticsEvent.SETTINGS_GENERAL_AUTOPLAY_TOGGLED,
                                     mapOf("enabled" to it)
                                 )
                                 settings.setAutoPlayNextEpisodeOnEmpty(it)
@@ -523,7 +523,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Composable
     private fun AutoPlayNextOnEmpty(saved: Boolean, onSave: (Boolean) -> Unit) =
         SettingRow(
-            primaryText = stringResource(LR.string.settings_continuous_playback),
+            primaryText = stringResource(LR.string.settings_autoplay),
             secondaryText = stringResource(LR.string.settings_continuous_playback_summary),
             toggle = SettingRowToggle.Switch(checked = saved),
             modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) }
