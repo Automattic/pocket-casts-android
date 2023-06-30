@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -21,10 +22,16 @@ import au.com.shiftyjelly.pocketcasts.compose.components.GradientIconData
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.SignInState
 import au.com.shiftyjelly.pocketcasts.settings.about.AboutFragment
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.privacy.PrivacyFragment
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -38,6 +45,7 @@ fun SettingsFragmentPage(
     onBackPressed: () -> Unit,
     openFragment: (Fragment) -> Unit
 ) {
+    val context = LocalContext.current
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings),
@@ -64,7 +72,18 @@ fun SettingsFragmentPage(
             }
 
             if (!signInState.isSignedIn || signInState.isSignedInAsFree) {
-                PlusRow(onClick = { openFragment(PlusSettingsFragment()) })
+                PlusRow(onClick = {
+                    if (FeatureFlag.isEnabled(Feature.ADD_PATRON_ENABLED)) {
+                        OnboardingLauncher.openOnboardingFlow(
+                            context.getActivity(),
+                            OnboardingFlow.PlusUpsell(
+                                OnboardingUpgradeSource.SETTINGS
+                            )
+                        )
+                    } else {
+                        openFragment(PlusSettingsFragment())
+                    }
+                })
             }
 
             GeneralRow(onClick = { openFragment(PlaybackSettingsFragment()) })

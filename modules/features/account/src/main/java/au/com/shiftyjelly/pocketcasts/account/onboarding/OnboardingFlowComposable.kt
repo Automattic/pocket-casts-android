@@ -205,7 +205,8 @@ private fun Content(
                 OnboardingUpgradeSource.LOGIN,
                 OnboardingUpgradeSource.PLUS_DETAILS,
                 OnboardingUpgradeSource.PROFILE,
-                OnboardingUpgradeSource.ACCOUNT_DETAILS -> false
+                OnboardingUpgradeSource.ACCOUNT_DETAILS,
+                OnboardingUpgradeSource.SETTINGS -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
             }
