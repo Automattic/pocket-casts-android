@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.viewModels
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -31,8 +31,8 @@ class SearchResultsFragment : BaseFragment() {
 
     private val onlySearchRemote: Boolean
         get() = arguments?.getBoolean(ARG_ONLY_SEARCH_REMOTE) ?: false
-    private val source: AnalyticsSource
-        get() = AnalyticsSource.fromString(arguments?.getString(ARG_SOURCE))
+    private val source: SourceView
+        get() = SourceView.fromString(arguments?.getString(ARG_SOURCE))
     private val type: ResultsType
         get() = ResultsType.fromString(arguments?.getString(ARG_TYPE))
 
@@ -143,7 +143,7 @@ class SearchResultsFragment : BaseFragment() {
         fun newInstance(
             type: ResultsType,
             onlySearchRemote: Boolean = false,
-            source: AnalyticsSource
+            source: SourceView
         ): SearchResultsFragment {
             val fragment = SearchResultsFragment()
             val arguments = Bundle().apply {

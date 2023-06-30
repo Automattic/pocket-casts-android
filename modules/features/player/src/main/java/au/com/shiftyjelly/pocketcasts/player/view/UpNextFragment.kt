@@ -16,9 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -81,7 +81,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     @Inject lateinit var analyticsTracker: AnalyticsTrackerWrapper
 
     lateinit var adapter: UpNextAdapter
-    private val playbackSource = AnalyticsSource.UP_NEXT
+    private val sourceView = SourceView.UP_NEXT
     private val playerViewModel: PlayerViewModel by activityViewModels()
     private var userRearrangingFrom: Int? = null
     private var userDraggingStart: Int? = null
@@ -127,7 +127,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val imageLoader = PodcastImageLoaderThemed(context)
-        multiSelectHelper.source = AnalyticsSource.UP_NEXT
+        multiSelectHelper.source = SourceView.UP_NEXT
         adapter = UpNextAdapter(
             context = context,
             imageLoader = imageLoader,
@@ -273,7 +273,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         recyclerView.findViewHolderForAdapterPosition(position)?.let {
             episodeItemTouchHelper?.clearView(recyclerView, it)
         }
-        playbackManager.playEpisodesNext(episodes = listOf(episode), source = AnalyticsSource.UP_NEXT)
+        playbackManager.playEpisodesNext(episodes = listOf(episode), source = SourceView.UP_NEXT)
         trackSwipeAction(SwipeAction.UP_NEXT_MOVE_TOP)
     }
 
@@ -282,7 +282,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
         recyclerView.findViewHolderForAdapterPosition(position)?.let {
             episodeItemTouchHelper?.clearView(recyclerView, it)
         }
-        playbackManager.playEpisodesLast(episodes = listOf(episode), source = AnalyticsSource.UP_NEXT)
+        playbackManager.playEpisodesLast(episodes = listOf(episode), source = SourceView.UP_NEXT)
         trackSwipeAction(SwipeAction.UP_NEXT_MOVE_BOTTOM)
     }
 
@@ -336,7 +336,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
 
     override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {
         if (settings.getTapOnUpNextShouldPlay()) {
-            playerViewModel.playEpisode(uuid = episodeUuid, playbackSource = playbackSource)
+            playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)
         } else {
             (activity as? FragmentHostListener)?.openEpisodeDialog(
                 episodeUuid = episodeUuid,
@@ -356,7 +356,7 @@ class UpNextFragment : BaseFragment(), UpNextListener, UpNextTouchCallback.ItemT
                 forceDark = true
             )
         } else {
-            playerViewModel.playEpisode(uuid = episodeUuid, playbackSource = playbackSource)
+            playerViewModel.playEpisode(uuid = episodeUuid, sourceView = sourceView)
         }
     }
 

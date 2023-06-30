@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -401,8 +401,8 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
     }
 
     private fun getAnalyticsEventSource() = when (mode) {
-        Mode.Downloaded -> AnalyticsSource.DOWNLOADS
-        Mode.Starred -> AnalyticsSource.STARRED
-        Mode.History -> AnalyticsSource.LISTENING_HISTORY
+        Mode.Downloaded -> SourceView.DOWNLOADS
+        Mode.Starred -> SourceView.STARRED
+        Mode.History -> SourceView.LISTENING_HISTORY
     }
 }

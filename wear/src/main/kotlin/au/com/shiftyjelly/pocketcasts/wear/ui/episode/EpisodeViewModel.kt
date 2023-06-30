@@ -11,8 +11,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.palette.graphics.Palette
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -81,7 +81,7 @@ class EpisodeViewModel @Inject constructor(
     private val audioOutputSelectorHelper: AudioOutputSelectorHelper,
 ) : AndroidViewModel(appContext as Application) {
     private var playAttempt: Job? = null
-    private val analyticsSource = AnalyticsSource.EPISODE_DETAILS
+    private val sourceView = SourceView.EPISODE_DETAILS
 
     sealed class State {
         data class Loaded(
@@ -264,7 +264,7 @@ class EpisodeViewModel @Inject constructor(
 
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_DOWNLOAD_CANCELLED,
-                    source = analyticsSource,
+                    source = sourceView,
                     uuid = episode.uuid
                 )
             } else if (!episode.isDownloaded) {
@@ -274,7 +274,7 @@ class EpisodeViewModel @Inject constructor(
 
                 episodeAnalytics.trackEvent(
                     event = AnalyticsEvent.EPISODE_DOWNLOAD_QUEUED,
-                    source = analyticsSource,
+                    source = sourceView,
                     uuid = episode.uuid
                 )
             }
@@ -301,7 +301,7 @@ class EpisodeViewModel @Inject constructor(
             )
             episodeAnalytics.trackEvent(
                 event = AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
-                source = analyticsSource,
+                source = sourceView,
                 uuid = episode.uuid,
             )
         }
@@ -335,7 +335,7 @@ class EpisodeViewModel @Inject constructor(
             }
             playbackManager.playNowSync(
                 episode = episode,
-                playbackSource = analyticsSource,
+                sourceView = sourceView,
             )
             _showNowPlaying.emit(true)
         }
@@ -349,7 +349,7 @@ class EpisodeViewModel @Inject constructor(
         playAttempt?.cancel()
 
         viewModelScope.launch {
-            playbackManager.pause(playbackSource = analyticsSource)
+            playbackManager.pause(sourceView = sourceView)
         }
     }
 
@@ -359,7 +359,7 @@ class EpisodeViewModel @Inject constructor(
             playbackManager.play(
                 upNextPosition = upNextPosition,
                 episode = state.episode,
-                source = analyticsSource
+                source = sourceView
             )
         }
     }
@@ -368,7 +368,7 @@ class EpisodeViewModel @Inject constructor(
         val state = stateFlow.value as? State.Loaded ?: return
         playbackManager.removeEpisode(
             episodeToRemove = state.episode,
-            source = AnalyticsSource.EPISODE_DETAILS
+            source = SourceView.EPISODE_DETAILS
         )
     }
 
@@ -402,14 +402,14 @@ class EpisodeViewModel @Inject constructor(
                 episodeManager.unarchive(episode)
                 episodeAnalytics.trackEvent(
                     AnalyticsEvent.EPISODE_UNARCHIVED,
-                    analyticsSource,
+                    sourceView,
                     episode.uuid
                 )
             } else {
                 episodeManager.archive(episode, playbackManager)
                 episodeAnalytics.trackEvent(
                     AnalyticsEvent.EPISODE_ARCHIVED,
-                    analyticsSource,
+                    sourceView,
                     episode.uuid
                 )
             }
@@ -426,7 +426,7 @@ class EpisodeViewModel @Inject constructor(
             episodeManager.toggleStarEpisodeAsync(episode)
             val event =
                 if (episode.isStarred) AnalyticsEvent.EPISODE_UNSTARRED else AnalyticsEvent.EPISODE_STARRED
-            episodeAnalytics.trackEvent(event, analyticsSource, episode.uuid)
+            episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
         }
     }
 
@@ -440,7 +440,7 @@ class EpisodeViewModel @Inject constructor(
                     episodeManager.markAsPlayed(episode, playbackManager, podcastManager)
                     AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
                 }
-                episodeAnalytics.trackEvent(event, analyticsSource, episode.uuid)
+                episodeAnalytics.trackEvent(event, sourceView, episode.uuid)
             }
         }
     }

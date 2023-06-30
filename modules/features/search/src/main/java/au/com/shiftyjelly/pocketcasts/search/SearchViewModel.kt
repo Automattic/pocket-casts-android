@@ -5,8 +5,8 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -42,7 +42,7 @@ class SearchViewModel @Inject constructor(
         searchState
     }
     val loading = searchHandler.loading
-    private var source: AnalyticsSource = AnalyticsSource.UNKNOWN
+    private var source: SourceView = SourceView.UNKNOWN
 
     private val _state: MutableStateFlow<SearchState> = MutableStateFlow(
         SearchState.Results(
@@ -100,7 +100,7 @@ class SearchViewModel @Inject constructor(
         searchHandler.setOnlySearchRemote(remote)
     }
 
-    fun setSource(source: AnalyticsSource) {
+    fun setSource(source: SourceView) {
         this.source = source
         searchHandler.setSource(source)
     }
@@ -137,7 +137,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun trackSearchResultTapped(
-        source: AnalyticsSource,
+        source: SourceView,
         uuid: String,
         type: SearchResultType
     ) {
@@ -149,7 +149,7 @@ class SearchViewModel @Inject constructor(
 
     fun trackSearchShownOrDismissed(
         event: AnalyticsEvent,
-        source: AnalyticsSource,
+        source: SourceView,
     ) {
         analyticsTracker.track(
             event,
@@ -157,7 +157,7 @@ class SearchViewModel @Inject constructor(
         )
     }
 
-    fun trackSearchListShown(source: AnalyticsSource, type: ResultsType) {
+    fun trackSearchListShown(source: SourceView, type: ResultsType) {
         analyticsTracker.track(
             AnalyticsEvent.SEARCH_LIST_SHOWN,
             AnalyticsProp.searchListShown(source = source, type = type)
@@ -177,16 +177,16 @@ class SearchViewModel @Inject constructor(
         private const val RESULT_TYPE = "result_type"
         private const val DISPLAYING = "displaying"
 
-        fun searchResultTapped(source: AnalyticsSource, uuid: String, type: SearchResultType) =
+        fun searchResultTapped(source: SourceView, uuid: String, type: SearchResultType) =
             mapOf(SOURCE to source.analyticsValue, UUID to uuid, RESULT_TYPE to type.value)
 
-        fun searchShownOrDismissed(source: AnalyticsSource) =
+        fun searchShownOrDismissed(source: SourceView) =
             mapOf(SOURCE to source.analyticsValue)
 
-        fun podcastSubscribed(source: AnalyticsSource, uuid: String) =
+        fun podcastSubscribed(source: SourceView, uuid: String) =
             mapOf(SOURCE to "${source.analyticsValue}_search", UUID to uuid)
 
-        fun searchListShown(source: AnalyticsSource, type: ResultsType) =
+        fun searchListShown(source: SourceView, type: ResultsType) =
             mapOf(SOURCE to source.analyticsValue, DISPLAYING to type.value)
     }
 }

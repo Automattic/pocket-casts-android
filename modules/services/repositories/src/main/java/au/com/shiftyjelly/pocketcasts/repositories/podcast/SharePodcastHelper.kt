@@ -3,8 +3,8 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -21,7 +21,7 @@ data class SharePodcastHelper(
     val upToInSeconds: Double? = null, // Share a position in an episode of a podcast.
     val context: Context,
     private val shareType: ShareType,
-    private val source: AnalyticsSource,
+    private val source: SourceView,
     private val analyticsTracker: AnalyticsTrackerWrapper,
 ) {
 
@@ -69,12 +69,12 @@ data class SharePodcastHelper(
     }
 
     private fun shouldTrackShareEvent() =
-        source != AnalyticsSource.PODCAST_SCREEN // Podcast screen has it's own share event
+        source != SourceView.PODCAST_SCREEN // Podcast screen has it's own share event
 
     private object AnalyticsProp {
         const val SOURCE = "source"
         const val TYPE = "type"
-        fun shareMap(type: ShareType, source: AnalyticsSource) =
+        fun shareMap(type: ShareType, source: SourceView) =
             mapOf(TYPE to type.value, SOURCE to source.analyticsValue)
     }
 

@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentShareBinding
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -53,7 +53,7 @@ class ShareFragment : BaseDialogFragment() {
                     null,
                     requireContext(),
                     ShareType.PODCAST,
-                    AnalyticsSource.PLAYER,
+                    SourceView.PLAYER,
                     analyticsTracker
                 ).showShareDialogDirect()
             }
@@ -67,7 +67,7 @@ class ShareFragment : BaseDialogFragment() {
                     null,
                     requireContext(),
                     ShareType.EPISODE,
-                    AnalyticsSource.PLAYER,
+                    SourceView.PLAYER,
                     analyticsTracker
                 ).showShareDialogDirect()
             }
@@ -81,7 +81,7 @@ class ShareFragment : BaseDialogFragment() {
                     episode.playedUpTo,
                     requireContext(),
                     ShareType.CURRENT_TIME,
-                    AnalyticsSource.PLAYER,
+                    SourceView.PLAYER,
                     analyticsTracker
                 ).showShareDialogDirect()
             }
@@ -95,7 +95,7 @@ class ShareFragment : BaseDialogFragment() {
                     episode.playedUpTo,
                     requireContext(),
                     ShareType.EPISODE_FILE,
-                    AnalyticsSource.PLAYER,
+                    SourceView.PLAYER,
                     analyticsTracker
                 ).sendFile()
             }

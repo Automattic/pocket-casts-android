@@ -18,9 +18,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -532,7 +532,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             }
         }
 
-        playButtonListener.source = AnalyticsSource.PODCAST_SCREEN
+        playButtonListener.source = SourceView.PODCAST_SCREEN
         if (adapter == null) {
             adapter = PodcastAdapter(
                 downloadManager = downloadManager,
@@ -629,7 +629,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 }
             }
         }
-        multiSelectHelper.source = AnalyticsSource.PODCAST_SCREEN
+        multiSelectHelper.source = SourceView.PODCAST_SCREEN
         binding.multiSelectToolbar.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, fragmentManager = parentFragmentManager)
 
         return binding.root
@@ -800,7 +800,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                 null,
                 context,
                 SharePodcastHelper.ShareType.PODCAST,
-                AnalyticsSource.PODCAST_SCREEN,
+                SourceView.PODCAST_SCREEN,
                 analyticsTracker
             ).showShareDialogDirect()
         }

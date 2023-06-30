@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -112,7 +112,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             radiusPx = 4.dpToPx(context)
         }.smallPlaceholder()
 
-        playButtonListener.source = AnalyticsSource.FILTERS
+        playButtonListener.source = SourceView.FILTERS
         adapter = EpisodeListAdapter(downloadManager, playbackManager, upNextQueue, settings, this::onRowClick, playButtonListener, imageLoader, multiSelectHelper, childFragmentManager)
     }
 
@@ -386,7 +386,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val multiSelectToolbar = binding.multiSelectToolbar
-        multiSelectHelper.source = AnalyticsSource.FILTERS
+        multiSelectHelper.source = SourceView.FILTERS
         multiSelectHelper.isMultiSelectingLive.observe(
             viewLifecycleOwner,
             Observer {

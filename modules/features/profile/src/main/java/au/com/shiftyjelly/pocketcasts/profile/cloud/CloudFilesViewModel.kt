@@ -3,9 +3,9 @@ package au.com.shiftyjelly.pocketcasts.profile.cloud
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -61,10 +61,10 @@ class CloudFilesViewModel @Inject constructor(
     fun episodeSwipeUpNext(episode: BaseEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILES)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playNext(episode = episode, source = AnalyticsSource.FILES)
+                playbackManager.playNext(episode = episode, source = SourceView.FILES)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
@@ -74,10 +74,10 @@ class CloudFilesViewModel @Inject constructor(
     fun episodeSwipeUpLast(episode: BaseEpisode) {
         GlobalScope.launch(Dispatchers.Default) {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.FILES)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playLast(episode = episode, source = AnalyticsSource.FILES)
+                playbackManager.playLast(episode = episode, source = SourceView.FILES)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
@@ -92,7 +92,7 @@ class CloudFilesViewModel @Inject constructor(
         CloudDeleteHelper.deleteEpisode(episode, deleteState, playbackManager, episodeManager, userEpisodeManager)
         episodeAnalytics.trackEvent(
             event = if (deleteState == DeleteState.Cloud && !episode.isDownloaded) AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD else AnalyticsEvent.EPISODE_DOWNLOAD_DELETED,
-            source = AnalyticsSource.FILES,
+            source = SourceView.FILES,
             uuid = episode.uuid,
         )
     }

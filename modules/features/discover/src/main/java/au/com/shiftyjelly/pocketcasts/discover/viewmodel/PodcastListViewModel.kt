@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -151,11 +151,11 @@ class PodcastListViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: PodcastEpisode) {
-        playbackManager.playNow(episode, forceStream = true, playbackSource = AnalyticsSource.DISCOVER_PODCAST_LIST)
+        playbackManager.playNow(episode, forceStream = true, sourceView = SourceView.DISCOVER_PODCAST_LIST)
     }
 
     fun stopPlayback() {
-        playbackManager.stopAsync(playbackSource = AnalyticsSource.DISCOVER_PODCAST_LIST)
+        playbackManager.stopAsync(sourceView = SourceView.DISCOVER_PODCAST_LIST)
     }
 }
 

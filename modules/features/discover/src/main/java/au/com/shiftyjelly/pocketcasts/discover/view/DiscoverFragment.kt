@@ -10,9 +10,9 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverState
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
@@ -64,7 +64,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         viewModel.subscribeToPodcast(podcast)
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
-            mapOf(SOURCE_KEY to AnalyticsSource.DISCOVER.analyticsValue, UUID_KEY to podcast.uuid)
+            mapOf(SOURCE_KEY to SourceView.DISCOVER.analyticsValue, UUID_KEY to podcast.uuid)
         )
     }
 
@@ -117,7 +117,7 @@ class DiscoverFragment : BaseFragment(), DiscoverAdapter.Listener, RegionSelectF
         val searchFragment = SearchFragment.newInstance(
             floating = true,
             onlySearchRemote = true,
-            source = AnalyticsSource.DISCOVER
+            source = SourceView.DISCOVER
         )
         (activity as FragmentHostListener).addFragment(searchFragment, onTop = true)
         binding?.recyclerView?.smoothScrollToPosition(0)

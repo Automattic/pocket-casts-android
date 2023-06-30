@@ -8,9 +8,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -184,7 +184,7 @@ class PodcastViewModel
             podcastManager.subscribeToPodcast(podcastUuid = it.uuid, sync = true)
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_SUBSCRIBED,
-                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = AnalyticsSource.PODCAST_SCREEN)
+                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN)
             )
         }
     }
@@ -194,7 +194,7 @@ class PodcastViewModel
             podcastManager.unsubscribeAsync(podcastUuid = it.uuid, playbackManager = playbackManager)
             analyticsTracker.track(
                 AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = AnalyticsSource.PODCAST_SCREEN)
+                AnalyticsProp.podcastSubscribeToggled(uuid = it.uuid, source = SourceView.PODCAST_SCREEN)
             )
         }
     }
@@ -310,10 +310,10 @@ class PodcastViewModel
     fun episodeSwipeUpNext(episode: BaseEpisode) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.PODCAST_SCREEN)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.PODCAST_SCREEN)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playNext(episode = episode, source = AnalyticsSource.PODCAST_SCREEN)
+                playbackManager.playNext(episode = episode, source = SourceView.PODCAST_SCREEN)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_TOP)
             }
         }
@@ -322,10 +322,10 @@ class PodcastViewModel
     fun episodeSwipeUpLast(episode: BaseEpisode) {
         launch {
             if (playbackManager.upNextQueue.contains(episode.uuid)) {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = AnalyticsSource.PODCAST_SCREEN)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.PODCAST_SCREEN)
                 trackSwipeAction(SwipeAction.UP_NEXT_REMOVE)
             } else {
-                playbackManager.playLast(episode = episode, source = AnalyticsSource.PODCAST_SCREEN)
+                playbackManager.playLast(episode = episode, source = SourceView.PODCAST_SCREEN)
                 trackSwipeAction(SwipeAction.UP_NEXT_ADD_BOTTOM)
             }
         }
@@ -409,7 +409,7 @@ class PodcastViewModel
     private fun trackEpisodeEvent(event: AnalyticsEvent, episode: PodcastEpisode) {
         episodeAnalytics.trackEvent(
             event,
-            source = AnalyticsSource.PODCAST_SCREEN,
+            source = SourceView.PODCAST_SCREEN,
             uuid = episode.uuid
         )
     }
@@ -417,7 +417,7 @@ class PodcastViewModel
     private fun trackEpisodeBulkEvent(event: AnalyticsEvent, count: Int) {
         episodeAnalytics.trackBulkEvent(
             event,
-            source = AnalyticsSource.PODCAST_SCREEN,
+            source = SourceView.PODCAST_SCREEN,
             count = count
         )
     }
@@ -458,7 +458,7 @@ class PodcastViewModel
             mapOf(SHOW_ARCHIVED to archived)
         fun notificationEnabled(show: Boolean) =
             mapOf(ENABLED_KEY to show)
-        fun podcastSubscribeToggled(source: AnalyticsSource, uuid: String) =
+        fun podcastSubscribeToggled(source: SourceView, uuid: String) =
             mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
         fun swipePerformed(source: SwipeSource, action: SwipeAction) =
             mapOf(SOURCE_KEY to source, ACTION_KEY to action.analyticsValue)
