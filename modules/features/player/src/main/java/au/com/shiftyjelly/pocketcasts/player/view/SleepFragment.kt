@@ -64,7 +64,6 @@ class SleepFragment : BaseDialogFragment() {
 
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
-        binding.buttonMins1.setOnClickListener { startTimer(mins = 1) }
         binding.buttonMins5.setOnClickListener { startTimer(mins = 5) }
         binding.buttonMins15.setOnClickListener { startTimer(mins = 15) }
         binding.buttonMins30.setOnClickListener { startTimer(mins = 30) }
