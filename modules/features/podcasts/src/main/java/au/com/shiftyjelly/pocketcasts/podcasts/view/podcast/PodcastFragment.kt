@@ -41,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -446,6 +447,11 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
             analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SHOWN)
             FirebaseAnalyticsTracker.openedPodcast(podcastUuid)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        AutomaticUpNextSource.mostRecentList = podcastUuid
     }
 
     override fun onPause() {

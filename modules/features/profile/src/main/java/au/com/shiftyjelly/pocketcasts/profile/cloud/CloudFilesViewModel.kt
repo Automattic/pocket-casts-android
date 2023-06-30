@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -17,9 +18,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
-import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -34,21 +33,20 @@ class CloudFilesViewModel @Inject constructor(
     private val settings: Settings,
     userManager: UserManager,
     private val analyticsTracker: AnalyticsTrackerWrapper,
-    private val episodeAnalytics: EpisodeAnalytics
+    private val episodeAnalytics: EpisodeAnalytics,
+    private val cloudFilesManager: CloudFilesManager,
 ) : ViewModel() {
 
-    val sortOrderRelay = BehaviorRelay.create<Settings.CloudSortOrder>().apply { accept(settings.getCloudSortOrder()) }
-    val sortedCloudFiles = sortOrderRelay.toFlowable(BackpressureStrategy.LATEST).switchMap { userEpisodeManager.observeUserEpisodesSorted(it) }
-    val cloudFilesList = sortedCloudFiles.toLiveData()
     val accountUsage = userEpisodeManager.observeAccountUsage().toLiveData()
     val signInState = userManager.getSignInState().toLiveData()
+    val cloudFilesList = cloudFilesManager.cloudFilesList
 
     fun refreshFiles(userInitiated: Boolean) {
         if (userInitiated) {
             analyticsTracker.track(
                 AnalyticsEvent.PULLED_TO_REFRESH,
                 mapOf(
-                    "source" to when (cloudFilesList.value?.isEmpty()) {
+                    "source" to when (cloudFilesManager.cloudFilesList.value?.isEmpty()) {
                         true -> "no_files"
                         false -> "files"
                         else -> "unknown"
@@ -101,11 +99,11 @@ class CloudFilesViewModel @Inject constructor(
 
     fun changeSort(sortOrder: Settings.CloudSortOrder) {
         settings.setCloudSortOrder(sortOrder)
-        sortOrderRelay.accept(sortOrder)
+        cloudFilesManager.sortOrderRelay.accept(sortOrder)
     }
 
     fun getSortOrder(): Settings.CloudSortOrder {
-        return sortOrderRelay.value ?: settings.getCloudSortOrder()
+        return cloudFilesManager.sortOrderRelay.value ?: settings.getCloudSortOrder()
     }
 
     private fun trackSwipeAction(swipeAction: SwipeAction) {

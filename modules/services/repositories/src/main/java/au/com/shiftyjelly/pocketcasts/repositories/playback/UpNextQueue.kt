@@ -20,7 +20,7 @@ interface UpNextQueue {
 
     val allEpisodes get(): List<BaseEpisode> = currentEpisode?.let { listOf(it) + queueEpisodes } ?: queueEpisodes
     fun isCurrentEpisode(episode: BaseEpisode): Boolean
-    suspend fun playNow(episode: BaseEpisode, onAdd: (() -> Unit)?)
+    suspend fun playNow(episode: BaseEpisode, automaticUpNextSource: AutomaticUpNextSource?, onAdd: (() -> Unit)?)
     suspend fun playNext(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
     suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
     suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager)

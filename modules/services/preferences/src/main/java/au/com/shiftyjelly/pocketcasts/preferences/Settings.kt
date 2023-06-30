@@ -621,4 +621,7 @@ interface Settings {
     // account management settings).
     fun setFullySignedOut(boolean: Boolean)
     fun getFullySignedOut(): Boolean
+
+    fun getlastLoadedFromPodcastOrFilterUuid(): String?
+    fun setlastLoadedFromPodcastOrFilterUuid(uuid: String?)
 }

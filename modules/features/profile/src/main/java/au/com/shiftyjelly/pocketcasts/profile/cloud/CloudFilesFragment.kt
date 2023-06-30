@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBind
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageLoader
+import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomaticUpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -83,6 +84,11 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         binding?.recyclerView?.adapter = null
         super.onDestroyView()
         binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        AutomaticUpNextSource.mostRecentList = AutomaticUpNextSource.Companion.Predefined.files
     }
 
     override fun onPause() {
