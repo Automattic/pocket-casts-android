@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 77,
-    "identityHash": "e2432180af3a56417c2df058f6f4b8d1",
+    "identityHash": "8104e1828f39de2d84a9277b825cc28b",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -61,7 +61,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "time",
+            "fieldPath": "timeSecs",
             "columnName": "time",
             "affinity": "INTEGER",
             "notNull": true
@@ -93,13 +93,13 @@
         },
         "indices": [
           {
-            "name": "podcast_uuid",
+            "name": "bookmarks_podcast_uuid",
             "unique": false,
             "columnNames": [
               "podcast_uuid"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `podcast_uuid` ON `${TABLE_NAME}` (`podcast_uuid`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `bookmarks_podcast_uuid` ON `${TABLE_NAME}` (`podcast_uuid`)"
           }
         ],
         "foreignKeys": []
@@ -1498,7 +1498,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e2432180af3a56417c2df058f6f4b8d1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8104e1828f39de2d84a9277b825cc28b')"
     ]
   }
 }

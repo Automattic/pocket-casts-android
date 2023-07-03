@@ -10,7 +10,7 @@ import java.util.Date
 @Entity(
     tableName = "bookmarks",
     indices = [
-        Index(name = "podcast_uuid", value = arrayOf("podcast_uuid"))
+        Index(name = "bookmarks_podcast_uuid", value = arrayOf("podcast_uuid"))
     ]
 )
 data class Bookmark(
