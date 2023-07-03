@@ -104,6 +104,7 @@ fun NowPlayingScreen(
                             artist = state.subtitle,
                             modifier = modifier
                                 .clickable { navigateToEpisode(state.episodeUuid) },
+                            isPlaybackError = state.error,
                         )
                     }
 

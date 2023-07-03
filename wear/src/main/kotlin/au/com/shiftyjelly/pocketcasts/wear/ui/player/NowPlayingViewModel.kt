@@ -43,6 +43,7 @@ class NowPlayingViewModel @Inject constructor(
             val seekBackwardIncrement: SeekButtonIncrement,
             val seekForwardIncrement: SeekButtonIncrement,
             val trackPositionUiModel: TrackPositionUiModel.Actual,
+            val error: Boolean = false,
         ) : State()
         object Loading : State()
         object Empty : State()
@@ -83,6 +84,7 @@ class NowPlayingViewModel @Inject constructor(
                     seekBackwardIncrement = SeekButtonIncrement.Known(skipBackwardSecs),
                     seekForwardIncrement = SeekButtonIncrement.Known(skipForwardSecs),
                     trackPositionUiModel = trackPositionUiModel,
+                    error = playbackState.isError,
                 )
             }
         }.stateIn(
