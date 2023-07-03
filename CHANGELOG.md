@@ -1,6 +1,8 @@
 7.43
 -----
-
+*   New Feature:
+    *   Add capability to add +1 minute on the sleep timer
+        ([#1139](https://github.com/Automattic/pocket-casts-android/pull/1139)).
 
 7.42
 -----
