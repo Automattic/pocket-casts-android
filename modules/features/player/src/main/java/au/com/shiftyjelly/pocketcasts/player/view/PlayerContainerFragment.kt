@@ -20,6 +20,8 @@ import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTrackerWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentPlayerContainerBinding
@@ -237,6 +239,7 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     private sealed class Section(@StringRes val titleRes: Int) {
         object Player : Section(VR.string.player_tab_playing)
         object Notes : Section(LR.string.player_tab_notes)
+        object Bookmarks : Section(LR.string.player_tab_bookmarks)
         object Chapters : Section(LR.string.player_tab_chapters)
     }
 
@@ -257,6 +260,10 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
 
         if (hasNotes) {
             newSections.add(Section.Notes)
+        }
+
+        if (FeatureFlag.isEnabled(Feature.BOOKMARKS_ENABLED)) {
+            newSections.add(Section.Bookmarks)
         }
 
         if (hasChapters) {
@@ -289,6 +296,7 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
         return when (sections[position]) {
             is Section.Player -> PlayerHeaderFragment()
             is Section.Notes -> NotesFragment()
+            is Section.Bookmarks -> BookmarksFragment()
             is Section.Chapters -> ChaptersFragment()
         }
     }
