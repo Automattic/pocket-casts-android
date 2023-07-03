@@ -240,6 +240,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
     PLAYBACK_STOP("playback_stop"),
     PLAYBACK_SEEK("playback_seek"),
+    PLAYBACK_EPISODE_AUTOPLAYED("playback_episode_autoplayed"),
 
     /* Privacy */
     PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
