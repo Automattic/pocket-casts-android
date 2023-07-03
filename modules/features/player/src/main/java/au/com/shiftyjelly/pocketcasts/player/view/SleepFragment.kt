@@ -75,7 +75,8 @@ class SleepFragment : BaseDialogFragment() {
         binding.customMinusButton.setOnClickListener { minusButtonClicked() }
         binding.customPlusButton.setOnClickListener { plusButtonClicked() }
         binding.buttonCustom.setOnClickListener { startCustomTimer() }
-        binding.buttonAddTime.setOnClickListener { addExtraMins() }
+        binding.buttonAdd5Minute.setOnClickListener { addExtra5minute() }
+        binding.buttonAdd1Minute.setOnClickListener { addExtra1minute() }
         binding.buttonEndOfEpisode2.setOnClickListener {
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE))
             startTimerEndOfEpisode()
@@ -98,8 +99,10 @@ class SleepFragment : BaseDialogFragment() {
                 val tintColor = theme.playerHighlightColor(viewModel.podcast)
                 val tintColorStateList = ColorStateList.valueOf(tintColor)
                 val binding = binding ?: return@Observer
-                binding.buttonAddTime.strokeColor = tintColorStateList
-                binding.buttonAddTime.setTextColor(tintColorStateList)
+                binding.buttonAdd5Minute.strokeColor = tintColorStateList
+                binding.buttonAdd5Minute.setTextColor(tintColorStateList)
+                binding.buttonAdd1Minute.strokeColor = tintColorStateList
+                binding.buttonAdd1Minute.setTextColor(tintColorStateList)
                 binding.buttonCancelEndOfEpisode.strokeColor = tintColorStateList
                 binding.buttonCancelEndOfEpisode.setTextColor(tintColorStateList)
                 binding.buttonCancelTime.strokeColor = tintColorStateList
@@ -116,11 +119,19 @@ class SleepFragment : BaseDialogFragment() {
         (dialog as? BottomSheetDialog)?.behavior?.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    private fun addExtraMins() {
+    private fun addExtra5minute() {
         viewModel.sleepTimerAddExtraMins(mins = 5)
         analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to TimeUnit.MILLISECONDS.toSeconds(5.minutes())))
         viewModel.timeLeftInSeconds()?.let { timeLeft ->
             binding?.root?.announceForAccessibility("5 minutes added to sleep timer. ${timeLeft / 60} minutes ${timeLeft % 60} seconds remaining")
+        }
+    }
+
+    private fun addExtra1minute() {
+        viewModel.sleepTimerAddExtraMins(mins = 1)
+        analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to TimeUnit.MILLISECONDS.toSeconds(1.minutes())))
+        viewModel.timeLeftInSeconds()?.let { timeLeft ->
+            binding?.root?.announceForAccessibility("1 minute added to sleep timer. ${timeLeft / 60} minutes ${timeLeft % 60} seconds remaining")
         }
     }
 

@@ -42,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="@{safeUnbox(viewModel.isSleepRunning) &amp;&amp; !safeUnbox(viewModel.isSleepAtEndOfEpisode)}"
-                app:constraint_referenced_ids="sleepTime,buttonAddTime,buttonEndOfEpisode2,buttonCancelTime"
+                app:constraint_referenced_ids="sleepTime,buttonAdd1Minute,buttonAdd5Minute,buttonEndOfEpisode2,buttonCancelTime"
                 tools:ignore="MissingConstraints" />
 
             <androidx.constraintlayout.widget.Group
@@ -330,20 +330,41 @@
                 app:layout_constraintTop_toBottomOf="@+id/sleepAnimation" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonAddTime"
+                android:id="@+id/buttonAdd1Minute"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="56dp"
-                android:layout_gravity="center"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="32dp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center"
+                android:minWidth="172dp"
+                android:text="@string/player_sleep_add_1_minute"
+                android:textColor="?attr/player_contrast_01"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/buttonAdd5Minute"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sleepTime"
+                app:strokeColor="?attr/player_contrast_01"
+                app:textAllCaps="false" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonAdd5Minute"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginEnd="32dp"
+                android:layout_gravity="center"
                 android:minWidth="172dp"
                 android:text="@string/player_sleep_add_5_minutes"
                 android:textColor="?attr/player_contrast_01"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/buttonAdd1Minute"
                 app:layout_constraintTop_toBottomOf="@+id/sleepTime"
                 app:strokeColor="?attr/player_contrast_01"
                 app:textAllCaps="false" />
@@ -363,7 +384,7 @@
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/buttonAddTime"
+                app:layout_constraintTop_toBottomOf="@+id/buttonAdd5Minute"
                 app:strokeColor="?attr/player_contrast_01"
                 app:textAllCaps="false" />
 
