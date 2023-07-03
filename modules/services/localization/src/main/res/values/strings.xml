@@ -1211,7 +1211,7 @@
     <string name="settings_up_next_swipe_summary">When swiping from left to right on an episode, the default action will be %s.</string>
     <string name="settings_up_next_tap">Play Up Next episode on tap</string>
     <string name="settings_up_next_tap_summary">If on, tapping on an item in your Up Next queue will play it. Long pressing will show the episode options.</string>
-    <string name="settings_continuous_playback">Continuous playback</string>
+    <string name="settings_autoplay">Autoplay</string>
     <string name="settings_continuous_playback_summary">If your Up Next queue is empty, we\'ll play episodes from the same podcast or list you\'re currently listening to.</string>
     <string name="settings_use_android_light_dark_mode">Use Android Light/Dark Mode</string>
     <string name="settings_use_embedded_podcast_artwork">Use embedded podcast artwork</string>

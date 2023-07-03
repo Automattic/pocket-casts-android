@@ -240,6 +240,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYBACK_SKIP_FORWARD("playback_skip_forward"),
     PLAYBACK_STOP("playback_stop"),
     PLAYBACK_SEEK("playback_seek"),
+    PLAYBACK_EPISODE_AUTOPLAYED("playback_episode_autoplayed"),
 
     /* Privacy */
     PRIVACY_SETTINGS_SHOWN("privacy_settings_shown"),
@@ -476,7 +477,7 @@ enum class AnalyticsEvent(val key: String) {
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOWN("settings_general_media_notification_controls_shown"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_SHOW_CUSTOM_TOGGLED("settings_general_media_notification_controls_show_custom_toggled"),
     SETTINGS_GENERAL_MEDIA_NOTIFICATION_CONTROLS_ORDER_CHANGED("settings_general_media_notification_controls_order_changed"),
-    SETTINGS_GENERAL_CONTINUOUS_PLAYBACK_TOGGLED("settings_general_continuous_playback_toggled"),
+    SETTINGS_GENERAL_AUTOPLAY_TOGGLED("settings_general_autoplay_toggled"),
 
     /* Settings - Help */
     SETTINGS_HELP_SHOWN("settings_help_shown"),
