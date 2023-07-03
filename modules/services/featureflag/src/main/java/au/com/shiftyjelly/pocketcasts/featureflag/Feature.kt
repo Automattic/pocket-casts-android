@@ -25,4 +25,9 @@ enum class Feature(
         title = "Auto Play When Up Next Empty Setting",
         defaultValue = BuildConfig.DEBUG,
     ),
+    BOOKMARKS_ENABLED(
+        key = "bookmarks_enabled",
+        title = "Bookmarks",
+        defaultValue = BuildConfig.DEBUG
+    ),
 }
