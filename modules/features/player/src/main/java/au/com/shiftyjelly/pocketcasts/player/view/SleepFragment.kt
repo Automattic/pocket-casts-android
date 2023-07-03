@@ -143,12 +143,20 @@ class SleepFragment : BaseDialogFragment() {
     }
 
     private fun plusButtonClicked() {
-        viewModel.sleepCustomTimeMins = viewModel.sleepCustomTimeMins + 5
+        if (viewModel.sleepCustomTimeMins < 5) {
+            viewModel.sleepCustomTimeMins += 1
+        } else {
+            viewModel.sleepCustomTimeMins += 5
+        }
         binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
     }
 
     private fun minusButtonClicked() {
-        viewModel.sleepCustomTimeMins = viewModel.sleepCustomTimeMins - 5
+        if (viewModel.sleepCustomTimeMins <= 5) {
+            viewModel.sleepCustomTimeMins -= 1
+        } else {
+            viewModel.sleepCustomTimeMins -= 5
+        }
         binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeMins}")
     }
 
