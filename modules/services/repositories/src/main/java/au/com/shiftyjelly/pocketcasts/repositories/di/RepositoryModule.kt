@@ -4,6 +4,8 @@ import androidx.work.WorkerFactory
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -79,6 +81,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesPlaylistManager(playlistManagerImpl: PlaylistManagerImpl): PlaylistManager
+
+    @Binds
+    @Singleton
+    abstract fun providesBookmarkManager(bookmarkManager: BookmarkManagerImpl): BookmarkManager
 
     @Binds
     @Singleton

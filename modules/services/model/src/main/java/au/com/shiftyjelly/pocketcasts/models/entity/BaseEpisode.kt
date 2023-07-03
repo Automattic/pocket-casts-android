@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.entity
 
+import au.com.shiftyjelly.pocketcasts.models.db.helper.UserEpisodePodcastSubstitute
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import java.util.Date
@@ -92,6 +93,9 @@ sealed interface BaseEpisode {
 
     val isExemptFromAutoDownload: Boolean
         get() = autoDownloadStatus == PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE
+
+    val podcastOrSubstituteUuid: String
+        get() = if (this is PodcastEpisode) this.podcastUuid else UserEpisodePodcastSubstitute.substituteUuid
 
     // fall back to something that most podcasts are
     fun getFileExtension(): String {
