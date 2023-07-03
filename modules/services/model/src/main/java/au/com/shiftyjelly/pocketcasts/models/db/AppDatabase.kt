@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.PodcastLicensingEnumConve
 import au.com.shiftyjelly.pocketcasts.models.converter.PodcastsSortTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
+import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
@@ -31,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
@@ -47,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Database(
     entities = [
         AnonymousBumpStat::class,
+        Bookmark::class,
         PodcastEpisode::class,
         Folder::class,
         Playlist::class,
@@ -58,7 +61,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserEpisode::class,
         PodcastRatings::class
     ],
-    version = 76,
+    version = 77,
     exportSchema = true
 )
 @TypeConverters(
@@ -85,6 +88,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bumpStatsDao(): BumpStatsDao
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun podcastRatingsDao(): PodcastRatingsDao
+    abstract fun bookmarkDao(): BookmarkDao
 
     companion object {
         // This seems dodgy but I got it from Google, https://github.com/googlesamples/android-sunflower/blob/master/app/src/main/java/com/google/samples/apps/sunflower/data/AppDatabase.kt
@@ -428,6 +432,23 @@ abstract class AppDatabase : RoomDatabase() {
 
         val MIGRATION_75_76 = addMigration(75, 76) { database ->
             database.execSQL("ALTER TABLE episodes RENAME TO podcast_episodes")
+        }
+
+        val MIGRATION_76_77 = addMigration(76, 77) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS bookmarks (
+                        `uuid` TEXT NOT NULL,
+                        `podcast_uuid` TEXT NOT NULL,
+                        `episode_uuid` TEXT NOT NULL,
+                        `time` INTEGER NOT NULL, 
+                        `created_at` INTEGER NOT NULL,
+                        `deleted` INTEGER NOT NULL,
+                        `sync_status` INTEGER NOT NULL,
+                        PRIMARY KEY(`uuid`)
+                    );
+                """.trimIndent()
+            )
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
@@ -796,6 +817,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_73_74,
                 MIGRATION_74_75,
                 MIGRATION_75_76,
+                MIGRATION_76_77,
             )
         }
 
