@@ -122,17 +122,20 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                when (position) {
-                    0 -> {
+                when (adapter.pageTitle(position)) {
+                    LR.string.player_tab_playing -> {
                         if (previousPosition == INVALID_TAB_POSITION) return
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to NOW_PLAYING))
                         FirebaseAnalyticsTracker.nowPlayingOpen()
                     }
-                    1 -> {
+                    LR.string.player_tab_notes -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to SHOW_NOTES))
                         FirebaseAnalyticsTracker.openedPlayerNotes()
                     }
-                    2 -> {
+                    LR.string.player_tab_bookmarks -> {
+                        // TODO: Bookmarks - Add analytics event
+                    }
+                    LR.string.player_tab_chapters -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to CHAPTERS))
                         FirebaseAnalyticsTracker.openedPlayerChapters()
                     }
