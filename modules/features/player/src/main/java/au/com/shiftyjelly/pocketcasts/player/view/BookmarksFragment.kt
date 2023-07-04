@@ -44,7 +44,7 @@ class BookmarksFragment : BaseFragment() {
 }
 
 @Composable
-fun BookmarksPage(
+private fun BookmarksPage(
     playerViewModel: PlayerViewModel,
 ) {
     val listData = playerViewModel.listDataLive.asFlow().collectAsState(initial = null)
