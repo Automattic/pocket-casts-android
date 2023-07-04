@@ -17,6 +17,7 @@
     <string name="archived">Archived</string>
     <string name="auto_archive">Auto archive</string>
     <string name="auto_download">Auto download</string>
+    <string name="bookmarks">Bookmarks</string>
     <string name="cancel">Cancel</string>
     <string name="cancel_download">Cancel download</string>
     <string name="chapters">Chapters</string>
@@ -276,7 +277,7 @@
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
     <string name="player_sleep_when_episode_ends">Sleeping when episode ends</string>
     <string name="player_star" translatable="false">@string/star</string>
-    <string name="player_tab_bookmarks">Bookmarks</string>
+    <string name="player_tab_bookmarks" translatable="false">@string/bookmarks</string>
     <string name="player_tab_chapters" translatable="false">@string/chapters</string>
     <string name="player_tab_notes">Notes</string>
     <string name="player_tab_playing">Playing</string>
