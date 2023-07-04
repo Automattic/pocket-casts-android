@@ -30,7 +30,8 @@ class BookmarkManagerImpl @Inject constructor(
             podcastUuid = episode.podcastOrSubstituteUuid,
             timeSecs = timeSecs,
             createdAt = Date(),
-            syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED
+            syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED,
+            title = ""
         )
         bookmarkDao.insert(bookmark)
         return bookmark
