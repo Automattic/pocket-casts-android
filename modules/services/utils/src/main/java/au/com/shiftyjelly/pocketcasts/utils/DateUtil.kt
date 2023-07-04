@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.utils
 
-import timber.log.Timber
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -34,16 +32,6 @@ object DateUtil {
             .atZone(ZoneId.systemDefault())
             .toLocalDate()
             .format(DateTimeFormatter.ofPattern(pattern))
-    }
-
-    fun toEpochMillis(localDateTime: LocalDateTime) = try {
-        localDateTime
-            .atZone(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli()
-    } catch (e: Exception) {
-        Timber.e("Conversion to epoch millis failed [${e.message}]")
-        null
     }
 }
 
