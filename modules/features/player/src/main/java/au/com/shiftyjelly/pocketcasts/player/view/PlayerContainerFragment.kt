@@ -122,20 +122,20 @@ class PlayerContainerFragment : BaseFragment(), HasBackstack {
 
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                when (adapter.pageTitle(position)) {
-                    LR.string.player_tab_playing -> {
+                when {
+                    adapter.isPlayerTab(position) -> {
                         if (previousPosition == INVALID_TAB_POSITION) return
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to NOW_PLAYING))
                         FirebaseAnalyticsTracker.nowPlayingOpen()
                     }
-                    LR.string.player_tab_notes -> {
+                    adapter.isNotesTab(position) -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to SHOW_NOTES))
                         FirebaseAnalyticsTracker.openedPlayerNotes()
                     }
-                    LR.string.player_tab_bookmarks -> {
+                    adapter.isBookmarksTab(position) -> {
                         // TODO: Bookmarks - Add analytics event
                     }
-                    LR.string.player_tab_chapters -> {
+                    adapter.isChaptersTab(position) -> {
                         analyticsTracker.track(AnalyticsEvent.PLAYER_TAB_SELECTED, mapOf(TAB_KEY to CHAPTERS))
                         FirebaseAnalyticsTracker.openedPlayerChapters()
                     }
@@ -307,6 +307,11 @@ private class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     @StringRes fun pageTitle(position: Int): Int {
         return sections[position].titleRes
     }
+
+    fun isPlayerTab(position: Int) = sections[position] is Section.Player
+    fun isNotesTab(position: Int) = sections[position] is Section.Notes
+    fun isBookmarksTab(position: Int) = sections[position] is Section.Bookmarks
+    fun isChaptersTab(position: Int) = sections[position] is Section.Chapters
 }
 
 private const val PLAYER_TOUR_NAME = "player"
