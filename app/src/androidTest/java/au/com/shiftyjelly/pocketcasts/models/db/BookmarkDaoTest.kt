@@ -47,7 +47,8 @@ class BookmarkDaoTest {
                     timeSecs = 61,
                     createdAt = Date(),
                     deleted = false,
-                    syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED
+                    syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED,
+                    title = ""
                 )
             )
             assertNotNull("Inserted bookmark should be able to be found", bookmarkDao.findByUuid(uuid))
@@ -65,7 +66,8 @@ class BookmarkDaoTest {
                 timeSecs = 61,
                 createdAt = Date(),
                 deleted = false,
-                syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED
+                syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED,
+                title = ""
             )
             bookmarkDao.insert(bookmark)
 
@@ -95,7 +97,8 @@ class BookmarkDaoTest {
                 timeSecs = 61,
                 createdAt = Date(),
                 deleted = false,
-                syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED
+                syncStatus = Bookmark.SYNC_STATUS_NOT_SYNCED,
+                title = ""
             )
             bookmarkDao.insert(bookmark)
             assertNotNull(bookmarkDao.findByUuid(uuid))
