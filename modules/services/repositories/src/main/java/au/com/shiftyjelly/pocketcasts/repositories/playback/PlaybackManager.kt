@@ -238,6 +238,10 @@ open class PlaybackManager @Inject constructor(
             }
         }
 
+        analyticsTracker.track(
+            AnalyticsEvent.PLAYBACK_EPISODE_AUTOPLAYED,
+            mapOf("episode_uuid" to autoPlayEpisode.uuid),
+        )
         return autoPlayEpisode
     }
 

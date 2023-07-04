@@ -18,6 +18,7 @@ data class Bookmark(
     @ColumnInfo(name = "podcast_uuid") var podcastUuid: String,
     @ColumnInfo(name = "episode_uuid") var episodeUuid: String,
     @ColumnInfo(name = "time") var timeSecs: Int,
+    @ColumnInfo(name = "title") var title: String,
     @ColumnInfo(name = "created_at") var createdAt: Date,
     @ColumnInfo(name = "deleted") var deleted: Boolean = false,
     @ColumnInfo(name = "sync_status") var syncStatus: Int
