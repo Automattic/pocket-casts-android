@@ -30,7 +30,7 @@ object DateUtil {
         return date
             .toInstant()
             .atZone(ZoneId.systemDefault())
-            .toLocalDate()
+            .toLocalDateTime()
             .format(DateTimeFormatter.ofPattern(pattern))
     }
 }
