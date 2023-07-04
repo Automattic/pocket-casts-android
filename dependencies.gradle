@@ -140,6 +140,7 @@ project.ext {
             liveDataReactiveStreams: "androidx.lifecycle:lifecycle-reactivestreams-ktx:$versionLifecycle",
             lifecycleViewModel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$versionLifecycle",
             lifecycleScope: "androidx.lifecycle:lifecycle-runtime-ktx:$versionLifecycle",
+            lifecycleScopeCompose: "androidx.lifecycle:lifecycle-runtime-compose:$versionLifecycle",
             lifecycleLiveData: "androidx.lifecycle:lifecycle-livedata-ktx:$versionLifecycle",
             lifecycleProcess: "androidx.lifecycle:lifecycle-process:$versionLifecycle",
             billing: "com.android.billingclient:billing:$versionBillingClient",
