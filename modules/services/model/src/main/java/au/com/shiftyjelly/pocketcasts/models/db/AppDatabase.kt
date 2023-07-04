@@ -442,6 +442,7 @@ abstract class AppDatabase : RoomDatabase() {
                         `podcast_uuid` TEXT NOT NULL,
                         `episode_uuid` TEXT NOT NULL,
                         `time` INTEGER NOT NULL, 
+                        `title` TEXT NOT NULL,
                         `created_at` INTEGER NOT NULL,
                         `deleted` INTEGER NOT NULL,
                         `sync_status` INTEGER NOT NULL,
