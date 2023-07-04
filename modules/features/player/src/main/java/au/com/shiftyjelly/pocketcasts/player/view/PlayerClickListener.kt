@@ -9,6 +9,7 @@ interface PlayerClickListener {
     fun onSkipForward()
     fun onPlayClicked()
     fun onSkipForwardLongPress()
+    fun onEnableLocalPlayBackEffects()
     fun onClosePlayer()
     fun onEffectsClick()
     fun onSleepClick()
