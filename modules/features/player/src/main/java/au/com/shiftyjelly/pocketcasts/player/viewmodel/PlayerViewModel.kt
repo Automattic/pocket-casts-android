@@ -274,7 +274,7 @@ class PlayerViewModel @Inject constructor(
     }
     var sleepCustomTimeMins: Int = 5
         set(value) {
-            field = value.coerceIn(5, 240)
+            field = value.coerceIn(1, 240)
             settings.setSleepTimerCustomMins(field)
             sleepCustomTimeText.postValue(calcCustomTimeText())
             updateSleepTimer()
