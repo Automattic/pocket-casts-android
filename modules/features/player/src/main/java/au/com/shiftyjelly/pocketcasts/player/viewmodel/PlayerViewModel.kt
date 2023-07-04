@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
 import android.content.Context
 import android.content.res.Resources
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -393,6 +394,28 @@ class PlayerViewModel @Inject constructor(
         playbackManager.upNextQueue.currentEpisode?.let {
             markAsPlayedConfirmed(it)
         }
+    }
+
+    fun toggleNotifications(context: Context) {
+        Toast.makeText(context, LR.string.player_effects_custom_effects_applied, Toast.LENGTH_SHORT).show()
+    }
+
+    fun updateOverrideGlobalEffects(override: Boolean) {
+        val podcast = this.podcast ?: return
+        launch {
+            podcastManager.updateOverrideGlobalEffects(podcast, override)
+            if (shouldUpdatePlaybackManager()) {
+                val effects = if (override) podcast.playbackEffects else settings.getGlobalPlaybackEffects()
+                playbackManager.updatePlayerEffects(effects)
+            }
+        }
+    }
+
+    private fun shouldUpdatePlaybackManager(): Boolean {
+        val podcast = this.podcast ?: return false
+        val currentEpisode = playbackManager.upNextQueue.currentEpisode
+        val podcastUuid = if (currentEpisode is PodcastEpisode) currentEpisode.podcastUuid else null
+        return podcastUuid == podcast.uuid
     }
 
     fun hasNextEpisode(): Boolean {
