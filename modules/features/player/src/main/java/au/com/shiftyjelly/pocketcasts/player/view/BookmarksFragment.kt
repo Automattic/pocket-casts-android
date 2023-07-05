@@ -81,7 +81,7 @@ class BookmarksFragment : BaseFragment() {
 }
 
 @Composable
-fun BookmarksPage(
+private fun BookmarksPage(
     playerViewModel: PlayerViewModel,
     bookmarksViewModel: BookmarksViewModel = hiltViewModel(),
 ) {
