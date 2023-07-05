@@ -296,7 +296,18 @@ class PodcastAdapter(
         notifyItemChanged(0)
     }
 
-    fun setEpisodes(episodes: List<PodcastEpisode>, showingArchived: Boolean, episodeCount: Int, archivedCount: Int, searchTerm: String, episodeLimit: Int?, episodeLimitIndex: Int?, grouping: PodcastGrouping, episodesSortType: EpisodesSortType, context: Context) {
+    fun setEpisodes(
+        episodes: List<PodcastEpisode>,
+        showingArchived: Boolean,
+        episodeCount: Int,
+        archivedCount: Int,
+        searchTerm: String,
+        episodeLimit: Int?,
+        episodeLimitIndex: Int?,
+        podcast: Podcast,
+        context: Context,
+    ) {
+        val grouping = podcast.podcastGrouping
         val groupingFunction = grouping.sortFunction
         val episodesPlusLimit: MutableList<Any> = episodes.toMutableList()
         if (episodeLimit != null && episodeLimitIndex != null && groupingFunction == null) {
@@ -305,13 +316,7 @@ class PodcastAdapter(
             }
         }
         if (groupingFunction != null) {
-            val reversedSort = if (grouping is PodcastGrouping.Season) {
-                episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC
-            } else {
-                false
-            }
-
-            val grouped = grouping.formGroups(episodes, reversedSort, context.resources)
+            val grouped = grouping.formGroups(episodes, podcast, context.resources)
             episodesPlusLimit.clear()
 
             grouped.forEachIndexed { index, list ->

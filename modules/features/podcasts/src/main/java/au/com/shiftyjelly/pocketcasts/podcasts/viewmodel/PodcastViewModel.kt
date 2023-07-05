@@ -148,14 +148,10 @@ class PodcastViewModel
             .loadEpisodes(episodeManager)
             .doOnNext {
                 if (it is EpisodeState.Loaded) {
-                    val reversedSort = if (it.grouping is PodcastGrouping.Season) {
-                        it.episodesSortType == EpisodesSortType.EPISODES_SORT_BY_DATE_DESC
-                    } else {
-                        false
-                    }
-                    groupedEpisodes.postValue(it.grouping.formGroups(it.episodes, reversedSort = reversedSort, resources = resources))
+                    val groups = it.podcast.podcastGrouping.formGroups(it.episodes, it.podcast, resources)
+                    groupedEpisodes.postValue(groups)
                 } else {
-                    groupedEpisodes.postValue(listOf())
+                    groupedEpisodes.postValue(emptyList())
                 }
             }
             .onErrorReturn {
@@ -424,6 +420,7 @@ class PodcastViewModel
 
     sealed class EpisodeState {
         data class Loaded(
+            val podcast: Podcast,
             val episodes: List<PodcastEpisode>,
             val showingArchived: Boolean,
             val episodeCount: Int,
@@ -431,8 +428,6 @@ class PodcastViewModel
             val searchTerm: String,
             val episodeLimit: Int?,
             val episodeLimitIndex: Int?,
-            val grouping: PodcastGrouping,
-            val episodesSortType: EpisodesSortType
         ) : EpisodeState()
         data class Error(
             val errorMessage: String,
@@ -520,6 +515,7 @@ private fun Flowable<CombinedEpisodeData>.loadEpisodes(episodeManager: EpisodeMa
                 }
 
                 PodcastViewModel.EpisodeState.Loaded(
+                    podcast = podcast,
                     episodes = filteredList,
                     showingArchived = showArchivedWithSearch,
                     episodeCount = episodeCount,
@@ -527,8 +523,6 @@ private fun Flowable<CombinedEpisodeData>.loadEpisodes(episodeManager: EpisodeMa
                     searchTerm = searchTerm,
                     episodeLimit = podcast.autoArchiveEpisodeLimit,
                     episodeLimitIndex = episodeLimitIndex,
-                    grouping = podcast.podcastGrouping,
-                    episodesSortType = podcast.episodesSortType
                 )
             }
             .doOnError { Timber.e("Error loading episodes: ${it.message}") }

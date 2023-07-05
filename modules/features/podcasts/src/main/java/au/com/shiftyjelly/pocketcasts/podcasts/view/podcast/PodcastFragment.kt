@@ -684,8 +684,7 @@ class PodcastFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, Corouti
                             searchTerm = state.searchTerm,
                             episodeLimit = state.episodeLimit,
                             episodeLimitIndex = state.episodeLimitIndex,
-                            grouping = state.grouping,
-                            episodesSortType = state.episodesSortType,
+                            podcast = state.podcast,
                             context = contextRequired
                         )
                         if (state.searchTerm.isNotEmpty() && state.searchTerm != lastSearchTerm) {
