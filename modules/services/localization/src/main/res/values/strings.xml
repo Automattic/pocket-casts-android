@@ -1653,6 +1653,12 @@
     <string name="onboarding_import_from_other_apps_step_1">Find the other app\’s export option and export an OPML file.</string>
     <string name="onboarding_import_from_other_apps_step_2">Use your phone\’s \“Share\” menu to send the file to Pocket Casts. Alternatively, import the file from Pocket Casts\’ \“Import &amp; export OPML\” settings menu.</string>
 
+    <!-- Bookmarks -->
+
+    <string name="bookmarks_singular">%s bookmark</string>
+    <string name="bookmarks_plural">%s bookmarks</string>
+    <string name="bookmark_play">Play at bookmark position %s</string>
+
     <!--    Tasker Plugin-->
 
     <string name="must_provide_filter_name">Must provide filter name</string>

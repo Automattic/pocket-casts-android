@@ -170,6 +170,7 @@ dependencies {
     implementation androidLibs.liveDataReactiveStreams
     implementation androidLibs.lifecycleViewModel
     implementation androidLibs.lifecycleScope
+    implementation androidLibs.lifecycleScopeCompose
     implementation androidLibs.lifecycleLiveData
     implementation androidLibs.lifecycleProcess
     implementation androidLibs.paging
