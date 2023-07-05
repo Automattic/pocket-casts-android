@@ -192,7 +192,7 @@ private fun BookmarkItem(
                 )
             }
             Column(
-                Modifier.weight(1f, fill = true)
+                Modifier.weight(1f)
             ) {
                 TextH40(
                     text = bookmark.title,
